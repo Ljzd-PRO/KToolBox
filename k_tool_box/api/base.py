@@ -1,13 +1,10 @@
 from abc import ABC, abstractmethod
-from functools import cached_property
-from json import JSONDecodeError
-from pathlib import Path
 from typing import Literal, Generic, TypeVar, Optional, Callable, Any
 from urllib.parse import urlunparse
 
 import httpx
 import tenacity
-from pydantic import BaseModel, ValidationError, ConfigDict
+from pydantic import BaseModel, ValidationError, ConfigDict, RootModel
 from tenacity import RetryCallState, wait_fixed, retry_if_result
 from tenacity.stop import stop_base, stop_never, stop_after_attempt
 
@@ -41,9 +38,10 @@ class APIRet(Generic[_T], BaseModel):
         return self.code == APIRetCodeEnum.Success
 
 
-class BaseAPI(ABC):
+class BaseAPI(ABC, Generic[_T]):
     path: str = "/"
     method: Literal["get", "post"]
+    extra_validator: Optional[Callable[[str], BaseModel]] = None
 
     class Response(BaseModel):
         """
@@ -68,31 +66,33 @@ class BaseAPI(ABC):
             return wrapper
 
     @classmethod
-    def handle_res(cls, res: httpx.Response) -> APIRet[Response]:
+    def handle_res(cls, res: httpx.Response) -> APIRet[_T]:
         """Handle API response"""
         try:
-            res_json = res.json()
-        except JSONDecodeError as e:
-            return APIRet(
-                code=APIRetCodeEnum.JsonDecodeError.value,
-                message=str(e),
-                exception=e
-            )
-        else:
-            try:
+            if cls.extra_validator:
+                res_model = cls.extra_validator(res.text)
+            else:
+                res_model = cls.Response.model_validate_json(res.text)
+        except (ValueError, ValidationError) as e:
+            if isinstance(e, ValueError):
                 return APIRet(
-                    data=cls.Response.model_validate(res_json)
+                    code=APIRetCodeEnum.JsonDecodeError.value,
+                    message=str(e),
+                    exception=e
                 )
-            except ValidationError as e:
+            elif isinstance(e, ValidationError):
                 return APIRet(
                     code=APIRetCodeEnum.ValidationError.value,
                     message=str(e),
                     exception=e
                 )
+        else:
+            data = res_model.root if isinstance(res_model, RootModel) else res_model
+            return APIRet(data=data)
 
     @classmethod
     @retry
-    async def request(cls, path: str = None, **kwargs) -> APIRet[Response]:
+    async def request(cls, path: str = None, **kwargs) -> APIRet[_T]:
         """
         Make a request to the API
         :param path: Fully initialed URL path
