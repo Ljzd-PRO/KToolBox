@@ -18,6 +18,7 @@ _T = TypeVar('_T')
 
 class APITenacityStop(stop_base):
     """APIs Stop strategies"""
+
     def __call__(self, retry_state: RetryCallState) -> bool:
         if config.api_retry_times is None:
             return stop_never(retry_state)
