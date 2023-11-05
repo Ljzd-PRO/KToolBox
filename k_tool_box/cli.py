@@ -13,4 +13,5 @@ class KToolBoxCli:
     @staticmethod
     async def test():
         """run test"""
-        return await get_creators()
+        ret = await get_creators()
+        return ret.data if ret else ret.message
