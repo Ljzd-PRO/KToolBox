@@ -12,7 +12,6 @@ from k_tool_box.configuration import config
 from k_tool_box.enum import RetCodeEnum
 from k_tool_box.utils import BaseRet
 
-
 __all__ = ["APITenacityStop", "APIRet", "BaseAPI"]
 
 _T = TypeVar('_T')

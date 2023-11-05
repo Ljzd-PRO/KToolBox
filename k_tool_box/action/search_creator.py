@@ -1,8 +1,8 @@
 from typing import Iterator
 
-from .base import ActionRet
 from k_tool_box.api.model import Creator
 from k_tool_box.api.posts import get_creators
+from .base import ActionRet
 
 __all__ = ["search_creator"]
 
