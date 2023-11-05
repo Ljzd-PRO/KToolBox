@@ -1,10 +1,6 @@
-import asyncio
+import fire
 
-from k_tool_box.api.posts import get_creators
+from k_tool_box.cli import KToolBoxCli
 
 if __name__ == "__main__":
-    async def main():
-        ret = await get_creators()
-        print(ret)
-
-    asyncio.run(main())
+    fire.Fire(KToolBoxCli)
