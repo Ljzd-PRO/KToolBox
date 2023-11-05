@@ -17,8 +17,9 @@ class GetCreators(BaseAPI):
         root: List[Creator]
 
     @classmethod
-    async def __call__(cls) -> APIRet[Response]:
+    async def __call__(cls) -> APIRet[List[Creator]]:
         return await cls.request()
 
 
 get_creators = GetCreators.__call__
+"""List all creators with details. I blame DDG for .txt."""

@@ -20,10 +20,7 @@ _T = TypeVar('_T')
 
 
 class APITenacityStop(stop_base):
-    """
-    经过配置的 tenacity API 调用停止策略
-    """
-
+    """APIs Stop strategies"""
     def __call__(self, retry_state: RetryCallState) -> bool:
         if config.api_retry_times is None:
             return stop_never(retry_state)
@@ -32,6 +29,7 @@ class APITenacityStop(stop_base):
 
 
 class APIRet(Generic[_T], BaseModel):
+    """Return data model of API call"""
     code: int = APIRetCodeEnum.Success.value
     message: str = ''
     exception: Optional[Exception] = None
@@ -49,13 +47,13 @@ class BaseAPI(ABC):
 
     class Response(BaseModel):
         """
-        API 请求响应数据模型
+        API response model
         """
         pass
 
     @staticmethod
     def retry(*args, **kwargs):
-        """已配置好的重试器"""
+        """Wrap a function with a new `Retrying` object"""
         wrapper = tenacity.retry(
             stop=APITenacityStop(),
             wait=wait_fixed(config.api_retry_interval),
@@ -71,6 +69,7 @@ class BaseAPI(ABC):
 
     @classmethod
     def handle_res(cls, res: httpx.Response) -> APIRet[Response]:
+        """Handle API response"""
         try:
             res_json = res.json()
         except JSONDecodeError as e:
@@ -94,6 +93,11 @@ class BaseAPI(ABC):
     @classmethod
     @retry
     async def request(cls, path: str = None, **kwargs) -> APIRet[Response]:
+        """
+        Make a request to the API
+        :param path: Fully initialed URL path
+        :param kwargs: Keyword arguments of `httpx._client.AsyncClient.request`
+        """
         if path is None:
             path = cls.path
         url_parts = [config.api_scheme, config.api_netloc, f"{config.api_path}{path}", '', '', '']
@@ -119,4 +123,5 @@ class BaseAPI(ABC):
     @classmethod
     @abstractmethod
     async def __call__(cls, *args, **kwargs) -> APIRet[Response]:
+        """Function to call API"""
         pass
