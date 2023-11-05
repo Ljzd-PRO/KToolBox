@@ -28,7 +28,7 @@ class APITenacityStop(stop_base):
             return stop_after_attempt(config.api_retry_times)(retry_state)
 
 
-class APIRet(BaseRet):
+class APIRet(BaseRet[_T]):
     """Return data model of API call"""
     pass
 
