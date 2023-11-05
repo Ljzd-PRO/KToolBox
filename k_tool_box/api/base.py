@@ -4,12 +4,14 @@ from urllib.parse import urlunparse
 
 import httpx
 import tenacity
-from pydantic import BaseModel, ValidationError, ConfigDict, RootModel
+from pydantic import BaseModel, ValidationError, RootModel
 from tenacity import RetryCallState, wait_fixed, retry_if_result
 from tenacity.stop import stop_base, stop_never, stop_after_attempt
 
 from k_tool_box.configuration import config
-from .enum import APIRetCodeEnum
+from k_tool_box.enum import RetCodeEnum
+from k_tool_box.utils import BaseRet
+
 
 __all__ = ["APITenacityStop", "APIRet", "BaseAPI"]
 
@@ -26,17 +28,9 @@ class APITenacityStop(stop_base):
             return stop_after_attempt(config.api_retry_times)(retry_state)
 
 
-class APIRet(Generic[_T], BaseModel):
+class APIRet(BaseRet):
     """Return data model of API call"""
-    code: int = APIRetCodeEnum.Success.value
-    message: str = ''
-    exception: Optional[Exception] = None
-    data: Optional[_T] = None
-
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-
-    def __bool__(self):
-        return self.code == APIRetCodeEnum.Success
+    pass
 
 
 class BaseAPI(ABC, Generic[_T]):
@@ -77,13 +71,13 @@ class BaseAPI(ABC, Generic[_T]):
         except (ValueError, ValidationError) as e:
             if isinstance(e, ValueError):
                 return APIRet(
-                    code=APIRetCodeEnum.JsonDecodeError.value,
+                    code=RetCodeEnum.JsonDecodeError.value,
                     message=str(e),
                     exception=e
                 )
             elif isinstance(e, ValidationError):
                 return APIRet(
-                    code=APIRetCodeEnum.ValidationError.value,
+                    code=RetCodeEnum.ValidationError.value,
                     message=str(e),
                     exception=e
                 )
@@ -114,7 +108,7 @@ class BaseAPI(ABC, Generic[_T]):
                 )
         except Exception as e:
             return APIRet(
-                code=APIRetCodeEnum.NetWorkError.value,
+                code=RetCodeEnum.NetWorkError.value,
                 message=str(e),
                 exception=e
             )
