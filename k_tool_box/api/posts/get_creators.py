@@ -9,6 +9,7 @@ __all__ = ["GetCreators", "get_creators"]
 
 
 class GetCreators(BaseAPI):
+    """List All Creators"""
     path = "/creators.txt"
     method = "get"
 
