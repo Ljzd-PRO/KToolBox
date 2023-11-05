@@ -1,0 +1,1760 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Kemono API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://kemono.party/api/v1"
+    },
+    {
+      "url": "https://coomer.party/api/v1"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Posts",
+      "description": "Version one"
+    },
+    {
+      "name": "Post Flagging",
+      "description": "Flag post for re-import"
+    },
+    {
+      "name": "Discord"
+    },
+    {
+      "name": "Favorites"
+    },
+    {
+      "name": "File Search"
+    },
+    {
+      "name": "Misc"
+    }
+  ],
+  "paths": {
+    "/creators.txt": {
+      "get": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "List All Creators",
+        "description": "List all creators with details. I blame DDG for .txt.",
+        "responses": {
+          "200": {
+            "description": "List of all creators",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "favorited": {
+                        "type": "integer",
+                        "description": "The number of times this creator has been favorited"
+                      },
+                      "id": {
+                        "type": "string",
+                        "description": "The ID of the creator"
+                      },
+                      "indexed": {
+                        "type": "number",
+                        "description": "Timestamp when the creator was indexed, Unix time as integer"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "The name of the creator"
+                      },
+                      "service": {
+                        "type": "string",
+                        "description": "The service for the creator"
+                      },
+                      "updated": {
+                        "type": "number",
+                        "description": "Timestamp when the creator was last updated, Unix time as integer"
+                      }
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "favorited": 1,
+                    "id": "21101760",
+                    "indexed": 1672534800,
+                    "name": "RAIGYO",
+                    "service": "fanbox",
+                    "updated": 1672534800
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/posts": {
+      "get": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "List recent posts",
+        "description": "List of recently imported posts",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search query",
+            "schema": {
+              "type": "string",
+              "minLength": 3
+            }
+          },
+          {
+            "name": "o",
+            "in": "query",
+            "description": "Result offset, stepping of 50 is enforced",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of recently added posts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "user": {
+                        "type": "string"
+                      },
+                      "service": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "content": {
+                        "type": "string"
+                      },
+                      "embed": {
+                        "type": "object"
+                      },
+                      "shared_file": {
+                        "type": "boolean"
+                      },
+                      "added": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "published": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "edited": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "file": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "path": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "attachments": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "path": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "id": "1836570",
+                    "user": "6570768",
+                    "service": "fanbox",
+                    "title": "今日はFANBOXを始まりました！",
+                    "content": "<p>みなさんこんにちは、影おじです。</p><p>先週のように、FANBOXを始まりに決定しました！</p><p>そしてFANBOXの更新内容について、アンケートのみなさん</p><p>ありがとうございました！</p><p><br/></p><p>では更新内容の詳しいことはこちらです↓</p><p>毎回の絵、元も差分がありませんの場合、ボナスとして差分イラストを支援者の皆様にプレゼント。</p><p>もとも差分があれば、ボナスとしてヌード差分イラストを支援者の皆様にプレゼント。</p><p><br/></p><p>これから、仕事以外の時間、できる限り勤勉な更新したいと思います！</p><p>どうぞよろしくお願いいたします！</p>",
+                    "embed": {},
+                    "shared_file": false,
+                    "added": "2021-03-30T18:00:05.973913",
+                    "published": "2021-01-24T17:54:38",
+                    "edited": "2021-01-24T18:46:15",
+                    "file": {
+                      "name": "a99d9674-5490-400e-acca-4bed99590699.jpg",
+                      "path": "/5c/98/5c984d1f62f0990a0891d8fa359aecdff6ac1e26ac165ba7bb7f31cc99e7a674.jpg"
+                    },
+                    "attachments": []
+                  },
+                  {
+                    "id": "1836649",
+                    "user": "6570768",
+                    "service": "fanbox",
+                    "title": "忍ちゃん  脇コキ差分",
+                    "content": "",
+                    "embed": {},
+                    "shared_file": false,
+                    "added": "2021-03-30T17:59:57.815397",
+                    "published": "2021-01-24T18:23:12",
+                    "edited": "2023-01-04T14:45:19",
+                    "file": {
+                      "name": "4c5615f9-be74-4fa7-b88d-168fd37a2824.jpg",
+                      "path": "/d0/3c/d03c893927521536646619f5fb33426aa4b82dc12869865d6d666932755d9acd.jpg"
+                    },
+                    "attachments": [
+                      {
+                        "name": "9cc982e4-1d94-4a1a-ac62-3dddd29f881c.png",
+                        "path": "/d7/4d/d74d1727f2c3fcf7a7cc2d244d677d93b4cc562a56904765e4e708523b34fb4c.png"
+                      },
+                      {
+                        "name": "ab0e17d7-52e5-42c2-925b-5cfdb451df0c.png",
+                        "path": "/1b/67/1b677a8c0525e386bf2b2f013e36e29e4033feb2308798e4e5e3780da6c0e815.png"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{service}/user/{creator_id}": {
+      "get": {
+        "summary": "Get a list of creator posts",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "The service where the post is located",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The ID of the creator",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search query",
+            "schema": {
+              "type": "string",
+              "minLength": 3
+            }
+          },
+          {
+            "name": "o",
+            "in": "query",
+            "description": "Result offset, stepping of 50 is enforced",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "user": {
+                        "type": "string"
+                      },
+                      "service": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "content": {
+                        "type": "string"
+                      },
+                      "embed": {
+                        "type": "object"
+                      },
+                      "shared_file": {
+                        "type": "boolean"
+                      },
+                      "added": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "published": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "edited": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "file": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "path": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "attachments": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "path": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "id": "1836570",
+                    "user": "6570768",
+                    "service": "fanbox",
+                    "title": "今日はFANBOXを始まりました！",
+                    "content": "<p>みなさんこんにちは、影おじです。</p><p>先週のように、FANBOXを始まりに決定しました！</p><p>そしてFANBOXの更新内容について、アンケートのみなさん</p><p>ありがとうございました！</p><p><br/></p><p>では更新内容の詳しいことはこちらです↓</p><p>毎回の絵、元も差分がありませんの場合、ボナスとして差分イラストを支援者の皆様にプレゼント。</p><p>もとも差分があれば、ボナスとしてヌード差分イラストを支援者の皆様にプレゼント。</p><p><br/></p><p>これから、仕事以外の時間、できる限り勤勉な更新したいと思います！</p><p>どうぞよろしくお願いいたします！</p>",
+                    "embed": {},
+                    "shared_file": false,
+                    "added": "2021-03-30T18:00:05.973913",
+                    "published": "2021-01-24T17:54:38",
+                    "edited": "2021-01-24T18:46:15",
+                    "file": {
+                      "name": "a99d9674-5490-400e-acca-4bed99590699.jpg",
+                      "path": "/5c/98/5c984d1f62f0990a0891d8fa359aecdff6ac1e26ac165ba7bb7f31cc99e7a674.jpg"
+                    },
+                    "attachments": []
+                  },
+                  {
+                    "id": "1836649",
+                    "user": "6570768",
+                    "service": "fanbox",
+                    "title": "忍ちゃん  脇コキ差分",
+                    "content": "",
+                    "embed": {},
+                    "shared_file": false,
+                    "added": "2021-03-30T17:59:57.815397",
+                    "published": "2021-01-24T18:23:12",
+                    "edited": "2023-01-04T14:45:19",
+                    "file": {
+                      "name": "4c5615f9-be74-4fa7-b88d-168fd37a2824.jpg",
+                      "path": "/d0/3c/d03c893927521536646619f5fb33426aa4b82dc12869865d6d666932755d9acd.jpg"
+                    },
+                    "attachments": [
+                      {
+                        "name": "9cc982e4-1d94-4a1a-ac62-3dddd29f881c.png",
+                        "path": "/d7/4d/d74d1727f2c3fcf7a7cc2d244d677d93b4cc562a56904765e4e708523b34fb4c.png"
+                      },
+                      {
+                        "name": "ab0e17d7-52e5-42c2-925b-5cfdb451df0c.png",
+                        "path": "/1b/67/1b677a8c0525e386bf2b2f013e36e29e4033feb2308798e4e5e3780da6c0e815.png"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "404": {
+            "description": "Posts not found"
+          }
+        }
+      }
+    },
+    "/{service}/user/{creator_id}/announcements": {
+      "get": {
+        "summary": "Get creator announcements",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "description": "The service name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "required": true,
+            "description": "The creator's ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "service": {
+                        "type": "string"
+                      },
+                      "user_id": {
+                        "type": "string"
+                      },
+                      "hash": {
+                        "type": "string",
+                        "description": "sha256"
+                      },
+                      "content": {
+                        "type": "string"
+                      },
+                      "added": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "isoformat UTC"
+                      }
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "service": "patreon",
+                    "user_id": "8693043",
+                    "hash": "820b7397c7f75efb13c4a8aa5d4aacfbb200749f3e1cec16e9f2951d158be8c2",
+                    "content": "Hey guys, thank you so much for your support, that means a lot to me!",
+                    "added": "2023-01-31T05:16:15.462035"
+                  }
+                ]
+              }
+            }
+          },
+          "404": {
+            "description": "Artist not found"
+          }
+        }
+      }
+    },
+    "/{service}/user/{creator_id}/fancards": {
+      "get": {
+        "summary": "Get fancards by creator, fanbox only",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "description": "The service name, has to be \"fanbox\"",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "required": true,
+            "description": "The creator's ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "user_id": {
+                        "type": "string"
+                      },
+                      "file_id": {
+                        "type": "integer"
+                      },
+                      "hash": {
+                        "type": "string"
+                      },
+                      "mtime": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "ctime": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "mime": {
+                        "type": "string"
+                      },
+                      "ext": {
+                        "type": "string"
+                      },
+                      "added": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "size": {
+                        "type": "integer"
+                      },
+                      "ihash": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "id": 108058645,
+                    "user_id": "3316400",
+                    "file_id": 108058645,
+                    "hash": "727bf3f0d774a98c80cf6c76c3fb0e049522b88eb7f02c8d3fc59bae20439fcf",
+                    "mtime": "2023-05-23T15:09:43.941195",
+                    "ctime": "2023-05-23T15:09:43.941195",
+                    "mime": "image/jpeg",
+                    "ext": ".jpg",
+                    "added": "2023-05-23T15:09:43.960578",
+                    "size": 339710,
+                    "ihash": null
+                  },
+                  {
+                    "id": 103286760,
+                    "user_id": "3316400",
+                    "file_id": 103286760,
+                    "hash": "8b0d0f1be38efab9306b32c7b14b74ddd92a2513026c859a280fe737980a467d",
+                    "mtime": "2023-04-26T14:16:53.205183",
+                    "ctime": "2023-04-26T14:16:53.205183",
+                    "mime": "image/jpeg",
+                    "ext": ".jpg",
+                    "added": "2023-04-26T14:16:53.289143",
+                    "size": 339764,
+                    "ihash": null
+                  }
+                ]
+              }
+            }
+          },
+          "404": {
+            "description": "Artist not found"
+          }
+        }
+      }
+    },
+    "/{service}/user/{creator_id}/post/{post_id}": {
+      "get": {
+        "summary": "Get a specific post",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "description": "The service name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "required": true,
+            "description": "The creator's ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "description": "The post ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "type": "string"
+                    },
+                    "service": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "content": {
+                      "type": "string"
+                    },
+                    "embed": {
+                      "type": "object"
+                    },
+                    "shared_file": {
+                      "type": "boolean"
+                    },
+                    "added": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "published": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "edited": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "file": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "path": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "attachments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "path": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "type": "string"
+                    },
+                    "prev": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": "1836570",
+                  "user": "6570768",
+                  "service": "fanbox",
+                  "title": "今日はFANBOXを始まりました！",
+                  "content": "<p>みなさんこんにちは、影おじです。</p><p>先週のように、FANBOXを始まりに決定しました！</p><p>そしてFANBOXの更新内容について、アンケートのみなさん</p><p>ありがとうございました！</p><p><br/></p><p>では更新内容の詳しいことはこちらです↓</p><p>毎回の絵、元も差分がありませんの場合、ボナスとして差分イラストを支援者の皆様にプレゼント。</p><p>もとも差分があれば、ボナスとしてヌード差分イラストを支援者の皆様にプレゼント。</p><p><br/></p><p>これから、仕事以外の時間、できる限り勤勉な更新したいと思います！</p><p>どうぞよろしくお願いいたします！</p>",
+                  "embed": {},
+                  "shared_file": false,
+                  "added": "2021-03-30T18:00:05.973913",
+                  "published": "2021-01-24T17:54:38",
+                  "edited": "2021-01-24T18:46:15",
+                  "file": {
+                    "name": "a99d9674-5490-400e-acca-4bed99590699.jpg",
+                    "path": "/5c/98/5c984d1f62f0990a0891d8fa359aecdff6ac1e26ac165ba7bb7f31cc99e7a674.jpg"
+                  },
+                  "attachments": [],
+                  "next": null,
+                  "prev": "1836649"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Post not found"
+          }
+        }
+      }
+    },
+    "/discord/channel/{channel_id}": {
+      "get": {
+        "tags": [
+          "Discord"
+        ],
+        "summary": "Get Discord channel posts by offset",
+        "parameters": [
+          {
+            "name": "channel_id",
+            "in": "path",
+            "description": "ID of the Discord channel",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "o",
+            "in": "query",
+            "description": "Result offset, stepping of 150 is enforced",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Discord channel found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "author": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "avatar": {
+                            "type": "string"
+                          },
+                          "username": {
+                            "type": "string"
+                          },
+                          "public_flags": {
+                            "type": "integer"
+                          },
+                          "discriminator": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "server": {
+                        "type": "string"
+                      },
+                      "channel": {
+                        "type": "string"
+                      },
+                      "content": {
+                        "type": "string"
+                      },
+                      "added": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "published": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "edited": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "embeds": {
+                        "type": "array",
+                        "items": {}
+                      },
+                      "mentions": {
+                        "type": "array",
+                        "items": {}
+                      },
+                      "attachments": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "path": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "id": "942909658610413578",
+                    "author": {
+                      "id": "421590382300889088",
+                      "avatar": "0956f3dc18eba7da9daedc4e50fb96d0",
+                      "username": "Merry",
+                      "public_flags": 0,
+                      "discriminator": "7849"
+                    },
+                    "server": "455285536341491714",
+                    "channel": "455287420959850496",
+                    "content": "@everyone Happy Valentine’s Day! 💜✨",
+                    "added": "2022-02-15T01:26:12.708959",
+                    "published": "2022-02-14T22:26:21.027000",
+                    "edited": null,
+                    "embeds": [],
+                    "mentions": [],
+                    "attachments": []
+                  },
+                  {
+                    "id": "942909571947712594",
+                    "author": {
+                      "id": "421590382300889088",
+                      "avatar": "0956f3dc18eba7da9daedc4e50fb96d0",
+                      "username": "Merry",
+                      "public_flags": 0,
+                      "discriminator": "7849"
+                    },
+                    "server": "455285536341491714",
+                    "channel": "455287420959850496",
+                    "content": "",
+                    "added": "2022-02-15T01:26:13.006228",
+                    "published": "2022-02-14T22:26:00.365000",
+                    "edited": null,
+                    "embeds": [],
+                    "mentions": [],
+                    "attachments": [
+                      {
+                        "name": "sofa_03.png",
+                        "path": "/3b/4e/3b4ed5aabdd85b26fbbc3ee9b0e5649df69167efe26b5abc24cc2a1159f446d4.png"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "404": {
+            "description": "Discord channel not found"
+          }
+        }
+      }
+    },
+    "/discord/channel/lookup/{discord_server}": {
+      "get": {
+        "tags": [
+          "Discord"
+        ],
+        "summary": "Lookup Discord channels",
+        "parameters": [
+          {
+            "name": "discord_server",
+            "in": "path",
+            "description": "Discord Server ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Discord channels found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "id": "455285536341491716",
+                    "name": "news"
+                  },
+                  {
+                    "id": "455287420959850496",
+                    "name": "nyarla-lewds"
+                  }
+                ]
+              }
+            }
+          },
+          "404": {
+            "description": "Discord server not found"
+          }
+        }
+      }
+    },
+    "/account/favorites": {
+      "get": {
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "List Account Favorites",
+        "description": "List account favorites (posts or creators) for the authenticated user (cookie session)",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Type of favorites to list (post or creator (artist) )",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "post",
+                "artist"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of account favorites",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "faved_seq": {
+                        "type": "integer",
+                        "description": "The sequence number of the favorite"
+                      },
+                      "id": {
+                        "type": "string",
+                        "description": "The ID of the favorite (post or creator)"
+                      },
+                      "indexed": {
+                        "type": "string",
+                        "description": "Timestamp when the creator was indexed isoformat"
+                      },
+                      "last_imported": {
+                        "type": "string",
+                        "description": "Timestamp when the creator was last imported"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "The name of the creator"
+                      },
+                      "service": {
+                        "type": "string",
+                        "description": "The service where the creator is located"
+                      },
+                      "updated": {
+                        "type": "string",
+                        "description": "Timestamp when the creator was last updated"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/schemas/401"
+          }
+        }
+      }
+    },
+    "/favorites/post/{service}/{creator_id}/{post_id}": {
+      "post": {
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Add Favorite Post",
+        "description": "Add a post to the user's favorite posts",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "Service of the post",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The ID of the creator",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "description": "The ID of the post",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Favorite post added successfully",
+            "content": {}
+          },
+          "302": {
+            "description": "Redirect to login if not authenticated",
+            "content": {}
+          },
+          "401": {
+            "$ref": "#/components/schemas/401"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Remove Favorite Post",
+        "description": "Remove a post from the user's favorite posts",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "The service where the post is located",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The ID of the creator",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "description": "The ID of the post",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unfavorite post removed successfully",
+            "content": {}
+          },
+          "302": {
+            "description": "Redirect to login if not authenticated",
+            "content": {}
+          },
+          "401": {
+            "$ref": "#/components/schemas/401"
+          }
+        }
+      }
+    },
+    "/favorites/creator/{service}/{creator_id}": {
+      "post": {
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Add Favorite creator",
+        "description": "Add an creator to the user's favorite creators",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "The service where the creator is located",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The ID of the creator",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Favorite creator added successfully",
+            "content": {}
+          },
+          "302": {
+            "description": "Redirect to login if not authenticated",
+            "content": {}
+          },
+          "401": {
+            "$ref": "#/components/schemas/401"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Remove Favorite Creator",
+        "description": "Remove an creator from the user's favorite creators",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "The service where the creator is located",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The ID of the creator",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Favorite creator removed successfully",
+            "content": {}
+          },
+          "302": {
+            "description": "Redirect to login if not authenticated",
+            "content": {}
+          },
+          "401": {
+            "$ref": "#/components/schemas/401"
+          }
+        }
+      }
+    },
+    "/search_hash/{file_hash}": {
+      "get": {
+        "tags": [
+          "File Search"
+        ],
+        "summary": "Lookup file by hash",
+        "parameters": [
+          {
+            "name": "file_hash",
+            "in": "path",
+            "required": true,
+            "description": "SHA-2 / SHA-256",
+            "schema": {
+              "type": "string",
+              "format": "hex",
+              "minLength": 64,
+              "maxLength": 64
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "hash": {
+                      "type": "string"
+                    },
+                    "mtime": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "ctime": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "mime": {
+                      "type": "string"
+                    },
+                    "ext": {
+                      "type": "string"
+                    },
+                    "added": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "size": {
+                      "type": "integer"
+                    },
+                    "ihash": {
+                      "type": "string"
+                    },
+                    "posts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "file_id": {
+                            "type": "integer"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "user": {
+                            "type": "string"
+                          },
+                          "service": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "substring": {
+                            "type": "string"
+                          },
+                          "published": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "file": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "path": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "attachments": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string"
+                                },
+                                "path": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "discord_posts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "file_id": {
+                            "type": "integer"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "server": {
+                            "type": "string"
+                          },
+                          "channel": {
+                            "type": "string"
+                          },
+                          "substring": {
+                            "type": "string"
+                          },
+                          "published": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "embeds": {
+                            "type": "array",
+                            "items": {}
+                          },
+                          "mentions": {
+                            "type": "array",
+                            "items": {}
+                          },
+                          "attachments": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string"
+                                },
+                                "path": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "id": 40694581,
+                  "hash": "b926020cf035af45a1351e0a7e2c983ebcc93b4c751998321a6593a98277cdeb",
+                  "mtime": "2021-12-04T07:16:09.385539",
+                  "ctime": "2021-12-04T07:16:09.385539",
+                  "mime": "image/png",
+                  "ext": ".png",
+                  "added": "2021-12-04T07:16:09.443016",
+                  "size": 10869921,
+                  "ihash": null,
+                  "posts": [
+                    {
+                      "file_id": 108400151,
+                      "id": "5956097",
+                      "user": "21101760",
+                      "service": "fanbox",
+                      "title": "Loli Bae",
+                      "substring": "Thank you for your continued support! \nいつも支援ありがとうご",
+                      "published": "2023-05-14T00:00:00",
+                      "file": {
+                        "name": "8f183dac-470d-4587-9657-23efe8890a7b.jpg",
+                        "path": "/e5/1f/e51fc831dfdac7a21cc650ad46af59340e35e2a051aed8c1e65633592f4dc11c.jpg"
+                      },
+                      "attachments": [
+                        {
+                          "name": "b644eb9c-cffa-400e-9bd6-40cccb2331ba.png",
+                          "path": "/5e/b3/5eb3197668ac23bd7c473d3c750334eb206b060c610e4ac5fa1a9370fd1314d9.png"
+                        },
+                        {
+                          "name": "17f295ba-a9f2-4034-aafc-bf74904ec144.png",
+                          "path": "/88/ad/88ad2ba77c89e4d7a9dbe1f9531ba3e3077a82aee2b61efa29fda122ebe1b516.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "discord_posts": [
+                    {
+                      "file_id": 40694581,
+                      "id": "769704201495904286",
+                      "server": "455285536341491714",
+                      "channel": "769703874356445216",
+                      "substring": "",
+                      "published": "2020-10-24T23:29:42.049",
+                      "embeds": [],
+                      "mentions": [],
+                      "attachments": [
+                        {
+                          "name": "3.png",
+                          "path": "/b9/26/b926020cf035af45a1351e0a7e2c983ebcc93b4c751998321a6593a98277cdeb.png"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found"
+          }
+        }
+      }
+    },
+    "/{service}/user/{creator_id}/post/{post}/flag": {
+      "post": {
+        "tags": [
+          "Post Flagging"
+        ],
+        "summary": "Flag a post",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "post",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Flagged successfully",
+            "content": {}
+          },
+          "409": {
+            "description": "Already flagged",
+            "content": {}
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Post Flagging"
+        ],
+        "summary": "Check if a Post is flagged",
+        "description": "Check if a Post is flagged",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "The service where the post is located",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The creator of the post",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "post",
+            "in": "path",
+            "description": "The ID of the post to flag",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The post is flagged",
+            "content": {}
+          },
+          "404": {
+            "description": "The post has no flag",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/{service}/user/{creator_id}/post/{post_id}/revisions": {
+      "get": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "List a Post's Revisions",
+        "description": "List revisions of a specific post by service, creator_id, and post_id",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "The service where the post is located",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The ID of the creator",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "description": "The ID of the post",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of post revisions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "revision_id": {
+                        "type": "integer"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "user": {
+                        "type": "string"
+                      },
+                      "service": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "content": {
+                        "type": "string"
+                      },
+                      "embed": {
+                        "type": "object"
+                      },
+                      "shared_file": {
+                        "type": "boolean"
+                      },
+                      "added": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "published": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "edited": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "file": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "path": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "attachments": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "path": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "revision_id": 8059287,
+                    "id": "1836570",
+                    "user": "6570768",
+                    "service": "fanbox",
+                    "title": "今日はFANBOXを始まりました！",
+                    "content": "<p>みなさんこんにちは、影おじです。</p><p>先週のように、FANBOXを始まりに決定しました！</p><p>そしてFANBOXの更新内容について、アンケートのみなさん</p><p>ありがとうございました！</p><p><br/></p><p>では更新内容の詳しいことはこちらです↓</p><p>毎回の絵、元も差分がありませんの場合、ボナスとして差分イラストを支援者の皆様にプレゼント。</p><p>もとも差分があれば、ボナスとしてヌード差分イラストを支援者の皆様にプレゼント。</p><p><br/></p><p>これから、仕事以外の時間、できる限り勤勉な更新したいと思います！</p><p>どうぞよろしくお願いいたします！</p>",
+                    "embed": {},
+                    "shared_file": false,
+                    "added": "2023-09-19T13:19:57.416086",
+                    "published": "2021-01-24T17:54:38",
+                    "edited": "2021-01-24T18:46:15",
+                    "file": {
+                      "name": "8c2be0fd-a130-4afb-9314-80f2501d94f7.jpg",
+                      "path": "/5c/98/5c984d1f62f0990a0891d8fa359aecdff6ac1e26ac165ba7bb7f31cc99e7a674.jpg"
+                    },
+                    "attachments": [
+                      {
+                        "name": "attachment1.jpg",
+                        "path": "/attachments/attachment1.jpg"
+                      },
+                      {
+                        "name": "attachment2.jpg",
+                        "path": "/attachments/attachment2.jpg"
+                      }
+                    ]
+                  },
+                  {
+                    "revision_id": 6770513,
+                    "id": "1836570",
+                    "user": "6570768",
+                    "service": "fanbox",
+                    "title": "今日はFANBOXを始まりました！",
+                    "content": "<p>みなさんこんにちは、影おじです。</p><p>先週のように、FANBOXを始まりに決定しました！</p><p>そしてFANBOXの更新内容について、アンケートのみなさん</p><p>ありがとうございました！</p><p><br/></p><p>では更新内容の詳しいことはこちらです↓</p><p>毎回の絵、元も差分がありませんの場合、ボナスとして差分イラストを支援者の皆様にプレゼント。</p><p>もとも差分があれば、ボナスとしてヌード差分イラストを支援者の皆様にプレゼント。</p><p><br/></p><p>これから、仕事以外の時間、できる限り勤勉な更新したいと思います！</p><p>どうぞよろしくお願いいたします！</p>",
+                    "embed": {},
+                    "shared_file": false,
+                    "added": "2023-07-28T23:51:25.477291",
+                    "published": "2021-01-24T17:54:38",
+                    "edited": "2021-01-24T18:46:15",
+                    "file": {
+                      "name": "0d133e49-a2d4-4733-9044-dd57e25b1fce.jpg",
+                      "path": "/5c/98/5c984d1f62f0990a0891d8fa359aecdff6ac1e26ac165ba7bb7f31cc99e7a674.jpg"
+                    },
+                    "attachments": [
+                      {
+                        "name": "attachment3.jpg",
+                        "path": "/attachments/attachment3.jpg"
+                      },
+                      {
+                        "name": "attachment4.jpg",
+                        "path": "/attachments/attachment4.jpg"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "404": {
+            "description": "Post not found"
+          }
+        }
+      }
+    },
+    "/app_version": {
+      "get": {
+        "tags": [
+          "Misc"
+        ],
+        "summary": "Git Commit Hash",
+        "description": "Show current App commit hash",
+        "responses": {
+          "200": {
+            "description": "Commit Hash",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "undefined"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "description": "Session key that can be found in cookies after a successful login",
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session"
+      }
+    },
+    "schemas": {
+      "401": {
+        "title": "Unauthorized",
+        "description": "Unauthorized Access"
+      }
+    }
+  }
+}

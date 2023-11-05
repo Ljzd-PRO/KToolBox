@@ -1,0 +1,1 @@
+datamodel-codegen --input .\k_generator\Get_a_list_of_creator_posts.json --output example_model.py --input-file-type jsonschema --output-model-type pydantic_v2.BaseModel
