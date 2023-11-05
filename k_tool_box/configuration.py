@@ -13,5 +13,7 @@ class Configuration(BaseModel):
     api_retry_times: int = 3
     api_retry_interval: float = 2.0
 
+    statics_host: str = "img.kemono.su"
+
 
 config = Configuration()
