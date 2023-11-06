@@ -7,7 +7,7 @@ readme = "README.md"
 homepage = "https://github.com/Ljzd-PRO/KToolBox"
 repository = "https://github.com/Ljzd-PRO/KToolBox"
 documentation = "https://github.com/Ljzd-PRO/KToolBox/wiki"
-keywords = ["kemono", "fluent-design", "fluent", "pyqt", "qt", "winui"]
+keywords = ["kemono", "kemono.party", "fluent-design", "fluent", "pyqt", "qt", "winui", "os-independent"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
