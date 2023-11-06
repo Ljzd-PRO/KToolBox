@@ -1,0 +1,64 @@
+[tool.poetry]
+name = "ktoolbox"
+version = "0.0.1-dev"
+description = "A useful tool for Kemono.party"
+authors = ["Ljzd-PRO <ljzd@office.ljzd-pro.ml>"]
+readme = "README.md"
+homepage = "https://github.com/Ljzd-PRO/KToolBox"
+repository = "https://github.com/Ljzd-PRO/KToolBox"
+documentation = "https://github.com/Ljzd-PRO/KToolBox/wiki"
+keywords = ["kemono", "fluent-design", "fluent", "pyqt", "qt", "winui"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 5 - Production/Stable",
+    "Topic :: Desktop Environment",
+    "Topic :: Terminals",
+]
+
+packages = [
+    { include = "k_generator" },
+    { include = "ktoolbox" },
+]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/Ljzd-PRO/KToolBox/issues"
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.12"
+pydantic = "^2.4.2"
+tenacity = "^8.2.3"
+httpx = "<=0.25.0"
+fire = "^0.5.0"
+
+#[tool.poetry.group.uvloop.dependencies]
+#uvloop = "^0.17.0"
+
+[tool.poetry.group.pyinstaller.dependencies]
+pyinstaller = "==6.1.0"
+
+#[tool.poetry.group.test.dependencies]
+#pytest = "^7.3.1"
+#pytest-html = "^3.2.0"
+#pytest-asyncio = "^0.21.0"
+#flake8 = "^6.0.0"
+
+[tool.poetry.group.dev.dependencies]
+datamodel-code-generator = "^0.22.1"
+
+#[tool.poetry.group.uvloop]
+#optional = true
+
+[tool.poetry.group.pyinstaller]
+optional = true
+
+#[tool.poetry.group.test]
+#optional = true
+
+[tool.poetry.group.dev]
+optional = true
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
