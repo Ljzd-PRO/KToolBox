@@ -1,6 +1,6 @@
 from k_tool_box.action import search_creator as search_creator_action
 from k_tool_box.api.misc import get_app_version
-from k_tool_box.api.posts import get_creator_post
+from k_tool_box.api.posts import get_creator_post, get_post
 
 __all__ = ["KToolBoxCli"]
 
@@ -35,5 +35,5 @@ class KToolBoxCli:
     @staticmethod
     async def test():
         """run test"""
-        ret = await get_creator_post(service="fanbox", creator_id="3316400", q="1月")
+        ret = await get_post(service="fanbox", creator_id="3316400", post_id="3057352")
         return ret.data if ret else ret.message
