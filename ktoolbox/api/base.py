@@ -21,10 +21,10 @@ class APITenacityStop(stop_base):
     """APIs Stop strategies"""
 
     def __call__(self, retry_state: RetryCallState) -> bool:
-        if config.api_retry_times is None:
+        if config.api.retry_times is None:
             return stop_never(retry_state)
         else:
-            return stop_after_attempt(config.api_retry_times)(retry_state)
+            return stop_after_attempt(config.api.retry_times)(retry_state)
 
 
 class APIRet(BaseRet[_T]):
@@ -48,7 +48,7 @@ class BaseAPI(ABC, Generic[_T]):
         """Wrap a function with a new `Retrying` object"""
         wrapper = tenacity.retry(
             stop=APITenacityStop(),
-            wait=wait_fixed(config.api_retry_interval),
+            wait=wait_fixed(config.api.retry_interval),
             retry=retry_if_result(lambda x: not bool(x)),
             reraise=True,
             retry_error_callback=lambda x: x.outcome.result(),  # type: Callable[[RetryCallState], Any]
@@ -94,14 +94,14 @@ class BaseAPI(ABC, Generic[_T]):
         """
         if path is None:
             path = cls.path
-        url_parts = [config.api_scheme, config.api_netloc, f"{config.api_path}{path}", '', '', '']
+        url_parts = [config.api.scheme, config.api.netloc, f"{config.api.path}{path}", '', '', '']
         url = urlunparse(url_parts)
         try:
             async with httpx.AsyncClient() as client:
                 res = await client.request(
                     method=cls.method,
                     url=url,
-                    timeout=config.api_timeout,
+                    timeout=config.api.timeout,
                     follow_redirects=True,
                     **kwargs
                 )
