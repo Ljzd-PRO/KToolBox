@@ -1,4 +1,4 @@
 pydantic==2.4.2
 tenacity==8.2.3
-httpx==1.0.0b0
+httpx==0.25.0
 fire==0.5.0
