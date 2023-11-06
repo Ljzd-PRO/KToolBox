@@ -38,14 +38,14 @@ async def download(
         * Else if `alt_filename` parameter is set, use it.
         * Else use filename from URL 'path' part.
     """
-    buffer_size = buffer_size or config.download.buffer_size
-    chunk_size = chunk_size or config.download.chunk_size
+    buffer_size = buffer_size or config.downloader.buffer_size
+    chunk_size = chunk_size or config.downloader.chunk_size
     async with httpx.AsyncClient() as client:
         async with client.stream(
                 method="GET",
                 url=url,
                 follow_redirects=True,
-                timeout=config.download.timeout
+                timeout=config.downloader.timeout
         ) as res:  # type: httpx.Response
             if res.status_code != httpx.codes.OK:
                 return DownloaderRet(

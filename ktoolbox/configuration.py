@@ -13,7 +13,7 @@ class APIConfiguration(BaseModel):
     """Kemono API URL scheme"""
     netloc: str = "kemono.su"
     """Kemono API URL netloc"""
-    statics_host: str = "img.kemono.su"
+    statics_netloc: str = "img.kemono.su"
     """URL netloc of Kemono server for static files (e.g. images)"""
     attachment_netloc: str = "kemono.su"
     """URL netloc of Kemono server for post attachment files"""
@@ -27,7 +27,7 @@ class APIConfiguration(BaseModel):
     """Seconds of API request retry interval"""
 
 
-class DownloadConfiguration(BaseModel):
+class DownloaderConfiguration(BaseModel):
     """File Downloader Configuration"""
     scheme: Literal["http", "https"] = "https"
     """Downloader URL scheme"""
@@ -43,7 +43,7 @@ class DownloadConfiguration(BaseModel):
 
 class Configuration(BaseSettings):
     api: APIConfiguration = APIConfiguration()
-    download: DownloadConfiguration = DownloadConfiguration()
+    downloader: DownloaderConfiguration = DownloaderConfiguration()
 
     # noinspection SpellCheckingInspection
     model_config = SettingsConfigDict(

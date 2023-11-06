@@ -82,5 +82,5 @@ def file_name_from_headers(headers: Dict[str, str]) -> Optional[str]:
             charset, name = name_with_charset
             return urllib.parse.unquote(name, charset)
     if file_name := options.get("filename"):
-        return urllib.parse.unquote(file_name, config.download.encoding)
+        return urllib.parse.unquote(file_name, config.downloader.encoding)
     return None

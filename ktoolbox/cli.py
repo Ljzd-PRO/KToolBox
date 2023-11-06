@@ -1,9 +1,14 @@
+import asyncio
+from pathlib import Path
+
 from ktoolbox import __version__
 from ktoolbox.action import search_creator as search_creator_action
 from ktoolbox.api.misc import get_app_version
 from ktoolbox.api.posts import get_creator_post as get_creator_post_api, get_post as get_post_api
 
 __all__ = ["KToolBoxCli"]
+
+from ktoolbox.downloader import download
 
 from ktoolbox.enum import TextEnum
 
@@ -74,3 +79,10 @@ class KToolBoxCli:
             post_id=post_id
         )
         return ret.data if ret else ret.message
+
+    @staticmethod
+    async def dev_test(url: str):
+        """Dev test"""
+        ret = await download(url, Path("./"), progress=True)
+        return ret.data if ret else ret.message
+
