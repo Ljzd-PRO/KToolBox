@@ -6,26 +6,39 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 __all__ = ["config", "Configuration"]
 
 
+# noinspection SpellCheckingInspection
 class APIConfiguration(BaseModel):
+    """Kemono API Configuration"""
     scheme: Literal["http", "https"] = "https"
-    # noinspection SpellCheckingInspection
+    """Kemono API URL scheme"""
     netloc: str = "kemono.su"
-    # noinspection SpellCheckingInspection
+    """Kemono API URL netloc"""
     statics_host: str = "img.kemono.su"
+    """URL netloc of Kemono server for static files (e.g. images)"""
+    attachment_netloc: str = "kemono.su"
+    """URL netloc of Kemono server for post attachment files"""
     path: str = "/api/v1"
+    """Kemono API URL root path"""
     timeout: float = 5.0
+    """API request timeout"""
     retry_times: int = 3
+    """API request retry times (when request failed)"""
     retry_interval: float = 2.0
+    """Seconds of API request retry interval"""
 
 
 class DownloadConfiguration(BaseModel):
+    """File Downloader Configuration"""
     scheme: Literal["http", "https"] = "https"
-    # noinspection SpellCheckingInspection
-    netloc: str = "kemono.su"
+    """Downloader URL scheme"""
     timeout: float = 30.0
+    """Downloader request timeout"""
     encoding: str = "utf-8"
+    """Charset for filename parsing"""
     buffer_size: int = 1024
+    """Number of bytes for file I/O buffer"""
     chunk_size: int = 1024
+    """Number of bytes for chunk of downloader stream"""
 
 
 class Configuration(BaseSettings):
