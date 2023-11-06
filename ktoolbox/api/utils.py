@@ -1,6 +1,6 @@
 from urllib.parse import urlunparse
 
-from k_tool_box.configuration import config
+from ktoolbox.configuration import config
 
 __all__ = ["get_creator_icon", "get_creator_banner"]
 

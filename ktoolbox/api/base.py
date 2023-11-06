@@ -8,9 +8,9 @@ from pydantic import BaseModel, ValidationError, RootModel
 from tenacity import RetryCallState, wait_fixed, retry_if_result
 from tenacity.stop import stop_base, stop_never, stop_after_attempt
 
-from k_tool_box.configuration import config
-from k_tool_box.enum import RetCodeEnum
-from k_tool_box.utils import BaseRet
+from ktoolbox.configuration import config
+from ktoolbox.enum import RetCodeEnum
+from ktoolbox.utils import BaseRet
 
 __all__ = ["APITenacityStop", "APIRet", "BaseAPI"]
 

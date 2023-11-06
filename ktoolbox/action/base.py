@@ -1,6 +1,6 @@
 from typing import TypeVar
 
-from k_tool_box.utils import BaseRet
+from ktoolbox.utils import BaseRet
 
 __all__ = ["ActionRet"]
 

@@ -1,5 +1,5 @@
-from k_tool_box.api import BaseAPI, APIRet
-from k_tool_box.api.model import Post
+from ktoolbox.api import BaseAPI, APIRet
+from ktoolbox.api.model import Post
 
 __all__ = ["GetPost", "get_post"]
 

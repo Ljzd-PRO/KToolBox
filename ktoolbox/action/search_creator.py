@@ -1,12 +1,12 @@
 from typing import Iterator
 
-from k_tool_box.api.model import Creator
-from k_tool_box.api.posts import get_creators
+from ktoolbox.api.model import Creator
+from ktoolbox.api.posts import get_creators
 from .base import ActionRet
 
 __all__ = ["search_creator"]
 
-from k_tool_box.utils import BaseRet
+from ktoolbox.utils import BaseRet
 
 
 # noinspection PyShadowingBuiltins

@@ -2,8 +2,8 @@ from typing import List
 
 from pydantic import RootModel
 
-from k_tool_box.api import BaseAPI, APIRet
-from k_tool_box.api.model import Creator
+from ktoolbox.api import BaseAPI, APIRet
+from ktoolbox.api.model import Creator
 
 __all__ = ["GetCreators", "get_creators"]
 

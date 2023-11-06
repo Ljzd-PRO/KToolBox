@@ -1,6 +1,6 @@
 from pydantic import RootModel
 
-from k_tool_box.api import BaseAPI, APIRet
+from ktoolbox.api import BaseAPI, APIRet
 
 __all__ = ["GetAppVersion", "get_app_version"]
 

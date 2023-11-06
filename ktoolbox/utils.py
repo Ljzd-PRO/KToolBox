@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict
 
 __all__ = ["BaseRet"]
 
-from k_tool_box.enum import RetCodeEnum
+from ktoolbox.enum import RetCodeEnum
 
 _T = TypeVar('_T')
 
