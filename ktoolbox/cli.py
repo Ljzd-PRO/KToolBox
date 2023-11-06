@@ -1,7 +1,7 @@
 from ktoolbox import __version__
 from ktoolbox.action import search_creator as search_creator_action
 from ktoolbox.api.misc import get_app_version
-from ktoolbox.api.posts import get_post
+from ktoolbox.api.posts import get_creator_post as get_creator_post_api, get_post as get_post_api
 
 __all__ = ["KToolBoxCli"]
 
@@ -39,7 +39,38 @@ class KToolBoxCli:
             return ret.message
 
     @staticmethod
-    async def test():
-        """run test"""
-        ret = await get_post(service="fanbox", creator_id="3316400", post_id="3057352")
+    async def get_creator_post(service: str, creator_id: str, q: str = None, o: int = None):
+        """
+        Get a list of creator posts
+
+        :param service: The service where the post is located
+        :param creator_id: The ID of the creator
+        :param q: Search query
+        :param o: Result offset, stepping of 50 is enforced
+        """
+        ret = await get_creator_post_api(
+            service=service,
+            creator_id=creator_id,
+            q=q,
+            o=o
+        )
+        if ret:
+            return ret.data or TextEnum.SearchResultEmpty
+        else:
+            return ret.message
+
+    @staticmethod
+    async def get_post(service: str, creator_id: str, post_id: str):
+        """
+        Get a specific post
+
+        :param service: The service name
+        :param creator_id: The creator's ID
+        :param post_id: The post ID
+        """
+        ret = await get_post_api(
+            service=service,
+            creator_id=creator_id,
+            post_id=post_id
+        )
         return ret.data if ret else ret.message
