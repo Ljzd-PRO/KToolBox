@@ -4,7 +4,9 @@ __all__ = ["Creator"]
 
 
 class Creator(BaseModel):
+    # noinspection SpellCheckingInspection
     favorited: int
+    # noinspection SpellCheckingInspection
     """The number of times this creator has been favorited"""
     id: str
     """The ID of the creator"""

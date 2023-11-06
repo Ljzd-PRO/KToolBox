@@ -13,4 +13,5 @@ class Announcement(BaseModel):
     """sha256"""
     content: Optional[str] = None
     added: Optional[datetime] = None
+    # noinspection SpellCheckingInspection
     """isoformat UTC"""
