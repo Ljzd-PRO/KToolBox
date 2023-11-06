@@ -1,6 +1,7 @@
+from k_tool_box import __version__
 from k_tool_box.action import search_creator as search_creator_action
 from k_tool_box.api.misc import get_app_version
-from k_tool_box.api.posts import get_creator_post, get_post
+from k_tool_box.api.posts import get_post
 
 __all__ = ["KToolBoxCli"]
 
@@ -8,6 +9,11 @@ from k_tool_box.enum import TextEnum
 
 
 class KToolBoxCli:
+    @staticmethod
+    async def version():
+        """Show KToolBox version"""
+        return __version__
+
     @staticmethod
     async def site_version():
         # noinspection SpellCheckingInspection
