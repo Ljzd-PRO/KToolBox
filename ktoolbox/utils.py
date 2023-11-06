@@ -1,6 +1,7 @@
 import cgi
-from typing import Generic, TypeVar, Optional, Dict
 import urllib.parse
+from typing import Generic, TypeVar, Optional, Dict
+
 from pydantic import BaseModel, ConfigDict
 
 __all__ = ["BaseRet", "file_name_from_headers"]

@@ -1,4 +1,3 @@
-import asyncio
 from pathlib import Path
 
 from ktoolbox import __version__
@@ -85,4 +84,3 @@ class KToolBoxCli:
         """Dev test"""
         ret = await download(url, Path("./"), progress=True)
         return ret.data if ret else ret.message
-
