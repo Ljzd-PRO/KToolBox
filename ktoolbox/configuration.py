@@ -18,8 +18,19 @@ class APIConfiguration(BaseModel):
     retry_interval: float = 2.0
 
 
+class DownloadConfiguration(BaseModel):
+    scheme: Literal["http", "https"] = "https"
+    # noinspection SpellCheckingInspection
+    netloc: str = "kemono.su"
+    timeout: float = 30.0
+    encoding: str = "utf-8"
+    buffer_size: int = 1024
+    chunk_size: int = 1024
+
+
 class Configuration(BaseSettings):
     api: APIConfiguration = APIConfiguration()
+    download: DownloadConfiguration = DownloadConfiguration()
 
     # noinspection SpellCheckingInspection
     model_config = SettingsConfigDict(
