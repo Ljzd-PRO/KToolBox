@@ -1,8 +1,9 @@
 from typing import Iterator
 
+from ktoolbox.action import ActionRet
 from ktoolbox.api.model import Creator
 from ktoolbox.api.posts import get_creators
-from .base import ActionRet
+
 
 __all__ = ["search_creator"]
 

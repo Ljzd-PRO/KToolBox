@@ -1,10 +1,12 @@
 from collections import UserList
 from pathlib import Path
-from typing import List, Generator, Optional
+from typing import List, Generator, Optional, Literal
 
 from pydantic import BaseModel, Field
 
 __all__ = ["Job"]
+
+from ktoolbox.enum import PostFileTypeEnum
 
 
 class Job(BaseModel):
@@ -17,6 +19,8 @@ class Job(BaseModel):
     """Use this name if no filename given by the server"""
     server_path: str
     """The `path` part of download URL"""
+    type: Optional[Literal[PostFileTypeEnum.Attachment, PostFileTypeEnum.File]] = None
+    """Target file type"""
 
 
 class JobList(Job, UserList[Job]):
@@ -28,6 +32,6 @@ class JobList(Job, UserList[Job]):
     server_path: str = Field(exclude=True, default=None)
     data: List[Job] = []
 
-    def __iter__(self) -> Generator[Job]:
+    def __iter__(self) -> Generator[Job, None, None]:
         """Generator for iterating over jobs"""
         yield from self.data

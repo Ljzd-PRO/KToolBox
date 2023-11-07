@@ -1,9 +1,17 @@
+from pathlib import Path
 from typing import Literal
 
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-__all__ = ["config", "Configuration"]
+__all__ = [
+    "config",
+    "APIConfiguration",
+    "DownloaderConfiguration",
+    "PostStructureConfiguration",
+    "JobConfiguration",
+    "Configuration"
+]
 
 
 # noinspection SpellCheckingInspection
@@ -34,17 +42,48 @@ class DownloaderConfiguration(BaseModel):
     timeout: float = 30.0
     """Downloader request timeout"""
     encoding: str = "utf-8"
-    """Charset for filename parsing"""
+    """Charset for filename parsing and post content text saving"""
     buffer_size: int = 1024
     """Number of bytes for file I/O buffer"""
     chunk_size: int = 1024
     """Number of bytes for chunk of downloader stream"""
 
 
+class PostStructureConfiguration(BaseModel):
+    # noinspection SpellCheckingInspection
+    """
+        Post path structure model
+
+        * Default:
+
+            |__+ ..
+
+            |__+ attachments
+
+            |____+ (e.g. 1.png)
+
+            |____+ (e.g. 2.png)
+
+            |__+ content.txt
+
+            |__+ <Post file>
+
+            |__+ <Post data (post.ktoolbox.json)>
+        """
+    attachments: Path = Path("attachments")
+    """Sub path of attachment directory"""
+    content_filepath: Path = Path("content.txt")
+    """Sub path of post content text file"""
+
+
 class JobConfiguration(BaseModel):
     """Download jobs Configuration"""
     count: int = 10
     """Number of coroutines for concurrent download"""
+    post_id_as_name: bool = False
+    """Use post ID as post directory name"""
+    post_structure: PostStructureConfiguration = PostStructureConfiguration()
+    """Post path structure"""
 
 
 class Configuration(BaseSettings):
