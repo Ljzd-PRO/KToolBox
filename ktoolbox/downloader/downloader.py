@@ -89,7 +89,8 @@ class Downloader:
                             code=RetCodeEnum.GeneralFailure,
                             message=generate_message(
                                 title="Download failed",
-                                status_code=res.status_code
+                                status_code=res.status_code,
+                                filename=self.alt_filename
                             )
                         )
                     if not (file_name := file_name_from_headers(res.headers)):
@@ -116,7 +117,10 @@ class Downloader:
                 data=file_name
             ) if file_name else DownloaderRet(
                 code=RetCodeEnum.GeneralFailure,
-                message=generate_message("Download failed")
+                message=generate_message(
+                    "Download failed",
+                    filename=self.alt_filename
+                )
             )
 
     __call__ = run

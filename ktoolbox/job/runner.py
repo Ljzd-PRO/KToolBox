@@ -81,4 +81,4 @@ class JobRunner:
                 self.tasks.add(task)
                 task.add_done_callback(self.tasks.discard)
             await asyncio.wait(self.tasks)
-        # TODO: finished log
+        logger.success(generate_message("All jobs in queue finished"))
