@@ -59,7 +59,7 @@ class JobRunner:
             if ret:
                 logger.success(
                     generate_message(
-                        title="Download success",
+                        "Download success",
                         filename=ret.data
                     )
                 )

@@ -88,7 +88,7 @@ class Downloader:
                         return DownloaderRet(
                             code=RetCodeEnum.GeneralFailure,
                             message=generate_message(
-                                title="Download failed",
+                                "Download failed",
                                 status_code=res.status_code,
                                 filename=self.alt_filename
                             )
