@@ -1,5 +1,6 @@
 import asyncio
-from typing import List, Set
+from asyncio import CancelledError
+from typing import List, Set, Dict
 from urllib.parse import urlunparse
 
 from loguru import logger
@@ -8,7 +9,6 @@ from tqdm import tqdm as std_tqdm
 from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
 from ktoolbox.job import Job
-
 from ktoolbox.utils import generate_msg
 
 __all__ = ["JobRunner"]
@@ -30,7 +30,7 @@ class JobRunner:
         self.tqdm_class = tqdm_class
         self.progress = progress
         self.tasks: Set[asyncio.Task] = set()
-        self.downloaders: List[Downloader] = []
+        self.downloaders_with_task: Dict[Downloader, asyncio.Task] = {}
         self.lock = asyncio.Lock()
 
     @property
@@ -45,6 +45,7 @@ class JobRunner:
     async def processor(self):
         """Process each job in `self.job_queue`"""
         while not self.job_queue.empty():
+            # Create downloader
             job = await self.job_queue.get()
             url_parts = [config.downloader.scheme, config.api.files_netloc, job.server_path, '', '', '']
             url = urlunparse(url_parts)
@@ -53,21 +54,50 @@ class JobRunner:
                 path=job.path,
                 alt_filename=job.alt_filename
             )
-            self.downloaders.append(downloader)
-            ret = await downloader.run(
-                sync_callable=self.downloaders.remove,
-                tqdm_class=self.tqdm_class,
-                progress=self.progress
+
+            # Create task
+            task = asyncio.create_task(
+                downloader.run(
+                    tqdm_class=self.tqdm_class,
+                    progress=self.progress
+                )
             )
-            if ret:
-                logger.success(
+            self.downloaders_with_task[downloader] = task
+            task.add_done_callback(lambda _: self.downloaders_with_task.pop(downloader))
+
+            # Run task
+            task_done_set, _ = await asyncio.wait([task], return_when=asyncio.FIRST_EXCEPTION)
+            task_done = task_done_set.pop()
+            try:
+                exception = task_done.exception()
+            except CancelledError as e:
+                exception = e
+            if not exception:   # raise Exception when cancelled or other exceptions
+                ret = task_done.result()
+                if ret:
+                    logger.success(
+                        generate_msg(
+                            "Download success",
+                            filename=ret.data
+                        )
+                    )
+                else:
+                    logger.error(ret.message)
+            elif isinstance(exception, CancelledError):
+                logger.warning(
                     generate_msg(
-                        "Download success",
-                        filename=ret.data
+                        "Download cancelled",
+                        filename=job.alt_filename
                     )
                 )
             else:
-                logger.error(ret.message)
+                logger.error(
+                    generate_msg(
+                        "Download failed",
+                        filename=job.alt_filename,
+                        exception=exception
+                    )
+                )
             self.job_queue.task_done()
         await self.job_queue.join()
 
@@ -90,3 +120,28 @@ class JobRunner:
         """Add jobs to `self.job_queue`"""
         for job in jobs:
             await self.job_queue.put(job)
+
+    @staticmethod
+    async def _force_cancel(target: asyncio.Task, wait_time: float = None) -> bool:
+        """
+        Force cancel `asyncio.Task` after `wait_time` seconds
+
+        :param target: Target task
+        :param wait_time: Seconds to wait before cancel (`0` for skip one event loop run cycle)
+        :return: Whether cancelled successfully
+        """
+        if wait_time is not None:
+            await asyncio.sleep(wait_time)
+        return target.cancel()
+
+    async def cancel_downloader(self, target: Downloader) -> bool:
+        """
+        Cancel downloader
+
+        :return: Whether cancelled successfully
+        """
+        task = self.downloaders_with_task[target]
+        if not task.done():
+            target.cancel()
+            return await self._force_cancel(task, 0) or task.done()
+        return True
