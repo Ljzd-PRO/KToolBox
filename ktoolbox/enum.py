@@ -13,9 +13,12 @@ class RetCodeEnum(IntEnum):
     GeneralFailure = -1
 
     # APIRet
-    NetWorkError = 100
-    JsonDecodeError = 200
-    ValidationError = 300
+    NetWorkError = 1001
+    JsonDecodeError = 1002
+    ValidationError = 1003
+
+    # ActionRet
+    MissingParameter = 2001
 
 
 class PostFileTypeEnum(StrEnum):
