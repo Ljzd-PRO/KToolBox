@@ -108,6 +108,9 @@ class Configuration(BaseSettings):
     job: JobConfiguration = JobConfiguration()
     logger: LoggerConfiguration = LoggerConfiguration()
 
+    json_dump_indent: int = 4
+    """Indent of JSON file dump"""
+
     # noinspection SpellCheckingInspection
     model_config = SettingsConfigDict(
         env_prefix='ktoolbox_',

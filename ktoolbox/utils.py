@@ -128,5 +128,5 @@ async def dump_search(result: List[BaseModel], path: Path):
     async with aiofiles.open(str(path), "w", encoding="utf-8") as f:
         await f.write(
             SearchResult(result=result)
-            .model_dump_json(indent=4)
+            .model_dump_json(indent=config.json_dump_indent)
         )

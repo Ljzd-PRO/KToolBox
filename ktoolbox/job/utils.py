@@ -58,6 +58,6 @@ async def create_job_from_post(
     if dump_post_data:
         async with aiofiles.open(str(post_path / DataStorageNameEnum.PostData), "w", encoding="utf-8") as f:
             await f.write(
-                post.model_dump_json(indent=4)
+                post.model_dump_json(indent=config.json_dump_indent)
             )
     return jobs
