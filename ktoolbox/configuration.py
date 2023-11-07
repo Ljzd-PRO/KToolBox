@@ -52,24 +52,24 @@ class DownloaderConfiguration(BaseModel):
 class PostStructureConfiguration(BaseModel):
     # noinspection SpellCheckingInspection
     """
-        Post path structure model
+    Post path structure model
 
-        * Default:
+    * Default:
 
-            |__+ ..
+        |__+ ..
 
-            |__+ attachments
+        |__+ attachments
 
-            |____+ (e.g. 1.png)
+        |____+ (e.g. 1.png)
 
-            |____+ (e.g. 2.png)
+        |____+ (e.g. 2.png)
 
-            |__+ content.txt
+        |__+ content.txt
 
-            |__+ <Post file>
+        |__+ <Post file>
 
-            |__+ <Post data (post.ktoolbox.json)>
-        """
+        |__+ <Post data (post.ktoolbox.json)>
+    """
     attachments: Path = Path("attachments")
     """Sub path of attachment directory"""
     content_filepath: Path = Path("content.txt")
