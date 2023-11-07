@@ -87,6 +87,13 @@ class JobConfiguration(BaseModel):
     """Use post ID as post directory name"""
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
     """Post path structure"""
+    mix_posts: bool = False
+    """
+    Save all files from different posts at same path in creator directory
+
+    It would not create any post directory, and `CreatorIndices` would not been recorded, \
+    without `CreatorIndices` you **cannot update** the creator directory.
+    """
     job_list_filepath: Optional[Path] = None
     """Filepath for job list data saving, `None` for disable job list saving"""
 
