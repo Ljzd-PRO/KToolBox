@@ -55,6 +55,7 @@ async def search_creator_post(
     :param q: Search query
     :param o: Result offset, stepping of 50 is enforced
     """
+
     async def inner(**kwargs):
         posts: List[Post] = []
         if any([id, name, service]):
@@ -66,7 +67,7 @@ async def search_creator_post(
                     o=o
                 )
                 return ActionRet(data=ret.data) if ret else ret
-            else:   # else need to get `id` and `service`
+            else:  # else need to get `id` and `service`
                 creators_ret = await search_creator(id=id, name=name, service=service)
                 if not creators_ret:
                     return ActionRet(**creators_ret.model_dump(mode="python"))

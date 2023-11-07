@@ -10,7 +10,6 @@ from pydantic import BaseModel, ConfigDict
 
 from ktoolbox.configuration import config
 from ktoolbox.enum import RetCodeEnum, DataStorageNameEnum
-
 from ktoolbox.model import SearchResult
 
 __all__ = ["BaseRet", "file_name_from_headers", "generate_msg", "logger_init", "dump_search"]

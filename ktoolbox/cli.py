@@ -6,7 +6,6 @@ from ktoolbox.api.misc import get_app_version
 from ktoolbox.api.posts import get_post as get_post_api
 from ktoolbox.downloader import Downloader
 from ktoolbox.enum import TextEnum
-
 from ktoolbox.utils import dump_search
 
 __all__ = ["KToolBoxCli"]
