@@ -5,10 +5,11 @@ from typing import List, Generator, Optional, Literal, Dict
 from pydantic import BaseModel, Field
 
 from ktoolbox.api.model import Creator, Post
-from ktoolbox.enum import PostFileTypeEnum, DataStorageNameEnum
-from ktoolbox import __version__
+from ktoolbox.enum import PostFileTypeEnum
 
-__all__ = ["Job", "CreatorIndices"]
+from ktoolbox.model import BaseKToolBoxData
+
+__all__ = ["Job", "JobListData", "CreatorIndices"]
 
 
 class Job(BaseModel):
@@ -39,15 +40,22 @@ class JobList(Job, UserList[Job]):
         yield from self.data
 
 
-class CreatorIndices(BaseModel):
+class JobListData(BaseKToolBoxData):
+    """
+    Download job list data model
+
+    For saving the list of jobs to disk.
+    """
+    jobs: List[Job] = []
+    """All jobs"""
+
+
+class CreatorIndices(BaseKToolBoxData):
     """
     Creator directory indices model
 
     Record the path of each downloaded post.
     """
-    version: str = __version__
-    type: str = DataStorageNameEnum.CreatorIndicesData.name
-
     creator: Creator
     """Creator data"""
     posts: Dict[Path, Post] = {}

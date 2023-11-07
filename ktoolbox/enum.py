@@ -26,3 +26,4 @@ class PostFileTypeEnum(StrEnum):
 class DataStorageNameEnum(StrEnum):
     PostData = "post.json"
     CreatorIndicesData = "creator-indices.ktoolbox"
+    JobListData = "job-list.ktoolbox"
