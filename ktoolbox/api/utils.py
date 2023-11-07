@@ -2,7 +2,10 @@ from urllib.parse import urlunparse
 
 from ktoolbox.configuration import config
 
-__all__ = ["get_creator_icon", "get_creator_banner"]
+__all__ = ["SEARCH_STEP", "get_creator_icon", "get_creator_banner"]
+
+SEARCH_STEP = 50
+"""Searching APIs result steps"""
 
 
 def get_creator_icon(creator_id: str, service: str) -> str:
