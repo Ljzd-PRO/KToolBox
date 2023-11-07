@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 from ktoolbox.api.model import Creator, Post
 from ktoolbox.enum import PostFileTypeEnum
+from ktoolbox import __version__
 
 __all__ = ["Job", "CreatorIndices"]
 
@@ -44,6 +45,7 @@ class CreatorIndices(BaseModel):
 
     Record the path of each downloaded post.
     """
+    version: str = __version__
     creator: Creator
     """Creator data"""
     posts: Dict[Path, Post] = {}
