@@ -41,7 +41,7 @@ class JobRunner:
         """Process each job in `self.job_queue`"""
         while not self.job_queue.empty():
             job = await self.job_queue.get()
-            url_parts = [config.downloader.scheme, config.api.attachment_netloc, job.server_path, '', '', '']
+            url_parts = [config.downloader.scheme, config.api.files_netloc, job.server_path, '', '', '']
             url = urlunparse(url_parts)
             downloader = Downloader(
                 url=url,

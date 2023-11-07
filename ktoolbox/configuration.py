@@ -15,8 +15,8 @@ class APIConfiguration(BaseModel):
     """Kemono API URL netloc"""
     statics_netloc: str = "img.kemono.su"
     """URL netloc of Kemono server for static files (e.g. images)"""
-    attachment_netloc: str = "kemono.su"
-    """URL netloc of Kemono server for post attachment files"""
+    files_netloc: str = "kemono.su"
+    """URL netloc of Kemono server for post files"""
     path: str = "/api/v1"
     """Kemono API URL root path"""
     timeout: float = 5.0
