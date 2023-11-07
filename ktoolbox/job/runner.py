@@ -15,18 +15,20 @@ __all__ = ["JobRunner"]
 
 
 class JobRunner:
-    def __init__(self, job_list: List[Job] = None, tqdm_class: std_tqdm = None):
+    def __init__(self, *, job_list: List[Job] = None, tqdm_class: std_tqdm = None, progress: bool = False):
         """
         Create a job runner
 
         :param job_list: Jobs to initial `self.job_queue`
         :param tqdm_class: `tqdm` class to replace default `tqdm.asyncio.tqdm`
+        :param progress: Show progress bar
         """
         job_list = job_list or []
         self.job_queue: asyncio.Queue[Job] = asyncio.Queue()
         for job in job_list:
             self.job_queue.put_nowait(job)
         self.tqdm_class = tqdm_class
+        self.progress = progress
         self.tasks: Set[asyncio.Task] = set()
         self.downloaders: List[Downloader] = []
         self.lock = asyncio.Lock()
@@ -54,7 +56,8 @@ class JobRunner:
             self.downloaders.append(downloader)
             ret = await downloader.run(
                 sync_callable=self.downloaders.remove,
-                tqdm_class=self.tqdm_class
+                tqdm_class=self.tqdm_class,
+                progress=self.progress
             )
             if ret:
                 logger.success(
