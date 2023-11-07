@@ -1,6 +1,6 @@
 from collections import UserList
 from pathlib import Path
-from typing import List, Generator
+from typing import List, Generator, Optional
 
 from pydantic import BaseModel, Field
 
@@ -13,6 +13,8 @@ class Job(BaseModel):
     """
     path: Path
     """Directory path to save the file"""
+    alt_filename: Optional[str] = None
+    """Use this name if no filename given by the server"""
     server_path: str
     """The `path` part of download URL"""
 

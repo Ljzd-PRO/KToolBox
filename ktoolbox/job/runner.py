@@ -45,7 +45,8 @@ class JobRunner:
             url = urlunparse(url_parts)
             downloader = Downloader(
                 url=url,
-                path=job.path
+                path=job.path,
+                alt_filename=job.alt_filename
             )
             self.downloaders.append(downloader)
             await downloader.run(
