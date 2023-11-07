@@ -24,5 +24,5 @@ class PostFileTypeEnum(StrEnum):
 
 # noinspection SpellCheckingInspection
 class DataStorageNameEnum(StrEnum):
-    PostData = "post.ktoolbox.json"
-    CreatorIndicesData = "creator-indices.ktoolbox.json"
+    PostData = "post.json"
+    CreatorIndicesData = "creator-indices.ktoolbox"
