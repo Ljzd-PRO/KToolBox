@@ -19,19 +19,19 @@ class JobRunner:
         """
         Create a job runner
 
-        :param job_list: Jobs to initial `self.job_queue`
+        :param job_list: Jobs to initial `self._job_queue`
         :param tqdm_class: `tqdm` class to replace default `tqdm.asyncio.tqdm`
         :param progress: Show progress bar
         """
         job_list = job_list or []
-        self.job_queue: asyncio.Queue[Job] = asyncio.Queue()
+        self._job_queue: asyncio.Queue[Job] = asyncio.Queue()
         for job in job_list:
-            self.job_queue.put_nowait(job)
+            self._job_queue.put_nowait(job)
         self.tqdm_class = tqdm_class
         self.progress = progress
-        self.tasks: Set[asyncio.Task] = set()
         self.downloaders_with_task: Dict[Downloader, asyncio.Task] = {}
-        self.lock = asyncio.Lock()
+        self._concurrent_tasks: Set[asyncio.Task] = set()
+        self._lock = asyncio.Lock()
 
     @property
     def finished(self):
@@ -40,13 +40,13 @@ class JobRunner:
 
         :return: `False` if **in process**, `False` otherwise
         """
-        return not self.lock.locked()
+        return not self._lock.locked()
 
     async def processor(self):
-        """Process each job in `self.job_queue`"""
-        while not self.job_queue.empty():
+        """Process each job in `self._job_queue`"""
+        while not self._job_queue.empty():
             # Create downloader
-            job = await self.job_queue.get()
+            job = await self._job_queue.get()
             url_parts = [config.downloader.scheme, config.api.files_netloc, job.server_path, '', '', '']
             url = urlunparse(url_parts)
             downloader = Downloader(
@@ -98,8 +98,8 @@ class JobRunner:
                         exception=exception
                     )
                 )
-            self.job_queue.task_done()
-        await self.job_queue.join()
+            self._job_queue.task_done()
+        await self._job_queue.join()
 
     async def start(self):
         """
@@ -107,19 +107,19 @@ class JobRunner:
 
         It will **Block** until other call of `self.start()` method finished
         """
-        async with self.lock:
-            self.tasks.clear()
+        async with self._lock:
+            self._concurrent_tasks.clear()
             for _ in range(config.job.count):
                 task = asyncio.create_task(self.processor())
-                self.tasks.add(task)
-                task.add_done_callback(self.tasks.discard)
-            await asyncio.wait(self.tasks)
+                self._concurrent_tasks.add(task)
+                task.add_done_callback(self._concurrent_tasks.discard)
+            await asyncio.wait(self._concurrent_tasks)
         logger.success(generate_msg("All jobs in queue finished"))
 
     async def add_jobs(self, *jobs: Job):
-        """Add jobs to `self.job_queue`"""
+        """Add jobs to `self._job_queue`"""
         for job in jobs:
-            await self.job_queue.put(job)
+            await self._job_queue.put(job)
 
     @staticmethod
     async def _force_cancel(target: asyncio.Task, wait_time: float = None) -> bool:
