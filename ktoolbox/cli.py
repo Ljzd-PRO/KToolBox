@@ -60,27 +60,6 @@ class KToolBoxCli:
             return ret.message
 
     @staticmethod
-    async def get_creator_post(service: str, creator_id: str, q: str = None, o: int = None):
-        """
-        Get a list of creator posts
-
-        :param service: The service where the post is located
-        :param creator_id: The ID of the creator
-        :param q: Search query
-        :param o: Result offset, stepping of 50 is enforced
-        """
-        ret = await get_creator_post_api(
-            service=service,
-            creator_id=creator_id,
-            q=q,
-            o=o
-        )
-        if ret:
-            return ret.data or TextEnum.SearchResultEmpty
-        else:
-            return ret.message
-
-    @staticmethod
     async def get_post(service: str, creator_id: str, post_id: str):
         """
         Get a specific post
