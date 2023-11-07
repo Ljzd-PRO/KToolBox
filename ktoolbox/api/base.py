@@ -70,13 +70,13 @@ class BaseAPI(ABC, Generic[_T]):
         except (ValueError, ValidationError) as e:
             if isinstance(e, ValueError):
                 return APIRet(
-                    code=RetCodeEnum.JsonDecodeError.value,
+                    code=RetCodeEnum.JsonDecodeError,
                     message=str(e),
                     exception=e
                 )
             elif isinstance(e, ValidationError):
                 return APIRet(
-                    code=RetCodeEnum.ValidationError.value,
+                    code=RetCodeEnum.ValidationError,
                     message=str(e),
                     exception=e
                 )
@@ -107,7 +107,7 @@ class BaseAPI(ABC, Generic[_T]):
                 )
         except Exception as e:
             return APIRet(
-                code=RetCodeEnum.NetWorkError.value,
+                code=RetCodeEnum.NetWorkError,
                 message=str(e),
                 exception=e
             )
