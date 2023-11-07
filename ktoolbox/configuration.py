@@ -1,5 +1,7 @@
+import logging
+from logging import getLevelName
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Union, Optional
 
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -86,11 +88,20 @@ class JobConfiguration(BaseModel):
     """Post path structure"""
 
 
+class LoggerConfiguration(BaseModel):
+    """Logger configuration"""
+    path: Optional[Path] = Path(".")
+    """Path to save logs"""
+    level: Union[str, int] = getLevelName(logging.DEBUG)
+    """Log filter level"""
+
+
 class Configuration(BaseSettings):
     """KToolBox Configuration"""
     api: APIConfiguration = APIConfiguration()
     downloader: DownloaderConfiguration = DownloaderConfiguration()
     job: JobConfiguration = JobConfiguration()
+    logger: LoggerConfiguration = LoggerConfiguration()
 
     # noinspection SpellCheckingInspection
     model_config = SettingsConfigDict(
