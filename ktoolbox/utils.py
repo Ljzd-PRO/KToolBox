@@ -1,15 +1,20 @@
 import cgi
 import os.path
 import urllib.parse
-from typing import Generic, TypeVar, Optional, Dict
+from pathlib import Path
+from typing import Generic, TypeVar, Optional, Dict, List
 
+import aiofiles
 from loguru import logger
 from pydantic import BaseModel, ConfigDict
 
 from ktoolbox.configuration import config
 from ktoolbox.enum import RetCodeEnum, DataStorageNameEnum
 
-__all__ = ["BaseRet", "file_name_from_headers", "generate_message", "logger_init"]
+from ktoolbox.model import SearchResult
+
+__all__ = ["BaseRet", "file_name_from_headers", "generate_message", "logger_init", "dump_search"]
+
 _T = TypeVar('_T')
 
 
@@ -116,4 +121,12 @@ def logger_init(disable_stdout: bool = False):
             level=config.logger.level,
             rotation=config.logger.rotation,
             diagnose=True
+        )
+
+
+async def dump_search(result: List[BaseModel], path: Path):
+    async with aiofiles.open(str(path), "w", encoding="utf-8") as f:
+        await f.write(
+            SearchResult(result=result)
+            .model_dump_json(indent=4)
         )
