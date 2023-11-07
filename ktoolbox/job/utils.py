@@ -15,7 +15,7 @@ async def create_job_from_post(
         post: Post,
         post_path: Path,
         *,
-        path_structure: Union[PostStructureConfiguration, bool] = None,
+        post_structure: Union[PostStructureConfiguration, bool] = None,
         dump_post_data: bool = False
 ) -> List[Job]:
     """
@@ -23,15 +23,15 @@ async def create_job_from_post(
     
     :param post: post data
     :param post_path: Path of the post directory
-    :param path_structure: post path structure, `False` -> disable, `True` & `None` -> `config.job.post_structure`
+    :param post_structure: post path structure, `False` -> disable, `True` & `None` -> `config.job.post_structure`
     :param dump_post_data: Whether to dump post data (post.json) in post directory
     """
     jobs: List[Job] = []
-    if path_structure in [True, None]:
-        path_structure = config.job.post_structure
-    if path_structure:
-        attachments_path = post_path / path_structure.attachments
-        content_path = post_path / path_structure.content_filepath
+    if post_structure in [True, None]:
+        post_structure = config.job.post_structure
+    if post_structure:
+        attachments_path = post_path / post_structure.attachments
+        content_path = post_path / post_structure.content_filepath
     else:
         attachments_path = post_path
         content_path = None
