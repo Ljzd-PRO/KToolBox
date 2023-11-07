@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from ktoolbox import __version__
-from ktoolbox.action import search_creator as search_creator_action
+from ktoolbox.action import search_creator as search_creator_action, search_creator_post as search_creator_post_action
 from ktoolbox.api.misc import get_app_version
 from ktoolbox.api.posts import get_creator_post as get_creator_post_api, get_post as get_post_api
 from ktoolbox.downloader import Downloader
@@ -34,6 +34,25 @@ class KToolBoxCli:
         :param service: The service for the creator
         """
         ret = await search_creator_action(id=id, name=name, service=service)
+        if ret:
+            result_list = list(ret.data)
+            return result_list or TextEnum.SearchResultEmpty
+        else:
+            return ret.message
+
+    # noinspection PyShadowingBuiltins
+    @staticmethod
+    async def search_creator_post(id: str = None, name: str = None, service: str = None, q: str = None, o: int = None):
+        """
+        Search posts from creator, you can use multiple parameters as keywords.
+
+        :param id: The ID of the creator
+        :param name: The name of the creator
+        :param service: The service for the creator
+        :param q: Search query
+        :param o: Result offset, stepping of 50 is enforced
+        """
+        ret = await search_creator_post_action(id=id, name=name, service=service, q=q, o=o)
         if ret:
             result_list = list(ret.data)
             return result_list or TextEnum.SearchResultEmpty
