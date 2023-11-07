@@ -17,7 +17,7 @@ __all__ = ["JobRunner"]
 
 
 class JobRunner:
-    def __init__(self, *, job_list: List[Job] = None, tqdm_class: std_tqdm = None, progress: bool = False):
+    def __init__(self, *, job_list: List[Job] = None, tqdm_class: std_tqdm = None, progress: bool = True):
         """
         Create a job runner
 
