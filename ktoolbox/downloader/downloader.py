@@ -1,8 +1,9 @@
 import asyncio
 import urllib.parse
 from asyncio import CancelledError
+from functools import cached_property
 from pathlib import Path
-from typing import Callable, Any, Coroutine, Type
+from typing import Callable, Any, Coroutine, Type, Optional
 
 import aiofiles
 import httpx
@@ -42,14 +43,40 @@ class Downloader:
             * Else use filename from URL 'path' part.
         """
 
-        self.url = url
-        self.path = path
-        self.buffer_size = buffer_size or config.downloader.buffer_size
-        self.chunk_size = chunk_size or config.downloader.chunk_size
-        self.alt_filename = alt_filename
+        self._url = url
+        self._path = path
+        self._buffer_size = buffer_size or config.downloader.buffer_size
+        self._chunk_size = chunk_size or config.downloader.chunk_size
+        self._alt_filename = alt_filename
+        self._filename = alt_filename
 
-        self.lock = asyncio.Lock()
+        self._lock = asyncio.Lock()
         self._stop: bool = False
+
+    @cached_property
+    def url(self) -> str:
+        """Download URL"""
+        return self._url
+
+    @cached_property
+    def path(self) -> Path:
+        """Directory path to save the file"""
+        return self._path
+
+    @cached_property
+    def buffer_size(self) -> int:
+        """Number of bytes for file I/O buffer"""
+        return self._buffer_size
+
+    @cached_property
+    def chunk_size(self) -> int:
+        """Number of bytes for chunk of download stream"""
+        return self._chunk_size
+
+    @property
+    def filename(self) -> Optional[str]:
+        """Actual filename of the download file"""
+        return self._filename
 
     @property
     def finished(self) -> bool:
@@ -58,7 +85,7 @@ class Downloader:
 
         :return: `False` if the download **in process**, `False` otherwise
         """
-        return not self.lock.locked()
+        return not self._lock.locked()
 
     def cancel(self):
         """
@@ -87,11 +114,11 @@ class Downloader:
         :raise CancelledError
         """
         tqdm_class: Type[std_tqdm] = tqdm_class or tqdm.asyncio.tqdm
-        async with self.lock:
+        async with self._lock:
             async with httpx.AsyncClient() as client:
                 async with client.stream(
                         method="GET",
-                        url=self.url,
+                        url=self._url,
                         follow_redirects=True,
                         timeout=config.downloader.timeout
                 ) as res:  # type: httpx.Response
@@ -101,20 +128,21 @@ class Downloader:
                             message=generate_msg(
                                 "Download failed",
                                 status_code=res.status_code,
-                                filename=self.alt_filename
+                                filename=self._alt_filename
                             )
                         )
 
                     # Get filename
-                    if not (file_name := file_name_from_headers(res.headers)):
-                        if not (file_name := self.alt_filename):
-                            file_name = urllib.parse.unquote(Path(self.url).name)
+                    if not (filename := file_name_from_headers(res.headers)):
+                        if not (filename := self._alt_filename):
+                            filename = urllib.parse.unquote(Path(self._url).name)
+                    self._filename = filename
 
                     total_size = int(length_str) if (length_str := res.headers.get("Content-Length")) else None
-                    async with aiofiles.open(str(self.path / file_name), "wb", self.buffer_size) as f:
-                        chunk_iterator = res.aiter_bytes(self.chunk_size)
+                    async with aiofiles.open(str(self._path / filename), "wb", self._buffer_size) as f:
+                        chunk_iterator = res.aiter_bytes(self._chunk_size)
                         t = tqdm_class(
-                            desc=file_name,
+                            desc=filename,
                             total=total_size,
                             disable=not progress,
                             unit="B",
@@ -130,12 +158,12 @@ class Downloader:
             if async_callable:
                 await async_callable(self)
             return DownloaderRet(
-                data=file_name
-            ) if file_name else DownloaderRet(
+                data=filename
+            ) if filename else DownloaderRet(
                 code=RetCodeEnum.GeneralFailure,
                 message=generate_msg(
                     "Download failed",
-                    filename=self.alt_filename
+                    filename=self._alt_filename
                 )
             )
 
