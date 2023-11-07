@@ -5,7 +5,6 @@ __all__ = ["TextEnum", "RetCodeEnum", "PostFileTypeEnum", "DataStorageNameEnum"]
 
 class TextEnum(StrEnum):
     SearchResultEmpty = str(None)
-    RetMsgTemplate = "{title}: {key} - {value}"
 
 
 class RetCodeEnum(IntEnum):

@@ -2,11 +2,14 @@ import asyncio
 from typing import List, Set
 from urllib.parse import urlunparse
 
+from loguru import logger
 from tqdm import tqdm as std_tqdm
 
 from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
 from ktoolbox.job import Job
+
+from ktoolbox.utils import generate_message
 
 __all__ = ["JobRunner"]
 
@@ -49,11 +52,19 @@ class JobRunner:
                 alt_filename=job.alt_filename
             )
             self.downloaders.append(downloader)
-            await downloader.run(
+            ret = await downloader.run(
                 sync_callable=self.downloaders.remove,
                 tqdm_class=self.tqdm_class
             )
-            # TODO: finished log
+            if ret:
+                logger.success(
+                    generate_message(
+                        title="Download success",
+                        filename=ret.data
+                    )
+                )
+            else:
+                logger.error(ret.message)
             self.job_queue.task_done()
         await self.job_queue.join()
 

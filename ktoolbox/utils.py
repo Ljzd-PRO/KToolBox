@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict
 from ktoolbox.configuration import config
 from ktoolbox.enum import RetCodeEnum
 
-__all__ = ["BaseRet", "file_name_from_headers"]
+__all__ = ["BaseRet", "file_name_from_headers", "generate_message"]
 _T = TypeVar('_T')
 
 
@@ -84,3 +84,15 @@ def file_name_from_headers(headers: Dict[str, str]) -> Optional[str]:
     if file_name := options.get("filename"):
         return urllib.parse.unquote(file_name, config.downloader.encoding)
     return None
+
+
+def generate_message(title: str = None, **kwargs):
+    """
+    Generate message for `BaseRet` and logger
+
+    :param title:
+    :param kwargs:
+    :return:
+    """
+    title: str = title or ""
+    return f"{title} - {kwargs}" if kwargs else title

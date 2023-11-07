@@ -10,8 +10,8 @@ from tqdm import tqdm as std_tqdm
 
 from ktoolbox.configuration import config
 from ktoolbox.downloader import DownloaderRet
-from ktoolbox.enum import RetCodeEnum, TextEnum
-from ktoolbox.utils import file_name_from_headers
+from ktoolbox.enum import RetCodeEnum
+from ktoolbox.utils import file_name_from_headers, generate_message
 
 __all__ = ["Downloader"]
 
@@ -87,10 +87,9 @@ class Downloader:
                     if res.status_code != httpx.codes.OK:
                         return DownloaderRet(
                             code=RetCodeEnum.GeneralFailure,
-                            message=TextEnum.RetMsgTemplate.format(
+                            message=generate_message(
                                 title="Download failed",
-                                key="status_code",
-                                value="res.status_code"
+                                status_code=res.status_code
                             )
                         )
                     if not (file_name := file_name_from_headers(res.headers)):
@@ -117,7 +116,7 @@ class Downloader:
                 data=file_name
             ) if file_name else DownloaderRet(
                 code=RetCodeEnum.GeneralFailure,
-                message="Download failed"
+                message=generate_message("Download failed")
             )
 
     __call__ = run
