@@ -41,7 +41,7 @@ class BaseAPI(ABC, Generic[_T]):
         """
         API response model
         """
-        pass
+        ...
 
     @staticmethod
     def retry(*args, **kwargs):
@@ -118,4 +118,4 @@ class BaseAPI(ABC, Generic[_T]):
     @abstractmethod
     async def __call__(cls, *args, **kwargs) -> APIRet[Response]:
         """Function to call API"""
-        pass
+        ...

@@ -9,7 +9,7 @@ class GetPost(BaseAPI):
     method = "get"
 
     class Response(Post):
-        pass
+        ...
 
     @classmethod
     async def __call__(cls, service: str, creator_id: str, post_id: str) -> APIRet[Post]:
