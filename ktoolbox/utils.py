@@ -92,9 +92,8 @@ def generate_message(title: str = None, **kwargs):
     """
     Generate message for `BaseRet` and logger
 
-    :param title:
-    :param kwargs:
-    :return:
+    :param title: Message title
+    :param kwargs: Extra data
     """
     title: str = title or ""
     return f"{title} - {kwargs}" if kwargs else title

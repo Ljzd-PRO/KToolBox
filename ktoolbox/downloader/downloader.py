@@ -27,7 +27,7 @@ class Downloader:
             alt_filename: str = None
     ):
         """
-        Initial a file downloader
+        Initialize a file downloader
 
         :param url: Download URL
         :param path: Directory path to save the file
