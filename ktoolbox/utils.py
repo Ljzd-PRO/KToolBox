@@ -1,13 +1,15 @@
 import cgi
+import os.path
 import urllib.parse
 from typing import Generic, TypeVar, Optional, Dict
 
+from loguru import logger
 from pydantic import BaseModel, ConfigDict
 
 from ktoolbox.configuration import config
-from ktoolbox.enum import RetCodeEnum
+from ktoolbox.enum import RetCodeEnum, DataStorageNameEnum
 
-__all__ = ["BaseRet", "file_name_from_headers", "generate_message"]
+__all__ = ["BaseRet", "file_name_from_headers", "generate_message", "logger_init"]
 _T = TypeVar('_T')
 
 
@@ -96,3 +98,23 @@ def generate_message(title: str = None, **kwargs):
     """
     title: str = title or ""
     return f"{title} - {kwargs}" if kwargs else title
+
+
+def logger_init(disable_stdout: bool = False):
+    """
+    Initialize `loguru` logger
+
+    :param disable_stdout: Disable default output stream
+    """
+    if disable_stdout:
+        logger.remove()
+    path = config.logger.path
+    if not os.path.isdir(path):
+        os.makedirs(path)
+    if path is not None:
+        logger.add(
+            path / DataStorageNameEnum.LogData,
+            level=config.logger.level,
+            rotation=config.logger.rotation,
+            diagnose=True
+        )

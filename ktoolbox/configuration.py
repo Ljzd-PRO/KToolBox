@@ -1,3 +1,4 @@
+import datetime
 import logging
 from logging import getLevelName
 from pathlib import Path
@@ -94,6 +95,8 @@ class LoggerConfiguration(BaseModel):
     """Path to save logs"""
     level: Union[str, int] = getLevelName(logging.DEBUG)
     """Log filter level"""
+    rotation: Union[str, int, datetime.time, datetime.timedelta] = "1 week"
+    """Log rotation"""
 
 
 class Configuration(BaseSettings):
