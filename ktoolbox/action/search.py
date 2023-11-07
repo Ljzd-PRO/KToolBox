@@ -47,7 +47,7 @@ async def search_creator_post(
         o: str = None
 ) -> BaseRet[List[Post]]:
     """
-    Search posts of a creator with multiple keywords support.
+    Search posts from creator with multiple keywords support.
 
     :param id: The ID of the creator
     :param name: The name of the creator
