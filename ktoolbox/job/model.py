@@ -1,12 +1,13 @@
 from collections import UserList
 from pathlib import Path
-from typing import List, Generator, Optional, Literal
+from typing import List, Generator, Optional, Literal, Dict
 
 from pydantic import BaseModel, Field
 
-__all__ = ["Job"]
-
+from ktoolbox.api.model import Creator, Post
 from ktoolbox.enum import PostFileTypeEnum
+
+__all__ = ["Job", "CreatorIndices"]
 
 
 class Job(BaseModel):
@@ -35,3 +36,15 @@ class JobList(Job, UserList[Job]):
     def __iter__(self) -> Generator[Job, None, None]:
         """Generator for iterating over jobs"""
         yield from self.data
+
+
+class CreatorIndices(BaseModel):
+    """
+    Creator directory indices model
+
+    Record the path of each downloaded post.
+    """
+    creator: Creator
+    """Creator data"""
+    posts: Dict[Path, Post] = {}
+    """Posts path and their `Post` data"""
