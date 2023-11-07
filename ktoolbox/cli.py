@@ -4,9 +4,7 @@ from ktoolbox import __version__
 from ktoolbox.action import search_creator as search_creator_action
 from ktoolbox.api.misc import get_app_version
 from ktoolbox.api.posts import get_creator_post as get_creator_post_api, get_post as get_post_api
-
 from ktoolbox.downloader import Downloader
-
 from ktoolbox.enum import TextEnum
 
 __all__ = ["KToolBoxCli"]

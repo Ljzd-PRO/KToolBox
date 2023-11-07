@@ -11,6 +11,7 @@ class BaseKToolBoxData(BaseModel):
     """
     Base class for all KToolBox data models.
     """
+
     def __init__(self, **data: Any):
         super().__init__(**data)
         self.type = type(self)

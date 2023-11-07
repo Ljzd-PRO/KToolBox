@@ -6,7 +6,6 @@ from pydantic import BaseModel, Field
 
 from ktoolbox.api.model import Creator, Post
 from ktoolbox.enum import PostFileTypeEnum
-
 from ktoolbox.model import BaseKToolBoxData
 
 __all__ = ["Job", "JobListData", "CreatorIndices"]
