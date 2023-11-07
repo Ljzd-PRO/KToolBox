@@ -3,6 +3,7 @@ import urllib.parse
 from pathlib import Path
 from typing import Callable, Any, Coroutine, Type
 
+import aiofiles
 import httpx
 import tqdm.asyncio
 from tqdm import tqdm as std_tqdm
@@ -11,9 +12,9 @@ from ktoolbox.configuration import config
 from ktoolbox.downloader import DownloaderRet
 from ktoolbox.enum import RetCodeEnum
 
-__all__ = ["Downloader"]
-
 from ktoolbox.utils import file_name_from_headers
+
+__all__ = ["Downloader"]
 
 
 class Downloader:
@@ -93,7 +94,7 @@ class Downloader:
                         if not (file_name := self.alt_filename):
                             file_name = urllib.parse.unquote(Path(self.url).name)
                     total_size = int(length_str) if (length_str := res.headers.get("Content-Length")) else None
-                    with open(str(self.path / file_name), "wb", self.buffer_size) as f:
+                    async with aiofiles.open(str(self.path / file_name), "wb", self.buffer_size) as f:
                         chunk_iterator = res.aiter_bytes(self.chunk_size)
                         t = tqdm_class(
                             desc=file_name,
@@ -103,7 +104,7 @@ class Downloader:
                             unit_scale=True
                         )
                         async for chunk in chunk_iterator:
-                            f.write(chunk)
+                            await f.write(chunk)
                             t.update(len(chunk))  # Update progress bar
             if sync_callable:
                 sync_callable(self)
