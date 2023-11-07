@@ -1,9 +1,12 @@
 from pathlib import Path
 
+import aiofiles
+
 from ktoolbox import __version__
 from ktoolbox.action import search_creator as search_creator_action, search_creator_post as search_creator_post_action
 from ktoolbox.api.misc import get_app_version
 from ktoolbox.api.posts import get_post as get_post_api
+from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
 from ktoolbox.enum import TextEnum
 from ktoolbox.utils import dump_search
@@ -80,20 +83,29 @@ class KToolBoxCli:
             return ret.message
 
     @staticmethod
-    async def get_post(service: str, creator_id: str, post_id: str):
+    async def get_post(service: str, creator_id: str, post_id: str, *, dump: Path = None):
         """
         Get a specific post
 
         :param service: The service name
         :param creator_id: The creator's ID
         :param post_id: The post ID
+        :param dump: Dump the result to a JSON file
         """
         ret = await get_post_api(
             service=service,
             creator_id=creator_id,
             post_id=post_id
         )
-        return ret.data if ret else ret.message
+        if ret:
+            if dump:
+                async with aiofiles.open(str(dump), "w", encoding="utf-8") as f:
+                    await f.write(
+                        ret.data.model_dump_json(indent=config.json_dump_indent)
+                    )
+            return ret.data
+        else:
+            return ret.message
 
     @staticmethod
     async def dev_test():
