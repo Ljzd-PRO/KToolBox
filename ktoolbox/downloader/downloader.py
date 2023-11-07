@@ -1,5 +1,6 @@
 import asyncio
 import urllib.parse
+from asyncio import CancelledError
 from pathlib import Path
 from typing import Callable, Any, Coroutine, Type
 
@@ -48,6 +49,7 @@ class Downloader:
         self.alt_filename = alt_filename
 
         self.lock = asyncio.Lock()
+        self._stop: bool = False
 
     @property
     def finished(self) -> bool:
@@ -57,6 +59,14 @@ class Downloader:
         :return: `False` if the download **in process**, `False` otherwise
         """
         return not self.lock.locked()
+
+    def cancel(self):
+        """
+        Cancel the download
+
+        It will raise `asyncio.CancelledError` in `chunk_iterator` (writing chunk to file) iteration.
+        """
+        self._stop = True
 
     async def run(
             self,
@@ -74,6 +84,7 @@ class Downloader:
         :param tqdm_class: `tqdm` class to replace default `tqdm.asyncio.tqdm`
         :param progress: Show progress bar
         :return: `DownloaderRet` which contain the actual output filename
+        :raise CancelledError
         """
         tqdm_class: Type[std_tqdm] = tqdm_class or tqdm.asyncio.tqdm
         async with self.lock:
@@ -93,9 +104,12 @@ class Downloader:
                                 filename=self.alt_filename
                             )
                         )
+
+                    # Get filename
                     if not (file_name := file_name_from_headers(res.headers)):
                         if not (file_name := self.alt_filename):
                             file_name = urllib.parse.unquote(Path(self.url).name)
+
                     total_size = int(length_str) if (length_str := res.headers.get("Content-Length")) else None
                     async with aiofiles.open(str(self.path / file_name), "wb", self.buffer_size) as f:
                         chunk_iterator = res.aiter_bytes(self.chunk_size)
@@ -107,6 +121,8 @@ class Downloader:
                             unit_scale=True
                         )
                         async for chunk in chunk_iterator:
+                            if self._stop:
+                                raise CancelledError
                             await f.write(chunk)
                             t.update(len(chunk))  # Update progress bar
             if sync_callable:
