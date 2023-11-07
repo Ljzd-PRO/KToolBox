@@ -87,12 +87,14 @@ class JobConfiguration(BaseModel):
     """Use post ID as post directory name"""
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
     """Post path structure"""
+    job_list_filepath: Optional[Path] = None
+    """Filepath for job list data saving, `None` for disable job list saving"""
 
 
 class LoggerConfiguration(BaseModel):
     """Logger configuration"""
     path: Optional[Path] = Path(".")
-    """Path to save logs"""
+    """Path to save logs, `None` for disable log file output"""
     level: Union[str, int] = getLevelName(logging.DEBUG)
     """Log filter level"""
     rotation: Union[str, int, datetime.time, datetime.timedelta] = "1 week"
