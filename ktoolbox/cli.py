@@ -5,11 +5,11 @@ from ktoolbox.action import search_creator as search_creator_action
 from ktoolbox.api.misc import get_app_version
 from ktoolbox.api.posts import get_creator_post as get_creator_post_api, get_post as get_post_api
 
-__all__ = ["KToolBoxCli"]
-
-from ktoolbox.downloader import download
+from ktoolbox.downloader import Downloader
 
 from ktoolbox.enum import TextEnum
+
+__all__ = ["KToolBoxCli"]
 
 
 class KToolBoxCli:
@@ -80,7 +80,11 @@ class KToolBoxCli:
         return ret.data if ret else ret.message
 
     @staticmethod
-    async def dev_test(url: str):
+    async def dev_test():
         """Dev test"""
-        ret = await download(url, Path("./"), progress=True)
+        downloader = Downloader(
+            "https://github.com/Ljzd-PRO/Mys_Goods_Tool/releases/download/v2.1.0/v2.1.0-Linux-x86_64.zip",
+            Path("./")
+        )
+        ret = await downloader.run(progress=True)
         return ret.data if ret else ret.message
