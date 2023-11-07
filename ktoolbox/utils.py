@@ -13,7 +13,7 @@ from ktoolbox.enum import RetCodeEnum, DataStorageNameEnum
 
 from ktoolbox.model import SearchResult
 
-__all__ = ["BaseRet", "file_name_from_headers", "generate_message", "logger_init", "dump_search"]
+__all__ = ["BaseRet", "file_name_from_headers", "generate_msg", "logger_init", "dump_search"]
 
 _T = TypeVar('_T')
 
@@ -93,7 +93,7 @@ def file_name_from_headers(headers: Dict[str, str]) -> Optional[str]:
     return None
 
 
-def generate_message(title: str = None, **kwargs):
+def generate_msg(title: str = None, **kwargs):
     """
     Generate message for `BaseRet` and logger
 

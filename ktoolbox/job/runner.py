@@ -9,7 +9,7 @@ from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
 from ktoolbox.job import Job
 
-from ktoolbox.utils import generate_message
+from ktoolbox.utils import generate_msg
 
 __all__ = ["JobRunner"]
 
@@ -61,7 +61,7 @@ class JobRunner:
             )
             if ret:
                 logger.success(
-                    generate_message(
+                    generate_msg(
                         "Download success",
                         filename=ret.data
                     )
@@ -84,4 +84,4 @@ class JobRunner:
                 self.tasks.add(task)
                 task.add_done_callback(self.tasks.discard)
             await asyncio.wait(self.tasks)
-        logger.success(generate_message("All jobs in queue finished"))
+        logger.success(generate_msg("All jobs in queue finished"))

@@ -4,7 +4,7 @@ from ktoolbox.action import ActionRet
 from ktoolbox.api.model import Creator, Post
 from ktoolbox.api.posts import get_creators, get_creator_post
 from ktoolbox.enum import RetCodeEnum
-from ktoolbox.utils import BaseRet, generate_message
+from ktoolbox.utils import BaseRet, generate_msg
 
 __all__ = ["search_creator", "search_creator_post"]
 
@@ -84,7 +84,7 @@ async def search_creator_post(
         else:
             return ActionRet(
                 code=RetCodeEnum.MissingParameter,
-                message=generate_message(
+                message=generate_msg(
                     "Missing `id`, `name`, `service` parameter, at least given one of them.",
                     **kwargs
                 )
