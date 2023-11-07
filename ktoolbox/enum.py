@@ -8,6 +8,7 @@ class TextEnum(StrEnum):
 
 
 class RetCodeEnum(IntEnum):
+    """Enum for `BaseRet.code`"""
     Success = 0
     GeneralFailure = -1
 
@@ -18,12 +19,15 @@ class RetCodeEnum(IntEnum):
 
 
 class PostFileTypeEnum(StrEnum):
+    # noinspection SpellCheckingInspection
+    """File types of Kemono post files"""
     Attachment = "attachment"
     File = "file"
 
 
 # noinspection SpellCheckingInspection
 class DataStorageNameEnum(StrEnum):
+    """File names for saving KToolBox data files"""
     PostData = "post.json"
     CreatorIndicesData = "creator-indices.ktoolbox"
     JobListData = "job-list.ktoolbox"

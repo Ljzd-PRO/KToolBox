@@ -87,6 +87,7 @@ class JobConfiguration(BaseModel):
 
 
 class Configuration(BaseSettings):
+    """KToolBox Configuration"""
     api: APIConfiguration = APIConfiguration()
     downloader: DownloaderConfiguration = DownloaderConfiguration()
     job: JobConfiguration = JobConfiguration()
