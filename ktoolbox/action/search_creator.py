@@ -4,9 +4,9 @@ from ktoolbox.action import ActionRet
 from ktoolbox.api.model import Creator
 from ktoolbox.api.posts import get_creators
 
-__all__ = ["search_creator"]
-
 from ktoolbox.utils import BaseRet
+
+__all__ = ["search_creator"]
 
 
 # noinspection PyShadowingBuiltins
