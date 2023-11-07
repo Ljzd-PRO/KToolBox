@@ -1,5 +1,7 @@
 import asyncio
 from asyncio import CancelledError
+from functools import cached_property
+from types import MappingProxyType
 from typing import List, Set, Dict
 from urllib.parse import urlunparse
 
@@ -27,9 +29,9 @@ class JobRunner:
         self._job_queue: asyncio.Queue[Job] = asyncio.Queue()
         for job in job_list:
             self._job_queue.put_nowait(job)
-        self.tqdm_class = tqdm_class
-        self.progress = progress
-        self.downloaders_with_task: Dict[Downloader, asyncio.Task] = {}
+        self._tqdm_class = tqdm_class
+        self._progress = progress
+        self._downloaders_with_task: Dict[Downloader, asyncio.Task] = {}
         self._concurrent_tasks: Set[asyncio.Task] = set()
         self._lock = asyncio.Lock()
 
@@ -41,6 +43,30 @@ class JobRunner:
         :return: `False` if **in process**, `False` otherwise
         """
         return not self._lock.locked()
+
+    @cached_property
+    def downloaders(self) -> MappingProxyType[Downloader, asyncio.Task]:
+        """Get downloaders with task"""
+        return MappingProxyType(self._downloaders_with_task)
+
+    @property
+    def waiting_size(self) -> int:
+        """Get the number of jobs waiting to be processed"""
+        return self._job_queue.qsize()
+
+    @property
+    def done_size(self) -> int:
+        """Get the number of jobs that done"""
+        size = 0
+        for downloader, task in self._downloaders_with_task.items():
+            if downloader.finished or task.done():
+                size += 1
+        return size
+
+    @property
+    def processing_size(self) -> int:
+        """Get the number of jobs that in process"""
+        return len(self._downloaders_with_task) - self.done_size
 
     async def processor(self):
         """Process each job in `self._job_queue`"""
@@ -58,12 +84,13 @@ class JobRunner:
             # Create task
             task = asyncio.create_task(
                 downloader.run(
-                    tqdm_class=self.tqdm_class,
-                    progress=self.progress
+                    tqdm_class=self._tqdm_class,
+                    progress=self._progress
                 )
             )
-            self.downloaders_with_task[downloader] = task
-            task.add_done_callback(lambda _: self.downloaders_with_task.pop(downloader))
+            self._downloaders_with_task[downloader] = task
+            # task.add_done_callback(lambda _: self._downloaders_with_task.pop(downloader))
+            #   Delete this for counting finished job tasks
 
             # Run task
             task_done_set, _ = await asyncio.wait([task], return_when=asyncio.FIRST_EXCEPTION)
@@ -72,7 +99,7 @@ class JobRunner:
                 exception = task_done.exception()
             except CancelledError as e:
                 exception = e
-            if not exception:   # raise Exception when cancelled or other exceptions
+            if not exception:  # raise Exception when cancelled or other exceptions
                 ret = task_done.result()
                 if ret:
                     logger.success(
@@ -140,7 +167,7 @@ class JobRunner:
 
         :return: Whether cancelled successfully
         """
-        task = self.downloaders_with_task[target]
+        task = self._downloaders_with_task[target]
         if not task.done():
             target.cancel()
             return await self._force_cancel(task, 0) or task.done()
