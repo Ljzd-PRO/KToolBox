@@ -20,7 +20,7 @@ async def create_job_from_post(
 ) -> List[Job]:
     """
     Create a list of download job from a post data
-    
+
     :param post: post data
     :param post_path: Path of the post directory
     :param post_structure: post path structure, `False` -> disable, `True` & `None` -> `config.job.post_structure`
