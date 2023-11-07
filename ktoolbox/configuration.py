@@ -41,9 +41,16 @@ class DownloaderConfiguration(BaseModel):
     """Number of bytes for chunk of downloader stream"""
 
 
+class JobConfiguration(BaseModel):
+    """Download jobs Configuration"""
+    count: int = 10
+    """Number of coroutines for concurrent download"""
+
+
 class Configuration(BaseSettings):
     api: APIConfiguration = APIConfiguration()
     downloader: DownloaderConfiguration = DownloaderConfiguration()
+    job: JobConfiguration = JobConfiguration()
 
     # noinspection SpellCheckingInspection
     model_config = SettingsConfigDict(
