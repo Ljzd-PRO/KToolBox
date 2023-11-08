@@ -44,8 +44,7 @@ jobs:
       - name: Run Pytest
         run: |
           cd tests/
-          poetry run pytest -v --capture=sys --cov --cov-report=xml \
-          --html=report-${{ github.ref }}-${{ matrix.os }}-${{ matrix.python-version }}.html --self-contained-html
+          poetry run pytest -v --capture=sys --cov --cov-report=xml --html=report-${{ github.ref }}-${{ matrix.os }}-${{ matrix.python-version }}.html --self-contained-html
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v3
