@@ -1,0 +1,47 @@
+name: Code Coverage
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    paths:
+      - "ktoolbox/**"
+      - "tests/**"
+      - ".github/actions/setup-python/**"
+      - ".github/workflows/codecov.yml"
+      - "pyproject.toml"
+      - "prod.env"
+
+jobs:
+  test:
+    name: Test Coverage
+    runs-on: ${{ matrix.os }}
+    concurrency:
+      group: test-coverage-${{ github.ref }}-${{ matrix.os }}-${{ matrix.python-version }}
+      cancel-in-progress: true
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python environment
+        uses: ./.github/actions/setup-python
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run Pytest
+        run: |
+          cd tests/
+          pytest -v --capture=sys --cov --cov-report=xml --html=report-${{ matrix.python-version }}.html --self-contained-html
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          files: ./tests/coverage.xml

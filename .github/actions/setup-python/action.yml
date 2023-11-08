@@ -1,0 +1,24 @@
+name: Setup Python
+description: Setup Python
+
+inputs:
+  python-version:
+    description: Python version
+    required: false
+    default: "3.10"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install poetry
+      run: pipx install poetry
+      shell: bash
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.python-version }}
+        architecture: "x64"
+        cache: "poetry"
+
+    - run: poetry install --with test
+      shell: bash
