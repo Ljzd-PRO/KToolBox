@@ -45,6 +45,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           files: ./tests/coverage.xml
+          flags: unit
 
       - name: Upload pytest HTML result
         uses: actions/upload-artifact@v3
