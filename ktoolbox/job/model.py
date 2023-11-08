@@ -4,7 +4,7 @@ from typing import List, Generator, Optional, Literal, Dict
 
 from pydantic import BaseModel, Field
 
-from ktoolbox.api.model import Creator, Post
+from ktoolbox.api.model import Post
 from ktoolbox.enum import PostFileTypeEnum
 from ktoolbox.model import BaseKToolBoxData
 

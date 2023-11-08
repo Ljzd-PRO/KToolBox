@@ -27,6 +27,22 @@ class APITenacityStop(stop_base):
             return stop_after_attempt(config.api.retry_times)(retry_state)
 
 
+def _retry(*args, **kwargs):
+    """Wrap an API method with a new `Retrying` object"""
+    wrapper = tenacity.retry(
+        stop=APITenacityStop(),
+        wait=wait_fixed(config.api.retry_interval),
+        retry=retry_if_result(lambda x: not bool(x)),
+        reraise=True,
+        retry_error_callback=lambda x: x.outcome.result(),  # type: Callable[[RetryCallState], Any]
+        **kwargs
+    )
+    if len(args) == 1 and callable(args[0]):
+        return wrapper(args[0])
+    else:
+        return wrapper
+
+
 class APIRet(BaseRet[_T]):
     """Return data model of API call"""
     pass
@@ -42,22 +58,6 @@ class BaseAPI(ABC, Generic[_T]):
         API response model
         """
         ...
-
-    @staticmethod
-    def retry(*args, **kwargs):
-        """Wrap a function with a new `Retrying` object"""
-        wrapper = tenacity.retry(
-            stop=APITenacityStop(),
-            wait=wait_fixed(config.api.retry_interval),
-            retry=retry_if_result(lambda x: not bool(x)),
-            reraise=True,
-            retry_error_callback=lambda x: x.outcome.result(),  # type: Callable[[RetryCallState], Any]
-            **kwargs
-        )
-        if len(args) == 1 and callable(args[0]):
-            return wrapper(args[0])
-        else:
-            return wrapper
 
     @classmethod
     def handle_res(cls, res: httpx.Response) -> APIRet[_T]:
@@ -85,7 +85,7 @@ class BaseAPI(ABC, Generic[_T]):
             return APIRet(data=data)
 
     @classmethod
-    @retry
+    @_retry
     async def request(cls, path: str = None, **kwargs) -> APIRet[_T]:
         """
         Make a request to the API

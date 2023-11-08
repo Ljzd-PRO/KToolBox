@@ -49,7 +49,7 @@ class KToolBoxCli:
             result_list = list(ret.data)
             if dump:
                 await dump_search(result_list, dump)
-            return result_list or TextEnum.SearchResultEmpty
+            return result_list or TextEnum.SearchResultEmpty.value
         else:
             return ret.message
 
@@ -78,7 +78,7 @@ class KToolBoxCli:
         if ret:
             if dump:
                 await dump_search(ret.data, dump)
-            return ret.data or TextEnum.SearchResultEmpty
+            return ret.data or TextEnum.SearchResultEmpty.value
         else:
             return ret.message
 
