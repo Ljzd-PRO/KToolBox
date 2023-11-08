@@ -33,7 +33,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: false
     env:
-      PYTEST_REPORT_FILENAME: report-${{ github.ref }}-${{ matrix.os }}-${{ matrix.python-version }}.html
+      PYTEST_REPORT_FILENAME: report-${{ matrix.os }}-${{ matrix.python-version }}.html
 
     steps:
       - uses: actions/checkout@v4
