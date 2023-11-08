@@ -4,7 +4,15 @@ on:
   push:
     branches:
       - master
+    paths:
+      - ".github/actions/setup-python/**"
+      - ".github/workflows/python-package.yml"
+      - "pyproject.toml"
   pull_request:
+    paths:
+      - ".github/actions/setup-python/**"
+      - ".github/workflows/python-package.yml"
+      - "pyproject.toml"
 
 jobs:
   build:
