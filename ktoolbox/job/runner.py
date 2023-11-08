@@ -45,7 +45,7 @@ class JobRunner:
         return not self._lock.locked()
 
     @cached_property
-    def downloaders(self) -> MappingProxyType[Downloader, asyncio.Task]:
+    def downloaders(self):
         """Get downloaders with task"""
         return MappingProxyType(self._downloaders_with_task)
 
