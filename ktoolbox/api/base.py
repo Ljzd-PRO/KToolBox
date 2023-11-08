@@ -53,11 +53,8 @@ class BaseAPI(ABC, Generic[_T]):
     method: Literal["get", "post"]
     extra_validator: Optional[Callable[[str], BaseModel]] = None
 
-    class Response(BaseModel):
-        """
-        API response model
-        """
-        ...
+    Response = BaseModel
+    """API response model"""
 
     @classmethod
     def handle_res(cls, res: httpx.Response) -> APIRet[_T]:
