@@ -1,9 +1,9 @@
-from enum import StrEnum, IntEnum
+from enum import IntEnum, Enum
 
 __all__ = ["TextEnum", "RetCodeEnum", "PostFileTypeEnum", "DataStorageNameEnum"]
 
 
-class TextEnum(StrEnum):
+class TextEnum(Enum):
     SearchResultEmpty = str(None)
 
 
@@ -21,7 +21,7 @@ class RetCodeEnum(IntEnum):
     MissingParameter = 2001
 
 
-class PostFileTypeEnum(StrEnum):
+class PostFileTypeEnum(Enum):
     # noinspection SpellCheckingInspection
     """File types of Kemono post files"""
     Attachment = "attachment"
@@ -29,7 +29,7 @@ class PostFileTypeEnum(StrEnum):
 
 
 # noinspection SpellCheckingInspection
-class DataStorageNameEnum(StrEnum):
+class DataStorageNameEnum(Enum):
     """File names for saving KToolBox data files"""
     PostData = "post.json"
     CreatorIndicesData = "creator-indices.ktoolbox"
