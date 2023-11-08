@@ -46,6 +46,7 @@ pyinstaller = "==6.1.0"
 pytest = "==7.4.3"
 pytest-html = "==4.1.1"
 pytest-asyncio = "==0.21.1"
+pytest-cov = "==4.1.0"
 allpairspy = "==2.5.1"
 
 [tool.poetry.group.dev.dependencies]
