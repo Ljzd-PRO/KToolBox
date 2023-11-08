@@ -1,4 +1,4 @@
-from typing import Type, Any, List, Generic, TypeVar
+from typing import Type, Any, List, Generic, TypeVar, Union
 
 from pydantic import BaseModel, field_serializer
 
@@ -19,7 +19,7 @@ class BaseKToolBoxData(BaseModel):
         self.type = type(self)
 
     version: str = __version__
-    type: Type["BaseKToolBoxData"] = None
+    type: Union[Type["BaseKToolBoxData"], str] = None
 
     @field_serializer('type')
     def _(self, value: Type["BaseKToolBoxData"], _info):
