@@ -58,4 +58,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: pytest-html-${{ matrix.python-version }}
-          path: ./tests/report-${{ matrix.python-version }}.html
+          path: ./tests/report-*.html
