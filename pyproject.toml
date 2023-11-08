@@ -42,11 +42,11 @@ aiofiles = "^23.2.1"
 [tool.poetry.group.pyinstaller.dependencies]
 pyinstaller = "==6.1.0"
 
-#[tool.poetry.group.test.dependencies]
-#pytest = "^7.3.1"
-#pytest-html = "^3.2.0"
-#pytest-asyncio = "^0.21.0"
-#flake8 = "^6.0.0"
+[tool.poetry.group.test.dependencies]
+pytest = "==7.4.3"
+pytest-html = "==4.1.1"
+pytest-asyncio = "==0.21.1"
+allpairspy = "==2.5.1"
 
 [tool.poetry.group.dev.dependencies]
 datamodel-code-generator = "^0.22.1"
@@ -57,8 +57,8 @@ datamodel-code-generator = "^0.22.1"
 [tool.poetry.group.pyinstaller]
 optional = true
 
-#[tool.poetry.group.test]
-#optional = true
+[tool.poetry.group.test]
+optional = true
 
 [tool.poetry.group.dev]
 optional = true
