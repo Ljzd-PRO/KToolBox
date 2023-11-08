@@ -45,3 +45,9 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           files: ./tests/coverage.xml
+
+      - name: Upload pytest HTML result
+        uses: actions/upload-artifact@v3
+        with:
+          name: pytest-html-${{ matrix.python-version }}
+          path: ./tests/report-${{ matrix.python-version }}.html
