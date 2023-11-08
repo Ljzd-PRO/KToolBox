@@ -32,6 +32,8 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
         os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: false
+    env:
+      PYTEST_REPORT_FILENAME: report-${{ github.ref }}-${{ matrix.os }}-${{ matrix.python-version }}.html
 
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +46,7 @@ jobs:
       - name: Run Pytest
         run: |
           cd tests/
-          poetry run pytest -v --capture=sys --cov --cov-report=xml --html=report-${{ github.ref }}-${{ matrix.os }}-${{ matrix.python-version }}.html --self-contained-html
+          poetry run pytest -v --capture=sys --cov --cov-report=xml --html=${{ env.PYTEST_REPORT_FILENAME }} --self-contained-html
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v3
@@ -57,5 +59,5 @@ jobs:
       - name: Upload pytest HTML result
         uses: actions/upload-artifact@v3
         with:
-          name: pytest-html-${{ matrix.python-version }}
-          path: ./tests/report-${{ matrix.python-version }}.html
+          name: ${{ env.PYTEST_REPORT_FILENAME }}
+          path: ./tests/${{ env.PYTEST_REPORT_FILENAME }}
