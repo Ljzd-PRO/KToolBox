@@ -55,7 +55,11 @@ class CreatorIndices(BaseKToolBoxData):
 
     Record the path of each downloaded post.
     """
-    creator: Creator
-    """Creator data"""
-    posts: Dict[Path, Post] = {}
-    """Posts path and their `Post` data"""
+    creator_id: str
+    """Creator ID"""
+    service: str
+    """Creator service"""
+    posts: Dict[str, Post] = {}
+    """All posts, `id` -> `Post`"""
+    posts_path: Dict[str, Path] = {}
+    """Posts and their path, `id` -> `Path`"""
