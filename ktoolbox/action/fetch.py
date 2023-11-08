@@ -1,4 +1,4 @@
-from typing import AsyncGenerator, List
+from typing import AsyncGenerator, List, Any
 
 from ktoolbox.api.model import Post
 from ktoolbox.api.posts import get_creator_post
@@ -16,7 +16,7 @@ class FetchInterruptError(Exception):
         self.ret = ret
 
 
-async def fetch_all_creator_posts(service: str, creator_id: str) -> AsyncGenerator[List[Post]]:
+async def fetch_all_creator_posts(service: str, creator_id: str) -> AsyncGenerator[List[Post], Any]:
     """
     Fetch all posts from a creator
 
