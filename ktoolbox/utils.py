@@ -41,12 +41,12 @@ def parse_header(line: str) -> Dict[str, Optional[str]]:
     :param line: Header line
     :return: Dict of header line
 
-    * Example:
+    .. rubric:: Example:
     ```
     parse_header("text/html; charset=utf-8")
     ```
 
-    * Return:
+    .. rubric:: Return:
     ```
     {'text/html': None, 'charset': 'utf-8'}
     ```
@@ -69,12 +69,12 @@ def filename_from_headers(headers: Dict[str, str]) -> Optional[str]:
     :param headers: HTTP headers
     :return: File name
 
-    * Example:
+    .. rubric:: Example:
     ```
     filename_from_headers('attachment;filename*=utf-8\\'\\'README%2Emd;filename="README.md"')
     ```
 
-    * Return:
+    .. rubric:: Return:
     ```
     README.md
     ```

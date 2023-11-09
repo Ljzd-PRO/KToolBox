@@ -223,9 +223,8 @@ class KToolBoxCli:
         You can update the directory anytime after download finished, \
         such as to update after creator published new posts.
 
-        * NOTICE:
-
-            If ``update_from`` was provided, it should be located **inside the creator directory**.
+        .. rubric:: NOTICE:
+        * If ``update_from`` was provided, it should be located **inside the creator directory**.
 
         :param url: The post URL
         :param service: The service where the post is located

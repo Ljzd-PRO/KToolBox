@@ -58,21 +58,20 @@ class PostStructureConfiguration(BaseModel):
     """
     Post path structure model
 
-    * Default:
+    .. rubric:: Default:
+    |__+ ..
 
-        |__+ ..
+    |__+ attachments
 
-        |__+ attachments
+    |____+ (e.g. 1.png)
 
-        |____+ (e.g. 1.png)
+    |____+ (e.g. 2.png)
 
-        |____+ (e.g. 2.png)
+    |__+ content.txt
 
-        |__+ content.txt
+    |__+ <Post file>
 
-        |__+ <Post file>
-
-        |__+ <Post data (post.ktoolbox.json)>
+    |__+ <Post data (post.ktoolbox.json)>
     """
     attachments: Path = Path("attachments")
     """Sub path of attachment directory"""
@@ -92,6 +91,7 @@ class JobConfiguration(BaseModel):
     """
     Save all files from different posts at same path in creator directory
 
+    .. rubric:: NOTICE:
     It would not create any post directory, and ``CreatorIndices`` would not been recorded, \
     without ``CreatorIndices`` you **cannot update** the creator directory.
     """
@@ -104,15 +104,7 @@ class LoggerConfiguration(BaseModel):
     path: Optional[Path] = Path("logs")
     """Path to save logs, ``None`` for disable log file output"""
     level: Union[str, int] = logging.DEBUG
-    """
-    Log filter level,
-    
-    * Default value:
-        
-        When using CLI: ``WARNING``
-        
-        Other situations: ``DEBUG``
-    """
+    """Log filter level"""
     rotation: Union[str, int, datetime.time, datetime.timedelta] = "1 week"
     """Log rotation"""
 
