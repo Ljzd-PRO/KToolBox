@@ -102,8 +102,16 @@ class LoggerConfiguration(BaseModel):
     """Logger configuration"""
     path: Optional[Path] = Path("logs")
     """Path to save logs, `None` for disable log file output"""
-    level: Union[str, int] = getLevelName(logging.DEBUG)
-    """Log filter level"""
+    level: Optional[Union[str, int]] = None
+    """
+    Log filter level,
+    
+    * Default value:
+        
+        When using CLI: `WARNING`
+        
+        Other situations: `DEBUG`
+    """
     rotation: Union[str, int, datetime.time, datetime.timedelta] = "1 week"
     """Log rotation"""
 
