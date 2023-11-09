@@ -139,7 +139,8 @@ async def create_job_from_creator(
             indices = CreatorIndices(
                 creator_id=creator_id,
                 service=service,
-                posts={path / post.title: post for post in post_list}
+                posts={post.id: post for post in post_list},
+                posts_path={post.id: path / post.title for post in post_list}
             )
         if indices:
             async with aiofiles.open(path / DataStorageNameEnum.CreatorIndicesData.value) as f:
