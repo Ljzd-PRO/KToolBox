@@ -114,7 +114,7 @@ class KToolBoxCli:
     @overload
     async def download_post(
             url: str,
-            path: Union[Path, str],
+            path: Union[Path, str] = Path("."),
             *,
             dump_post_data=True
     ):
@@ -126,7 +126,7 @@ class KToolBoxCli:
             service: str,
             creator_id: str,
             post_id: str,
-            path: Union[Path, str],
+            path: Union[Path, str] = Path("."),
             *,
             dump_post_data=True
     ):
@@ -138,7 +138,7 @@ class KToolBoxCli:
             service: str = None,
             creator_id: str = None,
             post_id: str = None,
-            path: Union[Path, str] = None,
+            path: Union[Path, str] = Path("."),
             *,
             dump_post_data=True
     ):
@@ -149,7 +149,7 @@ class KToolBoxCli:
         :param service: The service name
         :param creator_id: The creator's ID
         :param post_id: The post ID
-        :param path: Download path
+        :param path: Download path, default is current directory
         :param dump_post_data: Whether to dump post data (post.json) in post directory
         """
         # Get service, creator_id, post_id
