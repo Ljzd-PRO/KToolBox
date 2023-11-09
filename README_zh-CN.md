@@ -9,6 +9,28 @@
 </p>
 
 <p align="center">
+  <a href="https://pypi.org/project/ktoolbox" target="_blank">
+    <img src="https://img.shields.io/github/v/release/Ljzd-PRO/KToolBox?logo=python" alt="Version">
+  </a>
+
+  <a href="./LICENSE">
+    <img src="https://img.shields.io/badge/License-GPLv3-blue" alt="GPLv3"/>
+  </a>
+
+  <a href="https://github.com/Ljzd-PRO/KToolBox/commits/master">
+    <img src="https://img.shields.io/github/last-commit/Ljzd-PRO/KToolBox/master" alt="Last Commit"/>
+  </a>
+
+  <a href="https://codecov.io/gh/Ljzd-PRO/KToolBox" target="_blank">
+      <img src="https://codecov.io/gh/Ljzd-PRO/KToolBox/branch/master/graph/badge.svg?token=5XK9CYQHQN" alt="codecov"/>
+  </a>
+
+  <a style="text-decoration:none">
+    <img src="https://img.shields.io/badge/Platform-Win%20|%20Linux%20|%20macOS-blue" alt="Platform Win | Linux | macOS"/>
+  </a>
+</p>
+
+<p align="center">
     <a href="./README.md">English</a> | <a href="./README_zh-CN.md">中文</a>
 </p>
 
