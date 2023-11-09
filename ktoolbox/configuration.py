@@ -46,10 +46,10 @@ class DownloaderConfiguration(BaseModel):
     """Downloader request timeout"""
     encoding: str = "utf-8"
     """Charset for filename parsing and post content text saving"""
-    buffer_size: int = 1024
-    """Number of bytes for file I/O buffer"""
+    buffer_size: int = 20480
+    """Number of bytes of file I/O buffer for each downloading file"""
     chunk_size: int = 1024
-    """Number of bytes for chunk of downloader stream"""
+    """Number of bytes of chunk of downloader stream"""
     temp_suffix: str = "tmp"
     """Temp filename suffix of downloading files"""
 

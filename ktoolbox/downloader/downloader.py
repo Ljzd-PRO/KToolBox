@@ -142,7 +142,7 @@ class Downloader:
                         return DownloaderRet(
                             code=RetCodeEnum.FileExisted,
                             message=generate_msg(
-                                "Download file existed",
+                                "Download file existed, skipped",
                                 path=self._path / filename
                             )
                         )
