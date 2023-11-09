@@ -39,6 +39,8 @@ async def create_job_from_post(
         attachments_path = post_path
         content_path = None
     for attachment in post.attachments:
+        if not attachment.path:
+            continue
         jobs.append(
             Job(
                 path=attachments_path,
