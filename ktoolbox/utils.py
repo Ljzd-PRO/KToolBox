@@ -138,7 +138,7 @@ async def dump_search(result: List[BaseModel], path: Path):
         )
 
 
-async def parse_webpage_url(url: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+def parse_webpage_url(url: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     # noinspection SpellCheckingInspection
     """
     Fetch **service**, **user_id**, **post_id** from webpage url

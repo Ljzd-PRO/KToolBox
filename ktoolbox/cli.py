@@ -4,8 +4,8 @@ from typing import Union, overload
 import aiofiles
 
 from ktoolbox import __version__
-from ktoolbox.action import search_creator as search_creator_action, search_creator_post as search_creator_post_action
 from ktoolbox.action import create_job_from_post
+from ktoolbox.action import search_creator as search_creator_action, search_creator_post as search_creator_post_action
 from ktoolbox.api.misc import get_app_version
 from ktoolbox.api.posts import get_post as get_post_api
 from ktoolbox.configuration import config
