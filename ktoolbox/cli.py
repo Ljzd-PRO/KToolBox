@@ -2,16 +2,17 @@ from pathlib import Path
 from typing import Union, overload
 
 import aiofiles
+from loguru import logger
 
 from ktoolbox import __version__
-from ktoolbox.action import create_job_from_post
+from ktoolbox.action import create_job_from_post, create_job_from_creator
 from ktoolbox.action import search_creator as search_creator_action, search_creator_post as search_creator_post_action
 from ktoolbox.api.misc import get_app_version
 from ktoolbox.api.posts import get_post as get_post_api
 from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
 from ktoolbox.enum import TextEnum
-from ktoolbox.job import JobRunner
+from ktoolbox.job import JobRunner, CreatorIndices
 from ktoolbox.utils import dump_search, parse_webpage_url, generate_msg
 
 __all__ = ["KToolBoxCli"]
@@ -176,6 +177,116 @@ class KToolBoxCli:
                 dump_post_data=dump_post_data
             )
             job_runner = JobRunner(job_list=job_list)
+            await job_runner.start()
+        else:
+            return ret.message
+
+    @staticmethod
+    @overload
+    async def sync_creator(
+            url: str,
+            path: Union[Path, str] = Path("."),
+            *,
+            update_from: Path = None,
+            save_creator_indices: bool = True,
+            mix_posts: bool = None
+    ):
+        ...
+
+    @staticmethod
+    @overload
+    async def sync_creator(
+            service: str,
+            creator_id: str,
+            path: Union[Path, str] = Path("."),
+            *,
+            update_from: Path = None,
+            save_creator_indices: bool = True,
+            mix_posts: bool = None
+    ):
+        ...
+
+    @staticmethod
+    async def sync_creator(
+            url: str = None,
+            service: str = None,
+            creator_id: str = None,
+            path: Union[Path, str] = Path("."),
+            *,
+            update_from: Path = None,
+            save_creator_indices: bool = True,
+            mix_posts: bool = None
+    ):
+        """
+        Sync all posts from a creator
+
+        You can update the directory anytime after download finished, \
+        such as to update after creator published new posts.
+
+        * NOTICE:
+
+            If `update_from` was provided, it should be located **inside the creator directory**.
+
+        :param url: The post URL
+        :param service: The service where the post is located
+        :param creator_id: The ID of the creator
+        :param path: Download path, default is current directory
+        :param update_from: `CreatorIndices` data path for update posts from current creator directory, \
+         `save_creator_indices` will be enabled if this provided
+        :param save_creator_indices: Record `CreatorIndices` data for update posts from current creator directory
+        :param mix_posts: Save all files from different posts at same path, \
+         `update_from`, `save_creator_indices` will be ignored if enabled
+        """
+        # Get service, creator_id
+        if url:
+            service, creator_id, _ = parse_webpage_url(url)
+        if not all([service, creator_id]):
+            return generate_msg(
+                TextEnum.MissingParams.value,
+                use_at_lease_one=[
+                    ["url"],
+                    ["service", "creator_id"]
+                ])
+
+        path = path if isinstance(path, Path) else Path(path)
+
+        # Get `CreatorIndices` data
+        if update_from:
+            async with aiofiles.open(update_from, encoding="utf-8") as f:
+                indices_text = await f.read()
+            indices = CreatorIndices.model_validate_json(indices_text)
+            creator_path = update_from.parent
+        else:
+            indices = None
+
+            # Get creator name
+            creator_name = creator_id
+            creator_ret = await search_creator_action(id=creator_id, service=service)
+            if creator_ret:
+                creator = next(creator_ret.data, None)
+                if creator:
+                    creator_name = creator.name
+            else:
+                logger.warning(
+                    generate_msg(
+                        f"Failed to fetch the name of creator <{creator_id}>, use creator ID as directory name",
+                        detail=creator_ret.message
+                    )
+                )
+            creator_path = path / creator_name
+
+        creator_path.mkdir(exist_ok=True)
+        ret = await create_job_from_creator(
+            service=service,
+            creator_id=creator_id,
+            path=creator_path,
+            update_from=indices,
+            all_pages=True,
+            save_creator_indices=save_creator_indices,
+            mix_posts=mix_posts
+        )
+        if ret:
+            job_runner = JobRunner(job_list=ret.data)
             await job_runner.start()
         else:
             return ret.message
