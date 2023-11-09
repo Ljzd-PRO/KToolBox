@@ -3,6 +3,7 @@ from typing import Union, overload
 
 import aiofiles
 from loguru import logger
+from pathvalidate import sanitize_filename
 
 from ktoolbox import __version__
 from ktoolbox.action import create_job_from_post, create_job_from_creator
@@ -173,7 +174,7 @@ class KToolBoxCli:
         if ret:
             job_list = await create_job_from_post(
                 post=ret.data,
-                post_path=path / ret.data.title,
+                post_path=path / sanitize_filename(ret.data.title),
                 dump_post_data=dump_post_data
             )
             job_runner = JobRunner(job_list=job_list)
@@ -274,7 +275,7 @@ class KToolBoxCli:
                         detail=creator_ret.message
                     )
                 )
-            creator_path = path / creator_name
+            creator_path = path / sanitize_filename(creator_name)
 
         creator_path.mkdir(exist_ok=True)
         ret = await create_job_from_creator(

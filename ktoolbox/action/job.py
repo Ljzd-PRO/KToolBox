@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List, Union, Tuple
 
 import aiofiles
+from pathvalidate import sanitize_filename
 
 from ktoolbox.action import ActionRet, fetch_all_creator_posts, FetchInterruptError
 from ktoolbox.api.model import Post
@@ -143,7 +144,7 @@ async def create_job_from_creator(
                 creator_id=creator_id,
                 service=service,
                 posts={post.id: post for post in post_list},
-                posts_path={post.id: path / post.title for post in post_list}
+                posts_path={post.id: path / sanitize_filename(post.title) for post in post_list}
             )
         if indices:
             async with aiofiles.open(
@@ -156,7 +157,7 @@ async def create_job_from_creator(
     job_list: List[Job] = []
     for post in post_list:
         # Get post path
-        default_post_path = path if mix_posts else path / post.title
+        default_post_path = path if mix_posts else path / sanitize_filename(post.title)
         if update_from:
             if not (post_path := update_from.posts_path.get(post.id)):
                 post_path = default_post_path
