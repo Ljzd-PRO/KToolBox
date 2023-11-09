@@ -59,7 +59,7 @@ async def create_job_from_post(
                 type=PostFileTypeEnum.File
             )
         )
-    if content_path:
+    if content_path and post.content:
         if not content_path.parent.is_dir():
             content_path.parent.mkdir()
         async with aiofiles.open(content_path, "w", encoding=config.downloader.encoding) as f:
