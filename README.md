@@ -55,6 +55,9 @@
 For more information, use the help command.
 
 > **Warning**
+> This project is still **in development**.
+
+> **Warning**
 > The return text here are only **demo**, some of them may be **outdated**.
 
 - Install KToolBox:
