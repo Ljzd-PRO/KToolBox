@@ -1,14 +1,17 @@
 from pathlib import Path
+from typing import Union
 
 import aiofiles
 
 from ktoolbox import __version__
 from ktoolbox.action import search_creator as search_creator_action, search_creator_post as search_creator_post_action
+from ktoolbox.action import create_job_from_post
 from ktoolbox.api.misc import get_app_version
 from ktoolbox.api.posts import get_post as get_post_api
 from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
 from ktoolbox.enum import TextEnum
+from ktoolbox.job import JobRunner
 from ktoolbox.utils import dump_search
 
 __all__ = ["KToolBoxCli"]
@@ -104,6 +107,41 @@ class KToolBoxCli:
                         ret.data.model_dump_json(indent=config.json_dump_indent)
                     )
             return ret.data
+        else:
+            return ret.message
+
+    @staticmethod
+    async def download_post(
+            service: str,
+            creator_id: str,
+            post_id: str,
+            path: Union[Path, str],
+            *,
+            dump_post_data=True
+    ):
+        """
+        Download a specific post
+
+        :param service: The service name
+        :param creator_id: The creator's ID
+        :param post_id: The post ID
+        :param path: Download path
+        :param dump_post_data: Whether to dump post data (post.json) in post directory
+        """
+        path = path if isinstance(path, Path) else Path(path)
+        ret = await get_post_api(
+            service=service,
+            creator_id=creator_id,
+            post_id=post_id
+        )
+        if ret:
+            job_list = await create_job_from_post(
+                post=ret.data,
+                post_path=path / ret.data.title,
+                dump_post_data=dump_post_data
+            )
+            job_runner = JobRunner(job_list=job_list)
+            await job_runner.start()
         else:
             return ret.message
 
