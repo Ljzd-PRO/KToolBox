@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ktoolbox"
-version = "0.0.1-dev"
+version = "0.1.0-dev"
 description = "A useful tool for Kemono.party"
 authors = ["Ljzd-PRO <ljzd@office.ljzd-pro.asia>"]
 readme = "README.md"
