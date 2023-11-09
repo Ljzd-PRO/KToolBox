@@ -225,17 +225,17 @@ class KToolBoxCli:
 
         * NOTICE:
 
-            If `update_from` was provided, it should be located **inside the creator directory**.
+            If ``update_from`` was provided, it should be located **inside the creator directory**.
 
         :param url: The post URL
         :param service: The service where the post is located
         :param creator_id: The ID of the creator
         :param path: Download path, default is current directory
-        :param update_from: `CreatorIndices` data path for update posts from current creator directory, \
-         `save_creator_indices` will be enabled if this provided
-        :param save_creator_indices: Record `CreatorIndices` data for update posts from current creator directory
+        :param update_from: ``CreatorIndices`` data path for update posts from current creator directory, \
+         ``save_creator_indices`` will be enabled if this provided
+        :param save_creator_indices: Record ``CreatorIndices`` data for update posts from current creator directory
         :param mix_posts: Save all files from different posts at same path, \
-         `update_from`, `save_creator_indices` will be ignored if enabled
+         ``update_from``, ``save_creator_indices`` will be ignored if enabled
         """
         # Get service, creator_id
         if url:
@@ -252,7 +252,7 @@ class KToolBoxCli:
         if update_from:
             update_from = update_from if isinstance(update_from, Path) else Path(update_from)
 
-        # Get `CreatorIndices` data
+        # Get ``CreatorIndices`` data
         if update_from:
             async with aiofiles.open(update_from, encoding="utf-8") as f:
                 indices_text = await f.read()

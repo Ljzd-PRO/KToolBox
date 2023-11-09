@@ -28,7 +28,7 @@ class Job(BaseModel):
 #     """
 #     (Alternative) Download job list model
 #
-#     Different from builtin list, it has a `path` attribute for root path of the jobs.
+#     Different from builtin list, it has a ``path`` attribute for root path of the jobs.
 #     """
 #     server_path: str = Field(exclude=True, default=None)
 #     data: List[Job] = []
@@ -59,6 +59,6 @@ class CreatorIndices(BaseKToolBoxData):
     service: str
     """Creator service"""
     posts: Dict[str, Post] = {}
-    """All posts, `id` -> `Post`"""
+    """All posts, ``id`` -> ``Post``"""
     posts_path: Dict[str, Path] = {}
-    """Posts and their path, `id` -> `Path`"""
+    """Posts and their path, ``id`` -> ``Path``"""

@@ -25,7 +25,8 @@ async def create_job_from_post(
 
     :param post: post data
     :param post_path: Path of the post directory
-    :param post_structure: post path structure, `False` -> disable, `True` & `None` -> `config.job.post_structure`
+    :param post_structure: post path structure, ``False`` -> disable, \
+     ``True`` & ``None`` -> ``config.job.post_structure``
     :param dump_post_data: Whether to dump post data (post.json) in post directory
     """
     jobs: List[Job] = []
@@ -69,13 +70,13 @@ async def create_job_from_post(
 
 def filter_posts_with_indices(posts: List[Post], indices: CreatorIndices) -> Tuple[List[Post], CreatorIndices]:
     """
-    Compare and filter posts by `CreatorIndices` data
+    Compare and filter posts by ``CreatorIndices`` data
 
     Only keep posts that was edited after last download.
 
     :param posts: Posts to filter
-    :param indices: `CreatorIndices` data to use
-    :return: A updated `List[Post]` and updated **new** `CreatorIndices` instance
+    :param indices: ``CreatorIndices`` data to use
+    :return: A updated ``List[Post]`` and updated **new** ``CreatorIndices`` instance
     """
     new_list = list(
         filter(
@@ -105,13 +106,13 @@ async def create_job_from_creator(
     :param service: The service where the post is located
     :param creator_id: The ID of the creator
     :param path: The path for posts to download
-    :param update_from: `CreatorIndices` data for update posts from current creator directory, \
-     `save_creator_indices` will be enabled if this provided
-    :param all_pages: Fetch all pages of posts, `o` will be ignored if enabled
+    :param update_from: ``CreatorIndices`` data for update posts from current creator directory, \
+     ``save_creator_indices`` will be enabled if this provided
+    :param all_pages: Fetch all pages of posts, ``o`` will be ignored if enabled
     :param o: Result offset, stepping of 50 is enforced
-    :param save_creator_indices: Record `CreatorIndices` data for update posts from current creator directory
+    :param save_creator_indices: Record ``CreatorIndices`` data for update posts from current creator directory
     :param mix_posts: Save all files from different posts at same path, \
-     `update_from`, `save_creator_indices` will be ignored if enabled
+     ``update_from``, ``save_creator_indices`` will be ignored if enabled
     """
     mix_posts = config.job.mix_posts if mix_posts is None else mix_posts
 
@@ -130,12 +131,12 @@ async def create_job_from_creator(
         else:
             return ActionRet(**ret.model_dump(mode="python"))
 
-    # Filter posts and generate `CreatorIndices`
+    # Filter posts and generate ``CreatorIndices``
     if not mix_posts:
         indices = None
         if update_from:
             post_list, indices = filter_posts_with_indices(post_list, update_from)
-        elif save_creator_indices:  # It's unnecessary to create indices again when `update_from` was provided
+        elif save_creator_indices:  # It's unnecessary to create indices again when ``update_from`` was provided
             indices = CreatorIndices(
                 creator_id=creator_id,
                 service=service,

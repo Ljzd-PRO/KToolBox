@@ -9,7 +9,7 @@ class TextEnum(Enum):
 
 
 class RetCodeEnum(IntEnum):
-    """Enum for `BaseRet.code`"""
+    """Enum for ``BaseRet.code``"""
     Success = 0
     GeneralFailure = -1
 

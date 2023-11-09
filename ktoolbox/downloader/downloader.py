@@ -38,8 +38,8 @@ class Downloader:
         :param alt_filename: Use this name if no filename given by the server
 
         About filename:
-            * If `Content-Disposition` is set in headers, use filename from it.
-            * Else if `alt_filename` parameter is set, use it.
+            * If ``Content-Disposition`` is set in headers, use filename from it.
+            * Else if ``alt_filename`` parameter is set, use it.
             * Else use filename from URL 'path' part.
         """
 
@@ -83,7 +83,7 @@ class Downloader:
         """
         Check if the download finished
 
-        :return: `False` if the download **in process**, `False` otherwise
+        :return: ``False`` if the download **in process**, ``True`` otherwise
         """
         return not self._lock.locked()
 
@@ -91,7 +91,7 @@ class Downloader:
         """
         Cancel the download
 
-        It will raise `asyncio.CancelledError` in `chunk_iterator` (writing chunk to file) iteration.
+        It will raise ``asyncio.CancelledError`` in ``chunk_iterator`` (writing chunk to file) iteration.
         """
         self._stop = True
 
@@ -108,9 +108,9 @@ class Downloader:
 
         :param sync_callable: Sync callable for download finished
         :param async_callable: Async callable for download finished
-        :param tqdm_class: `tqdm` class to replace default `tqdm.asyncio.tqdm`
+        :param tqdm_class: ``tqdm`` class to replace default ``tqdm.asyncio.tqdm``
         :param progress: Show progress bar
-        :return: `DownloaderRet` which contain the actual output filename
+        :return: ``DownloaderRet`` which contain the actual output filename
         :raise CancelledError
         """
         tqdm_class: Type[std_tqdm] = tqdm_class or tqdm.asyncio.tqdm

@@ -22,8 +22,8 @@ class JobRunner:
         """
         Create a job runner
 
-        :param job_list: Jobs to initial `self._job_queue`
-        :param tqdm_class: `tqdm` class to replace default `tqdm.asyncio.tqdm`
+        :param job_list: Jobs to initial ``self._job_queue``
+        :param tqdm_class: ``tqdm`` class to replace default ``tqdm.asyncio.tqdm``
         :param progress: Show progress bar
         """
         job_list = job_list or []
@@ -41,7 +41,7 @@ class JobRunner:
         """
         Check if all jobs finished
 
-        :return: `False` if **in process**, `False` otherwise
+        :return: ``False`` if **in process**, ``False`` otherwise
         """
         return not self._lock.locked()
 
@@ -70,7 +70,7 @@ class JobRunner:
         return len(self._downloaders_with_task) - self.done_size
 
     async def processor(self) -> int:
-        """Process each job in `self._job_queue`"""
+        """Process each job in ``self._job_queue``"""
         failed_num = 0
         while not self._job_queue.empty():
             job = await self._job_queue.get()
@@ -142,7 +142,7 @@ class JobRunner:
         """
         Start processing jobs concurrently
 
-        It will **Block** until other call of `self.start()` method finished
+        It will **Block** until other call of ``self.start()`` method finished
         """
         failed_num = 0
         async with self._lock:
@@ -163,17 +163,17 @@ class JobRunner:
             logger.success(generate_msg("All jobs in queue finished"))
 
     async def add_jobs(self, *jobs: Job):
-        """Add jobs to `self._job_queue`"""
+        """Add jobs to ``self._job_queue``"""
         for job in jobs:
             await self._job_queue.put(job)
 
     @staticmethod
     async def _force_cancel(target: asyncio.Task, wait_time: float = None) -> bool:
         """
-        Force cancel `asyncio.Task` after `wait_time` seconds
+        Force cancel ``asyncio.Task`` after ``wait_time`` seconds
 
         :param target: Target task
-        :param wait_time: Seconds to wait before cancel (`0` for skip one event loop run cycle)
+        :param wait_time: Seconds to wait before cancel (``0`` for skip one event loop run cycle)
         :return: Whether cancelled successfully
         """
         if wait_time is not None:

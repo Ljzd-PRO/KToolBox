@@ -34,7 +34,7 @@ def parse_header(line: str) -> Dict[str, Optional[str]]:
     """
     Alternative resolution for parsing header line.
 
-    Apply when `cgi.parse_header` is unable to use due to the deprecation of `cgi` module.
+    Apply when ``cgi.parse_header`` is unable to use due to the deprecation of `cgi` module.
 
     https://peps.python.org/pep-0594/#cgi
 
@@ -64,7 +64,7 @@ def filename_from_headers(headers: Dict[str, str]) -> Optional[str]:
     """
     Get file name from headers.
 
-    Parse from `Content-Disposition`.
+    Parse from ``Content-Disposition``.
 
     :param headers: HTTP headers
     :return: File name
@@ -94,7 +94,7 @@ def filename_from_headers(headers: Dict[str, str]) -> Optional[str]:
 
 def generate_msg(title: str = None, **kwargs):
     """
-    Generate message for `BaseRet` and logger
+    Generate message for ``BaseRet`` and logger
 
     :param title: Message title
     :param kwargs: Extra data
@@ -105,7 +105,7 @@ def generate_msg(title: str = None, **kwargs):
 
 def logger_init(std_level: Union[str, int] = None, disable_stdout: bool = False):
     """
-    Initialize `loguru` logger
+    Initialize ``loguru`` logger
 
     :param std_level: Standard output log filter level
     :param disable_stdout: Disable default output stream
@@ -143,7 +143,7 @@ def parse_webpage_url(url: str) -> Tuple[Optional[str], Optional[str], Optional[
     """
     Fetch **service**, **user_id**, **post_id** from webpage url
 
-    Each part can be `None` if not found in url.
+    Each part can be ``None`` if not found in url.
 
     :param url: Kemono Webpage url
     :return: Tuple of **service**, **user_id**, **post_id**

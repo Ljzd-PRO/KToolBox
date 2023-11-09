@@ -28,7 +28,7 @@ class APITenacityStop(stop_base):
 
 
 def _retry(*args, **kwargs):
-    """Wrap an API method with a new `Retrying` object"""
+    """Wrap an API method with a new ``Retrying`` object"""
     wrapper = tenacity.retry(
         stop=APITenacityStop(),
         wait=wait_fixed(config.api.retry_interval),
@@ -87,7 +87,7 @@ class BaseAPI(ABC, Generic[_T]):
         """
         Make a request to the API
         :param path: Fully initialed URL path
-        :param kwargs: Keyword arguments of `httpx._client.AsyncClient.request`
+        :param kwargs: Keyword arguments of ``httpx._client.AsyncClient.request``
         """
         if path is None:
             path = cls.path

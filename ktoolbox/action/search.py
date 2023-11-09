@@ -59,7 +59,7 @@ async def search_creator_post(
     async def inner(**kwargs):
         posts: List[Post] = []
         if any([id, name, service]):
-            if id is not None and service:  # `get_creator_post` required
+            if id is not None and service:  # ``get_creator_post`` required
                 ret = await get_creator_post(
                     service=service,
                     creator_id=id,
@@ -67,7 +67,7 @@ async def search_creator_post(
                     o=o
                 )
                 return ActionRet(data=ret.data) if ret else ret
-            else:  # else need to get `id` and `service`
+            else:  # else need to get ``id`` and ``service``
                 creators_ret = await search_creator(id=id, name=name, service=service)
                 if not creators_ret:
                     return ActionRet(**creators_ret.model_dump(mode="python"))

@@ -92,26 +92,26 @@ class JobConfiguration(BaseModel):
     """
     Save all files from different posts at same path in creator directory
 
-    It would not create any post directory, and `CreatorIndices` would not been recorded, \
-    without `CreatorIndices` you **cannot update** the creator directory.
+    It would not create any post directory, and ``CreatorIndices`` would not been recorded, \
+    without ``CreatorIndices`` you **cannot update** the creator directory.
     """
     job_list_filepath: Optional[Path] = None
-    """Filepath for job list data saving, `None` for disable job list saving"""
+    """Filepath for job list data saving, ``None`` for disable job list saving"""
 
 
 class LoggerConfiguration(BaseModel):
     """Logger configuration"""
     path: Optional[Path] = Path("logs")
-    """Path to save logs, `None` for disable log file output"""
+    """Path to save logs, ``None`` for disable log file output"""
     level: Union[str, int] = logging.DEBUG
     """
     Log filter level,
     
     * Default value:
         
-        When using CLI: `WARNING`
+        When using CLI: ``WARNING``
         
-        Other situations: `DEBUG`
+        Other situations: ``DEBUG``
     """
     rotation: Union[str, int, datetime.time, datetime.timedelta] = "1 week"
     """Log rotation"""
