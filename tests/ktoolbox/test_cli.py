@@ -1,4 +1,5 @@
 import os
+import tempfile
 from collections import OrderedDict
 from pathlib import Path
 from typing import NamedTuple
@@ -10,7 +11,9 @@ from pydantic import ValidationError
 from ktoolbox import __version__
 from ktoolbox.api.model import Creator, Post
 from ktoolbox.cli import KToolBoxCli
+from ktoolbox.enum import TextEnum, DataStorageNameEnum
 from ktoolbox.model import SearchResult
+from ktoolbox.utils import generate_msg
 from tests.utils import settings
 
 
@@ -91,3 +94,33 @@ async def test_get_post():
 
     normal = await KToolBoxCli.get_post("fanbox", "3316400", "6434459")
     assert isinstance(normal, Post)
+
+
+@pytest.mark.asyncio
+async def test_download_post():
+    invalid = await KToolBoxCli.download_post(url="")
+    assert invalid == generate_msg(
+        TextEnum.MissingParams.value,
+        use_at_lease_one=[
+            ["url"],
+            ["service", "creator_id", "post_id"]
+        ]
+    )
+
+    with tempfile.TemporaryDirectory() as td:
+        dir_path = Path(td)
+        url_only = await KToolBoxCli.download_post(
+            url="https://kemono.su/fanbox/user/9016/post/6622968",
+            path=dir_path
+        )
+        assert url_only is None
+        assert (dir_new := next(dir_path.iterdir(), None)) is not None
+        assert (dir_new / DataStorageNameEnum.PostData.value).is_file()
+
+    no_url_and_no_dump = await KToolBoxCli.download_post(
+        service="fanbox",
+        creator_id="9016",
+        post_id="6622968",
+        dump_post_data=False
+    )
+    assert no_url_and_no_dump is None
