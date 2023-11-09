@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import List, Union, Tuple
 
@@ -55,6 +56,8 @@ async def create_job_from_post(
         )
     )
     if content_path:
+        if not os.path.isdir(content_path_parent := str(content_path.parent)):
+            os.makedirs(content_path_parent)
         async with aiofiles.open(content_path, "w", encoding=config.downloader.encoding) as f:
             await f.write(post.content)
     if dump_post_data:

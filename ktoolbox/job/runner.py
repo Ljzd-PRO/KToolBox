@@ -1,4 +1,5 @@
 import asyncio
+import os
 from asyncio import CancelledError
 from functools import cached_property
 from types import MappingProxyType
@@ -73,6 +74,8 @@ class JobRunner:
         while not self._job_queue.empty():
             # Create downloader
             job = await self._job_queue.get()
+            if not os.path.isdir(job.path):
+                os.makedirs(job.path)
             url_parts = [config.downloader.scheme, config.api.files_netloc, job.server_path, '', '', '']
             url = urlunparse(url_parts)
             downloader = Downloader(
