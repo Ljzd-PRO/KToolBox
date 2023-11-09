@@ -69,8 +69,9 @@ class JobRunner:
         """Get the number of jobs that in process"""
         return len(self._downloaders_with_task) - self.done_size
 
-    async def processor(self):
+    async def processor(self) -> int:
         """Process each job in `self._job_queue`"""
+        failed_num = 0
         while not self._job_queue.empty():
             job = await self._job_queue.get()
             if not job.path.is_dir():
@@ -116,6 +117,7 @@ class JobRunner:
                     logger.warning(ret.message)
                 else:
                     logger.error(ret.message)
+                    failed_num += 1
             elif isinstance(exception, CancelledError):
                 logger.warning(
                     generate_msg(
@@ -131,8 +133,10 @@ class JobRunner:
                         exception=exception
                     )
                 )
+                failed_num += 1
             self._job_queue.task_done()
         await self._job_queue.join()
+        return failed_num
 
     async def start(self):
         """
@@ -140,14 +144,23 @@ class JobRunner:
 
         It will **Block** until other call of `self.start()` method finished
         """
+        failed_num = 0
         async with self._lock:
             self._concurrent_tasks.clear()
             for _ in range(config.job.count):
                 task = asyncio.create_task(self.processor())
                 self._concurrent_tasks.add(task)
                 task.add_done_callback(self._concurrent_tasks.discard)
-            await asyncio.wait(self._concurrent_tasks)
-        logger.success(generate_msg("All jobs in queue finished"))
+            task_done_set, _ = await asyncio.wait(self._concurrent_tasks)
+            for task in task_done_set:
+                try:
+                    failed_num += task.result()
+                except CancelledError:
+                    pass
+        if failed_num:
+            logger.warning(generate_msg(f"{failed_num} jobs failed, download finished"))
+        else:
+            logger.success(generate_msg("All jobs in queue finished"))
 
     async def add_jobs(self, *jobs: Job):
         """Add jobs to `self._job_queue`"""
