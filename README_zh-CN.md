@@ -3,40 +3,40 @@
 </h1>
 
 <p style="text-align: center">
-  KToolBox is a useful CLI tool for downloading posts content in
+  KToolBox 是一个用于下载
   <a href="https://kemono.su/">Kemono.party / Kemono.su</a>
+  中作品内容的实用命令行工具
 </p>
 
 <p style="text-align: center">
     <a href="./README.md">English</a> | <a href="./README_zh-CN.md">中文</a>
 </p>
 
-## Features
+## 功能
 
-- You can download all files from a specific post from Kemono
-- Or download **all post** from a specific creator / artist from Kemono
-- **Sync** the downloaded creator / artist directory to latest, \
-  download the posts that recently updated or published only
-- Search creator and post, then dump the results
-- Concurrently download the files
-- Support all platform
+- 你可以下载 Kemono 上的作品的所有文件
+- 或者下载某个作者 / 画师的所有作品
+- **同步**已下载完成的作者 / 画师目录至最新, 只有近期更新和新发布的作品会被下载
+- 搜索作者 / 画师和作品，并导出结果
+- 并发下载
+- 支持全平台
 
-## Dev Plan
+## 开发计划
 
-- [ ] Add a Fluent Design style GUI
+- [ ] 增加 Fluent Design 风格的 UI 界面
 
-## Tutorial
+## 使用方法
 
-For more information, use the help command.
+更多信息请参考帮助命令
 
-> The return text here are only **demo**, some of them may be outdated.
+> 此处命令返回的文本仅作为**演示**使用，部分可能已经过时。
 
-- Get general help:
+- 获取帮助总览:
     ```bash
     python -m ktoolbox -h
     ```
     <details>
-    <summary>Return</summary>
+    <summary>返回文本</summary>
       <pre>
         <code>
   INFO: Showing help with the command '__main__.py -- --help'.
@@ -64,14 +64,14 @@ For more information, use the help command.
       </pre>
     </details>
 
-  > To get more information, see `KToolBoxCli` in [`ktoolbox/cli.py`](ktoolbox/cli.py).
+  > 前往 [`ktoolbox/cli.py`](ktoolbox/cli.py) 中的 `KToolBoxCli` 查看更多信息。
 
-- Get help of a command:
+- 获取某个命令的帮助信息:
     ```bash
     python -m ktoolbox download-post -h
     ```
     <details>
-    <summary>Return</summary>
+    <summary>返回文本</summary>
       <pre>
         <code>
   NAME
@@ -95,32 +95,30 @@ For more information, use the help command.
     </details>
   
 
-- Download a specific post:
+- 下载指定的作品:
     ```bash
     python -m ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
     ```
   
-  > If some files failed to download, you can try to execute the command line again, \
-  > the downloaded files will be **skipped**.
+  > 如果部分文件下载失败，你可以尝试重新运行命令，已下载完成的文件会被**跳过**。
 
-- Download all posts from a creator:
+- 下载作者的所有作品:
     ```bash
     python -m ktoolbox sync-creator https://kemono.su/fanbox/user/9016
     ```
   
-  > By default, you will get a `creator-indices.ktoolbox` file in the creator directory, \
-  > you can use it to update the directory anytime.
+  > 默认情况下你会在作者目录下得到一个 `creator-indices.ktoolbox` 文件，你可以用它来更新目录。
   
-- Update a downloaded creator directory:
+- 更新一个作者目录:
     ```bash
     python -m ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
     ```
   
-  > The `creator-indices.ktoolbox` file contains the information and filepath of posts inside the directory.  
+  > `creator-indices.ktoolbox` 包含目录下的所有作品的信息和路径。  
 
-## About Kemono
+## 关于 Kemono
 
-Description from https://kemono.su :
+官网 https://kemono.su 的介绍:
 
 > Kemono is a public archiver for:
 >  
