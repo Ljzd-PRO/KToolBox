@@ -50,14 +50,15 @@ async def create_job_from_post(
                 type=PostFileTypeEnum.Attachment
             )
         )
-    jobs.append(
-        Job(
-            path=post_path,
-            alt_filename=post.file.name,
-            server_path=post.file.path,
-            type=PostFileTypeEnum.File
+    if post.file.path:
+        jobs.append(
+            Job(
+                path=post_path,
+                alt_filename=post.file.name,
+                server_path=post.file.path,
+                type=PostFileTypeEnum.File
+            )
         )
-    )
     if content_path:
         if not content_path.parent.is_dir():
             content_path.parent.mkdir()
