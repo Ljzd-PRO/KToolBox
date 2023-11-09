@@ -1,13 +1,13 @@
-<h1 style="text-align: center">
+<h1 align="center">
   KToolBox
 </h1>
 
-<p style="text-align: center">
+<p align="center">
   KToolBox is a useful CLI tool for downloading posts content in
   <a href="https://kemono.su/">Kemono.party / Kemono.su</a>
 </p>
 
-<p style="text-align: center">
+<p align="center">
     <a href="./README.md">English</a> | <a href="./README_zh-CN.md">中文</a>
 </p>
 
@@ -29,7 +29,7 @@
 
 For more information, use the help command.
 
-> The return text here are only **demo**, some of them may be outdated.
+The return text here are only **demo**, some of them may be **outdated**.
 
 - Get general help:
     ```bash
@@ -108,15 +108,16 @@ For more information, use the help command.
     python -m ktoolbox sync-creator https://kemono.su/fanbox/user/9016
     ```
   
-  > By default, you will get a `creator-indices.ktoolbox` file in the creator directory, \
-  > you can use it to update the directory anytime.
+  By default, you will get a `creator-indices.ktoolbox` file in the creator directory, \
+  you can use it to update the directory anytime.
   
+
 - Update a downloaded creator directory:
     ```bash
     python -m ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
     ```
   
-  > The `creator-indices.ktoolbox` file contains the information and filepath of posts inside the directory.  
+  The `creator-indices.ktoolbox` file contains the information and filepath of posts inside the directory.  
 
 ## About Kemono
 

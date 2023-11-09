@@ -1,14 +1,14 @@
-<h1 style="text-align: center">
+<h1 align="center">
   KToolBox
 </h1>
 
-<p style="text-align: center">
+<p align="center">
   KToolBox 是一个用于下载
   <a href="https://kemono.su/">Kemono.party / Kemono.su</a>
   中作品内容的实用命令行工具
 </p>
 
-<p style="text-align: center">
+<p align="center">
     <a href="./README.md">English</a> | <a href="./README_zh-CN.md">中文</a>
 </p>
 
@@ -17,7 +17,7 @@
 - 你可以下载 Kemono 上的作品的所有文件
 - 或者下载某个作者 / 画师的所有作品
 - **同步**已下载完成的作者 / 画师目录至最新, 只有近期更新和新发布的作品会被下载
-- 搜索作者 / 画师和作品，并导出结果
+- 搜索作者和作品，并导出结果
 - 并发下载
 - 支持全平台
 
@@ -29,7 +29,7 @@
 
 更多信息请参考帮助命令
 
-> 此处命令返回的文本仅作为**演示**使用，部分可能已经过时。
+此处命令返回的文本仅作为**演示**使用，部分可能已经**过时**。
 
 - 获取帮助总览:
     ```bash
@@ -107,14 +107,15 @@
     python -m ktoolbox sync-creator https://kemono.su/fanbox/user/9016
     ```
   
-  > 默认情况下你会在作者目录下得到一个 `creator-indices.ktoolbox` 文件，你可以用它来更新目录。
+  默认情况下你会在作者目录下得到一个 `creator-indices.ktoolbox` 文件，你可以用它来更新目录。
+
   
 - 更新一个作者目录:
     ```bash
     python -m ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
     ```
   
-  > `creator-indices.ktoolbox` 包含目录下的所有作品的信息和路径。  
+  `creator-indices.ktoolbox` 包含目录下的所有作品的信息和路径。  
 
 ## 关于 Kemono
 
