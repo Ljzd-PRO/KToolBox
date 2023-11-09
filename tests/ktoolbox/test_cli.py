@@ -124,3 +124,38 @@ async def test_download_post():
         dump_post_data=False
     )
     assert no_url_and_no_dump is None
+
+
+@pytest.mark.asyncio
+async def test_sync_creator():
+    # noinspection SpellCheckingInspection
+    service = "fanbox"
+    creator_id = "76712"
+    creator_url = f"https://kemono.su/{service}/user/{creator_id}"
+
+    invalid = await KToolBoxCli.sync_creator(url="")
+    assert invalid == generate_msg(
+        TextEnum.MissingParams.value,
+        use_at_lease_one=[
+            ["url"],
+            ["service", "creator_id"]
+        ]
+    )
+
+    with tempfile.TemporaryDirectory() as td:
+        dir_path = Path(td)
+        url_only = await KToolBoxCli.sync_creator(
+            url=creator_url,
+            path=dir_path
+        )
+        assert url_only is None
+        assert (dir_new := next(dir_path.iterdir(), None)) is not None
+        assert (indices := (dir_new / DataStorageNameEnum.CreatorIndicesData.value)).is_file()
+
+        with_indices = await KToolBoxCli.sync_creator(
+            service=service,
+            creator_id=creator_id,
+            path=dir_path,
+            update_from=indices
+        )
+        assert with_indices is None
