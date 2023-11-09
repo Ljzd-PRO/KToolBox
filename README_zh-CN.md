@@ -31,6 +31,11 @@
 
 此处命令返回的文本仅作为**演示**使用，部分可能已经**过时**。
 
+- 安装 KToolBox：
+    ```bash
+    pip3 install ktoolbox
+    ```
+
 - 获取帮助总览:
     ```bash
     python -m ktoolbox -h
@@ -135,3 +140,10 @@
 > 
 > Contributors here upload content and share it here for easy searching and organization. \
 > To get started viewing content, either search for creators on the artists page, or search for content on the posts page.
+
+
+## 许可证
+
+KToolBox 使用 GPLv3 许可证.
+
+Copyright © 2023 by Ljzd-PRO.

@@ -31,6 +31,11 @@ For more information, use the help command.
 
 The return text here are only **demo**, some of them may be **outdated**.
 
+- Install KToolBox:
+    ```bash
+    pip3 install ktoolbox
+    ```
+  
 - Get general help:
     ```bash
     python -m ktoolbox -h
@@ -137,3 +142,9 @@ Description from https://kemono.su :
 > 
 > Contributors here upload content and share it here for easy searching and organization. \
 > To get started viewing content, either search for creators on the artists page, or search for content on the posts page.
+
+## License
+
+KToolBox is licensed under GPLv3.
+
+Copyright © 2023 by Ljzd-PRO.
