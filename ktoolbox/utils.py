@@ -1,8 +1,9 @@
 import cgi
 import os.path
+import sys
 import urllib.parse
 from pathlib import Path
-from typing import Generic, TypeVar, Optional, Dict, List
+from typing import Generic, TypeVar, Optional, Dict, List, Union
 
 import aiofiles
 from loguru import logger
@@ -103,21 +104,25 @@ def generate_msg(title: str = None, **kwargs):
     return f"{title} - {kwargs}" if kwargs else title
 
 
-def logger_init(disable_stdout: bool = False):
+def logger_init(level: Union[str, int] = None, disable_stdout: bool = False):
     """
     Initialize `loguru` logger
 
+    :param level: Log filter level
     :param disable_stdout: Disable default output stream
     """
     if disable_stdout:
         logger.remove()
+    elif level is not None:
+        logger.remove()
+        logger.add(sys.stderr, level=level)
     path = config.logger.path
     if not os.path.isdir(path):
         os.makedirs(path)
     if path is not None:
         logger.add(
             path / DataStorageNameEnum.LogData.value,
-            level=config.logger.level,
+            level=config.logger.level if level is None else level,
             rotation=config.logger.rotation,
             diagnose=True
         )
