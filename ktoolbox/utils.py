@@ -1,4 +1,5 @@
 import cgi
+import logging
 import os.path
 import sys
 import urllib.parse
@@ -104,25 +105,28 @@ def generate_msg(title: str = None, **kwargs):
     return f"{title} - {kwargs}" if kwargs else title
 
 
-def logger_init(level: Union[str, int] = None, disable_stdout: bool = False):
+def logger_init(std_level: Union[str, int] = None, disable_stdout: bool = False):
     """
     Initialize `loguru` logger
 
-    :param level: Log filter level, priority use `config.logger.level`
+    :param std_level: Standard output log filter level
     :param disable_stdout: Disable default output stream
     """
     if disable_stdout:
         logger.remove()
-    elif level is not None:
+    elif std_level is not None:
         logger.remove()
-        logger.add(sys.stderr, level=level)
+        logger.add(
+            sys.stderr,
+            level=std_level
+        )
     path = config.logger.path
     if not os.path.isdir(path):
         os.makedirs(path)
     if path is not None:
         logger.add(
             path / DataStorageNameEnum.LogData.value,
-            level=config.logger.level if config.logger.level else level,
+            level=config.logger.level,
             rotation=config.logger.rotation,
             diagnose=True
         )

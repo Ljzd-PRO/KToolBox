@@ -102,7 +102,7 @@ class LoggerConfiguration(BaseModel):
     """Logger configuration"""
     path: Optional[Path] = Path("logs")
     """Path to save logs, `None` for disable log file output"""
-    level: Optional[Union[str, int]] = None
+    level: Union[str, int] = logging.DEBUG
     """
     Log filter level,
     
