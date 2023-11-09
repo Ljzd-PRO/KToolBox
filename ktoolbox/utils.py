@@ -108,7 +108,7 @@ def logger_init(level: Union[str, int] = None, disable_stdout: bool = False):
     """
     Initialize `loguru` logger
 
-    :param level: Log filter level
+    :param level: Log filter level, priority use `config.logger.level`
     :param disable_stdout: Disable default output stream
     """
     if disable_stdout:
@@ -122,7 +122,7 @@ def logger_init(level: Union[str, int] = None, disable_stdout: bool = False):
     if path is not None:
         logger.add(
             path / DataStorageNameEnum.LogData.value,
-            level=config.logger.level if level is None else level,
+            level=config.logger.level if config.logger.level else level,
             rotation=config.logger.rotation,
             diagnose=True
         )
