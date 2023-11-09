@@ -169,6 +169,10 @@ Description from https://kemono.su :
 > Contributors here upload content and share it here for easy searching and organization. \
 > To get started viewing content, either search for creators on the artists page, or search for content on the posts page.
 
+## Code Coverage
+
+![codecov.io](https://codecov.io/gh/Ljzd-PRO/KToolBox/graphs/sunburst.svg?token=5XK9CYQHQN)
+
 ## License
 
 KToolBox is licensed under GPLv3.

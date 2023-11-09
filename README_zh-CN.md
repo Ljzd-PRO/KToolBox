@@ -167,6 +167,9 @@
 > Contributors here upload content and share it here for easy searching and organization. \
 > To get started viewing content, either search for creators on the artists page, or search for content on the posts page.
 
+## 代码覆盖率
+
+![codecov.io](https://codecov.io/gh/Ljzd-PRO/KToolBox/graphs/sunburst.svg?token=5XK9CYQHQN)
 
 ## 许可证
 
