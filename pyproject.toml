@@ -16,10 +16,7 @@ classifiers = [
     "Topic :: Terminals",
 ]
 
-packages = [
-    { include = "k_generator" },
-    { include = "ktoolbox" },
-]
+packages = [{ include = "ktoolbox" }]
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/Ljzd-PRO/KToolBox/issues"
