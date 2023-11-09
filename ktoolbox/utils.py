@@ -116,7 +116,7 @@ def logger_init(disable_stdout: bool = False):
         os.makedirs(path)
     if path is not None:
         logger.add(
-            path / DataStorageNameEnum.LogData,
+            path / DataStorageNameEnum.LogData.value,
             level=config.logger.level,
             rotation=config.logger.rotation,
             diagnose=True
