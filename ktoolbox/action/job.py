@@ -143,7 +143,11 @@ async def create_job_from_creator(
                 posts_path={post.id: path / post.title for post in post_list}
             )
         if indices:
-            async with aiofiles.open(path / DataStorageNameEnum.CreatorIndicesData.value) as f:
+            async with aiofiles.open(
+                    path / DataStorageNameEnum.CreatorIndicesData.value,
+                    "w",
+                    encoding="utf-8"
+            ) as f:
                 await f.write(indices.model_dump_json(indent=config.json_dump_indent))
 
     job_list: List[Job] = []
