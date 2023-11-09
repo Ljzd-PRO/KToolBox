@@ -249,6 +249,8 @@ class KToolBoxCli:
                 ])
 
         path = path if isinstance(path, Path) else Path(path)
+        if update_from:
+            update_from = update_from if isinstance(update_from, Path) else Path(update_from)
 
         # Get `CreatorIndices` data
         if update_from:
