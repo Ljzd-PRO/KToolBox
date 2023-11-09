@@ -34,6 +34,8 @@
     <a href="./README.md">English</a> | <a href="./README_zh-CN.md">中文</a>
 </p>
 
+![Preview](./static/preview-1.png)
+
 ## 功能
 
 - 你可以下载 Kemono 上的作品的所有文件

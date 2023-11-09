@@ -33,6 +33,8 @@
     <a href="./README.md">English</a> | <a href="./README_zh-CN.md">中文</a>
 </p>
 
+![Preview](./static/preview-1.png)
+
 ## Features
 
 - You can download all files from a specific post from Kemono
