@@ -150,8 +150,8 @@ def parse_webpage_url(url: str) -> Tuple[Optional[str], Optional[str], Optional[
     """
     path_url = Path(url)
     parts = path_url.parts
-    if url_parts_len := len(parts) < 7:
+    if (url_parts_len := len(parts)) < 7:
         # Pad to full size
-        parts += (None for _ in range(url_parts_len))
+        parts += tuple(None for _ in range(7 - url_parts_len))
     _scheme, _netloc, service, _user_key, user_id, _post_key, post_id = parts
     return service, user_id, post_id
