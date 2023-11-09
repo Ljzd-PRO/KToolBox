@@ -1,5 +1,4 @@
 import asyncio
-import os
 import urllib.parse
 from asyncio import CancelledError
 from functools import cached_property
@@ -139,7 +138,7 @@ class Downloader:
                             filename = urllib.parse.unquote(Path(self._url).name)
                     self._filename = filename
 
-                    if os.path.isfile(self._path / filename):
+                    if (self._path / filename).is_file():
                         return DownloaderRet(
                             code=RetCodeEnum.FileExisted,
                             message=generate_msg(

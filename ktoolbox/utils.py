@@ -1,6 +1,4 @@
 import cgi
-import logging
-import os.path
 import sys
 import urllib.parse
 from pathlib import Path
@@ -121,8 +119,8 @@ def logger_init(std_level: Union[str, int] = None, disable_stdout: bool = False)
             level=std_level
         )
     path = config.logger.path
-    if not os.path.isdir(path):
-        os.makedirs(path)
+    if not path.is_dir():
+        path.mkdir()
     if path is not None:
         logger.add(
             path / DataStorageNameEnum.LogData.value,
