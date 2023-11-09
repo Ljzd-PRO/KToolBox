@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Union
+from typing import Union, overload
 
 import aiofiles
 
@@ -12,7 +12,7 @@ from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
 from ktoolbox.enum import TextEnum
 from ktoolbox.job import JobRunner
-from ktoolbox.utils import dump_search
+from ktoolbox.utils import dump_search, parse_webpage_url, generate_msg
 
 __all__ = ["KToolBoxCli"]
 
@@ -111,6 +111,17 @@ class KToolBoxCli:
             return ret.message
 
     @staticmethod
+    @overload
+    async def download_post(
+            url: str,
+            path: Union[Path, str],
+            *,
+            dump_post_data=True
+    ):
+        ...
+
+    @staticmethod
+    @overload
     async def download_post(
             service: str,
             creator_id: str,
@@ -119,15 +130,39 @@ class KToolBoxCli:
             *,
             dump_post_data=True
     ):
+        ...
+
+    @staticmethod
+    async def download_post(
+            url: str = None,
+            service: str = None,
+            creator_id: str = None,
+            post_id: str = None,
+            path: Union[Path, str] = None,
+            *,
+            dump_post_data=True
+    ):
         """
         Download a specific post
 
+        :param url: The post URL
         :param service: The service name
         :param creator_id: The creator's ID
         :param post_id: The post ID
         :param path: Download path
         :param dump_post_data: Whether to dump post data (post.json) in post directory
         """
+        # Get service, creator_id, post_id
+        if url:
+            service, creator_id, post_id = parse_webpage_url(url)
+        if not all([service, creator_id, post_id]):
+            return generate_msg(
+                TextEnum.MissingParams.value,
+                use_at_lease_one=[
+                    ["url"],
+                    ["service", "creator_id", "post_id"]
+                ])
+
         path = path if isinstance(path, Path) else Path(path)
         ret = await get_post_api(
             service=service,

@@ -5,6 +5,7 @@ __all__ = ["TextEnum", "RetCodeEnum", "PostFileTypeEnum", "DataStorageNameEnum"]
 
 class TextEnum(Enum):
     SearchResultEmpty = str(None)
+    MissingParams = "Required parameters are missing"
 
 
 class RetCodeEnum(IntEnum):
