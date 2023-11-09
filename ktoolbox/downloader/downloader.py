@@ -13,7 +13,7 @@ from tqdm import tqdm as std_tqdm
 from ktoolbox.configuration import config
 from ktoolbox.downloader import DownloaderRet
 from ktoolbox.enum import RetCodeEnum
-from ktoolbox.utils import file_name_from_headers, generate_msg
+from ktoolbox.utils import filename_from_headers, generate_msg
 
 __all__ = ["Downloader"]
 
@@ -133,7 +133,7 @@ class Downloader:
                         )
 
                     # Get filename
-                    if not (filename := file_name_from_headers(res.headers)):
+                    if not (filename := filename_from_headers(res.headers)):
                         if not (filename := self._alt_filename):
                             filename = urllib.parse.unquote(Path(self._url).name)
                     self._filename = filename

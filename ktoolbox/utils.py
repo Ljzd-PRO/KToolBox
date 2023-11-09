@@ -12,7 +12,7 @@ from ktoolbox.configuration import config
 from ktoolbox.enum import RetCodeEnum, DataStorageNameEnum
 from ktoolbox.model import SearchResult
 
-__all__ = ["BaseRet", "file_name_from_headers", "generate_msg", "logger_init", "dump_search", "parse_webpage_url"]
+__all__ = ["BaseRet", "filename_from_headers", "generate_msg", "logger_init", "dump_search", "parse_webpage_url"]
 
 _T = TypeVar('_T')
 
@@ -60,7 +60,7 @@ def parse_header(line: str) -> Dict[str, Optional[str]]:
     return dict_value
 
 
-def file_name_from_headers(headers: Dict[str, str]) -> Optional[str]:
+def filename_from_headers(headers: Dict[str, str]) -> Optional[str]:
     """
     Get file name from headers.
 
@@ -71,7 +71,7 @@ def file_name_from_headers(headers: Dict[str, str]) -> Optional[str]:
 
     * Example:
     ```
-    file_name_from_headers('attachment;filename*=utf-8\\'\\'README%2Emd;filename="README.md"')
+    filename_from_headers('attachment;filename*=utf-8\\'\\'README%2Emd;filename="README.md"')
     ```
 
     * Return:
@@ -83,12 +83,12 @@ def file_name_from_headers(headers: Dict[str, str]) -> Optional[str]:
         if not (disposition := headers.get("content-disposition")):
             return None
     _, options = cgi.parse_header(disposition)  # alternative: `parse_header` in `utils.py`
-    if file_name := options.get("filename*"):
-        if len(name_with_charset := file_name.split("''")) == 2:
+    if filename := options.get("filename*"):
+        if len(name_with_charset := filename.split("''")) == 2:
             charset, name = name_with_charset
             return urllib.parse.unquote(name, charset)
-    if file_name := options.get("filename"):
-        return urllib.parse.unquote(file_name, config.downloader.encoding)
+    if filename := options.get("filename"):
+        return urllib.parse.unquote(filename, config.downloader.encoding)
     return None
 
 
