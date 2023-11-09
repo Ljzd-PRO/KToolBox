@@ -75,8 +75,8 @@ class PostStructureConfiguration(BaseModel):
     """
     attachments: Path = Path("attachments")
     """Sub path of attachment directory"""
-    content_filepath: Path = Path("content.txt")
-    """Sub path of post content text file"""
+    content_filepath: Path = Path("index.html")
+    """Sub path of post content HTML file"""
 
 
 class JobConfiguration(BaseModel):
