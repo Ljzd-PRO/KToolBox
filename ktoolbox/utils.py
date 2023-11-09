@@ -2,7 +2,7 @@ import cgi
 import sys
 import urllib.parse
 from pathlib import Path
-from typing import Generic, TypeVar, Optional, Dict, List, Union
+from typing import Generic, TypeVar, Optional, Dict, List, Union, Tuple
 
 import aiofiles
 from loguru import logger
@@ -12,7 +12,7 @@ from ktoolbox.configuration import config
 from ktoolbox.enum import RetCodeEnum, DataStorageNameEnum
 from ktoolbox.model import SearchResult
 
-__all__ = ["BaseRet", "file_name_from_headers", "generate_msg", "logger_init", "dump_search"]
+__all__ = ["BaseRet", "file_name_from_headers", "generate_msg", "logger_init", "dump_search", "parse_webpage_url"]
 
 _T = TypeVar('_T')
 
@@ -136,3 +136,22 @@ async def dump_search(result: List[BaseModel], path: Path):
             SearchResult(result=result)
             .model_dump_json(indent=config.json_dump_indent)
         )
+
+
+async def parse_webpage_url(url: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+    # noinspection SpellCheckingInspection
+    """
+    Fetch **service**, **user_id**, **post_id** from webpage url
+
+    Each part can be `None` if not found in url.
+
+    :param url: Kemono Webpage url
+    :return: Tuple of **service**, **user_id**, **post_id**
+    """
+    path_url = Path(url)
+    parts = path_url.parts
+    if url_parts_len := len(parts) < 7:
+        # Pad to full size
+        parts += (None for _ in range(url_parts_len))
+    _scheme, _netloc, service, _user_key, user_id, _post_key, post_id = parts
+    return service, user_id, post_id
