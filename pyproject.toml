@@ -31,6 +31,7 @@ fire = "^0.5.0"
 tqdm = "^4.66.1"
 loguru = "^0.7.2"
 aiofiles = "^23.2.1"
+pathvalidate = "^3.2.0"
 
 #[tool.poetry.group.uvloop.dependencies]
 #uvloop = "^0.17.0"

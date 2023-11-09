@@ -890,6 +890,21 @@ files = [
 ]
 
 [[package]]
+name = "pathvalidate"
+version = "3.2.0"
+description = "pathvalidate is a Python library to sanitize/validate a string such as filenames/file-paths/etc."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pathvalidate-3.2.0-py3-none-any.whl", hash = "sha256:cc593caa6299b22b37f228148257997e2fa850eea2daf7e4cc9205cef6908dee"},
+    {file = "pathvalidate-3.2.0.tar.gz", hash = "sha256:5e8378cf6712bff67fbe7a8307d99fa8c1a0cb28aa477056f8fc374f0dff24ad"},
+]
+
+[package.extras]
+docs = ["Sphinx (>=2.4)", "sphinx-rtd-theme (>=1.2.2)", "urllib3 (<2)"]
+test = ["Faker (>=1.0.8)", "allpairspy (>=2)", "click (>=6.2)", "pytest (>=6.0.1)", "pytest-discord (>=0.1.4)", "pytest-md-report (>=0.4.1)"]
+
+[[package]]
 name = "pefile"
 version = "2023.2.7"
 description = "Python PE parsing module"
@@ -1679,4 +1694,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "4348314961c5380a4d6f84a3bad9e6bdfd25950e0a8d40a5e4b3291f0c2916cd"
+content-hash = "0472db5b8d1f2d74baae2f9e8e33afb550dddb88f187fc533e131e94495f1226"
