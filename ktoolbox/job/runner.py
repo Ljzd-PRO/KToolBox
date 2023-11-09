@@ -11,6 +11,7 @@ from tqdm import tqdm as std_tqdm
 
 from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
+from ktoolbox.enum import RetCodeEnum
 from ktoolbox.job import Job
 from ktoolbox.utils import generate_msg
 
@@ -72,10 +73,11 @@ class JobRunner:
     async def processor(self):
         """Process each job in `self._job_queue`"""
         while not self._job_queue.empty():
-            # Create downloader
             job = await self._job_queue.get()
             if not os.path.isdir(job.path):
                 os.makedirs(job.path)
+
+            # Create downloader
             url_parts = [config.downloader.scheme, config.api.files_netloc, job.server_path, '', '', '']
             url = urlunparse(url_parts)
             downloader = Downloader(
@@ -104,13 +106,15 @@ class JobRunner:
                 exception = e
             if not exception:  # raise Exception when cancelled or other exceptions
                 ret = task_done.result()
-                if ret:
+                if ret.code == RetCodeEnum.Success:
                     logger.success(
                         generate_msg(
                             "Download success",
                             filename=ret.data
                         )
                     )
+                elif ret.code == RetCodeEnum.FileExisted:
+                    logger.warning(ret.message)
                 else:
                     logger.error(ret.message)
             elif isinstance(exception, CancelledError):

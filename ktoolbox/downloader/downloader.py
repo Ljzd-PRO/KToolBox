@@ -1,4 +1,5 @@
 import asyncio
+import os
 import urllib.parse
 from asyncio import CancelledError
 from functools import cached_property
@@ -138,8 +139,19 @@ class Downloader:
                             filename = urllib.parse.unquote(Path(self._url).name)
                     self._filename = filename
 
+                    if os.path.isfile(self._path / filename):
+                        return DownloaderRet(
+                            code=RetCodeEnum.FileExisted,
+                            message=generate_msg(
+                                "Download file existed",
+                                path=self._path / filename
+                            )
+                        )
+
+                    # Download
+                    temp_filepath = (self._path / filename).with_suffix(f".{config.downloader.temp_suffix}")
                     total_size = int(length_str) if (length_str := res.headers.get("Content-Length")) else None
-                    async with aiofiles.open(str(self._path / filename), "wb", self._buffer_size) as f:
+                    async with aiofiles.open(str(temp_filepath), "wb", self._buffer_size) as f:
                         chunk_iterator = res.aiter_bytes(self._chunk_size)
                         t = tqdm_class(
                             desc=filename,
@@ -153,6 +165,9 @@ class Downloader:
                                 raise CancelledError
                             await f.write(chunk)
                             t.update(len(chunk))  # Update progress bar
+
+            # Download finished
+            temp_filepath.rename(self._path / filename)
             if sync_callable:
                 sync_callable(self)
             if async_callable:

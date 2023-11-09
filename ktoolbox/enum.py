@@ -20,6 +20,9 @@ class RetCodeEnum(IntEnum):
     # ActionRet
     MissingParameter = 2001
 
+    # DownloaderRet
+    FileExisted = 3001
+
 
 class PostFileTypeEnum(Enum):
     # noinspection SpellCheckingInspection

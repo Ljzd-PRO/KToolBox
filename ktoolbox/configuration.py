@@ -50,6 +50,8 @@ class DownloaderConfiguration(BaseModel):
     """Number of bytes for file I/O buffer"""
     chunk_size: int = 1024
     """Number of bytes for chunk of downloader stream"""
+    temp_suffix: str = "tmp"
+    """Temp filename suffix of downloading files"""
 
 
 class PostStructureConfiguration(BaseModel):
