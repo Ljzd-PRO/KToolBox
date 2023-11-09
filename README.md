@@ -30,7 +30,8 @@
 
 For more information, use the help command.
 
-The return text here are only **demo**, some of them may be **outdated**.
+> **Warning**
+> The return text here are only **demo**, some of them may be **outdated**.
 
 - Install KToolBox:
     ```bash
