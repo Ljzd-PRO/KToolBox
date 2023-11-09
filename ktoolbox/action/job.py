@@ -80,7 +80,7 @@ def filter_posts_with_indices(posts: List[Post], indices: CreatorIndices) -> Tup
     """
     new_list = list(
         filter(
-            lambda x: x.edited > indices.posts[x.id].edited, posts
+            lambda x: x not in indices.posts or x.edited > indices.posts[x.id].edited, posts
         )
     )
     new_indices = indices.model_copy(deep=True)
