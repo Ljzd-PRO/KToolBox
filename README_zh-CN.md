@@ -1,5 +1,5 @@
-<p align="center">
-  <img align="center" src="static/repository-open-graph-2.svg" alt="logo">
+<p align="center" style="text-decoration:none">
+  <img align="center" src="https://raw.githubusercontent.com/Ljzd-PRO/KToolBox/master/static/repository-open-graph-2.svg" alt="logo">
 </p>
 
 <h1 align="center">
