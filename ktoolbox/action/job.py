@@ -30,6 +30,8 @@ async def create_job_from_post(
      ``True`` & ``None`` -> ``config.job.post_structure``
     :param dump_post_data: Whether to dump post data (post.json) in post directory
     """
+    if not post_path.is_dir():
+        post_path.mkdir()
     jobs: List[Job] = []
     if post_structure in [True, None]:
         post_structure = config.job.post_structure
