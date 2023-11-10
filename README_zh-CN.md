@@ -18,7 +18,7 @@
   </a>
 
   <a href="./LICENSE">
-    <img src="https://img.shields.io/badge/License-GPLv3-blue" alt="GPLv3"/>
+    <img src="https://img.shields.io/badge/License-MIT-blue" alt="MIT"/>
   </a>
 
   <a href="https://github.com/Ljzd-PRO/KToolBox/activity">
@@ -184,6 +184,6 @@
 
 ## 许可证
 
-KToolBox 使用 GPLv3 许可证.
+KToolBox 使用 MIT 许可证.
 
 Copyright © 2023 by Ljzd-PRO.

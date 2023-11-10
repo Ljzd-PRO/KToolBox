@@ -17,7 +17,7 @@
   </a>
 
   <a href="./LICENSE">
-    <img src="https://img.shields.io/badge/License-GPLv3-blue" alt="GPLv3"/>
+    <img src="https://img.shields.io/badge/License-MIT-blue" alt="MIT"/>
   </a>
 
   <a href="https://github.com/Ljzd-PRO/KToolBox/activity">
@@ -186,6 +186,6 @@ Description from https://kemono.su :
 
 ## License
 
-KToolBox is licensed under GPLv3.
+KToolBox is licensed under MIT.
 
 Copyright © 2023 by Ljzd-PRO.
