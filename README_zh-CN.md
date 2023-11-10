@@ -17,8 +17,8 @@
     <img src="https://img.shields.io/badge/License-GPLv3-blue" alt="GPLv3"/>
   </a>
 
-  <a href="https://github.com/Ljzd-PRO/KToolBox/commits/master">
-    <img src="https://img.shields.io/github/last-commit/Ljzd-PRO/KToolBox/master" alt="Last Commit"/>
+  <a href="https://github.com/Ljzd-PRO/KToolBox/commits/devel">
+    <img src="https://img.shields.io/github/last-commit/Ljzd-PRO/KToolBox/devel" alt="Last Commit"/>
   </a>
 
   <a href="https://codecov.io/gh/Ljzd-PRO/KToolBox" target="_blank">
@@ -150,6 +150,10 @@
     ```
   
   `creator-indices.ktoolbox` 包含目录下的所有作品的信息和路径。  
+
+## 开发相关
+
+- 开发版分支: [🔗devel](https://github.com/Ljzd-PRO/KToolBox/tree/devel)
 
 ## 关于 Kemono
 

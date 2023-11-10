@@ -16,8 +16,8 @@
     <img src="https://img.shields.io/badge/License-GPLv3-blue" alt="GPLv3"/>
   </a>
 
-  <a href="https://github.com/Ljzd-PRO/KToolBox/commits/master">
-    <img src="https://img.shields.io/github/last-commit/Ljzd-PRO/KToolBox/master" alt="Last Commit"/>
+  <a href="https://github.com/Ljzd-PRO/KToolBox/commits/devel">
+    <img src="https://img.shields.io/github/last-commit/Ljzd-PRO/KToolBox/devel" alt="Last Commit"/>
   </a>
 
   <a href="https://codecov.io/gh/Ljzd-PRO/KToolBox" target="_blank">
@@ -152,6 +152,10 @@ For more information, use the help command.
     ```
   
   The `creator-indices.ktoolbox` file contains the information and filepath of posts inside the directory.  
+
+## About Development
+
+- Development branch: [🔗devel](https://github.com/Ljzd-PRO/KToolBox/tree/devel)
 
 ## About Kemono
 
