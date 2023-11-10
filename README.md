@@ -1,5 +1,5 @@
 <p align="center">
-  <img align="center" src="./static/repository-open-graph.svg" alt="logo">
+  <img align="center" src="static/repository-open-graph-2.svg" alt="logo">
 </p>
 
 <h1 align="center">
