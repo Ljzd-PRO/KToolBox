@@ -30,7 +30,7 @@
   </a>
 
   <a style="text-decoration:none">
-    <img src="https://img.shields.io/badge/Platform-Win%20|%20Linux%20|%20macOS-blue" alt="Platform Win | Linux | macOS"/>
+    <img src="https://img.shields.io/badge/Platform-Windows%20|%20Linux%20|%20macOS-blue" alt="Platform Win | Linux | macOS"/>
   </a>
 </p>
 
