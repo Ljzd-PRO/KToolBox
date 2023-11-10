@@ -16,7 +16,7 @@
     <img src="https://img.shields.io/badge/License-GPLv3-blue" alt="GPLv3"/>
   </a>
 
-  <a href="https://github.com/Ljzd-PRO/KToolBox/commits/devel">
+  <a href="https://github.com/Ljzd-PRO/KToolBox/activity">
     <img src="https://img.shields.io/github/last-commit/Ljzd-PRO/KToolBox/devel" alt="Last Commit"/>
   </a>
 
