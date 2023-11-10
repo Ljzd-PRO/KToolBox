@@ -7,7 +7,6 @@ from typing import Generic, TypeVar, Optional, Dict, List, Tuple
 
 import aiofiles
 from loguru import logger
-# noinspection PyProtectedMember
 from pydantic import BaseModel, ConfigDict
 
 from ktoolbox.configuration import config
