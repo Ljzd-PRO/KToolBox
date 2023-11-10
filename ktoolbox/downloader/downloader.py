@@ -113,6 +113,17 @@ class Downloader:
         :return: ``DownloaderRet`` which contain the actual output filename
         :raise CancelledError
         """
+        # Use ``self._alt_filename`` instead of filename from server,
+        # to make the process more efficient
+        if (self._path / self._filename).is_file():
+            return DownloaderRet(
+                code=RetCodeEnum.FileExisted,
+                message=generate_msg(
+                    "Download file existed, skipped",
+                    path=self._path / self._filename
+                )
+            )
+
         tqdm_class: Type[std_tqdm] = tqdm_class or tqdm.asyncio.tqdm
         async with self._lock:
             async with httpx.AsyncClient() as client:
@@ -137,15 +148,6 @@ class Downloader:
                         if not (filename := self._alt_filename):
                             filename = urllib.parse.unquote(Path(self._url).name)
                     self._filename = filename
-
-                    if (self._path / filename).is_file():
-                        return DownloaderRet(
-                            code=RetCodeEnum.FileExisted,
-                            message=generate_msg(
-                                "Download file existed, skipped",
-                                path=self._path / filename
-                            )
-                        )
 
                     # Download
                     temp_filepath = (self._path / filename).with_suffix(f".{config.downloader.temp_suffix}")
