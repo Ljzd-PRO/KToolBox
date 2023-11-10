@@ -268,6 +268,13 @@ class KToolBoxCli:
                 creator = next(creator_ret.data, None)
                 if creator:
                     creator_name = creator.name
+                    logger.info(
+                        generate_msg(
+                            "Got creator information",
+                            name=creator.name,
+                            id=creator.id
+                        )
+                    )
             else:
                 logger.warning(
                     generate_msg(

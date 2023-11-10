@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List, Union, Tuple
 
 import aiofiles
+from loguru import logger
 from pathvalidate import sanitize_filename
 
 from ktoolbox.action import ActionRet, fetch_all_creator_posts, FetchInterruptError
@@ -123,6 +124,7 @@ async def create_job_from_creator(
     mix_posts = config.job.mix_posts if mix_posts is None else mix_posts
 
     # Get posts
+    logger.info(f"Start fetching posts from creator {creator_id}")
     if all_pages:
         post_list: List[Post] = []
         try:
@@ -136,12 +138,14 @@ async def create_job_from_creator(
             post_list = ret.data
         else:
             return ActionRet(**ret.model_dump(mode="python"))
+    logger.info(f"Get {len(post_list)} posts, start creating jobs")
 
     # Filter posts and generate ``CreatorIndices``
     if not mix_posts:
         indices = None
         if update_from:
             post_list, indices = filter_posts_with_indices(post_list, update_from)
+            logger.info(f"{len(post_list)} posts will be downloaded")
         elif save_creator_indices:  # It's unnecessary to create indices again when ``update_from`` was provided
             indices = CreatorIndices(
                 creator_id=creator_id,
