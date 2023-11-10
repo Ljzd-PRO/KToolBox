@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from typing import List, Union, Tuple
 
@@ -38,7 +37,7 @@ async def create_job_from_post(
     if post_structure in [True, None]:
         post_structure = config.job.post_structure
     if post_structure:
-        attachments_path = post_path / post_structure.attachments   # attachments
+        attachments_path = post_path / post_structure.attachments  # attachments
         attachments_path.mkdir(exist_ok=True)
         content_path = post_path / post_structure.content_filepath  # content
         content_path.parent.mkdir(exist_ok=True)
@@ -48,7 +47,7 @@ async def create_job_from_post(
 
     # Create jobs
     jobs: List[Job] = []
-    for attachment in post.attachments:     # attachments
+    for attachment in post.attachments:  # attachments
         if not attachment.path:
             continue
         jobs.append(
