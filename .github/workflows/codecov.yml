@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+      - devel
     paths:
       - "ktoolbox/**"
       - "tests/**"

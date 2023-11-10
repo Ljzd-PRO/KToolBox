@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+      - devel
     paths:
       - ".github/actions/setup-python/**"
       - ".github/workflows/python-package.yml"
