@@ -120,16 +120,15 @@ def logger_init(cli_use: bool = False, disable_stdout: bool = False):
             level=logging.INFO,
             filter=lambda record: record["level"].name != "SUCCESS"
         )
-    path = config.logger.path
-    if not path.is_dir():
-        path.mkdir()
-    if path is not None:
-        logger.add(
-            path / DataStorageNameEnum.LogData.value,
-            level=config.logger.level,
-            rotation=config.logger.rotation,
-            diagnose=True
-        )
+    if path := config.logger.path:
+        path.mkdir(exist_ok=True)
+        if path is not None:
+            logger.add(
+                path / DataStorageNameEnum.LogData.value,
+                level=config.logger.level,
+                rotation=config.logger.rotation,
+                diagnose=True
+            )
 
 
 async def dump_search(result: List[BaseModel], path: Path):
