@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import List, Union, Tuple
 
@@ -31,18 +32,23 @@ async def create_job_from_post(
      ``True`` & ``None`` -> ``config.job.post_structure``
     :param dump_post_data: Whether to dump post data (post.json) in post directory
     """
-    if not post_path.is_dir():
-        post_path.mkdir()
-    jobs: List[Job] = []
+    post_path.mkdir(exist_ok=True)
+
+    # Load ``PostStructureConfiguration``
     if post_structure in [True, None]:
         post_structure = config.job.post_structure
     if post_structure:
-        attachments_path = post_path / post_structure.attachments
-        content_path = post_path / post_structure.content_filepath
+        attachments_path = post_path / post_structure.attachments   # attachments
+        attachments_path.mkdir(exist_ok=True)
+        content_path = post_path / post_structure.content_filepath  # content
+        content_path.parent.mkdir(exist_ok=True)
     else:
         attachments_path = post_path
         content_path = None
-    for attachment in post.attachments:
+
+    # Create jobs
+    jobs: List[Job] = []
+    for attachment in post.attachments:     # attachments
         if not attachment.path:
             continue
         jobs.append(
@@ -53,7 +59,7 @@ async def create_job_from_post(
                 type=PostFileTypeEnum.Attachment
             )
         )
-    if post.file.path:
+    if post.file.path:  # file
         jobs.append(
             Job(
                 path=post_path,
@@ -62,9 +68,9 @@ async def create_job_from_post(
                 type=PostFileTypeEnum.File
             )
         )
+
+    # Write content file
     if content_path and post.content:
-        if not content_path.parent.is_dir():
-            content_path.parent.mkdir()
         async with aiofiles.open(content_path, "w", encoding=config.downloader.encoding) as f:
             await f.write(post.content)
     if dump_post_data:
@@ -72,6 +78,7 @@ async def create_job_from_post(
             await f.write(
                 post.model_dump_json(indent=config.json_dump_indent)
             )
+
     return jobs
 
 

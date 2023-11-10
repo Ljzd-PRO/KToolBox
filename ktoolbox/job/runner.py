@@ -74,8 +74,6 @@ class JobRunner:
         failed_num = 0
         while not self._job_queue.empty():
             job = await self._job_queue.get()
-            if not job.path.is_dir():
-                job.path.mkdir()
 
             # Create downloader
             url_parts = [config.downloader.scheme, config.api.files_netloc, job.server_path, '', '', '']
