@@ -1,3 +1,7 @@
+<p align="center">
+  <img align="center" src="./static/repository-open-graph.svg" alt="logo">
+</p>
+
 <h1 align="center">
   KToolBox
 </h1>
