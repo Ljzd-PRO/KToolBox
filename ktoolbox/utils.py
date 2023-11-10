@@ -1,11 +1,13 @@
 import cgi
+import logging
 import sys
 import urllib.parse
 from pathlib import Path
-from typing import Generic, TypeVar, Optional, Dict, List, Union, Tuple
+from typing import Generic, TypeVar, Optional, Dict, List, Tuple
 
 import aiofiles
 from loguru import logger
+# noinspection PyProtectedMember
 from pydantic import BaseModel, ConfigDict
 
 from ktoolbox.configuration import config
@@ -103,20 +105,21 @@ def generate_msg(title: str = None, **kwargs):
     return f"{title} - {kwargs}" if kwargs else title
 
 
-def logger_init(std_level: Union[str, int] = None, disable_stdout: bool = False):
+def logger_init(cli_use: bool = False, disable_stdout: bool = False):
     """
     Initialize ``loguru`` logger
 
-    :param std_level: Standard output log filter level
+    :param cli_use: Set logger level ``INFO`` and filter out ``SUCCESS``
     :param disable_stdout: Disable default output stream
     """
     if disable_stdout:
         logger.remove()
-    elif std_level is not None:
+    elif cli_use:
         logger.remove()
         logger.add(
             sys.stderr,
-            level=std_level
+            level=logging.INFO,
+            filter=lambda record: record["level"].name != "SUCCESS"
         )
     path = config.logger.path
     if not path.is_dir():
