@@ -62,7 +62,7 @@ async def create_job_from_post(
         jobs.append(
             Job(
                 path=post_path,
-                alt_filename=post.file.name,
+                alt_filename=f"{post.id}_{post.file.name}",
                 server_path=post.file.path,
                 type=PostFileTypeEnum.File
             )
