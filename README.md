@@ -33,7 +33,7 @@
     <a href="./README.md">English</a> | <a href="./README_zh-CN.md">中文</a>
 </p>
 
-![Preview](./static/preview-1.png)
+![Preview](https://raw.githubusercontent.com/Ljzd-PRO/KToolBox/master/static/preview-1.png)
 
 ## Features
 
