@@ -101,7 +101,7 @@ class JobConfiguration(BaseModel):
 
 class LoggerConfiguration(BaseModel):
     """Logger configuration"""
-    path: Optional[Path] = None
+    path: Optional[Path] = Path("logs")
     """Path to save logs, ``None`` for disable log file output"""
     level: Union[str, int] = logging.DEBUG
     """Log filter level"""
