@@ -38,7 +38,7 @@
     <a href="./README.md">English</a> | <a href="./README_zh-CN.md">中文</a>
 </p>
 
-![Preview](https://raw.githubusercontent.com/Ljzd-PRO/KToolBox/master/static/preview-1.png)
+![Preview](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-1.png)
 
 ## 功能
 
