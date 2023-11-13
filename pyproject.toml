@@ -47,7 +47,7 @@ pytest-cov = "==4.1.0"
 allpairspy = "==2.5.1"
 
 [tool.poetry.group.dev.dependencies]
-datamodel-code-generator = "^0.22.1"
+datamodel-code-generator = ">=0.22.1,<0.24.0"
 
 #[tool.poetry.group.uvloop]
 #optional = true
