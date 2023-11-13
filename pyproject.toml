@@ -37,7 +37,7 @@ pathvalidate = "^3.2.0"
 #uvloop = "^0.17.0"
 
 [tool.poetry.group.pyinstaller.dependencies]
-pyinstaller = "==6.1.0"
+pyinstaller = "==6.2.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "==7.4.3"
