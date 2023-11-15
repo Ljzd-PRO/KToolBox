@@ -37,7 +37,7 @@
     <a href="./README.md">English</a> | <a href="./README_zh-CN.md">中文</a>
 </p>
 
-![Preview](https://raw.githubusercontent.com/Ljzd-PRO/KToolBox/master/static/preview-1.png)
+![Preview](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-1.png)
 
 ## Features
 
@@ -57,9 +57,6 @@
 ## Tutorial
 
 For more information, use the help command.
-
-> **Warning**
-> This project is still **in development**.
 
 > **Warning**
 > The return text here are only **demo**, some of them may be **outdated**.
