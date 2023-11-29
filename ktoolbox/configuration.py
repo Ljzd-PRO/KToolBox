@@ -115,8 +115,10 @@ class Configuration(BaseSettings):
     downloader: DownloaderConfiguration = DownloaderConfiguration()
     job: JobConfiguration = JobConfiguration()
     logger: LoggerConfiguration = LoggerConfiguration()
-    ssl_verify: bool = True
 
+    ssl_verify: bool = True
+    # noinspection SpellCheckingInspection
+    """Enable SSL certificate verification for Kemono API server and download server"""
     json_dump_indent: int = 4
     """Indent of JSON file dump"""
 
