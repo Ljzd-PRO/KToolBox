@@ -115,6 +115,7 @@ class Configuration(BaseSettings):
     downloader: DownloaderConfiguration = DownloaderConfiguration()
     job: JobConfiguration = JobConfiguration()
     logger: LoggerConfiguration = LoggerConfiguration()
+    ssl_verify: bool = True
 
     json_dump_indent: int = 4
     """Indent of JSON file dump"""
