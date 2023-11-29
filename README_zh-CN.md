@@ -157,7 +157,7 @@
 ### 配置
 
 - KToolBox 读取工作目录下的 **`prod.env` 文件** 或 **环境变量** 来设定配置
-- **所有配置选项** 都定义在 [`ktoolbox/config.py`](ktoolbox/configuration.py)
+- **所有配置选项** 都定义在 [`ktoolbox/configuration.py`](ktoolbox/configuration.py)
 - 用 `__` 来指定子选项, 例如 `KTOOLBOX_API__SCHEME` 相当于 `api.scheme`
 - 所有配置选项都是可选的
 

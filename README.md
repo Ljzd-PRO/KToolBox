@@ -159,7 +159,7 @@ For more information, use the help command.
 ### Configuration
 
 - KToolBox read **`prod.env` file** in the work folder or **environment variables** to store configuration
-- **All configuration options** defined in [`ktoolbox/config.py`](ktoolbox/configuration.py)
+- **All configuration options** defined in [`ktoolbox/configuration.py`](ktoolbox/configuration.py)
 - Use `__` to specify the sub option, like `KTOOLBOX_API__SCHEME` means `api.scheme`
 - All configuration options are optional
 
