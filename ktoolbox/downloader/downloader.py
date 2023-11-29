@@ -126,7 +126,7 @@ class Downloader:
 
         tqdm_class: Type[std_tqdm] = tqdm_class or tqdm.asyncio.tqdm
         async with self._lock:
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(verify=config.ssl_verify) as client:
                 async with client.stream(
                         method="GET",
                         url=self._url,
