@@ -56,6 +56,8 @@
 
 ## 使用方法
 
+### 命令
+
 更多信息请参考帮助命令
 
 > **Warning**
@@ -151,6 +153,31 @@
     ```
   
   `creator-indices.ktoolbox` 包含目录下的所有作品的信息和路径。  
+
+### 配置
+
+- KToolBox 读取工作目录下的 **`prod.env` 文件** 或 **环境变量** 来设定配置
+- **所有配置选项** 都定义在 [`ktoolbox/config.py`](ktoolbox/configuration.py)
+- 用 `__` 来指定子选项, 例如 `KTOOLBOX_API__SCHEME` 相当于 `api.scheme`
+- 所有配置选项都是可选的
+
+#### `prod.env` 文件示例
+
+```dotenv
+# 可同时下载10个文件
+KTOOLBOX_JOB__COUNT=10
+
+# 为每个下载任务分配 102400 字节内存作为缓冲区
+KTOOLBOX_DOWNLOADER__BUFFER_SIZE=102400
+
+# 设置作品附件目录为 `./`, 这意味着所有附件将直接保存在作品目录下
+# 而不会创建一个子目录来储存
+KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
+
+# 为Kemono API服务器和下载服务器禁用SSL证书检查
+# 在Kemono服务器的证书过期时很有用 （SSL: CERTIFICATE_VERIFY_FAILED）
+KTOOLBOX_SSL_VERIFY=False
+```
 
 ## 开发相关
 
