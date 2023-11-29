@@ -7,6 +7,7 @@ readme = "README.md"
 homepage = "https://github.com/Ljzd-PRO/KToolBox"
 repository = "https://github.com/Ljzd-PRO/KToolBox"
 documentation = "https://github.com/Ljzd-PRO/KToolBox/wiki"
+
 keywords = ["kemono", "kemono.party", "cli-app", "downloader", "os-independent"]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -20,6 +21,9 @@ packages = [{ include = "ktoolbox" }]
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/Ljzd-PRO/KToolBox/issues"
+
+[tool.poetry.scripts]
+ktoolbox = "ktoolbox.__main__:main"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.12"
