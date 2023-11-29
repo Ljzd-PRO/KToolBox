@@ -70,7 +70,7 @@
 
 - 获取帮助总览:
     ```bash
-    python -m ktoolbox -h
+    ktoolbox -h
     ```
     <details>
     <summary>返回文本</summary>
@@ -105,7 +105,7 @@
 
 - 获取某个命令的帮助信息:
     ```bash
-    python -m ktoolbox download-post -h
+    ktoolbox download-post -h
     ```
     <details>
     <summary>返回文本</summary>
@@ -134,14 +134,14 @@
 
 - 下载指定的作品:
     ```bash
-    python -m ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
+    ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
     ```
   
   > 如果部分文件下载失败，你可以尝试重新运行命令，已下载完成的文件会被**跳过**。
 
 - 下载作者的所有作品:
     ```bash
-    python -m ktoolbox sync-creator https://kemono.su/fanbox/user/9016
+    ktoolbox sync-creator https://kemono.su/fanbox/user/9016
     ```
   
   默认情况下你会在作者目录下得到一个 `creator-indices.ktoolbox` 文件，你可以用它来更新目录。
@@ -149,7 +149,7 @@
   
 - 更新一个作者目录:
     ```bash
-    python -m ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
+    ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
     ```
   
   `creator-indices.ktoolbox` 包含目录下的所有作品的信息和路径。  

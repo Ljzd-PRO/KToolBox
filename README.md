@@ -70,7 +70,7 @@ For more information, use the help command.
   
 - Get general help:
     ```bash
-    python -m ktoolbox -h
+    ktoolbox -h
     ```
     <details>
     <summary>Return</summary>
@@ -105,7 +105,7 @@ For more information, use the help command.
 
 - Get help of a command:
     ```bash
-    python -m ktoolbox download-post -h
+    ktoolbox download-post -h
     ```
     <details>
     <summary>Return</summary>
@@ -134,7 +134,7 @@ For more information, use the help command.
 
 - Download a specific post:
     ```bash
-    python -m ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
+    ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
     ```
   
   > If some files failed to download, you can try to execute the command line again, \
@@ -142,7 +142,7 @@ For more information, use the help command.
 
 - Download all posts from a creator:
     ```bash
-    python -m ktoolbox sync-creator https://kemono.su/fanbox/user/9016
+    ktoolbox sync-creator https://kemono.su/fanbox/user/9016
     ```
   
   By default, you will get a `creator-indices.ktoolbox` file in the creator directory, \
@@ -151,7 +151,7 @@ For more information, use the help command.
 
 - Update a downloaded creator directory:
     ```bash
-    python -m ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
+    ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
     ```
   
   The `creator-indices.ktoolbox` file contains the information and filepath of posts inside the directory.  
