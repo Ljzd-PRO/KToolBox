@@ -7,7 +7,7 @@ from typing import Generic, TypeVar, Optional, Dict, List, Tuple
 
 import aiofiles
 from loguru import logger
-from pydantic import BaseModel, BaseConfig
+from pydantic import BaseModel
 
 from ktoolbox.configuration import config
 from ktoolbox.enum import RetCodeEnum, DataStorageNameEnum
@@ -25,7 +25,7 @@ class BaseRet(BaseModel, Generic[_T]):
     exception: Optional[Exception] = None
     data: Optional[_T] = None
 
-    class Config(BaseConfig):
+    class Config(BaseModel.Config):
         arbitrary_types_allowed = True
 
     def __bool__(self):
