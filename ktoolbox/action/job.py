@@ -75,7 +75,7 @@ async def create_job_from_post(
     if dump_post_data:
         async with aiofiles.open(str(post_path / DataStorageNameEnum.PostData.value), "w", encoding="utf-8") as f:
             await f.write(
-                post.model_dump_json(indent=config.json_dump_indent)
+                post.json(indent=config.json_dump_indent)
             )
 
     return jobs
@@ -96,7 +96,7 @@ def filter_posts_with_indices(posts: List[Post], indices: CreatorIndices) -> Tup
             lambda x: x.id not in indices.posts or x.edited > indices.posts[x.id].edited, posts
         )
     )
-    new_indices = indices.model_copy(deep=True)
+    new_indices = indices.copy(deep=True)
     for post in new_list:
         new_indices.posts[post.id] = post
     return new_list, new_indices
@@ -137,13 +137,13 @@ async def create_job_from_creator(
             async for part in fetch_all_creator_posts(service=service, creator_id=creator_id):
                 post_list += part
         except FetchInterruptError as e:
-            return ActionRet(**e.ret.model_dump(mode="python"))
+            return ActionRet(**e.ret.dict())
     else:
         ret = await get_creator_post(service=service, creator_id=creator_id, o=o)
         if ret:
             post_list = ret.data
         else:
-            return ActionRet(**ret.model_dump(mode="python"))
+            return ActionRet(**ret.dict())
     logger.info(f"Get {len(post_list)} posts, start creating jobs")
 
     # Filter posts and generate ``CreatorIndices``
@@ -165,7 +165,7 @@ async def create_job_from_creator(
                     "w",
                     encoding="utf-8"
             ) as f:
-                await f.write(indices.model_dump_json(indent=config.json_dump_indent))
+                await f.write(indices.json(indent=config.json_dump_indent))
 
     job_list: List[Job] = []
     for post in post_list:

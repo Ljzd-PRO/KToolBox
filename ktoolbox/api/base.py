@@ -4,12 +4,13 @@ from urllib.parse import urlunparse
 
 import httpx
 import tenacity
-from pydantic import BaseModel, ValidationError, RootModel
+from pydantic import BaseModel, ValidationError
 from tenacity import RetryCallState, wait_fixed, retry_if_result
 from tenacity.stop import stop_base, stop_never, stop_after_attempt
 
 from ktoolbox.configuration import config
 from ktoolbox.enum import RetCodeEnum
+from ktoolbox.model import RootModel
 from ktoolbox.utils import BaseRet
 
 __all__ = ["APITenacityStop", "APIRet", "BaseAPI"]
@@ -63,7 +64,7 @@ class BaseAPI(ABC, Generic[_T]):
             if cls.extra_validator:
                 res_model = cls.extra_validator(res.text)
             else:
-                res_model = cls.Response.model_validate_json(res.text)
+                res_model = cls.Response.parse_raw(res.text)
         except (ValueError, ValidationError) as e:
             if isinstance(e, ValueError):
                 return APIRet(
@@ -78,7 +79,7 @@ class BaseAPI(ABC, Generic[_T]):
                     exception=e
                 )
         else:
-            data = res_model.root if isinstance(res_model, RootModel) else res_model
+            data = res_model.__root__ if isinstance(res_model, RootModel) else res_model
             return APIRet(data=data)
 
     @classmethod

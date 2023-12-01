@@ -41,7 +41,7 @@ async def _test_dump(dump: Path):
         json_text = f.read()
     os.remove(str(dump))
     try:
-        validate_result = SearchResult.model_validate_json(json_text)
+        validate_result = SearchResult.parse_raw(json_text)
     except ValidationError as e:
         validate_result = e
     assert isinstance(validate_result, SearchResult)

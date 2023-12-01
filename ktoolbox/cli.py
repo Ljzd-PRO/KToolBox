@@ -106,7 +106,7 @@ class KToolBoxCli:
             if dump:
                 async with aiofiles.open(str(dump), "w", encoding="utf-8") as f:
                     await f.write(
-                        ret.data.model_dump_json(indent=config.json_dump_indent)
+                        ret.data.json(indent=config.json_dump_indent)
                     )
             return ret.data
         else:
@@ -256,7 +256,7 @@ class KToolBoxCli:
         if update_from:
             async with aiofiles.open(update_from, encoding="utf-8") as f:
                 indices_text = await f.read()
-            indices = CreatorIndices.model_validate_json(indices_text)
+            indices = CreatorIndices.parse_raw(indices_text)
             creator_path = update_from.parent
         else:
             indices = None

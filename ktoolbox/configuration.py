@@ -3,8 +3,7 @@ import logging
 from pathlib import Path
 from typing import Literal, Union, Optional
 
-from pydantic import BaseModel
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import BaseModel, BaseSettings
 
 __all__ = [
     "config",
@@ -122,13 +121,11 @@ class Configuration(BaseSettings):
     json_dump_indent: int = 4
     """Indent of JSON file dump"""
 
-    # noinspection SpellCheckingInspection
-    model_config = SettingsConfigDict(
-        env_prefix='ktoolbox_',
-        env_nested_delimiter='__',
-        env_file='.env',
-        env_file_encoding='utf-8'
-    )
+    class Config(BaseSettings.Config):
+        env_prefix = 'ktoolbox_'
+        env_nested_delimiter = '__'
+        env_file = '.env'
+        env_file_encoding = 'utf-8'
 
 
 config = Configuration(_env_file='prod.env')

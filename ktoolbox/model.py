@@ -1,10 +1,10 @@
 from typing import Type, Any, List, Generic, TypeVar, Union
 
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel
 
 from ktoolbox import __version__
 
-__all__ = ["BaseKToolBoxData", "SearchResult"]
+__all__ = ["BaseKToolBoxData", "SearchResult", "RootModel"]
 
 _T = TypeVar("_T")
 
@@ -21,11 +21,11 @@ class BaseKToolBoxData(BaseModel):
     version: str = __version__
     type: Union[Type["BaseKToolBoxData"], str] = None
 
-    @field_serializer('type')
-    def _(self, value: Type["BaseKToolBoxData"], _info):
-        return str(value)
-
 
 class SearchResult(BaseKToolBoxData, Generic[_T]):
     """Cli search result"""
     result: List[_T] = []
+
+
+class RootModel(BaseModel, Generic[_T]):
+    __root__: _T

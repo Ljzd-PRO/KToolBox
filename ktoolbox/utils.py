@@ -7,7 +7,7 @@ from typing import Generic, TypeVar, Optional, Dict, List, Tuple
 
 import aiofiles
 from loguru import logger
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, BaseConfig
 
 from ktoolbox.configuration import config
 from ktoolbox.enum import RetCodeEnum, DataStorageNameEnum
@@ -25,7 +25,8 @@ class BaseRet(BaseModel, Generic[_T]):
     exception: Optional[Exception] = None
     data: Optional[_T] = None
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    class Config(BaseConfig):
+        arbitrary_types_allowed = True
 
     def __bool__(self):
         return self.code == RetCodeEnum.Success
@@ -135,7 +136,7 @@ async def dump_search(result: List[BaseModel], path: Path):
     async with aiofiles.open(str(path), "w", encoding="utf-8") as f:
         await f.write(
             SearchResult(result=result)
-            .model_dump_json(indent=config.json_dump_indent)
+            .json(indent=config.json_dump_indent)
         )
 
 

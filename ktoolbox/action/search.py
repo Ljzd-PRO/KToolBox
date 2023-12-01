@@ -70,7 +70,7 @@ async def search_creator_post(
             else:  # else need to get ``id`` and ``service``
                 creators_ret = await search_creator(id=id, name=name, service=service)
                 if not creators_ret:
-                    return ActionRet(**creators_ret.model_dump(mode="python"))
+                    return ActionRet(**creators_ret.dict())
                 else:
                     for creator in creators_ret.data:
                         ret = await get_creator_post(
