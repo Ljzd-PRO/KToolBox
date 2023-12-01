@@ -171,7 +171,7 @@ class KToolBoxCli:
             post_id=post_id
         )
         if ret:
-            post_path = path / ret.data.id if config.job.post_id_as_name else path / sanitize_filename(ret.data.title)
+            post_path = path / ret.data.id if config.job.post_id_as_path else path / sanitize_filename(ret.data.title)
             job_list = await create_job_from_post(
                 post=ret.data,
                 post_path=post_path,

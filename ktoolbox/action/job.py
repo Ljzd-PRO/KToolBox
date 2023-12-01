@@ -172,7 +172,7 @@ async def create_job_from_creator(
         # Get post path
         if mix_posts:
             default_post_path = path
-        elif config.job.post_id_as_name:
+        elif config.job.post_id_as_path:
             default_post_path = path / post.id
         else:
             default_post_path = path / sanitize_filename(post.title)
