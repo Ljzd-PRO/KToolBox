@@ -11,7 +11,6 @@ from ktoolbox.action import search_creator as search_creator_action, search_crea
 from ktoolbox.api.misc import get_app_version
 from ktoolbox.api.posts import get_post as get_post_api
 from ktoolbox.configuration import config
-from ktoolbox.downloader import Downloader
 from ktoolbox.enum import TextEnum
 from ktoolbox.job import JobRunner, CreatorIndices
 from ktoolbox.utils import dump_search, parse_webpage_url, generate_msg
@@ -35,8 +34,8 @@ class KToolBoxCli:
     # noinspection PyShadowingBuiltins
     @staticmethod
     async def search_creator(
-            id: str = None,
             name: str = None,
+            id: str = None,
             service: str = None,
             *,
             dump: Path = None
@@ -172,9 +171,10 @@ class KToolBoxCli:
             post_id=post_id
         )
         if ret:
+            post_path = path / ret.data.id if config.job.post_id_as_path else path / sanitize_filename(ret.data.title)
             job_list = await create_job_from_post(
                 post=ret.data,
-                post_path=path / sanitize_filename(ret.data.title),
+                post_path=post_path,
                 dump_post_data=dump_post_data
             )
             job_runner = JobRunner(job_list=job_list)
@@ -299,13 +299,3 @@ class KToolBoxCli:
             await job_runner.start()
         else:
             return ret.message
-
-    @staticmethod
-    async def dev_test():
-        """Dev test"""
-        downloader = Downloader(
-            "https://github.com/Ljzd-PRO/Mys_Goods_Tool/releases/download/v2.1.0/v2.1.0-Linux-x86_64.zip",
-            Path("./")
-        )
-        ret = await downloader.run(progress=True)
-        return ret.data if ret else ret.message
