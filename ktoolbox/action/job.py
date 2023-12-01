@@ -170,7 +170,12 @@ async def create_job_from_creator(
     job_list: List[Job] = []
     for post in post_list:
         # Get post path
-        default_post_path = path if mix_posts else path / sanitize_filename(post.title)
+        if mix_posts:
+            default_post_path = path
+        elif config.job.post_id_as_path:
+            default_post_path = path / post.id
+        else:
+            default_post_path = path / sanitize_filename(post.title)
         if update_from:
             if not (post_path := update_from.posts_path.get(post.id)):
                 post_path = default_post_path
