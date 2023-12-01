@@ -9,7 +9,7 @@ class GetAppVersion(BaseAPI):
     method = "get"
 
     class Response(RootModel[str]):
-        pass
+        __root__: str
 
     extra_validator = RootModel.parse_obj
 

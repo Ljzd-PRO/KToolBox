@@ -12,7 +12,7 @@ class GetCreatorPost(BaseAPI):
     method = "get"
 
     class Response(RootModel[List[Post]]):
-        pass
+        __root__: List[Post]
 
     @classmethod
     async def __call__(cls, service: str, creator_id: str, *, q: str = None, o: int = None) -> APIRet[List[Post]]:

@@ -12,7 +12,7 @@ class GetAnnouncement(BaseAPI):
     method = "get"
 
     class Response(RootModel[List[Announcement]]):
-        pass
+        __root__: List[Announcement]
 
     @classmethod
     async def __call__(cls, service: str, creator_id: str) -> APIRet[List[Announcement]]:
