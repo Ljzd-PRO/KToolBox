@@ -6,6 +6,7 @@ on:
     branches:
       - master
       - devel
+      - pure-py
     paths:
       - ".github/actions/setup-python/**"
       - ".github/workflows/python-package.yml"
