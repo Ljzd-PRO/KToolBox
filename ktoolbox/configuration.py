@@ -82,7 +82,7 @@ class JobConfiguration(BaseModel):
     """Download jobs Configuration"""
     count: int = 4
     """Number of coroutines for concurrent download"""
-    post_id_as_name: bool = False
+    post_id_as_path: bool = False
     """Use post ID as post directory name"""
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
     """Post path structure"""
