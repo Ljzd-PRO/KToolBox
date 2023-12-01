@@ -299,13 +299,3 @@ class KToolBoxCli:
             await job_runner.start()
         else:
             return ret.message
-
-    @staticmethod
-    async def dev_test():
-        """Dev test"""
-        downloader = Downloader(
-            "https://github.com/Ljzd-PRO/Mys_Goods_Tool/releases/download/v2.1.0/v2.1.0-Linux-x86_64.zip",
-            Path("./")
-        )
-        ret = await downloader.run(progress=True)
-        return ret.data if ret else ret.message
