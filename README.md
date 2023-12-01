@@ -84,6 +84,10 @@ For more information, use the help command.
     ```bash
     pip3 install ktoolbox
     ```
+  - For [a-Shell](https://github.com/holzschu/a-shell):
+      ```bash
+      pip3 install ktoolbox-pure-py
+      ```
   
 - Get general help:
     ```bash

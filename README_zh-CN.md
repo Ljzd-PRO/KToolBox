@@ -84,6 +84,10 @@
     ```bash
     pip3 install ktoolbox
     ```
+  - 对于 [a-Shell](https://github.com/holzschu/a-shell):
+      ```bash
+      pip3 install ktoolbox-pure-py
+      ```
 
 - 获取帮助总览:
     ```bash
