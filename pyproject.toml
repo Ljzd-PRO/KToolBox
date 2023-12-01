@@ -27,7 +27,7 @@ ktoolbox = "ktoolbox.__main__:main"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.12"
-pydantic = {version="==1.10.13", extras=["dotenv"]}
+pydantic = {version="^1.10.13", extras=["dotenv"]}
 tenacity = "^8.2.3"
 httpx = {version="<=0.25.0", extras=["socks"]}
 fire = "^0.5.0"
