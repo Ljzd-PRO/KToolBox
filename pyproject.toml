@@ -36,9 +36,6 @@ loguru = "^0.7.2"
 aiofiles = "^23.2.1"
 pathvalidate = "^3.2.0"
 
-#[tool.poetry.group.uvloop.dependencies]
-#uvloop = "^0.17.0"
-
 [tool.poetry.group.pyinstaller.dependencies]
 pyinstaller = "==6.1.0"
 
