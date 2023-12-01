@@ -181,8 +181,10 @@ KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 KTOOLBOX_SSL_VERIFY=False
 ```
 
-## About Development
-
+## Other Branches
+- Pure Python branch: [🔗pure-py](https://github.com/Ljzd-PRO/KToolBox/tree/pure-py)
+  - Use pydantic v1 so that cargo is not needed for installation
+  - For example, you can use it on iOS terminal App [a-shell](https://github.com/holzschu/a-shell)
 - Development branch: [🔗devel](https://github.com/Ljzd-PRO/KToolBox/tree/devel)
 
 ## About Kemono
