@@ -56,6 +56,23 @@
 
 ## 使用方法
 
+### iOS 快捷指令（可选）
+
+- 你可以用 iOS 终端 App [a-Shell](https://github.com/holzschu/a-shell) 运行 KToolBox
+- 这些快捷指令可以在 a-Shell 自动安装 KToolBox 和下载 Kemono 作品
+  - 你可以通过网页共享界面触发“下载 Kemono 作品”，或直接在快捷指令 App 运行
+- 访问下面的快捷指令 URL 或前往 [`shortcuts/`](./shortcuts) 下载快捷指令文件
+
+#### 英文
+
+- [KToolBox Manager](https://www.icloud.com/shortcuts/ed981823ea424ebfaefe90e07c146c9f)
+- [Download Kemono Post](https://www.icloud.com/shortcuts/dbfef8dfb3774b92b4a8f10d5e3c963c)
+
+#### 中文
+
+- [KToolBox 管理器](https://www.icloud.com/shortcuts/5ebf774fa3eb4c3e98c8db46485314ec)
+- [下载 Kemono 作品](https://www.icloud.com/shortcuts/8d081bc5d66448b7bde19504df885ccd)
+
 ### 命令
 
 更多信息请参考帮助命令

@@ -56,6 +56,23 @@
 
 ## Tutorial
 
+### iOS Shortcuts (Optional)
+
+- You can run KToolBox using iOS terminal App [a-Shell](https://github.com/holzschu/a-shell)
+- These shortcuts can automatically install KToolBox and download posts in a-Shell
+  - You can trigger "Download Kemono Post" by web page share view, or run directly in Shortcuts App
+- Visit shortcut URLs below or download shortcut files at [`shortcuts/`](./shortcuts)
+
+#### English
+
+- [KToolBox Manager](https://www.icloud.com/shortcuts/ed981823ea424ebfaefe90e07c146c9f)
+- [Download Kemono Post](https://www.icloud.com/shortcuts/dbfef8dfb3774b92b4a8f10d5e3c963c)
+
+#### Chinese
+
+- [KToolBox 管理器](https://www.icloud.com/shortcuts/5ebf774fa3eb4c3e98c8db46485314ec)
+- [下载 Kemono 作品](https://www.icloud.com/shortcuts/8d081bc5d66448b7bde19504df885ccd)
+
 ### Command
 
 For more information, use the help command.
