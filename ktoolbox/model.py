@@ -1,4 +1,5 @@
-from typing import Type, Any, List, Generic, TypeVar, Union
+import json
+from typing import Type, Any, List, Generic, TypeVar, Union, Dict
 
 from pydantic import BaseModel
 
@@ -7,6 +8,11 @@ from ktoolbox import __version__
 __all__ = ["BaseKToolBoxData", "SearchResult", "RootModel"]
 
 _T = TypeVar("_T")
+
+
+def _dump_type(obj: Dict[str, Any], *args, **kwargs):
+    obj["type"] = str(obj["type"])
+    return json.dumps(obj, *args, **kwargs)
 
 
 class BaseKToolBoxData(BaseModel):
@@ -20,6 +26,9 @@ class BaseKToolBoxData(BaseModel):
 
     version: str = __version__
     type: Union[Type["BaseKToolBoxData"], str] = None
+
+    class Config(BaseModel.Config):
+        json_dumps = _dump_type
 
 
 class SearchResult(BaseKToolBoxData, Generic[_T]):
