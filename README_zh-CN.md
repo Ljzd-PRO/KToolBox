@@ -183,7 +183,7 @@ KTOOLBOX_SSL_VERIFY=False
 
 - 纯 Python 分支：[🔗pure-py](https://github.com/Ljzd-PRO/KToolBox/tree/pure-py)
   - 使用 pydantic v1 因此安装时不需要 cargo
-  - 例如你可以在 iOS 的终端 App [a-shell](https://github.com/holzschu/a-shell) 运行
+  - 例如你可以在 iOS 的终端 App [a-Shell](https://github.com/holzschu/a-shell) 运行
   - PyPI：https://pypi.org/project/ktoolbox-pure-py/
 - 开发版分支：[🔗devel](https://github.com/Ljzd-PRO/KToolBox/tree/devel)
 
