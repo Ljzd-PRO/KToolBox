@@ -6,6 +6,7 @@ on:
     branches:
       - master
       - devel
+      - pure-py
     paths:
       - "ktoolbox/**"
       - "tests/**"
