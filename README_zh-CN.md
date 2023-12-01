@@ -179,9 +179,12 @@ KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 KTOOLBOX_SSL_VERIFY=False
 ```
 
-## 开发相关
+## 其他分支
 
-- 开发版分支: [🔗devel](https://github.com/Ljzd-PRO/KToolBox/tree/devel)
+- 纯 Python 分支：[🔗pure-py](https://github.com/Ljzd-PRO/KToolBox/tree/pure-py)
+  - 使用 pydantic v1 因此安装时不需要 cargo
+  - 例如你可以在 iOS 的终端 App [a-shell](https://github.com/holzschu/a-shell) 运行
+- 开发版分支：[🔗devel](https://github.com/Ljzd-PRO/KToolBox/tree/devel)
 
 ## 关于 Kemono
 
