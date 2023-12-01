@@ -65,13 +65,13 @@
 
 #### 英文
 
-- [KToolBox Manager](https://www.icloud.com/shortcuts/ed981823ea424ebfaefe90e07c146c9f)
-- [Download Kemono Post](https://www.icloud.com/shortcuts/dbfef8dfb3774b92b4a8f10d5e3c963c)
+- [KToolBox Manager](https://www.icloud.com/shortcuts/0bf54a3131e14259982870c640c7efb8)
+- [Download Kemono Post](https://www.icloud.com/shortcuts/b5633b6a80354a9890d53bab9f756234)
 
 #### 中文
 
-- [KToolBox 管理器](https://www.icloud.com/shortcuts/5ebf774fa3eb4c3e98c8db46485314ec)
-- [下载 Kemono 作品](https://www.icloud.com/shortcuts/8d081bc5d66448b7bde19504df885ccd)
+- [KToolBox 管理器](https://www.icloud.com/shortcuts/2f9c2a6b74f140758fb0f5620d032f31)
+- [下载 Kemono 作品](https://www.icloud.com/shortcuts/b12036bb0c6148bea761de06e3b65667)
 
 ### 命令
 
