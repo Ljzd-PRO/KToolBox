@@ -12,7 +12,8 @@ on:
       - "mkdocs.yml"
   workflow_dispatch:
 
-#permissions:
+permissions:
+  contents: write
 #  id-token: write
 #  pages: write
 
