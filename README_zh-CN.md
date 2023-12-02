@@ -60,7 +60,7 @@
 
 ## 使用方法
 
-前往 [文档](https://ktoolbox.readthedocs.io/) 查看更多详情。
+前往 [文档](https://ktoolbox.readthedocs.io/latest/zh/) 查看更多详情。
 
 ### 安装
 
