@@ -64,7 +64,7 @@
 
 ### Command
 
-For more information, use the help command or goto [Commands](./commands.md) page.
+For more information, use the help command or goto [Commands](commands.md) page.
   
 #### ❓ Get general help
 ```bash
