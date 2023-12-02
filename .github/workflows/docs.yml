@@ -12,6 +12,9 @@ on:
       - "mkdocs.yml"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   documentation:
     name: Build documentation
