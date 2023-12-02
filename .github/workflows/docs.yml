@@ -12,8 +12,8 @@ on:
       - "mkdocs.yml"
   workflow_dispatch:
 
-permissions:
-  contents: write
+#permissions:
+#  contents: write
 
 jobs:
   documentation:
@@ -27,9 +27,11 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Build and deploy to gh-pages branch
+      - name: Build
         run: |
-          poetry run mike deploy --push --update-aliases master latest
+          poetry run mkdocs build --clean
+          poetry run mkdocs --version
+#          poetry run mike deploy --push --update-aliases master latest
 
       - name: Upload to GitHub Pages
         uses: actions/upload-pages-artifact@v2
