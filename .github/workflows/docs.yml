@@ -10,6 +10,7 @@ on:
       - "pyproject.toml"
       - "docs/**"
       - "mkdocs.yml"
+  workflow_dispatch:
 
 permissions:
   id-token: write
