@@ -11,6 +11,9 @@ on:
       - "docs/**"
       - "mkdocs.yml"
 
+permissions:
+  id-token: write
+
 jobs:
   documentation:
     name: Build documentation
