@@ -12,9 +12,9 @@ on:
       - "mkdocs.yml"
   workflow_dispatch:
 
-permissions:
-  id-token: write
-  pages: write
+#permissions:
+#  id-token: write
+#  pages: write
 
 jobs:
   documentation:
@@ -22,21 +22,26 @@ jobs:
     environment: github-pages
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
 
       - name: Setup Python environment
         uses: ./.github/actions/setup-python
         with:
           python-version: "3.11"
 
-      - name: Build documentation
+      - name: Build and push
         run: |
-          poetry run mike deploy --update-aliases master latest
+          poetry run mike deploy --push --update-aliases master latest
 
       - name: Upload to GitHub Pages
         uses: actions/upload-pages-artifact@v2
         with:
           path: site
 
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v2
+# GitHub Pages will deploy from gh-pages branch automatically
+
+#      - name: Deploy to GitHub Pages
+#        uses: actions/deploy-pages@v2
