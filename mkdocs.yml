@@ -1,4 +1,5 @@
 site_name: KToolBox
+site_description: Documentation for KToolBox
 repo_url: https://github.com/Ljzd-PRO/KToolBox
 repo_name: Ljzd-PRO/KToolBox
 edit_uri: https://github.com/Ljzd-PRO/KToolBox/tree/devel/docs
@@ -31,8 +32,10 @@ plugins:
         - locale: en
           default: true
           name: English
+
         - locale: zh
           name: 中文（简体）
+
           nav_translations:
             Get Started: 开始
             Welcome to KToolBox: 欢迎使用 KToolBox
@@ -44,6 +47,25 @@ plugins:
             Commands: 命令
             iOS Shortcuts: iOS 快捷指令
             API Documentation: API 文档
+
+          site_description: "KToolBox 文档"
+
+          theme:
+            palette:
+              - media: "(prefers-color-scheme)"
+                toggle:
+                  icon: material/brightness-auto
+                  name: 切换至自动
+              - media: "(prefers-color-scheme: light)"
+                scheme: default
+                toggle:
+                  icon: material/brightness-7
+                  name: 切换至深色模式
+              - media: "(prefers-color-scheme: dark)"
+                scheme: slate
+                toggle:
+                  icon: material/brightness-4
+                  name: 切换至浅色模式
   - tags
   - search
 
@@ -80,14 +102,7 @@ theme:
 
 extra:
   version:
-    default: latest
     provider: mike
-  alternate:
-    - name: English
-      lang: en
-    - name: 中文（简体）
-      link: /zh/
-      lang: zh
 
 markdown_extensions:
 
