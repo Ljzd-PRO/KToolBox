@@ -51,8 +51,6 @@ theme:
   name: material
   features:
     - search.suggest
-    - navigation.instant
-    - navigation.instant.prefetch
     - navigation.tracking
     - navigation.tabs
     - navigation.path
