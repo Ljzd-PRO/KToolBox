@@ -783,6 +783,75 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration" class="md-nav__link">
+    <span class="md-ellipsis">
+      DownloaderConfiguration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DownloaderConfiguration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.scheme" class="md-nav__link">
+    <span class="md-ellipsis">
+      scheme
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.timeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      timeout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.encoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      encoding
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.buffer_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      buffer_size
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.chunk_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      chunk_size
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.temp_suffix" class="md-nav__link">
+    <span class="md-ellipsis">
+      temp_suffix
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ktoolbox.configuration.PostStructureConfiguration" class="md-nav__link">
     <span class="md-ellipsis">
       PostStructureConfiguration
@@ -1165,6 +1234,75 @@
   <a href="#ktoolbox.configuration.APIConfiguration.retry_interval" class="md-nav__link">
     <span class="md-ellipsis">
       retry_interval
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration" class="md-nav__link">
+    <span class="md-ellipsis">
+      DownloaderConfiguration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DownloaderConfiguration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.scheme" class="md-nav__link">
+    <span class="md-ellipsis">
+      scheme
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.timeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      timeout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.encoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      encoding
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.buffer_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      buffer_size
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.chunk_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      chunk_size
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.temp_suffix" class="md-nav__link">
+    <span class="md-ellipsis">
+      temp_suffix
     </span>
   </a>
   
@@ -1789,6 +1927,213 @@
   <div class="doc doc-contents ">
   
       <p>Seconds of API request retry interval</p>
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h2 id="ktoolbox.configuration.DownloaderConfiguration" class="doc doc-heading">
+          <code>DownloaderConfiguration</code>
+
+
+<a href="#ktoolbox.configuration.DownloaderConfiguration" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents first">
+
+  
+      <p>File Downloader Configuration</p>
+
+            <details class="quote">
+              <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DownloaderConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;File Downloader Configuration&quot;&quot;&quot;</span>
+    <span class="n">scheme</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;http&quot;</span><span class="p">,</span> <span class="s2">&quot;https&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;https&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Downloader URL scheme&quot;&quot;&quot;</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">30.0</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Downloader request timeout&quot;&quot;&quot;</span>
+    <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Charset for filename parsing and post content text saving&quot;&quot;&quot;</span>
+    <span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20480</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of bytes of file I/O buffer for each downloading file&quot;&quot;&quot;</span>
+    <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of bytes of chunk of downloader stream&quot;&quot;&quot;</span>
+    <span class="n">temp_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;tmp&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Temp filename suffix of downloading files&quot;&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h3 id="ktoolbox.configuration.DownloaderConfiguration.scheme" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">scheme</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;http&#39;</span><span class="p">,</span> <span class="s1">&#39;https&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;https&#39;</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.configuration.DownloaderConfiguration.scheme" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Downloader URL scheme</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h3 id="ktoolbox.configuration.DownloaderConfiguration.timeout" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">30.0</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.configuration.DownloaderConfiguration.timeout" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Downloader request timeout</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h3 id="ktoolbox.configuration.DownloaderConfiguration.encoding" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;utf-8&#39;</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.configuration.DownloaderConfiguration.encoding" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Charset for filename parsing and post content text saving</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h3 id="ktoolbox.configuration.DownloaderConfiguration.buffer_size" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20480</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.configuration.DownloaderConfiguration.buffer_size" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Number of bytes of file I/O buffer for each downloading file</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h3 id="ktoolbox.configuration.DownloaderConfiguration.chunk_size" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.configuration.DownloaderConfiguration.chunk_size" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Number of bytes of chunk of downloader stream</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h3 id="ktoolbox.configuration.DownloaderConfiguration.temp_suffix" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">temp_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;tmp&#39;</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.configuration.DownloaderConfiguration.temp_suffix" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Temp filename suffix of downloading files</p>
   </div>
 
 </div>
