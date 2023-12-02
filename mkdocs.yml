@@ -86,7 +86,7 @@ extra:
     - name: English
       lang: en
     - name: 中文（简体）
-      link: zh
+      link: /zh/
       lang: zh
 
 markdown_extensions:
