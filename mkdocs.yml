@@ -1,0 +1,123 @@
+site_name: KToolBox
+repo_url: https://github.com/Ljzd-PRO/KToolBox
+repo_name: Ljzd-PRO/KToolBox
+edit_uri: https://github.com/Ljzd-PRO/KToolBox/tree/devel/docs
+copyright: Copyright © 2023 by Ljzd-PRO
+
+watch:
+- ktoolbox
+
+nav:
+  - Get Started:
+    - Welcome to KToolBox: index.md
+    - About Kemono: about-kemono.md
+    - More: more.md
+  - Configuration:
+      - Guide: configuration/guide.md
+      - Reference: configuration/reference.md
+  - Commands: commands.md
+  - iOS Shortcuts: shortcut.md
+  - API Documentation: api.md
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: sphinx
+  - i18n:
+      docs_structure: folder
+      languages:
+        - locale: en
+          default: true
+          name: English
+        - locale: zh
+          name: 中文（简体）
+          nav_translations:
+            Get Started: 开始
+            Welcome to KToolBox: 欢迎使用 KToolBox
+            About Kemono: 关于 Kemono
+            More: 更多
+            Configuration: 配置
+            Guide: 向导
+            Reference: 参考
+            Commands: 命令
+            iOS Shortcuts: iOS 快捷指令
+            API Documentation: API 文档
+  - tags
+  - search
+
+theme:
+  name: material
+  features:
+    - search.suggest
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.path
+    - navigation.indexes
+    - navigation.top
+  palette:
+
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+
+extra:
+  alternate:
+    - name: English
+      lang: en
+    - name: 简体中文
+      link: /zh/
+      lang: zh
+
+markdown_extensions:
+
+  # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+
+  # Python Markdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
