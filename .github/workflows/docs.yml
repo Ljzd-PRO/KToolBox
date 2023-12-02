@@ -12,12 +12,14 @@ on:
       - "mkdocs.yml"
   workflow_dispatch:
 
-#permissions:
-#  contents: write
+permissions:
+  id-token: write
+  pages: write
 
 jobs:
   documentation:
     name: Build documentation
+    environment: github-pages
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -27,13 +29,14 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Build
+      - name: Build documentation
         run: |
-          poetry run mkdocs build --clean
-          poetry run mkdocs --version
-#          poetry run mike deploy --push --update-aliases master latest
+          poetry run mike deploy --update-aliases master latest
 
       - name: Upload to GitHub Pages
         uses: actions/upload-pages-artifact@v2
         with:
           path: site
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v2
