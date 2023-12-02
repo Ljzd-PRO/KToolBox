@@ -1,115 +1,115 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
-        <loc>http://localhost:8000/master/</loc>
+        <loc>https://ktoolbox.readthedocs.io/master/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/masterzh/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/"/>
     </url>
     <url>
-        <loc>http://localhost:8000/master/about-kemono/</loc>
+        <loc>https://ktoolbox.readthedocs.io/master/about-kemono/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master/about-kemono/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/masterzh/about-kemono/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/about-kemono/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/about-kemono/"/>
     </url>
     <url>
-        <loc>http://localhost:8000/master/api/</loc>
+        <loc>https://ktoolbox.readthedocs.io/master/api/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master/api/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/masterzh/api/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/api/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/api/"/>
     </url>
     <url>
-        <loc>http://localhost:8000/master/commands/</loc>
+        <loc>https://ktoolbox.readthedocs.io/master/commands/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master/commands/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/masterzh/commands/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/commands/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/commands/"/>
     </url>
     <url>
-        <loc>http://localhost:8000/master/more/</loc>
+        <loc>https://ktoolbox.readthedocs.io/master/more/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master/more/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/masterzh/more/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/more/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/more/"/>
     </url>
     <url>
-        <loc>http://localhost:8000/master/shortcut/</loc>
+        <loc>https://ktoolbox.readthedocs.io/master/shortcut/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master/shortcut/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/masterzh/shortcut/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/shortcut/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/shortcut/"/>
     </url>
     <url>
-        <loc>http://localhost:8000/master/configuration/guide/</loc>
+        <loc>https://ktoolbox.readthedocs.io/master/configuration/guide/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master/configuration/guide/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/masterzh/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/guide/"/>
     </url>
     <url>
-        <loc>http://localhost:8000/master/configuration/reference/</loc>
+        <loc>https://ktoolbox.readthedocs.io/master/configuration/reference/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master/configuration/reference/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/masterzh/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/reference/"/>
     </url>
     <url>
-        <loc>http://localhost:8000/master/zh/</loc>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/master/zh/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master"/>
     </url>
     <url>
-        <loc>http://localhost:8000/master/zh/about-kemono/</loc>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/about-kemono/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/master/zh/about-kemono/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/masterabout-kemono/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/about-kemono/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterabout-kemono/"/>
     </url>
     <url>
-        <loc>http://localhost:8000/master/zh/api/</loc>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/api/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/master/zh/api/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/masterapi/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/api/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterapi/"/>
     </url>
     <url>
-        <loc>http://localhost:8000/master/zh/commands/</loc>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/commands/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/master/zh/commands/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/mastercommands/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/commands/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercommands/"/>
     </url>
     <url>
-        <loc>http://localhost:8000/master/zh/more/</loc>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/more/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/master/zh/more/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/mastermore/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/more/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermore/"/>
     </url>
     <url>
-        <loc>http://localhost:8000/master/zh/shortcut/</loc>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/shortcut/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/master/zh/shortcut/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/mastershortcut/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/shortcut/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastershortcut/"/>
     </url>
     <url>
-        <loc>http://localhost:8000/master/zh/configuration/guide/</loc>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/configuration/guide/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/master/zh/configuration/guide/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/masterconfiguration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/guide/"/>
     </url>
     <url>
-        <loc>http://localhost:8000/master/zh/configuration/reference/</loc>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/configuration/reference/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/master/zh/configuration/reference/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/masterconfiguration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/reference/"/>
     </url>
 </urlset>
