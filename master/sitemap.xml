@@ -1,115 +1,115 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
-        <loc>None./</loc>
+        <loc>http://localhost:8000/master/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="None"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/masterzh/"/>
     </url>
     <url>
-        <loc>Noneabout-kemono/</loc>
+        <loc>http://localhost:8000/master/about-kemono/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="Noneabout-kemono/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/about-kemono/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master/about-kemono/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/masterzh/about-kemono/"/>
     </url>
     <url>
-        <loc>Noneapi/</loc>
+        <loc>http://localhost:8000/master/api/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="Noneapi/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/api/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master/api/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/masterzh/api/"/>
     </url>
     <url>
-        <loc>Nonecommands/</loc>
+        <loc>http://localhost:8000/master/commands/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="Nonecommands/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/commands/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master/commands/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/masterzh/commands/"/>
     </url>
     <url>
-        <loc>Nonemore/</loc>
+        <loc>http://localhost:8000/master/more/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="Nonemore/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/more/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master/more/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/masterzh/more/"/>
     </url>
     <url>
-        <loc>Noneshortcut/</loc>
+        <loc>http://localhost:8000/master/shortcut/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="Noneshortcut/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/shortcut/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master/shortcut/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/masterzh/shortcut/"/>
     </url>
     <url>
-        <loc>Noneconfiguration/guide/</loc>
+        <loc>http://localhost:8000/master/configuration/guide/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="Noneconfiguration/guide/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/masterzh/configuration/guide/"/>
     </url>
     <url>
-        <loc>Noneconfiguration/reference/</loc>
+        <loc>http://localhost:8000/master/configuration/reference/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="Noneconfiguration/reference/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/masterzh/configuration/reference/"/>
     </url>
     <url>
-        <loc>Nonezh/</loc>
+        <loc>http://localhost:8000/master/zh/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="None"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/master/zh/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/master"/>
     </url>
     <url>
-        <loc>Nonezh/about-kemono/</loc>
+        <loc>http://localhost:8000/master/zh/about-kemono/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/about-kemono/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="Noneabout-kemono/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/master/zh/about-kemono/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/masterabout-kemono/"/>
     </url>
     <url>
-        <loc>Nonezh/api/</loc>
+        <loc>http://localhost:8000/master/zh/api/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/api/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="Noneapi/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/master/zh/api/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/masterapi/"/>
     </url>
     <url>
-        <loc>Nonezh/commands/</loc>
+        <loc>http://localhost:8000/master/zh/commands/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/commands/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="Nonecommands/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/master/zh/commands/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/mastercommands/"/>
     </url>
     <url>
-        <loc>Nonezh/more/</loc>
+        <loc>http://localhost:8000/master/zh/more/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/more/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="Nonemore/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/master/zh/more/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/mastermore/"/>
     </url>
     <url>
-        <loc>Nonezh/shortcut/</loc>
+        <loc>http://localhost:8000/master/zh/shortcut/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/shortcut/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="Noneshortcut/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/master/zh/shortcut/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/mastershortcut/"/>
     </url>
     <url>
-        <loc>Nonezh/configuration/guide/</loc>
+        <loc>http://localhost:8000/master/zh/configuration/guide/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/configuration/guide/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="Noneconfiguration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/master/zh/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/masterconfiguration/guide/"/>
     </url>
     <url>
-        <loc>Nonezh/configuration/reference/</loc>
+        <loc>http://localhost:8000/master/zh/configuration/reference/</loc>
         <lastmod>2023-12-02</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/configuration/reference/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="Noneconfiguration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="http://localhost:8000/master/zh/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://localhost:8000/masterconfiguration/reference/"/>
     </url>
 </urlset>
