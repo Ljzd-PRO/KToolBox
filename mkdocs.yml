@@ -62,7 +62,7 @@ theme:
     - media: "(prefers-color-scheme)"
       toggle:
         icon: material/brightness-auto
-        name: Switch to light mode
+        name: Switch to system preference
 
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
@@ -76,7 +76,7 @@ theme:
       scheme: slate
       toggle:
         icon: material/brightness-4
-        name: Switch to system preference
+        name: Switch to light mode
 
 extra:
   version:
