@@ -1,4 +1,4 @@
-# 向导
+# Guide
 
 - KToolBox read **`prod.env` file** in the work folder or **environment variables** to store configuration
 - Check [Reference](./reference.md) for all configuration options
