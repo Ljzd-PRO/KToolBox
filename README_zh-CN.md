@@ -69,7 +69,7 @@
   pip3 install ktoolbox
   ```
 
-- 对于 iOS a-Shell
+- 对于 iOS [a-Shell](https://github.com/holzschu/a-shell)
   ```bash
   pip3 install ktoolbox-pure-py
   ```
