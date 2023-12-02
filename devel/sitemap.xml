@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>None./</loc>
+        <lastmod>2023-12-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="None"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/"/>
+    </url>
+    <url>
+        <loc>Noneabout-kemono/</loc>
+        <lastmod>2023-12-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneabout-kemono/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/about-kemono/"/>
+    </url>
+    <url>
+        <loc>Noneapi/</loc>
+        <lastmod>2023-12-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneapi/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/api/"/>
+    </url>
+    <url>
+        <loc>Nonecommands/</loc>
+        <lastmod>2023-12-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonecommands/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/commands/"/>
+    </url>
+    <url>
+        <loc>Nonemore/</loc>
+        <lastmod>2023-12-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonemore/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/more/"/>
+    </url>
+    <url>
+        <loc>Noneshortcut/</loc>
+        <lastmod>2023-12-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneshortcut/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/shortcut/"/>
+    </url>
+    <url>
+        <loc>Noneconfiguration/guide/</loc>
+        <lastmod>2023-12-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneconfiguration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/configuration/guide/"/>
+    </url>
+    <url>
+        <loc>Noneconfiguration/reference/</loc>
+        <lastmod>2023-12-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneconfiguration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/configuration/reference/"/>
+    </url>
+    <url>
+        <loc>Nonezh/</loc>
+        <lastmod>2023-12-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="None"/>
+    </url>
+    <url>
+        <loc>Nonezh/about-kemono/</loc>
+        <lastmod>2023-12-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/about-kemono/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneabout-kemono/"/>
+    </url>
+    <url>
+        <loc>Nonezh/api/</loc>
+        <lastmod>2023-12-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/api/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneapi/"/>
+    </url>
+    <url>
+        <loc>Nonezh/commands/</loc>
+        <lastmod>2023-12-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/commands/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonecommands/"/>
+    </url>
+    <url>
+        <loc>Nonezh/more/</loc>
+        <lastmod>2023-12-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/more/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonemore/"/>
+    </url>
+    <url>
+        <loc>Nonezh/shortcut/</loc>
+        <lastmod>2023-12-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/shortcut/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneshortcut/"/>
+    </url>
+    <url>
+        <loc>Nonezh/configuration/guide/</loc>
+        <lastmod>2023-12-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneconfiguration/guide/"/>
+    </url>
+    <url>
+        <loc>Nonezh/configuration/reference/</loc>
+        <lastmod>2023-12-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="Nonezh/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneconfiguration/reference/"/>
+    </url>
+</urlset>
