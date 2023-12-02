@@ -20,6 +20,16 @@
         filters:
             - "!model_config"
 
+::: ktoolbox.configuration.DownloaderConfiguration
+    options:
+        show_root_heading: true
+        show_root_full_path: false
+        show_if_no_docstring: true
+        show_bases: false
+        members_order: source
+        filters:
+            - "!model_config"
+
 ::: ktoolbox.configuration.PostStructureConfiguration
     options:
         show_root_heading: true
