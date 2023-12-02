@@ -63,7 +63,7 @@
 
 ### 命令
 
-使用帮助命令或前往 [命令](./commands.md) 页面查看更多帮助.
+使用帮助命令或前往 [命令](./commands.md) 页面查看更多帮助。
   
 #### ❓ 获取帮助总览
 ```bash
@@ -95,4 +95,4 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016
 ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
 ```
 ??? info "关于 `creator-indices.ktoolbox` 文件"
-    `creator-indices.ktoolbox` 包含目录下的所有作品的信息和路径。  
+    `creator-indices.ktoolbox` 包含目录下的所有作品的信息和路径。
