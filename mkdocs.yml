@@ -79,6 +79,9 @@ theme:
         name: Switch to system preference
 
 extra:
+  version:
+    default: latest
+    provider: mike
   alternate:
     - name: English
       link: /en/
