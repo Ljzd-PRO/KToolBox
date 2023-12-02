@@ -3,7 +3,6 @@ site_url: https://ktoolbox.readthedocs.io/
 site_description: Documentation for KToolBox
 repo_url: https://github.com/Ljzd-PRO/KToolBox
 repo_name: Ljzd-PRO/KToolBox
-edit_uri: https://github.com/Ljzd-PRO/KToolBox/tree/devel/docs
 copyright: Copyright © 2023 by Ljzd-PRO
 
 watch:
