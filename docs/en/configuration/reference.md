@@ -1,4 +1,4 @@
-# Configuration
+# Reference
 
 ::: ktoolbox.configuration.Configuration
     options:
