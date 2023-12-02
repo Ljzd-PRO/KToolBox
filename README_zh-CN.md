@@ -29,6 +29,10 @@
       <img src="https://codecov.io/gh/Ljzd-PRO/KToolBox/branch/master/graph/badge.svg?token=5XK9CYQHQN" alt="codecov"/>
   </a>
 
+  <a href='https://ktoolbox.readthedocs.io/'>
+    <img src='https://readthedocs.org/projects/ktoolbox/badge/?version=latest' alt='Documentation Status' />
+  </a>
+
   <a style="text-decoration:none">
     <img src="https://img.shields.io/badge/Platform-Windows%20|%20Linux%20|%20macOS-blue" alt="Platform Win | Linux | macOS"/>
   </a>
@@ -56,176 +60,71 @@
 
 ## 使用方法
 
-### iOS 快捷指令（可选）
+前往 [文档](https://ktoolbox.readthedocs.io/) 查看更多详情。
 
-- 你可以用 iOS 终端 App [a-Shell](https://github.com/holzschu/a-shell) 运行 KToolBox
-- 这些快捷指令可以在 a-Shell 自动安装 KToolBox 和下载 Kemono 作品
-  - 你可以通过网页共享界面触发“下载 Kemono 作品”，或直接在快捷指令 App 运行
-- 访问下面的快捷指令 URL 或前往 [`shortcuts/`](./shortcuts) 下载快捷指令文件
+### 安装
 
-#### 英文
+- 一般情况
+  ```bash
+  pip3 install ktoolbox
+  ```
 
-- [KToolBox Manager](https://www.icloud.com/shortcuts/0bf54a3131e14259982870c640c7efb8)
-- [Download Kemono Post](https://www.icloud.com/shortcuts/b5633b6a80354a9890d53bab9f756234)
-
-#### 中文
-
-- [KToolBox 管理器](https://www.icloud.com/shortcuts/2f9c2a6b74f140758fb0f5620d032f31)
-- [下载 Kemono 作品](https://www.icloud.com/shortcuts/b12036bb0c6148bea761de06e3b65667)
+- 对于 iOS a-Shell
+  ```bash
+  pip3 install ktoolbox-pure-py
+  ```
 
 ### 命令
 
-更多信息请参考帮助命令
+使用帮助命令或前往 [命令](https://ktoolbox.readthedocs.io/latest/zh/commands/) 页面查看更多帮助。
+  
+#### ❓ 获取帮助总览
+```bash
+ktoolbox -h
+```
+  
+#### ❓ 获取某个命令的帮助信息
+```bash
+ktoolbox download-post -h
+```
 
-> **Warning**
-> 此处命令返回的文本仅作为**演示**使用，部分可能已经**过时**。
+#### ⬇️🖼️ 下载指定的作品
+```bash
+ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
+```
 
-- 安装 KToolBox：
-    ```bash
-    pip3 install ktoolbox
-    ```
-  - 对于 [a-Shell](https://github.com/holzschu/a-shell):
-      ```bash
-      pip3 install ktoolbox-pure-py
-      ```
+如果部分文件下载失败，你可以尝试重新运行命令，已下载完成的文件会被 **跳过**。
+  
+#### ⬇️🖌️ 下载作者的所有作品
+```bash
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016
+```
 
-- 获取帮助总览:
-    ```bash
-    ktoolbox -h
-    ```
-    <details>
-    <summary>返回文本</summary>
-      <pre>
-        <code>
-  INFO: Showing help with the command '__main__.py -- --help'.
-  <br>
-  NAME
-      __main__.py
-  <br>
-  SYNOPSIS
-      __main__.py COMMAND | -
-  <br>
-  COMMANDS
-      COMMAND is one of the following:
-  <br>
-     download_post
-       Download a specific post
-  <br>
-     ...
-  <br>
-     sync_creator
-       Sync all posts from a creator
-  <br>
-     version
-       Show KToolBox version
-        </code>
-      </pre>
-    </details>
-
-  > 前往 [`ktoolbox/cli.py`](ktoolbox/cli.py) 中的 `KToolBoxCli` 查看更多信息。
-
-- 获取某个命令的帮助信息:
-    ```bash
-    ktoolbox download-post -h
-    ```
-    <details>
-    <summary>返回文本</summary>
-      <pre>
-        <code>
-  NAME
-      __main__.py sync-creator - Sync all posts from a creator
-  <br>
-  SYNOPSIS
-      __main__.py sync-creator &lt;flags>
-  <br>
-  DESCRIPTION
-      You can update the directory anytime after download finished, such as to update after creator published new posts.
-      * If `update_from` was provided, it should be located **inside the creator directory**.
-  <br>
-  FLAGS
-      -u, --url=URL
-          Type: Optional[str]
-          Default: None
-          The post URL
-      ...
-        </code>
-      </pre>
-    </details>
+> 默认情况下你会在作者目录下得到一个 `creator-indices.ktoolbox` 文件，你可以用它来更新目录。
   
 
-- 下载指定的作品:
-    ```bash
-    ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
-    ```
-  
-  > 如果部分文件下载失败，你可以尝试重新运行命令，已下载完成的文件会被**跳过**。
+#### 🔄️ 更新一个作者目录
+```bash
+ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
+```
 
-- 下载作者的所有作品:
-    ```bash
-    ktoolbox sync-creator https://kemono.su/fanbox/user/9016
-    ```
-  
-  默认情况下你会在作者目录下得到一个 `creator-indices.ktoolbox` 文件，你可以用它来更新目录。
+`creator-indices.ktoolbox` 包含目录下的所有作品的信息和路径。
 
-  
-- 更新一个作者目录:
-    ```bash
-    ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
-    ```
-  
-  `creator-indices.ktoolbox` 包含目录下的所有作品的信息和路径。  
+### iOS 快捷指令
+
+前往 [iOS 快捷指令](https://ktoolbox.readthedocs.io/latest/zh/shortcut/) 页面查看更多详情。
 
 ### 配置
 
-- KToolBox 读取工作目录下的 **`prod.env` 文件** 或 **环境变量** 来设定配置
-- **所有配置选项** 都定义在 [`ktoolbox/configuration.py`](ktoolbox/configuration.py)
-- 用 `__` 来指定子选项, 例如 `KTOOLBOX_API__SCHEME` 相当于 `api.scheme`
-- 所有配置选项都是可选的
-
-#### `prod.env` 文件示例
-
-```dotenv
-# 可同时下载10个文件
-KTOOLBOX_JOB__COUNT=10
-
-# 为每个下载任务分配 102400 字节内存作为缓冲区
-KTOOLBOX_DOWNLOADER__BUFFER_SIZE=102400
-
-# 设置作品附件目录为 `./`, 这意味着所有附件将直接保存在作品目录下
-# 而不会创建一个子目录来储存
-KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-
-# 为Kemono API服务器和下载服务器禁用SSL证书检查
-# 在Kemono服务器的证书过期时很有用 （SSL: CERTIFICATE_VERIFY_FAILED）
-KTOOLBOX_SSL_VERIFY=False
-```
+前往 [配置-向导](https://ktoolbox.readthedocs.io/latest/zh/configuration/guide/) 页面查看更多详情。
 
 ## 其他分支
 
 - 纯 Python 分支：[🔗pure-py](https://github.com/Ljzd-PRO/KToolBox/tree/pure-py)
   - 使用 pydantic v1 因此安装时不需要 cargo
   - 例如你可以在 iOS 的终端 App [a-Shell](https://github.com/holzschu/a-shell) 运行
-  - PyPI：https://pypi.org/project/ktoolbox-pure-py/
+  - 🔗[PyPI](https://pypi.org/project/ktoolbox-pure-py/)
 - 开发版分支：[🔗devel](https://github.com/Ljzd-PRO/KToolBox/tree/devel)
-
-## 关于 Kemono
-
-官网 https://kemono.su 的介绍:
-
-> Kemono is a public archiver for:
->  
-> - Patreon
-> - Pixiv Fanbox
-> - Discord
-> - Fantia
-> - Afdian
-> - Boosty
-> - DLsite
-> - Gumroad
-> - SubscribeStar
-> 
-> Contributors here upload content and share it here for easy searching and organization. \
-> To get started viewing content, either search for creators on the artists page, or search for content on the posts page.
 
 ## 代码覆盖率
 
