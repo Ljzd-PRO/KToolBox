@@ -29,6 +29,10 @@
       <img src="https://codecov.io/gh/Ljzd-PRO/KToolBox/branch/master/graph/badge.svg?token=5XK9CYQHQN" alt="codecov"/>
   </a>
 
+  <a href='https://ktoolbox.readthedocs.io/'>
+    <img src='https://readthedocs.org/projects/ktoolbox/badge/?version=latest' alt='Documentation Status' />
+  </a>
+
   <a style="text-decoration:none">
     <img src="https://img.shields.io/badge/Platform-Windows%20|%20Linux%20|%20macOS-blue" alt="Platform Win | Linux | macOS"/>
   </a>
