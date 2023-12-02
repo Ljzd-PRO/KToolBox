@@ -80,7 +80,7 @@ ktoolbox download-post -h
 ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
 ```
 ??? info "如果部分文件下载失败"
-    如果部分文件下载失败，你可以尝试重新运行命令，已下载完成的文件会被**跳过**。
+    如果部分文件下载失败，你可以尝试重新运行命令，已下载完成的文件会被 **跳过**。
   
 #### ⬇️🖌️ 下载作者的所有作品
 ```bash
