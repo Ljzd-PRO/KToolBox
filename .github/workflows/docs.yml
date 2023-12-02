@@ -28,7 +28,7 @@ jobs:
 
       - name: Build documentation
         run: |
-          poetry run mkdocs build --clean --verbose
+          poetry run mkdocs build --clean
           poetry run mkdocs --version
 
       - name: Upload to GitHub Pages
