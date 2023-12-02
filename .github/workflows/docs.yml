@@ -34,6 +34,7 @@ jobs:
 
       - name: Build and push
         run: |
+          git pull
           poetry run mike deploy --push --update-aliases master latest
 
       - name: Upload to GitHub Pages
