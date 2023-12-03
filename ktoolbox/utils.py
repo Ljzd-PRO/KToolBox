@@ -14,7 +14,15 @@ from ktoolbox.configuration import config
 from ktoolbox.enum import RetCodeEnum, DataStorageNameEnum
 from ktoolbox.model import SearchResult
 
-__all__ = ["BaseRet", "filename_from_headers", "generate_msg", "logger_init", "dump_search", "parse_webpage_url"]
+__all__ = [
+    "BaseRet",
+    "filename_from_headers",
+    "generate_msg",
+    "logger_init",
+    "dump_search",
+    "parse_webpage_url",
+    "uvloop_init"
+]
 
 _T = TypeVar('_T')
 
