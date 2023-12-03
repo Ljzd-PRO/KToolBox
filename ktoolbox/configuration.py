@@ -121,6 +121,12 @@ class Configuration(BaseSettings):
     """Enable SSL certificate verification for Kemono API server and download server"""
     json_dump_indent: int = 4
     """Indent of JSON file dump"""
+    use_uvloop: bool = True
+    """
+    Use uvloop for asyncio (Disabled on Windows by default)
+    
+    Install uvloop by `pip install ktoolbox[uvloop]` or it will not work.
+    """
 
     # noinspection SpellCheckingInspection
     model_config = SettingsConfigDict(

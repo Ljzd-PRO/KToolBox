@@ -1,3 +1,4 @@
+import asyncio
 import cgi
 import logging
 import sys
@@ -156,3 +157,26 @@ def parse_webpage_url(url: str) -> Tuple[Optional[str], Optional[str], Optional[
         parts += tuple(None for _ in range(7 - url_parts_len))
     _scheme, _netloc, service, _user_key, user_id, _post_key, post_id = parts
     return service, user_id, post_id
+
+
+def uvloop_init():
+    """
+    Set event loop policy to uvloop if available.
+
+    :return: If uvloop enabled successfully
+    """
+    if config.use_uvloop:
+        if sys.platform == "win32":
+            logger.info("uvloop is not supported on Windows")
+        else:
+            try:
+                import uvloop
+            except ModuleNotFoundError:
+                logger.info(
+                    "uvloop is not installed, but it's optional. "
+                    "You can install it with `pip install ktoolbox[uvloop]`"
+                )
+            else:
+                asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+                return True
+    return False
