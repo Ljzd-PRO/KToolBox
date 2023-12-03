@@ -175,9 +175,10 @@ def uvloop_init():
     """
     if config.use_uvloop:
         if sys.platform == "win32":
-            logger.info("uvloop is not supported on Windows")
+            logger.info("uvloop is not supported on Windows, but it's optional.")
         else:
             try:
+                # noinspection PyUnresolvedReferences
                 import uvloop
             except ModuleNotFoundError:
                 logger.info(
