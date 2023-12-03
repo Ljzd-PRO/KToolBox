@@ -16,41 +16,47 @@ __all__ = [
 ]
 
 
-# noinspection SpellCheckingInspection
+# noinspection SpellCheckingInspection,GrazieInspection
 class APIConfiguration(BaseModel):
-    """Kemono API Configuration"""
+    """
+    Kemono API Configuration
+
+    :ivar scheme: Kemono API URL scheme
+    :ivar netloc: Kemono API URL netloc
+    :ivar statics_netloc: URL netloc of Kemono server for static files (e.g. images)
+    :ivar files_netloc: URL netloc of Kemono server for post files
+    :ivar path: Kemono API URL root path
+    :ivar timeout: API request timeout
+    :ivar retry_times: API request retry times (when request failed)
+    :ivar retry_interval: Seconds of API request retry interval
+    """
     scheme: Literal["http", "https"] = "https"
-    """Kemono API URL scheme"""
     netloc: str = "kemono.su"
-    """Kemono API URL netloc"""
     statics_netloc: str = "img.kemono.su"
-    """URL netloc of Kemono server for static files (e.g. images)"""
     files_netloc: str = "kemono.su"
-    """URL netloc of Kemono server for post files"""
     path: str = "/api/v1"
-    """Kemono API URL root path"""
     timeout: float = 5.0
-    """API request timeout"""
     retry_times: int = 3
-    """API request retry times (when request failed)"""
     retry_interval: float = 2.0
-    """Seconds of API request retry interval"""
 
 
 class DownloaderConfiguration(BaseModel):
-    """File Downloader Configuration"""
+    """
+    File Downloader Configuration
+
+    :ivar scheme: Downloader URL scheme
+    :ivar timeout: Downloader request timeout
+    :ivar encoding: Charset for filename parsing and post content text saving
+    :ivar buffer_size: Number of bytes of file I/O buffer for each downloading file
+    :ivar chunk_size: Number of bytes of chunk of downloader stream
+    :ivar temp_suffix: Temp filename suffix of downloading files
+    """
     scheme: Literal["http", "https"] = "https"
-    """Downloader URL scheme"""
     timeout: float = 30.0
-    """Downloader request timeout"""
     encoding: str = "utf-8"
-    """Charset for filename parsing and post content text saving"""
     buffer_size: int = 20480
-    """Number of bytes of file I/O buffer for each downloading file"""
     chunk_size: int = 1024
-    """Number of bytes of chunk of downloader stream"""
     temp_suffix: str = "tmp"
-    """Temp filename suffix of downloading files"""
 
 
 class PostStructureConfiguration(BaseModel):
@@ -58,77 +64,79 @@ class PostStructureConfiguration(BaseModel):
     """
     Post path structure model
 
-    .. rubric:: Default:
-    |__+ ..
+    - Default:
+    ```
+    |-- ..
+    |-- attachments
+    |   |-- 1.png
+    |   |-- 2.png
+    |-- content.txt
+    |-- <Post file>
+    |-- <Post data (post.ktoolbox.json)>
+    ```
 
-    |__+ attachments
-
-    |____+ (e.g. 1.png)
-
-    |____+ (e.g. 2.png)
-
-    |__+ content.txt
-
-    |__+ <Post file>
-
-    |__+ <Post data (post.ktoolbox.json)>
+    :ivar attachments: Sub path of attachment directory
+    :ivar content_filepath: Sub path of post content HTML file
     """
     attachments: Path = Path("attachments")
-    """Sub path of attachment directory"""
     content_filepath: Path = Path("index.html")
-    """Sub path of post content HTML file"""
 
 
 class JobConfiguration(BaseModel):
-    """Download jobs Configuration"""
-    count: int = 4
-    """Number of coroutines for concurrent download"""
-    post_id_as_path: bool = False
-    """Use post ID as post directory name"""
-    post_structure: PostStructureConfiguration = PostStructureConfiguration()
-    """Post path structure"""
-    mix_posts: bool = False
     """
-    Save all files from different posts at same path in creator directory
+    Download jobs Configuration
 
-    .. rubric:: NOTICE:
+    :ivar count: Number of coroutines for concurrent download
+    :ivar post_id_as_path: Use post ID as post directory name
+    :ivar post_structure: Post path structure
+    :ivar mix_posts: Save all files from different posts at same path in creator directory. \
     It would not create any post directory, and ``CreatorIndices`` would not been recorded, \
     without ``CreatorIndices`` you **cannot update** the creator directory.
+    :ivar job_list_filepath: Filepath for job list data saving, ``None`` for disable job list saving
     """
+    count: int = 4
+    post_id_as_path: bool = False
+    post_structure: PostStructureConfiguration = PostStructureConfiguration()
+    mix_posts: bool = False
     job_list_filepath: Optional[Path] = None
-    """Filepath for job list data saving, ``None`` for disable job list saving"""
 
 
 class LoggerConfiguration(BaseModel):
-    """Logger configuration"""
+    """
+    Logger configuration
+
+    :ivar path: Path to save logs, ``None`` for disable log file output
+    :ivar level: Log filter level
+    :ivar rotation: Log rotation
+    """
     path: Optional[Path] = Path("logs")
-    """Path to save logs, ``None`` for disable log file output"""
     level: Union[str, int] = logging.DEBUG
-    """Log filter level"""
     rotation: Union[str, int, datetime.time, datetime.timedelta] = "1 week"
-    """Log rotation"""
 
 
 class Configuration(BaseSettings):
-    """KToolBox Configuration"""
+    # noinspection SpellCheckingInspection,GrazieInspection
+    """
+    KToolBox Configuration
+
+    :ivar api:
+    :ivar downloader:
+    :ivar job:
+    :ivar logger:
+    :ivar ssl_verify: Enable SSL certificate verification for Kemono API server and download server
+    :ivar json_dump_indent: Indent of JSON file dump
+    :ivar use_uvloop: Use uvloop for asyncio (Disabled on Windows by default) \
+    uvloop will improve concurrent performance, but it is not compatible with Windows. \
+    Install uvloop by `pip install ktoolbox[uvloop]` or it will not work.
+    """
     api: APIConfiguration = APIConfiguration()
     downloader: DownloaderConfiguration = DownloaderConfiguration()
     job: JobConfiguration = JobConfiguration()
     logger: LoggerConfiguration = LoggerConfiguration()
 
     ssl_verify: bool = True
-    # noinspection SpellCheckingInspection
-    """Enable SSL certificate verification for Kemono API server and download server"""
     json_dump_indent: int = 4
-    """Indent of JSON file dump"""
     use_uvloop: bool = True
-    """
-    Use uvloop for asyncio (Disabled on Windows by default)
-    
-    uvloop will improve concurrent performance, but it is not compatible with Windows.
-    
-    Install uvloop by `pip install ktoolbox[uvloop]` or it will not work.
-    """
 
     # noinspection SpellCheckingInspection
     model_config = SettingsConfigDict(
