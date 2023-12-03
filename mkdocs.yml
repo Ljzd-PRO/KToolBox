@@ -103,6 +103,9 @@ theme:
 extra:
   version:
     provider: mike
+  analytics:
+    provider: google
+    property: G-LLM6CEJEH3
 
 markdown_extensions:
 
