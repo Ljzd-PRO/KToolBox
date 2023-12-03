@@ -18,6 +18,7 @@ nav:
       - Reference: configuration/reference.md
   - Commands: commands.md
   - iOS Shortcuts: shortcut.md
+  - FAQ: faq.md
   - API Documentation: api.md
 
 plugins:
@@ -46,6 +47,7 @@ plugins:
             Reference: 参考
             Commands: 命令
             iOS Shortcuts: iOS 快捷指令
+            FAQ: 常见问题
             API Documentation: API 文档
 
           site_description: "KToolBox 文档"
