@@ -48,18 +48,18 @@ def parse_header(line: str) -> Dict[str, Optional[str]]:
 
     https://peps.python.org/pep-0594/#cgi
 
-    :param line: Header line
-    :return: Dict of header line
-
-    .. rubric:: Example:
+    - Example:
     ```
     parse_header("text/html; charset=utf-8")
     ```
 
-    .. rubric:: Return:
+    - Return:
     ```
     {'text/html': None, 'charset': 'utf-8'}
     ```
+
+    :param line: Header line
+    :return: Dict of header line
     """
     dict_value: Dict[str, Optional[str]] = {}
     for item in line.split(";"):
@@ -76,18 +76,18 @@ def filename_from_headers(headers: Dict[str, str]) -> Optional[str]:
 
     Parse from ``Content-Disposition``.
 
-    :param headers: HTTP headers
-    :return: File name
-
-    .. rubric:: Example:
+    - Example:
     ```
     filename_from_headers('attachment;filename*=utf-8\\'\\'README%2Emd;filename="README.md"')
     ```
 
-    .. rubric:: Return:
+    - Return:
     ```
     README.md
     ```
+
+    :param headers: HTTP headers
+    :return: File name
     """
     if not (disposition := headers.get("Content-Disposition")):
         if not (disposition := headers.get("content-disposition")):
