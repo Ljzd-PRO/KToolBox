@@ -37,8 +37,8 @@ loguru = "^0.7.2"
 aiofiles = "^23.2.1"
 pathvalidate = "^3.2.0"
 
-#[tool.poetry.group.uvloop.dependencies]
-#uvloop = "^0.17.0"
+[tool.poetry.group.uvloop.dependencies]
+uvloop = "^0.19.0"
 
 [tool.poetry.group.pyinstaller.dependencies]
 pyinstaller = "==6.1.0"
@@ -60,8 +60,8 @@ allpairspy = "==2.5.1"
 [tool.poetry.group.dev.dependencies]
 datamodel-code-generator = ">=0.22.1,<0.24.0"
 
-#[tool.poetry.group.uvloop]
-#optional = true
+[tool.poetry.group.uvloop]
+optional = true
 
 [tool.poetry.group.pyinstaller]
 optional = true
