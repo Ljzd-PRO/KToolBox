@@ -13,10 +13,10 @@ nav:
     - Welcome to KToolBox: index.md
     - About Kemono: about-kemono.md
     - More: more.md
+  - Commands: commands.md
   - Configuration:
       - Guide: configuration/guide.md
       - Reference: configuration/reference.md
-  - Commands: commands.md
   - iOS Shortcuts: shortcut.md
   - FAQ: faq.md
   - API Documentation: api.md
@@ -42,10 +42,10 @@ plugins:
             Welcome to KToolBox: 欢迎使用 KToolBox
             About Kemono: 关于 Kemono
             More: 更多
+            Commands: 命令
             Configuration: 配置
             Guide: 向导
             Reference: 参考
-            Commands: 命令
             iOS Shortcuts: iOS 快捷指令
             FAQ: 常见问题
             API Documentation: API 文档
