@@ -125,6 +125,8 @@ class Configuration(BaseSettings):
     """
     Use uvloop for asyncio (Disabled on Windows by default)
     
+    uvloop will improve concurrent performance, but it is not compatible with Windows.
+    
     Install uvloop by `pip install ktoolbox[uvloop]` or it will not work.
     """
 
