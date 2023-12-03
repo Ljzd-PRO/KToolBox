@@ -167,7 +167,7 @@ def parse_webpage_url(url: str) -> Tuple[Optional[str], Optional[str], Optional[
     return service, user_id, post_id
 
 
-def uvloop_init():
+def uvloop_init() -> bool:
     """
     Set event loop policy to uvloop if available.
 
