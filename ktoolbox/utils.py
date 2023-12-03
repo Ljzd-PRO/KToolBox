@@ -187,5 +187,6 @@ def uvloop_init():
                 )
             else:
                 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+                logger.success("Set event loop policy to uvloop successfully.")
                 return True
     return False
