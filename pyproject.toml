@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "ktoolbox-pure-py"
-version = "0.2.2"
+version = "0.2.3"
 description = "A useful CLI tool for downloading posts in Kemono.party / .su (Pure Python version)"
 authors = ["Ljzd-PRO <ljzd@office.ljzd-pro.asia>"]
 readme = "README.md"
-homepage = "https://github.com/Ljzd-PRO/KToolBox"
+homepage = "https://ktoolbox.readthedocs.io/"
 repository = "https://github.com/Ljzd-PRO/KToolBox"
-documentation = "https://github.com/Ljzd-PRO/KToolBox/wiki"
+documentation = "https://ktoolbox.readthedocs.io/"
 
 keywords = ["kemono", "kemono.party", "cli-app", "downloader", "os-independent"]
 classifiers = [
@@ -36,8 +36,18 @@ loguru = "^0.7.2"
 aiofiles = "^23.2.1"
 pathvalidate = "^3.2.0"
 
+[tool.poetry.group.uvloop.dependencies]
+uvloop = "^0.19.0"
+
 [tool.poetry.group.pyinstaller.dependencies]
 pyinstaller = "==6.1.0"
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.5.3"
+mkdocs-static-i18n = "^1.2.0"
+mkdocs-material = "^9.4.14"
+mkdocstrings = {version="^0.24.0", extras=["python"]}
+mike = "^2.0.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "==7.4.3"
@@ -49,7 +59,13 @@ allpairspy = "==2.5.1"
 [tool.poetry.group.dev.dependencies]
 datamodel-code-generator = ">=0.22.1,<0.24.0"
 
+[tool.poetry.group.uvloop]
+optional = true
+
 [tool.poetry.group.pyinstaller]
+optional = true
+
+[tool.poetry.group.docs]
 optional = true
 
 [tool.poetry.group.test]

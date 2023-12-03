@@ -1,0 +1,48 @@
+name: Documentation
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "ktoolbox/**"
+      - ".github/actions/setup-python/**"
+      - ".github/workflows/docs.yml"
+      - "pyproject.toml"
+      - "docs/**"
+      - "mkdocs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+#  id-token: write
+#  pages: write
+
+jobs:
+  documentation:
+    name: Build documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+      - name: Setup Python environment
+        uses: ./.github/actions/setup-python
+        with:
+          python-version: "3.11"
+
+      - name: Build and push
+        run: |
+          git pull
+          poetry run mike deploy --push --update-aliases master latest
+
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: site
+
+# GitHub Pages will deploy from gh-pages branch automatically
+
+#      - name: Deploy to GitHub Pages
+#        uses: actions/deploy-pages@v2

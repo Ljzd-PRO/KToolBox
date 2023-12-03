@@ -28,6 +28,10 @@
       <img src="https://codecov.io/gh/Ljzd-PRO/KToolBox/branch/master/graph/badge.svg?token=5XK9CYQHQN" alt="codecov"/>
   </a>
 
+  <a href='https://ktoolbox.readthedocs.io/'>
+    <img src='https://readthedocs.org/projects/ktoolbox/badge/?version=latest' alt='Documentation Status' />
+  </a>
+
   <a style="text-decoration:none">
     <img src="https://img.shields.io/badge/Platform-Windows%20|%20Linux%20|%20macOS-blue" alt="Platform Win | Linux | macOS"/>
   </a>
@@ -56,157 +60,72 @@
 
 ## Tutorial
 
-### iOS Shortcuts (Optional)
+See [documentation](https://ktoolbox.readthedocs.io/) for more details.
 
-- You can run KToolBox using iOS terminal App [a-Shell](https://github.com/holzschu/a-shell)
-- These shortcuts can automatically install KToolBox and download posts in a-Shell
-  - You can trigger "Download Kemono Post" by web page share view, or run directly in Shortcuts App
-- Visit shortcut URLs below or download shortcut files at [`shortcuts/`](./shortcuts)
+### Installation
 
-#### English
+- Normal
+  ```bash
+  pip3 install ktoolbox
+  ```
 
-- [KToolBox Manager](https://www.icloud.com/shortcuts/ed981823ea424ebfaefe90e07c146c9f)
-- [Download Kemono Post](https://www.icloud.com/shortcuts/dbfef8dfb3774b92b4a8f10d5e3c963c)
-
-#### Chinese
-
-- [KToolBox 管理器](https://www.icloud.com/shortcuts/5ebf774fa3eb4c3e98c8db46485314ec)
-- [下载 Kemono 作品](https://www.icloud.com/shortcuts/8d081bc5d66448b7bde19504df885ccd)
+- For [a-Shell](https://github.com/holzschu/a-shell)
+  ```bash
+  pip3 install ktoolbox-pure-py
+  ```
 
 ### Command
 
-For more information, use the help command.
-
-> [!Warning]
-> The return text here are only **demo**, some of them may be **outdated**.
-
-- Install KToolBox:
-    ```bash
-    pip3 install ktoolbox
-    ```
-  - For [a-Shell](https://github.com/holzschu/a-shell):
-      ```bash
-      pip3 install ktoolbox-pure-py
-      ```
+For more information, use the help command or goto [Command](https://ktoolbox.readthedocs.io/latest/commands/) page.
   
-- Get general help:
-    ```bash
-    ktoolbox -h
-    ```
-    <details>
-    <summary>Return</summary>
-      <pre>
-        <code>
-  INFO: Showing help with the command '__main__.py -- --help'.
-  <br>
-  NAME
-      __main__.py
-  <br>
-  SYNOPSIS
-      __main__.py COMMAND | -
-  <br>
-  COMMANDS
-      COMMAND is one of the following:
-  <br>
-     download_post
-       Download a specific post
-  <br>
-     ...
-  <br>
-     sync_creator
-       Sync all posts from a creator
-  <br>
-     version
-       Show KToolBox version
-        </code>
-      </pre>
-    </details>
+#### ❓ Get general help
+```bash
+ktoolbox -h
+```
+  
+#### ❓ Get help of a command
+```bash
+ktoolbox download-post -h
+```
 
-  > To get more information, see `KToolBoxCli` in [`ktoolbox/cli.py`](ktoolbox/cli.py).
+#### ⬇️🖼️ Download a specific post
+```bash
+ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
+```
 
-- Get help of a command:
-    ```bash
-    ktoolbox download-post -h
-    ```
-    <details>
-    <summary>Return</summary>
-      <pre>
-        <code>
-  NAME
-      __main__.py sync-creator - Sync all posts from a creator
-  <br>
-  SYNOPSIS
-      __main__.py sync-creator &lt;flags>
-  <br>
-  DESCRIPTION
-      You can update the directory anytime after download finished, such as to update after creator published new posts.
-      * If `update_from` was provided, it should be located **inside the creator directory**.
-  <br>
-  FLAGS
-      -u, --url=URL
-          Type: Optional[str]
-          Default: None
-          The post URL
-      ...
-        </code>
-      </pre>
-    </details>
+If some files failed to download, you can try to execute the command line again, 
+the downloaded files will be **skipped**.
+  
+#### ⬇️🖌️ Download all posts from a creator
+```bash
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016
+```
+
+> By default, you will get a `creator-indices.ktoolbox` file in the creator directory, 
+> you can use it to update the directory anytime.
   
 
-- Download a specific post:
-    ```bash
-    ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
-    ```
-  
-  > If some files failed to download, you can try to execute the command line again, \
-  > the downloaded files will be **skipped**.
+#### 🔄️ Update a downloaded creator directory
+```bash
+ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
+```
 
-- Download all posts from a creator:
-    ```bash
-    ktoolbox sync-creator https://kemono.su/fanbox/user/9016
-    ```
-  
-  By default, you will get a `creator-indices.ktoolbox` file in the creator directory, \
-  you can use it to update the directory anytime.
-  
+The `creator-indices.ktoolbox` file contains the information and filepath of posts inside the directory.
 
-- Update a downloaded creator directory:
-    ```bash
-    ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
-    ```
-  
-  The `creator-indices.ktoolbox` file contains the information and filepath of posts inside the directory.  
+### iOS Shortcuts
+
+Goto [Shortcuts for iOS](https://ktoolbox.readthedocs.io/latest/shortcut/) page for more details.
 
 ### Configuration
 
-- KToolBox read **`prod.env` file** in the work folder or **environment variables** to store configuration
-- **All configuration options** defined in [`ktoolbox/configuration.py`](ktoolbox/configuration.py)
-- Use `__` to specify the sub option, like `KTOOLBOX_API__SCHEME` means `api.scheme`
-- All configuration options are optional
-
-#### `prod.env` file example
-
-```dotenv
-# Download 10 files at the same time.
-KTOOLBOX_JOB__COUNT=10
-
-# Allocate 102400 Bytes as buffer for each download job
-KTOOLBOX_DOWNLOADER__BUFFER_SIZE=102400
-
-# Set post attachments directory path as `./`, it means to save all attachments files in post directory
-# without making a new sub directory to storage them
-KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-
-# Disable SSL certificate verification for Kemono API server and download server
-# It's useful when certificate on Kemono server expired. (SSL: CERTIFICATE_VERIFY_FAILED)
-KTOOLBOX_SSL_VERIFY=False
-```
+Goto [Configuration-Guide](https://ktoolbox.readthedocs.io/latest/configuration/guide/) page for more details.
 
 ## Other Branches
+
 - Pure Python branch: [🔗pure-py](https://github.com/Ljzd-PRO/KToolBox/tree/pure-py)
   - Use pydantic v1 so that cargo is not needed for installation
   - For example, you can use it on iOS terminal App [a-Shell](https://github.com/holzschu/a-shell)
-  - PyPI: https://pypi.org/project/ktoolbox-pure-py/
+  - 🔗[PyPI](https://pypi.org/project/ktoolbox-pure-py/)
 - Development branch: [🔗devel](https://github.com/Ljzd-PRO/KToolBox/tree/devel)
 
 ## About Kemono

@@ -1,3 +1,4 @@
+import asyncio
 import cgi
 import logging
 import sys
@@ -13,7 +14,15 @@ from ktoolbox.configuration import config
 from ktoolbox.enum import RetCodeEnum, DataStorageNameEnum
 from ktoolbox.model import SearchResult
 
-__all__ = ["BaseRet", "filename_from_headers", "generate_msg", "logger_init", "dump_search", "parse_webpage_url"]
+__all__ = [
+    "BaseRet",
+    "filename_from_headers",
+    "generate_msg",
+    "logger_init",
+    "dump_search",
+    "parse_webpage_url",
+    "uvloop_init"
+]
 
 _T = TypeVar('_T')
 
@@ -40,18 +49,18 @@ def parse_header(line: str) -> Dict[str, Optional[str]]:
 
     https://peps.python.org/pep-0594/#cgi
 
-    :param line: Header line
-    :return: Dict of header line
-
-    .. rubric:: Example:
+    - Example:
     ```
     parse_header("text/html; charset=utf-8")
     ```
 
-    .. rubric:: Return:
+    - Return:
     ```
     {'text/html': None, 'charset': 'utf-8'}
     ```
+
+    :param line: Header line
+    :return: Dict of header line
     """
     dict_value: Dict[str, Optional[str]] = {}
     for item in line.split(";"):
@@ -68,18 +77,18 @@ def filename_from_headers(headers: Dict[str, str]) -> Optional[str]:
 
     Parse from ``Content-Disposition``.
 
-    :param headers: HTTP headers
-    :return: File name
-
-    .. rubric:: Example:
+    - Example:
     ```
     filename_from_headers('attachment;filename*=utf-8\\'\\'README%2Emd;filename="README.md"')
     ```
 
-    .. rubric:: Return:
+    - Return:
     ```
     README.md
     ```
+
+    :param headers: HTTP headers
+    :return: File name
     """
     if not (disposition := headers.get("Content-Disposition")):
         if not (disposition := headers.get("content-disposition")):
@@ -157,3 +166,28 @@ def parse_webpage_url(url: str) -> Tuple[Optional[str], Optional[str], Optional[
         parts += tuple(None for _ in range(7 - url_parts_len))
     _scheme, _netloc, service, _user_key, user_id, _post_key, post_id = parts
     return service, user_id, post_id
+
+
+def uvloop_init() -> bool:
+    """
+    Set event loop policy to uvloop if available.
+
+    :return: If uvloop enabled successfully
+    """
+    if config.use_uvloop:
+        if sys.platform == "win32":
+            logger.info("uvloop is not supported on Windows, but it's optional.")
+        else:
+            try:
+                # noinspection PyUnresolvedReferences
+                import uvloop
+            except ModuleNotFoundError:
+                logger.info(
+                    "uvloop is not installed, but it's optional. "
+                    "You can install it with `pip install ktoolbox[uvloop]`"
+                )
+            else:
+                asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+                logger.success("Set event loop policy to uvloop successfully.")
+                return True
+    return False
