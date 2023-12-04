@@ -62,17 +62,17 @@ plugins:
               - media: "(prefers-color-scheme)"
                 toggle:
                   icon: material/brightness-auto
-                  name: 切换至浅色模式
+                  name: 切换至深色模式
               - media: "(prefers-color-scheme: light)"
                 scheme: default
                 toggle:
                   icon: material/brightness-7
-                  name: 切换至深色模式
+                  name: 切换至自动
               - media: "(prefers-color-scheme: dark)"
                 scheme: slate
                 toggle:
                   icon: material/brightness-4
-                  name: 切换至自动
+                  name: 切换至浅色模式
           extra:
             analytics:
               provider: google
@@ -110,21 +110,21 @@ theme:
     - media: "(prefers-color-scheme)"
       toggle:
         icon: material/brightness-auto
-        name: Switch to light mode
+        name: Switch to dark mode
 
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
       toggle:
         icon: material/brightness-7
-        name: Switch to dark mode
+        name: Switch to system preference
 
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       toggle:
         icon: material/brightness-4
-        name: Switch to system preference
+        name: Switch to light mode
 
 extra:
   version:
