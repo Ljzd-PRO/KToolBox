@@ -29,7 +29,7 @@ ktoolbox = "ktoolbox.__main__:main"
 python = ">=3.8,<3.12"
 pydantic = {version="^1.10.13", extras=["dotenv"]}
 tenacity = "^8.2.3"
-httpx = {version="<=0.25.0", extras=["socks"]}
+httpx = {version="^0.25.2", extras=["socks"]}
 fire = "^0.5.0"
 tqdm = "^4.66.1"
 loguru = "^0.7.2"
