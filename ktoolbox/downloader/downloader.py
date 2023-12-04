@@ -31,16 +31,16 @@ class Downloader:
         """
         Initialize a file downloader
 
+        - About filename:
+            * If ``Content-Disposition`` is set in headers, use filename from it.
+            * Else if ``alt_filename`` parameter is set, use it.
+            * Else use filename from URL 'path' part.
+
         :param url: Download URL
         :param path: Directory path to save the file
         :param buffer_size: Number of bytes for file I/O buffer
         :param chunk_size: Number of bytes for chunk of download stream
         :param alt_filename: Use this name if no filename given by the server
-
-        .. rubric:: About filename:
-        * If ``Content-Disposition`` is set in headers, use filename from it.
-        * Else if ``alt_filename`` parameter is set, use it.
-        * Else use filename from URL 'path' part.
         """
 
         self._url = url
