@@ -56,7 +56,7 @@
 ## Dev Plan
 
 - [ ] Add a Fluent Design style GUI
-- [ ] Add uvloop support for Unix platform
+- [x] Add uvloop support for Unix platform
 
 ## Tutorial
 
