@@ -45,12 +45,13 @@
 
 ## Features
 
-- Support for **multi-thread** downloads (technically, coroutine).
-- Ability to download individual post as well as **all post** by a specified creator/artist.
-- **Update downloaded** creator/artist directories to the latest status.
-- Customize the **structure** of downloaded post/creator **directories**.
-- Search for creators/artists and posts, and **export the results**.
-- **Cross-platform** support & **iOS shortcuts** available.
+- Support for **multi-thread** downloads (technically, coroutine)
+- **Retry** after download failed
+- Ability to download individual post as well as **all post** by a specified creator/artist
+- **Update downloaded** creator/artist directories to the latest status
+- Customize the **structure** of downloaded post/creator **directories**
+- Search for creators/artists and posts, and **export the results**
+- **Cross-platform** support & **iOS shortcuts** available
 
 ## Dev Plan
 

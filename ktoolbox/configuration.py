@@ -50,6 +50,10 @@ class DownloaderConfiguration(BaseModel):
     :ivar buffer_size: Number of bytes of file I/O buffer for each downloading file
     :ivar chunk_size: Number of bytes of chunk of downloader stream
     :ivar temp_suffix: Temp filename suffix of downloading files
+    :ivar retry_times: Downloader retry times (when download failed)
+    :ivar retry_stop_never: Never stop downloader from retrying (when download failed) \
+    (``retry_times`` will be ignored when enabled)
+    :ivar retry_interval: Seconds of downloader retry interval
     """
     scheme: Literal["http", "https"] = "https"
     timeout: float = 30.0
@@ -57,6 +61,9 @@ class DownloaderConfiguration(BaseModel):
     buffer_size: int = 20480
     chunk_size: int = 1024
     temp_suffix: str = "tmp"
+    retry_times: int = 10
+    retry_stop_never: bool = False
+    retry_interval: float = 3.0
 
 
 class PostStructureConfiguration(BaseModel):

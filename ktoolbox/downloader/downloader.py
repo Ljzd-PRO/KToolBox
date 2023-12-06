@@ -7,7 +7,12 @@ from typing import Callable, Any, Coroutine, Type, Optional
 
 import aiofiles
 import httpx
+import tenacity
 import tqdm.asyncio
+from httpx import NetworkError
+from loguru import logger
+from tenacity import wait_fixed, retry_if_result, retry_if_exception
+from tenacity.stop import stop_after_attempt, stop_never
 from tqdm import tqdm as std_tqdm
 
 from ktoolbox.configuration import config
@@ -95,6 +100,22 @@ class Downloader:
         """
         self._stop = True
 
+    @tenacity.retry(
+        stop=stop_never if config.downloader.retry_stop_never else stop_after_attempt(config.downloader.retry_times),
+        wait=wait_fixed(config.downloader.retry_interval),
+        retry=retry_if_result(
+            lambda x: not x and x.code != RetCodeEnum.FileExisted
+        ) | retry_if_exception(
+            lambda x: isinstance(x, NetworkError)
+        ),
+        before_sleep=lambda x: logger.warning(
+            generate_msg(
+                f"Retrying ({x.attempt_number})",
+                message=x.outcome.result().message if not x.outcome.failed else None,
+            )
+        ),
+        reraise=True
+    )
     async def run(
             self,
             *,
