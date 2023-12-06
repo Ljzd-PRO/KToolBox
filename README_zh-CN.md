@@ -56,7 +56,7 @@
 ## 开发计划
 
 - [ ] 增加 Fluent Design 风格的 UI 界面
-- [ ] 对 Unix 平台增加 uvloop 支持
+- [x] 对 Unix 平台增加 uvloop 支持
 
 ## 使用方法
 
