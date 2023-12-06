@@ -41,13 +41,12 @@
 
 ## Features
 
-- You can download all files from a specific post from Kemono
-- Or download **all post** from a specific creator / artist from Kemono
-- **Sync** the downloaded creator / artist directory to latest, \
-  download the posts that recently updated or published only
-- Search creator and post, then dump the results
-- Concurrently download the files
-- Support all platform
+- Support for **multi-thread** downloads (technically, coroutine).
+- Ability to download individual post as well as **all post** by a specified creator/artist.
+- **Update downloaded** creator/artist directories to the latest status.
+- Customize the **structure** of downloaded post/creator **directories**.
+- Search for creators/artists and posts, and **export the results**.
+- **Cross-platform** support & **iOS shortcuts** available.
 
 ## Tutorial
 
