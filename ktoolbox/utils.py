@@ -176,13 +176,13 @@ def uvloop_init() -> bool:
     """
     if config.use_uvloop:
         if sys.platform == "win32":
-            logger.info("uvloop is not supported on Windows, but it's optional.")
+            logger.debug("uvloop is not supported on Windows, but it's optional.")
         else:
             try:
                 # noinspection PyUnresolvedReferences
                 import uvloop
             except ModuleNotFoundError:
-                logger.info(
+                logger.debug(
                     "uvloop is not installed, but it's optional. "
                     "You can install it with `pip install ktoolbox[uvloop]`"
                 )

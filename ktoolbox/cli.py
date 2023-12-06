@@ -6,7 +6,7 @@ from loguru import logger
 from pathvalidate import sanitize_filename
 
 from ktoolbox import __version__
-from ktoolbox.action import create_job_from_post, create_job_from_creator
+from ktoolbox.action import create_job_from_post, create_job_from_creator, generate_post_path_name
 from ktoolbox.action import search_creator as search_creator_action, search_creator_post as search_creator_post_action
 from ktoolbox.api.misc import get_app_version
 from ktoolbox.api.posts import get_post as get_post_api
@@ -171,7 +171,7 @@ class KToolBoxCli:
             post_id=post_id
         )
         if ret:
-            post_path = path / ret.data.id if config.job.post_id_as_path else path / sanitize_filename(ret.data.title)
+            post_path = path / generate_post_path_name(ret.data)
             job_list = await create_job_from_post(
                 post=ret.data,
                 post_path=post_path,

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ktoolbox-pure-py"
-version = "0.2.3"
+version = "0.3.0"
 description = "A useful CLI tool for downloading posts in Kemono.party / .su (Pure Python version)"
 authors = ["Ljzd-PRO <ljzd@office.ljzd-pro.asia>"]
 readme = "README.md"
@@ -52,7 +52,7 @@ mike = "^2.0.0"
 [tool.poetry.group.test.dependencies]
 pytest = "==7.4.3"
 pytest-html = "==4.1.1"
-pytest-asyncio = "==0.21.1"
+pytest-asyncio = "==0.23.2"
 pytest-cov = "==4.1.0"
 allpairspy = "==2.5.1"
 
