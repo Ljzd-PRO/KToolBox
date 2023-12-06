@@ -1394,7 +1394,7 @@
             <span class="n">post_id</span><span class="o">=</span><span class="n">post_id</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
-            <span class="n">post_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="n">ret</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">id</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">post_id_as_path</span> <span class="k">else</span> <span class="n">path</span> <span class="o">/</span> <span class="n">sanitize_filename</span><span class="p">(</span><span class="n">ret</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+            <span class="n">post_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="n">generate_post_path_name</span><span class="p">(</span><span class="n">ret</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
             <span class="n">job_list</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_job_from_post</span><span class="p">(</span>
                 <span class="n">post</span><span class="o">=</span><span class="n">ret</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
                 <span class="n">post_path</span><span class="o">=</span><span class="n">post_path</span><span class="p">,</span>
@@ -1743,7 +1743,7 @@
         <span class="n">post_id</span><span class="o">=</span><span class="n">post_id</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
-        <span class="n">post_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="n">ret</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">id</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">post_id_as_path</span> <span class="k">else</span> <span class="n">path</span> <span class="o">/</span> <span class="n">sanitize_filename</span><span class="p">(</span><span class="n">ret</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">post_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="n">generate_post_path_name</span><span class="p">(</span><span class="n">ret</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
         <span class="n">job_list</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_job_from_post</span><span class="p">(</span>
             <span class="n">post</span><span class="o">=</span><span class="n">ret</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
             <span class="n">post_path</span><span class="o">=</span><span class="n">post_path</span><span class="p">,</span>
