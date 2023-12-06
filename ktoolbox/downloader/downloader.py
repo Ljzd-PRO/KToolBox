@@ -111,6 +111,7 @@ class Downloader:
             generate_msg(
                 f"Retrying ({x.attempt_number})",
                 message=x.outcome.result().message if not x.outcome.failed else None,
+                exception=x.outcome.exception()
             )
         ),
         reraise=True
