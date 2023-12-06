@@ -12,6 +12,8 @@ from ktoolbox.configuration import config, PostStructureConfiguration
 from ktoolbox.enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.job import Job, CreatorIndices
 
+from ktoolbox.action.utils import generate_post_path_name
+
 __all__ = ["create_job_from_post", "filter_posts_with_indices", "create_job_from_creator"]
 
 
@@ -47,7 +49,7 @@ async def create_job_from_post(
 
     # Create jobs
     jobs: List[Job] = []
-    for attachment in post.attachments:  # attachments
+    for attachment in post.attachments or []:  # attachments
         if not attachment.path:
             continue
         jobs.append(
@@ -58,7 +60,7 @@ async def create_job_from_post(
                 type=PostFileTypeEnum.Attachment
             )
         )
-    if post.file.path:  # file
+    if post.file and post.file.path:  # file
         jobs.append(
             Job(
                 path=post_path,
@@ -170,12 +172,7 @@ async def create_job_from_creator(
     job_list: List[Job] = []
     for post in post_list:
         # Get post path
-        if mix_posts:
-            default_post_path = path
-        elif config.job.post_id_as_path:
-            default_post_path = path / post.id
-        else:
-            default_post_path = path / sanitize_filename(post.title)
+        default_post_path = path if mix_posts else path / generate_post_path_name(post)
         if update_from:
             if not (post_path := update_from.posts_path.get(post.id)):
                 post_path = default_post_path
