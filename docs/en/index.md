@@ -42,6 +42,7 @@
 ## Features
 
 - Support for **multi-thread** downloads (technically, coroutine).
+- **Retry** after download failed.
 - Ability to download individual post as well as **all post** by a specified creator/artist.
 - **Update downloaded** creator/artist directories to the latest status.
 - Customize the **structure** of downloaded post/creator **directories**.
