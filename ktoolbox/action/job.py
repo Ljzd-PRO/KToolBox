@@ -6,13 +6,12 @@ from loguru import logger
 from pathvalidate import sanitize_filename
 
 from ktoolbox.action import ActionRet, fetch_all_creator_posts, FetchInterruptError
+from ktoolbox.action.utils import generate_post_path_name
 from ktoolbox.api.model import Post
 from ktoolbox.api.posts import get_creator_post
 from ktoolbox.configuration import config, PostStructureConfiguration
 from ktoolbox.enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.job import Job, CreatorIndices
-
-from ktoolbox.action.utils import generate_post_path_name
 
 __all__ = ["create_job_from_post", "filter_posts_with_indices", "create_job_from_creator"]
 

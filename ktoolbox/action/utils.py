@@ -3,7 +3,6 @@ from pathvalidate import sanitize_filename
 from ktoolbox.api.model import Post
 from ktoolbox.configuration import config
 
-
 __all__ = ["generate_post_path_name"]
 
 
