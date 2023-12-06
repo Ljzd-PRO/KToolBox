@@ -9,7 +9,6 @@ import aiofiles
 import httpx
 import tenacity
 import tqdm.asyncio
-from httpx import NetworkError
 from loguru import logger
 from tenacity import wait_fixed, retry_if_result, retry_if_exception
 from tenacity.stop import stop_after_attempt, stop_never
@@ -106,7 +105,7 @@ class Downloader:
         retry=retry_if_result(
             lambda x: not x and x.code != RetCodeEnum.FileExisted
         ) | retry_if_exception(
-            lambda x: isinstance(x, NetworkError)
+            lambda x: isinstance(x, httpx.HTTPError)
         ),
         before_sleep=lambda x: logger.warning(
             generate_msg(
