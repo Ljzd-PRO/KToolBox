@@ -1,12 +1,13 @@
 from datetime import datetime
-from typing import Optional, List, Generator, Any
+from typing import Optional, List, Generator, Any, Tuple
 
 from pathvalidate import sanitize_filename
 
 from ktoolbox.api.model import Post
 from ktoolbox.configuration import config
+from ktoolbox.job import CreatorIndices
 
-__all__ = ["generate_post_path_name", "filter_posts_by_time"]
+__all__ = ["generate_post_path_name", "filter_posts_by_time", "filter_posts_with_indices"]
 
 
 def generate_post_path_name(post: Post) -> str:
@@ -51,3 +52,24 @@ def filter_posts_by_time(
     """
     post_filter = filter(lambda x: _match_post_time(x, start_time, end_time), post_list)
     yield from post_filter
+
+
+def filter_posts_with_indices(posts: List[Post], indices: CreatorIndices) -> Tuple[List[Post], CreatorIndices]:
+    """
+    Compare and filter posts by ``CreatorIndices`` data
+
+    Only keep posts that was edited after last download.
+
+    :param posts: Posts to filter
+    :param indices: ``CreatorIndices`` data to use
+    :return: A updated ``List[Post]`` and updated **new** ``CreatorIndices`` instance
+    """
+    new_list = list(
+        filter(
+            lambda x: x.id not in indices.posts or x.edited > indices.posts[x.id].edited, posts
+        )
+    )
+    new_indices = indices.model_copy(deep=True)
+    for post in new_list:
+        new_indices.posts[post.id] = post
+    return new_list, new_indices

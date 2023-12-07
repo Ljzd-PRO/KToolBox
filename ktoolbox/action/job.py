@@ -1,20 +1,20 @@
 from datetime import datetime
 from pathlib import Path
-from typing import List, Union, Tuple, Optional
+from typing import List, Union, Optional
 
 import aiofiles
 from loguru import logger
 from pathvalidate import sanitize_filename
 
 from ktoolbox.action import ActionRet, fetch_all_creator_posts, FetchInterruptError
-from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_time
+from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_time, filter_posts_with_indices
 from ktoolbox.api.model import Post
 from ktoolbox.api.posts import get_creator_post
 from ktoolbox.configuration import config, PostStructureConfiguration
 from ktoolbox.enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.job import Job, CreatorIndices
 
-__all__ = ["create_job_from_post", "filter_posts_with_indices", "create_job_from_creator"]
+__all__ = ["create_job_from_post", "create_job_from_creator"]
 
 
 async def create_job_from_post(
@@ -81,27 +81,6 @@ async def create_job_from_post(
             )
 
     return jobs
-
-
-def filter_posts_with_indices(posts: List[Post], indices: CreatorIndices) -> Tuple[List[Post], CreatorIndices]:
-    """
-    Compare and filter posts by ``CreatorIndices`` data
-
-    Only keep posts that was edited after last download.
-
-    :param posts: Posts to filter
-    :param indices: ``CreatorIndices`` data to use
-    :return: A updated ``List[Post]`` and updated **new** ``CreatorIndices`` instance
-    """
-    new_list = list(
-        filter(
-            lambda x: x.id not in indices.posts or x.edited > indices.posts[x.id].edited, posts
-        )
-    )
-    new_indices = indices.model_copy(deep=True)
-    for post in new_list:
-        new_indices.posts[post.id] = post
-    return new_list, new_indices
 
 
 async def create_job_from_creator(
