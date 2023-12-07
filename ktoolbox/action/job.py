@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import List, Union, Optional, Tuple
+from typing import List, Union, Optional
 
 import aiofiles
 from loguru import logger
@@ -81,27 +81,6 @@ async def create_job_from_post(
             )
 
     return jobs
-
-
-def filter_posts_with_indices(posts: List[Post], indices: CreatorIndices) -> Tuple[List[Post], CreatorIndices]:
-    """
-    Compare and filter posts by ``CreatorIndices`` data
-
-    Only keep posts that was edited after last download.
-
-    :param posts: Posts to filter
-    :param indices: ``CreatorIndices`` data to use
-    :return: A updated ``List[Post]`` and updated **new** ``CreatorIndices`` instance
-    """
-    new_list = list(
-        filter(
-            lambda x: x.id not in indices.posts or x.edited > indices.posts[x.id].edited, posts
-        )
-    )
-    new_indices = indices.copy(deep=True)
-    for post in new_list:
-        new_indices.posts[post.id] = post
-    return new_list, new_indices
 
 
 async def create_job_from_creator(
