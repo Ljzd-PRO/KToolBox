@@ -7,7 +7,7 @@ from ktoolbox.api.model import Post
 from ktoolbox.configuration import config
 from ktoolbox.job import CreatorIndices
 
-__all__ = ["generate_post_path_name", "filter_posts_by_time", "filter_posts_with_indices"]
+__all__ = ["generate_post_path_name", "filter_posts_by_time", "filter_posts_by_indices"]
 
 
 def generate_post_path_name(post: Post) -> str:
@@ -54,7 +54,7 @@ def filter_posts_by_time(
     yield from post_filter
 
 
-def filter_posts_with_indices(posts: List[Post], indices: CreatorIndices) -> Tuple[List[Post], CreatorIndices]:
+def filter_posts_by_indices(posts: List[Post], indices: CreatorIndices) -> Tuple[List[Post], CreatorIndices]:
     """
     Compare and filter posts by ``CreatorIndices`` data
 

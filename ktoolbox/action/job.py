@@ -7,7 +7,7 @@ from loguru import logger
 from pathvalidate import sanitize_filename
 
 from ktoolbox.action import ActionRet, fetch_all_creator_posts, FetchInterruptError
-from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_time, filter_posts_with_indices
+from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_time, filter_posts_by_indices
 from ktoolbox.api.model import Post
 from ktoolbox.api.posts import get_creator_post
 from ktoolbox.configuration import config, PostStructureConfiguration
@@ -139,7 +139,7 @@ async def create_job_from_creator(
     if not mix_posts:
         indices = None
         if update_from:
-            post_list, indices = filter_posts_with_indices(post_list, update_from)
+            post_list, indices = filter_posts_by_indices(post_list, update_from)
             logger.info(f"{len(post_list)} posts will be downloaded")
         elif save_creator_indices:  # It's unnecessary to create indices again when ``update_from`` was provided
             indices = CreatorIndices(
