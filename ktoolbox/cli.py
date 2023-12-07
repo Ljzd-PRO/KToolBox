@@ -1,5 +1,6 @@
+from datetime import datetime
 from pathlib import Path
-from typing import Union, overload
+from typing import Union, overload, Tuple
 
 import aiofiles
 from loguru import logger
@@ -190,7 +191,8 @@ class KToolBoxCli:
             *,
             update_from: Path = None,
             save_creator_indices: bool = True,
-            mix_posts: bool = None
+            mix_posts: bool = None,
+            time_range: Tuple[str, str] = None
     ):
         ...
 
@@ -203,7 +205,8 @@ class KToolBoxCli:
             *,
             update_from: Path = None,
             save_creator_indices: bool = True,
-            mix_posts: bool = None
+            mix_posts: bool = None,
+            time_range: Tuple[str, str] = None
     ):
         ...
 
@@ -216,7 +219,9 @@ class KToolBoxCli:
             *,
             update_from: Union[Path, str] = None,
             save_creator_indices: bool = True,
-            mix_posts: bool = None
+            mix_posts: bool = None,
+            start_time: str = None,
+            end_time: str = None,
     ):
         """
         Sync all posts from a creator
@@ -225,16 +230,23 @@ class KToolBoxCli:
         such as to update after creator published new posts.
 
         * If ``update_from`` was provided, it should be located **inside the creator directory**.
+        * ``start_time`` & ``end_time`` example: ``2023-12-7``, ``2023-12-07``
 
         :param url: The post URL
         :param service: The service where the post is located
         :param creator_id: The ID of the creator
         :param path: Download path, default is current directory
         :param update_from: ``CreatorIndices`` data path for update posts from current creator directory, \
-         ``save_creator_indices`` will be enabled if this provided
+            ``save_creator_indices`` will be enabled if this provided
         :param save_creator_indices: Record ``CreatorIndices`` data for update posts from current creator directory
         :param mix_posts: Save all files from different posts at same path, \
-         ``update_from``, ``save_creator_indices`` will be ignored if enabled
+            ``update_from``, ``save_creator_indices`` will be ignored if enabled
+        :param start_time: Start time of the published time range for posts downloading. \
+            Set to ``0`` if ``None`` was given. \
+            Time format: ``%Y-%m-%d``
+        :param end_time: End time of the published time range for posts downloading. \
+            Set to latest time (infinity) if ``None`` was given. \
+            Time format: ``%Y-%m-%d``
         """
         # Get service, creator_id
         if url:
@@ -291,7 +303,9 @@ class KToolBoxCli:
             update_from=indices,
             all_pages=True,
             save_creator_indices=save_creator_indices,
-            mix_posts=mix_posts
+            mix_posts=mix_posts,
+            start_time=datetime.strptime(start_time, "%Y-%m-%d") if start_time else None,
+            end_time=datetime.strptime(end_time, "%Y-%m-%d") if end_time else None
         )
         if ret:
             job_runner = JobRunner(job_list=ret.data)
