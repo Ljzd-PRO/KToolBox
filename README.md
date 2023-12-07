@@ -77,7 +77,7 @@ See [documentation](https://ktoolbox.readthedocs.io/) for more details.
 
 ### Command
 
-For more information, use the help command or goto [Command](https://ktoolbox.readthedocs.io/latest/commands/) page.
+For more information, use the help command or goto [Command](https://ktoolbox.readthedocs.io/latest/commands/guide) page.
   
 #### ❓ Get general help
 ```bash
