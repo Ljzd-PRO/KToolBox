@@ -154,10 +154,4 @@
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/configuration/reference/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/reference/"/>
     </url>
-    <url>
-        <loc>https://ktoolbox.readthedocs.io/master/zh/commands/</loc>
-        <lastmod>2023-12-07</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/commands/"/>
-    </url>
 </urlset>
