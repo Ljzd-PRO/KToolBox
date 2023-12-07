@@ -1,20 +1,22 @@
 
 <!doctype html>
-<html lang="zh" class="no-js">
+<html lang="en" class="no-js">
   <head>
     
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="KToolBox 文档">
+        <meta name="description" content="Documentation for KToolBox">
       
       
       
-        <link rel="canonical" href="https://ktoolbox.readthedocs.io/master/zh/">
+        <link rel="canonical" href="https://ktoolbox.readthedocs.io/master/coomer/">
       
       
+        <link rel="prev" href="../shortcut/">
       
-        <link rel="next" href="about-kemono/">
+      
+        <link rel="next" href="../faq/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -22,7 +24,7 @@
     
     
       
-        <title>欢迎使用 KToolBox - KToolBox</title>
+        <title>Coomer - KToolBox</title>
       
     
     
@@ -47,8 +49,6 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-    
-      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
@@ -88,8 +88,8 @@
     <div data-md-component="skip">
       
         
-        <a href="#_1" class="md-skip">
-          跳转至
+        <a href="#coomer" class="md-skip">
+          Skip to content
         </a>
       
     </div>
@@ -105,8 +105,8 @@
       
 
 <header class="md-header" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="页眉">
-    <a href="./" title="KToolBox" class="md-header__button md-logo" aria-label="KToolBox" data-md-component="logo">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="KToolBox" class="md-header__button md-logo" aria-label="KToolBox" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -126,7 +126,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              欢迎使用 KToolBox
+              Coomer
             
           </span>
         </div>
@@ -139,9 +139,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换至深色模式"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="切换至深色模式" for="__palette_1" hidden>
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9h-1.9M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69m-9.15 3.96h2.3L12 9l-1.15 3.65Z"/></svg>
       </label>
     
@@ -149,9 +149,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换至自动"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="切换至自动" for="__palette_2" hidden>
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_2" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
       </label>
     
@@ -159,9 +159,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换至浅色模式"  type="radio" name="__palette" id="__palette_2">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
     
-      <label class="md-header__button md-icon" title="切换至浅色模式" for="__palette_0" hidden>
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
       </label>
     
@@ -176,20 +176,20 @@
       <div class="md-header__option">
   <div class="md-select">
     
-    <button class="md-header__button md-icon" aria-label="选择当前语言">
+    <button class="md-header__button md-icon" aria-label="Select language">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
     </button>
     <div class="md-select__inner">
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="/master/" hreflang="en" class="md-select__link">
+            <a href="./" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
         
           <li class="md-select__item">
-            <a href="/master/zh/" hreflang="zh" class="md-select__link">
+            <a href="../zh/coomer/" hreflang="zh" class="md-select__link">
               中文（简体）
             </a>
           </li>
@@ -208,21 +208,21 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
       </label>
-      <nav class="md-search__options" aria-label="查找">
+      <nav class="md-search__options" aria-label="Search">
         
-          <a href="javascript:void(0)" class="md-search__icon md-icon" title="分享" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
             
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
           </a>
         
-        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
         </button>
@@ -235,7 +235,7 @@
       <div class="md-search__scrollwrap" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
-            正在初始化搜索引擎
+            Initializing search
           </div>
           <ol class="md-search-result__list" role="presentation"></ol>
         </div>
@@ -246,7 +246,7 @@
     
     
       <div class="md-header__source">
-        <a href="https://github.com/Ljzd-PRO/KToolBox" title="前往仓库" class="md-source" data-md-component="source">
+        <a href="https://github.com/Ljzd-PRO/KToolBox" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
@@ -267,25 +267,23 @@
         
           
             
-<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
   <div class="md-grid">
     <ul class="md-tabs__list">
       
         
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href=".." class="md-tabs__link">
           
   
     
   
-  开始
+  Get Started
 
         </a>
       </li>
@@ -300,12 +298,12 @@
     
     
       <li class="md-tabs__item">
-        <a href="commands/guide/" class="md-tabs__link">
+        <a href="../commands/guide/" class="md-tabs__link">
           
   
     
   
-  命令
+  Commands
 
         </a>
       </li>
@@ -320,12 +318,12 @@
     
     
       <li class="md-tabs__item">
-        <a href="configuration/guide/" class="md-tabs__link">
+        <a href="../configuration/guide/" class="md-tabs__link">
           
   
     
   
-  配置
+  Configuration
 
         </a>
       </li>
@@ -338,12 +336,12 @@
   
   
     <li class="md-tabs__item">
-      <a href="shortcut/" class="md-tabs__link">
+      <a href="../shortcut/" class="md-tabs__link">
         
   
     
   
-  iOS 快捷指令
+  iOS Shortcuts
 
       </a>
     </li>
@@ -353,9 +351,11 @@
         
   
   
+    
   
-    <li class="md-tabs__item">
-      <a href="coomer/" class="md-tabs__link">
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
         
   
     
@@ -372,12 +372,12 @@
   
   
     <li class="md-tabs__item">
-      <a href="faq/" class="md-tabs__link">
+      <a href="../faq/" class="md-tabs__link">
         
   
     
   
-  常见问题
+  FAQ
 
       </a>
     </li>
@@ -389,12 +389,12 @@
   
   
     <li class="md-tabs__item">
-      <a href="api/" class="md-tabs__link">
+      <a href="../api/" class="md-tabs__link">
         
   
     
   
-  API 文档
+  API Documentation
 
       </a>
     </li>
@@ -421,9 +421,9 @@
   
 
 
-<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="./" title="KToolBox" class="md-nav__button md-logo" aria-label="KToolBox" data-md-component="logo">
+    <a href=".." title="KToolBox" class="md-nav__button md-logo" aria-label="KToolBox" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -433,7 +433,7 @@
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.com/Ljzd-PRO/KToolBox" title="前往仓库" class="md-source" data-md-component="source">
+      <a href="https://github.com/Ljzd-PRO/KToolBox" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
@@ -450,8 +450,6 @@
       
   
   
-    
-  
   
   
     
@@ -472,37 +470,37 @@
       
       
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="./" class="md-nav__link md-nav__link--active">
+            <a href=".." class="md-nav__link ">
               
   
   <span class="md-ellipsis">
-    开始
+    Get Started
   </span>
   
 
             </a>
             
               
-              <label class="md-nav__link md-nav__link--active" for="__nav_1" id="__nav_1_label" tabindex="">
+              <label class="md-nav__link " for="__nav_1" id="__nav_1_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_1">
             <span class="md-nav__icon md-icon"></span>
-            开始
+            Get Started
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -515,11 +513,11 @@
   
   
     <li class="md-nav__item">
-      <a href="about-kemono/" class="md-nav__link">
+      <a href="../about-kemono/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    关于 Kemono
+    About Kemono
   </span>
   
 
@@ -536,11 +534,11 @@
   
   
     <li class="md-nav__item">
-      <a href="more/" class="md-nav__link">
+      <a href="../more/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    更多
+    More
   </span>
   
 
@@ -589,7 +587,7 @@
             
   
   <span class="md-ellipsis">
-    命令
+    Commands
   </span>
   
 
@@ -599,7 +597,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
-            命令
+            Commands
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -610,11 +608,11 @@
   
   
     <li class="md-nav__item">
-      <a href="commands/guide/" class="md-nav__link">
+      <a href="../commands/guide/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    向导
+    Guide
   </span>
   
 
@@ -631,11 +629,11 @@
   
   
     <li class="md-nav__item">
-      <a href="commands/reference/" class="md-nav__link">
+      <a href="../commands/reference/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    参考
+    Reference
   </span>
   
 
@@ -684,7 +682,7 @@
             
   
   <span class="md-ellipsis">
-    配置
+    Configuration
   </span>
   
 
@@ -694,7 +692,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
-            配置
+            Configuration
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -705,11 +703,11 @@
   
   
     <li class="md-nav__item">
-      <a href="configuration/guide/" class="md-nav__link">
+      <a href="../configuration/guide/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    向导
+    Guide
   </span>
   
 
@@ -726,11 +724,11 @@
   
   
     <li class="md-nav__item">
-      <a href="configuration/reference/" class="md-nav__link">
+      <a href="../configuration/reference/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    参考
+    Reference
   </span>
   
 
@@ -754,11 +752,11 @@
   
   
     <li class="md-nav__item">
-      <a href="shortcut/" class="md-nav__link">
+      <a href="../shortcut/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    iOS 快捷指令
+    iOS Shortcuts
   </span>
   
 
@@ -771,10 +769,30 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="coomer/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Coomer
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -783,6 +801,35 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#about-coomer" class="md-nav__link">
+    <span class="md-ellipsis">
+      About Coomer
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -794,11 +841,11 @@
   
   
     <li class="md-nav__item">
-      <a href="faq/" class="md-nav__link">
+      <a href="../faq/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    常见问题
+    FAQ
   </span>
   
 
@@ -814,11 +861,11 @@
   
   
     <li class="md-nav__item">
-      <a href="api/" class="md-nav__link">
+      <a href="../api/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    API 文档
+    API Documentation
   </span>
   
 
@@ -840,107 +887,25 @@
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="目录">
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      目录
+      Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#about-coomer" class="md-nav__link">
     <span class="md-ellipsis">
-      功能
+      About Coomer
     </span>
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      使用方法
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="使用方法">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      安装
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      命令
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="命令">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      ❓ 获取帮助总览
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      ❓ 获取某个命令的帮助信息
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
-    <span class="md-ellipsis">
-      ⬇️🖼️ 下载指定的作品
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
-    <span class="md-ellipsis">
-      ⬇️🖌️ 下载作者的所有作品
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
-    <span class="md-ellipsis">
-      🔄️ 更新一个作者目录
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -959,7 +924,7 @@
                   
 
   
-    <a href="https://github.com/Ljzd-PRO/KToolBox/edit/master/docs/zh/index.md" title="编辑此页" class="md-content__button md-icon">
+    <a href="https://github.com/Ljzd-PRO/KToolBox/edit/master/docs/en/coomer.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
     </a>
@@ -967,104 +932,25 @@
   
 
 
-<p style="text-decoration:none">
-  <img src="https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/repository-open-graph-2.svg" alt="logo">
-</p>
+<h1 id="coomer">Coomer<a class="headerlink" href="#coomer" title="Permanent link">&para;</a></h1>
+<p>KToolBox support downloading from Coomer.su / Coomer.party, but currently need to <strong>configure</strong> before it can use.</p>
+<p>You need to set the configuration by <code>prod.env</code> dotenv file or system environment variables:
+<div class="highlight"><pre><span></span><code># For Coomer API
+KTOOLBOX_API__NETLOC=coomer.su
 
-<h1 style="text-align: center">
-  KToolBox
-</h1>
-
-<p style="text-align: center">
-  KToolBox 是一个用于下载
-  <a href="https://kemono.su/">Kemono.party / Kemono.su</a>
-  中作品内容的实用命令行工具
-</p>
-
-<p style="text-align: center">
-  <a href="https://pypi.org/project/ktoolbox" target="_blank">
-    <img src="https://img.shields.io/github/v/release/Ljzd-PRO/KToolBox?logo=python" alt="Version">
-  </a>
-
-  <a href="./LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT-blue" alt="MIT"/>
-  </a>
-
-  <a href="https://github.com/Ljzd-PRO/KToolBox/activity">
-    <img src="https://img.shields.io/github/last-commit/Ljzd-PRO/KToolBox/devel" alt="Last Commit"/>
-  </a>
-
-  <a href="https://codecov.io/gh/Ljzd-PRO/KToolBox" target="_blank">
-      <img src="https://codecov.io/gh/Ljzd-PRO/KToolBox/branch/master/graph/badge.svg?token=5XK9CYQHQN" alt="codecov"/>
-  </a>
-
-  <a href='https://ktoolbox.readthedocs.io/'>
-    <img src='https://readthedocs.org/projects/ktoolbox/badge/?version=latest' alt='Documentation Status' />
-  </a>
-
-  <a style="text-decoration:none">
-    <img src="https://img.shields.io/badge/Platform-Windows%20|%20Linux%20|%20macOS-blue" alt="Platform Win | Linux | macOS"/>
-  </a>
-</p>
-
-<p><img src="https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-1.png" alt="Preview"></p>
-<h2 id="_1">功能<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+# For downloading files from Coomer server
+KTOOLBOX_API__FILES_NETLOC=coomer.su
+</code></pre></div></p>
+<h2 id="about-coomer">About Coomer<a class="headerlink" href="#about-coomer" title="Permanent link">&para;</a></h2>
+<p>Description from <a href="https://coomer.su">https://coomer.su</a> :</p>
+<blockquote>
+<p>Coomer is a public archiver for:</p>
 <ul>
-<li>支持 <strong>多线程</strong> 下载（技术上是协程）</li>
-<li>下载失败后进行 <strong>重试</strong></li>
-<li>支持下载单个作品以及指定的画师的 <strong>所有作品</strong></li>
-<li>可 <strong>更新已下载</strong> 的画师目录至最新状态</li>
-<li>可自定义下载的作品/画师 <strong>目录结构</strong></li>
-<li>可搜索画师和作品，并 <strong>导出结果</strong></li>
-<li>支持全平台，并提供 <strong>iOS 快捷指令</strong></li>
+<li>OnlyFans</li>
+<li>Fansly</li>
 </ul>
-<h2 id="_2">使用方法<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<h3 id="_3">安装<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">一般情况</label><label for="__tabbed_1_2">对于 iOS a-Shell</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code>pip3<span class="w"> </span>install<span class="w"> </span>ktoolbox
-</code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code>pip3<span class="w"> </span>install<span class="w"> </span>ktoolbox-pure-py
-</code></pre></div>
-<div class="admonition info">
-<p class="admonition-title">关于 a-Shell</p>
-<p><a href="https://github.com/holzschu/a-shell">a-Shell</a> 是一个 iOS 终端 App，它只能运行纯 Python 脚本</p>
-</div>
-</div>
-</div>
-</div>
-<h3 id="_4">命令<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
-<p>使用帮助命令或前往 <a href="commands/guide/">命令</a> 页面查看更多帮助。</p>
-<h4 id="_5">❓ 获取帮助总览<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>-h
-</code></pre></div>
-<h4 id="_6">❓ 获取某个命令的帮助信息<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>download-post<span class="w"> </span>-h
-</code></pre></div>
-<h4 id="_7">⬇️🖼️ 下载指定的作品<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>download-post<span class="w"> </span>https://kemono.su/fanbox/user/49494721/post/6608808
-</code></pre></div>
-<details class="info">
-<summary>如果部分文件下载失败</summary>
-<p>如果部分文件下载失败，你可以尝试重新运行命令，已下载完成的文件会被 <strong>跳过</strong>。</p>
-</details>
-<h4 id="_8">⬇️🖌️ 下载作者的所有作品<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016
-</code></pre></div>
-<details class="info">
-<summary>输出</summary>
-<p>默认情况下你会在作者目录下得到一个 <code>creator-indices.ktoolbox</code> 文件，你可以用它来更新目录。</p>
-</details>
-<h4 id="_9">🔄️ 更新一个作者目录<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/641955<span class="w"> </span>--update-with<span class="o">=</span>./xxx/creator-indices.ktoolbox
-</code></pre></div>
-<details class="info">
-<summary>关于 <code>creator-indices.ktoolbox</code> 文件</summary>
-<p><code>creator-indices.ktoolbox</code> 包含目录下的所有作品的信息和路径。</p>
-</details>
+<p>Contributors here upload content and share it here for easy searching and organization. To get started viewing content, either search for creators on the creators page, or search for content on the posts page. If you want to contribute content, head over to the import page.</p>
+</blockquote>
 
 
 
@@ -1081,16 +967,16 @@
   <form class="md-feedback" name="feedback" hidden>
     <fieldset>
       <legend class="md-feedback__title">
-        这个页面对你有帮助吗？
+        Was this page helpful?
       </legend>
       <div class="md-feedback__inner">
         <div class="md-feedback__list">
           
-            <button class="md-feedback__icon md-icon" type="submit" title="这个页面有帮助" data-md-value="1">
+            <button class="md-feedback__icon md-icon" type="submit" title="This page was helpful" data-md-value="1">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81Z"/></svg>
             </button>
           
-            <button class="md-feedback__icon md-icon" type="submit" title="这个页面可以改进" data-md-value="0">
+            <button class="md-feedback__icon md-icon" type="submit" title="This page could be improved" data-md-value="0">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14Z"/></svg>
             </button>
           
@@ -1102,7 +988,7 @@
               
                 
               
-              感谢你的反馈！
+              Thanks for your feedback!
             </div>
           
             <div data-md-value="0" hidden>
@@ -1110,7 +996,7 @@
               
                 
               
-              感谢你的反馈，你可以前往我们 GitHub 仓库 Issues 或 Discussion 页面提交更多建议！
+              Thanks for your feedback! You can submit more advice on Issues or Discussion page of our GitHub Repository.
             </div>
           
         </div>
@@ -1130,7 +1016,7 @@
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
-  回到页面顶部
+  Back to top
 </button>
         
       </main>
@@ -1139,17 +1025,33 @@
   
     
       
-      <nav class="md-footer__inner md-grid" aria-label="页脚" >
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../shortcut/" class="md-footer__link md-footer__link--prev" aria-label="Previous: iOS Shortcuts">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                iOS Shortcuts
+              </div>
+            </div>
+          </a>
         
         
           
-          <a href="about-kemono/" class="md-footer__link md-footer__link--next" aria-label="下一页: 关于 Kemono">
+          <a href="../faq/" class="md-footer__link md-footer__link--next" aria-label="Next: FAQ">
             <div class="md-footer__title">
               <span class="md-footer__direction">
-                下一页
+                Next
               </span>
               <div class="md-ellipsis">
-                关于 Kemono
+                FAQ
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1187,7 +1089,7 @@
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.action.edit"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.action.edit"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
       <script src="../assets/javascripts/bundle.d7c377c4.min.js"></script>
