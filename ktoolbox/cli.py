@@ -229,7 +229,7 @@ class KToolBoxCli:
         You can update the directory anytime after download finished, \
         such as to update after creator published new posts.
 
-        * If ``update_from`` was provided, it should be located **inside the creator directory**.
+        * If ``update_from`` was provided, the file should be located **inside the creator directory**.
         * ``start_time`` & ``end_time`` example: ``2023-12-7``, ``2023-12-07``
 
         :param url: The post URL
