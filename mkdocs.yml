@@ -21,6 +21,7 @@ nav:
     - Guide: configuration/guide.md
     - Reference: configuration/reference.md
   - iOS Shortcuts: shortcut.md
+  - Coomer: coomer.md
   - FAQ: faq.md
   - API Documentation: api.md
 
