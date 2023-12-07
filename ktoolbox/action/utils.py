@@ -69,7 +69,7 @@ def filter_posts_by_indices(posts: List[Post], indices: CreatorIndices) -> Tuple
             lambda x: x.id not in indices.posts or x.edited > indices.posts[x.id].edited, posts
         )
     )
-    new_indices = indices.model_copy(deep=True)
+    new_indices = indices.copy(deep=True)
     for post in new_list:
         new_indices.posts[post.id] = post
     return new_list, new_indices
