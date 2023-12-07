@@ -1,7 +1,4 @@
-# Commands
-
-!!! info "Usage"
-    Visit [Command](index.md#command)
+# 参考
 
 ::: ktoolbox.cli.KToolBoxCli
     options:

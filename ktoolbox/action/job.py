@@ -1,19 +1,20 @@
+from datetime import datetime
 from pathlib import Path
-from typing import List, Union, Tuple
+from typing import List, Union, Optional
 
 import aiofiles
 from loguru import logger
 from pathvalidate import sanitize_filename
 
 from ktoolbox.action import ActionRet, fetch_all_creator_posts, FetchInterruptError
-from ktoolbox.action.utils import generate_post_path_name
+from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_time, filter_posts_by_indices
 from ktoolbox.api.model import Post
 from ktoolbox.api.posts import get_creator_post
 from ktoolbox.configuration import config, PostStructureConfiguration
 from ktoolbox.enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.job import Job, CreatorIndices
 
-__all__ = ["create_job_from_post", "filter_posts_with_indices", "create_job_from_creator"]
+__all__ = ["create_job_from_post", "create_job_from_creator"]
 
 
 async def create_job_from_post(
@@ -82,27 +83,6 @@ async def create_job_from_post(
     return jobs
 
 
-def filter_posts_with_indices(posts: List[Post], indices: CreatorIndices) -> Tuple[List[Post], CreatorIndices]:
-    """
-    Compare and filter posts by ``CreatorIndices`` data
-
-    Only keep posts that was edited after last download.
-
-    :param posts: Posts to filter
-    :param indices: ``CreatorIndices`` data to use
-    :return: A updated ``List[Post]`` and updated **new** ``CreatorIndices`` instance
-    """
-    new_list = list(
-        filter(
-            lambda x: x.id not in indices.posts or x.edited > indices.posts[x.id].edited, posts
-        )
-    )
-    new_indices = indices.model_copy(deep=True)
-    for post in new_list:
-        new_indices.posts[post.id] = post
-    return new_list, new_indices
-
-
 async def create_job_from_creator(
         service: str,
         creator_id: str,
@@ -112,7 +92,9 @@ async def create_job_from_creator(
         all_pages: bool = False,
         o: int = None,
         save_creator_indices: bool = True,
-        mix_posts: bool = None
+        mix_posts: bool = None,
+        start_time: Optional[datetime],
+        end_time: Optional[datetime]
 ) -> ActionRet[List[Job]]:
     """
     Create a list of download job from a creator
@@ -127,6 +109,8 @@ async def create_job_from_creator(
     :param save_creator_indices: Record ``CreatorIndices`` data for update posts from current creator directory
     :param mix_posts: Save all files from different posts at same path, \
      ``update_from``, ``save_creator_indices`` will be ignored if enabled
+    :param start_time: Start time of the time range
+    :param end_time: End time of the time range
     """
     mix_posts = config.job.mix_posts if mix_posts is None else mix_posts
 
@@ -145,13 +129,17 @@ async def create_job_from_creator(
             post_list = ret.data
         else:
             return ActionRet(**ret.model_dump(mode="python"))
+
+    # Filter posts by publish time
+    if start_time or end_time:
+        post_list = list(filter_posts_by_time(post_list, start_time, end_time))
     logger.info(f"Get {len(post_list)} posts, start creating jobs")
 
     # Filter posts and generate ``CreatorIndices``
     if not mix_posts:
         indices = None
         if update_from:
-            post_list, indices = filter_posts_with_indices(post_list, update_from)
+            post_list, indices = filter_posts_by_indices(post_list, update_from)
             logger.info(f"{len(post_list)} posts will be downloaded")
         elif save_creator_indices:  # It's unnecessary to create indices again when ``update_from`` was provided
             indices = CreatorIndices(

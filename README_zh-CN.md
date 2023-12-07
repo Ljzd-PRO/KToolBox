@@ -53,6 +53,7 @@
 - 可自定义下载的作品/画师 **目录结构**
 - 可搜索画师和作品，并 **导出结果**
 - 支持全平台，并提供 **iOS 快捷指令**
+- 对于 Coomer.su / Coomer.party 的支持，请查看文档 [Coomer](https://ktoolbox.readthedocs.io/latest/zh/coomer/)。
 
 ## 开发计划
 
