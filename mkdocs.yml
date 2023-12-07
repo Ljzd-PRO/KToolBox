@@ -14,11 +14,14 @@ nav:
     - Welcome to KToolBox: index.md
     - About Kemono: about-kemono.md
     - More: more.md
-  - Commands: commands.md
+  - Commands:
+    - Guide: commands/guide.md
+    - Reference: commands/reference.md
   - Configuration:
-      - Guide: configuration/guide.md
-      - Reference: configuration/reference.md
+    - Guide: configuration/guide.md
+    - Reference: configuration/reference.md
   - iOS Shortcuts: shortcut.md
+  - Coomer: coomer.md
   - FAQ: faq.md
   - API Documentation: api.md
 
