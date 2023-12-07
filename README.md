@@ -52,6 +52,7 @@
 - Customize the **structure** of downloaded post/creator **directories**
 - Search for creators/artists and posts, and **export the results**
 - **Cross-platform** support & **iOS shortcuts** available
+- For Coomer.su / Coomer.party support, check document [Coomer](https://ktoolbox.readthedocs.io/latest/coomer/) for more.
 
 ## Dev Plan
 
