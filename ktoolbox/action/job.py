@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Tuple
 
 import aiofiles
 from loguru import logger
