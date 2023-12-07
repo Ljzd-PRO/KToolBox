@@ -72,6 +72,7 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --end-time=2023-8-5
 ### 时间格式
 
 时间值应当符合 `%Y-%m-%d` 格式，例如：
+
 - `2023-12-7`
 - `2023-12-07`
 - `2023-12-31`
