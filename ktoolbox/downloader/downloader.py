@@ -36,8 +36,8 @@ class Downloader:
         Initialize a file downloader
 
         - About filename:
-            * If ``Content-Disposition`` is set in headers, use filename from it.
-            * Else if ``alt_filename`` parameter is set, use it.
+            * If ``alt_filename`` parameter is set, use it.
+            * Else if ``Content-Disposition`` is set in headers, use filename from it.
             * Else use filename from URL 'path' part.
 
         :param url: Download URL
@@ -165,8 +165,8 @@ class Downloader:
                         )
 
                     # Get filename
-                    if not (filename := filename_from_headers(res.headers)):
-                        if not (filename := self._alt_filename):
+                    if not (filename := self._alt_filename):
+                        if not (filename := filename_from_headers(res.headers)):
                             filename = urllib.parse.unquote(Path(self._url).name)
                     self._filename = filename
 

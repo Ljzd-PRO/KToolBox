@@ -21,4 +21,7 @@ KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 # 为Kemono API服务器和下载服务器禁用SSL证书检查
 # 在Kemono服务器的证书过期时很有用 （SSL: CERTIFICATE_VERIFY_FAILED）
 KTOOLBOX_SSL_VERIFY=False
+
+# 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
+KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
 ```

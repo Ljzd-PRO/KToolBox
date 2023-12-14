@@ -11,6 +11,7 @@ from pydantic import ValidationError
 from ktoolbox import __version__
 from ktoolbox.api.model import Creator, Post
 from ktoolbox.cli import KToolBoxCli
+from ktoolbox.configuration import config
 from ktoolbox.enum import TextEnum, DataStorageNameEnum
 from ktoolbox.model import SearchResult
 from ktoolbox.utils import generate_msg
@@ -98,6 +99,7 @@ async def test_get_post():
 
 @pytest.mark.asyncio
 async def test_download_post():
+    # Test invalid input
     invalid = await KToolBoxCli.download_post(url="")
     assert invalid == generate_msg(
         TextEnum.MissingParams.value,
@@ -107,6 +109,7 @@ async def test_download_post():
         ]
     )
 
+    # Test post.json existed or not
     with tempfile.TemporaryDirectory() as td:
         dir_path = Path(td)
         url_only = await KToolBoxCli.download_post(
@@ -117,6 +120,7 @@ async def test_download_post():
         assert (dir_new := next(dir_path.iterdir(), None)) is not None
         assert (dir_new / DataStorageNameEnum.PostData.value).is_file()
 
+    # Test manually input post information and `dump_post_data`
     no_url_and_no_dump = await KToolBoxCli.download_post(
         service="fanbox",
         creator_id="9016",
@@ -124,6 +128,17 @@ async def test_download_post():
         dump_post_data=False
     )
     assert no_url_and_no_dump is None
+
+    # Test `post_id_as_path`
+    with tempfile.TemporaryDirectory() as td:
+        dir_path = Path(td)
+        config.job.post_id_as_path = True
+        await KToolBoxCli.download_post(
+            url="https://kemono.su/fanbox/user/9016/post/6622968",
+            path=dir_path
+        )
+        assert (dir_path / "6622968").is_dir()
+        config.job.post_id_as_path = False
 
 
 @pytest.mark.asyncio
@@ -133,6 +148,7 @@ async def test_sync_creator():
     creator_id = "76712"
     creator_url = f"https://kemono.su/{service}/user/{creator_id}"
 
+    # Test invalid params input
     invalid = await KToolBoxCli.sync_creator(url="")
     assert invalid == generate_msg(
         TextEnum.MissingParams.value,
@@ -144,6 +160,8 @@ async def test_sync_creator():
 
     with tempfile.TemporaryDirectory() as td:
         dir_path = Path(td)
+
+        # Test url only
         url_only = await KToolBoxCli.sync_creator(
             url=creator_url,
             path=dir_path
@@ -152,6 +170,7 @@ async def test_sync_creator():
         assert (dir_new := next(dir_path.iterdir(), None)) is not None
         assert (indices := (dir_new / DataStorageNameEnum.CreatorIndicesData.value)).is_file()
 
+        # Test `update_from`
         with_indices = await KToolBoxCli.sync_creator(
             service=service,
             creator_id=creator_id,
@@ -159,3 +178,45 @@ async def test_sync_creator():
             update_from=indices
         )
         assert with_indices is None
+
+    # Test `mix_posts`
+    with tempfile.TemporaryDirectory() as td:
+        dir_path = Path(td)
+        await KToolBoxCli.sync_creator(
+            url=creator_url,
+            path=dir_path,
+            mix_posts=True
+        )
+        assert (dir_new := next(dir_path.iterdir(), None)) is not None
+        sub_dirs = list(filter(lambda x: x.is_dir(), dir_new.iterdir()))
+        assert len(sub_dirs) == 0
+
+    # Test `start_time`, `end_time`
+
+    await KToolBoxCli.sync_creator(
+        url=creator_url,
+        start_time="2022-06-05"
+    )
+
+    with tempfile.TemporaryDirectory() as td:
+        dir_path = Path(td)
+        await KToolBoxCli.sync_creator(
+            url=creator_url,
+            path=dir_path,
+            start_time="2022-06-05",
+            end_time="2022-06-24"
+        )
+        assert (dir_new := next(dir_path.iterdir(), None)) is not None
+        posts = list(filter(lambda x: x.is_dir(), dir_new.iterdir()))
+        assert len(posts) == 4
+
+    with tempfile.TemporaryDirectory() as td:
+        dir_path = Path(td)
+        await KToolBoxCli.sync_creator(
+            url=creator_url,
+            path=dir_path,
+            end_time="2022-06-23"
+        )
+        assert (dir_new := next(dir_path.iterdir(), None)) is not None
+        posts = list(filter(lambda x: x.is_dir(), dir_new.iterdir()))
+        assert len(posts) == 3
