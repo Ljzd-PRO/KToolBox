@@ -98,13 +98,15 @@ class JobConfiguration(BaseModel):
     :ivar mix_posts: Save all files from different posts at same path in creator directory. \
     It would not create any post directory, and ``CreatorIndices`` would not been recorded, \
     without ``CreatorIndices`` you **cannot update** the creator directory.
-    :ivar job_list_filepath: Filepath for job list data saving, ``None`` for disable job list saving
+    :ivar sequential_filename: Rename attachments in numerical order, e.g. ``1.png``, ``2.png``, ...
     """
     count: int = 4
     post_id_as_path: bool = False
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
     mix_posts: bool = False
-    job_list_filepath: Optional[Path] = None
+    sequential_filename: bool = False
+    # job_list_filepath: Optional[Path] = None
+    # """Filepath for job list data saving, ``None`` for disable job list saving"""
 
 
 class LoggerConfiguration(BaseModel):

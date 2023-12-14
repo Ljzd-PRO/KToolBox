@@ -8,7 +8,7 @@ from pathvalidate import sanitize_filename
 
 from ktoolbox.action import ActionRet, fetch_all_creator_posts, FetchInterruptError
 from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_time, filter_posts_by_indices
-from ktoolbox.api.model import Post
+from ktoolbox.api.model import Post, Attachment
 from ktoolbox.api.posts import get_creator_post
 from ktoolbox.configuration import config, PostStructureConfiguration
 from ktoolbox.enum import PostFileTypeEnum, DataStorageNameEnum
@@ -49,13 +49,14 @@ async def create_job_from_post(
 
     # Create jobs
     jobs: List[Job] = []
-    for attachment in post.attachments or []:  # attachments
+    for i, attachment in enumerate(post.attachments or []):  # type: int, Attachment
         if not attachment.path:
             continue
+        alt_filename = f"{i + 1}{Path(attachment.name).suffix}" if config.job.sequential_filename else attachment.name
         jobs.append(
             Job(
                 path=attachments_path,
-                alt_filename=attachment.name,
+                alt_filename=alt_filename,
                 server_path=attachment.path,
                 type=PostFileTypeEnum.Attachment
             )
