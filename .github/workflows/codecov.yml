@@ -55,5 +55,5 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
-          files: ./tests/coverage.xml
+          files: coverage.xml
           flags: ${{ github.ref_name }}
