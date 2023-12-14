@@ -99,6 +99,7 @@ async def test_get_post():
 
 @pytest.mark.asyncio
 async def test_download_post():
+    # Test invalid input
     invalid = await KToolBoxCli.download_post(url="")
     assert invalid == generate_msg(
         TextEnum.MissingParams.value,
@@ -108,6 +109,7 @@ async def test_download_post():
         ]
     )
 
+    # Test post.json existed or not
     with tempfile.TemporaryDirectory() as td:
         dir_path = Path(td)
         url_only = await KToolBoxCli.download_post(
@@ -118,6 +120,7 @@ async def test_download_post():
         assert (dir_new := next(dir_path.iterdir(), None)) is not None
         assert (dir_new / DataStorageNameEnum.PostData.value).is_file()
 
+    # Test manually input post information and `dump_post_data`
     no_url_and_no_dump = await KToolBoxCli.download_post(
         service="fanbox",
         creator_id="9016",
@@ -146,6 +149,7 @@ async def test_sync_creator():
     creator_id = "76712"
     creator_url = f"https://kemono.su/{service}/user/{creator_id}"
 
+    # Test invalid params input
     invalid = await KToolBoxCli.sync_creator(url="")
     assert invalid == generate_msg(
         TextEnum.MissingParams.value,
@@ -157,6 +161,8 @@ async def test_sync_creator():
 
     with tempfile.TemporaryDirectory() as td:
         dir_path = Path(td)
+
+        # Test url only
         url_only = await KToolBoxCli.sync_creator(
             url=creator_url,
             path=dir_path
@@ -165,6 +171,7 @@ async def test_sync_creator():
         assert (dir_new := next(dir_path.iterdir(), None)) is not None
         assert (indices := (dir_new / DataStorageNameEnum.CreatorIndicesData.value)).is_file()
 
+        # Test `update_from`
         with_indices = await KToolBoxCli.sync_creator(
             service=service,
             creator_id=creator_id,
@@ -183,6 +190,8 @@ async def test_sync_creator():
         )
         sub_dirs = list(filter(lambda x: x.is_dir(), dir_path.iterdir()))
         assert len(sub_dirs) == 0
+
+    # Test `start_time`, `end_time`
 
     await KToolBoxCli.sync_creator(
         url=creator_url,
