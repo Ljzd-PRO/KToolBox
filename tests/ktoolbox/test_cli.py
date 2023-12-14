@@ -11,6 +11,7 @@ from pydantic import ValidationError
 from ktoolbox import __version__
 from ktoolbox.api.model import Creator, Post
 from ktoolbox.cli import KToolBoxCli
+from ktoolbox.configuration import config
 from ktoolbox.enum import TextEnum, DataStorageNameEnum
 from ktoolbox.model import SearchResult
 from ktoolbox.utils import generate_msg
@@ -124,6 +125,12 @@ async def test_download_post():
         dump_post_data=False
     )
     assert no_url_and_no_dump is None
+
+    # Test `post_id_as_path`
+    config.job.post_id_as_path = True
+    await KToolBoxCli.download_post(url="https://kemono.su/fanbox/user/9016/post/6622968")
+    assert Path("6622968").is_dir()
+    config.job.post_id_as_path = False
 
 
 @pytest.mark.asyncio
