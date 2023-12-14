@@ -137,8 +137,7 @@ async def test_download_post():
             url="https://kemono.su/fanbox/user/9016/post/6622968",
             path=dir_path
         )
-        assert (dir_new := next(dir_path.iterdir(), None)) is not None
-        assert (dir_new / "6622968").is_dir()
+        assert (dir_path / "6622968").is_dir()
         config.job.post_id_as_path = False
 
 
