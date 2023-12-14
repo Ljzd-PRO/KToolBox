@@ -173,6 +173,17 @@ async def test_sync_creator():
         )
         assert with_indices is None
 
+    # Test `mix_posts`
+    with tempfile.TemporaryDirectory() as td:
+        dir_path = Path(td)
+        await KToolBoxCli.sync_creator(
+            url=creator_url,
+            path=dir_path,
+            mix_posts=True
+        )
+        sub_dirs = list(filter(lambda x: x.is_dir(), dir_path.iterdir()))
+        assert len(sub_dirs) == 0
+
     await KToolBoxCli.sync_creator(
         url=creator_url,
         start_time="2022-06-05"
