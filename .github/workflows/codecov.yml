@@ -48,7 +48,7 @@ jobs:
 
       - name: Run Pytest
         run: |
-          poetry run pytest -v --capture=sys --cov --cov-report=xml --html=${{ env.PYTEST_REPORT_FILENAME }} --self-contained-html tests/
+          poetry run pytest -v --capture=sys --cov --cov-report=xml tests/
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v3
@@ -57,9 +57,3 @@ jobs:
         with:
           files: ./tests/coverage.xml
           flags: ${{ github.ref_name }}
-
-      - name: Upload pytest HTML result
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ env.PYTEST_REPORT_FILENAME }}
-          path: ./tests/${{ env.PYTEST_REPORT_FILENAME }}
