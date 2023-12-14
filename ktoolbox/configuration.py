@@ -99,7 +99,7 @@ class JobConfiguration(BaseModel):
     :ivar mix_posts: Save all files from different posts at same path in creator directory. \
     It would not create any post directory, and ``CreatorIndices`` would not been recorded, \
     without ``CreatorIndices`` you **cannot update** the creator directory.
-    :ivar sequential_filename: Rename files in numerical order, e.g. ``1.png``, ``2.png``, ...
+    :ivar sequential_filename: Rename attachments in numerical order, e.g. ``1.png``, ``2.png``, ...
     """
     count: int = 4
     post_id_as_path: bool = False
