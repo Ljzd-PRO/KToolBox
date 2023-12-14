@@ -188,7 +188,8 @@ async def test_sync_creator():
             path=dir_path,
             mix_posts=True
         )
-        sub_dirs = list(filter(lambda x: x.is_dir(), dir_path.iterdir()))
+        assert (dir_new := next(dir_path.iterdir(), None)) is not None
+        sub_dirs = list(filter(lambda x: x.is_dir(), dir_new.iterdir()))
         assert len(sub_dirs) == 0
 
     # Test `start_time`, `end_time`
@@ -206,7 +207,8 @@ async def test_sync_creator():
             start_time="2022-06-05",
             end_time="2022-06-24"
         )
-        posts = list(filter(lambda x: x.is_dir(), dir_path.iterdir()))
+        assert (dir_new := next(dir_path.iterdir(), None)) is not None
+        posts = list(filter(lambda x: x.is_dir(), dir_new.iterdir()))
         assert len(posts) == 4
 
     with tempfile.TemporaryDirectory() as td:
@@ -216,5 +218,6 @@ async def test_sync_creator():
             path=dir_path,
             end_time="2022-06-23"
         )
-        posts = list(filter(lambda x: x.is_dir(), dir_path.iterdir()))
+        assert (dir_new := next(dir_path.iterdir(), None)) is not None
+        posts = list(filter(lambda x: x.is_dir(), dir_new.iterdir()))
         assert len(posts) == 3
