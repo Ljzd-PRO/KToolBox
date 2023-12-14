@@ -192,7 +192,9 @@ class KToolBoxCli:
             update_from: Path = None,
             save_creator_indices: bool = True,
             mix_posts: bool = None,
-            time_range: Tuple[str, str] = None
+            time_range: Tuple[str, str] = None,
+            start_time: str = None,
+            end_time: str = None
     ):
         ...
 
@@ -206,7 +208,9 @@ class KToolBoxCli:
             update_from: Path = None,
             save_creator_indices: bool = True,
             mix_posts: bool = None,
-            time_range: Tuple[str, str] = None
+            time_range: Tuple[str, str] = None,
+            start_time: str = None,
+            end_time: str = None
     ):
         ...
 
@@ -221,7 +225,7 @@ class KToolBoxCli:
             save_creator_indices: bool = True,
             mix_posts: bool = None,
             start_time: str = None,
-            end_time: str = None,
+            end_time: str = None
     ):
         """
         Sync all posts from a creator
