@@ -78,7 +78,7 @@
 
 ### 命令
 
-使用帮助命令或前往 [命令](https://ktoolbox.readthedocs.io/latest/zh/commands/) 页面查看更多帮助。
+使用帮助命令或前往 [命令](https://ktoolbox.readthedocs.io/latest/zh/commands/guide/) 页面查看更多帮助。
   
 #### ❓ 获取帮助总览
 ```bash

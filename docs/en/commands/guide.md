@@ -74,6 +74,7 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --end-time=2023-8-5
 ### Time Format
 
 The time value should match `%Y-%m-%d`, for example:
+
 - `2023-12-7`
 - `2023-12-07`
 - `2023-12-31`
