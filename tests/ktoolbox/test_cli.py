@@ -159,3 +159,29 @@ async def test_sync_creator():
             update_from=indices
         )
         assert with_indices is None
+
+    await KToolBoxCli.sync_creator(
+        url=creator_url,
+        start_time="2022-06-05"
+    )
+
+    with tempfile.TemporaryDirectory() as td:
+        dir_path = Path(td)
+        await KToolBoxCli.sync_creator(
+            url=creator_url,
+            path=dir_path,
+            start_time="2022-06-05",
+            end_time="2022-06-24"
+        )
+        posts = list(filter(lambda x: x.is_dir(), dir_path.iterdir()))
+        assert len(posts) == 4
+
+    with tempfile.TemporaryDirectory() as td:
+        dir_path = Path(td)
+        await KToolBoxCli.sync_creator(
+            url=creator_url,
+            path=dir_path,
+            end_time="2022-06-23"
+        )
+        posts = list(filter(lambda x: x.is_dir(), dir_path.iterdir()))
+        assert len(posts) == 3
