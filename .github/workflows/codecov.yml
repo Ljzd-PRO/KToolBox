@@ -56,4 +56,4 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           files: coverage.xml
-          flags: ${{ github.ref_name }}
+          flags: ${{ matrix.os }}-${{ matrix.python-version }}
