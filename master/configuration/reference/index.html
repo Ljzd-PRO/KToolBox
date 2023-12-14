@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.0">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.2">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.45e1311d.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.50c56a3b.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -1112,9 +1112,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ktoolbox.configuration.JobConfiguration.job_list_filepath" class="md-nav__link">
+  <a href="#ktoolbox.configuration.JobConfiguration.sequential_filename" class="md-nav__link">
     <span class="md-ellipsis">
-      job_list_filepath
+      sequential_filename
     </span>
   </a>
   
@@ -1630,9 +1630,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ktoolbox.configuration.JobConfiguration.job_list_filepath" class="md-nav__link">
+  <a href="#ktoolbox.configuration.JobConfiguration.sequential_filename" class="md-nav__link">
     <span class="md-ellipsis">
-      job_list_filepath
+      sequential_filename
     </span>
   </a>
   
@@ -1822,9 +1822,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">126</span>
 <span class="normal">127</span>
 <span class="normal">128</span>
 <span class="normal">129</span>
@@ -1852,7 +1850,9 @@
 <span class="normal">151</span>
 <span class="normal">152</span>
 <span class="normal">153</span>
-<span class="normal">154</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Configuration</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Configuration</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
     <span class="c1"># noinspection SpellCheckingInspection,GrazieInspection</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    KToolBox Configuration</span>
@@ -3046,13 +3046,13 @@
           </td>
         </tr>
         <tr>
-          <td><code>job_list_filepath</code></td>
+          <td><code>sequential_filename</code></td>
           <td>
-                <code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>]</code>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Filepath for job list data saving, <code>None</code> for disable job list saving</p>
+              <p>Rename attachments in numerical order, e.g. <code>1.png</code>, <code>2.png</code>, ...</p>
             </div>
           </td>
         </tr>
@@ -3087,13 +3087,13 @@
 <span class="sd">    :ivar mix_posts: Save all files from different posts at same path in creator directory. \</span>
 <span class="sd">    It would not create any post directory, and ``CreatorIndices`` would not been recorded, \</span>
 <span class="sd">    without ``CreatorIndices`` you **cannot update** the creator directory.</span>
-<span class="sd">    :ivar job_list_filepath: Filepath for job list data saving, ``None`` for disable job list saving</span>
+<span class="sd">    :ivar sequential_filename: Rename attachments in numerical order, e.g. ``1.png``, ``2.png``, ...</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
     <span class="n">post_id_as_path</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">post_structure</span><span class="p">:</span> <span class="n">PostStructureConfiguration</span> <span class="o">=</span> <span class="n">PostStructureConfiguration</span><span class="p">()</span>
     <span class="n">mix_posts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">job_list_filepath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">sequential_filename</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 </code></pre></div></td></tr></table></div>
             </details>
 
@@ -3196,15 +3196,15 @@
 
 
 
-<h3 id="ktoolbox.configuration.JobConfiguration.job_list_filepath" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">job_list_filepath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
+<h3 id="ktoolbox.configuration.JobConfiguration.sequential_filename" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">sequential_filename</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
-<a href="#ktoolbox.configuration.JobConfiguration.job_list_filepath" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#ktoolbox.configuration.JobConfiguration.sequential_filename" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -3289,9 +3289,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">113</span>
 <span class="normal">114</span>
 <span class="normal">115</span>
 <span class="normal">116</span>
@@ -3299,7 +3297,9 @@
 <span class="normal">118</span>
 <span class="normal">119</span>
 <span class="normal">120</span>
-<span class="normal">121</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">LoggerConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">LoggerConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Logger configuration</span>
 

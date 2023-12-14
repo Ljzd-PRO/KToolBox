@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.0">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.2">
     
     
       
@@ -26,7 +26,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.45e1311d.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.50c56a3b.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -2210,15 +2210,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ktoolbox.configuration.JobConfiguration.job_list_filepath" class="md-nav__link">
-    <span class="md-ellipsis">
-      job_list_filepath
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ktoolbox.configuration.JobConfiguration.mix_posts" class="md-nav__link">
     <span class="md-ellipsis">
       mix_posts
@@ -2240,6 +2231,15 @@
   <a href="#ktoolbox.configuration.JobConfiguration.post_structure" class="md-nav__link">
     <span class="md-ellipsis">
       post_structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.JobConfiguration.sequential_filename" class="md-nav__link">
+    <span class="md-ellipsis">
+      sequential_filename
     </span>
   </a>
   
@@ -4662,15 +4662,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ktoolbox.configuration.JobConfiguration.job_list_filepath" class="md-nav__link">
-    <span class="md-ellipsis">
-      job_list_filepath
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ktoolbox.configuration.JobConfiguration.mix_posts" class="md-nav__link">
     <span class="md-ellipsis">
       mix_posts
@@ -4692,6 +4683,15 @@
   <a href="#ktoolbox.configuration.JobConfiguration.post_structure" class="md-nav__link">
     <span class="md-ellipsis">
       post_structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.JobConfiguration.sequential_filename" class="md-nav__link">
+    <span class="md-ellipsis">
+      sequential_filename
     </span>
   </a>
   
@@ -5816,7 +5816,7 @@
 
 
 <h2 id="ktoolbox.__version__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.3.2&#39;</span></code>
+          <code class="highlight language-python"><span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.3.4&#39;</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
@@ -6528,8 +6528,7 @@
 
           <details class="quote">
             <summary>Source code in <code>ktoolbox/action/job.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 86</span>
-<span class="normal"> 87</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 87</span>
 <span class="normal"> 88</span>
 <span class="normal"> 89</span>
 <span class="normal"> 90</span>
@@ -6618,7 +6617,8 @@
 <span class="normal">173</span>
 <span class="normal">174</span>
 <span class="normal">175</span>
-<span class="normal">176</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">create_job_from_creator</span><span class="p">(</span>
+<span class="normal">176</span>
+<span class="normal">177</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">create_job_from_creator</span><span class="p">(</span>
         <span class="n">service</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">creator_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
@@ -6872,7 +6872,8 @@
 <span class="normal">80</span>
 <span class="normal">81</span>
 <span class="normal">82</span>
-<span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">create_job_from_post</span><span class="p">(</span>
+<span class="normal">83</span>
+<span class="normal">84</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">create_job_from_post</span><span class="p">(</span>
         <span class="n">post</span><span class="p">:</span> <span class="n">Post</span><span class="p">,</span>
         <span class="n">post_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -6904,13 +6905,14 @@
 
     <span class="c1"># Create jobs</span>
     <span class="n">jobs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Job</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">post</span><span class="o">.</span><span class="n">attachments</span> <span class="ow">or</span> <span class="p">[]:</span>  <span class="c1"># attachments</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">attachments</span> <span class="ow">or</span> <span class="p">[]):</span>  <span class="c1"># type: int, Attachment</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">attachment</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
             <span class="k">continue</span>
+        <span class="n">alt_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}{</span><span class="n">Path</span><span class="p">(</span><span class="n">attachment</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename</span> <span class="k">else</span> <span class="n">attachment</span><span class="o">.</span><span class="n">name</span>
         <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="n">Job</span><span class="p">(</span>
                 <span class="n">path</span><span class="o">=</span><span class="n">attachments_path</span><span class="p">,</span>
-                <span class="n">alt_filename</span><span class="o">=</span><span class="n">attachment</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">alt_filename</span><span class="o">=</span><span class="n">alt_filename</span><span class="p">,</span>
                 <span class="n">server_path</span><span class="o">=</span><span class="n">attachment</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
                 <span class="nb">type</span><span class="o">=</span><span class="n">PostFileTypeEnum</span><span class="o">.</span><span class="n">Attachment</span>
             <span class="p">)</span>
@@ -10098,7 +10100,11 @@
 <span class="normal">311</span>
 <span class="normal">312</span>
 <span class="normal">313</span>
-<span class="normal">314</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">KToolBoxCli</span><span class="p">:</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">KToolBoxCli</span><span class="p">:</span>
     <span class="nd">@staticmethod</span>
     <span class="k">async</span> <span class="k">def</span> <span class="nf">version</span><span class="p">():</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Show KToolBox version&quot;&quot;&quot;</span>
@@ -10271,7 +10277,9 @@
             <span class="n">update_from</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">save_creator_indices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
             <span class="n">mix_posts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">time_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">time_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">start_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">end_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
         <span class="o">...</span>
 
@@ -10285,7 +10293,9 @@
             <span class="n">update_from</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">save_creator_indices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
             <span class="n">mix_posts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">time_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">time_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">start_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">end_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
         <span class="o">...</span>
 
@@ -10300,7 +10310,7 @@
             <span class="n">save_creator_indices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
             <span class="n">mix_posts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">start_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">end_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">end_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sync all posts from a creator</span>
@@ -11317,11 +11327,7 @@
 
           <details class="quote">
             <summary>Source code in <code>ktoolbox/cli.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">217</span>
 <span class="normal">218</span>
 <span class="normal">219</span>
 <span class="normal">220</span>
@@ -11418,7 +11424,11 @@
 <span class="normal">311</span>
 <span class="normal">312</span>
 <span class="normal">313</span>
-<span class="normal">314</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">sync_creator</span><span class="p">(</span>
         <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">service</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -11429,7 +11439,7 @@
         <span class="n">save_creator_indices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">mix_posts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">start_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">end_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">end_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sync all posts from a creator</span>
@@ -12112,9 +12122,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">126</span>
 <span class="normal">127</span>
 <span class="normal">128</span>
 <span class="normal">129</span>
@@ -12142,7 +12150,9 @@
 <span class="normal">151</span>
 <span class="normal">152</span>
 <span class="normal">153</span>
-<span class="normal">154</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Configuration</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Configuration</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
     <span class="c1"># noinspection SpellCheckingInspection,GrazieInspection</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    KToolBox Configuration</span>
@@ -12834,13 +12844,13 @@
           </td>
         </tr>
         <tr>
-          <td><code>job_list_filepath</code></td>
+          <td><code>sequential_filename</code></td>
           <td>
-                <code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>]</code>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Filepath for job list data saving, <code>None</code> for disable job list saving</p>
+              <p>Rename attachments in numerical order, e.g. <code>1.png</code>, <code>2.png</code>, ...</p>
             </div>
           </td>
         </tr>
@@ -12875,13 +12885,13 @@
 <span class="sd">    :ivar mix_posts: Save all files from different posts at same path in creator directory. \</span>
 <span class="sd">    It would not create any post directory, and ``CreatorIndices`` would not been recorded, \</span>
 <span class="sd">    without ``CreatorIndices`` you **cannot update** the creator directory.</span>
-<span class="sd">    :ivar job_list_filepath: Filepath for job list data saving, ``None`` for disable job list saving</span>
+<span class="sd">    :ivar sequential_filename: Rename attachments in numerical order, e.g. ``1.png``, ``2.png``, ...</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
     <span class="n">post_id_as_path</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">post_structure</span><span class="p">:</span> <span class="n">PostStructureConfiguration</span> <span class="o">=</span> <span class="n">PostStructureConfiguration</span><span class="p">()</span>
     <span class="n">mix_posts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">job_list_filepath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">sequential_filename</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 </code></pre></div></td></tr></table></div>
             </details>
 
@@ -12909,27 +12919,6 @@
   </span>
 
 <a href="#ktoolbox.configuration.JobConfiguration.count" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-  <div class="doc doc-contents ">
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h4 id="ktoolbox.configuration.JobConfiguration.job_list_filepath" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">job_list_filepath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-<a href="#ktoolbox.configuration.JobConfiguration.job_list_filepath" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
   <div class="doc doc-contents ">
@@ -12993,6 +12982,27 @@
   </span>
 
 <a href="#ktoolbox.configuration.JobConfiguration.post_structure" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h4 id="ktoolbox.configuration.JobConfiguration.sequential_filename" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">sequential_filename</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.configuration.JobConfiguration.sequential_filename" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
   <div class="doc doc-contents ">
@@ -13079,9 +13089,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">113</span>
 <span class="normal">114</span>
 <span class="normal">115</span>
 <span class="normal">116</span>
@@ -13089,7 +13097,9 @@
 <span class="normal">118</span>
 <span class="normal">119</span>
 <span class="normal">120</span>
-<span class="normal">121</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">LoggerConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">LoggerConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Logger configuration</span>
 
@@ -13739,8 +13749,8 @@
 <span class="sd">        Initialize a file downloader</span>
 
 <span class="sd">        - About filename:</span>
-<span class="sd">            * If ``Content-Disposition`` is set in headers, use filename from it.</span>
-<span class="sd">            * Else if ``alt_filename`` parameter is set, use it.</span>
+<span class="sd">            * If ``alt_filename`` parameter is set, use it.</span>
+<span class="sd">            * Else if ``Content-Disposition`` is set in headers, use filename from it.</span>
 <span class="sd">            * Else use filename from URL &#39;path&#39; part.</span>
 
 <span class="sd">        :param url: Download URL</span>
@@ -13868,8 +13878,8 @@
                         <span class="p">)</span>
 
                     <span class="c1"># Get filename</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">filename</span> <span class="o">:=</span> <span class="n">filename_from_headers</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">)):</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">filename</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alt_filename</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">filename</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alt_filename</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">filename</span> <span class="o">:=</span> <span class="n">filename_from_headers</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">)):</span>
                             <span class="n">filename</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="n">filename</span>
 
@@ -14120,8 +14130,8 @@
       <p>Initialize a file downloader</p>
 <ul>
 <li>About filename:<ul>
-<li>If <code>Content-Disposition</code> is set in headers, use filename from it.</li>
-<li>Else if <code>alt_filename</code> parameter is set, use it.</li>
+<li>If <code>alt_filename</code> parameter is set, use it.</li>
+<li>Else if <code>Content-Disposition</code> is set in headers, use filename from it.</li>
 <li>Else use filename from URL 'path' part.</li>
 </ul>
 </li>
@@ -14260,8 +14270,8 @@
 <span class="sd">    Initialize a file downloader</span>
 
 <span class="sd">    - About filename:</span>
-<span class="sd">        * If ``Content-Disposition`` is set in headers, use filename from it.</span>
-<span class="sd">        * Else if ``alt_filename`` parameter is set, use it.</span>
+<span class="sd">        * If ``alt_filename`` parameter is set, use it.</span>
+<span class="sd">        * Else if ``Content-Disposition`` is set in headers, use filename from it.</span>
 <span class="sd">        * Else use filename from URL &#39;path&#39; part.</span>
 
 <span class="sd">    :param url: Download URL</span>
@@ -14611,8 +14621,8 @@
                     <span class="p">)</span>
 
                 <span class="c1"># Get filename</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">filename</span> <span class="o">:=</span> <span class="n">filename_from_headers</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">)):</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">filename</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alt_filename</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">filename</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alt_filename</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">filename</span> <span class="o">:=</span> <span class="n">filename_from_headers</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">)):</span>
                         <span class="n">filename</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="n">filename</span>
 
