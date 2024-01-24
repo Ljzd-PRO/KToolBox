@@ -108,7 +108,7 @@ class BaseAPI(ABC, Generic[_T]):
         if path is None:
             path = cls.path
         url_parts = [config.api.scheme, config.api.netloc, f"{config.api.path}{path}", '', '', '']
-        url = urlunparse(url_parts)
+        url = str(urlunparse(url_parts))
         try:
             async with httpx.AsyncClient(verify=config.ssl_verify) as client:
                 res = await client.request(

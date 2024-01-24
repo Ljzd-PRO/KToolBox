@@ -77,7 +77,7 @@ class JobRunner:
 
             # Create downloader
             url_parts = [config.downloader.scheme, config.api.files_netloc, job.server_path, '', '', '']
-            url = urlunparse(url_parts)
+            url = str(urlunparse(url_parts))
             downloader = Downloader(
                 url=url,
                 path=job.path,
