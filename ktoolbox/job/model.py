@@ -4,7 +4,7 @@ from typing import List, Optional, Literal, Dict
 from pydantic import BaseModel
 
 from ktoolbox.api.model import Post
-from ktoolbox.enum import PostFileTypeEnum
+from ktoolbox._enum import PostFileTypeEnum
 from ktoolbox.model import BaseKToolBoxData
 
 __all__ = ["Job", "JobListData", "CreatorIndices"]

@@ -16,7 +16,7 @@ from tqdm import tqdm as std_tqdm
 
 from ktoolbox.configuration import config
 from ktoolbox.downloader import DownloaderRet
-from ktoolbox.enum import RetCodeEnum
+from ktoolbox._enum import RetCodeEnum
 from ktoolbox.utils import filename_from_headers, generate_msg
 
 __all__ = ["Downloader"]

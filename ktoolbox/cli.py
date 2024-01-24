@@ -12,7 +12,7 @@ from ktoolbox.action import search_creator as search_creator_action, search_crea
 from ktoolbox.api.misc import get_app_version
 from ktoolbox.api.posts import get_post as get_post_api
 from ktoolbox.configuration import config
-from ktoolbox.enum import TextEnum
+from ktoolbox._enum import TextEnum
 from ktoolbox.job import JobRunner, CreatorIndices
 from ktoolbox.utils import dump_search, parse_webpage_url, generate_msg
 
