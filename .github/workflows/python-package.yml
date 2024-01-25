@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Python environment
         uses: ./.github/actions/setup-python
@@ -36,7 +36,7 @@ jobs:
         run: poetry build
 
       - name: Upload Wheels
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ktoolbox-wheels
           path: dist
@@ -48,7 +48,7 @@ jobs:
         os: [ windows-latest, ubuntu-latest, macos-latest ]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Python environment
         uses: ./.github/actions/setup-python
@@ -59,7 +59,7 @@ jobs:
         uses: ./.github/actions/pyinstaller
 
       - name: Upload Executable
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ktoolbox-executable-${{ runner.os }}-x86_64
           path: dist
