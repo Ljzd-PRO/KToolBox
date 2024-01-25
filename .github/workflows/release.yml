@@ -5,14 +5,14 @@ on:
   push:
 
 jobs:
+  build:
+    uses: ./.github/workflows/python-package.yml
+
   release:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Create executable
-        uses: ./.github/workflows/python-package.yml
 
       - name: Download executable
         uses: actions/download-artifact@v4
