@@ -11,7 +11,7 @@ from loguru import logger
 from pydantic import BaseModel
 
 from ktoolbox.configuration import config
-from ktoolbox.enum import RetCodeEnum, DataStorageNameEnum
+from ktoolbox._enum import RetCodeEnum, DataStorageNameEnum
 from ktoolbox.model import SearchResult
 
 __all__ = [

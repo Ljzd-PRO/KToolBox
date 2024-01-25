@@ -15,7 +15,7 @@ def get_creator_icon(creator_id: str, service: str) -> str:
     :return: The icon URL.
     """
     url_parts = [config.api.scheme, config.api.statics_netloc, f"/icons/{service}/{creator_id}", '', '', '']
-    return urlunparse(url_parts)
+    return str(urlunparse(url_parts))
 
 
 def get_creator_banner(creator_id: str, service: str) -> str:
@@ -25,4 +25,4 @@ def get_creator_banner(creator_id: str, service: str) -> str:
     :return: The banner URL.
     """
     url_parts = [config.api.scheme, config.api.statics_netloc, f"/banners/{service}/{creator_id}", '', '', '']
-    return urlunparse(url_parts)
+    return str(urlunparse(url_parts))

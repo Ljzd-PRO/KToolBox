@@ -10,7 +10,7 @@ from tqdm import tqdm as std_tqdm
 
 from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
-from ktoolbox.enum import RetCodeEnum
+from ktoolbox._enum import RetCodeEnum
 from ktoolbox.job import Job
 from ktoolbox.utils import generate_msg
 
@@ -77,7 +77,7 @@ class JobRunner:
 
             # Create downloader
             url_parts = [config.downloader.scheme, config.api.files_netloc, job.server_path, '', '', '']
-            url = urlunparse(url_parts)
+            url = str(urlunparse(url_parts))
             downloader = Downloader(
                 url=url,
                 path=job.path,

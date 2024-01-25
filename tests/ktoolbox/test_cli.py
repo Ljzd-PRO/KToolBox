@@ -12,7 +12,7 @@ from ktoolbox import __version__
 from ktoolbox.api.model import Creator, Post
 from ktoolbox.cli import KToolBoxCli
 from ktoolbox.configuration import config
-from ktoolbox.enum import TextEnum, DataStorageNameEnum
+from ktoolbox._enum import TextEnum, DataStorageNameEnum
 from ktoolbox.model import SearchResult
 from ktoolbox.utils import generate_msg
 from tests.utils import settings

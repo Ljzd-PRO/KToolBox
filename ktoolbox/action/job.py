@@ -11,7 +11,7 @@ from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_time,
 from ktoolbox.api.model import Post, Attachment
 from ktoolbox.api.posts import get_creator_post
 from ktoolbox.configuration import config, PostStructureConfiguration
-from ktoolbox.enum import PostFileTypeEnum, DataStorageNameEnum
+from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.job import Job, CreatorIndices
 
 __all__ = ["create_job_from_post", "create_job_from_creator"]

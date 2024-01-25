@@ -1,0 +1,24 @@
+name: Package using PyInstaller
+description: Bundles a Python application and all its dependencies into a single package.
+
+inputs:
+  spec-path:
+    description: Path of Spec file
+    required: false
+    default: "ktoolbox.spec"
+
+  dist-path:
+    description: Path of Spec file
+    required: false
+    default: "dist"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create Executable
+      run: poetry run pyinstaller ${{ inputs.spec-path }} --distpath ${{ inputs.dist-path }}
+      shell: bash
+
+    - name: Copy Extra Files
+      run: cp README.md README_zh-CN.md example.env prod.env LICENSE dist
+      shell: bash

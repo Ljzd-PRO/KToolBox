@@ -10,7 +10,7 @@ from tenacity import RetryCallState, wait_fixed, retry_if_result
 from tenacity.stop import stop_base, stop_never, stop_after_attempt
 
 from ktoolbox.configuration import config
-from ktoolbox.enum import RetCodeEnum
+from ktoolbox._enum import RetCodeEnum
 from ktoolbox.model import RootModel
 from ktoolbox.utils import BaseRet, generate_msg
 
@@ -109,7 +109,7 @@ class BaseAPI(ABC, Generic[_T]):
         if path is None:
             path = cls.path
         url_parts = [config.api.scheme, config.api.netloc, f"{config.api.path}{path}", '', '', '']
-        url = urlunparse(url_parts)
+        url = str(urlunparse(url_parts))
         try:
             async with httpx.AsyncClient(verify=config.ssl_verify) as client:
                 res = await client.request(

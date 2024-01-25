@@ -38,7 +38,7 @@ jobs:
           poetry run mike deploy --push --update-aliases master latest
 
       - name: Upload to GitHub Pages
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: site
 

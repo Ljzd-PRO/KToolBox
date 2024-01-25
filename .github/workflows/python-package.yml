@@ -2,6 +2,7 @@ name: Python Package
 
 on:
   workflow_dispatch:
+  workflow_call:
   push:
     branches:
       - master
@@ -9,20 +10,22 @@ on:
       - pure-py
     paths:
       - ".github/actions/setup-python/**"
+      - ".github/actions/pyinstaller/**"
       - ".github/workflows/python-package.yml"
       - "pyproject.toml"
   pull_request:
     paths:
       - ".github/actions/setup-python/**"
+      - ".github/actions/pyinstaller/**"
       - ".github/workflows/python-package.yml"
       - "pyproject.toml"
 
 jobs:
-  build:
+  build-wheels:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Python environment
         uses: ./.github/actions/setup-python
@@ -31,3 +34,32 @@ jobs:
 
       - name: Build package with Poetry
         run: poetry build
+
+      - name: Upload Wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: ktoolbox-wheels
+          path: dist
+
+  create-executable:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python environment
+        uses: ./.github/actions/setup-python
+        with:
+          python-version: "3.11"
+
+      - name: Create Executable
+        uses: ./.github/actions/pyinstaller
+
+      - name: Upload Executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: ktoolbox-executable-${{ runner.os }}-x86_64
+          path: dist

@@ -16,7 +16,7 @@ from tqdm import tqdm as std_tqdm
 
 from ktoolbox.configuration import config
 from ktoolbox.downloader import DownloaderRet
-from ktoolbox.enum import RetCodeEnum
+from ktoolbox._enum import RetCodeEnum
 from ktoolbox.utils import filename_from_headers, generate_msg
 
 __all__ = ["Downloader"]
@@ -179,8 +179,9 @@ class Downloader:
                             desc=filename,
                             total=total_size,
                             disable=not progress,
-                            unit="B",
-                            unit_scale=True
+                            unit="iB",
+                            unit_scale=True,
+                            unit_divisor=1024
                         )
                         async for chunk in chunk_iterator:
                             if self._stop:
