@@ -15,6 +15,6 @@
 
 ## 许可证
 
-KToolBox 使用 MIT 许可证.
+KToolBox 使用 BSD 3-Clause 许可证.
 
 Copyright © 2023 by Ljzd-PRO.

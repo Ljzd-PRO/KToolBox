@@ -17,7 +17,7 @@
   </a>
 
   <a href="https://github.com/Ljzd-PRO/KToolBox/blob/master/LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT-blue" alt="MIT"/>
+    <img src="https://img.shields.io/github/license/Ljzd-PRO/KToolBox" alt="BSD 3-Clause"/>
   </a>
 
   <a href="https://github.com/Ljzd-PRO/KToolBox/activity">

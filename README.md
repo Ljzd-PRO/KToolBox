@@ -17,7 +17,7 @@
   </a>
 
   <a href="./LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT-blue" alt="MIT"/>
+    <img src="https://img.shields.io/github/license/Ljzd-PRO/KToolBox" alt="BSD 3-Clause"/>
   </a>
 
   <a href="https://github.com/Ljzd-PRO/KToolBox/activity">
@@ -154,6 +154,6 @@ Description from https://kemono.su :
 
 ## License
 
-KToolBox is licensed under MIT.
+KToolBox is licensed under BSD 3-Clause.
 
 Copyright © 2023 by Ljzd-PRO.
