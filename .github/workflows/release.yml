@@ -23,11 +23,13 @@ jobs:
 
       - name: Compress Directories
         run: |
-          for dir in artifact/*/; do
+          cd artifact
+          for dir in */; do
             dir_name=$(basename "$dir")
             zip_file_name="${dir_name}.zip"
-            zip -r "artifact/${zip_file_name}" "$dir"
+            zip -r "${zip_file_name}" "${dir}"
           done
+          cd ..
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
