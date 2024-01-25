@@ -10,11 +10,13 @@ on:
       - pure-py
     paths:
       - ".github/actions/setup-python/**"
+      - ".github/actions/pyinstaller/**"
       - ".github/workflows/python-package.yml"
       - "pyproject.toml"
   pull_request:
     paths:
       - ".github/actions/setup-python/**"
+      - ".github/actions/pyinstaller/**"
       - ".github/workflows/python-package.yml"
       - "pyproject.toml"
 
