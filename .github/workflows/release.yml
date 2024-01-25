@@ -1,0 +1,33 @@
+name: Publish Python Package
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create executable
+        uses: ./.github/workflows/python-package
+
+      - name: Download executable
+        uses: actions/download-artifact@v4
+        with:
+          path: artifact
+
+      - name: Compress Directories
+        run: |
+          for dir in artifact/*/; do
+            dir_name=$(basename "$dir")
+            zip_file_name="${dir_name}.zip"
+            zip -r "artifact/${zip_file_name}" "$dir"
+          done
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: artifact/*.zip
