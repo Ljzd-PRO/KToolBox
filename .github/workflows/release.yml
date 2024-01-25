@@ -26,10 +26,17 @@ jobs:
           cd artifact
           for dir in */; do
             dir_name=$(basename "$dir")
-            zip_file_name="${dir_name}.zip"
+            zip_file_name="${dir_name}-${github.ref}.zip"
             zip -r "${zip_file_name}" "${dir}"
           done
           cd ..
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          body_path: CHANGELOG.md
+          files: artifact/*.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
