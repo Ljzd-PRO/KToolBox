@@ -12,6 +12,7 @@ __all__ = [
     "DownloaderConfiguration",
     "PostStructureConfiguration",
     "JobConfiguration",
+    "LoggerConfiguration",
     "Configuration"
 ]
 
