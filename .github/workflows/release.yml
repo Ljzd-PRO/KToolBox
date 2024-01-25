@@ -3,6 +3,21 @@ name: GitHub Release
 on:
   workflow_dispatch:
   push:
+    branches:
+      - master
+      - devel
+      - pure-py
+    paths:
+      - ".github/actions/setup-python/**"
+      - ".github/actions/pyinstaller/**"
+      - ".github/workflows/release.yml"
+      - "pyproject.toml"
+  pull_request:
+    paths:
+      - ".github/actions/setup-python/**"
+      - ".github/actions/pyinstaller/**"
+      - ".github/workflows/release.yml"
+      - "pyproject.toml"
 
 jobs:
   build:
@@ -26,7 +41,7 @@ jobs:
           cd artifact
           for dir in */; do
             dir_name=$(basename "$dir")
-            zip_file_name="${dir_name}-${{ github.ref }}.zip"
+            zip_file_name="${dir_name}-$(basename ${{ github.ref }}).zip"
             zip -r "${zip_file_name}" "${dir}"
           done
           cd ..
@@ -37,8 +52,3 @@ jobs:
         with:
           body_path: CHANGELOG.md
           files: artifact/*.zip
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          path: artifact/*.zip
