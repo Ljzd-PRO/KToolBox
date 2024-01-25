@@ -19,7 +19,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
       - uses: actions/checkout@v3
@@ -31,3 +31,20 @@ jobs:
 
       - name: Build package with Poetry
         run: poetry build
+
+      - name: Create Executable
+        uses: ./.github/actions/pyinstaller
+        with:
+          dist-path: pyinstaller-dist
+
+      - name: Upload Executable
+        uses: actions/upload-artifact@v3
+        with:
+          name: ktoolbox-executable-${{ runner.os }}-amd64
+          path: pyinstaller-dist
+
+      - name: Upload Wheels
+        uses: actions/upload-artifact@v3
+        with:
+          name: ktoolbox-wheels-${{ runner.os }}-amd64
+          path: dist
