@@ -6,6 +6,9 @@ on:
     tags:
       - "*"
 
+permissions:
+  contents: write
+
 jobs:
   build:
     uses: ./.github/workflows/python-package.yml
