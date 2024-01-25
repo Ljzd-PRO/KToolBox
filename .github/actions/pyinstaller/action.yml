@@ -18,9 +18,9 @@ runs:
     - uses: actions/checkout@v3
 
     - name: Create Executable
-      run: pyinstaller ${{ inputs.spec-path }} --distpath ${{ inputs.dist-path }}
+      run: poetry run pyinstaller ${{ inputs.spec-path }} --distpath ${{ inputs.dist-path }}
       shell: bash
 
     - name: Copy Extra Files
-      run: cp README.md README_zh-CN.md example.env prod.env LICENSE dist/
+      run: cp README.md README_zh-CN.md example.env prod.env LICENSE dist
       shell: bash
