@@ -20,5 +20,5 @@ runs:
         architecture: "x64"
         cache: "poetry"
 
-    - run: poetry install --with test,docs
+    - run: poetry install --with test,docs,pyinstaller
       shell: bash
