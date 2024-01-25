@@ -26,7 +26,7 @@ jobs:
           cd artifact
           for dir in */; do
             dir_name=$(basename "$dir")
-            zip_file_name="${dir_name}-${github.ref}.zip"
+            zip_file_name="${dir_name}-${{ github.ref }}.zip"
             zip -r "${zip_file_name}" "${dir}"
           done
           cd ..
