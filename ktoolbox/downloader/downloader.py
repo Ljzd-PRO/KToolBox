@@ -171,7 +171,7 @@ class Downloader:
                     self._filename = filename
 
                     # Download
-                    temp_filepath = (self._path / filename).with_suffix(f".{config.downloader.temp_suffix}")
+                    temp_filepath = (self._path / filename).with_suffix(f"{Path(filename).suffix}.{config.downloader.temp_suffix}")
                     total_size = int(length_str) if (length_str := res.headers.get("Content-Length")) else None
                     async with aiofiles.open(str(temp_filepath), "wb", self._buffer_size) as f:
                         chunk_iterator = res.aiter_bytes(self._chunk_size)
