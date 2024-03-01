@@ -2,154 +2,154 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/about-kemono/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/about-kemono/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/about-kemono/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/api/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/api/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/api/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/coomer/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/coomer/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/coomer/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/faq/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/faq/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/faq/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/more/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/more/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/more/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/shortcut/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/shortcut/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/shortcut/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/commands/guide/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/commands/guide/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/commands/guide/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/commands/reference/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/commands/reference/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/commands/reference/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/configuration/guide/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/configuration/guide/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/guide/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/configuration/reference/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/configuration/reference/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/reference/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/about-kemono/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/about-kemono/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterabout-kemono/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/api/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/api/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterapi/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/coomer/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/coomer/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercoomer/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/faq/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/faq/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterfaq/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/more/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/more/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermore/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/shortcut/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/shortcut/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastershortcut/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/commands/guide/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/commands/guide/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercommands/guide/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/commands/reference/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/commands/reference/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercommands/reference/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/configuration/guide/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/configuration/guide/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/guide/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/configuration/reference/</loc>
-        <lastmod>2024-01-25</lastmod>
+        <lastmod>2024-03-01</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/configuration/reference/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/reference/"/>

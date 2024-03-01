@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.5">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.11">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.50c56a3b.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.7e359304.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
@@ -467,14 +467,12 @@
       
     
     
-    
-    
       
       
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    
+    <li class="md-nav__item md-nav__item--nested">
       
-        
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
@@ -493,7 +491,7 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_1" id="__nav_1_label" tabindex="">
+              <label class="md-nav__link " for="__nav_1" id="__nav_1_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
@@ -574,14 +572,15 @@
       
     
     
-    
-    
+      
+        
+        
       
       
+    
     
     <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
-        
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
@@ -781,20 +780,18 @@
       
     
     
-    
-    
       
       
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    
+    <li class="md-nav__item md-nav__item--nested">
       
-        
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -1354,24 +1351,7 @@
 <span class="normal">298</span>
 <span class="normal">299</span>
 <span class="normal">300</span>
-<span class="normal">301</span>
-<span class="normal">302</span>
-<span class="normal">303</span>
-<span class="normal">304</span>
-<span class="normal">305</span>
-<span class="normal">306</span>
-<span class="normal">307</span>
-<span class="normal">308</span>
-<span class="normal">309</span>
-<span class="normal">310</span>
-<span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">KToolBoxCli</span><span class="p">:</span>
+<span class="normal">301</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">KToolBoxCli</span><span class="p">:</span>
     <span class="nd">@staticmethod</span>
     <span class="k">async</span> <span class="k">def</span> <span class="nf">version</span><span class="p">():</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Show KToolBox version&quot;&quot;&quot;</span>
@@ -1541,7 +1521,6 @@
             <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
             <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">),</span>
             <span class="o">*</span><span class="p">,</span>
-            <span class="n">update_from</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">save_creator_indices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
             <span class="n">mix_posts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">time_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1557,7 +1536,6 @@
             <span class="n">creator_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
             <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">),</span>
             <span class="o">*</span><span class="p">,</span>
-            <span class="n">update_from</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">save_creator_indices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
             <span class="n">mix_posts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">time_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1573,7 +1551,6 @@
             <span class="n">creator_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">),</span>
             <span class="o">*</span><span class="p">,</span>
-            <span class="n">update_from</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">save_creator_indices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
             <span class="n">mix_posts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">start_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1592,8 +1569,6 @@
 <span class="sd">        :param service: The service where the post is located</span>
 <span class="sd">        :param creator_id: The ID of the creator</span>
 <span class="sd">        :param path: Download path, default is current directory</span>
-<span class="sd">        :param update_from: ``CreatorIndices`` data path for update posts from current creator directory, \</span>
-<span class="sd">            ``save_creator_indices`` will be enabled if this provided</span>
 <span class="sd">        :param save_creator_indices: Record ``CreatorIndices`` data for update posts from current creator directory</span>
 <span class="sd">        :param mix_posts: Save all files from different posts at same path, \</span>
 <span class="sd">            ``update_from``, ``save_creator_indices`` will be ignored if enabled</span>
@@ -1616,47 +1591,35 @@
                 <span class="p">])</span>
 
         <span class="n">path</span> <span class="o">=</span> <span class="n">path</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">Path</span><span class="p">)</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">update_from</span><span class="p">:</span>
-            <span class="n">update_from</span> <span class="o">=</span> <span class="n">update_from</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">update_from</span><span class="p">,</span> <span class="n">Path</span><span class="p">)</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="n">update_from</span><span class="p">)</span>
 
-        <span class="c1"># Get ``CreatorIndices`` data</span>
-        <span class="k">if</span> <span class="n">update_from</span><span class="p">:</span>
-            <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">update_from</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">indices_text</span> <span class="o">=</span> <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-            <span class="n">indices</span> <span class="o">=</span> <span class="n">CreatorIndices</span><span class="o">.</span><span class="n">model_validate_json</span><span class="p">(</span><span class="n">indices_text</span><span class="p">)</span>
-            <span class="n">creator_path</span> <span class="o">=</span> <span class="n">update_from</span><span class="o">.</span><span class="n">parent</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">indices</span> <span class="o">=</span> <span class="kc">None</span>
-
-            <span class="c1"># Get creator name</span>
-            <span class="n">creator_name</span> <span class="o">=</span> <span class="n">creator_id</span>
-            <span class="n">creator_ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">search_creator_action</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">creator_id</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="n">service</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">creator_ret</span><span class="p">:</span>
-                <span class="n">creator</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">creator_ret</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">creator</span><span class="p">:</span>
-                    <span class="n">creator_name</span> <span class="o">=</span> <span class="n">creator</span><span class="o">.</span><span class="n">name</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                        <span class="n">generate_msg</span><span class="p">(</span>
-                            <span class="s2">&quot;Got creator information&quot;</span><span class="p">,</span>
-                            <span class="n">name</span><span class="o">=</span><span class="n">creator</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                            <span class="nb">id</span><span class="o">=</span><span class="n">creator</span><span class="o">.</span><span class="n">id</span>
-                        <span class="p">)</span>
-                    <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+        <span class="c1"># Get creator name</span>
+        <span class="n">creator_name</span> <span class="o">=</span> <span class="n">creator_id</span>
+        <span class="n">creator_ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">search_creator_action</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">creator_id</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="n">service</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">creator_ret</span><span class="p">:</span>
+            <span class="n">creator</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">creator_ret</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">creator</span><span class="p">:</span>
+                <span class="n">creator_name</span> <span class="o">=</span> <span class="n">creator</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                     <span class="n">generate_msg</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Failed to fetch the name of creator &lt;</span><span class="si">{</span><span class="n">creator_id</span><span class="si">}</span><span class="s2">&gt;, use creator ID as directory name&quot;</span><span class="p">,</span>
-                        <span class="n">detail</span><span class="o">=</span><span class="n">creator_ret</span><span class="o">.</span><span class="n">message</span>
+                        <span class="s2">&quot;Got creator information&quot;</span><span class="p">,</span>
+                        <span class="n">name</span><span class="o">=</span><span class="n">creator</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                        <span class="nb">id</span><span class="o">=</span><span class="n">creator</span><span class="o">.</span><span class="n">id</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
-            <span class="n">creator_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="n">sanitize_filename</span><span class="p">(</span><span class="n">creator_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="n">generate_msg</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to fetch the name of creator &lt;</span><span class="si">{</span><span class="n">creator_id</span><span class="si">}</span><span class="s2">&gt;, use creator ID as directory name&quot;</span><span class="p">,</span>
+                    <span class="n">detail</span><span class="o">=</span><span class="n">creator_ret</span><span class="o">.</span><span class="n">message</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">creator_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="n">sanitize_filename</span><span class="p">(</span><span class="n">creator_name</span><span class="p">)</span>
 
         <span class="n">creator_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_job_from_creator</span><span class="p">(</span>
             <span class="n">service</span><span class="o">=</span><span class="n">service</span><span class="p">,</span>
             <span class="n">creator_id</span><span class="o">=</span><span class="n">creator_id</span><span class="p">,</span>
             <span class="n">path</span><span class="o">=</span><span class="n">creator_path</span><span class="p">,</span>
-            <span class="n">update_from</span><span class="o">=</span><span class="n">indices</span><span class="p">,</span>
             <span class="n">all_pages</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">save_creator_indices</span><span class="o">=</span><span class="n">save_creator_indices</span><span class="p">,</span>
             <span class="n">mix_posts</span><span class="o">=</span><span class="n">mix_posts</span><span class="p">,</span>
@@ -2514,20 +2477,6 @@
           </td>
         </tr>
         <tr>
-          <td><code>update_from</code></td>
-          <td>
-                <code><a class="autorefs autorefs-external" title="typing.Union" href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p><code>CreatorIndices</code> data path for update posts from current creator directory,             <code>save_creator_indices</code> will be enabled if this provided</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
           <td><code>save_creator_indices</code></td>
           <td>
                 <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
@@ -2588,7 +2537,9 @@
 
           <details class="quote">
             <summary>Source code in <code>ktoolbox/cli.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">217</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
 <span class="normal">218</span>
 <span class="normal">219</span>
 <span class="normal">220</span>
@@ -2672,31 +2623,13 @@
 <span class="normal">298</span>
 <span class="normal">299</span>
 <span class="normal">300</span>
-<span class="normal">301</span>
-<span class="normal">302</span>
-<span class="normal">303</span>
-<span class="normal">304</span>
-<span class="normal">305</span>
-<span class="normal">306</span>
-<span class="normal">307</span>
-<span class="normal">308</span>
-<span class="normal">309</span>
-<span class="normal">310</span>
-<span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="normal">301</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">sync_creator</span><span class="p">(</span>
         <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">service</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">creator_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">),</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">update_from</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">save_creator_indices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">mix_posts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">start_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2715,8 +2648,6 @@
 <span class="sd">    :param service: The service where the post is located</span>
 <span class="sd">    :param creator_id: The ID of the creator</span>
 <span class="sd">    :param path: Download path, default is current directory</span>
-<span class="sd">    :param update_from: ``CreatorIndices`` data path for update posts from current creator directory, \</span>
-<span class="sd">        ``save_creator_indices`` will be enabled if this provided</span>
 <span class="sd">    :param save_creator_indices: Record ``CreatorIndices`` data for update posts from current creator directory</span>
 <span class="sd">    :param mix_posts: Save all files from different posts at same path, \</span>
 <span class="sd">        ``update_from``, ``save_creator_indices`` will be ignored if enabled</span>
@@ -2739,47 +2670,35 @@
             <span class="p">])</span>
 
     <span class="n">path</span> <span class="o">=</span> <span class="n">path</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">Path</span><span class="p">)</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">update_from</span><span class="p">:</span>
-        <span class="n">update_from</span> <span class="o">=</span> <span class="n">update_from</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">update_from</span><span class="p">,</span> <span class="n">Path</span><span class="p">)</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="n">update_from</span><span class="p">)</span>
 
-    <span class="c1"># Get ``CreatorIndices`` data</span>
-    <span class="k">if</span> <span class="n">update_from</span><span class="p">:</span>
-        <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">update_from</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">indices_text</span> <span class="o">=</span> <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-        <span class="n">indices</span> <span class="o">=</span> <span class="n">CreatorIndices</span><span class="o">.</span><span class="n">model_validate_json</span><span class="p">(</span><span class="n">indices_text</span><span class="p">)</span>
-        <span class="n">creator_path</span> <span class="o">=</span> <span class="n">update_from</span><span class="o">.</span><span class="n">parent</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">indices</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="c1"># Get creator name</span>
-        <span class="n">creator_name</span> <span class="o">=</span> <span class="n">creator_id</span>
-        <span class="n">creator_ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">search_creator_action</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">creator_id</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="n">service</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">creator_ret</span><span class="p">:</span>
-            <span class="n">creator</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">creator_ret</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">creator</span><span class="p">:</span>
-                <span class="n">creator_name</span> <span class="o">=</span> <span class="n">creator</span><span class="o">.</span><span class="n">name</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="n">generate_msg</span><span class="p">(</span>
-                        <span class="s2">&quot;Got creator information&quot;</span><span class="p">,</span>
-                        <span class="n">name</span><span class="o">=</span><span class="n">creator</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                        <span class="nb">id</span><span class="o">=</span><span class="n">creator</span><span class="o">.</span><span class="n">id</span>
-                    <span class="p">)</span>
-                <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+    <span class="c1"># Get creator name</span>
+    <span class="n">creator_name</span> <span class="o">=</span> <span class="n">creator_id</span>
+    <span class="n">creator_ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">search_creator_action</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">creator_id</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="n">service</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">creator_ret</span><span class="p">:</span>
+        <span class="n">creator</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">creator_ret</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">creator</span><span class="p">:</span>
+            <span class="n">creator_name</span> <span class="o">=</span> <span class="n">creator</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                 <span class="n">generate_msg</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Failed to fetch the name of creator &lt;</span><span class="si">{</span><span class="n">creator_id</span><span class="si">}</span><span class="s2">&gt;, use creator ID as directory name&quot;</span><span class="p">,</span>
-                    <span class="n">detail</span><span class="o">=</span><span class="n">creator_ret</span><span class="o">.</span><span class="n">message</span>
+                    <span class="s2">&quot;Got creator information&quot;</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">creator</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="n">creator</span><span class="o">.</span><span class="n">id</span>
                 <span class="p">)</span>
             <span class="p">)</span>
-        <span class="n">creator_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="n">sanitize_filename</span><span class="p">(</span><span class="n">creator_name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="n">generate_msg</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to fetch the name of creator &lt;</span><span class="si">{</span><span class="n">creator_id</span><span class="si">}</span><span class="s2">&gt;, use creator ID as directory name&quot;</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="n">creator_ret</span><span class="o">.</span><span class="n">message</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">creator_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="n">sanitize_filename</span><span class="p">(</span><span class="n">creator_name</span><span class="p">)</span>
 
     <span class="n">creator_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_job_from_creator</span><span class="p">(</span>
         <span class="n">service</span><span class="o">=</span><span class="n">service</span><span class="p">,</span>
         <span class="n">creator_id</span><span class="o">=</span><span class="n">creator_id</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="n">creator_path</span><span class="p">,</span>
-        <span class="n">update_from</span><span class="o">=</span><span class="n">indices</span><span class="p">,</span>
         <span class="n">all_pages</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">save_creator_indices</span><span class="o">=</span><span class="n">save_creator_indices</span><span class="p">,</span>
         <span class="n">mix_posts</span><span class="o">=</span><span class="n">mix_posts</span><span class="p">,</span>
@@ -2981,7 +2900,7 @@
     <script id="__config" type="application/json">{"base": "../../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.action.edit"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.c18c5fb9.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
       
     
   </body>
