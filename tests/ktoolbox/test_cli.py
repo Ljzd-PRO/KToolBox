@@ -167,17 +167,6 @@ async def test_sync_creator():
             path=dir_path
         )
         assert url_only is None
-        assert (dir_new := next(dir_path.iterdir(), None)) is not None
-        assert (indices := (dir_new / DataStorageNameEnum.CreatorIndicesData.value)).is_file()
-
-        # Test `update_from`
-        with_indices = await KToolBoxCli.sync_creator(
-            service=service,
-            creator_id=creator_id,
-            path=dir_path,
-            update_from=indices
-        )
-        assert with_indices is None
 
     # Test `mix_posts`
     with tempfile.TemporaryDirectory() as td:

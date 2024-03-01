@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ktoolbox"
-version = "0.3.6"
+version = "0.4.0"
 description = "A useful CLI tool for downloading posts in Kemono.party / .su"
 authors = ["Ljzd-PRO <ljzd@office.ljzd-pro.asia>"]
 readme = "README.md"
@@ -52,7 +52,7 @@ mike = "^2.0.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "==7.4.3"
-pytest-asyncio = "==0.23.3"
+pytest-asyncio = "==0.23.5"
 pytest-cov = "==4.1.0"
 allpairspy = "==2.5.1"
 

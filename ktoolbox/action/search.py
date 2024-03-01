@@ -1,9 +1,9 @@
 from typing import Iterator, List
 
+from ktoolbox._enum import RetCodeEnum
 from ktoolbox.action import ActionRet
 from ktoolbox.api.model import Creator, Post
 from ktoolbox.api.posts import get_creators, get_creator_post
-from ktoolbox._enum import RetCodeEnum
 from ktoolbox.utils import BaseRet, generate_msg
 
 __all__ = ["search_creator", "search_creator_post"]
