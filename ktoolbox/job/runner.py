@@ -70,7 +70,11 @@ class JobRunner:
         return len(self._downloaders_with_task) - self.done_size
 
     async def processor(self) -> int:
-        """Process each job in ``self._job_queue``"""
+        """
+        Process each job in ``self._job_queue``
+
+        :return: Number of jobs that failed
+        """
         failed_num = 0
         while not self._job_queue.empty():
             job = await self._job_queue.get()
@@ -159,6 +163,7 @@ class JobRunner:
             logger.warning(generate_msg(f"{failed_num} jobs failed, download finished"))
         else:
             logger.success(generate_msg("All jobs in queue finished"))
+        return failed_num
 
     async def add_jobs(self, *jobs: Job):
         """Add jobs to ``self._job_queue``"""
