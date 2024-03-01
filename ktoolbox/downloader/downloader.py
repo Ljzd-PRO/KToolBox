@@ -14,9 +14,9 @@ from tenacity import wait_fixed, retry_if_result, retry_if_exception
 from tenacity.stop import stop_after_attempt, stop_never
 from tqdm import tqdm as std_tqdm
 
+from ktoolbox._enum import RetCodeEnum
 from ktoolbox.configuration import config
 from ktoolbox.downloader import DownloaderRet
-from ktoolbox._enum import RetCodeEnum
 from ktoolbox.utils import filename_from_headers, generate_msg
 
 __all__ = ["Downloader"]
@@ -171,7 +171,8 @@ class Downloader:
                     self._filename = filename
 
                     # Download
-                    temp_filepath = (self._path / filename).with_suffix(f"{Path(filename).suffix}.{config.downloader.temp_suffix}")
+                    temp_filepath = (self._path / filename).with_suffix(
+                        f"{Path(filename).suffix}.{config.downloader.temp_suffix}")
                     total_size = int(length_str) if (length_str := res.headers.get("Content-Length")) else None
                     async with aiofiles.open(str(temp_filepath), "wb", self._buffer_size) as f:
                         chunk_iterator = res.aiter_bytes(self._chunk_size)

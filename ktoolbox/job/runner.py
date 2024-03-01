@@ -8,9 +8,9 @@ from urllib.parse import urlunparse
 from loguru import logger
 from tqdm import tqdm as std_tqdm
 
+from ktoolbox._enum import RetCodeEnum
 from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
-from ktoolbox._enum import RetCodeEnum
 from ktoolbox.job import Job
 from ktoolbox.utils import generate_msg
 
