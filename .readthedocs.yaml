@@ -16,6 +16,8 @@ build:
       - poetry config virtualenvs.create false
     post_install:
       - poetry install --with docs
+  commands:
+    - mkdocs build --clean --site-dir $READTHEDOCS_OUTPUT/html --config-file mkdocs.yml
 
 mkdocs:
   configuration: mkdocs.yml
