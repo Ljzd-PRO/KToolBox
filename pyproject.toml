@@ -11,7 +11,7 @@ documentation = "https://ktoolbox.readthedocs.io/"
 keywords = ["kemono", "kemono.party", "cli-app", "downloader", "os-independent"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Development Status :: 5 - Production/Stable",
     "Topic :: Terminals",
