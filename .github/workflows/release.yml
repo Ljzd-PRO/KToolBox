@@ -43,3 +43,8 @@ jobs:
           body_path: CHANGELOG.md
           files: artifact/*.zip
           prerelease: contains(github.ref, 'beta')
+
+  publish:
+    needs:
+      - release
+    uses: ./.github/workflows/python-publish.yml

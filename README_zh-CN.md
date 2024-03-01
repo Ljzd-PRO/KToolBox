@@ -18,7 +18,7 @@
   </a>
 
   <a href="./LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT-blue" alt="MIT"/>
+    <img src="https://img.shields.io/github/license/Ljzd-PRO/KToolBox" alt="BSD 3-Clause"/>
   </a>
 
   <a href="https://github.com/Ljzd-PRO/KToolBox/activity">
@@ -134,6 +134,6 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/c
 
 ## 许可证
 
-KToolBox 使用 MIT 许可证.
+KToolBox 使用 BSD 3-Clause 许可证.
 
 Copyright © 2023 by Ljzd-PRO.

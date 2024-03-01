@@ -10,8 +10,8 @@ import aiofiles
 from loguru import logger
 from pydantic import BaseModel
 
-from ktoolbox.configuration import config
 from ktoolbox._enum import RetCodeEnum, DataStorageNameEnum
+from ktoolbox.configuration import config
 from ktoolbox.model import SearchResult
 
 __all__ = [

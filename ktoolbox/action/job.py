@@ -6,12 +6,12 @@ import aiofiles
 from loguru import logger
 from pathvalidate import sanitize_filename
 
+from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.action import ActionRet, fetch_all_creator_posts, FetchInterruptError
-from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_time, filter_posts_by_indices
+from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_time
 from ktoolbox.api.model import Post, Attachment
 from ktoolbox.api.posts import get_creator_post
 from ktoolbox.configuration import config, PostStructureConfiguration
-from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.job import Job, CreatorIndices
 
 __all__ = ["create_job_from_post", "create_job_from_creator"]
@@ -89,7 +89,6 @@ async def create_job_from_creator(
         creator_id: str,
         path: Path,
         *,
-        update_from: CreatorIndices = None,
         all_pages: bool = False,
         o: int = None,
         save_creator_indices: bool = True,
@@ -103,8 +102,6 @@ async def create_job_from_creator(
     :param service: The service where the post is located
     :param creator_id: The ID of the creator
     :param path: The path for posts to download
-    :param update_from: ``CreatorIndices`` data for update posts from current creator directory, \
-     ``save_creator_indices`` will be enabled if this provided
     :param all_pages: Fetch all pages of posts, ``o`` will be ignored if enabled
     :param o: Result offset, stepping of 50 is enforced
     :param save_creator_indices: Record ``CreatorIndices`` data for update posts from current creator directory
@@ -138,18 +135,13 @@ async def create_job_from_creator(
 
     # Filter posts and generate ``CreatorIndices``
     if not mix_posts:
-        indices = None
-        if update_from:
-            post_list, indices = filter_posts_by_indices(post_list, update_from)
-            logger.info(f"{len(post_list)} posts will be downloaded")
-        elif save_creator_indices:  # It's unnecessary to create indices again when ``update_from`` was provided
+        if save_creator_indices:  # It's unnecessary to create indices again when ``update_from`` was provided
             indices = CreatorIndices(
                 creator_id=creator_id,
                 service=service,
                 posts={post.id: post for post in post_list},
                 posts_path={post.id: path / sanitize_filename(post.title) for post in post_list}
             )
-        if indices:
             async with aiofiles.open(
                     path / DataStorageNameEnum.CreatorIndicesData.value,
                     "w",
@@ -160,12 +152,7 @@ async def create_job_from_creator(
     job_list: List[Job] = []
     for post in post_list:
         # Get post path
-        default_post_path = path if mix_posts else path / generate_post_path_name(post)
-        if update_from:
-            if not (post_path := update_from.posts_path.get(post.id)):
-                post_path = default_post_path
-        else:
-            post_path = default_post_path
+        post_path = path if mix_posts else path / generate_post_path_name(post)
 
         # Generate jobs
         job_list += await create_job_from_post(

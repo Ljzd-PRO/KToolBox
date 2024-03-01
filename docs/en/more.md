@@ -16,6 +16,6 @@
 
 ## License
 
-KToolBox is licensed under MIT.
+KToolBox is licensed under BSD 3-Clause.
 
 Copyright © 2023 by Ljzd-PRO.
