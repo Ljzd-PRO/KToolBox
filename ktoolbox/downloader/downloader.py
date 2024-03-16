@@ -55,9 +55,9 @@ class Downloader:
         self._buffer_size = buffer_size or config.downloader.buffer_size
         self._chunk_size = chunk_size or config.downloader.chunk_size
         # _alt_filename 是用于下载的文件名
-        self._alt_filename = alt_filename # 用于下载的文件名
-        self._server_path = server_path # 服务器文件路径 /hash[:1]/hash2[1:3]/hash
-        self._filename = alt_filename # 保留用做实际文件名
+        self._alt_filename = alt_filename  # 用于下载的文件名
+        self._server_path = server_path  # 服务器文件路径 /hash[:1]/hash2[1:3]/hash
+        self._filename = alt_filename  # 保留用做实际文件名
 
         self._lock = asyncio.Lock()
         self._stop: bool = False
@@ -142,7 +142,6 @@ class Downloader:
         # Use ``self._alt_filename`` instead of filename from server,
         # to make the process more efficient
 
-
         enable_use_bucket = config.downloader.use_bucket
         server_relpath = self._server_path[1:]
         art_file_path = self._path / self._filename
@@ -190,12 +189,12 @@ class Downloader:
                     # Get filename
                     server_path_filename = urllib.parse.unquote(server_relpath.split("/")[-1])
                     filename = self._alt_filename \
-                        or filename_from_headers(res.headers) \
-                        or server_path_filename
+                               or filename_from_headers(res.headers) \
+                               or server_path_filename
                     self._filename = filename
 
                     # Download
-                    temp_filepath = Path(f"{ (self._path / server_path_filename) }.{config.downloader.temp_suffix}")
+                    temp_filepath = Path(f"{(self._path / server_path_filename)}.{config.downloader.temp_suffix}")
                     total_size = int(length_str) if (length_str := res.headers.get("Content-Length")) else None
                     async with aiofiles.open(str(temp_filepath), "wb", self._buffer_size) as f:
                         chunk_iterator = res.aiter_bytes(self._chunk_size)

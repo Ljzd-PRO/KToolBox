@@ -163,6 +163,8 @@ class Configuration(BaseSettings):
 
 
 config = Configuration(_env_file='prod.env')
+
+
 def config_check_bucket():
     if config.downloader.use_bucket:
         import tempfile
