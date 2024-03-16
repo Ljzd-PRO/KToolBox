@@ -56,8 +56,8 @@ class DownloaderConfiguration(BaseModel):
     :ivar retry_stop_never: Never stop downloader from retrying (when download failed) \
     (``retry_times`` will be ignored when enabled)
     :ivar retry_interval: Seconds of downloader retry interval
-    :ivar local_bucket_mode: Enable local storage bucket mode
-    :ivar local_bucket_path: Path of local storage bucket
+    :ivar use_bucket: Enable local storage bucket mode
+    :ivar bucket_path: Path of local storage bucket
     """
     scheme: Literal["http", "https"] = "https"
     timeout: float = 30.0
