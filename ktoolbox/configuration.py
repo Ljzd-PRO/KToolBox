@@ -1,9 +1,13 @@
 import datetime
 import logging
+import os
+import tempfile
+import warnings
 from pathlib import Path
-from typing import Literal, Union, Optional
+from typing import Literal, Union, Optional, Any
 
-from pydantic import BaseModel, BaseSettings
+from loguru import logger
+from pydantic import BaseModel, BaseSettings, validator
 
 __all__ = [
     "config",
@@ -54,6 +58,8 @@ class DownloaderConfiguration(BaseModel):
     :ivar retry_stop_never: Never stop downloader from retrying (when download failed) \
     (``retry_times`` will be ignored when enabled)
     :ivar retry_interval: Seconds of downloader retry interval
+    :ivar use_bucket: Enable local storage bucket mode
+    :ivar bucket_path: Path of local storage bucket
     """
     scheme: Literal["http", "https"] = "https"
     timeout: float = 30.0
@@ -64,6 +70,28 @@ class DownloaderConfiguration(BaseModel):
     retry_times: int = 10
     retry_stop_never: bool = False
     retry_interval: float = 3.0
+    use_bucket: bool = False
+    bucket_path: Path = Path("./.ktoolbox/bucket_storage")
+
+    def __init__(self, /, **data: Any):
+        super().__init__(**data)
+        self.check_bucket_path()
+
+    def check_bucket_path(self) -> "DownloaderConfiguration":
+        if self.use_bucket:
+            # noinspection PyBroadException
+            try:
+                bucket_path = Path(self.bucket_path)
+                bucket_path.mkdir(parents=True, exist_ok=True)
+                with tempfile.TemporaryFile(dir=bucket_path) as temp_file:
+                    temp_link_file_path = f"{bucket_path / temp_file.name}.hlink"
+                    os.link(temp_file.name, temp_link_file_path)
+                    os.remove(temp_link_file_path)
+            except Exception:
+                self.use_bucket = False
+                logger.exception(f"`DownloaderConfiguration.bucket_path` is not available, "
+                                 f"`DownloaderConfiguration.use_bucket` has been disabled.")
+        return self
 
 
 class PostStructureConfiguration(BaseModel):
@@ -73,13 +101,13 @@ class PostStructureConfiguration(BaseModel):
 
     - Default:
     ```
-    |-- ..
-    |-- attachments
-    |   |-- 1.png
-    |   |-- 2.png
-    |-- content.txt
-    |-- <Post file>
-    |-- <Post data (post.ktoolbox.json)>
+    ..
+    ├─ content.txt
+    ├─ <Post file>
+    ├─ <Post data (post.ktoolbox.json)>
+    └─ attachments
+       ├─ 1.png
+       └─ 2.png
     ```
 
     :ivar attachments: Sub path of attachment directory
@@ -93,8 +121,23 @@ class JobConfiguration(BaseModel):
     """
     Download jobs Configuration
 
+    - Available properties for ``post_dirname_format``
+
+        | Property      | Type   |
+        |---------------|--------|
+        | ``id``        | String |
+        | ``user``      | String |
+        | ``service``   | String |
+        | ``title``     | String |
+        | ``added``     | Date   |
+        | ``published`` | Date   |
+        | ``edited``    | Date   |
+
     :ivar count: Number of coroutines for concurrent download
-    :ivar post_id_as_path: Use post ID as post directory name
+    :ivar post_id_as_path: (**Deprecated**) Use post ID as post directory name
+    :ivar post_dirname_format: Customize the post directory name format, \
+    you can use some of the [properties](/configuration/reference/#ktoolbox.configuration.JobConfiguration) in ``Post``. \
+    e.g. ``{published}{id}`` > ``[2024-1-1]123123``, ``{user}_{published}{title}`` > ``234234_[2024-1-1]HelloWorld``
     :ivar post_structure: Post path structure
     :ivar mix_posts: Save all files from different posts at same path in creator directory. \
     It would not create any post directory, and ``CreatorIndices`` would not been recorded, \
@@ -103,11 +146,22 @@ class JobConfiguration(BaseModel):
     """
     count: int = 4
     post_id_as_path: bool = False
+    post_dirname_format: str = "{title}"
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
     mix_posts: bool = False
     sequential_filename: bool = False
+
     # job_list_filepath: Optional[Path] = None
     # """Filepath for job list data saving, ``None`` for disable job list saving"""
+
+    @validator("post_id_as_path")
+    def post_id_as_path_validator(cls, v):
+        if v != cls.__fields__["post_id_as_path"].default:
+            warnings.warn(
+                "`JobConfiguration.post_id_as_path` is deprecated and is scheduled for removal in further version. "
+                "Use `JobConfiguration.post_dirname_format` instead",
+                FutureWarning
+            )
 
 
 class LoggerConfiguration(BaseModel):
@@ -128,10 +182,10 @@ class Configuration(BaseSettings):
     """
     KToolBox Configuration
 
-    :ivar api:
-    :ivar downloader:
-    :ivar job:
-    :ivar logger:
+    :ivar api: Kemono API Configuration
+    :ivar downloader: File Downloader Configuration
+    :ivar job: Download jobs Configuration
+    :ivar logger: Logger configuration
     :ivar ssl_verify: Enable SSL certificate verification for Kemono API server and download server
     :ivar json_dump_indent: Indent of JSON file dump
     :ivar use_uvloop: Use uvloop for asyncio (Disabled on Windows by default) \

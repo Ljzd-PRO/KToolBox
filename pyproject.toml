@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ktoolbox-pure-py"
-version = "0.4.0"
+version = "0.5.0-dev"
 description = "A useful CLI tool for downloading posts in Kemono.party / .su (Pure Python version)"
 authors = ["Ljzd-PRO <ljzd@office.ljzd-pro.asia>"]
 readme = "README.md"
@@ -29,7 +29,7 @@ ktoolbox = "ktoolbox.__main__:main"
 python = ">=3.8,<3.12"
 pydantic = {version="^1.10.13", extras=["dotenv"]}
 tenacity = "^8.2.3"
-httpx = {version=">=0.24.1,<0.27.0", extras=["socks"]}
+httpx = {version=">=0.24.1,<0.28.0", extras=["socks"]}
 fire = "^0.5.0"
 tqdm = "^4.66.1"
 loguru = "^0.7.2"
@@ -40,7 +40,7 @@ pathvalidate = "^3.2.0"
 uvloop = "^0.19.0"
 
 [tool.poetry.group.pyinstaller.dependencies]
-pyinstaller = "==6.3.0"
+pyinstaller = "==6.5.0"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.5.3"
