@@ -147,7 +147,7 @@ class Downloader:
         art_file_path = self._path / self._filename
         check_path = art_file_path
         if enable_use_bucket:
-            art_bucket_file_path = config.downloader.bucket_dirpath / server_relpath
+            art_bucket_file_path = config.downloader.bucket_path / server_relpath
             check_path = art_bucket_file_path
 
         # Check if the file exists

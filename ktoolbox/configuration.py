@@ -69,7 +69,7 @@ class DownloaderConfiguration(BaseModel):
     retry_stop_never: bool = False
     retry_interval: float = 3.0
     use_bucket: bool = False
-    bucket_dirpath: Path = Path("./.ktoolbox/bucket_storage")
+    bucket_path: Path = Path("./.ktoolbox/bucket_storage")
 
 
 class PostStructureConfiguration(BaseModel):
@@ -169,7 +169,7 @@ def config_check_bucket():
     if config.downloader.use_bucket:
         import tempfile
         try:
-            bucket_dirpath = Path(config.downloader.bucket_dirpath)
+            bucket_dirpath = Path(config.downloader.bucket_path)
             bucket_dirpath.mkdir(parents=True, exist_ok=True)
             with tempfile.TemporaryFile(dir=bucket_dirpath) as temp_file:
                 temp_linkfile_path = f"{bucket_dirpath / temp_file.name}.hlink"
