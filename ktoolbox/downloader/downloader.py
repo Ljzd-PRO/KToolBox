@@ -167,7 +167,7 @@ class Downloader:
                 code=RetCodeEnum.FileExisted,
                 message=generate_msg(
                     ret_msg,
-                    path=self._path / self._filename
+                    path=art_file_path
                 )
             )
 
@@ -186,7 +186,7 @@ class Downloader:
                             message=generate_msg(
                                 "Download failed",
                                 status_code=res.status_code,
-                                filename=self._alt_filename
+                                filename=art_file_path
                             )
                         )
 
