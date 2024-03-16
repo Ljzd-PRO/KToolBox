@@ -1,8 +1,10 @@
 import datetime
 import logging
+import os
 from pathlib import Path
 from typing import Literal, Union, Optional
 
+from loguru import logger
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -55,6 +57,8 @@ class DownloaderConfiguration(BaseModel):
     :ivar retry_stop_never: Never stop downloader from retrying (when download failed) \
     (``retry_times`` will be ignored when enabled)
     :ivar retry_interval: Seconds of downloader retry interval
+    :ivar use_bucket: Enable local storage bucket mode
+    :ivar bucket_path: Path of local storage bucket
     """
     scheme: Literal["http", "https"] = "https"
     timeout: float = 30.0
@@ -65,6 +69,8 @@ class DownloaderConfiguration(BaseModel):
     retry_times: int = 10
     retry_stop_never: bool = False
     retry_interval: float = 3.0
+    use_bucket: bool = False
+    bucket_path: Path = Path("./.ktoolbox/bucket_storage")
 
 
 class PostStructureConfiguration(BaseModel):
@@ -158,3 +164,23 @@ class Configuration(BaseSettings):
 
 
 config = Configuration(_env_file='prod.env')
+
+
+def config_check_bucket():
+    if config.downloader.use_bucket:
+        import tempfile
+        # noinspection PyBroadException
+        try:
+            bucket_path = Path(config.downloader.bucket_path)
+            bucket_path.mkdir(parents=True, exist_ok=True)
+            with tempfile.TemporaryFile(dir=bucket_path) as temp_file:
+                temp_link_file_path = f"{bucket_path / temp_file.name}.hlink"
+                os.link(temp_file.name, temp_link_file_path)
+                os.remove(temp_link_file_path)
+        except Exception:
+            config.downloader.use_bucket = False
+            logger.exception(f"`DownloaderConfiguration.bucket_path` is not available, "
+                             f"`DownloaderConfiguration.use_bucket` has been disabled.")
+
+
+config_check_bucket()
