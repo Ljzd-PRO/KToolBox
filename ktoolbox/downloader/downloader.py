@@ -156,7 +156,7 @@ class Downloader:
                 ret_msg = "Download file already exists in both bucket and local, skipping"
                 if not art_file_path.is_file():
                     ret_msg = "Download file already exists in bucket, linking to target path"
-                    check_path.link_to(art_file_path)
+                    check_path.hardlink_to(art_file_path)
             else:
                 ret_msg = "Download file already exists, skipping"
             return DownloaderRet(
