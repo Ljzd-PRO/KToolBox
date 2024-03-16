@@ -2,11 +2,12 @@ import datetime
 import logging
 import os
 import tempfile
+import warnings
 from pathlib import Path
 from typing import Literal, Union, Optional
 
 from loguru import logger
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, model_validator, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 __all__ = [
@@ -118,9 +119,31 @@ class JobConfiguration(BaseModel):
     """
     Download jobs Configuration
 
+    - Available properties for ``post_dirname_format``
+
+        +---------------+--------+
+        | Property      | Type   |
+        +---------------+--------+
+        | ``id``        | String |
+        +---------------+--------+
+        | ``user``      | String |
+        +---------------+--------+
+        | ``service``   | String |
+        +---------------+--------+
+        | ``title``     | String |
+        +---------------+--------+
+        | ``added``     | Date   |
+        +---------------+--------+
+        | ``published`` | Date   |
+        +---------------+--------+
+        | ``edited``    | Date   |
+        +---------------+--------+
+
     :ivar count: Number of coroutines for concurrent download
-    :ivar post_id_as_path: Use post ID as post directory name
-    :ivar post_path_with_date: Prefix the post directory name with its release/publish date, e.g. ``[2024-1-1]PostName``
+    :ivar post_id_as_path: (Deprecated) Use post ID as post directory name
+    :ivar post_dirname_format: Customize the post directory name format, \
+    you can use some of the properties in ``Post``. \
+    e.g. ``{published}{id}`` > ``[2024-1-1]123123``, ``{user}_{published}{title}`` > ``234234_[2024-1-1]HelloWorld``
     :ivar post_structure: Post path structure
     :ivar mix_posts: Save all files from different posts at same path in creator directory. \
     It would not create any post directory, and ``CreatorIndices`` would not been recorded, \
@@ -129,12 +152,22 @@ class JobConfiguration(BaseModel):
     """
     count: int = 4
     post_id_as_path: bool = False
-    post_path_with_date: bool = False
+    post_dirname_format: str = "{title}"
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
     mix_posts: bool = False
     sequential_filename: bool = False
+
     # job_list_filepath: Optional[Path] = None
     # """Filepath for job list data saving, ``None`` for disable job list saving"""
+
+    @field_validator("post_id_as_path")
+    def post_id_as_path_validator(cls, v):
+        if v != cls.model_fields["post_id_as_path"].default:
+            warnings.warn(
+                "`JobConfiguration.post_id_as_path` is deprecated and is scheduled for removal in further version. "
+                "Use `JobConfiguration.post_dirname_format` instead",
+                FutureWarning
+            )
 
 
 class LoggerConfiguration(BaseModel):
