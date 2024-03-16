@@ -1,6 +1,6 @@
 import asyncio
 import os
-import urllib.parse
+from urllib.parse import urlparse, unquote
 from asyncio import CancelledError
 from functools import cached_property
 from pathlib import Path
@@ -140,22 +140,23 @@ class Downloader:
         :return: ``DownloaderRet`` which contain the actual output filename
         :raise CancelledError
         """
-        # Use ``self._alt_filename`` instead of filename from server,
-        # to make the process more efficient
-
-        enable_use_bucket = config.downloader.use_bucket
+        # Get filename to check if file exists
+        # Check it before request to make progress more efficiency
         server_relpath = self._server_path[1:]
-        art_file_path = self._path / self._filename
+        server_relpath_without_params = urlparse(server_relpath).path
+        server_path_filename = unquote(Path(server_relpath_without_params).name)
+        art_file_path = self._path / (self._filename or server_path_filename)
         check_path = art_file_path
 
+        # Get bucket file path
         art_bucket_file_path: Optional[Path] = None
-        if enable_use_bucket:
+        if config.downloader.use_bucket:
             art_bucket_file_path = config.downloader.bucket_path / server_relpath
             check_path = art_bucket_file_path
 
         # Check if the file exists
         if check_path.is_file():
-            if enable_use_bucket:
+            if config.downloader.use_bucket:
                 ret_msg = "Download file already exists in both bucket and local, skipping"
                 if not art_file_path.is_file():
                     ret_msg = "Download file already exists in bucket, linking to target path"
@@ -190,7 +191,6 @@ class Downloader:
                         )
 
                     # Get filename
-                    server_path_filename = urllib.parse.unquote(Path(server_relpath).name)
                     filename = self._alt_filename or filename_from_headers(res.headers) or server_path_filename
                     self._filename = filename
 
@@ -214,7 +214,7 @@ class Downloader:
                             t.update(len(chunk))  # Update progress bar
 
             # Download finished
-            if enable_use_bucket:
+            if config.downloader.use_bucket:
                 art_bucket_file_path.parent.mkdir(parents=True, exist_ok=True)
                 os.link(temp_filepath, art_bucket_file_path)
 
