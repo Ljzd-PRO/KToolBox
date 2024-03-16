@@ -169,12 +169,12 @@ def config_check_bucket():
     if config.downloader.use_bucket:
         import tempfile
         try:
-            bucket_dirpath = Path(config.downloader.bucket_path)
-            bucket_dirpath.mkdir(parents=True, exist_ok=True)
-            with tempfile.TemporaryFile(dir=bucket_dirpath) as temp_file:
-                temp_linkfile_path = f"{bucket_dirpath / temp_file.name}.hlink"
-                os.link(temp_file.name, temp_linkfile_path)
-                os.remove(temp_linkfile_path)
+            bucket_path = Path(config.downloader.bucket_path)
+            bucket_path.mkdir(parents=True, exist_ok=True)
+            with tempfile.TemporaryFile(dir=bucket_path) as temp_file:
+                temp_link_file_path = f"{bucket_path / temp_file.name}.hlink"
+                os.link(temp_file.name, temp_link_file_path)
+                os.remove(temp_link_file_path)
 
         except Exception as e:
             config.downloader.use_bucket = False
