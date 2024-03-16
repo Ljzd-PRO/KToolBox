@@ -1,10 +1,10 @@
 import asyncio
 import os
-from urllib.parse import urlparse, unquote
 from asyncio import CancelledError
 from functools import cached_property
 from pathlib import Path
 from typing import Callable, Any, Coroutine, Type, Optional
+from urllib.parse import urlparse, unquote
 
 import aiofiles
 import httpx
