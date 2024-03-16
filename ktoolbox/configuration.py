@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 from typing import Literal, Union, Optional
 
+from loguru import logger
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -168,6 +169,7 @@ config = Configuration(_env_file='prod.env')
 def config_check_bucket():
     if config.downloader.use_bucket:
         import tempfile
+        # noinspection PyBroadException
         try:
             bucket_path = Path(config.downloader.bucket_path)
             bucket_path.mkdir(parents=True, exist_ok=True)
@@ -175,10 +177,10 @@ def config_check_bucket():
                 temp_link_file_path = f"{bucket_path / temp_file.name}.hlink"
                 os.link(temp_file.name, temp_link_file_path)
                 os.remove(temp_link_file_path)
-
-        except Exception as e:
+        except Exception:
             config.downloader.use_bucket = False
-            print(f"[error]Your bucket_dirpath unknown hard link is not available, use_bucket has been disabled.")
+            logger.exception(f"`DownloaderConfiguration.bucket_path` is not available, "
+                             f"`DownloaderConfiguration.use_bucket` has been disabled.")
 
 
 config_check_bucket()
