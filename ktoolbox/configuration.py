@@ -99,13 +99,13 @@ class PostStructureConfiguration(BaseModel):
 
     - Default:
     ```
-    |-- ..
-    |-- attachments
-    |   |-- 1.png
-    |   |-- 2.png
-    |-- content.txt
-    |-- <Post file>
-    |-- <Post data (post.ktoolbox.json)>
+    ..
+    ├─ content.txt
+    ├─ <Post file>
+    ├─ <Post data (post.ktoolbox.json)>
+    └─ attachments
+       ├─ 1.png
+       └─ 2.png
     ```
 
     :ivar attachments: Sub path of attachment directory
@@ -121,28 +121,20 @@ class JobConfiguration(BaseModel):
 
     - Available properties for ``post_dirname_format``
 
-        +---------------+--------+
         | Property      | Type   |
-        +---------------+--------+
+        |---------------|--------|
         | ``id``        | String |
-        +---------------+--------+
         | ``user``      | String |
-        +---------------+--------+
         | ``service``   | String |
-        +---------------+--------+
         | ``title``     | String |
-        +---------------+--------+
         | ``added``     | Date   |
-        +---------------+--------+
         | ``published`` | Date   |
-        +---------------+--------+
         | ``edited``    | Date   |
-        +---------------+--------+
 
     :ivar count: Number of coroutines for concurrent download
-    :ivar post_id_as_path: (Deprecated) Use post ID as post directory name
+    :ivar post_id_as_path: (**Deprecated**) Use post ID as post directory name
     :ivar post_dirname_format: Customize the post directory name format, \
-    you can use some of the properties in ``Post``. \
+    you can use some of the [properties](/configuration/reference/#ktoolbox.configuration.JobConfiguration) in ``Post``. \
     e.g. ``{published}{id}`` > ``[2024-1-1]123123``, ``{user}_{published}{title}`` > ``234234_[2024-1-1]HelloWorld``
     :ivar post_structure: Post path structure
     :ivar mix_posts: Save all files from different posts at same path in creator directory. \
