@@ -190,10 +190,8 @@ class Downloader:
                         )
 
                     # Get filename
-                    server_path_filename = urllib.parse.unquote(server_relpath.split("/")[-1])
-                    filename = self._alt_filename \
-                               or filename_from_headers(res.headers) \
-                               or server_path_filename
+                    server_path_filename = urllib.parse.unquote(Path(server_relpath).name)
+                    filename = self._alt_filename or filename_from_headers(res.headers) or server_path_filename
                     self._filename = filename
 
                     # Download
