@@ -180,10 +180,10 @@ class Configuration(BaseSettings):
     """
     KToolBox Configuration
 
-    :ivar api:
-    :ivar downloader:
-    :ivar job:
-    :ivar logger:
+    :ivar api: Kemono API Configuration
+    :ivar downloader: File Downloader Configuration
+    :ivar job: Download jobs Configuration
+    :ivar logger: Logger configuration
     :ivar ssl_verify: Enable SSL certificate verification for Kemono API server and download server
     :ivar json_dump_indent: Indent of JSON file dump
     :ivar use_uvloop: Use uvloop for asyncio (Disabled on Windows by default) \
