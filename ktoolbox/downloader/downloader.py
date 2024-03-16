@@ -34,6 +34,7 @@ class Downloader:
             alt_filename: str = None,
             server_path: str = None
     ):
+        # noinspection GrazieInspection
         """
         Initialize a file downloader
 
