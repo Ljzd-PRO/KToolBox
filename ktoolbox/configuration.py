@@ -1,5 +1,6 @@
 import datetime
 import logging
+import os
 from pathlib import Path
 from typing import Literal, Union, Optional
 
@@ -55,6 +56,8 @@ class DownloaderConfiguration(BaseModel):
     :ivar retry_stop_never: Never stop downloader from retrying (when download failed) \
     (``retry_times`` will be ignored when enabled)
     :ivar retry_interval: Seconds of downloader retry interval
+    :ivar local_bucket_mode: Enable local storage bucket mode
+    :ivar local_bucket_path: Path of local storage bucket
     """
     scheme: Literal["http", "https"] = "https"
     timeout: float = 30.0
@@ -65,6 +68,8 @@ class DownloaderConfiguration(BaseModel):
     retry_times: int = 10
     retry_stop_never: bool = False
     retry_interval: float = 3.0
+    use_bucket: bool = False
+    bucket_dirpath: Path = Path("./.ktoolbox/bucket_storage")
 
 
 class PostStructureConfiguration(BaseModel):
@@ -158,3 +163,20 @@ class Configuration(BaseSettings):
 
 
 config = Configuration(_env_file='prod.env')
+def config_check_bucket():
+    if config.downloader.use_bucket:
+        import tempfile
+        try:
+            bucket_dirpath = Path(config.downloader.bucket_dirpath)
+            bucket_dirpath.mkdir(parents=True, exist_ok=True)
+            with tempfile.TemporaryFile(dir=bucket_dirpath) as temp_file:
+                temp_linkfile_path = f"{bucket_dirpath / temp_file.name}.hlink"
+                os.link(temp_file.name, temp_linkfile_path)
+                os.remove(temp_linkfile_path)
+
+        except Exception as e:
+            config.downloader.use_bucket = False
+            print(f"[error]Your bucket_dirpath unknown hard link is not available, use_bucket has been disabled.")
+
+
+config_check_bucket()
