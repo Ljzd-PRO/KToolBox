@@ -120,6 +120,7 @@ class JobConfiguration(BaseModel):
 
     :ivar count: Number of coroutines for concurrent download
     :ivar post_id_as_path: Use post ID as post directory name
+    :ivar post_path_with_date: Prefix the post directory name with its release/publish date, e.g. ``[2024-1-1]PostName``
     :ivar post_structure: Post path structure
     :ivar mix_posts: Save all files from different posts at same path in creator directory. \
     It would not create any post directory, and ``CreatorIndices`` would not been recorded, \
@@ -128,6 +129,7 @@ class JobConfiguration(BaseModel):
     """
     count: int = 4
     post_id_as_path: bool = False
+    post_path_with_date: bool = False
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
     mix_posts: bool = False
     sequential_filename: bool = False

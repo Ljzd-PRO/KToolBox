@@ -13,9 +13,12 @@ __all__ = ["generate_post_path_name", "filter_posts_by_time", "filter_posts_by_i
 def generate_post_path_name(post: Post) -> str:
     """Generate directory name for post to save."""
     if config.job.post_id_as_path or not post.title:
-        return post.id
+        post_dirname = post.id
     else:
-        return sanitize_filename(post.title)
+        post_dirname = sanitize_filename(post.title)
+    if config.job.post_path_with_date:
+        post_dirname = f"{post.published.strftime('[%Y-%m-%d]')}{post_dirname}"
+    return post_dirname
 
 
 def _match_post_time(
