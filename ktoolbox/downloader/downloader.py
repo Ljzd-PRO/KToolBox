@@ -47,7 +47,8 @@ class Downloader:
         :param buffer_size: Number of bytes for file I/O buffer
         :param chunk_size: Number of bytes for chunk of download stream
         :param alt_filename: Use this name if no filename given by the server
-        :param server_path: Server path of the file. if config.use_bucket is True, it will be used as save the path to the file
+        :param server_path: Server path of the file. if config.use_bucket is True, \
+        it will be used as save the path to the file
         """
 
         self._url = url
@@ -146,6 +147,8 @@ class Downloader:
         server_relpath = self._server_path[1:]
         art_file_path = self._path / self._filename
         check_path = art_file_path
+
+        art_bucket_file_path: Optional[Path] = None
         if enable_use_bucket:
             art_bucket_file_path = config.downloader.bucket_path / server_relpath
             check_path = art_bucket_file_path
@@ -216,6 +219,7 @@ class Downloader:
             if enable_use_bucket:
                 art_bucket_file_path.parent.mkdir(parents=True, exist_ok=True)
                 os.link(temp_filepath, art_bucket_file_path)
+
             temp_filepath.rename(self._path / filename)
             if sync_callable:
                 sync_callable(self)
