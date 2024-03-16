@@ -129,16 +129,16 @@ async def test_download_post():
     )
     assert no_url_and_no_dump is None
 
-    # Test `post_id_as_path`
+    # Test `post_dirname_format`
     with tempfile.TemporaryDirectory() as td:
         dir_path = Path(td)
-        config.job.post_id_as_path = True
+        config.job.post_dirname_format = "{published}{id}"
         await KToolBoxCli.download_post(
             url="https://kemono.su/fanbox/user/9016/post/6622968",
             path=dir_path
         )
-        assert (dir_path / "6622968").is_dir()
-        config.job.post_id_as_path = False
+        assert (dir_path / "[2023-09-02]6622968").is_dir()
+        config.job.post_dirname_format = "{title}"
 
 
 @pytest.mark.asyncio
