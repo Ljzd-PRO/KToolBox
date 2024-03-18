@@ -52,7 +52,7 @@ mike = "^2.0.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "==7.4.3"
-pytest-asyncio = "==0.23.5"
+pytest-asyncio = "==0.23.5.post1"
 pytest-cov = "==4.1.0"
 allpairspy = "==2.5.1"
 
