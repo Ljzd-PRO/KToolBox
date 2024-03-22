@@ -58,4 +58,4 @@
 
 - 将 `JobConfiguration.post_id_as_path` 标记为已弃用, 请用 `JobConfiguration.post_dirname_format` 取代
 
-**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.4.0...v0.5.0
+**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.4.0...v0.5.0-beta.1
