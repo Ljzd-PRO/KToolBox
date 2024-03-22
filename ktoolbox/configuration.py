@@ -204,7 +204,8 @@ class Configuration(BaseSettings):
         env_prefix='ktoolbox_',
         env_nested_delimiter='__',
         env_file='.env',
-        env_file_encoding='utf-8'
+        env_file_encoding='utf-8',
+        extra='ignore'
     )
 
 
