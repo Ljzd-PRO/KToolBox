@@ -42,21 +42,6 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 ??? tip "更新作者目录"
     你可以再次运行命令，文件名相同的文件将会被跳过。
 
-## 下载指定数量的作品
-
-`sync-creator`
-
-- `--offset`
-- `--length`
-
-```bash
-# 下载作者/画师最新的 10 个作品
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --length=10
-
-# 下载作者/画师最新的第 11 至 15 个作品
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
-```
-
 ## 下载在指定时间范围内发布的作品
 
 `sync-creator`

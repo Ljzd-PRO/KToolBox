@@ -102,12 +102,6 @@ the downloaded files will be **skipped**.
 # Download all posts of the creator/artist
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016
 
-# Download latest 10 posts of the creator/artist
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --length=10
-
-# Download latest No.11-No.15 posts of the creator/artist
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
-
 # Download posts from the creator/artist from 2024-1-1 to 2024-3-1
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 --end-time=2024-3-1
 ```
