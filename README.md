@@ -56,7 +56,7 @@
 
 ## Dev Plan
 
-- [ ] Add a Fluent Design style GUI
+- [ ] GUI
 - [x] Add uvloop support for Unix platform
 
 ## Tutorial
@@ -97,27 +97,31 @@ ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
 If some files failed to download, you can try to execute the command line again, 
 the downloaded files will be **skipped**.
   
-#### ⬇️🖌️ Download all posts from a creator
+#### ⬇️🖌️ Download posts from a creator
 ```bash
+# Download all posts of the creator/artist
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016
+
+# Download latest 10 posts of the creator/artist
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --length=10
+
+# Download latest No.11-No.15 posts of the creator/artist
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
+
+# Download posts from the creator/artist from 2024-1-1 to 2024-3-1
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 --end-time=2024-3-1
 ```
-
-> By default, you will get a `creator-indices.ktoolbox` file in the creator directory, 
-> you can use it to update the directory anytime.
-  
-
-#### 🔄️ Update a downloaded creator directory
-```bash
-ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
-```
-
-The `creator-indices.ktoolbox` file contains the information and filepath of posts inside the directory.
 
 ### iOS Shortcuts
 
 Goto [Shortcuts for iOS](https://ktoolbox.readthedocs.io/latest/shortcut/) page for more details.
 
 ### Configuration
+
+- Download 10 files at the same time
+- Rename attachments in numerical order
+- Prefix the post directory name with its release/publish date
+- ...
 
 Goto [Configuration-Guide](https://ktoolbox.readthedocs.io/latest/configuration/guide/) page for more details.
 

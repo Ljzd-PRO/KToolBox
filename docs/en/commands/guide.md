@@ -34,24 +34,30 @@ ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
 `sync-creator`
 
 ```bash
+# Download all posts of the creator/artist
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016
 ```
-??? info "Output"
+??? info "About `creator-indices.ktoolbox` file"
     By default, you will get a `creator-indices.ktoolbox` file in the creator directory, 
-    you can use it to update the directory anytime.
-  
+    it contains the information and filepath of posts inside the directory.
 
-## Update a downloaded creator directory
+??? tip "Update creator directory"
+    You can rerun the command, files with the same filename will be skipped.
+
+## Download a specified number of posts from the creator
 
 `sync-creator`
 
-- `--update-with`
+- `--offset`
+- `--length`
 
 ```bash
-ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
+# Download latest 10 posts of the creator/artist
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --length=10
+
+# Download latest No.11-No.15 posts of the creator/artist
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 ```
-??? info "About `creator-indices.ktoolbox` file"
-    The `creator-indices.ktoolbox` file contains the information and filepath of posts inside the directory.
 
 ## Download posts that published within the specified time range
 
