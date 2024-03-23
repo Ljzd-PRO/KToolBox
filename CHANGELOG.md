@@ -15,10 +15,10 @@
   - 📖More information: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
    ```dotenv
    # It will create directories like `[2024-1-1]HelloWorld`
-   KTOOLBOX_JOB__POST_DIRNAME_FORMAT="{published}{title}"
+   KTOOLBOX_JOB__POST_DIRNAME_FORMAT="[{published}]{title}"
    ```
    ```dotenv
-   # It will create directories like `[2024-1-1]_12345_112233`
+   # It will create directories like `2024-1-1_12345_112233`
    KTOOLBOX_JOB__POST_DIRNAME_FORMAT="{published}_{user}_{id}"
    ```
    ```dotenv
@@ -45,10 +45,10 @@
   - 📖更多信息: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
    ```dotenv
    # 将会创建例如 `[2024-1-1]HelloWorld` 的目录名
-   KTOOLBOX_JOB__POST_DIRNAME_FORMAT="{published}{title}"
+   KTOOLBOX_JOB__POST_DIRNAME_FORMAT="[{published}]{title}"
    ```
    ```dotenv
-   # 将会创建例如 `[2024-1-1]_12345_112233` 的目录名
+   # 将会创建例如 `2024-1-1_12345_112233` 的目录名
    KTOOLBOX_JOB__POST_DIRNAME_FORMAT="{published}_{user}_{id}"
    ```
    ```dotenv
