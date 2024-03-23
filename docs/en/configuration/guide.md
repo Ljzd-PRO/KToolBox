@@ -19,7 +19,7 @@ KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
 
 # Prefix the post directory name with its release/publish date, e.g. `[2024-1-1]HelloWorld`
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT={published}{title}
+KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title}
 
 # Allocate 102400 Bytes as buffer for each download job
 KTOOLBOX_DOWNLOADER__BUFFER_SIZE=102400
