@@ -132,7 +132,7 @@ async def test_download_post():
     # Test `post_dirname_format`
     with tempfile.TemporaryDirectory() as td:
         dir_path = Path(td)
-        config.job.post_dirname_format = "{published}{id}"
+        config.job.post_dirname_format = "[{published}]{id}"
         await KToolBoxCli.download_post(
             url="https://kemono.su/fanbox/user/9016/post/6622968",
             path=dir_path
