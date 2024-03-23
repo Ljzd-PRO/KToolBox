@@ -46,8 +46,8 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 
 `sync-creator`
 
-- `--start-time`
-- `--end-time`
+- `--start-time`：下载指定开始时间范围内的作品
+- `--end-time`：下载指定结束时间范围内的作品
 
 ```bash
 # 从 2023-8-5 到 2023-12-6
