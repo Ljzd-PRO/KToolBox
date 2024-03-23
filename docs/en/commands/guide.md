@@ -48,8 +48,8 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016
 
 `sync-creator`
 
-- `--offset`
-- `--length`
+- `--offset`: Posts result offset (or start offset)
+- `--length`: The number of posts to fetch, defaults to fetching all posts
 
 ```bash
 # Download latest 10 posts of the creator/artist

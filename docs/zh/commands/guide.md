@@ -46,8 +46,8 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 
 `sync-creator`
 
-- `--offset`
-- `--length`
+- `--offset`：作品结果偏移量（或起始偏移量）
+- `--length`：要获取的作品数量，默认获取所有作品
 
 ```bash
 # 下载作者/画师最新的 10 个作品
