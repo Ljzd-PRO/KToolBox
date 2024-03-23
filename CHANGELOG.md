@@ -7,11 +7,11 @@
 ### 💡 Feature
 
 - Add support for local storage bucket mode (#74) (@Nacosia)
-  - Edit `KTOOLBOX_DOWNLOADER__USE_BUCKET`, `KTOOLBOX_DOWNLOADER_BUCKET_PATH` to set this option
+  - Edit `KTOOLBOX_DOWNLOADER__USE_BUCKET`, `KTOOLBOX_DOWNLOADER_BUCKET_PATH` in `prod.env` or environment variables to set this option
   - 📖More information: [Configuration-Reference-DownloaderConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.DownloaderConfiguration)
 
 - Add support for customizing the post directory name format (#45, #46)
-  - Edit `KTOOLBOX_JOB__POST_DIRNAME_FORMAT` to set this option
+  - Edit `KTOOLBOX_JOB__POST_DIRNAME_FORMAT` in `prod.env` or environment variables to set this option
   - 📖More information: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
    ```dotenv
    # It will create directories like `[2024-1-1]HelloWorld`
@@ -37,11 +37,11 @@
 ### 💡 新特性
 
 - 增加本地存储桶模式的存储支持 (#74) (@Nacosia)
-  - 编辑 `KTOOLBOX_DOWNLOADER__USE_BUCKET`, `KTOOLBOX_DOWNLOADER_BUCKET_PATH` 以设置该选项
+  - 在 `prod.env` 或环境变量中编辑 `KTOOLBOX_DOWNLOADER__USE_BUCKET`, `KTOOLBOX_DOWNLOADER_BUCKET_PATH` 以设置该选项
   - 📖更多信息: [Configuration-Reference-DownloaderConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.DownloaderConfiguration)
 
 - 增加支持自定义作品目录名格式 (#45, #46)
-  - 编辑 `KTOOLBOX_JOB__POST_DIRNAME_FORMAT` 以设置该选项
+  - 在 `prod.env` 或环境变量中编辑 `KTOOLBOX_JOB__POST_DIRNAME_FORMAT` 以设置该选项
   - 📖更多信息: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
    ```dotenv
    # 将会创建例如 `[2024-1-1]HelloWorld` 的目录名
