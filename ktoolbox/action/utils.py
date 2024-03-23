@@ -16,7 +16,7 @@ def generate_post_path_name(post: Post) -> str:
     if config.job.post_id_as_path or not post.title:
         return post.id
     else:
-        time_format = "[%Y-%m-%d]"
+        time_format = "%Y-%m-%d"
         try:
             return sanitize_filename(
                 config.job.post_dirname_format.format(
@@ -24,9 +24,9 @@ def generate_post_path_name(post: Post) -> str:
                     user=post.user,
                     service=post.service,
                     title=post.title,
-                    added=post.added.strftime(time_format) if post.added else "[]",
-                    published=post.published.strftime(time_format) if post.published else "[]",
-                    edited=post.edited.strftime(time_format) if post.edited else "[]"
+                    added=post.added.strftime(time_format) if post.added else "",
+                    published=post.published.strftime(time_format) if post.published else "",
+                    edited=post.edited.strftime(time_format) if post.edited else ""
                 )
             )
         except KeyError as e:
