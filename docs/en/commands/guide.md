@@ -63,8 +63,8 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 
 `sync-creator`
 
-- `--start-time`
-- `--end-time`
+- `--start-time`: Start time of the published time range for posts downloading.
+- `--end-time`: End time of the published time range for posts downloading.
 
 ```bash
 # From 2023-8-5 to 2023-12-6
