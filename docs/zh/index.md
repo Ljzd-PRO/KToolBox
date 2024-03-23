@@ -89,15 +89,17 @@ ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
   
 #### ⬇️🖌️ 下载作者的所有作品
 ```bash
+# 下载作者/画师最新的 10 个作品
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016
-```
-??? info "输出"
-    默认情况下你会在作者目录下得到一个 `creator-indices.ktoolbox` 文件，你可以用它来更新目录。
-  
 
-#### 🔄️ 更新一个作者目录
-```bash
-ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
+# 下载作者/画师最新的第 11 至 15 个作品
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --length=10
+
+# 下载作者/画师的所有作品
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
+
+# 下载作者/画师从 2024-1-1 到 2024-3-1 的作品
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 --end-time=2024-3-1
 ```
 ??? info "关于 `creator-indices.ktoolbox` 文件"
-    `creator-indices.ktoolbox` 包含目录下的所有作品的信息和路径。
+    默认情况下你会在作者目录下得到一个 `creator-indices.ktoolbox` 文件，它包含目录下的所有作品的信息和路径。
