@@ -138,8 +138,7 @@ class JobConfiguration(BaseModel):
     e.g. ``[{published}]{id}`` > ``[2024-1-1]123123``, ``{user}_{published}_{title}`` > ``234234_2024-1-1_HelloWorld``
     :ivar post_structure: Post path structure
     :ivar mix_posts: Save all files from different posts at same path in creator directory. \
-    It would not create any post directory, and ``CreatorIndices`` would not been recorded, \
-    without ``CreatorIndices`` you **cannot update** the creator directory.
+    It would not create any post directory, and ``CreatorIndices`` would not been recorded.
     :ivar sequential_filename: Rename attachments in numerical order, e.g. ``1.png``, ``2.png``, ...
     """
     count: int = 4
