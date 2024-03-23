@@ -41,6 +41,9 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016
     By default, you will get a `creator-indices.ktoolbox` file in the creator directory, 
     it contains the information and filepath of posts inside the directory.
 
+??? tip "Update creator directory"
+    You can rerun the command, files with the same filename will be skipped.
+
 ## Download a specified number of posts from the creator
 
 `sync-creator`
