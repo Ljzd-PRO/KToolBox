@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.11">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.14">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.7e359304.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.10ba22f1.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
@@ -944,19 +944,22 @@
 <div class="highlight"><pre><span></span><code># 可同时下载10个文件
 KTOOLBOX_JOB__COUNT=10
 
-# 为每个下载任务分配 102400 字节内存作为缓冲区
-KTOOLBOX_DOWNLOADER__BUFFER_SIZE=102400
-
 # 设置作品附件目录为 `./`, 这意味着所有附件将直接保存在作品目录下
 # 而不会创建一个子目录来储存
 KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 
+# 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
+KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
+
+# 将发布日期作为作品目录名的开头，例如 `[2024-1-1]HelloWorld`
+KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title}
+
+# 为每个下载任务分配 102400 字节内存作为缓冲区
+KTOOLBOX_DOWNLOADER__BUFFER_SIZE=102400
+
 # 为Kemono API服务器和下载服务器禁用SSL证书检查
 # 在Kemono服务器的证书过期时很有用 （SSL: CERTIFICATE_VERIFY_FAILED）
 KTOOLBOX_SSL_VERIFY=False
-
-# 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
 </code></pre></div>
 
 
@@ -1099,7 +1102,7 @@ KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
     <script id="__config" type="application/json">{"base": "../../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.action.edit"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.bd41221c.min.js"></script>
       
     
   </body>

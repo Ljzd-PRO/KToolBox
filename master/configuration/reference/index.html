@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.11">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.14">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.7e359304.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.10ba22f1.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -1024,6 +1024,33 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.use_bucket" class="md-nav__link">
+    <span class="md-ellipsis">
+      use_bucket
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.bucket_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      bucket_path
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.check_bucket_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      check_bucket_path
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1091,6 +1118,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.JobConfiguration.post_dirname_format" class="md-nav__link">
+    <span class="md-ellipsis">
+      post_dirname_format
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ktoolbox.configuration.JobConfiguration.post_structure" class="md-nav__link">
     <span class="md-ellipsis">
       post_structure
@@ -1112,6 +1148,15 @@
   <a href="#ktoolbox.configuration.JobConfiguration.sequential_filename" class="md-nav__link">
     <span class="md-ellipsis">
       sequential_filename
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.JobConfiguration.post_id_as_path_validator" class="md-nav__link">
+    <span class="md-ellipsis">
+      post_id_as_path_validator
     </span>
   </a>
   
@@ -1542,6 +1587,33 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.use_bucket" class="md-nav__link">
+    <span class="md-ellipsis">
+      use_bucket
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.bucket_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      bucket_path
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.DownloaderConfiguration.check_bucket_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      check_bucket_path
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1609,6 +1681,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.JobConfiguration.post_dirname_format" class="md-nav__link">
+    <span class="md-ellipsis">
+      post_dirname_format
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ktoolbox.configuration.JobConfiguration.post_structure" class="md-nav__link">
     <span class="md-ellipsis">
       post_structure
@@ -1630,6 +1711,15 @@
   <a href="#ktoolbox.configuration.JobConfiguration.sequential_filename" class="md-nav__link">
     <span class="md-ellipsis">
       sequential_filename
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.JobConfiguration.post_id_as_path_validator" class="md-nav__link">
+    <span class="md-ellipsis">
+      post_id_as_path_validator
     </span>
   </a>
   
@@ -1743,7 +1833,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>Kemono API Configuration</p>
             </div>
           </td>
         </tr>
@@ -1754,7 +1844,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>File Downloader Configuration</p>
             </div>
           </td>
         </tr>
@@ -1765,7 +1855,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>Download jobs Configuration</p>
             </div>
           </td>
         </tr>
@@ -1776,7 +1866,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>Logger configuration</p>
             </div>
           </td>
         </tr>
@@ -1818,45 +1908,46 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span>
-<span class="normal">132</span>
-<span class="normal">133</span>
-<span class="normal">134</span>
-<span class="normal">135</span>
-<span class="normal">136</span>
-<span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span>
-<span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Configuration</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Configuration</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
     <span class="c1"># noinspection SpellCheckingInspection,GrazieInspection</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    KToolBox Configuration</span>
 
-<span class="sd">    :ivar api:</span>
-<span class="sd">    :ivar downloader:</span>
-<span class="sd">    :ivar job:</span>
-<span class="sd">    :ivar logger:</span>
+<span class="sd">    :ivar api: Kemono API Configuration</span>
+<span class="sd">    :ivar downloader: File Downloader Configuration</span>
+<span class="sd">    :ivar job: Download jobs Configuration</span>
+<span class="sd">    :ivar logger: Logger configuration</span>
 <span class="sd">    :ivar ssl_verify: Enable SSL certificate verification for Kemono API server and download server</span>
 <span class="sd">    :ivar json_dump_indent: Indent of JSON file dump</span>
 <span class="sd">    :ivar use_uvloop: Use uvloop for asyncio (Disabled on Windows by default) \</span>
@@ -1877,7 +1968,8 @@
         <span class="n">env_prefix</span><span class="o">=</span><span class="s1">&#39;ktoolbox_&#39;</span><span class="p">,</span>
         <span class="n">env_nested_delimiter</span><span class="o">=</span><span class="s1">&#39;__&#39;</span><span class="p">,</span>
         <span class="n">env_file</span><span class="o">=</span><span class="s1">&#39;.env&#39;</span><span class="p">,</span>
-        <span class="n">env_file_encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span>
+        <span class="n">env_file_encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -2164,11 +2256,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">25</span>
 <span class="normal">26</span>
 <span class="normal">27</span>
 <span class="normal">28</span>
@@ -2184,7 +2272,11 @@
 <span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
-<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">APIConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">APIConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Kemono API Configuration</span>
 
@@ -2516,16 +2608,34 @@
             </div>
           </td>
         </tr>
+        <tr>
+          <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.DownloaderConfiguration.use_bucket" href="#ktoolbox.configuration.DownloaderConfiguration.use_bucket">use_bucket</a></code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Enable local storage bucket mode</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.DownloaderConfiguration.bucket_path" href="#ktoolbox.configuration.DownloaderConfiguration.bucket_path">bucket_path</a></code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Path of local storage bucket</p>
+            </div>
+          </td>
+        </tr>
     </tbody>
   </table>
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">48</span>
 <span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span>
@@ -2544,7 +2654,32 @@
 <span class="normal">64</span>
 <span class="normal">65</span>
 <span class="normal">66</span>
-<span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DownloaderConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DownloaderConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    File Downloader Configuration</span>
 
@@ -2558,6 +2693,8 @@
 <span class="sd">    :ivar retry_stop_never: Never stop downloader from retrying (when download failed) \</span>
 <span class="sd">    (``retry_times`` will be ignored when enabled)</span>
 <span class="sd">    :ivar retry_interval: Seconds of downloader retry interval</span>
+<span class="sd">    :ivar use_bucket: Enable local storage bucket mode</span>
+<span class="sd">    :ivar bucket_path: Path of local storage bucket</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">scheme</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;http&quot;</span><span class="p">,</span> <span class="s2">&quot;https&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;https&quot;</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">30.0</span>
@@ -2568,6 +2705,25 @@
     <span class="n">retry_times</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
     <span class="n">retry_stop_never</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">retry_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">3.0</span>
+    <span class="n">use_bucket</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">bucket_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;./.ktoolbox/bucket_storage&quot;</span><span class="p">)</span>
+
+    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">check_bucket_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DownloaderConfiguration&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_bucket</span><span class="p">:</span>
+            <span class="c1"># noinspection PyBroadException</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">bucket_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket_path</span><span class="p">)</span>
+                <span class="n">bucket_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryFile</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">bucket_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">temp_file</span><span class="p">:</span>
+                    <span class="n">temp_link_file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bucket_path</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">temp_file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.hlink&quot;</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">temp_file</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">temp_link_file_path</span><span class="p">)</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">temp_link_file_path</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">use_bucket</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`DownloaderConfiguration.bucket_path` is not available, &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;`DownloaderConfiguration.use_bucket` has been disabled.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
             </details>
 
@@ -2761,7 +2917,99 @@
 
 </div>
 
+<div class="doc doc-object doc-attribute">
 
+
+
+<h3 id="ktoolbox.configuration.DownloaderConfiguration.use_bucket" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">use_bucket</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.configuration.DownloaderConfiguration.use_bucket" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ktoolbox.configuration.DownloaderConfiguration.bucket_path" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">bucket_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;./.ktoolbox/bucket_storage&#39;</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.configuration.DownloaderConfiguration.bucket_path" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="ktoolbox.configuration.DownloaderConfiguration.check_bucket_path" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">check_bucket_path</span><span class="p">()</span></code>
+
+<a href="#ktoolbox.configuration.DownloaderConfiguration.check_bucket_path" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+
+          <details class="quote">
+            <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">check_bucket_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DownloaderConfiguration&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_bucket</span><span class="p">:</span>
+        <span class="c1"># noinspection PyBroadException</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">bucket_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket_path</span><span class="p">)</span>
+            <span class="n">bucket_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryFile</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">bucket_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">temp_file</span><span class="p">:</span>
+                <span class="n">temp_link_file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bucket_path</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">temp_file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.hlink&quot;</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">temp_file</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">temp_link_file_path</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">temp_link_file_path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">use_bucket</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`DownloaderConfiguration.bucket_path` is not available, &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;`DownloaderConfiguration.use_bucket` has been disabled.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
 
 
 
@@ -2789,13 +3037,13 @@
       <p>Post path structure model</p>
 <ul>
 <li>Default:
-<div class="highlight"><pre><span></span><code>|-- ..
-|-- attachments
-|   |-- 1.png
-|   |-- 2.png
-|-- content.txt
-|-- &lt;Post file&gt;
-|-- &lt;Post data (post.ktoolbox.json)&gt;
+<div class="highlight"><pre><span></span><code>..
+├─ content.txt
+├─ &lt;Post file&gt;
+├─ &lt;Post data (post.ktoolbox.json)&gt;
+└─ attachments
+   ├─ 1.png
+   └─ 2.png
 </code></pre></div></li>
 </ul>
 
@@ -2838,40 +3086,40 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span>
-<span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span>
-<span class="normal">89</span>
-<span class="normal">90</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">PostStructureConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">PostStructureConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="c1"># noinspection SpellCheckingInspection</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Post path structure model</span>
 
 <span class="sd">    - Default:</span>
 <span class="sd">    ```</span>
-<span class="sd">    |-- ..</span>
-<span class="sd">    |-- attachments</span>
-<span class="sd">    |   |-- 1.png</span>
-<span class="sd">    |   |-- 2.png</span>
-<span class="sd">    |-- content.txt</span>
-<span class="sd">    |-- &lt;Post file&gt;</span>
-<span class="sd">    |-- &lt;Post data (post.ktoolbox.json)&gt;</span>
+<span class="sd">    ..</span>
+<span class="sd">    ├─ content.txt</span>
+<span class="sd">    ├─ &lt;Post file&gt;</span>
+<span class="sd">    ├─ &lt;Post data (post.ktoolbox.json)&gt;</span>
+<span class="sd">    └─ attachments</span>
+<span class="sd">       ├─ 1.png</span>
+<span class="sd">       └─ 2.png</span>
 <span class="sd">    ```</span>
 
 <span class="sd">    :ivar attachments: Sub path of attachment directory</span>
@@ -2958,6 +3206,49 @@
 
   
       <p>Download jobs Configuration</p>
+<ul>
+<li>
+<p>Available properties for <code>post_dirname_format</code></p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>user</code></td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>service</code></td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>added</code></td>
+<td>Date</td>
+</tr>
+<tr>
+<td><code>published</code></td>
+<td>Date</td>
+</tr>
+<tr>
+<td><code>edited</code></td>
+<td>Date</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
 
 
 
@@ -2989,7 +3280,18 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Use post ID as post directory name</p>
+              <p>(<strong>Deprecated</strong>) Use post ID as post directory name</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.JobConfiguration.post_dirname_format" href="#ktoolbox.configuration.JobConfiguration.post_dirname_format">post_dirname_format</a></code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Customize the post directory name format, you can use some of the     <a href="/configuration/reference/#ktoolbox.configuration.JobConfiguration">properties</a> in <code>Post</code>.     e.g. <code>[{published}]{id}</code> &gt; <code>[2024-1-1]123123</code>, <code>{user}_{published}_{title}</code> &gt; <code>234234_2024-1-1_HelloWorld</code></p>
             </div>
           </td>
         </tr>
@@ -3011,7 +3313,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Save all files from different posts at same path in creator directory.     It would not create any post directory, and <code>CreatorIndices</code> would not been recorded,     without <code>CreatorIndices</code> you <strong>cannot update</strong> the creator directory.</p>
+              <p>Save all files from different posts at same path in creator directory.     It would not create any post directory, and <code>CreatorIndices</code> would not been recorded.</p>
             </div>
           </td>
         </tr>
@@ -3031,39 +3333,93 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">JobConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">JobConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Download jobs Configuration</span>
 
+<span class="sd">    - Available properties for ``post_dirname_format``</span>
+
+<span class="sd">        | Property      | Type   |</span>
+<span class="sd">        |---------------|--------|</span>
+<span class="sd">        | ``id``        | String |</span>
+<span class="sd">        | ``user``      | String |</span>
+<span class="sd">        | ``service``   | String |</span>
+<span class="sd">        | ``title``     | String |</span>
+<span class="sd">        | ``added``     | Date   |</span>
+<span class="sd">        | ``published`` | Date   |</span>
+<span class="sd">        | ``edited``    | Date   |</span>
+
 <span class="sd">    :ivar count: Number of coroutines for concurrent download</span>
-<span class="sd">    :ivar post_id_as_path: Use post ID as post directory name</span>
+<span class="sd">    :ivar post_id_as_path: (**Deprecated**) Use post ID as post directory name</span>
+<span class="sd">    :ivar post_dirname_format: Customize the post directory name format, you can use some of the \</span>
+<span class="sd">    [properties](/configuration/reference/#ktoolbox.configuration.JobConfiguration) in ``Post``. \</span>
+<span class="sd">    e.g. ``[{published}]{id}`` &gt; ``[2024-1-1]123123``, ``{user}_{published}_{title}`` &gt; ``234234_2024-1-1_HelloWorld``</span>
 <span class="sd">    :ivar post_structure: Post path structure</span>
 <span class="sd">    :ivar mix_posts: Save all files from different posts at same path in creator directory. \</span>
-<span class="sd">    It would not create any post directory, and ``CreatorIndices`` would not been recorded, \</span>
-<span class="sd">    without ``CreatorIndices`` you **cannot update** the creator directory.</span>
+<span class="sd">    It would not create any post directory, and ``CreatorIndices`` would not been recorded.</span>
 <span class="sd">    :ivar sequential_filename: Rename attachments in numerical order, e.g. ``1.png``, ``2.png``, ...</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
     <span class="n">post_id_as_path</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">post_dirname_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{title}</span><span class="s2">&quot;</span>
     <span class="n">post_structure</span><span class="p">:</span> <span class="n">PostStructureConfiguration</span> <span class="o">=</span> <span class="n">PostStructureConfiguration</span><span class="p">()</span>
     <span class="n">mix_posts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">sequential_filename</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># job_list_filepath: Optional[Path] = None</span>
+    <span class="c1"># &quot;&quot;&quot;Filepath for job list data saving, ``None`` for disable job list saving&quot;&quot;&quot;</span>
+
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;post_id_as_path&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">post_id_as_path_validator</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="o">!=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">model_fields</span><span class="p">[</span><span class="s2">&quot;post_id_as_path&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">default</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;`JobConfiguration.post_id_as_path` is deprecated and is scheduled for removal in further version. &quot;</span>
+                <span class="s2">&quot;Use `JobConfiguration.post_dirname_format` instead&quot;</span><span class="p">,</span>
+                <span class="ne">FutureWarning</span>
+            <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
 
@@ -3110,6 +3466,26 @@
   </span>
 
 <a href="#ktoolbox.configuration.JobConfiguration.post_id_as_path" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ktoolbox.configuration.JobConfiguration.post_dirname_format" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">post_dirname_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{title}</span><span class="s1">&#39;</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.configuration.JobConfiguration.post_dirname_format" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -3178,6 +3554,42 @@
 </div>
 
 
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="ktoolbox.configuration.JobConfiguration.post_id_as_path_validator" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">post_id_as_path_validator</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></code>
+
+<a href="#ktoolbox.configuration.JobConfiguration.post_id_as_path_validator" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+
+          <details class="quote">
+            <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;post_id_as_path&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">post_id_as_path_validator</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">v</span> <span class="o">!=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">model_fields</span><span class="p">[</span><span class="s2">&quot;post_id_as_path&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">default</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;`JobConfiguration.post_id_as_path` is deprecated and is scheduled for removal in further version. &quot;</span>
+            <span class="s2">&quot;Use `JobConfiguration.post_dirname_format` instead&quot;</span><span class="p">,</span>
+            <span class="ne">FutureWarning</span>
+        <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
 
 
 
@@ -3254,17 +3666,17 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">LoggerConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">LoggerConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Logger configuration</span>
 
@@ -3499,7 +3911,7 @@
     <script id="__config" type="application/json">{"base": "../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.action.edit"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
+      <script src="../../assets/javascripts/bundle.bd41221c.min.js"></script>
       
     
   </body>

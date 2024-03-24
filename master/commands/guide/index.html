@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.11">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.14">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.7e359304.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.10ba22f1.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -691,15 +691,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#update-a-downloaded-creator-directory" class="md-nav__link">
-    <span class="md-ellipsis">
-      Update a downloaded creator directory
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#download-posts-that-published-within-the-specified-time-range" class="md-nav__link">
     <span class="md-ellipsis">
       Download posts that published within the specified time range
@@ -996,15 +987,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#update-a-downloaded-creator-directory" class="md-nav__link">
-    <span class="md-ellipsis">
-      Update a downloaded creator directory
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#download-posts-that-published-within-the-specified-time-range" class="md-nav__link">
     <span class="md-ellipsis">
       Download posts that published within the specified time range
@@ -1076,29 +1058,23 @@ the downloaded files will be <strong>skipped</strong>.</p>
 </details>
 <h2 id="download-all-posts-from-a-creator">Download all posts from a creator<a class="headerlink" href="#download-all-posts-from-a-creator" title="Permanent link">&para;</a></h2>
 <p><code>sync-creator</code></p>
-<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016
-</code></pre></div>
-<details class="info">
-<summary>Output</summary>
-<p>By default, you will get a <code>creator-indices.ktoolbox</code> file in the creator directory, 
-you can use it to update the directory anytime.</p>
-</details>
-<h2 id="update-a-downloaded-creator-directory">Update a downloaded creator directory<a class="headerlink" href="#update-a-downloaded-creator-directory" title="Permanent link">&para;</a></h2>
-<p><code>sync-creator</code></p>
-<ul>
-<li><code>--update-with</code></li>
-</ul>
-<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/641955<span class="w"> </span>--update-with<span class="o">=</span>./xxx/creator-indices.ktoolbox
+<div class="highlight"><pre><span></span><code><span class="c1"># Download all posts of the creator/artist</span>
+ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016
 </code></pre></div>
 <details class="info">
 <summary>About <code>creator-indices.ktoolbox</code> file</summary>
-<p>The <code>creator-indices.ktoolbox</code> file contains the information and filepath of posts inside the directory.</p>
+<p>By default, you will get a <code>creator-indices.ktoolbox</code> file in the creator directory, 
+it contains the information and filepath of posts inside the directory.</p>
+</details>
+<details class="tip">
+<summary>Update creator directory</summary>
+<p>You can rerun the command, files with the same filename will be skipped.</p>
 </details>
 <h2 id="download-posts-that-published-within-the-specified-time-range">Download posts that published within the specified time range<a class="headerlink" href="#download-posts-that-published-within-the-specified-time-range" title="Permanent link">&para;</a></h2>
 <p><code>sync-creator</code></p>
 <ul>
-<li><code>--start-time</code></li>
-<li><code>--end-time</code></li>
+<li><code>--start-time</code>: Start time of the published time range for posts downloading.</li>
+<li><code>--end-time</code>: End time of the published time range for posts downloading.</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="c1"># From 2023-8-5 to 2023-12-6</span>
 ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/641955<span class="w"> </span>--start-time<span class="o">=</span><span class="m">2023</span>-8-5<span class="w"> </span>--end-time<span class="o">=</span><span class="m">2023</span>-12-6
@@ -1257,7 +1233,7 @@ ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemo
     <script id="__config" type="application/json">{"base": "../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.action.edit"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
+      <script src="../../assets/javascripts/bundle.bd41221c.min.js"></script>
       
     
   </body>

@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.11">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.14">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.7e359304.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.10ba22f1.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -942,19 +942,22 @@
 <div class="highlight"><pre><span></span><code># Download 10 files at the same time.
 KTOOLBOX_JOB__COUNT=10
 
-# Allocate 102400 Bytes as buffer for each download job
-KTOOLBOX_DOWNLOADER__BUFFER_SIZE=102400
-
 # Set post attachments directory path as `./`, it means to save all attachments files in post directory
 # without making a new sub directory to storage them
 KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 
+# Rename attachments in numerical order, e.g. `1.png`, `2.png`, ...
+KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
+
+# Prefix the post directory name with its release/publish date, e.g. `[2024-1-1]HelloWorld`
+KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title}
+
+# Allocate 102400 Bytes as buffer for each download job
+KTOOLBOX_DOWNLOADER__BUFFER_SIZE=102400
+
 # Disable SSL certificate verification for Kemono API server and download server
 # It&#39;s useful when certificate on Kemono server expired. (SSL: CERTIFICATE_VERIFY_FAILED)
 KTOOLBOX_SSL_VERIFY=False
-
-# Rename attachments in numerical order, e.g. `1.png`, `2.png`, ...
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
 </code></pre></div>
 
 
@@ -1097,7 +1100,7 @@ KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
     <script id="__config" type="application/json">{"base": "../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.action.edit"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
+      <script src="../../assets/javascripts/bundle.bd41221c.min.js"></script>
       
     
   </body>
