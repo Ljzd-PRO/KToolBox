@@ -33,30 +33,21 @@ ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
 `sync-creator`
 
 ```bash
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016
-```
-??? info "输出"
-    默认情况下你会在作者目录下得到一个 `creator-indices.ktoolbox` 文件，你可以用它来更新目录。
-  
-
-## 更新一个作者目录
-
-`sync-creator`
-
-- `--update-with`
-
-```bash
-ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
+# 下载作者/画师的所有作品
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 ```
 ??? info "关于 `creator-indices.ktoolbox` 文件"
-    `creator-indices.ktoolbox` 包含目录下的所有作品的信息和路径。
+    默认情况下你会在作者目录下得到一个 `creator-indices.ktoolbox` 文件，它包含目录下的所有作品的信息和路径。
+
+??? tip "更新作者目录"
+    你可以再次运行命令，文件名相同的文件将会被跳过。
 
 ## 下载在指定时间范围内发布的作品
 
 `sync-creator`
 
-- `--start-time`
-- `--end-time`
+- `--start-time`：下载指定开始时间范围内的作品
+- `--end-time`：下载指定结束时间范围内的作品
 
 ```bash
 # 从 2023-8-5 到 2023-12-6

@@ -1,10 +1,11 @@
 from datetime import datetime
 from pathlib import Path
 from typing import List, Union, Optional
+from urllib.parse import urlparse
 
 import aiofiles
 from loguru import logger
-from pathvalidate import sanitize_filename
+from pathvalidate import sanitize_filename, is_valid_filename
 
 from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.action import ActionRet, fetch_all_creator_posts, FetchInterruptError
@@ -52,7 +53,13 @@ async def create_job_from_post(
     for i, attachment in enumerate(post.attachments or []):  # type: int, Attachment
         if not attachment.path:
             continue
-        alt_filename = f"{i + 1}{Path(attachment.name).suffix}" if config.job.sequential_filename else attachment.name
+        if is_valid_filename(attachment.name):
+            alt_filename = f"{i + 1}{Path(attachment.name).suffix}" if config.job.sequential_filename \
+                else attachment.name
+        else:
+            attachment_path_without_params = urlparse(attachment.path).path
+            alt_filename = f"{i + 1}{Path(attachment_path_without_params).suffix}" if config.job.sequential_filename \
+                else None
         jobs.append(
             Job(
                 path=attachments_path,

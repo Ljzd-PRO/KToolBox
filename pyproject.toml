@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ktoolbox"
-version = "0.4.0"
+version = "0.5.0"
 description = "A useful CLI tool for downloading posts in Kemono.party / .su"
 authors = ["Ljzd-PRO <ljzd@office.ljzd-pro.asia>"]
 readme = "README.md"
@@ -11,7 +11,7 @@ documentation = "https://ktoolbox.readthedocs.io/"
 keywords = ["kemono", "kemono.party", "cli-app", "downloader", "os-independent"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Development Status :: 5 - Production/Stable",
     "Topic :: Terminals",
@@ -30,8 +30,8 @@ python = ">=3.8,<3.12"
 pydantic = "^2.4.2"
 pydantic-settings = "^2.0.3"
 tenacity = "^8.2.3"
-httpx = {version=">=0.24.1,<0.27.0", extras=["socks"]}
-fire = "^0.5.0"
+httpx = {version=">=0.24.1,<0.28.0", extras=["socks"]}
+fire = ">=0.5,<0.7"
 tqdm = "^4.66.1"
 loguru = "^0.7.2"
 aiofiles = "^23.2.1"
@@ -41,7 +41,7 @@ pathvalidate = "^3.2.0"
 uvloop = "^0.19.0"
 
 [tool.poetry.group.pyinstaller.dependencies]
-pyinstaller = "==6.3.0"
+pyinstaller = "==6.5.0"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.5.3"
@@ -51,7 +51,7 @@ mkdocstrings = {version="^0.24.0", extras=["python"]}
 mike = "^2.0.0"
 
 [tool.poetry.group.test.dependencies]
-pytest = "==7.4.3"
+pytest = "==8.1.1"
 pytest-asyncio = "==0.23.5"
 pytest-cov = "==4.1.0"
 allpairspy = "==2.5.1"

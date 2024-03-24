@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional, List, Generator, Any, Tuple
 
+from loguru import logger
 from pathvalidate import sanitize_filename
 
 from ktoolbox.api.model import Post
@@ -15,7 +16,22 @@ def generate_post_path_name(post: Post) -> str:
     if config.job.post_id_as_path or not post.title:
         return post.id
     else:
-        return sanitize_filename(post.title)
+        time_format = "%Y-%m-%d"
+        try:
+            return sanitize_filename(
+                config.job.post_dirname_format.format(
+                    id=post.id,
+                    user=post.user,
+                    service=post.service,
+                    title=post.title,
+                    added=post.added.strftime(time_format) if post.added else "",
+                    published=post.published.strftime(time_format) if post.published else "",
+                    edited=post.edited.strftime(time_format) if post.edited else ""
+                )
+            )
+        except KeyError as e:
+            logger.error(f"`JobConfiguration.post_dirname_format` contains invalid key: {e}")
+            exit(1)
 
 
 def _match_post_time(
