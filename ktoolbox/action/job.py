@@ -1,4 +1,5 @@
 from datetime import datetime
+from itertools import count
 from pathlib import Path
 from typing import List, Union, Optional
 from urllib.parse import urlparse
@@ -8,10 +9,9 @@ from loguru import logger
 from pathvalidate import sanitize_filename, is_valid_filename
 
 from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
-from ktoolbox.action import ActionRet, fetch_all_creator_posts, FetchInterruptError
+from ktoolbox.action import ActionRet, fetch_creator_posts, FetchInterruptError
 from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_time
 from ktoolbox.api.model import Post, Attachment
-from ktoolbox.api.posts import get_creator_post
 from ktoolbox.configuration import config, PostStructureConfiguration
 from ktoolbox.job import Job, CreatorIndices
 
@@ -97,7 +97,8 @@ async def create_job_from_creator(
         path: Path,
         *,
         all_pages: bool = False,
-        o: int = None,
+        offset: int = 0,
+        length: int = 50,
         save_creator_indices: bool = True,
         mix_posts: bool = None,
         start_time: Optional[datetime],
@@ -109,8 +110,9 @@ async def create_job_from_creator(
     :param service: The service where the post is located
     :param creator_id: The ID of the creator
     :param path: The path for posts to download
-    :param all_pages: Fetch all pages of posts, ``o`` will be ignored if enabled
-    :param o: Result offset, stepping of 50 is enforced
+    :param all_pages: Fetch all posts, ``offset`` and ``length`` will be ignored if enabled
+    :param offset: Result offset (or start offset)
+    :param length: The number of posts to fetch
     :param save_creator_indices: Record ``CreatorIndices`` data for update posts from current creator directory
     :param mix_posts: Save all files from different posts at same path, \
      ``update_from``, ``save_creator_indices`` will be ignored if enabled
@@ -121,19 +123,22 @@ async def create_job_from_creator(
 
     # Get posts
     logger.info(f"Start fetching posts from creator {creator_id}")
-    if all_pages:
-        post_list: List[Post] = []
-        try:
-            async for part in fetch_all_creator_posts(service=service, creator_id=creator_id):
+    post_list: List[Post] = []
+    start_offset = offset - offset % 50
+    page_num = length // 50 + 1
+    page_counter = count() if all_pages else iter(range(page_num))
+
+    try:
+        async for part in fetch_creator_posts(service=service, creator_id=creator_id, o=start_offset):
+            if next(page_counter, None) is not None:
                 post_list += part
-        except FetchInterruptError as e:
-            return ActionRet(**e.ret.dict())
-    else:
-        ret = await get_creator_post(service=service, creator_id=creator_id, o=o)
-        if ret:
-            post_list = ret.data
-        else:
-            return ActionRet(**ret.dict())
+            else:
+                break
+    except FetchInterruptError as e:
+        return ActionRet(**e.ret.dict())
+
+    if not all_pages:
+        post_list = post_list[offset % 50:][:length]
 
     # Filter posts by publish time
     if start_time or end_time:

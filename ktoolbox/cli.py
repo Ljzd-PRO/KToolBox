@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Union, overload, Tuple
+from typing import Union, overload
 
 import aiofiles
 from loguru import logger
@@ -191,7 +191,6 @@ class KToolBoxCli:
             *,
             save_creator_indices: bool = True,
             mix_posts: bool = None,
-            time_range: Tuple[str, str] = None,
             start_time: str = None,
             end_time: str = None
     ):
@@ -206,7 +205,6 @@ class KToolBoxCli:
             *,
             save_creator_indices: bool = True,
             mix_posts: bool = None,
-            time_range: Tuple[str, str] = None,
             start_time: str = None,
             end_time: str = None
     ):
@@ -222,10 +220,12 @@ class KToolBoxCli:
             save_creator_indices: bool = True,
             mix_posts: bool = None,
             start_time: str = None,
-            end_time: str = None
+            end_time: str = None,
+            offset: int = 0,
+            length: int = None
     ):
         """
-        Sync all posts from a creator
+        Sync posts from a creator
 
         You can update the directory anytime after download finished, \
         such as to update after creator published new posts.
@@ -238,7 +238,7 @@ class KToolBoxCli:
         :param creator_id: The ID of the creator
         :param path: Download path, default is current directory
         :param save_creator_indices: Record ``CreatorIndices`` data for update posts from current creator directory
-        :param mix_posts: Save all files from different posts at same path, \
+        :param mix_posts: Save all_pages files from different posts at same path, \
             ``update_from``, ``save_creator_indices`` will be ignored if enabled
         :param start_time: Start time of the published time range for posts downloading. \
             Set to ``0`` if ``None`` was given. \
@@ -246,6 +246,8 @@ class KToolBoxCli:
         :param end_time: End time of the published time range for posts downloading. \
             Set to latest time (infinity) if ``None`` was given. \
             Time format: ``%Y-%m-%d``
+        :param offset: Result offset (or start offset)
+        :param length: The number of posts to fetch, defaults to fetching all posts.
         """
         # Get service, creator_id
         if url:
@@ -288,7 +290,9 @@ class KToolBoxCli:
             service=service,
             creator_id=creator_id,
             path=creator_path,
-            all_pages=True,
+            all_pages=not length,
+            offset=offset,
+            length=length,
             save_creator_indices=save_creator_indices,
             mix_posts=mix_posts,
             start_time=datetime.strptime(start_time, "%Y-%m-%d") if start_time else None,
