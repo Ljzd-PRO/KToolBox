@@ -88,18 +88,14 @@ ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
     If some files failed to download, you can try to execute the command line again, 
     the downloaded files will be **skipped**.
   
-#### ⬇️🖌️ Download all posts from a creator
+#### ⬇️🖌️ Download posts from a creator
 ```bash
+# Download all posts of the creator/artist
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016
-```
-??? info "Output"
-    By default, you will get a `creator-indices.ktoolbox` file in the creator directory, 
-    you can use it to update the directory anytime.
-  
 
-#### 🔄️ Update a downloaded creator directory
-```bash
-ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --update-with=./xxx/creator-indices.ktoolbox
+# Download posts from the creator/artist from 2024-1-1 to 2024-3-1
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 --end-time=2024-3-1
 ```
 ??? info "About `creator-indices.ktoolbox` file"
-    The `creator-indices.ktoolbox` file contains the information and filepath of posts inside the directory.
+    By default, you will get a `creator-indices.ktoolbox` file in the creator directory, 
+    it contains the information and filepath of posts inside the directory.
