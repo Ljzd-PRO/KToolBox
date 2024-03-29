@@ -1,61 +1,41 @@
 ## Changes
 
-### 🐍 Fix
-
-- Fixed download failure when server returns an invalid filename (`Attachment.name`) (#73)
-
 ### 💡 Feature
 
-- Add support for local storage bucket mode (#74) (@Nacosia)
-  - Edit `KTOOLBOX_DOWNLOADER__USE_BUCKET`, `KTOOLBOX_DOWNLOADER_BUCKET_PATH` in `prod.env` or environment variables to set this option
-  - 📖More information: [Configuration-Reference-DownloaderConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.DownloaderConfiguration)
-
-- Add support for customizing the post directory name format (#45, #46)
-  - Edit `KTOOLBOX_JOB__POST_DIRNAME_FORMAT` in `prod.env` or environment variables to set this option
-  - 📖More information: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
-   ```dotenv
-   # It will create directories like `[2024-1-1]HelloWorld`
-   KTOOLBOX_JOB__POST_DIRNAME_FORMAT="[{published}]{title}"
-   ```
-   ```dotenv
-   # It will create directories like `2024-1-1_12345_112233`
-   KTOOLBOX_JOB__POST_DIRNAME_FORMAT="{published}_{user}_{id}"
-   ```
-   ```dotenv
-   # Default value. It will create directories like `HelloWorld`
-   KTOOLBOX_JOB__POST_DIRNAME_FORMAT="{title}"
-   ```
-
-- Marked `JobConfiguration.post_id_as_path` as deprecated, use `JobConfiguration.post_dirname_format` instead
+- Added support for downloading works within a specified range of quantity.
+  - Added `--offset`, `--length` options in `sync-creator` command
+  - `--offset`: Posts result offset (or start offset)
+  - `--length`: The number of posts to fetch, defaults to fetching all posts
+  
+  ```bash
+  # Download latest 10 posts of the creator/artist
+  ktoolbox sync-creator https://kemono.su/fanbox/user/xxxx --length=10
+  
+  # Download latest No.11-No.15 posts of the creator/artist
+  ktoolbox sync-creator https://kemono.su/fanbox/user/xxxx --offset=10 --length=5
+  
+  # Download all posts of the creator/artist
+  ktoolbox sync-creator https://kemono.su/fanbox/user/xxxx
+  ```
 
 - - -
 
-### 🐍 修复
-
-- 修复当服务器返回的文件名不合法时下载出错的问题 (`Attachment.name`) (#73)
-
 ### 💡 新特性
 
-- 增加本地存储桶模式的存储支持 (#74) (@Nacosia)
-  - 在 `prod.env` 或环境变量中编辑 `KTOOLBOX_DOWNLOADER__USE_BUCKET`, `KTOOLBOX_DOWNLOADER_BUCKET_PATH` 以设置该选项
-  - 📖更多信息: [Configuration-Reference-DownloaderConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.DownloaderConfiguration)
+- 增加下载指定数量范围作品的支持
+  - 在 `sync-creator` 命令中增加了 `--offset`, `--length` 选项
+  - `--offset`：作品结果偏移量（或起始偏移量）
+  - `--length`：要获取的作品数量，默认获取所有作品
+  
+  ```bash
+  # 下载作者/画师最新的 10 个作品
+  ktoolbox sync-creator https://kemono.su/fanbox/user/xxxx --length=10
+  
+  # 下载作者/画师最新的第 11 至 15 个作品
+  ktoolbox sync-creator https://kemono.su/fanbox/user/xxxx --offset=10 --length=5
+  
+  # 下载作者/画师的所有作品
+  ktoolbox sync-creator https://kemono.su/fanbox/user/xxxx
+  ```
 
-- 增加支持自定义作品目录名格式 (#45, #46)
-  - 在 `prod.env` 或环境变量中编辑 `KTOOLBOX_JOB__POST_DIRNAME_FORMAT` 以设置该选项
-  - 📖更多信息: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
-   ```dotenv
-   # 将会创建例如 `[2024-1-1]HelloWorld` 的目录名
-   KTOOLBOX_JOB__POST_DIRNAME_FORMAT="[{published}]{title}"
-   ```
-   ```dotenv
-   # 将会创建例如 `2024-1-1_12345_112233` 的目录名
-   KTOOLBOX_JOB__POST_DIRNAME_FORMAT="{published}_{user}_{id}"
-   ```
-   ```dotenv
-   # 默认值。 将会创建例如 `HelloWorld` 的目录名
-   KTOOLBOX_JOB__POST_DIRNAME_FORMAT="{title}"
-   ```
-
-- 将 `JobConfiguration.post_id_as_path` 标记为已弃用, 请用 `JobConfiguration.post_dirname_format` 取代
-
-**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.4.0...v0.5.0
+**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.5.0...v0.5.1

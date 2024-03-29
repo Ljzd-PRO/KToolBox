@@ -5,7 +5,7 @@ from ktoolbox.api.posts import get_creator_post
 from ktoolbox.api.utils import SEARCH_STEP
 from ktoolbox.utils import BaseRet
 
-__all__ = ["FetchInterruptError", "fetch_all_creator_posts"]
+__all__ = ["FetchInterruptError", "fetch_creator_posts"]
 
 
 class FetchInterruptError(Exception):
@@ -16,16 +16,16 @@ class FetchInterruptError(Exception):
         self.ret = ret
 
 
-async def fetch_all_creator_posts(service: str, creator_id: str) -> AsyncGenerator[List[Post], Any]:
+async def fetch_creator_posts(service: str, creator_id: str, o: int = 0) -> AsyncGenerator[List[Post], Any]:
     """
-    Fetch all posts from a creator
+    Fetch posts from a creator
 
     :param service: The service where the post is located
     :param creator_id: The ID of the creator
+    :param o: Result offset, stepping of 50 is enforced
     :return: Async generator of several list of posts
     :raise FetchInterruptError
     """
-    o = 0
     while True:
         ret = await get_creator_post(service=service, creator_id=creator_id, o=o)
         if ret:
