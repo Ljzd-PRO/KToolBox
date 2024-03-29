@@ -247,7 +247,7 @@ class KToolBoxCli:
             Set to latest time (infinity) if ``None`` was given. \
             Time format: ``%Y-%m-%d``
         :param offset: Result offset (or start offset)
-        :param length: The number of posts to fetch, defaults to fetching all posts.
+        :param length: The number of posts to fetch, defaults to fetching all posts after ``offset``.
         """
         # Get service, creator_id
         if url:
