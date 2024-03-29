@@ -98,7 +98,7 @@ async def create_job_from_creator(
         *,
         all_pages: bool = False,
         offset: int = 0,
-        length: int = 50,
+        length: Optional[int] = 50,
         save_creator_indices: bool = True,
         mix_posts: bool = None,
         start_time: Optional[datetime],
@@ -125,8 +125,11 @@ async def create_job_from_creator(
     logger.info(f"Start fetching posts from creator {creator_id}")
     post_list: List[Post] = []
     start_offset = offset - offset % 50
-    page_num = length // 50 + 1
-    page_counter = count() if all_pages else iter(range(page_num))
+    if all_pages:
+        page_counter = count()
+    else:
+        page_num = length // 50 + 1
+        page_counter = iter(range(page_num))
 
     try:
         async for part in fetch_creator_posts(service=service, creator_id=creator_id, o=start_offset):
@@ -139,6 +142,8 @@ async def create_job_from_creator(
 
     if not all_pages:
         post_list = post_list[offset % 50:][:length]
+    else:
+        post_list = post_list[offset % 50:]
 
     # Filter posts by publish time
     if start_time or end_time:

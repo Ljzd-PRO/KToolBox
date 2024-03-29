@@ -2,7 +2,8 @@
 
 ### 💡 Feature
 
-- Add `--offset`, `--length` options in `sync-creator` command
+- Added support for downloading works within a specified range of quantity.
+  - Added `--offset`, `--length` options in `sync-creator` command
   - `--offset`: Posts result offset (or start offset)
   - `--length`: The number of posts to fetch, defaults to fetching all posts
   
@@ -21,7 +22,8 @@
 
 ### 💡 新特性
 
-- 在 `sync-creator` 命令中增加了 `--offset`, `--length` 选项
+- 增加下载指定数量范围作品的支持
+  - 在 `sync-creator` 命令中增加了 `--offset`, `--length` 选项
   - `--offset`：作品结果偏移量（或起始偏移量）
   - `--length`：要获取的作品数量，默认获取所有作品
   
