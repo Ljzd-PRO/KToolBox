@@ -85,7 +85,7 @@ class JobRunner:
             downloader = Downloader(
                 url=url,
                 path=job.path,
-                alt_filename=job.alt_filename,
+                designated_filename=job.alt_filename,
                 server_path=job.server_path
             )
 
