@@ -1,10 +1,12 @@
 import cgi
+import os
 import urllib.parse
-from typing import Optional, Dict
+from pathlib import Path
+from typing import Optional, Dict, Tuple
 
 from ktoolbox.configuration import config
 
-__all__ = ["filename_from_headers"]
+__all__ = ["filename_from_headers", "duplicate_file_check"]
 
 
 def parse_header(line: str) -> Dict[str, Optional[str]]:
@@ -67,3 +69,26 @@ def filename_from_headers(headers: Dict[str, str]) -> Optional[str]:
     if filename := options.get("filename"):
         return urllib.parse.unquote(filename, config.downloader.encoding)
     return None
+
+
+def duplicate_file_check(local_file_path: Path, bucket_file_path: Path = None) -> Tuple[bool, Optional[str]]:
+    """
+    Check if the file existed, and link the bucket filepath to local filepath \
+    if ``DownloaderConfiguration.use_bucket`` enabled.
+
+    :param local_file_path: Download target path
+    :param bucket_file_path: The bucket filepath of the local download path
+    :return: ``(if file existed, message)``
+    """
+    duplicate_check_path = bucket_file_path or local_file_path
+    if duplicate_check_path.is_file():
+        if config.downloader.use_bucket:
+            ret_msg = "Download file already exists in both bucket and local, skipping"
+            if not local_file_path.is_file():
+                ret_msg = "Download file already exists in bucket, linking to local path"
+                os.link(bucket_file_path, local_file_path)
+        else:
+            ret_msg = "Download file already exists, skipping"
+        return True, ret_msg
+    else:
+        return False, None

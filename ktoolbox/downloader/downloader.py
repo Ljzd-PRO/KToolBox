@@ -17,7 +17,7 @@ from tqdm import tqdm as std_tqdm
 
 from ktoolbox._enum import RetCodeEnum
 from ktoolbox.configuration import config
-from ktoolbox.downloader import DownloaderRet, filename_from_headers
+from ktoolbox.downloader import DownloaderRet, filename_from_headers, duplicate_file_check
 from ktoolbox.utils import generate_msg
 
 __all__ = ["Downloader"]
@@ -52,7 +52,7 @@ class Downloader:
         :param buffer_size: Number of bytes for file I/O buffer
         :param chunk_size: Number of bytes for chunk of download stream
         :param designated_filename: Manually specify the filename for saving
-        :param server_path: Server path of the file. if ``DownloaderConfiguration.use_bucket`` is ``True``, \
+        :param server_path: Server path of the file. if ``DownloaderConfiguration.use_bucket`` enabled, \
         it will be used as the save path.
         """
 
@@ -151,23 +151,15 @@ class Downloader:
         server_path_filename = unquote(Path(server_relpath_without_params).name)
         # Priority order can be referenced from the constructor's documentation
         save_filepath = self._path / (self._save_filename or server_path_filename)
-        duplicate_check_path = save_filepath
 
         # Get bucket file path
         bucket_file_path: Optional[Path] = None
         if config.downloader.use_bucket:
             bucket_file_path = config.downloader.bucket_path / server_relpath
-            duplicate_check_path = bucket_file_path
 
         # Check if the file exists
-        if duplicate_check_path.is_file():
-            if config.downloader.use_bucket:
-                ret_msg = "Download file already exists in both bucket and local, skipping"
-                if not save_filepath.is_file():
-                    ret_msg = "Download file already exists in bucket, linking to target path"
-                    os.link(bucket_file_path, save_filepath)
-            else:
-                ret_msg = "Download file already exists, skipping"
+        file_existed, ret_msg = duplicate_file_check(save_filepath, bucket_file_path)
+        if file_existed:
             return DownloaderRet(
                 code=RetCodeEnum.FileExisted,
                 message=generate_msg(
@@ -199,9 +191,19 @@ class Downloader:
                     # Priority order can be referenced from the constructor's documentation
                     self._save_filename = self._designated_filename or filename_from_headers(
                         res.headers) or server_path_filename
+                    save_filepath = self._path / self._save_filename
+                    file_existed, ret_msg = duplicate_file_check(save_filepath, bucket_file_path)
+                    if file_existed:
+                        return DownloaderRet(
+                            code=RetCodeEnum.FileExisted,
+                            message=generate_msg(
+                                ret_msg,
+                                path=save_filepath
+                            )
+                        )
 
                     # Download
-                    temp_filepath = Path(f"{(self._path / server_path_filename)}.{config.downloader.temp_suffix}")
+                    temp_filepath = Path(f"{save_filepath}.{config.downloader.temp_suffix}")
                     total_size = int(length_str) if (length_str := res.headers.get("Content-Length")) else None
                     async with aiofiles.open(str(temp_filepath), "wb", self._buffer_size) as f:
                         chunk_iterator = res.aiter_bytes(self._chunk_size)
