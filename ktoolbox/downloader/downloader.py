@@ -197,8 +197,8 @@ class Downloader:
 
                     # Get filename for saving and check if file exists (Second-time duplicate file check)
                     # Priority order can be referenced from the constructor's documentation
-                    self._save_filename = self._designated_filename or filename_from_headers(res.headers) or \
-                                          server_path_filename
+                    self._save_filename = self._designated_filename or filename_from_headers(
+                        res.headers) or server_path_filename
 
                     # Download
                     temp_filepath = Path(f"{(self._path / server_path_filename)}.{config.downloader.temp_suffix}")
