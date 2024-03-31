@@ -17,7 +17,8 @@ from tqdm import tqdm as std_tqdm
 
 from ktoolbox._enum import RetCodeEnum
 from ktoolbox.configuration import config
-from ktoolbox.downloader import DownloaderRet, filename_from_headers, duplicate_file_check
+from ktoolbox.downloader.base import DownloaderRet
+from ktoolbox.downloader.utils import filename_from_headers, duplicate_file_check
 from ktoolbox.utils import generate_msg
 
 __all__ = ["Downloader"]
