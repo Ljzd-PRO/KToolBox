@@ -44,6 +44,21 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016
 ??? tip "Update creator directory"
     You can rerun the command, files with the same filename will be skipped.
 
+## Download a specified number of posts from the creator
+
+`sync-creator`
+
+- `--offset`: Posts result offset (or start offset)
+- `--length`: The number of posts to fetch, defaults to fetching all posts
+
+```bash
+# Download latest 10 posts of the creator/artist
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --length=10
+
+# Download latest No.11-No.15 posts of the creator/artist
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
+```
+
 ## Download posts that published within the specified time range
 
 `sync-creator`
