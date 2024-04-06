@@ -92,6 +92,12 @@ ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
 # 下载作者/画师的所有作品
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016
 
+# 下载作者/画师最新的 10 个作品
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --length=10
+
+# 下载作者/画师最新的第 11 至 15 个作品
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
+
 # 下载作者/画师从 2024-1-1 到 2024-3-1 的作品
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 --end-time=2024-3-1
 ```
