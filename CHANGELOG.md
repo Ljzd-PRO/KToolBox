@@ -1,41 +1,23 @@
 ## Changes
 
-### 💡 Feature
+[//]: # (### 💡 Feature)
 
-- Added support for downloading works within a specified range of quantity.
-  - Added `--offset`, `--length` options in `sync-creator` command
-  - `--offset`: Posts result offset (or start offset)
-  - `--length`: The number of posts to fetch, defaults to fetching all posts
-  
-  ```bash
-  # Download latest 10 posts of the creator/artist
-  ktoolbox sync-creator https://kemono.su/fanbox/user/xxxx --length=10
-  
-  # Download latest No.11-No.15 posts of the creator/artist
-  ktoolbox sync-creator https://kemono.su/fanbox/user/xxxx --offset=10 --length=5
-  
-  # Download all posts of the creator/artist
-  ktoolbox sync-creator https://kemono.su/fanbox/user/xxxx
-  ```
+### 🪲 Fix
+
+- Fix `FileNotFoundError` occurred when filename contains special characters (#94)
+- Fix `TypeError` occurred when using `--start-time`, `--end-time` options and posts had no `published` property (#93)
+- Fixed incorrect argument order when using bucket storage (#89 - @Nacosia)
+- Duplicate file check after HTTP connection started (#88)
 
 - - -
 
-### 💡 新特性
+[//]: # (### 💡 新特性)
 
-- 增加下载指定数量范围作品的支持
-  - 在 `sync-creator` 命令中增加了 `--offset`, `--length` 选项
-  - `--offset`：作品结果偏移量（或起始偏移量）
-  - `--length`：要获取的作品数量，默认获取所有作品
-  
-  ```bash
-  # 下载作者/画师最新的 10 个作品
-  ktoolbox sync-creator https://kemono.su/fanbox/user/xxxx --length=10
-  
-  # 下载作者/画师最新的第 11 至 15 个作品
-  ktoolbox sync-creator https://kemono.su/fanbox/user/xxxx --offset=10 --length=5
-  
-  # 下载作者/画师的所有作品
-  ktoolbox sync-creator https://kemono.su/fanbox/user/xxxx
-  ```
+### 🪲 Fix
 
-**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.5.0...v0.5.1
+- 修复当文件名包含特殊字符时会出现 `FileNotFoundError` 错误的问题 (#94)
+- 修复当使用 `--start-time`, `--end-time` 参数且作品 `published` 属性不存在的情况下会出现 `TypeError` 错误的问题 (#93)
+- 修复当使用桶储存时参数顺序不正确的问题 (#89 - @Nacosia)
+- 在建立 HTTP 连接后进行重复文件检查 (#88)
+
+**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.5.1...v0.5.2
