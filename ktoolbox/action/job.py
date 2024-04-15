@@ -10,7 +10,7 @@ from pathvalidate import sanitize_filename, is_valid_filename
 
 from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.action import ActionRet, fetch_creator_posts, FetchInterruptError
-from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_time
+from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date
 from ktoolbox.api.model import Post, Attachment
 from ktoolbox.configuration import config, PostStructureConfiguration
 from ktoolbox.job import Job, CreatorIndices
@@ -147,7 +147,7 @@ async def create_job_from_creator(
 
     # Filter posts by publish time
     if start_time or end_time:
-        post_list = list(filter_posts_by_time(post_list, start_time, end_time))
+        post_list = list(filter_posts_by_date(post_list, start_time, end_time))
     logger.info(f"Get {len(post_list)} posts, start creating jobs")
 
     # Filter posts and generate ``CreatorIndices``

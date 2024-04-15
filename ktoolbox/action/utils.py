@@ -8,7 +8,7 @@ from ktoolbox.api.model import Post
 from ktoolbox.configuration import config
 from ktoolbox.job import CreatorIndices
 
-__all__ = ["generate_post_path_name", "filter_posts_by_time", "filter_posts_by_indices"]
+__all__ = ["generate_post_path_name", "filter_posts_by_date", "filter_posts_by_indices"]
 
 
 def generate_post_path_name(post: Post) -> str:
@@ -34,40 +34,40 @@ def generate_post_path_name(post: Post) -> str:
             exit(1)
 
 
-def _match_post_time(
+def _match_post_date(
         post: Post,
-        start_time: Optional[datetime],
-        end_time: Optional[datetime]
+        start_date: Optional[datetime],
+        end_date: Optional[datetime]
 ) -> bool:
     """
-    Check if the post publish date match the time range.
+    Check if the post date match the time range.
 
     :param post: Target post object
-    :param start_time: Start time of the time range
-    :param end_time: End time of the time range
+    :param start_date: Start time of the time range
+    :param end_date: End time of the time range
     :return: Whether if the post publish date match the time range
     """
     post_date = post.published or post.added
-    if start_time and post_date and post_date < start_time:
+    if start_date and post_date and post_date < start_date:
         return False
-    if end_time and post_date and post_date > end_time:
+    if end_date and post_date and post_date > end_date:
         return False
     return True
 
 
-def filter_posts_by_time(
+def filter_posts_by_date(
         post_list: List[Post],
-        start_time: Optional[datetime],
-        end_time: Optional[datetime]
+        start_date: Optional[datetime],
+        end_date: Optional[datetime]
 ) -> Generator[Post, Any, Any]:
     """
-    Filter posts by publish time range
+    Filter posts by publish date range
 
     :param post_list: List of posts
-    :param start_time: Start time of the time range
-    :param end_time: End time of the time range
+    :param start_date: Start time of the time range
+    :param end_date: End time of the time range
     """
-    post_filter = filter(lambda x: _match_post_time(x, start_time, end_time), post_list)
+    post_filter = filter(lambda x: _match_post_date(x, start_date, end_date), post_list)
     yield from post_filter
 
 
