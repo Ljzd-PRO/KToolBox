@@ -13,7 +13,7 @@
 
 [//]: # (### 💡 新特性)
 
-### 🪲 Fix
+### 🪲 修复
 
 - 修复当文件名包含特殊字符时会出现 `FileNotFoundError` 错误的问题 (#94)
 - 修复当使用 `--start-time`, `--end-time` 参数且作品 `published` 属性不存在的情况下会出现 `TypeError` 错误的问题 (#93)
