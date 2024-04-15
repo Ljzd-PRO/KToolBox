@@ -10,7 +10,7 @@ from pathvalidate import sanitize_filename, is_valid_filename
 
 from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.action import ActionRet, fetch_creator_posts, FetchInterruptError
-from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_time
+from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date
 from ktoolbox.api.model import Post, Attachment
 from ktoolbox.configuration import config, PostStructureConfiguration
 from ktoolbox.job import Job, CreatorIndices
@@ -29,7 +29,7 @@ async def create_job_from_post(
     Create a list of download job from a post data
 
     :param post: post data
-    :param post_path: Path of the post directory
+    :param post_path: Path of the post directory, which needs to be sanitized
     :param post_structure: post path structure, ``False`` -> disable, \
      ``True`` & ``None`` -> ``config.job.post_structure``
     :param dump_post_data: Whether to dump post data (post.json) in post directory
@@ -109,7 +109,7 @@ async def create_job_from_creator(
 
     :param service: The service where the post is located
     :param creator_id: The ID of the creator
-    :param path: The path for posts to download
+    :param path: The path for downloading posts, which needs to be sanitized
     :param all_pages: Fetch all posts, ``offset`` and ``length`` will be ignored if enabled
     :param offset: Result offset (or start offset)
     :param length: The number of posts to fetch
@@ -147,7 +147,7 @@ async def create_job_from_creator(
 
     # Filter posts by publish time
     if start_time or end_time:
-        post_list = list(filter_posts_by_time(post_list, start_time, end_time))
+        post_list = list(filter_posts_by_date(post_list, start_time, end_time))
     logger.info(f"Get {len(post_list)} posts, start creating jobs")
 
     # Filter posts and generate ``CreatorIndices``

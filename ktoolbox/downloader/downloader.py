@@ -11,19 +11,25 @@ import httpx
 import tenacity
 import tqdm.asyncio
 from loguru import logger
+from pathvalidate import sanitize_filename
 from tenacity import wait_fixed, retry_if_result, retry_if_exception
 from tenacity.stop import stop_after_attempt, stop_never
 from tqdm import tqdm as std_tqdm
 
 from ktoolbox._enum import RetCodeEnum
 from ktoolbox.configuration import config
-from ktoolbox.downloader import DownloaderRet
-from ktoolbox.utils import filename_from_headers, generate_msg
+from ktoolbox.downloader.base import DownloaderRet
+from ktoolbox.downloader.utils import filename_from_headers, duplicate_file_check
+from ktoolbox.utils import generate_msg
 
 __all__ = ["Downloader"]
 
 
 class Downloader:
+    """
+    :ivar _save_filename: The actual filename for saving.
+    """
+
     def __init__(
             self,
             url: str,
@@ -31,7 +37,7 @@ class Downloader:
             *,
             buffer_size: int = None,
             chunk_size: int = None,
-            alt_filename: str = None,
+            designated_filename: str = None,
             server_path: str = None
     ):
         # noinspection GrazieInspection
@@ -39,27 +45,26 @@ class Downloader:
         Initialize a file downloader
 
         - About filename:
-            * If ``alt_filename`` parameter is set, use it.
-            * Else if ``Content-Disposition`` is set in headers, use filename from it.
-            * Else use filename from URL 'path' part.
+            1. If ``designated_filename`` parameter is set, use it.
+            2. Else if ``Content-Disposition`` is set in headers, use filename from it.
+            3. Else use filename from 'file' part of ``server_path``.
 
         :param url: Download URL
-        :param path: Directory path to save the file
+        :param path: Directory path to save the file, which needs to be sanitized
         :param buffer_size: Number of bytes for file I/O buffer
         :param chunk_size: Number of bytes for chunk of download stream
-        :param alt_filename: Use this name if no filename given by the server
-        :param server_path: Server path of the file. if config.use_bucket is True, \
-        it will be used as save the path to the file
+        :param designated_filename: Manually specify the filename for saving, which needs to be sanitized
+        :param server_path: Server path of the file. if ``DownloaderConfiguration.use_bucket`` enabled, \
+        it will be used as the save path.
         """
 
         self._url = url
         self._path = path
         self._buffer_size = buffer_size or config.downloader.buffer_size
         self._chunk_size = chunk_size or config.downloader.chunk_size
-        # _alt_filename 是用于下载的文件名
-        self._alt_filename = alt_filename  # 用于下载的文件名
-        self._server_path = server_path  # 服务器文件路径 /hash[:1]/hash2[1:3]/hash
-        self._filename = alt_filename  # 保留用做实际文件名
+        self._designated_filename = designated_filename
+        self._server_path = server_path  # /hash[:1]/hash2[1:3]/hash
+        self._save_filename = designated_filename  # Prioritize the manually specified filename
 
         self._lock = asyncio.Lock()
         self._stop: bool = False
@@ -87,7 +92,7 @@ class Downloader:
     @property
     def filename(self) -> Optional[str]:
         """Actual filename of the download file"""
-        return self._filename
+        return self._save_filename
 
     @property
     def finished(self) -> bool:
@@ -141,34 +146,27 @@ class Downloader:
         :return: ``DownloaderRet`` which contain the actual output filename
         :raise CancelledError
         """
-        # Get filename to check if file exists
+        # Get filename to check if file exists (First-time duplicate file check)
         # Check it before request to make progress more efficiency
         server_relpath = self._server_path[1:]
         server_relpath_without_params = urlparse(server_relpath).path
         server_path_filename = unquote(Path(server_relpath_without_params).name)
-        art_file_path = self._path / (self._filename or server_path_filename)
-        check_path = art_file_path
+        # Priority order can be referenced from the constructor's documentation
+        save_filepath = self._path / (self._save_filename or server_path_filename)
 
         # Get bucket file path
-        art_bucket_file_path: Optional[Path] = None
+        bucket_file_path: Optional[Path] = None
         if config.downloader.use_bucket:
-            art_bucket_file_path = config.downloader.bucket_path / server_relpath
-            check_path = art_bucket_file_path
+            bucket_file_path = config.downloader.bucket_path / server_relpath
 
         # Check if the file exists
-        if check_path.is_file():
-            if config.downloader.use_bucket:
-                ret_msg = "Download file already exists in both bucket and local, skipping"
-                if not art_file_path.is_file():
-                    ret_msg = "Download file already exists in bucket, linking to target path"
-                    check_path.hardlink_to(art_file_path)
-            else:
-                ret_msg = "Download file already exists, skipping"
+        file_existed, ret_msg = duplicate_file_check(save_filepath, bucket_file_path)
+        if file_existed:
             return DownloaderRet(
                 code=RetCodeEnum.FileExisted,
                 message=generate_msg(
                     ret_msg,
-                    path=art_file_path
+                    path=save_filepath
                 )
             )
 
@@ -187,21 +185,33 @@ class Downloader:
                             message=generate_msg(
                                 "Download failed",
                                 status_code=res.status_code,
-                                filename=art_file_path
+                                filename=save_filepath
                             )
                         )
 
-                    # Get filename
-                    filename = self._alt_filename or filename_from_headers(res.headers) or server_path_filename
-                    self._filename = filename
+                    # Get filename for saving and check if file exists (Second-time duplicate file check)
+                    # Priority order can be referenced from the constructor's documentation
+                    self._save_filename = self._designated_filename or sanitize_filename(
+                        filename_from_headers(res.headers)
+                    ) or server_path_filename
+                    save_filepath = self._path / self._save_filename
+                    file_existed, ret_msg = duplicate_file_check(save_filepath, bucket_file_path)
+                    if file_existed:
+                        return DownloaderRet(
+                            code=RetCodeEnum.FileExisted,
+                            message=generate_msg(
+                                ret_msg,
+                                path=save_filepath
+                            )
+                        )
 
                     # Download
-                    temp_filepath = Path(f"{(self._path / server_path_filename)}.{config.downloader.temp_suffix}")
+                    temp_filepath = Path(f"{save_filepath}.{config.downloader.temp_suffix}")
                     total_size = int(length_str) if (length_str := res.headers.get("Content-Length")) else None
                     async with aiofiles.open(str(temp_filepath), "wb", self._buffer_size) as f:
                         chunk_iterator = res.aiter_bytes(self._chunk_size)
                         t = tqdm_class(
-                            desc=filename,
+                            desc=self._save_filename,
                             total=total_size,
                             disable=not progress,
                             unit="iB",
@@ -216,21 +226,23 @@ class Downloader:
 
             # Download finished
             if config.downloader.use_bucket:
-                art_bucket_file_path.parent.mkdir(parents=True, exist_ok=True)
-                os.link(temp_filepath, art_bucket_file_path)
+                bucket_file_path.parent.mkdir(parents=True, exist_ok=True)
+                os.link(temp_filepath, bucket_file_path)
+            temp_filepath.rename(self._path / self._save_filename)
 
-            temp_filepath.rename(self._path / filename)
+            # Callbacks
             if sync_callable:
                 sync_callable(self)
             if async_callable:
                 await async_callable(self)
+
             return DownloaderRet(
-                data=filename
-            ) if filename else DownloaderRet(
+                data=self._save_filename
+            ) if self._save_filename else DownloaderRet(
                 code=RetCodeEnum.GeneralFailure,
                 message=generate_msg(
                     "Download failed",
-                    filename=self._alt_filename
+                    filename=self._designated_filename
                 )
             )
 
