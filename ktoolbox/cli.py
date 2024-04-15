@@ -106,7 +106,7 @@ class KToolBoxCli:
             if dump:
                 async with aiofiles.open(str(dump), "w", encoding="utf-8") as f:
                     await f.write(
-                        ret.data.model_dump_json(indent=config.json_dump_indent)
+                        ret.data.json(indent=config.json_dump_indent)
                     )
             return ret.data
         else:

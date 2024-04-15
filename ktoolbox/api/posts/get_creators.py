@@ -1,9 +1,8 @@
 from typing import List
 
-from pydantic import RootModel
-
 from ktoolbox.api import BaseAPI, APIRet
 from ktoolbox.api.model import Creator
+from ktoolbox.model import RootModel
 
 __all__ = ["GetCreators", "get_creators"]
 
@@ -14,7 +13,7 @@ class GetCreators(BaseAPI):
     method = "get"
 
     class Response(RootModel[List[Creator]]):
-        root: List[Creator]
+        __root__: List[Creator]
 
     @classmethod
     async def __call__(cls) -> APIRet[List[Creator]]:

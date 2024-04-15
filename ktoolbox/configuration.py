@@ -4,11 +4,10 @@ import os
 import tempfile
 import warnings
 from pathlib import Path
-from typing import Literal, Union, Optional
+from typing import Literal, Union, Optional, Any
 
 from loguru import logger
-from pydantic import BaseModel, model_validator, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import BaseModel, BaseSettings, validator
 
 __all__ = [
     "config",
@@ -74,7 +73,10 @@ class DownloaderConfiguration(BaseModel):
     use_bucket: bool = False
     bucket_path: Path = Path("./.ktoolbox/bucket_storage")
 
-    @model_validator(mode="after")
+    def __init__(self, /, **data: Any):
+        super().__init__(**data)
+        self.check_bucket_path()
+
     def check_bucket_path(self) -> "DownloaderConfiguration":
         if self.use_bucket:
             # noinspection PyBroadException
@@ -151,9 +153,9 @@ class JobConfiguration(BaseModel):
     # job_list_filepath: Optional[Path] = None
     # """Filepath for job list data saving, ``None`` for disable job list saving"""
 
-    @field_validator("post_id_as_path")
+    @validator("post_id_as_path")
     def post_id_as_path_validator(cls, v):
-        if v != cls.model_fields["post_id_as_path"].default:
+        if v != cls.__fields__["post_id_as_path"].default:
             warnings.warn(
                 "`JobConfiguration.post_id_as_path` is deprecated and is scheduled for removal in further version. "
                 "Use `JobConfiguration.post_dirname_format` instead",
@@ -198,14 +200,11 @@ class Configuration(BaseSettings):
     json_dump_indent: int = 4
     use_uvloop: bool = True
 
-    # noinspection SpellCheckingInspection
-    model_config = SettingsConfigDict(
-        env_prefix='ktoolbox_',
-        env_nested_delimiter='__',
-        env_file='.env',
-        env_file_encoding='utf-8',
-        extra='ignore'
-    )
+    class Config(BaseSettings.Config):
+        env_prefix = 'ktoolbox_'
+        env_nested_delimiter = '__'
+        env_file = '.env'
+        env_file_encoding = 'utf-8'
 
 
 config = Configuration(_env_file='prod.env')

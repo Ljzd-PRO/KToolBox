@@ -1,5 +1,4 @@
-from pydantic import BaseModel
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import BaseModel, BaseSettings
 
 __all__ = ["TestCliConf", "TestSettings", "settings"]
 
@@ -15,13 +14,11 @@ class TestSettings(BaseSettings):
     """
     cli_conf: TestCliConf = TestCliConf()
 
-    # noinspection SpellCheckingInspection
-    model_config = SettingsConfigDict(
-        env_prefix='ktoolbox_test_',
-        env_nested_delimiter='__',
-        env_file='.env.test',
-        env_file_encoding='utf-8'
-    )
+    class Config(BaseSettings.Config):
+        env_prefix = 'ktoolbox_test_'
+        env_nested_delimiter = '__'
+        env_file = '.env.test'
+        env_file_encoding = 'utf-8'
 
 
 settings = TestSettings()

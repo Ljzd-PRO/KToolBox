@@ -85,7 +85,7 @@ async def create_job_from_post(
     if dump_post_data:
         async with aiofiles.open(str(post_path / DataStorageNameEnum.PostData.value), "w", encoding="utf-8") as f:
             await f.write(
-                post.model_dump_json(indent=config.json_dump_indent)
+                post.json(indent=config.json_dump_indent)
             )
 
     return jobs
@@ -138,7 +138,7 @@ async def create_job_from_creator(
             else:
                 break
     except FetchInterruptError as e:
-        return ActionRet(**e.ret.model_dump(mode="python"))
+        return ActionRet(**e.ret.dict())
 
     if not all_pages:
         post_list = post_list[offset % 50:][:length]
@@ -164,7 +164,7 @@ async def create_job_from_creator(
                     "w",
                     encoding="utf-8"
             ) as f:
-                await f.write(indices.model_dump_json(indent=config.json_dump_indent))
+                await f.write(indices.json(indent=config.json_dump_indent))
 
     job_list: List[Job] = []
     for post in post_list:

@@ -1,6 +1,5 @@
-from pydantic import RootModel
-
 from ktoolbox.api import BaseAPI, APIRet
+from ktoolbox.model import RootModel
 
 __all__ = ["GetAppVersion", "get_app_version"]
 
@@ -10,9 +9,9 @@ class GetAppVersion(BaseAPI):
     method = "get"
 
     class Response(RootModel[str]):
-        root: str
+        __root__: str
 
-    extra_validator = Response.model_validate_strings
+    extra_validator = RootModel.parse_obj
 
     @classmethod
     async def __call__(cls) -> APIRet[str]:
