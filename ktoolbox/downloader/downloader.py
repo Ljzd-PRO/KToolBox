@@ -11,6 +11,7 @@ import httpx
 import tenacity
 import tqdm.asyncio
 from loguru import logger
+from pathvalidate import sanitize_filename
 from tenacity import wait_fixed, retry_if_result, retry_if_exception
 from tenacity.stop import stop_after_attempt, stop_never
 from tqdm import tqdm as std_tqdm
@@ -49,10 +50,10 @@ class Downloader:
             3. Else use filename from 'file' part of ``server_path``.
 
         :param url: Download URL
-        :param path: Directory path to save the file
+        :param path: Directory path to save the file, which needs to be sanitized
         :param buffer_size: Number of bytes for file I/O buffer
         :param chunk_size: Number of bytes for chunk of download stream
-        :param designated_filename: Manually specify the filename for saving
+        :param designated_filename: Manually specify the filename for saving, which needs to be sanitized
         :param server_path: Server path of the file. if ``DownloaderConfiguration.use_bucket`` enabled, \
         it will be used as the save path.
         """
@@ -190,8 +191,9 @@ class Downloader:
 
                     # Get filename for saving and check if file exists (Second-time duplicate file check)
                     # Priority order can be referenced from the constructor's documentation
-                    self._save_filename = self._designated_filename or filename_from_headers(
-                        res.headers) or server_path_filename
+                    self._save_filename = self._designated_filename or sanitize_filename(
+                        filename_from_headers(res.headers)
+                    ) or server_path_filename
                     save_filepath = self._path / self._save_filename
                     file_existed, ret_msg = duplicate_file_check(save_filepath, bucket_file_path)
                     if file_existed:

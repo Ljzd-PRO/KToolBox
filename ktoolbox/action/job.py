@@ -29,7 +29,7 @@ async def create_job_from_post(
     Create a list of download job from a post data
 
     :param post: post data
-    :param post_path: Path of the post directory
+    :param post_path: Path of the post directory, which needs to be sanitized
     :param post_structure: post path structure, ``False`` -> disable, \
      ``True`` & ``None`` -> ``config.job.post_structure``
     :param dump_post_data: Whether to dump post data (post.json) in post directory
@@ -109,7 +109,7 @@ async def create_job_from_creator(
 
     :param service: The service where the post is located
     :param creator_id: The ID of the creator
-    :param path: The path for posts to download
+    :param path: The path for downloading posts, which needs to be sanitized
     :param all_pages: Fetch all posts, ``offset`` and ``length`` will be ignored if enabled
     :param offset: Result offset (or start offset)
     :param length: The number of posts to fetch
