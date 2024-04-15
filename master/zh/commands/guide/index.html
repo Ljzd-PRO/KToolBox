@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.14">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.15">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.10ba22f1.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.7e359304.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
@@ -695,6 +695,15 @@
         <li class="md-nav__item">
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
+      下载指定数量的作品
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
       下载在指定时间范围内发布的作品
     </span>
   </a>
@@ -703,7 +712,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
+  <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
       时间格式
     </span>
@@ -991,6 +1000,15 @@
         <li class="md-nav__item">
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
+      下载指定数量的作品
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
       下载在指定时间范围内发布的作品
     </span>
   </a>
@@ -999,7 +1017,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
+  <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
       时间格式
     </span>
@@ -1070,7 +1088,19 @@ ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemo
 <summary>更新作者目录</summary>
 <p>你可以再次运行命令，文件名相同的文件将会被跳过。</p>
 </details>
-<h2 id="_6">下载在指定时间范围内发布的作品<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_6">下载指定数量的作品<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<p><code>sync-creator</code></p>
+<ul>
+<li><code>--offset</code>：作品结果偏移量（或起始偏移量）</li>
+<li><code>--length</code>：要获取的作品数量，默认获取所有作品</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1"># 下载作者/画师最新的 10 个作品</span>
+ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--length<span class="o">=</span><span class="m">10</span>
+
+<span class="c1"># 下载作者/画师最新的第 11 至 15 个作品</span>
+ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--offset<span class="o">=</span><span class="m">10</span><span class="w"> </span>--length<span class="o">=</span><span class="m">5</span>
+</code></pre></div>
+<h2 id="_7">下载在指定时间范围内发布的作品<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <p><code>sync-creator</code></p>
 <ul>
 <li><code>--start-time</code>：下载指定开始时间范围内的作品</li>
@@ -1085,7 +1115,7 @@ ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemo
 <span class="c1"># 2023-8-5 之前</span>
 ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/641955<span class="w"> </span>--end-time<span class="o">=</span><span class="m">2023</span>-8-5
 </code></pre></div>
-<h3 id="_7">时间格式<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<h3 id="_8">时间格式<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
 <p>时间值应当符合 <code>%Y-%m-%d</code> 格式，例如：</p>
 <ul>
 <li><code>2023-12-7</code></li>

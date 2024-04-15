@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.14">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.15">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.10ba22f1.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.7e359304.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -691,6 +691,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#download-a-specified-number-of-posts-from-the-creator" class="md-nav__link">
+    <span class="md-ellipsis">
+      Download a specified number of posts from the creator
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#download-posts-that-published-within-the-specified-time-range" class="md-nav__link">
     <span class="md-ellipsis">
       Download posts that published within the specified time range
@@ -987,6 +996,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#download-a-specified-number-of-posts-from-the-creator" class="md-nav__link">
+    <span class="md-ellipsis">
+      Download a specified number of posts from the creator
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#download-posts-that-published-within-the-specified-time-range" class="md-nav__link">
     <span class="md-ellipsis">
       Download posts that published within the specified time range
@@ -1070,6 +1088,18 @@ it contains the information and filepath of posts inside the directory.</p>
 <summary>Update creator directory</summary>
 <p>You can rerun the command, files with the same filename will be skipped.</p>
 </details>
+<h2 id="download-a-specified-number-of-posts-from-the-creator">Download a specified number of posts from the creator<a class="headerlink" href="#download-a-specified-number-of-posts-from-the-creator" title="Permanent link">&para;</a></h2>
+<p><code>sync-creator</code></p>
+<ul>
+<li><code>--offset</code>: Posts result offset (or start offset)</li>
+<li><code>--length</code>: The number of posts to fetch, defaults to fetching all posts</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1"># Download latest 10 posts of the creator/artist</span>
+ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--length<span class="o">=</span><span class="m">10</span>
+
+<span class="c1"># Download latest No.11-No.15 posts of the creator/artist</span>
+ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--offset<span class="o">=</span><span class="m">10</span><span class="w"> </span>--length<span class="o">=</span><span class="m">5</span>
+</code></pre></div>
 <h2 id="download-posts-that-published-within-the-specified-time-range">Download posts that published within the specified time range<a class="headerlink" href="#download-posts-that-published-within-the-specified-time-range" title="Permanent link">&para;</a></h2>
 <p><code>sync-creator</code></p>
 <ul>

@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.14">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.15">
     
     
       
@@ -26,7 +26,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.10ba22f1.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.7e359304.min.css">
       
         
         <link rel="stylesheet" href="assets/stylesheets/palette.06af60db.min.css">
@@ -1041,6 +1041,12 @@ the downloaded files will be <strong>skipped</strong>.</p>
 <h4 id="download-posts-from-a-creator">⬇️🖌️ Download posts from a creator<a class="headerlink" href="#download-posts-from-a-creator" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="c1"># Download all posts of the creator/artist</span>
 ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016
+
+<span class="c1"># Download latest 10 posts of the creator/artist</span>
+ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--length<span class="o">=</span><span class="m">10</span>
+
+<span class="c1"># Download latest No.11-No.15 posts of the creator/artist</span>
+ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--offset<span class="o">=</span><span class="m">10</span><span class="w"> </span>--length<span class="o">=</span><span class="m">5</span>
 
 <span class="c1"># Download posts from the creator/artist from 2024-1-1 to 2024-3-1</span>
 ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--start-time<span class="o">=</span><span class="m">2024</span>-1-1<span class="w"> </span>--end-time<span class="o">=</span><span class="m">2024</span>-3-1
