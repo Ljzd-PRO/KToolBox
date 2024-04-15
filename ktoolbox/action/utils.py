@@ -47,9 +47,10 @@ def _match_post_time(
     :param end_time: End time of the time range
     :return: Whether if the post publish date match the time range
     """
-    if start_time and post.published < start_time:
+    post_date = post.published or post.added
+    if start_time and post_date and post_date < start_time:
         return False
-    if end_time and post.published > end_time:
+    if end_time and post_date and post_date > end_time:
         return False
     return True
 
