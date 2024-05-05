@@ -102,7 +102,7 @@ class PostStructureConfiguration(BaseModel):
     ..
     ├─ content.txt
     ├─ <Post file>
-    ├─ <Post data (post.ktoolbox.json)>
+    ├─ <Post data (post.json)>
     └─ attachments
        ├─ 1.png
        └─ 2.png
