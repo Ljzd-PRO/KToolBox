@@ -102,6 +102,3 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 # Download posts from the creator/artist from 2024-1-1 to 2024-3-1
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 --end-time=2024-3-1
 ```
-??? info "About `creator-indices.ktoolbox` file"
-    By default, you will get a `creator-indices.ktoolbox` file in the creator directory, 
-    it contains the information and filepath of posts inside the directory.
