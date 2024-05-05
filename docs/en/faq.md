@@ -32,3 +32,17 @@ KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 ## Commands and flags should use `-` or `_` as seperator?
 
 Both is support, `-` is suggested.
+
+## Filename too long
+
+In some cases, the filename or the post directory name can be too long and caused download failure.
+To solve this issue, you can set **sequential filename** or use **custom post directory name**
+
+Set the configuration by `prod.env` dotenv file or system environment variables:
+```dotenv
+# Rename attachments in numerical order, e.g. `1.png`, `2.png`, ...
+KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
+
+# Set the post directory name to its release/publish date and ID, e.g. `[2024-1-1]11223344`
+KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}
+```
