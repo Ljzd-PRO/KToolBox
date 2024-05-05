@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 import os
 import tempfile
@@ -165,6 +166,10 @@ class JobConfiguration(BaseModel):
                 "Use `JobConfiguration.post_dirname_format` instead",
                 FutureWarning
             )
+
+    @validator("allow_list", "block_list", pre=True)
+    def allow_block_list_validator(cls, v):
+        return set(json.loads(v))
 
 
 class LoggerConfiguration(BaseModel):
