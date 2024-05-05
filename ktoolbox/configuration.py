@@ -4,7 +4,7 @@ import os
 import tempfile
 import warnings
 from pathlib import Path
-from typing import Literal, Union, Optional, Any
+from typing import Literal, Union, Optional, Any, Set
 
 from loguru import logger
 from pydantic import BaseModel, BaseSettings, validator
@@ -104,7 +104,7 @@ class PostStructureConfiguration(BaseModel):
     ..
     ├─ content.txt
     ├─ <Post file>
-    ├─ <Post data (post.ktoolbox.json)>
+    ├─ <Post data (post.json)>
     └─ attachments
        ├─ 1.png
        └─ 2.png
@@ -142,6 +142,8 @@ class JobConfiguration(BaseModel):
     :ivar mix_posts: Save all files from different posts at same path in creator directory. \
     It would not create any post directory, and ``CreatorIndices`` would not been recorded.
     :ivar sequential_filename: Rename attachments in numerical order, e.g. ``1.png``, ``2.png``, ...
+    :ivar allow_list: Download files which match these patterns (Unix shell-style), e.g. ``["*.png"]``
+    :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``
     """
     count: int = 4
     post_id_as_path: bool = False
@@ -149,6 +151,8 @@ class JobConfiguration(BaseModel):
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
     mix_posts: bool = False
     sequential_filename: bool = False
+    allow_list: Set[str] = set()
+    block_list: Set[str] = set()
 
     # job_list_filepath: Optional[Path] = None
     # """Filepath for job list data saving, ``None`` for disable job list saving"""

@@ -101,5 +101,3 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 # 下载作者/画师从 2024-1-1 到 2024-3-1 的作品
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 --end-time=2024-3-1
 ```
-??? info "关于 `creator-indices.ktoolbox` 文件"
-    默认情况下你会在作者目录下得到一个 `creator-indices.ktoolbox` 文件，它包含目录下的所有作品的信息和路径。

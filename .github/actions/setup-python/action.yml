@@ -5,7 +5,7 @@ inputs:
   python-version:
     description: Python version
     required: false
-    default: "3.10"
+    default: "3.11"
 
 runs:
   using: "composite"
@@ -14,7 +14,7 @@ runs:
       run: pipx install poetry
       shell: bash
 
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python-version }}
         architecture: "x64"

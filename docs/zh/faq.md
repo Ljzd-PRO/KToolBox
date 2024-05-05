@@ -17,7 +17,7 @@ uvloop 在 **Windows** 上 **不受支持**。如果你在 Linux 或 macOS 安�
 
 你可以设置配置选项 `job.post_structure.attachments` 为 `./`
 
-通过 dotenv文件 `prod.env` 或系统环境变量来设置配置：
+通过 dotenv 文件 `prod.env` 或系统环境变量来设置配置：
 ```dotenv
 KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 ```
@@ -30,3 +30,16 @@ KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 ## 命令和标志（选项）应当使用 `-` 还是 `_` 作为分隔符？
 
 两者都支持，推荐使用 `-`。
+
+## 文件名过长
+
+在一些情况下，文件名或作品目录名过长而导致下载失败。为了解决这个问题，你可以设置 **序列化文件名** 或使用 **自定义作品目录名**
+
+通过 dotenv 文件 `prod.env` 或系统环境变量来设置配置：
+```dotenv
+# 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
+KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
+
+# 设置作品目录名为其发布日期和ID，例如 `[2024-1-1]11223344`
+KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}
+```

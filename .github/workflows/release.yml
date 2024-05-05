@@ -3,6 +3,8 @@ name: GitHub Release
 on:
   workflow_dispatch:
   push:
+    tags:
+      - "*"
 
 permissions:
   contents: write
