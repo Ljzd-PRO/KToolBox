@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ktoolbox"
-version = "0.5.2"
+version = "0.6.0"
 description = "A useful CLI tool for downloading posts in Kemono.party / .su"
 authors = ["Ljzd-PRO <ljzd@office.ljzd-pro.asia>"]
 readme = "README.md"
