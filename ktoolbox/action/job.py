@@ -122,7 +122,7 @@ async def create_job_from_creator(
         all_pages: bool = False,
         offset: int = 0,
         length: Optional[int] = 50,
-        save_creator_indices: bool = True,
+        save_creator_indices: bool = False,
         mix_posts: bool = None,
         start_time: Optional[datetime],
         end_time: Optional[datetime]

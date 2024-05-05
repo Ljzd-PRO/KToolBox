@@ -217,7 +217,7 @@ class KToolBoxCli:
             creator_id: str = None,
             path: Union[Path, str] = Path("."),
             *,
-            save_creator_indices: bool = True,
+            save_creator_indices: bool = False,
             mix_posts: bool = None,
             start_time: str = None,
             end_time: str = None,
