@@ -136,9 +136,9 @@ async def create_job_from_creator(
     :param all_pages: Fetch all posts, ``offset`` and ``length`` will be ignored if enabled
     :param offset: Result offset (or start offset)
     :param length: The number of posts to fetch
-    :param save_creator_indices: Record ``CreatorIndices`` data for update posts from current creator directory
+    :param save_creator_indices: Record ``CreatorIndices`` data.
     :param mix_posts: Save all files from different posts at same path, \
-     ``update_from``, ``save_creator_indices`` will be ignored if enabled
+     ``save_creator_indices`` will be ignored if enabled
     :param start_time: Start time of the time range
     :param end_time: End time of the time range
     """
@@ -175,7 +175,7 @@ async def create_job_from_creator(
 
     # Filter posts and generate ``CreatorIndices``
     if not mix_posts:
-        if save_creator_indices:  # It's unnecessary to create indices again when ``update_from`` was provided
+        if save_creator_indices:
             indices = CreatorIndices(
                 creator_id=creator_id,
                 service=service,

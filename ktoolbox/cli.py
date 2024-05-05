@@ -230,16 +230,15 @@ class KToolBoxCli:
         You can update the directory anytime after download finished, \
         such as to update after creator published new posts.
 
-        * If ``update_from`` was provided, the file should be located **inside the creator directory**.
         * ``start_time`` & ``end_time`` example: ``2023-12-7``, ``2023-12-07``
 
         :param url: The post URL
         :param service: The service where the post is located
         :param creator_id: The ID of the creator
         :param path: Download path, default is current directory
-        :param save_creator_indices: Record ``CreatorIndices`` data for update posts from current creator directory
+        :param save_creator_indices: Record ``CreatorIndices`` data
         :param mix_posts: Save all_pages files from different posts at same path, \
-            ``update_from``, ``save_creator_indices`` will be ignored if enabled
+            ``save_creator_indices`` will be ignored if enabled
         :param start_time: Start time of the published time range for posts downloading. \
             Set to ``0`` if ``None`` was given. \
             Time format: ``%Y-%m-%d``
