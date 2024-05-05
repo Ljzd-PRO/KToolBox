@@ -1,4 +1,5 @@
 from datetime import datetime
+from fnmatch import fnmatch
 from itertools import count
 from pathlib import Path
 from typing import List, Union, Optional
@@ -48,35 +49,57 @@ async def create_job_from_post(
         attachments_path = post_path
         content_path = None
 
-    # Create jobs
+    # Filter and create jobs for ``Post.attachment``
     jobs: List[Job] = []
-    for i, attachment in enumerate(post.attachments or []):  # type: int, Attachment
+    for i, attachment in enumerate(post.attachments):  # type: int, Attachment
         if not attachment.path:
             continue
-        if is_valid_filename(attachment.name):
-            alt_filename = f"{i + 1}{Path(attachment.name).suffix}" if config.job.sequential_filename \
-                else attachment.name
-        else:
-            attachment_path_without_params = urlparse(attachment.path).path
-            alt_filename = f"{i + 1}{Path(attachment_path_without_params).suffix}" if config.job.sequential_filename \
-                else None
-        jobs.append(
-            Job(
-                path=attachments_path,
-                alt_filename=alt_filename,
-                server_path=attachment.path,
-                type=PostFileTypeEnum.Attachment
-            )
+        file_path_obj = Path(attachment.name) if is_valid_filename(attachment.name) else Path(
+            urlparse(attachment.path).path
         )
-    if post.file and post.file.path:  # file
-        jobs.append(
-            Job(
-                path=post_path,
-                alt_filename=f"{post.id}_{post.file.name}",
-                server_path=post.file.path,
-                type=PostFileTypeEnum.File
+        if (not config.job.allow_list or any(
+                map(
+                    lambda x: fnmatch(file_path_obj.name, x),
+                    config.job.allow_list
+                )
+        )) and not any(
+            map(
+                lambda x: fnmatch(file_path_obj.name, x),
+                config.job.block_list
             )
-        )
+        ):
+            alt_filename = f"{i + 1}{file_path_obj.suffix}" if config.job.sequential_filename else file_path_obj.name
+            jobs.append(
+                Job(
+                    path=attachments_path,
+                    alt_filename=alt_filename,
+                    server_path=attachment.path,
+                    type=PostFileTypeEnum.Attachment
+                )
+            )
+
+    # Filter and create jobs for ``Post.file``
+    if post.file and post.file.path:
+        post_file_name = post.file.name or Path(post.file.path).name
+        if (not config.job.allow_list or any(
+                map(
+                    lambda x: fnmatch(post_file_name, x),
+                    config.job.allow_list
+                )
+        )) and not any(
+            map(
+                lambda x: fnmatch(post_file_name, x),
+                config.job.block_list
+            )
+        ):
+            jobs.append(
+                Job(
+                    path=post_path,
+                    alt_filename=f"{post.id}_{post_file_name}",
+                    server_path=post.file.path,
+                    type=PostFileTypeEnum.File
+                )
+            )
 
     # Write content file
     if content_path and post.content:
@@ -99,7 +122,7 @@ async def create_job_from_creator(
         all_pages: bool = False,
         offset: int = 0,
         length: Optional[int] = 50,
-        save_creator_indices: bool = True,
+        save_creator_indices: bool = False,
         mix_posts: bool = None,
         start_time: Optional[datetime],
         end_time: Optional[datetime]
@@ -113,9 +136,9 @@ async def create_job_from_creator(
     :param all_pages: Fetch all posts, ``offset`` and ``length`` will be ignored if enabled
     :param offset: Result offset (or start offset)
     :param length: The number of posts to fetch
-    :param save_creator_indices: Record ``CreatorIndices`` data for update posts from current creator directory
+    :param save_creator_indices: Record ``CreatorIndices`` data.
     :param mix_posts: Save all files from different posts at same path, \
-     ``update_from``, ``save_creator_indices`` will be ignored if enabled
+     ``save_creator_indices`` will be ignored if enabled
     :param start_time: Start time of the time range
     :param end_time: End time of the time range
     """
@@ -152,7 +175,7 @@ async def create_job_from_creator(
 
     # Filter posts and generate ``CreatorIndices``
     if not mix_posts:
-        if save_creator_indices:  # It's unnecessary to create indices again when ``update_from`` was provided
+        if save_creator_indices:
             indices = CreatorIndices(
                 creator_id=creator_id,
                 service=service,
