@@ -1,4 +1,5 @@
 from datetime import datetime
+from fnmatch import fnmatch
 from itertools import count
 from pathlib import Path
 from typing import List, Union, Optional
@@ -48,9 +49,29 @@ async def create_job_from_post(
         attachments_path = post_path
         content_path = None
 
-    # Create jobs
+    # ``Post.attachment`` filter
+    allow_list_filter = filter(
+        lambda x: any(
+            map(
+                lambda y: fnmatch(x.name or Path(x.path).name, y),
+                config.job.allow_list
+            )
+        ),
+        post.attachments or []
+    )
+    attachment_name_filter = filter(
+        lambda x: not any(
+            map(
+                lambda y: fnmatch(x.name or Path(x.path).name, y),
+                config.job.block_list
+            )
+        ),
+        allow_list_filter
+    )
+
+    # Create jobs for ``Post.attachment``
     jobs: List[Job] = []
-    for i, attachment in enumerate(post.attachments or []):  # type: int, Attachment
+    for i, attachment in enumerate(attachment_name_filter):  # type: int, Attachment
         if not attachment.path:
             continue
         if is_valid_filename(attachment.name):
@@ -68,7 +89,19 @@ async def create_job_from_post(
                 type=PostFileTypeEnum.Attachment
             )
         )
-    if post.file and post.file.path:  # file
+
+    # Filter and create jobs for ``Post.file``
+    if post.file and post.file.path and any(
+            map(
+                lambda x: fnmatch(post.file.name or Path(post.file.path).name, x),
+                config.job.allow_list
+            )
+    ) and not any(
+        map(
+            lambda x: fnmatch(post.file.name or Path(post.file.path).name, x),
+            config.job.block_list
+        )
+    ):
         jobs.append(
             Job(
                 path=post_path,
