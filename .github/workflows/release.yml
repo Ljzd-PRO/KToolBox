@@ -42,4 +42,4 @@ jobs:
         with:
           body_path: CHANGELOG.md
           files: artifact/*.zip
-          prerelease: contains(github.ref, 'beta')
+          prerelease: ${{ contains(github.ref, 'beta') }}
