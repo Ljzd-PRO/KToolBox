@@ -993,13 +993,13 @@ files = [
 
 [[package]]
 name = "mkdocs-static-i18n"
-version = "1.2.2"
+version = "1.2.3"
 description = "MkDocs i18n plugin using static translation markdown files"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "mkdocs_static_i18n-1.2.2-py3-none-any.whl", hash = "sha256:c2e707cf3ba79186d1922c0a4a3a3ca164bc82cffc6e71a8583fb8025e80721f"},
-    {file = "mkdocs_static_i18n-1.2.2.tar.gz", hash = "sha256:3d15a7d5bcf942afab80624940649ada98c83dd307190bf4b6132a4fd92b43f7"},
+    {file = "mkdocs_static_i18n-1.2.3-py3-none-any.whl", hash = "sha256:e6f2f3c53b657d7632015b32dea3c64d0b80a7a8d6cde0334ca8f66f9e33b52f"},
+    {file = "mkdocs_static_i18n-1.2.3.tar.gz", hash = "sha256:7ccf4da6dd29570ec49cd863ebff6fef9cb82dbb1cb85249bdf744e8d839c914"},
 ]
 
 [package.dependencies]
