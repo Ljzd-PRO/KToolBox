@@ -140,6 +140,12 @@ class JobConfiguration(BaseModel):
     :ivar mix_posts: Save all files from different posts at same path in creator directory. \
     It would not create any post directory, and ``CreatorIndices`` would not been recorded.
     :ivar sequential_filename: Rename attachments in numerical order, e.g. ``1.png``, ``2.png``, ...
+    :ivar filename_format: Customize the filename format by inserting an empty ``{}`` to represent the basic filename.
+    Similar to post_dirname_format, you can use some of the [properties][ktoolbox.configuration.JobConfiguration] \
+    in Post. For example: ``{title}_{}`` could result in filenames like \
+    ``HelloWorld_b4b41de2-8736-480d-b5c3-ebf0d917561b``, ``HelloWorld_af349b25-ac08-46d7-98fb-6ce99a237b90``, etc. \
+    You can also use it with ``sequential_filename``. For instance, \
+    ``[{published}]_{}`` could result in filenames like ``[2024-1-1]_1.png``, ``[2024-1-1]_2.png``, etc.
     :ivar allow_list: Download files which match these patterns (Unix shell-style), e.g. ``["*.png"]``
     :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``
     """
@@ -149,6 +155,7 @@ class JobConfiguration(BaseModel):
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
     mix_posts: bool = False
     sequential_filename: bool = False
+    filename_format: str = "{}"
     allow_list: Set[str] = set()
     block_list: Set[str] = set()
 
