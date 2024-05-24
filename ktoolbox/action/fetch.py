@@ -24,7 +24,7 @@ async def fetch_creator_posts(service: str, creator_id: str, o: int = 0) -> Asyn
     :param creator_id: The ID of the creator
     :param o: Result offset, stepping of 50 is enforced
     :return: Async generator of several list of posts
-    :raise FetchInterruptError
+    :raise FetchInterruptError: Exception for interrupt of data fetching
     """
     while True:
         ret = await get_creator_post(service=service, creator_id=creator_id, o=o)

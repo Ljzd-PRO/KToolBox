@@ -144,7 +144,7 @@ class Downloader:
         :param tqdm_class: ``tqdm`` class to replace default ``tqdm.asyncio.tqdm``
         :param progress: Show progress bar
         :return: ``DownloaderRet`` which contain the actual output filename
-        :raise CancelledError
+        :raise CancelledError: Job cancelled
         """
         # Get filename to check if file exists (First-time duplicate file check)
         # Check it before request to make progress more efficiency

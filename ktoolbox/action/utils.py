@@ -8,7 +8,9 @@ from ktoolbox.api.model import Post
 from ktoolbox.configuration import config
 from ktoolbox.job import CreatorIndices
 
-__all__ = ["generate_post_path_name", "filter_posts_by_date", "filter_posts_by_indices"]
+__all__ = ["generate_post_path_name", "generate_filename", "filter_posts_by_date", "filter_posts_by_indices"]
+
+TIME_FORMAT = "%Y-%m-%d"
 
 
 def generate_post_path_name(post: Post) -> str:
@@ -16,7 +18,6 @@ def generate_post_path_name(post: Post) -> str:
     if config.job.post_id_as_path or not post.title:
         return post.id
     else:
-        time_format = "%Y-%m-%d"
         try:
             return sanitize_filename(
                 config.job.post_dirname_format.format(
@@ -24,14 +25,34 @@ def generate_post_path_name(post: Post) -> str:
                     user=post.user,
                     service=post.service,
                     title=post.title,
-                    added=post.added.strftime(time_format) if post.added else "",
-                    published=post.published.strftime(time_format) if post.published else "",
-                    edited=post.edited.strftime(time_format) if post.edited else ""
+                    added=post.added.strftime(TIME_FORMAT) if post.added else "",
+                    published=post.published.strftime(TIME_FORMAT) if post.published else "",
+                    edited=post.edited.strftime(TIME_FORMAT) if post.edited else ""
                 )
             )
         except KeyError as e:
             logger.error(f"`JobConfiguration.post_dirname_format` contains invalid key: {e}")
             exit(1)
+
+
+def generate_filename(post: Post, basic_name: str) -> str:
+    """Generate download filename"""
+    try:
+        return sanitize_filename(
+            config.job.filename_format.format(
+                basic_name,
+                id=post.id,
+                user=post.user,
+                service=post.service,
+                title=post.title,
+                added=post.added.strftime(TIME_FORMAT) if post.added else "",
+                published=post.published.strftime(TIME_FORMAT) if post.published else "",
+                edited=post.edited.strftime(TIME_FORMAT) if post.edited else ""
+            )
+        )
+    except KeyError as e:
+        logger.error(f"`JobConfiguration.filename_format` contains invalid key: {e}")
+        exit(1)
 
 
 def _match_post_date(
