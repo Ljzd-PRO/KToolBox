@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.20">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.24">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -949,6 +949,13 @@ KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 # Rename attachments in numerical order, e.g. `1.png`, `2.png`, ...
 KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
 
+# Customize the filename format by inserting an empty `{}` to represent the basic filename.
+# Similar to `post_dirname_format`, you can use some of the properties in `Post`.
+# For example: `{title}_{}` &gt; `HelloWorld_b4b41de2-8736-480d-b5c3-ebf0d917561b`, etc.
+# You can also use it with `sequential_filename`. For instance,
+# `[{published}]_{}` &gt; `[2024-1-1]_1.png`, `[2024-1-1]_2.png`, etc.
+KTOOLBOX_JOB__FILENAME_FORMAT=[{published}]_{}
+
 # Prefix the post directory name with its release/publish date, e.g. `[2024-1-1]HelloWorld`
 KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title}
 
@@ -1100,7 +1107,7 @@ KTOOLBOX_SSL_VERIFY=False
     <script id="__config" type="application/json">{"base": "../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.action.edit"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.dd8806f2.min.js"></script>
+      <script src="../../assets/javascripts/bundle.081f42fc.min.js"></script>
       
     
   </body>
