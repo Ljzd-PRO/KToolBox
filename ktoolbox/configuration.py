@@ -134,7 +134,7 @@ class JobConfiguration(BaseModel):
     :ivar count: Number of coroutines for concurrent download
     :ivar post_id_as_path: (**Deprecated**) Use post ID as post directory name
     :ivar post_dirname_format: Customize the post directory name format, you can use some of the \
-    [properties](/configuration/reference/#ktoolbox.configuration.JobConfiguration) in ``Post``. \
+    [properties][ktoolbox.configuration.JobConfiguration] in ``Post``. \
     e.g. ``[{published}]{id}`` > ``[2024-1-1]123123``, ``{user}_{published}_{title}`` > ``234234_2024-1-1_HelloWorld``
     :ivar post_structure: Post path structure
     :ivar mix_posts: Save all files from different posts at same path in creator directory. \
