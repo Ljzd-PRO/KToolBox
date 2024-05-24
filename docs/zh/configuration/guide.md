@@ -18,6 +18,13 @@ KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 # 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
 KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
 
+# 通过插入一个代表了基本文件名的空白的 `{}` 以自定义文件名格式 
+# 与 `post_dirname_format` 类似，你可以使用一些 `Post` 类里的属性
+# 例如 `{title}_{}` > `HelloWorld_b4b41de2-8736-480d-b5c3-ebf0d917561b`
+# 你也可以和 `sequential_filename` 搭配使用
+# 例如 `[{published}]_{}` > `[2024-1-1]_1.png`, `[2024-1-1]_2.png`
+KTOOLBOX_JOB__FILENAME_FORMAT=[{published}]_{}
+
 # 将发布日期作为作品目录名的开头，例如 `[2024-1-1]HelloWorld`
 KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title}
 

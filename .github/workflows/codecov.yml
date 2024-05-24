@@ -25,16 +25,24 @@ on:
 
 jobs:
   test:
-    name: Test Coverage
+    name: Test With Coverage
     runs-on: ${{ matrix.os }}
     concurrency:
       group: test-coverage-${{ github.ref }}-${{ matrix.os }}-${{ matrix.python-version }}
       cancel-in-progress: true
     strategy:
-      matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
-        os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: false
+      matrix:
+        # macos-14 aka. macos-latest has switched to being an ARM runner, only supporting newer versions of Python.
+        # https://github.com/actions/setup-python/issues/855#issuecomment-2096792205
+        os: [ ubuntu-latest, windows-latest, macos-13 ]
+        python-version: [ "3.8", "3.9", "3.10", "3.11" ]
+        include: # Use macos-latest here because it seems that Pydantic currently not support macOS ARM64 on 3.11, 3.12
+          - os: macos-latest
+            python-version: "3.11"
+        exclude:
+          - os: macos-13
+            python-version: "3.11"
     env:
       PYTEST_REPORT_FILENAME: report-${{ matrix.os }}-${{ matrix.python-version }}.html
 
@@ -51,7 +59,7 @@ jobs:
           poetry run pytest -v --capture=sys --cov --cov-report=xml tests/
 
       - name: Upload coverage report
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:

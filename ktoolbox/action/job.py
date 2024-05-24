@@ -11,7 +11,7 @@ from pathvalidate import sanitize_filename, is_valid_filename
 
 from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.action import ActionRet, fetch_creator_posts, FetchInterruptError
-from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date
+from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date, generate_filename
 from ktoolbox.api.model import Post, Attachment
 from ktoolbox.configuration import config, PostStructureConfiguration
 from ktoolbox.job import Job, CreatorIndices
@@ -68,7 +68,8 @@ async def create_job_from_post(
                 config.job.block_list
             )
         ):
-            alt_filename = f"{i + 1}{file_path_obj.suffix}" if config.job.sequential_filename else file_path_obj.name
+            basic_filename = f"{i + 1}{file_path_obj.suffix}" if config.job.sequential_filename else file_path_obj.name
+            alt_filename = generate_filename(post, basic_filename)
             jobs.append(
                 Job(
                     path=attachments_path,
