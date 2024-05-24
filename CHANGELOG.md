@@ -3,7 +3,7 @@
 ### 💡 Feature
 
 - Add support for customizing filename:
-  - Edit `KTOOLBOX_JOB__FILENAME_FORMAT` in `prod.env` or environment variables to set this option
+  - Edit `KTOOLBOX_JOB__FILENAME_FORMAT` in `prod.env` or environment variables to set this option (#116)
   - 📖More information: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
       ```dotenv
       # Rename attachments in numerical order, e.g. `1.png`, `2.png`, ...
@@ -23,7 +23,7 @@
 ### 💡 新特性
 
 - 支持自定义下载的文件名格式：
-  - 在 `prod.env` 或环境变量中编辑 `KTOOLBOX_JOB__FILENAME_FORMAT` 以设置该选项
+  - 在 `prod.env` 或环境变量中编辑 `KTOOLBOX_JOB__FILENAME_FORMAT` 以设置该选项 (#116)
   - 📖更多信息: [配置-参考-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
       ```dotenv
       # 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
