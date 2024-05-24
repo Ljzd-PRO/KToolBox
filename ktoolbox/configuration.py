@@ -109,10 +109,10 @@ class PostStructureConfiguration(BaseModel):
     ```
 
     :ivar attachments: Sub path of attachment directory
-    :ivar content_filepath: Sub path of post content HTML file
+    :ivar content_filepath: Sub path of post content file
     """
     attachments: Path = Path("attachments")
-    content_filepath: Path = Path("index.html")
+    content_filepath: Path = Path("content.txt")
 
 
 class JobConfiguration(BaseModel):
