@@ -65,7 +65,7 @@ See [documentation](https://ktoolbox.readthedocs.io/) for more details.
 
 ### Installation
 
-- Recommand
+- Recommend
   ```bash
   pip3 install pipx
   pipx install ktoolbox
