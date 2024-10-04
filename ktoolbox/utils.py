@@ -7,6 +7,7 @@ from typing import Generic, TypeVar, Optional, List, Tuple
 import aiofiles
 from loguru import logger
 from pydantic import BaseModel, ConfigDict
+from tqdm import tqdm
 
 from ktoolbox._enum import RetCodeEnum, DataStorageNameEnum
 from ktoolbox.configuration import config
@@ -60,7 +61,8 @@ def logger_init(cli_use: bool = False, disable_stdout: bool = False):
     elif cli_use:
         logger.remove()
         logger.add(
-            sys.stderr,
+            tqdm.write,
+            colorize=True,
             level=logging.INFO,
             filter=lambda record: record["level"].name != "SUCCESS"
         )
