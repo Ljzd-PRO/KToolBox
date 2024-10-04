@@ -53,12 +53,16 @@
 
 ### Installation
 
-=== "Normal"
+You can use executables from [releases](https://github.com/Ljzd-PRO/KToolBox/releases) page
+
+=== "Manually Install - Normal"
+    Recommend to use pipx
     ```bash
-    pip3 install ktoolbox
+    pip3 install pipx
+    pipx install ktoolbox
     ```
 
-=== "For iOS a-Shell"
+=== "Manually Install - For iOS a-Shell"
     ```bash
     pip3 install ktoolbox-pure-py
     ```

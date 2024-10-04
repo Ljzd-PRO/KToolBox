@@ -65,6 +65,10 @@ See [documentation](https://ktoolbox.readthedocs.io/) for more details.
 
 ### Installation
 
+You can use executables from [releases](https://github.com/Ljzd-PRO/KToolBox/releases) page
+
+Manually install:
+
 - Recommend
   ```bash
   pip3 install pipx
