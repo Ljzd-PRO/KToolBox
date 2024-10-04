@@ -66,9 +66,10 @@
 
 ### 安装
 
-- 一般情况
+- 推荐
   ```bash
-  pip3 install ktoolbox
+  pip3 install pipx
+  pipx install ktoolbox
   ```
 
 - 对于 iOS [a-Shell](https://github.com/holzschu/a-shell)

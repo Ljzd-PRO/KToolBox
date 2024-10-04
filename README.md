@@ -65,9 +65,10 @@ See [documentation](https://ktoolbox.readthedocs.io/) for more details.
 
 ### Installation
 
-- Normal
+- Recommend
   ```bash
-  pip3 install ktoolbox
+  pip3 install pipx
+  pipx install ktoolbox
   ```
 
 - For [a-Shell](https://github.com/holzschu/a-shell)
