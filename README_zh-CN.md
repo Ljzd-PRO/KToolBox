@@ -66,6 +66,10 @@
 
 ### 安装
 
+你可以从 [releases](https://github.com/Ljzd-PRO/KToolBox/releases) 页面下载可执行文件使用
+
+手动安装：
+
 - 推荐
   ```bash
   pip3 install pipx

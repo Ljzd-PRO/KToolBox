@@ -219,4 +219,4 @@ class Configuration(BaseSettings):
     )
 
 
-config = Configuration(_env_file='prod.env')
+config = Configuration(_env_file=['.env', 'prod.env'])
