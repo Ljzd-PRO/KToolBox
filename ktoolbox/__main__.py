@@ -3,7 +3,7 @@ from loguru import logger
 
 from ktoolbox.cli import KToolBoxCli
 from ktoolbox.configuration import config
-from ktoolbox.utils import logger_init, uvloop_init, generate_msg
+from ktoolbox.utils import logger_init, uvloop_init
 
 
 def main():
