@@ -9,7 +9,7 @@ from ktoolbox.utils import logger_init, uvloop_init, generate_msg
 def main():
     try:
         logger_init(cli_use=True)
-        logger.debug(generate_msg(config=config))
+        logger.info(repr(config))
         uvloop_init()
         fire.Fire(KToolBoxCli)
     except KeyboardInterrupt:
