@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 from typing import Optional, List, Generator, Any, Tuple
 
 from loguru import logger
@@ -37,10 +38,12 @@ def generate_post_path_name(post: Post) -> str:
 
 def generate_filename(post: Post, basic_name: str) -> str:
     """Generate download filename"""
+    basic_name_suffix = Path(basic_name).suffix
+    basic_name_filename = basic_name.split(basic_name_suffix)[0] if basic_name_suffix else basic_name
     try:
         return sanitize_filename(
             config.job.filename_format.format(
-                basic_name,
+                basic_name_filename,
                 id=post.id,
                 user=post.user,
                 service=post.service,
@@ -48,7 +51,7 @@ def generate_filename(post: Post, basic_name: str) -> str:
                 added=post.added.strftime(TIME_FORMAT) if post.added else "",
                 published=post.published.strftime(TIME_FORMAT) if post.published else "",
                 edited=post.edited.strftime(TIME_FORMAT) if post.edited else ""
-            )
+            ) + basic_name_suffix
         )
     except KeyError as e:
         logger.error(f"`JobConfiguration.filename_format` contains invalid key: {e}")
