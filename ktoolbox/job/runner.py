@@ -141,6 +141,17 @@ class JobRunner:
         await self._job_queue.join()
         return failed_num
 
+    async def _watch_status(self):
+        """
+        Watch running, completed, failed jobs
+        """
+        while not self._job_queue.empty():
+            await asyncio.sleep(30)
+            logger.info(f"Waiting: {self.waiting_size} - "
+                        f"Running: {self.processing_size} - "
+                        f"Completed: {self.done_size} "
+                        f"({(self.done_size / (self.waiting_size + self.processing_size + self.done_size)) * 100:.2f}%)")
+
     async def start(self):
         """
         Start processing jobs concurrently
@@ -154,7 +165,10 @@ class JobRunner:
                 task = asyncio.create_task(self.processor())
                 self._concurrent_tasks.add(task)
                 task.add_done_callback(self._concurrent_tasks.discard)
-            task_done_set, _ = await asyncio.wait(self._concurrent_tasks)
+            _, (task_done_set, _) = await asyncio.gather(
+                self._watch_status(),
+                asyncio.wait(self._concurrent_tasks)
+            )
             for task in task_done_set:
                 try:
                     failed_num += task.result()
