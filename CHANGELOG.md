@@ -3,6 +3,8 @@
 ### 💡 Feature
 
 - Show the download job status each 30s (waiting, running, completed%)
+- Shortened the log length
+  - E.g. `2024-10-05 20:12:37 | WARNING  | ktoolbox.job.runner - Download file already exists, skipping ...`
 
 ### 🪲 Fix
 
@@ -15,6 +17,8 @@
 ### 💡 新特性
 
 - 每隔 30 秒显示下载任务状态（等待中、运行中、已完成%）
+- 缩短了日志长度
+  - 例如 `2024-10-05 20:12:37 | WARNING  | ktoolbox.job.runner - Download file already exists, skipping ...`
 
 ### 🪲 修复
 
