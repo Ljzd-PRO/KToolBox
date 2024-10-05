@@ -147,8 +147,8 @@ class JobRunner:
         """
         while not self._job_queue.empty():
             await asyncio.sleep(30)
-            logger.info(f"Waiting: {self.waiting_size} - "
-                        f"Running: {self.processing_size} - "
+            logger.info(f"Waiting: {self.waiting_size} / "
+                        f"Running: {self.processing_size} / "
                         f"Completed: {self.done_size} "
                         f"({(self.done_size / (self.waiting_size + self.processing_size + self.done_size)) * 100:.2f}%)")
 
