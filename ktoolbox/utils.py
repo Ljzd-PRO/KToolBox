@@ -63,6 +63,9 @@ def logger_init(cli_use: bool = False, disable_stdout: bool = False):
         logger.add(
             tqdm.write,
             colorize=True,
+            format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
+                   "<level>{level: <8}</level> | "
+                   "<cyan>{name}</cyan> - <level>{message}</level>",
             level=logging.INFO,
             filter=lambda record: record["level"].name != "SUCCESS"
         )
