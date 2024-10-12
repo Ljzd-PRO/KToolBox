@@ -2,9 +2,7 @@
 
 KToolBox 支持从 Coomer.su / Coomer.party 下载
 
-Coomer.su 的文件可以从 Kemono.su / Kemono.party 服务器下载，所以 **无需编辑配置** 即可下载 Coomer 里的作品
-
-如果无效，你可以通过 dotenv文件 `prod.env` 或系统环境变量来修改配置，然后再次尝试：
+你需要通过 dotenv文件 `.env` 或 `prod.env` 或系统环境变量来修改配置：
 ```dotenv
 # Coomer API
 KTOOLBOX_API__NETLOC=coomer.su
