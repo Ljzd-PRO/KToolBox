@@ -106,3 +106,12 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 # Download posts from the creator/artist from 2024-1-1 to 2024-3-1
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 --end-time=2024-3-1
 ```
+
+### Configuration
+
+- Download 10 files at the same time
+- Rename attachments in numerical order
+- Prefix the post directory name with its release/publish date
+- ...
+
+Goto [Configuration-Guide](https://ktoolbox.readthedocs.io/latest/configuration/guide/) page for more details.

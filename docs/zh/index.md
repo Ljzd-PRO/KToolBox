@@ -105,3 +105,12 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 # 下载作者/画师从 2024-1-1 到 2024-3-1 的作品
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 --end-time=2024-3-1
 ```
+
+### 配置
+
+- 同时下载10个文件
+- 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
+- 将发布日期作为作品目录名的开头，例如 `[2024-1-1]HelloWorld`
+- ...
+
+前往 [配置-向导](https://ktoolbox.readthedocs.io/latest/zh/configuration/guide/) 页面查看更多详情。
