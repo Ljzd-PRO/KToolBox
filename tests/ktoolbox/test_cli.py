@@ -9,13 +9,15 @@ from allpairspy import AllPairs
 from pydantic import ValidationError
 
 from ktoolbox import __version__
+from ktoolbox._enum import TextEnum, DataStorageNameEnum
 from ktoolbox.api.model import Creator, Post
 from ktoolbox.cli import KToolBoxCli
 from ktoolbox.configuration import config
-from ktoolbox._enum import TextEnum, DataStorageNameEnum
 from ktoolbox.model import SearchResult
 from ktoolbox.utils import generate_msg
 from tests.utils import settings
+
+config.api.retry_times = 10
 
 
 @pytest.mark.asyncio
