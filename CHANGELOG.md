@@ -2,40 +2,28 @@
 
 ### 💡 Feature
 
-- Add support for customizing filename:
-  - Edit `KTOOLBOX_JOB__FILENAME_FORMAT` in `prod.env` or environment variables to set this option (#116)
-  - 📖More information: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
-      ```dotenv
-      # Rename attachments in numerical order, e.g. `1.png`, `2.png`, ...
-      KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
+- Show the download job status each 30s (waiting, running, completed%)
+- Shortened the log length
+  - E.g. `2024-10-05 20:12:37 | WARNING  | ktoolbox.job.runner - Download file already exists, skipping ...`
 
-      # `{}`: Basic filename
-      # Can be used with the configuration option above.
-      # Rename attachments to `[2024-1-1]_1.png`, `[2024-1-1]_2.png`, ...
-      KTOOLBOX_JOB__FILENAME_FORMAT="[{published}]_{}"
-      ```
-- Change default post text content filename `index.html` to `content.txt`
+### 🪲 Fix
 
-[//]: # (### 🪲 Fix)
+- Fix error when attempting to download files which posses too long names (invalid names) (#150)
+  - For example the wrong filename like this: `https://www.patreon.com/media-u/Z0FBQUFBQm........=#12345678_` \
+    KToolBox can get the correct filename: `6edd5bdae......0e7f913.png`
 
 - - -
 
 ### 💡 新特性
 
-- 支持自定义下载的文件名格式：
-  - 在 `prod.env` 或环境变量中编辑 `KTOOLBOX_JOB__FILENAME_FORMAT` 以设置该选项 (#116)
-  - 📖更多信息: [配置-参考-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
-      ```dotenv
-      # 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
-      KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
+- 每隔 30 秒显示下载任务状态（等待中、运行中、已完成%）
+- 缩短了日志长度
+  - 例如 `2024-10-05 20:12:37 | WARNING  | ktoolbox.job.runner - Download file already exists, skipping ...`
 
-      # `{}`：基本文件名
-      # 可以和上面的配置选项搭配使用
-      # 附件将被重命名为 `[2024-1-1]_1.png`, `[2024-1-1]_2.png`, ...
-      KTOOLBOX_JOB__FILENAME_FORMAT="[{published}]_{}"
-      ```
-- 更改默认的作品文本内容文件名 `index.html` 为 `content.txt`
+### 🪲 修复
 
-[//]: # (### 🪲 修复)
+- 修复下载过长文件名（非法文件名）的文件时报错的问题 (#150)
+  - 例如这样的错误文件名：`https://www.patreon.com/media-u/Z0FBQUFBQm........=#12345678_` \
+    KToolBox 可以获取到正确的文件名：`6edd5bdae......0e7f913.png`
 
-**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.6.0...v0.7.0
+**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.8.0...v0.9.0

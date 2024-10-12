@@ -66,9 +66,14 @@
 
 ### 安装
 
-- 一般情况
+你可以从 [releases](https://github.com/Ljzd-PRO/KToolBox/releases) 页面下载可执行文件使用
+
+手动安装：
+
+- 推荐
   ```bash
-  pip3 install ktoolbox
+  pip3 install pipx
+  pipx install ktoolbox
   ```
 
 - 对于 iOS [a-Shell](https://github.com/holzschu/a-shell)

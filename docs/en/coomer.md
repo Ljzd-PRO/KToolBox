@@ -2,9 +2,7 @@
 
 KToolBox support downloading from Coomer.su / Coomer.party
 
-Files of Coomer.su can be downloaded from Kemono.su / Kemono.party server, so you can download Coomer posts **without modifying configuration**.
-
-If it did not work, you can modify the configuration by `prod.env` dotenv file or system environment variables and then try again:
+You need to modify the configuration by `.env` or `prod.env` dotenv file or system environment variables:
 ```dotenv
 # For Coomer API
 KTOOLBOX_API__NETLOC=coomer.su

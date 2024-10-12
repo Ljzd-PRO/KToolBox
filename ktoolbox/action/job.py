@@ -81,22 +81,24 @@ async def create_job_from_post(
 
     # Filter and create jobs for ``Post.file``
     if post.file and post.file.path:
-        post_file_name = post.file.name or Path(post.file.path).name
+        post_file_name = Path(post.file.name) if is_valid_filename(post.file.name) else Path(
+            urlparse(post.file.path).path
+        )
         if (not config.job.allow_list or any(
                 map(
-                    lambda x: fnmatch(post_file_name, x),
+                    lambda x: fnmatch(post_file_name.name, x),
                     config.job.allow_list
                 )
         )) and not any(
             map(
-                lambda x: fnmatch(post_file_name, x),
+                lambda x: fnmatch(post_file_name.name, x),
                 config.job.block_list
             )
         ):
             jobs.append(
                 Job(
                     path=post_path,
-                    alt_filename=f"{post.id}_{post_file_name}",
+                    alt_filename=f"{post.id}_{post_file_name.name}",
                     server_path=post.file.path,
                     type=PostFileTypeEnum.File
                 )

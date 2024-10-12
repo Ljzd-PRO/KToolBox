@@ -214,9 +214,8 @@ class Downloader:
                             desc=self._save_filename,
                             total=total_size,
                             disable=not progress,
-                            unit="iB",
-                            unit_scale=True,
-                            unit_divisor=1024
+                            unit="B",
+                            unit_scale=True
                         )
                         async for chunk in chunk_iterator:
                             if self._stop:

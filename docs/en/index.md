@@ -53,12 +53,16 @@
 
 ### Installation
 
-=== "Normal"
+You can use executables from [releases](https://github.com/Ljzd-PRO/KToolBox/releases) page
+
+=== "Manually Install - Normal"
+    Recommend to use pipx
     ```bash
-    pip3 install ktoolbox
+    pip3 install pipx
+    pipx install ktoolbox
     ```
 
-=== "For iOS a-Shell"
+=== "Manually Install - For iOS a-Shell"
     ```bash
     pip3 install ktoolbox-pure-py
     ```
@@ -102,3 +106,12 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 # Download posts from the creator/artist from 2024-1-1 to 2024-3-1
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 --end-time=2024-3-1
 ```
+
+### Configuration
+
+- Download 10 files at the same time
+- Rename attachments in numerical order
+- Prefix the post directory name with its release/publish date
+- ...
+
+Goto [Configuration-Guide](https://ktoolbox.readthedocs.io/latest/configuration/guide/) page for more details.

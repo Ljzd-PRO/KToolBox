@@ -223,4 +223,4 @@ class Configuration(BaseSettings):
         env_file_encoding = 'utf-8'
 
 
-config = Configuration(_env_file='prod.env')
+config = Configuration(_env_file=['.env', 'prod.env'])

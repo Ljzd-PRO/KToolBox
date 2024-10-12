@@ -276,12 +276,14 @@ class KToolBoxCli:
                     )
                 )
         else:
-            logger.warning(
+            logger.error(
                 generate_msg(
-                    f"Failed to fetch the name of creator <{creator_id}>, use creator ID as directory name",
+                    f"Failed to fetch the name of creator <{creator_id}>",
                     detail=creator_ret.message
                 )
             )
+            return creator_ret.message
+
         creator_path = path / sanitize_filename(creator_name)
 
         creator_path.mkdir(exist_ok=True)

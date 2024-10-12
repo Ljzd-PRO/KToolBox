@@ -1,11 +1,11 @@
 # Guide
 
-- KToolBox read **`prod.env` file** in the work folder or **environment variables** to store configuration
+- KToolBox read **`.env` or `prod.env` file** in the work folder or **environment variables** to store configuration
 - Check [Reference](reference.md) for all configuration options
 - Use `__` to specify the sub option, like `KTOOLBOX_API__SCHEME` means `api.scheme`
 - All configuration options are optional
 
-## `prod.env` file example
+## `.env` / `prod.env` file example
 
 ```dotenv
 # Download 10 files at the same time.
@@ -27,11 +27,4 @@ KTOOLBOX_JOB__FILENAME_FORMAT=[{published}]_{}
 
 # Prefix the post directory name with its release/publish date, e.g. `[2024-1-1]HelloWorld`
 KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title}
-
-# Allocate 102400 Bytes as buffer for each download job
-KTOOLBOX_DOWNLOADER__BUFFER_SIZE=102400
-
-# Disable SSL certificate verification for Kemono API server and download server
-# It's useful when certificate on Kemono server expired. (SSL: CERTIFICATE_VERIFY_FAILED)
-KTOOLBOX_SSL_VERIFY=False
 ```
