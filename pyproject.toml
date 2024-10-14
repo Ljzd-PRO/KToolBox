@@ -38,7 +38,7 @@ aiofiles = "^23.2.1"
 pathvalidate = "^3.2.0"
 
 [tool.poetry.group.uvloop.dependencies]
-uvloop = "^0.19.0"
+uvloop = ">=0.19,<0.21"
 
 [tool.poetry.group.pyinstaller.dependencies]
 pyinstaller = "==6.10.0"
