@@ -20,4 +20,4 @@
 
 [//]: # (### 🪲 修复)
 
-**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.9.0...v0.10.0-beta.1
+**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.9.0...v0.10.0
