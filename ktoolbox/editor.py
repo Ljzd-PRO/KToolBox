@@ -295,7 +295,7 @@ def run_config_editor():
     urwid.MainLoop(top, palette=[("reversed", "standout", "")]).run()
 
 
-default_config = Configuration()
+default_config = Configuration(_env_file="")
 default_config_envs = set(dump_envs(default_config))
 initial_envs = set(dump_envs(config))
 menu_top = menu(
