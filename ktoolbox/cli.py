@@ -30,6 +30,7 @@ class KToolBoxCli:
     async def site_version():
         # noinspection SpellCheckingInspection
         """Show current Kemono site app commit hash"""
+        logger.info(repr(config))
         ret = await get_app_version()
         return ret.data if ret else ret.message
 
