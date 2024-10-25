@@ -2,28 +2,22 @@
 
 ### 💡 Feature
 
-- Show the download job status each 30s (waiting, running, completed%)
-- Shortened the log length
-  - E.g. `2024-10-05 20:12:37 | WARNING  | ktoolbox.job.runner - Download file already exists, skipping ...`
+- Added a graphical configuration editor, making configuration editing simple and convenient.
+  - Run `ktoolbox config-editor`
+- Added a command to generate a complete sample configuration file.
+  - Run `ktoolbox example-env`
 
-### 🪲 Fix
-
-- Fix error when attempting to download files which posses too long names (invalid names) (#150)
-  - For example the wrong filename like this: `https://www.patreon.com/media-u/Z0FBQUFBQm........=#12345678_` \
-    KToolBox can get the correct filename: `6edd5bdae......0e7f913.png`
+[//]: # (### 🪲 Fix)
 
 - - -
 
 ### 💡 新特性
 
-- 每隔 30 秒显示下载任务状态（等待中、运行中、已完成%）
-- 缩短了日志长度
-  - 例如 `2024-10-05 20:12:37 | WARNING  | ktoolbox.job.runner - Download file already exists, skipping ...`
+- 新增图形化配置编辑器，配置编辑将变得简单方便
+  - 运行 `ktoolbox config-editor`
+- 新增命令可生成完整的配置文件样例
+  - 运行 `ktoolbox example-env`
 
-### 🪲 修复
+[//]: # (### 🪲 修复)
 
-- 修复下载过长文件名（非法文件名）的文件时报错的问题 (#150)
-  - 例如这样的错误文件名：`https://www.patreon.com/media-u/Z0FBQUFBQm........=#12345678_` \
-    KToolBox 可以获取到正确的文件名：`6edd5bdae......0e7f913.png`
-
-**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.8.0...v0.9.0
+**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.9.0...v0.10.0-beta.1
