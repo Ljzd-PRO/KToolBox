@@ -5,6 +5,7 @@ from typing import Union, overload
 import aiofiles
 from loguru import logger
 from pathvalidate import sanitize_filename
+from settings_doc import render, OutputFormat
 
 from ktoolbox import __version__
 from ktoolbox._enum import TextEnum
@@ -32,6 +33,29 @@ class KToolBoxCli:
         ret = await get_app_version()
         return ret.data if ret else ret.message
 
+    @staticmethod
+    async def config_editor():
+        """Launch graphical KToolBox configuration editor"""
+        try:
+            from ktoolbox.editor import run_config_editor
+            run_config_editor()
+        except ModuleNotFoundError:
+            logger.error(
+                "You need to install extra dependencies to use the editor, "
+                "run `pip install ktoolbox[urwid]` "
+                "or `pipx install ktoolbox[urwid] --force` if you are using pipx"
+            )
+
+    @staticmethod
+    async def example_env():
+        """Generate an example configuration ``.env`` file."""
+        print(
+            render(
+                OutputFormat.DOTENV,
+                class_path=("ktoolbox.configuration.Configuration",)
+            )
+        )
+
     # noinspection PyShadowingBuiltins
     @staticmethod
     async def search_creator(
@@ -49,6 +73,7 @@ class KToolBoxCli:
         :param service: The service for the creator
         :param dump: Dump the result to a JSON file
         """
+        logger.info(repr(config))
         ret = await search_creator_action(id=id, name=name, service=service)
         if ret:
             result_list = list(ret.data)
@@ -79,6 +104,7 @@ class KToolBoxCli:
         :param o: Result offset, stepping of 50 is enforced
         :param dump: Dump the result to a JSON file
         """
+        logger.info(repr(config))
         ret = await search_creator_post_action(id=id, name=name, service=service, q=q, o=o)
         if ret:
             if dump:
@@ -97,6 +123,7 @@ class KToolBoxCli:
         :param post_id: The post ID
         :param dump: Dump the result to a JSON file
         """
+        logger.info(repr(config))
         ret = await get_post_api(
             service=service,
             creator_id=creator_id,
@@ -154,6 +181,7 @@ class KToolBoxCli:
         :param path: Download path, default is current directory
         :param dump_post_data: Whether to dump post data (post.json) in post directory
         """
+        logger.info(repr(config))
         # Get service, creator_id, post_id
         if url:
             service, creator_id, post_id = parse_webpage_url(url)
@@ -248,6 +276,7 @@ class KToolBoxCli:
         :param offset: Result offset (or start offset)
         :param length: The number of posts to fetch, defaults to fetching all posts after ``offset``.
         """
+        logger.info(repr(config))
         # Get service, creator_id
         if url:
             service, creator_id, _ = parse_webpage_url(url)

@@ -18,6 +18,22 @@ ktoolbox -h
 ktoolbox download-post -h
 ```
 
+## Launch the graphical configuration editor
+
+`config-editor`
+
+```bash
+ktoolbox config-editor
+```
+
+## Generate an example configuration file (`.env`/`prod.env`)
+
+`example-env`
+
+```bash
+ktoolbox example-env
+```
+
 ## Download a specific post
 
 `download-post`

@@ -2,14 +2,12 @@ import fire
 from loguru import logger
 
 from ktoolbox.cli import KToolBoxCli
-from ktoolbox.configuration import config
 from ktoolbox.utils import logger_init, uvloop_init
 
 
 def main():
     try:
         logger_init(cli_use=True)
-        logger.info(repr(config))
         uvloop_init()
         fire.Fire(KToolBoxCli)
     except KeyboardInterrupt:
