@@ -51,7 +51,9 @@ class CascadingBoxes(urwid.WidgetPlaceholder):
 
     def open_box(self, box: urwid.Widget):
         self.original_widget = urwid.Overlay(
-            urwid.LineBox(box),
+            urwid.LineBox(
+                urwid.Padding(box, align=urwid.CENTER, left=2, right=2)
+            ),
             self.original_widget,
             align=urwid.CENTER,
             width=(urwid.RELATIVE, 80),
@@ -135,6 +137,10 @@ def menu_button(
     return urwid.AttrMap(button, None, focus_map="reversed")
 
 
+def menu_option(widget: urwid.Widget) -> urwid.AttrMap:
+    """Return ``focus_map="reversed"`` Widget"""
+    return urwid.AttrMap(widget, None, focus_map="reversed")
+
 def sub_menu(
         caption: Union[str, Tuple[Hashable, str], List[Union[str, Tuple[Hashable, str]]]],
         choices: Iterable[urwid.Widget],
@@ -154,7 +160,7 @@ def menu(
         title: Union[str, Tuple[Hashable, str], List[Union[str, Tuple[Hashable, str]]]],
         choices: Iterable[urwid.Widget],
 ) -> urwid.ListBox:
-    body = [urwid.Text(title, align=urwid.Align.CENTER), urwid.Divider(), *choices]
+    body = [urwid.Text(title, align=urwid.CENTER), urwid.Divider(), *choices]
     return urwid.ListBox(urwid.SimpleFocusListWalker(body))
 
 
@@ -185,7 +191,9 @@ def on_save_dotenv(_: urwid.Button):
         pile = urwid.Pile([
             urwid.Text("Your changes have been saved."),
             urwid.Divider(),
-            menu_button("OK", lambda x: top.back()),
+            menu_option(urwid.Button(
+                "OK", lambda x: top.back()
+            )),
         ])
         try:
             save_dotenv()
@@ -195,13 +203,17 @@ def on_save_dotenv(_: urwid.Button):
                 urwid.Divider(),
                 urwid.Text(f"{type(e).__name__}: {e}"),
                 urwid.Divider(),
-                menu_button("OK", lambda x: top.back()),
+                menu_option(urwid.Button(
+                    "OK", lambda x: top.back()
+                )),
             ])
     else:
         pile = urwid.Pile([
             urwid.Text("Nothing has changed, no need to save."),
             urwid.Divider(),
-            menu_button("OK", lambda x: top.back()),
+            menu_option(urwid.Button(
+                "OK", lambda x: top.back()
+            )),
         ])
     top.open_box(urwid.Filler(pile))
 
@@ -213,8 +225,12 @@ def exit_program(_: urwid.Button = None) -> Optional[NoReturn]:
                 urwid.Pile([
                     urwid.Text("Any unsaved changes will be lost. Are you sure you want to EXIT?"),
                     urwid.Divider(),
-                    menu_button("NO", lambda x: top.back()),
-                    menu_button("YES", lambda x: top.exit()),
+                    menu_option(urwid.Button(
+                        "NO", lambda x: top.back()
+                    )),
+                    menu_option(urwid.Button(
+                        "YES", lambda x: top.exit()
+                    )),
                 ])
             )
         )
@@ -238,31 +254,31 @@ def model_to_widgets(model: BaseModel, fields: Iterable[str] = None) -> Generato
         if origin_annotation is Literal:
             radio_buttons = []
             for value in get_args(field_info.annotation):
-                urwid.RadioButton(
+                menu_option(urwid.RadioButton(
                     radio_buttons,
                     str(value),
                     model.__getattribute__(field) == value,
                     on_radio_button_change,
                     (model, field, value)
-                )
+                ))
             yield sub_menu(field, radio_buttons)
         elif bool in annotation:
-            yield urwid.CheckBox(
+            yield menu_option(urwid.CheckBox(
                 field,
                 model.__getattribute__(field),
                 on_state_change=on_checkbox_change,
                 user_data=(model, field)
-            )
+            ))
         elif any(map(lambda x: x in annotation, [str, int, float, Path])):
-            yield urwid.Columns([
-                urwid.Text(field, align=urwid.Align.LEFT),
+            yield menu_option(urwid.Columns([
+                urwid.Text(field, align=urwid.LEFT),
                 EditWithSignalWidget(
                     edit_text=str(model.__getattribute__(field)),
-                    align=urwid.Align.RIGHT,
+                    align=urwid.RIGHT,
                     on_state_change=on_edit_change,
                     user_data=(model, field, annotation)
                 )
-            ])
+            ]))
         elif isinstance(field_info.annotation, ModelMetaclass):
             yield sub_menu(field, model_to_widgets(model.__getattribute__(field)))
         else:
@@ -307,7 +323,7 @@ menu_top = menu(
                 urwid.Divider()
             ] + list(model_to_widgets(config, ["ssl_verify", "json_dump_indent", "use_uvloop"])),
         ),
-        menu_button(
+        menu_option(urwid.Button(
             "JSON Preview",
             lambda x: top.open_box(menu(
                 "JSON",
@@ -317,8 +333,8 @@ menu_top = menu(
                     )
                 ]
             )),
-        ),
-        menu_button(
+        )),
+        menu_option(urwid.Button(
             "DotEnv Preview",
             lambda x: top.open_box(menu(
                 "DotEnv",
@@ -329,23 +345,23 @@ menu_top = menu(
                     )
                 ]
             )),
-        ),
+        )),
         sub_menu(
             "Save",
             [
-                menu_button(
+                menu_option(urwid.Button(
                     "Save to '.env' / 'prod.env' file",
                     on_save_dotenv
-                )
+                ))
             ],
         ),
         urwid.Divider(bottom=2),
-        menu_button("Exit", exit_program),
+        menu_option(urwid.Button("Exit", exit_program)),
         urwid.Divider(bottom=2),
         urwid.Text(
             "For detailed information, please refer to "
             "https://ktoolbox.readthedocs.io/latest/configuration/reference/",
-            align=urwid.Align.CENTER
+            align=urwid.CENTER
         )
     ],
 )
