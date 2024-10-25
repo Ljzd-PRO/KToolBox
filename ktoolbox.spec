@@ -2,7 +2,7 @@
 
 import pkg_resources
 
-template_dir = pkg_resources.resource_filename('settings_doc', 'templates')  # 或使用 importlib.resources
+template_dir = pkg_resources.resource_filename('settings_doc', 'templates')
 
 a = Analysis(
     ['ktoolbox/__main__.py'],
