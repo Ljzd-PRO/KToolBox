@@ -1,6 +1,13 @@
 # Guide
 
-- KToolBox read **`.env` or `prod.env` file** in the work folder or **environment variables** to store configuration
+!!! tip "Graphical Configuration Editor"
+    Run `ktoolbox config-editor` to launch, 
+    it will make configuration editing simple and convenient.
+
+!!! tip "Generate Example `.env` File"
+    Run `ktoolbox example-env` to generate a complete sample configuration file.
+
+- KToolBox load **`.env` or `prod.env` file** in the work folder or **environment variables** to store configuration
 - Check [Reference](reference.md) for all configuration options
 - Use `__` to specify the sub option, like `KTOOLBOX_API__SCHEME` means `api.scheme`
 - All configuration options are optional
