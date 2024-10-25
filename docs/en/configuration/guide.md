@@ -7,6 +7,9 @@
 !!! tip "Generate Example `.env` File"
     Run `ktoolbox example-env` to generate a complete sample configuration file.
 
+![KToolBox Configuration Editor](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-2.png)
+![KToolBox Configuration Editor](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-3.png)
+
 - KToolBox load **`.env` or `prod.env` file** in the work folder or **environment variables** to store configuration
 - Check [Reference](reference.md) for all configuration options
 - Use `__` to specify the sub option, like `KTOOLBOX_API__SCHEME` means `api.scheme`

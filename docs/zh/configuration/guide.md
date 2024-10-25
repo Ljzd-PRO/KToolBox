@@ -6,6 +6,9 @@
 !!! tip "生成示例 `.env` 文件"
     运行 `ktoolbox example-env` 来生成完整的配置文件样例。
 
+![KToolBox 配置编辑器](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-2.png)
+![KToolBox 配置编辑器](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-3.png)
+
 - KToolBox 读取工作目录下的 **`.env` 或 `prod.env` 文件** 或 **环境变量** 来设定配置
 - 前往 [参考](./reference.md) 查看所有配置选项
 - 用 `__` 来指定子选项, 例如 `KTOOLBOX_API__SCHEME` 相当于 `api.scheme`
