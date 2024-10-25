@@ -5,7 +5,6 @@ from typing import Union, overload
 import aiofiles
 from loguru import logger
 from pathvalidate import sanitize_filename
-from settings_doc import render, OutputFormat
 
 from ktoolbox import __version__
 from ktoolbox._enum import TextEnum
@@ -34,14 +33,14 @@ class KToolBoxCli:
         return ret.data if ret else ret.message
 
     @staticmethod
+    async def config_editor():
+        """Launch graphical KToolBox configuration editor"""
+        logger.error("`ktoolbox-pure-py` does not support this feature. Please use `ktoolbox` instead.")
+
+    @staticmethod
     async def example_env():
         """Generate an example configuration ``.env`` file."""
-        print(
-            render(
-                OutputFormat.DOTENV,
-                class_path=("ktoolbox.configuration.Configuration",)
-            )
-        )
+        logger.error("`ktoolbox-pure-py` does not support this feature. Please use `ktoolbox` instead.")
 
     # noinspection PyShadowingBuiltins
     @staticmethod
