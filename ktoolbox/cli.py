@@ -34,6 +34,19 @@ class KToolBoxCli:
         return ret.data if ret else ret.message
 
     @staticmethod
+    async def config_editor():
+        """Launch graphical KToolBox configuration editor"""
+        try:
+            from ktoolbox.editor import run_config_editor
+            run_config_editor()
+        except ModuleNotFoundError:
+            logger.error(
+                "You need to install extra dependencies to use the editor, "
+                "run `pip install ktoolbox[urwid]` "
+                "or `pipx install ktoolbox[urwid] --force` if you are using pipx"
+            )
+
+    @staticmethod
     async def example_env():
         """Generate an example configuration ``.env`` file."""
         print(
