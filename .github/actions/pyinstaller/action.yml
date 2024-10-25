@@ -20,5 +20,5 @@ runs:
       shell: bash
 
     - name: Copy Extra Files
-      run: cp README.md README_zh-CN.md example.env prod.env LICENSE dist
+      run: cp README.md README_zh-CN.md example.env .env LICENSE dist
       shell: bash
