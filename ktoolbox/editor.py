@@ -4,7 +4,7 @@ import pprint
 import warnings
 from pathlib import Path
 from typing import get_args, Literal, Union, TypeVar, Optional, Tuple, Any, Callable, Hashable, Iterable, NoReturn, \
-    List, Generator
+    List, Generator, Sequence
 
 import urwid
 from pydantic import BaseModel
@@ -141,10 +141,11 @@ def menu_option(widget: urwid.Widget) -> urwid.AttrMap:
     """Return ``focus_map="reversed"`` Widget"""
     return urwid.AttrMap(widget, None, focus_map="reversed")
 
-def sub_menu(
+
+def sub_menu_with_menu_widget(
         caption: Union[str, Tuple[Hashable, str], List[Union[str, Tuple[Hashable, str]]]],
         choices: Iterable[urwid.Widget],
-) -> urwid.Widget:
+) -> Tuple[urwid.AttrMap[urwid.Button], urwid.ListBox]:
     contents = menu(
         caption,
         list(choices) + [urwid.Divider(bottom=2), menu_button("Back", lambda x: top.back())]
@@ -153,7 +154,15 @@ def sub_menu(
     def open_menu(_: urwid.Button) -> None:
         return top.open_box(contents)
 
-    return menu_button([caption, "..."], open_menu)
+    return menu_button([caption, "..."], open_menu), contents
+
+
+def sub_menu(
+        caption: Union[str, Tuple[Hashable, str], List[Union[str, Tuple[Hashable, str]]]],
+        choices: Iterable[urwid.Widget],
+) -> urwid.AttrMap[urwid.Button]:
+    button, _ = sub_menu_with_menu_widget(caption, choices)
+    return button
 
 
 def menu(
@@ -173,6 +182,62 @@ def on_radio_button_change(_: urwid.RadioButton, state: bool, user_data: Tuple[B
 def on_checkbox_change(_: urwid.CheckBox, state: bool, user_data: Tuple[BaseModel, str]):
     model, field = user_data
     model.__setattr__(field, state)
+
+
+def on_add_item(
+        _: urwid.Button,
+        user_data: Tuple[
+            BaseModel,
+            str,
+            Callable[[], Optional[Any]],
+            Union[List[_T], List[None]],
+            Callable[[], _T],
+            Union[urwid.MonitoredFocusList[_T], urwid.ListWalker]
+        ]
+):
+    model, field, get_default, item_list, get_new_widget, widget = user_data
+    values = list(model.__getattribute__(field))
+    values.append(get_default())
+    model.__setattr__(field, values)
+    new_widget = get_new_widget()
+    item_list.append(new_widget)
+    widget.append(new_widget)
+
+
+def on_remove_item(
+        _: urwid.Button,
+        user_data: Tuple[
+            BaseModel,
+            str,
+            Union[List[_T], List[None]],
+            _T,
+            Union[urwid.MonitoredFocusList[_T], urwid.ListWalker]
+        ]
+):
+    model, field, item_list, item, widget = user_data
+    values = list(model.__getattribute__(field))
+    index = item_list.index(item)
+    values.pop(index)
+    model.__setattr__(field, values)
+    item_list.pop(index)
+    widget.remove(item)
+
+
+def on_item_changed(
+        widget: EditWithSignalWidget,
+        user_data: Tuple[
+            BaseModel,
+            str,
+            Callable[[EditWithSignalWidget], Any],
+            Union[List[_T], List[None]],
+            _T
+        ]
+):
+    model, field, get_value_callback, item_list, item = user_data
+    values = list(model.__getattribute__(field))
+    index = item_list.index(item)
+    values[index] = get_value_callback(widget)
+    model.__setattr__(field, values)
 
 
 def on_edit_change(widget: urwid.EditWithSignalWidget, user_data: Tuple[BaseModel, str, Iterable[type]]):
@@ -238,6 +303,49 @@ def exit_program(_: urwid.Button = None) -> Optional[NoReturn]:
         top.exit()
 
 
+def get_value(item_types: Sequence[type]) -> Callable[[EditWithSignalWidget], Optional[Any]]:
+    def inner(w: EditWithSignalWidget = None):
+        for t in item_types:
+            try:
+                return t(w.get_edit_text()) if w is not None else t()
+            except ValueError:
+                continue
+        return None
+
+    return inner
+
+
+def get_item(
+        model: BaseModel,
+        field: str,
+        get_value_callback: Callable[[EditWithSignalWidget], Optional[Any]],
+        widget_list: List[urwid.WidgetPlaceholder],
+        list_walker: urwid.ListWalker
+) -> Callable[[str], urwid.WidgetPlaceholder]:
+    def inner(edit_text: str = ""):
+        item = urwid.WidgetPlaceholder(urwid.Widget())
+        edit_widget = EditWithSignalWidget(
+            edit_text=edit_text,
+            align=urwid.LEFT,
+            on_state_change=on_item_changed,
+            user_data=(model, field, get_value_callback, widget_list, item)
+        )
+        columns_widget = urwid.Columns([
+            edit_widget,
+            urwid.Divider(),
+            urwid.Divider(),
+            urwid.Button(
+                "Remove -",
+                on_remove_item,
+                (model, field, widget_list, item, list_walker)
+            )
+        ])
+        item.original_widget = columns_widget
+        return item
+
+    return inner
+
+
 def model_to_widgets(model: BaseModel, fields: Iterable[str] = None) -> Generator[urwid.Widget, Any, None]:
     """
     Generate urwid widgets for Pydantic model
@@ -279,6 +387,33 @@ def model_to_widgets(model: BaseModel, fields: Iterable[str] = None) -> Generato
                     user_data=(model, field, annotation)
                 )
             ]))
+        elif origin_annotation in [list, set, tuple]:
+            item_types = get_args(field_info.annotation)
+            widget_list = []
+            widget, menu_widget = sub_menu_with_menu_widget(field, [])
+            list_walker: urwid.SimpleFocusListWalker = menu_widget.body  # type: ignore
+            widget_list.extend([
+                get_item(model, field, get_value(item_types), widget_list, list_walker)
+                (str(existed)) for existed in model.__getattribute__(field)
+            ])
+            # noinspection PyTypeChecker
+            option_widget = menu_option(
+                urwid.Button(
+                    "Add +",
+                    on_add_item,
+                    (
+                        model,
+                        field,
+                        get_value(item_types),
+                        widget_list,
+                        get_item(model, field, get_value(item_types), widget_list, list_walker),
+                        list_walker
+                    )
+                )
+            )
+            list_walker.extend([urwid.Divider(), option_widget, urwid.Divider()])
+            list_walker.extend(widget_list)
+            yield widget
         elif isinstance(field_info.annotation, ModelMetaclass):
             yield sub_menu(field, model_to_widgets(model.__getattribute__(field)))
         else:
