@@ -195,6 +195,12 @@ def on_add_item(
             Union[urwid.MonitoredFocusList[_T], urwid.ListWalker]
         ]
 ):
+    """
+    Call when add item to List/Set/Tuple field
+
+    :param _: Widget
+    :param user_data: (model, field, () -> (default value), item list, () -> (new item), menu widget)
+    """
     model, field, get_default, item_list, get_new_widget, widget = user_data
     values = list(model.__getattribute__(field))
     values.append(get_default())
@@ -214,6 +220,12 @@ def on_remove_item(
             Union[urwid.MonitoredFocusList[_T], urwid.ListWalker]
         ]
 ):
+    """
+    Call when remove item to List/Set/Tuple field
+
+    :param _: Widget
+    :param user_data: (model, field, item list, item, menu widget)
+    """
     model, field, item_list, item, widget = user_data
     values = list(model.__getattribute__(field))
     index = item_list.index(item)
@@ -233,6 +245,12 @@ def on_item_changed(
             _T
         ]
 ):
+    """
+    Call when List/Set/Tuple field item changed
+
+    :param widget: Widget
+    :param user_data: (model, field, (edit widget) -> (value), item list, item)
+    """
     model, field, get_value_callback, item_list, item = user_data
     values = list(model.__getattribute__(field))
     index = item_list.index(item)
