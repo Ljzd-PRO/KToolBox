@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import pprint
 import warnings
+import webbrowser
 from pathlib import Path
 from typing import get_args, Literal, Union, TypeVar, Optional, Tuple, Any, Callable, Hashable, Iterable, NoReturn, \
     List, Generator, Sequence
@@ -446,6 +447,12 @@ def model_to_widgets(model: BaseModel, fields: Iterable[str] = None) -> Generato
                     "the graphical interface; please edit it in the '.env' or 'prod.env' file in the working directory."
                 )]
             )
+    yield urwid.Divider()
+    yield menu_option(urwid.Button(
+        f"View Document: {type(model).__name__}", lambda x: webbrowser.open(
+            f"https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.{type(model).__name__}"
+        )
+    ))
 
 
 def run_config_editor():
@@ -480,29 +487,36 @@ menu_top = menu(
                 urwid.Divider()
             ] + list(model_to_widgets(config, ["ssl_verify", "json_dump_indent", "use_uvloop"])),
         ),
-        menu_option(urwid.Button(
+        urwid.Divider(),
+        sub_menu(
             "JSON Preview",
-            lambda x: top.open_box(menu(
-                "JSON (Python Serialize Mode)",
-                [
-                    urwid.Text(
-                        pprint.pformat(config.model_dump(mode="python"))
+            [
+                urwid.Text(
+                    config.model_dump_json(indent=4)
+                )
+            ]
+        ),
+        sub_menu(
+            "JSON Preview (Python Serialize Mode)",
+            [
+                urwid.Text(
+                    pprint.pformat(
+                        config.model_dump(mode="python"),
+                        sort_dicts=False
                     )
-                ]
-            )),
-        )),
-        menu_option(urwid.Button(
-            "DotEnv Preview",
-            lambda x: top.open_box(menu(
-                "DotEnv",
-                [
-                    urwid.Text(
-                        "\n".join(dump_modified_envs(dump_envs(config))) or "Same as the default configuration, "
-                                                                            "DotEnv will be left empty."
-                    )
-                ]
-            )),
-        )),
+                )
+            ]
+        ),
+        sub_menu(
+            "DotEnv Preview (.env / prod.env)",
+            [
+                urwid.Text(
+                    "\n".join(dump_modified_envs(dump_envs(config))) or "Same as the default configuration, "
+                                                                        "DotEnv will be left empty."
+                )
+            ]
+        ),
+        urwid.Divider(),
         sub_menu(
             "Save",
             [
@@ -513,11 +527,13 @@ menu_top = menu(
             ],
         ),
         urwid.Divider(bottom=2),
+        menu_option(urwid.Button(
+            "Help", lambda x: webbrowser.open("https://ktoolbox.readthedocs.io/latest/configuration/guide/")
+        )),
         menu_option(urwid.Button("Exit", exit_program)),
         urwid.Divider(bottom=2),
         urwid.Text(
-            "For detailed information, please refer to "
-            "https://ktoolbox.readthedocs.io/latest/configuration/reference/",
+            "For detailed information, please refer to https://ktoolbox.readthedocs.io",
             align=urwid.CENTER
         )
     ],
