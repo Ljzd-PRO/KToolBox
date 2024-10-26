@@ -159,18 +159,6 @@ class JobConfiguration(BaseModel):
     allow_list: Set[str] = set()
     block_list: Set[str] = set()
 
-    # job_list_filepath: Optional[Path] = None
-    # """Filepath for job list data saving, ``None`` for disable job list saving"""
-
-    @validator("post_id_as_path")
-    def post_id_as_path_validator(cls, v):
-        if v != cls.__fields__["post_id_as_path"].default:
-            warnings.warn(
-                "`JobConfiguration.post_id_as_path` is deprecated and is scheduled for removal in further version. "
-                "Use `JobConfiguration.post_dirname_format` instead",
-                FutureWarning
-            )
-
     @validator("allow_list", "block_list", pre=True)
     def allow_block_list_validator(cls, v):
         return set(json.loads(v))
