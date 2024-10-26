@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import pprint
 import warnings
 from pathlib import Path
@@ -94,7 +95,10 @@ def dump_envs(model: BaseModel) -> List[str]:
             for env in dump_envs(value):
                 envs.append(f"{field.upper()}__{env}")
         else:
-            envs.append(f"{field.upper()}={model.__pydantic_serializer__.to_python(value, mode='json')}")
+            envs.append(
+                f"{field.upper()}="
+                f"{json.dumps(value) if isinstance(value, (list, tuple, dict)) else model.__pydantic_serializer__.to_python(value)}"
+            )
     return envs
 
 
@@ -479,7 +483,7 @@ menu_top = menu(
         menu_option(urwid.Button(
             "JSON Preview",
             lambda x: top.open_box(menu(
-                "JSON",
+                "JSON (Python Serialize Mode)",
                 [
                     urwid.Text(
                         pprint.pformat(config.model_dump(mode="python"))
