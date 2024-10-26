@@ -485,34 +485,49 @@ menu_top = menu(
             ] + list(model_to_widgets(config, ["ssl_verify", "json_dump_indent", "use_uvloop"])),
         ),
         urwid.Divider(),
-        sub_menu(
+        menu_option(urwid.Button(
             "JSON Preview",
-            [
-                urwid.Text(
-                    config.model_dump_json(indent=4)
-                )
-            ]
-        ),
-        sub_menu(
-            "JSON Preview (Python Serialize Mode)",
-            [
-                urwid.Text(
-                    pprint.pformat(
-                        config.model_dump(mode="python"),
-                        sort_dicts=False
-                    )
-                )
-            ]
-        ),
-        sub_menu(
+            lambda x: top.open_box(
+                sub_menu_with_menu_widget(
+                    "JSON Preview",
+                    [
+                        urwid.Text(
+                            config.model_dump_json(indent=4)
+                        )
+                    ]
+                )[1]
+            )
+        )),
+        menu_option(urwid.Button(
+            "JSON Preview (Python Mode)",
+            lambda x: top.open_box(
+                sub_menu_with_menu_widget(
+                    "JSON Preview (Python Serialize Mode)",
+                    [
+                        urwid.Text(
+                            pprint.pformat(
+                                config.model_dump(mode="python"),
+                                sort_dicts=False
+                            )
+                        )
+                    ]
+                )[1]
+            )
+        )),
+        menu_option(urwid.Button(
             "DotEnv Preview (.env / prod.env)",
-            [
-                urwid.Text(
-                    "\n".join(dump_modified_envs(dump_envs(config))) or "Same as the default configuration, "
-                                                                        "DotEnv will be left empty."
-                )
-            ]
-        ),
+            lambda x: top.open_box(
+                sub_menu_with_menu_widget(
+                    "DotEnv Preview (.env / prod.env)",
+                    [
+                        urwid.Text(
+                            "\n".join(dump_modified_envs(dump_envs(config))) or "Same as the default configuration, "
+                                                                                "DotEnv will be left empty."
+                        )
+                    ]
+                )[1]
+            )
+        )),
         urwid.Divider(),
         sub_menu(
             "Save",
