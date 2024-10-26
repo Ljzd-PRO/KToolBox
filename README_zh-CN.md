@@ -130,8 +130,8 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 -
 
 前往 [配置-向导](https://ktoolbox.readthedocs.io/latest/zh/configuration/guide/) 页面查看更多详情。
 
-![KToolBox 配置编辑器](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-2.png)
-![KToolBox 配置编辑器](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-3.png)
+![KToolBox 配置编辑器](static/preview-2.png)
+![KToolBox 配置编辑器](static/preview-3.png)
 
 ## 其他分支
 

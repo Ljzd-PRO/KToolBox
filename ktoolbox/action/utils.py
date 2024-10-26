@@ -16,7 +16,7 @@ TIME_FORMAT = "%Y-%m-%d"
 
 def generate_post_path_name(post: Post) -> str:
     """Generate directory name for post to save."""
-    if config.job.post_id_as_path or not post.title:
+    if not post.title:
         return post.id
     else:
         try:
