@@ -16,6 +16,14 @@
     <img src="https://img.shields.io/github/v/release/Ljzd-PRO/KToolBox?logo=python" alt="Version">
   </a>
 
+  <a href="https://pypi.org/project/ktoolbox" target="_blank">
+    <img src="https://img.shields.io/pypi/dm/ktoolbox?label=pypi-downloads" alt="PyPI Downloads">
+  </a>
+
+  <a href="https://github.com/Ljzd-PRO/KToolBox/releases" target="_blank">
+    <img src="https://img.shields.io/github/downloads/Ljzd-PRO/KToolBox/total?label=github-downloads" alt="GitHub Release Downloads">
+  </a>
+  
   <a href="./LICENSE">
     <img src="https://img.shields.io/github/license/Ljzd-PRO/KToolBox" alt="BSD 3-Clause"/>
   </a>
