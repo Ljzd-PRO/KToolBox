@@ -130,8 +130,8 @@ Goto [Shortcuts for iOS](https://ktoolbox.readthedocs.io/latest/shortcut/) page 
 
 Goto [Configuration-Guide](https://ktoolbox.readthedocs.io/latest/configuration/guide/) page for more details.
 
-![KToolBox Configuration Editor](static/preview-2.png)
-![KToolBox Configuration Editor](static/preview-3.png)
+![KToolBox Configuration Editor](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-2.png)
+![KToolBox Configuration Editor](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-3.png)
 
 ## Other Branches
 

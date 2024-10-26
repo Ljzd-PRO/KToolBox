@@ -43,3 +43,70 @@ KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
 # 设置作品目录名为其发布日期和ID，例如 `[2024-1-1]11223344`
 KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}
 ```
+
+## 如何配置代理？
+
+可以通过设置 `HTTPS_PROXY`, `HTTP_PROXY`, `ALL_PROXY` 环境变量实现
+
+参考：[HTTPX - Environment Variables](https://www.python-httpx.org/environment_variables/#http_proxy-https_proxy-all_proxy)
+
+例如这样设置：
+
+```shell
+# Unix Shell
+export HTTPS_PROXY=http://127.0.0.1:7897
+export HTTP_PROXY=http://127.0.0.1:7897
+export ALL_PROXY=socks5://127.0.0.1:7897
+```
+
+```powershell
+# Windows PowerShell
+$env:HTTP_PROXY="http://127.0.0.1:7897"; $env:HTTPS_PROXY="http://127.0.0.1:7897"
+```
+
+## 图形化配置编辑器无法打开
+
+!!! warning "注意"
+    [`ktoolbox-pure-py`](https://pypi.org/project/ktoolbox-pure-py/) 不支持图形化配置编辑器
+
+默认情况下，图形化配置编辑器的相关依赖不会被安装，可使用以下命令附带安装：
+
+```shell
+pip3 install ktoolbox[urwid]
+```
+
+如果你用的是 pipx：
+
+```shell
+pipx install ktoolbox[urwid] --force
+```
+
+## Kemono API 调用失败
+
+例如：
+
+```
+ktoolbox sync-creator "https://coomer.su/onlyfans/user/hollyharper11" --start-time="2020-05-01" --end-time="2025-01-01"
+
+2024-05-12 12:52:51.477 | INFO     | ktoolbox.cli:sync_creator:271 - Got creator information - {'name': 'hollyharper11', 'id': 'hollyharper11'}
+2024-05-12 12:52:51.479 | INFO     | ktoolbox.action.job:create_job_from_creator:148 - Start fetching posts from creator hollyharper11
+2024-05-12 12:52:56.477 | ERROR    | ktoolbox.api.base:_retry_error_callback:37 - Kemono API call failed - {'ret': APIRet(code=1002, message="1 validation error for Response\n  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='<!DOCTYPE html>\\n<html>\\...>\\n  </body>\\n</html>\\n', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.7/v/json_invalid", exception=1 validation error for Response
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='<!DOCTYPE html>\n<html>\...>\n  </body>\n</html>\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.7/v/json_invalid, data=None)}
+1 validation error for Response
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='<!DOCTYPE html>\n<html>\...>\n  </body>\n</html>\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.7/v/json_invalid
+```
+
+一般可能是因为请求频繁导致，你可以尝试设置更多的 API 重试次数
+
+```dotenv
+# .env / prod.env
+KTOOLBOX_API__RETRY_TIMES=10
+```
+
+你也可以通过图形化配置编辑器设置：API - retry_times
+
+## 其他
+
+一个社区分享的使用向导：[#141](https://github.com/Ljzd-PRO/KToolBox/issues/141)

@@ -38,8 +38,6 @@
   </a>
 </p>
 
-<img src="https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-1.png" alt="Preview">
-
 ## 功能
 
 - 支持 **多线程** 下载（技术上是协程）
