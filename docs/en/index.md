@@ -37,8 +37,6 @@
   </a>
 </p>
 
-<img src="https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-1.png" alt="Preview">
-
 ## Features
 
 - Support for **multi-thread** downloads (technically, coroutine)

@@ -1,11 +1,16 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+import pkg_resources
+
+template_dir = pkg_resources.resource_filename('settings_doc', 'templates')
 
 a = Analysis(
     ['ktoolbox/__main__.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[
+        (template_dir + '/*', 'settings_doc/templates'),
+    ],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

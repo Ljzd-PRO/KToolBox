@@ -18,6 +18,22 @@ ktoolbox -h
 ktoolbox download-post -h
 ```
 
+## 启动图形化配置编辑器
+
+`config-editor`
+
+```bash
+ktoolbox config-editor
+```
+
+## 生成一个配置文件样例 (`.env`/`prod.env`)
+
+`example-env`
+
+```bash
+ktoolbox example-env
+```
+
 ## 下载指定的作品
 
 `download-post`

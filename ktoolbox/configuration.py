@@ -2,12 +2,11 @@ import datetime
 import logging
 import os
 import tempfile
-import warnings
 from pathlib import Path
 from typing import Literal, Union, Optional, Set
 
 from loguru import logger
-from pydantic import BaseModel, model_validator, field_validator
+from pydantic import BaseModel, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 __all__ = [
@@ -132,7 +131,6 @@ class JobConfiguration(BaseModel):
         | ``edited``    | Date   |
 
     :ivar count: Number of coroutines for concurrent download
-    :ivar post_id_as_path: (**Deprecated**) Use post ID as post directory name
     :ivar post_dirname_format: Customize the post directory name format, you can use some of the \
     [properties][ktoolbox.configuration.JobConfiguration] in ``Post``. \
     e.g. ``[{published}]{id}`` > ``[2024-1-1]123123``, ``{user}_{published}_{title}`` > ``234234_2024-1-1_HelloWorld``
@@ -150,7 +148,6 @@ class JobConfiguration(BaseModel):
     :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``
     """
     count: int = 4
-    post_id_as_path: bool = False
     post_dirname_format: str = "{title}"
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
     mix_posts: bool = False
@@ -158,18 +155,6 @@ class JobConfiguration(BaseModel):
     filename_format: str = "{}"
     allow_list: Set[str] = set()
     block_list: Set[str] = set()
-
-    # job_list_filepath: Optional[Path] = None
-    # """Filepath for job list data saving, ``None`` for disable job list saving"""
-
-    @field_validator("post_id_as_path")
-    def post_id_as_path_validator(cls, v):
-        if v != cls.model_fields["post_id_as_path"].default:
-            warnings.warn(
-                "`JobConfiguration.post_id_as_path` is deprecated and is scheduled for removal in further version. "
-                "Use `JobConfiguration.post_dirname_format` instead",
-                FutureWarning
-            )
 
 
 class LoggerConfiguration(BaseModel):
@@ -181,7 +166,7 @@ class LoggerConfiguration(BaseModel):
     :ivar rotation: Log rotation
     """
     path: Optional[Path] = None
-    level: Union[str, int] = logging.DEBUG
+    level: Union[str, int] = logging.getLevelName(logging.DEBUG)
     rotation: Union[str, int, datetime.time, datetime.timedelta] = "1 week"
 
 
