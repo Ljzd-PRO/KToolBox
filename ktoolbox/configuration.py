@@ -166,7 +166,7 @@ class LoggerConfiguration(BaseModel):
     :ivar rotation: Log rotation
     """
     path: Optional[Path] = None
-    level: Union[str, int] = logging.DEBUG
+    level: Union[str, int] = logging.getLevelName(logging.DEBUG)
     rotation: Union[str, int, datetime.time, datetime.timedelta] = "1 week"
 
 
