@@ -134,15 +134,6 @@ def has_changed() -> bool:
     return bool(set(dump_envs(config)) - initial_envs)
 
 
-def menu_button(
-        caption: Union[str, Tuple[Hashable, str], List[Union[str, Tuple[Hashable, str]]]],
-        callback: Callable[[urwid.Button], Any],
-) -> urwid.AttrMap:
-    """The button contains in a menu"""
-    button = urwid.Button(caption, on_press=callback)
-    return urwid.AttrMap(button, None, focus_map="reversed")
-
-
 def menu_option(widget: urwid.Widget) -> urwid.AttrMap:
     """Return ``focus_map="reversed"`` Widget"""
     return urwid.AttrMap(widget, None, focus_map="reversed")
@@ -154,13 +145,18 @@ def sub_menu_with_menu_widget(
 ) -> Tuple[urwid.AttrMap[urwid.Button], urwid.ListBox]:
     contents = menu(
         caption,
-        list(choices) + [urwid.Divider(bottom=2), menu_button("Back", lambda x: top.back())]
+        list(choices) + [
+            urwid.Divider(bottom=2),
+            menu_option(urwid.Button(
+                "Back", lambda x: top.back()
+            ))
+        ]
     )
 
-    def open_menu(_: urwid.Button) -> None:
-        return top.open_box(contents)
-
-    return menu_button([caption, "..."], open_menu), contents
+    return menu_option(urwid.Button(
+        [caption, "..."],
+        lambda x: top.open_box(contents)
+    )), contents
 
 
 def sub_menu(
