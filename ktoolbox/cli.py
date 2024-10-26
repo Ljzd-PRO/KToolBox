@@ -22,7 +22,7 @@ __all__ = ["KToolBoxCli"]
 
 class KToolBoxCli:
     @staticmethod
-    def version():
+    async def version():
         """Show KToolBox version"""
         return __version__
 
@@ -35,7 +35,7 @@ class KToolBoxCli:
         return ret.data if ret else ret.message
 
     @staticmethod
-    def config_editor():
+    async def config_editor():
         """Launch graphical KToolBox configuration editor"""
         try:
             from ktoolbox.editor import run_config_editor
@@ -48,7 +48,7 @@ class KToolBoxCli:
             )
 
     @staticmethod
-    def example_env():
+    async def example_env():
         """Generate an example configuration ``.env`` file."""
         print(
             render(
