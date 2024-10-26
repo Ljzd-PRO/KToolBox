@@ -99,7 +99,7 @@ def dump_envs(model: BaseModel) -> List[str]:
         else:
             envs.append(
                 f"{field.upper()}="
-                f"{json.dumps(value) if isinstance(value, (list, tuple, dict)) else model.__pydantic_serializer__.to_python(value)}"
+                f"{json.dumps(list(value)) if isinstance(value, (list, set, tuple, dict)) else model.__pydantic_serializer__.to_python(value)}"
             )
     return envs
 
