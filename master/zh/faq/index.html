@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.39">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.42">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.8c3ca2c6.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.0253249f.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -869,6 +869,42 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      如何配置代理？
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      图形化配置编辑器无法打开
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kemono-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      Kemono API 调用失败
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      其他
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -959,6 +995,42 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      如何配置代理？
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      图形化配置编辑器无法打开
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kemono-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      Kemono API 调用失败
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      其他
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1016,6 +1088,49 @@ KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
 # 设置作品目录名为其发布日期和ID，例如 `[2024-1-1]11223344`
 KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}
 </code></pre></div></p>
+<h2 id="_3">如何配置代理？<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>可以通过设置 <code>HTTPS_PROXY</code>, <code>HTTP_PROXY</code>, <code>ALL_PROXY</code> 环境变量实现</p>
+<p>参考：<a href="https://www.python-httpx.org/environment_variables/#http_proxy-https_proxy-all_proxy">HTTPX - Environment Variables</a></p>
+<p>例如这样设置：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Unix Shell</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">HTTPS_PROXY</span><span class="o">=</span>http://127.0.0.1:7897
+<span class="nb">export</span><span class="w"> </span><span class="nv">HTTP_PROXY</span><span class="o">=</span>http://127.0.0.1:7897
+<span class="nb">export</span><span class="w"> </span><span class="nv">ALL_PROXY</span><span class="o">=</span>socks5://127.0.0.1:7897
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c"># Windows PowerShell</span>
+<span class="nv">$env:HTTP_PROXY</span><span class="p">=</span><span class="s2">&quot;http://127.0.0.1:7897&quot;</span><span class="p">;</span> <span class="nv">$env:HTTPS_PROXY</span><span class="p">=</span><span class="s2">&quot;http://127.0.0.1:7897&quot;</span>
+</code></pre></div>
+<h2 id="_4">图形化配置编辑器无法打开<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">注意</p>
+<p><a href="https://pypi.org/project/ktoolbox-pure-py/"><code>ktoolbox-pure-py</code></a> 不支持图形化配置编辑器</p>
+</div>
+<p>默认情况下，图形化配置编辑器的相关依赖不会被安装，可使用以下命令附带安装：</p>
+<div class="highlight"><pre><span></span><code>pip3<span class="w"> </span>install<span class="w"> </span>ktoolbox<span class="o">[</span>urwid<span class="o">]</span>
+</code></pre></div>
+<p>如果你用的是 pipx：</p>
+<div class="highlight"><pre><span></span><code>pipx<span class="w"> </span>install<span class="w"> </span>ktoolbox<span class="o">[</span>urwid<span class="o">]</span><span class="w"> </span>--force
+</code></pre></div>
+<h2 id="kemono-api">Kemono API 调用失败<a class="headerlink" href="#kemono-api" title="Permanent link">&para;</a></h2>
+<p>例如：</p>
+<div class="highlight"><pre><span></span><code>ktoolbox sync-creator &quot;https://coomer.su/onlyfans/user/hollyharper11&quot; --start-time=&quot;2020-05-01&quot; --end-time=&quot;2025-01-01&quot;
+
+2024-05-12 12:52:51.477 | INFO     | ktoolbox.cli:sync_creator:271 - Got creator information - {&#39;name&#39;: &#39;hollyharper11&#39;, &#39;id&#39;: &#39;hollyharper11&#39;}
+2024-05-12 12:52:51.479 | INFO     | ktoolbox.action.job:create_job_from_creator:148 - Start fetching posts from creator hollyharper11
+2024-05-12 12:52:56.477 | ERROR    | ktoolbox.api.base:_retry_error_callback:37 - Kemono API call failed - {&#39;ret&#39;: APIRet(code=1002, message=&quot;1 validation error for Response\n  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value=&#39;&lt;!DOCTYPE html&gt;\\n&lt;html&gt;\\...&gt;\\n  &lt;/body&gt;\\n&lt;/html&gt;\\n&#39;, input_type=str]\n    For further information visit https://errors.pydantic.dev/2.7/v/json_invalid&quot;, exception=1 validation error for Response
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value=&#39;&lt;!DOCTYPE html&gt;\n&lt;html&gt;\...&gt;\n  &lt;/body&gt;\n&lt;/html&gt;\n&#39;, input_type=str]
+    For further information visit https://errors.pydantic.dev/2.7/v/json_invalid, data=None)}
+1 validation error for Response
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value=&#39;&lt;!DOCTYPE html&gt;\n&lt;html&gt;\...&gt;\n  &lt;/body&gt;\n&lt;/html&gt;\n&#39;, input_type=str]
+    For further information visit https://errors.pydantic.dev/2.7/v/json_invalid
+</code></pre></div>
+<p>一般可能是因为请求频繁导致，你可以尝试设置更多的 API 重试次数</p>
+<div class="highlight"><pre><span></span><code># .env / prod.env
+KTOOLBOX_API__RETRY_TIMES=10
+</code></pre></div>
+<p>你也可以通过图形化配置编辑器设置：API - retry_times</p>
+<h2 id="_5">其他<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>一个社区分享的使用向导：<a href="https://github.com/Ljzd-PRO/KToolBox/issues/141">#141</a></p>
 
 
 
@@ -1157,7 +1272,7 @@ KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}
     <script id="__config" type="application/json">{"base": "../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.action.edit"], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.525ec568.min.js"></script>
+      <script src="../../assets/javascripts/bundle.83f73b43.min.js"></script>
       
     
   </body>
