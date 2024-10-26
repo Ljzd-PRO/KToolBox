@@ -13,6 +13,7 @@ from pydantic import BaseModel
 # noinspection PyProtectedMember
 from pydantic._internal._model_construction import ModelMetaclass
 
+from ktoolbox import __version__
 from ktoolbox.configuration import config, Configuration
 
 warnings.filterwarnings("ignore")
@@ -402,7 +403,7 @@ def model_to_widgets(model: BaseModel, fields: Iterable[str] = None) -> Generato
             ))
         elif any(map(lambda x: x in annotation, [str, int, float, Path])):
             yield menu_option(urwid.Columns([
-                urwid.Text(field, align=urwid.LEFT),
+                urwid.Text(f"{' ' * 4}{field}", align=urwid.LEFT),
                 EditWithSignalWidget(
                     edit_text=str(model.__getattribute__(field)),
                     align=urwid.RIGHT,
@@ -535,7 +536,9 @@ menu_top = menu(
         urwid.Text(
             "For detailed information, please refer to https://ktoolbox.readthedocs.io",
             align=urwid.CENTER
-        )
+        ),
+        urwid.Divider(),
+        urwid.Text(__version__, align=urwid.CENTER)
     ],
 )
 top = CascadingBoxes(menu_top)
