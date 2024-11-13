@@ -10,6 +10,9 @@ assignees: ''
 **Describe the bug**
 A clear and concise description of what the bug is.
 
+**Command & Configuration**
+The command you execute and the configuration you use.
+
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
