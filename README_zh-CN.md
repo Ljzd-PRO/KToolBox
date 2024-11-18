@@ -8,13 +8,21 @@
 
 <p align="center">
   KToolBox 是一个用于下载
-  <a href="https://kemono.su/">Kemono.party / Kemono.su</a>
+  <a href="https://kemono.su/">Kemono.su / Kemono.party</a>
   中作品内容的实用命令行工具
 </p>
 
 <p align="center">
   <a href="https://pypi.org/project/ktoolbox" target="_blank">
     <img src="https://img.shields.io/github/v/release/Ljzd-PRO/KToolBox?logo=python" alt="Version">
+  </a>
+
+<a href="https://pypi.org/project/ktoolbox" target="_blank">
+    <img src="https://img.shields.io/pypi/dm/ktoolbox?label=pypi-downloads" alt="PyPI Downloads">
+  </a>
+
+  <a href="https://github.com/Ljzd-PRO/KToolBox/releases" target="_blank">
+    <img src="https://img.shields.io/github/downloads/Ljzd-PRO/KToolBox/total?label=github-downloads" alt="GitHub Release Downloads">
   </a>
 
   <a href="./LICENSE">
@@ -42,23 +50,22 @@
     <a href="./README.md">English</a> | <a href="./README_zh-CN.md">中文</a>
 </p>
 
-<img src="https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-1.png" alt="Preview">
-
 ## 功能
 
-- 支持 **多线程** 下载（技术上是协程）
-- 下载失败后进行 **重试**
+- 支持并发下载
+- API 调用和下载失败后 **自动重试**
 - 支持下载单个作品以及指定的画师的 **所有作品**
 - 可 **更新已下载** 的画师目录至最新状态
-- 可自定义下载的作品/画师 **目录结构**
-- 可搜索画师和作品，并 **导出结果**
-- 支持全平台，并提供 **iOS 快捷指令**
-- 对于 Coomer.su / Coomer.party 的支持，请查看文档 [Coomer](https://ktoolbox.readthedocs.io/latest/zh/coomer/)。
+- 支持自定义下载的作品/画师 **文件和目录名格式**、**目录结构**
+- 支持排除 **指定格式** 的文件或仅下载指定格式的文件
+- 可搜索画师和作品，并导出结果
+- 支持全平台，并提供 iOS 快捷指令
+- 对于 Coomer.su / Coomer.party 的支持，请查看文档 [Coomer](https://ktoolbox.readthedocs.io/latest/zh/coomer/)
 
 ## 开发计划
 
 - [ ] GUI
-- [x] 对 Unix 平台增加 uvloop 支持
+- [ ] Discord 下载支持
 
 ## 使用方法
 

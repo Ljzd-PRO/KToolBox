@@ -29,6 +29,7 @@ class Downloader:
     """
     :ivar _save_filename: The actual filename for saving.
     """
+    client = httpx.AsyncClient(verify=config.ssl_verify)
 
     def __init__(
             self,
@@ -172,56 +173,55 @@ class Downloader:
 
         tqdm_class: Type[std_tqdm] = tqdm_class or tqdm.asyncio.tqdm
         async with self._lock:
-            async with httpx.AsyncClient(verify=config.ssl_verify) as client:
-                async with client.stream(
-                        method="GET",
-                        url=self._url,
-                        follow_redirects=True,
-                        timeout=config.downloader.timeout
-                ) as res:  # type: httpx.Response
-                    if res.status_code != httpx.codes.OK:
-                        return DownloaderRet(
-                            code=RetCodeEnum.GeneralFailure,
-                            message=generate_msg(
-                                "Download failed",
-                                status_code=res.status_code,
-                                filename=save_filepath
-                            )
+            async with self.client.stream(
+                    method="GET",
+                    url=self._url,
+                    follow_redirects=True,
+                    timeout=config.downloader.timeout
+            ) as res:  # type: httpx.Response
+                if res.status_code != httpx.codes.OK:
+                    return DownloaderRet(
+                        code=RetCodeEnum.GeneralFailure,
+                        message=generate_msg(
+                            "Download failed",
+                            status_code=res.status_code,
+                            filename=save_filepath
                         )
+                    )
 
-                    # Get filename for saving and check if file exists (Second-time duplicate file check)
-                    # Priority order can be referenced from the constructor's documentation
-                    self._save_filename = self._designated_filename or sanitize_filename(
-                        filename_from_headers(res.headers)
-                    ) or server_path_filename
-                    save_filepath = self._path / self._save_filename
-                    file_existed, ret_msg = duplicate_file_check(save_filepath, bucket_file_path)
-                    if file_existed:
-                        return DownloaderRet(
-                            code=RetCodeEnum.FileExisted,
-                            message=generate_msg(
-                                ret_msg,
-                                path=save_filepath
-                            )
+                # Get filename for saving and check if file exists (Second-time duplicate file check)
+                # Priority order can be referenced from the constructor's documentation
+                self._save_filename = self._designated_filename or sanitize_filename(
+                    filename_from_headers(res.headers)
+                ) or server_path_filename
+                save_filepath = self._path / self._save_filename
+                file_existed, ret_msg = duplicate_file_check(save_filepath, bucket_file_path)
+                if file_existed:
+                    return DownloaderRet(
+                        code=RetCodeEnum.FileExisted,
+                        message=generate_msg(
+                            ret_msg,
+                            path=save_filepath
                         )
+                    )
 
-                    # Download
-                    temp_filepath = Path(f"{save_filepath}.{config.downloader.temp_suffix}")
-                    total_size = int(length_str) if (length_str := res.headers.get("Content-Length")) else None
-                    async with aiofiles.open(str(temp_filepath), "wb", self._buffer_size) as f:
-                        chunk_iterator = res.aiter_bytes(self._chunk_size)
-                        t = tqdm_class(
-                            desc=self._save_filename,
-                            total=total_size,
-                            disable=not progress,
-                            unit="B",
-                            unit_scale=True
-                        )
-                        async for chunk in chunk_iterator:
-                            if self._stop:
-                                raise CancelledError
-                            await f.write(chunk)
-                            t.update(len(chunk))  # Update progress bar
+                # Download
+                temp_filepath = Path(f"{save_filepath}.{config.downloader.temp_suffix}")
+                total_size = int(length_str) if (length_str := res.headers.get("Content-Length")) else None
+                async with aiofiles.open(str(temp_filepath), "wb", self._buffer_size) as f:
+                    chunk_iterator = res.aiter_bytes(self._chunk_size)
+                    t = tqdm_class(
+                        desc=self._save_filename,
+                        total=total_size,
+                        disable=not progress,
+                        unit="B",
+                        unit_scale=True
+                    )
+                    async for chunk in chunk_iterator:
+                        if self._stop:
+                            raise CancelledError
+                        await f.write(chunk)
+                        t.update(len(chunk))  # Update progress bar
 
             # Download finished
             if config.downloader.use_bucket:
