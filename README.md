@@ -64,7 +64,7 @@
 ## Dev Plan
 
 - [ ] GUI
-- [x] Add uvloop support for Unix platform
+- [ ] Discord support
 
 ## Tutorial
 
