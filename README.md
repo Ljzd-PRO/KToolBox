@@ -8,7 +8,7 @@
 
 <p align="center">
   KToolBox is a useful CLI tool for downloading posts content in
-  <a href="https://kemono.su/">Kemono.party / Kemono.su</a>
+  <a href="https://kemono.su/">Kemono.su / Kemono.party</a>
 </p>
 
 <p align="center">
@@ -51,14 +51,15 @@
 
 ## Features
 
-- Support for **multi-thread** downloads (technically, coroutine)
-- **Retry** after download failed
-- Ability to download individual post as well as **all post** by a specified creator/artist
-- **Update downloaded** creator/artist directories to the latest status
-- Customize the **structure** of downloaded post/creator **directories**
-- Search for creators/artists and posts, and **export the results**
-- **Cross-platform** support & **iOS shortcuts** available
-- For Coomer.su / Coomer.party support, check document [Coomer](https://ktoolbox.readthedocs.io/latest/coomer/) for more.
+- Supports concurrent downloads  
+- Automatically retries API calls and downloads after failures  
+- Allows downloading individual posts or **all posts** of a specified artist  
+- Can **update downloaded** artist directories to the latest state  
+- Supports customizable **file and directory naming formats** and **directory structures** for downloaded posts/artists  
+- Enables excluding **specified file formats** or downloading only specified formats  
+- Allows searching for artists and posts, with options to export results  
+- Compatible with all platforms, with iOS shortcuts provided  
+- For support related to _Coomer.su / Coomer.party_, please refer to the documentation: [Coomer](https://ktoolbox.readthedocs.io/latest/coomer/)
 
 ## Dev Plan
 

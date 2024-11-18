@@ -8,7 +8,7 @@
 
 <p align="center">
   KToolBox 是一个用于下载
-  <a href="https://kemono.su/">Kemono.party / Kemono.su</a>
+  <a href="https://kemono.su/">Kemono.su / Kemono.party</a>
   中作品内容的实用命令行工具
 </p>
 
@@ -52,14 +52,15 @@
 
 ## 功能
 
-- 支持 **多线程** 下载（技术上是协程）
-- 下载失败后进行 **重试**
+- 支持并发下载
+- API 调用和下载失败后 **自动重试**
 - 支持下载单个作品以及指定的画师的 **所有作品**
 - 可 **更新已下载** 的画师目录至最新状态
-- 可自定义下载的作品/画师 **目录结构**
-- 可搜索画师和作品，并 **导出结果**
-- 支持全平台，并提供 **iOS 快捷指令**
-- 对于 Coomer.su / Coomer.party 的支持，请查看文档 [Coomer](https://ktoolbox.readthedocs.io/latest/zh/coomer/)。
+- 支持自定义下载的作品/画师 **文件和目录名格式**、**目录结构**
+- 支持排除 **指定格式** 的文件或仅下载指定格式的文件
+- 可搜索画师和作品，并导出结果
+- 支持全平台，并提供 iOS 快捷指令
+- 对于 Coomer.su / Coomer.party 的支持，请查看文档 [Coomer](https://ktoolbox.readthedocs.io/latest/zh/coomer/)
 
 ## 开发计划
 
