@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.42">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.44">
     
     
       
@@ -1364,6 +1364,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ktoolbox.api.BaseAPI.client" class="md-nav__link">
+    <span class="md-ellipsis">
+      client
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ktoolbox.api.BaseAPI.extra_validator" class="md-nav__link">
     <span class="md-ellipsis">
       extra_validator
@@ -1488,6 +1497,15 @@
   <a href="#ktoolbox.api.base.BaseAPI.Response" class="md-nav__link">
     <span class="md-ellipsis">
       Response
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.api.base.BaseAPI.client" class="md-nav__link">
+    <span class="md-ellipsis">
+      client
     </span>
   </a>
   
@@ -3395,6 +3413,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ktoolbox.downloader.Downloader.client" class="md-nav__link">
+    <span class="md-ellipsis">
+      client
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ktoolbox.downloader.Downloader.filename" class="md-nav__link">
     <span class="md-ellipsis">
       filename
@@ -3573,6 +3600,15 @@
   <a href="#ktoolbox.downloader.downloader.Downloader.chunk_size" class="md-nav__link">
     <span class="md-ellipsis">
       chunk_size
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.downloader.downloader.Downloader.client" class="md-nav__link">
+    <span class="md-ellipsis">
+      client
     </span>
   </a>
   
@@ -5394,6 +5430,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ktoolbox.api.BaseAPI.client" class="md-nav__link">
+    <span class="md-ellipsis">
+      client
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ktoolbox.api.BaseAPI.extra_validator" class="md-nav__link">
     <span class="md-ellipsis">
       extra_validator
@@ -5518,6 +5563,15 @@
   <a href="#ktoolbox.api.base.BaseAPI.Response" class="md-nav__link">
     <span class="md-ellipsis">
       Response
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.api.base.BaseAPI.client" class="md-nav__link">
+    <span class="md-ellipsis">
+      client
     </span>
   </a>
   
@@ -7425,6 +7479,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ktoolbox.downloader.Downloader.client" class="md-nav__link">
+    <span class="md-ellipsis">
+      client
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ktoolbox.downloader.Downloader.filename" class="md-nav__link">
     <span class="md-ellipsis">
       filename
@@ -7603,6 +7666,15 @@
   <a href="#ktoolbox.downloader.downloader.Downloader.chunk_size" class="md-nav__link">
     <span class="md-ellipsis">
       chunk_size
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.downloader.downloader.Downloader.client" class="md-nav__link">
+    <span class="md-ellipsis">
+      client
     </span>
   </a>
   
@@ -8963,7 +9035,7 @@
 
 
 <h2 id="ktoolbox.__version__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;v0.10.0&#39;</span></code>
+            <code class="highlight language-python"><span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;v0.11.0&#39;</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
@@ -10482,23 +10554,23 @@
 <span class="sd">    :param service: The service for the creator</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">filter_func</span><span class="p">(</span><span class="n">creator</span><span class="p">:</span> <span class="n">Creator</span><span class="p">):</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Filter creators with attributes&quot;&quot;&quot;</span>
-            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">continue</span>
-                <span class="k">elif</span> <span class="n">creator</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="kc">False</span>
-            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">def</span> <span class="nf">filter_func</span><span class="p">(</span><span class="n">creator</span><span class="p">:</span> <span class="n">Creator</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter creators with attributes&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">creator</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="nb">id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">creator</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">service</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">creator</span><span class="o">.</span><span class="n">service</span> <span class="o">!=</span> <span class="n">service</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
 
-        <span class="n">ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_creators</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">ret</span>
-        <span class="n">creators</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">data</span>
-        <span class="k">return</span> <span class="n">ActionRet</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">iter</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">filter_func</span><span class="p">,</span> <span class="n">creators</span><span class="p">)))</span>
-
-    <span class="k">return</span> <span class="k">await</span> <span class="n">inner</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="n">service</span><span class="p">)</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_creators</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+        <span class="n">base_ret</span> <span class="o">=</span> <span class="n">BaseRet</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">ret</span><span class="o">.</span><span class="n">model_dump</span><span class="p">())</span>
+        <span class="n">base_ret</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">([])</span>
+        <span class="k">return</span> <span class="n">base_ret</span>
+    <span class="n">creators</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">return</span> <span class="n">ActionRet</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">iter</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">filter_func</span><span class="p">,</span> <span class="n">creators</span><span class="p">)))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -11981,23 +12053,23 @@
 <span class="sd">    :param service: The service for the creator</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">filter_func</span><span class="p">(</span><span class="n">creator</span><span class="p">:</span> <span class="n">Creator</span><span class="p">):</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Filter creators with attributes&quot;&quot;&quot;</span>
-            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">continue</span>
-                <span class="k">elif</span> <span class="n">creator</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="kc">False</span>
-            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">def</span> <span class="nf">filter_func</span><span class="p">(</span><span class="n">creator</span><span class="p">:</span> <span class="n">Creator</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter creators with attributes&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">creator</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="nb">id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">creator</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">service</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">creator</span><span class="o">.</span><span class="n">service</span> <span class="o">!=</span> <span class="n">service</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
 
-        <span class="n">ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_creators</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">ret</span>
-        <span class="n">creators</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">data</span>
-        <span class="k">return</span> <span class="n">ActionRet</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">iter</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">filter_func</span><span class="p">,</span> <span class="n">creators</span><span class="p">)))</span>
-
-    <span class="k">return</span> <span class="k">await</span> <span class="n">inner</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="n">service</span><span class="p">)</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_creators</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+        <span class="n">base_ret</span> <span class="o">=</span> <span class="n">BaseRet</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">ret</span><span class="o">.</span><span class="n">model_dump</span><span class="p">())</span>
+        <span class="n">base_ret</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">([])</span>
+        <span class="k">return</span> <span class="n">base_ret</span>
+    <span class="n">creators</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">return</span> <span class="n">ActionRet</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">iter</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">filter_func</span><span class="p">,</span> <span class="n">creators</span><span class="p">)))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -12911,6 +12983,7 @@
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span>
     <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;post&quot;</span><span class="p">]</span>
     <span class="n">extra_validator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">BaseModel</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">verify</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">)</span>
 
     <span class="n">Response</span> <span class="o">=</span> <span class="n">BaseModel</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;API response model&quot;&quot;&quot;</span>
@@ -12953,14 +13026,13 @@
         <span class="n">url_parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">path</span><span class="si">}{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
         <span class="n">url</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">urlunparse</span><span class="p">(</span><span class="n">url_parts</span><span class="p">))</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">verify</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-                <span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
-                    <span class="n">method</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
-                    <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
-                    <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
-                    <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="o">**</span><span class="n">kwargs</span>
-                <span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">cls</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+                <span class="n">method</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+                <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+                <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">APIRet</span><span class="p">(</span>
                 <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">NetWorkError</span><span class="p">,</span>
@@ -13006,6 +13078,26 @@
     <div class="doc doc-contents ">
 
         <p>API response model</p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ktoolbox.api.BaseAPI.client" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">client</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">verify</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.api.BaseAPI.client" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
     </div>
 
 </div>
@@ -13126,8 +13218,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/api/base.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">75</span>
-<span class="normal">76</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">76</span>
 <span class="normal">77</span>
 <span class="normal">78</span>
 <span class="normal">79</span>
@@ -13149,7 +13240,8 @@
 <span class="normal">95</span>
 <span class="normal">96</span>
 <span class="normal">97</span>
-<span class="normal">98</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="normal">98</span>
+<span class="normal">99</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
 <span class="k">def</span> <span class="nf">handle_res</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span> <span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">APIRet</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Handle API response&quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
@@ -13241,8 +13333,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/api/base.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">100</span>
-<span class="normal">101</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">101</span>
 <span class="normal">102</span>
 <span class="normal">103</span>
 <span class="normal">104</span>
@@ -13282,14 +13373,13 @@
     <span class="n">url_parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">path</span><span class="si">}{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
     <span class="n">url</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">urlunparse</span><span class="p">(</span><span class="n">url_parts</span><span class="p">))</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">verify</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-            <span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
-                <span class="n">method</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
-                <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
-                <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
-                <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">kwargs</span>
-            <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">cls</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+            <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">APIRet</span><span class="p">(</span>
             <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">NetWorkError</span><span class="p">,</span>
@@ -13579,6 +13669,7 @@
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span>
     <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;post&quot;</span><span class="p">]</span>
     <span class="n">extra_validator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">BaseModel</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">verify</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">)</span>
 
     <span class="n">Response</span> <span class="o">=</span> <span class="n">BaseModel</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;API response model&quot;&quot;&quot;</span>
@@ -13621,14 +13712,13 @@
         <span class="n">url_parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">path</span><span class="si">}{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
         <span class="n">url</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">urlunparse</span><span class="p">(</span><span class="n">url_parts</span><span class="p">))</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">verify</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-                <span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
-                    <span class="n">method</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
-                    <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
-                    <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
-                    <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="o">**</span><span class="n">kwargs</span>
-                <span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">cls</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+                <span class="n">method</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+                <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+                <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">APIRet</span><span class="p">(</span>
                 <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">NetWorkError</span><span class="p">,</span>
@@ -13674,6 +13764,26 @@
     <div class="doc doc-contents ">
 
         <p>API response model</p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h5 id="ktoolbox.api.base.BaseAPI.client" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">client</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">verify</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.api.base.BaseAPI.client" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+    <div class="doc doc-contents ">
     </div>
 
 </div>
@@ -13794,8 +13904,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/api/base.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">75</span>
-<span class="normal">76</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">76</span>
 <span class="normal">77</span>
 <span class="normal">78</span>
 <span class="normal">79</span>
@@ -13817,7 +13926,8 @@
 <span class="normal">95</span>
 <span class="normal">96</span>
 <span class="normal">97</span>
-<span class="normal">98</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="normal">98</span>
+<span class="normal">99</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
 <span class="k">def</span> <span class="nf">handle_res</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span> <span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">APIRet</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Handle API response&quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
@@ -13909,8 +14019,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/api/base.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">100</span>
-<span class="normal">101</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">101</span>
 <span class="normal">102</span>
 <span class="normal">103</span>
 <span class="normal">104</span>
@@ -13950,14 +14059,13 @@
     <span class="n">url_parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">path</span><span class="si">}{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
     <span class="n">url</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">urlunparse</span><span class="p">(</span><span class="n">url_parts</span><span class="p">))</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">verify</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-            <span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
-                <span class="n">method</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
-                <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
-                <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
-                <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">kwargs</span>
-            <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">cls</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+            <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">APIRet</span><span class="p">(</span>
             <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">NetWorkError</span><span class="p">,</span>
@@ -14547,9 +14655,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>ktoolbox/api/model/creator.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 8</span>
 <span class="normal"> 9</span>
 <span class="normal">10</span>
 <span class="normal">11</span>
@@ -14561,20 +14667,22 @@
 <span class="normal">17</span>
 <span class="normal">18</span>
 <span class="normal">19</span>
-<span class="normal">20</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Creator</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Creator</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="c1"># noinspection SpellCheckingInspection</span>
     <span class="n">favorited</span><span class="p">:</span> <span class="nb">int</span>
     <span class="c1"># noinspection SpellCheckingInspection</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The number of times this creator has been favorited&quot;&quot;&quot;</span>
     <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The ID of the creator&quot;&quot;&quot;</span>
-    <span class="n">indexed</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">indexed</span><span class="p">:</span> <span class="n">datetime</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Timestamp when the creator was indexed, Unix time as integer&quot;&quot;&quot;</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The name of the creator&quot;&quot;&quot;</span>
     <span class="n">service</span><span class="p">:</span> <span class="nb">str</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The service for the creator&quot;&quot;&quot;</span>
-    <span class="n">updated</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">updated</span><span class="p">:</span> <span class="n">datetime</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Timestamp when the creator was last updated, Unix time as integer&quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -14636,7 +14744,7 @@
 
 
 <h5 id="ktoolbox.api.model.Creator.indexed" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">indexed</span><span class="p">:</span> <span class="nb">float</span></code>
+            <code class="highlight language-python"><span class="n">indexed</span><span class="p">:</span> <span class="n">datetime</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
@@ -14699,7 +14807,7 @@
 
 
 <h5 id="ktoolbox.api.model.Creator.updated" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">updated</span><span class="p">:</span> <span class="nb">float</span></code>
+            <code class="highlight language-python"><span class="n">updated</span><span class="p">:</span> <span class="n">datetime</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
@@ -15392,9 +15500,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>ktoolbox/api/model/creator.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 8</span>
 <span class="normal"> 9</span>
 <span class="normal">10</span>
 <span class="normal">11</span>
@@ -15406,20 +15512,22 @@
 <span class="normal">17</span>
 <span class="normal">18</span>
 <span class="normal">19</span>
-<span class="normal">20</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Creator</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Creator</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="c1"># noinspection SpellCheckingInspection</span>
     <span class="n">favorited</span><span class="p">:</span> <span class="nb">int</span>
     <span class="c1"># noinspection SpellCheckingInspection</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The number of times this creator has been favorited&quot;&quot;&quot;</span>
     <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The ID of the creator&quot;&quot;&quot;</span>
-    <span class="n">indexed</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">indexed</span><span class="p">:</span> <span class="n">datetime</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Timestamp when the creator was indexed, Unix time as integer&quot;&quot;&quot;</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The name of the creator&quot;&quot;&quot;</span>
     <span class="n">service</span><span class="p">:</span> <span class="nb">str</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The service for the creator&quot;&quot;&quot;</span>
-    <span class="n">updated</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">updated</span><span class="p">:</span> <span class="n">datetime</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Timestamp when the creator was last updated, Unix time as integer&quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -15481,7 +15589,7 @@
 
 
 <h6 id="ktoolbox.api.model.creator.Creator.indexed" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">indexed</span><span class="p">:</span> <span class="nb">float</span></code>
+            <code class="highlight language-python"><span class="n">indexed</span><span class="p">:</span> <span class="n">datetime</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
@@ -15544,7 +15652,7 @@
 
 
 <h6 id="ktoolbox.api.model.creator.Creator.updated" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">updated</span><span class="p">:</span> <span class="nb">float</span></code>
+            <code class="highlight language-python"><span class="n">updated</span><span class="p">:</span> <span class="n">datetime</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
@@ -21823,6 +21931,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :ivar _save_filename: The actual filename for saving.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">verify</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -21966,56 +22075,55 @@
 
         <span class="n">tqdm_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">std_tqdm</span><span class="p">]</span> <span class="o">=</span> <span class="n">tqdm_class</span> <span class="ow">or</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">asyncio</span><span class="o">.</span><span class="n">tqdm</span>
         <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
-            <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">verify</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-                <span class="k">async</span> <span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
-                        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
-                        <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">,</span>
-                        <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                        <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">timeout</span>
-                <span class="p">)</span> <span class="k">as</span> <span class="n">res</span><span class="p">:</span>  <span class="c1"># type: httpx.Response</span>
-                    <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
-                            <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">GeneralFailure</span><span class="p">,</span>
-                            <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
-                                <span class="s2">&quot;Download failed&quot;</span><span class="p">,</span>
-                                <span class="n">status_code</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span>
-                                <span class="n">filename</span><span class="o">=</span><span class="n">save_filepath</span>
-                            <span class="p">)</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
+                    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+                    <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">,</span>
+                    <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">timeout</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">res</span><span class="p">:</span>  <span class="c1"># type: httpx.Response</span>
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
+                        <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">GeneralFailure</span><span class="p">,</span>
+                        <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
+                            <span class="s2">&quot;Download failed&quot;</span><span class="p">,</span>
+                            <span class="n">status_code</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span>
+                            <span class="n">filename</span><span class="o">=</span><span class="n">save_filepath</span>
                         <span class="p">)</span>
+                    <span class="p">)</span>
 
-                    <span class="c1"># Get filename for saving and check if file exists (Second-time duplicate file check)</span>
-                    <span class="c1"># Priority order can be referenced from the constructor&#39;s documentation</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_designated_filename</span> <span class="ow">or</span> <span class="n">sanitize_filename</span><span class="p">(</span>
-                        <span class="n">filename_from_headers</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
-                    <span class="p">)</span> <span class="ow">or</span> <span class="n">server_path_filename</span>
-                    <span class="n">save_filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span>
-                    <span class="n">file_existed</span><span class="p">,</span> <span class="n">ret_msg</span> <span class="o">=</span> <span class="n">duplicate_file_check</span><span class="p">(</span><span class="n">save_filepath</span><span class="p">,</span> <span class="n">bucket_file_path</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">file_existed</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
-                            <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">FileExisted</span><span class="p">,</span>
-                            <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
-                                <span class="n">ret_msg</span><span class="p">,</span>
-                                <span class="n">path</span><span class="o">=</span><span class="n">save_filepath</span>
-                            <span class="p">)</span>
+                <span class="c1"># Get filename for saving and check if file exists (Second-time duplicate file check)</span>
+                <span class="c1"># Priority order can be referenced from the constructor&#39;s documentation</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_designated_filename</span> <span class="ow">or</span> <span class="n">sanitize_filename</span><span class="p">(</span>
+                    <span class="n">filename_from_headers</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+                <span class="p">)</span> <span class="ow">or</span> <span class="n">server_path_filename</span>
+                <span class="n">save_filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span>
+                <span class="n">file_existed</span><span class="p">,</span> <span class="n">ret_msg</span> <span class="o">=</span> <span class="n">duplicate_file_check</span><span class="p">(</span><span class="n">save_filepath</span><span class="p">,</span> <span class="n">bucket_file_path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">file_existed</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
+                        <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">FileExisted</span><span class="p">,</span>
+                        <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
+                            <span class="n">ret_msg</span><span class="p">,</span>
+                            <span class="n">path</span><span class="o">=</span><span class="n">save_filepath</span>
                         <span class="p">)</span>
+                    <span class="p">)</span>
 
-                    <span class="c1"># Download</span>
-                    <span class="n">temp_filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_filepath</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">temp_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                    <span class="n">total_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length_str</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">length_str</span> <span class="o">:=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
-                    <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">temp_filepath</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                        <span class="n">chunk_iterator</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">aiter_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunk_size</span><span class="p">)</span>
-                        <span class="n">t</span> <span class="o">=</span> <span class="n">tqdm_class</span><span class="p">(</span>
-                            <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span><span class="p">,</span>
-                            <span class="n">total</span><span class="o">=</span><span class="n">total_size</span><span class="p">,</span>
-                            <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">,</span>
-                            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span>
-                            <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span>
-                        <span class="p">)</span>
-                        <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunk_iterator</span><span class="p">:</span>
-                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span><span class="p">:</span>
-                                <span class="k">raise</span> <span class="n">CancelledError</span>
-                            <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
-                            <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">))</span>  <span class="c1"># Update progress bar</span>
+                <span class="c1"># Download</span>
+                <span class="n">temp_filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_filepath</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">temp_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">total_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length_str</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">length_str</span> <span class="o">:=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">temp_filepath</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">chunk_iterator</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">aiter_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunk_size</span><span class="p">)</span>
+                    <span class="n">t</span> <span class="o">=</span> <span class="n">tqdm_class</span><span class="p">(</span>
+                        <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span><span class="p">,</span>
+                        <span class="n">total</span><span class="o">=</span><span class="n">total_size</span><span class="p">,</span>
+                        <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">,</span>
+                        <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span>
+                        <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span>
+                    <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunk_iterator</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="n">CancelledError</span>
+                        <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+                        <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">))</span>  <span class="c1"># Update progress bar</span>
 
             <span class="c1"># Download finished</span>
             <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">use_bucket</span><span class="p">:</span>
@@ -22113,6 +22221,26 @@
     <div class="doc doc-contents ">
 
         <p>Number of bytes for chunk of download stream</p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ktoolbox.downloader.Downloader.client" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">client</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">verify</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.downloader.Downloader.client" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
     </div>
 
 </div>
@@ -22350,8 +22478,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/downloader/downloader.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
-<span class="normal">34</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
 <span class="normal">37</span>
@@ -22387,7 +22514,8 @@
 <span class="normal">67</span>
 <span class="normal">68</span>
 <span class="normal">69</span>
-<span class="normal">70</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">70</span>
+<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
@@ -22447,13 +22575,13 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/downloader/downloader.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">106</span>
-<span class="normal">107</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">107</span>
 <span class="normal">108</span>
 <span class="normal">109</span>
 <span class="normal">110</span>
 <span class="normal">111</span>
-<span class="normal">112</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">112</span>
+<span class="normal">113</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Cancel the download</span>
 
@@ -22602,8 +22730,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/downloader/downloader.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">114</span>
-<span class="normal">115</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">115</span>
 <span class="normal">116</span>
 <span class="normal">117</span>
 <span class="normal">118</span>
@@ -22795,56 +22922,55 @@
 
     <span class="n">tqdm_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">std_tqdm</span><span class="p">]</span> <span class="o">=</span> <span class="n">tqdm_class</span> <span class="ow">or</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">asyncio</span><span class="o">.</span><span class="n">tqdm</span>
     <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
-        <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">verify</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-            <span class="k">async</span> <span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
-                    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
-                    <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">,</span>
-                    <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">timeout</span>
-            <span class="p">)</span> <span class="k">as</span> <span class="n">res</span><span class="p">:</span>  <span class="c1"># type: httpx.Response</span>
-                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
-                        <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">GeneralFailure</span><span class="p">,</span>
-                        <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
-                            <span class="s2">&quot;Download failed&quot;</span><span class="p">,</span>
-                            <span class="n">status_code</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span>
-                            <span class="n">filename</span><span class="o">=</span><span class="n">save_filepath</span>
-                        <span class="p">)</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
+                <span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+                <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">,</span>
+                <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">timeout</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">res</span><span class="p">:</span>  <span class="c1"># type: httpx.Response</span>
+            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
+                    <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">GeneralFailure</span><span class="p">,</span>
+                    <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
+                        <span class="s2">&quot;Download failed&quot;</span><span class="p">,</span>
+                        <span class="n">status_code</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span>
+                        <span class="n">filename</span><span class="o">=</span><span class="n">save_filepath</span>
                     <span class="p">)</span>
+                <span class="p">)</span>
 
-                <span class="c1"># Get filename for saving and check if file exists (Second-time duplicate file check)</span>
-                <span class="c1"># Priority order can be referenced from the constructor&#39;s documentation</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_designated_filename</span> <span class="ow">or</span> <span class="n">sanitize_filename</span><span class="p">(</span>
-                    <span class="n">filename_from_headers</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
-                <span class="p">)</span> <span class="ow">or</span> <span class="n">server_path_filename</span>
-                <span class="n">save_filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span>
-                <span class="n">file_existed</span><span class="p">,</span> <span class="n">ret_msg</span> <span class="o">=</span> <span class="n">duplicate_file_check</span><span class="p">(</span><span class="n">save_filepath</span><span class="p">,</span> <span class="n">bucket_file_path</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">file_existed</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
-                        <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">FileExisted</span><span class="p">,</span>
-                        <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
-                            <span class="n">ret_msg</span><span class="p">,</span>
-                            <span class="n">path</span><span class="o">=</span><span class="n">save_filepath</span>
-                        <span class="p">)</span>
+            <span class="c1"># Get filename for saving and check if file exists (Second-time duplicate file check)</span>
+            <span class="c1"># Priority order can be referenced from the constructor&#39;s documentation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_designated_filename</span> <span class="ow">or</span> <span class="n">sanitize_filename</span><span class="p">(</span>
+                <span class="n">filename_from_headers</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+            <span class="p">)</span> <span class="ow">or</span> <span class="n">server_path_filename</span>
+            <span class="n">save_filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span>
+            <span class="n">file_existed</span><span class="p">,</span> <span class="n">ret_msg</span> <span class="o">=</span> <span class="n">duplicate_file_check</span><span class="p">(</span><span class="n">save_filepath</span><span class="p">,</span> <span class="n">bucket_file_path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">file_existed</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
+                    <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">FileExisted</span><span class="p">,</span>
+                    <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
+                        <span class="n">ret_msg</span><span class="p">,</span>
+                        <span class="n">path</span><span class="o">=</span><span class="n">save_filepath</span>
                     <span class="p">)</span>
+                <span class="p">)</span>
 
-                <span class="c1"># Download</span>
-                <span class="n">temp_filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_filepath</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">temp_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">total_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length_str</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">length_str</span> <span class="o">:=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
-                <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">temp_filepath</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                    <span class="n">chunk_iterator</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">aiter_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunk_size</span><span class="p">)</span>
-                    <span class="n">t</span> <span class="o">=</span> <span class="n">tqdm_class</span><span class="p">(</span>
-                        <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span><span class="p">,</span>
-                        <span class="n">total</span><span class="o">=</span><span class="n">total_size</span><span class="p">,</span>
-                        <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">,</span>
-                        <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span>
-                        <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span>
-                    <span class="p">)</span>
-                    <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunk_iterator</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span><span class="p">:</span>
-                            <span class="k">raise</span> <span class="n">CancelledError</span>
-                        <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
-                        <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">))</span>  <span class="c1"># Update progress bar</span>
+            <span class="c1"># Download</span>
+            <span class="n">temp_filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_filepath</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">temp_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">total_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length_str</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">length_str</span> <span class="o">:=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">temp_filepath</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">chunk_iterator</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">aiter_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunk_size</span><span class="p">)</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">tqdm_class</span><span class="p">(</span>
+                    <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span><span class="p">,</span>
+                    <span class="n">total</span><span class="o">=</span><span class="n">total_size</span><span class="p">,</span>
+                    <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">,</span>
+                    <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span>
+                    <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+                <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunk_iterator</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">CancelledError</span>
+                    <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+                    <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">))</span>  <span class="c1"># Update progress bar</span>
 
         <span class="c1"># Download finished</span>
         <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">use_bucket</span><span class="p">:</span>
@@ -23611,6 +23737,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :ivar _save_filename: The actual filename for saving.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">verify</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -23754,56 +23881,55 @@
 
         <span class="n">tqdm_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">std_tqdm</span><span class="p">]</span> <span class="o">=</span> <span class="n">tqdm_class</span> <span class="ow">or</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">asyncio</span><span class="o">.</span><span class="n">tqdm</span>
         <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
-            <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">verify</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-                <span class="k">async</span> <span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
-                        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
-                        <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">,</span>
-                        <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                        <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">timeout</span>
-                <span class="p">)</span> <span class="k">as</span> <span class="n">res</span><span class="p">:</span>  <span class="c1"># type: httpx.Response</span>
-                    <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
-                            <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">GeneralFailure</span><span class="p">,</span>
-                            <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
-                                <span class="s2">&quot;Download failed&quot;</span><span class="p">,</span>
-                                <span class="n">status_code</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span>
-                                <span class="n">filename</span><span class="o">=</span><span class="n">save_filepath</span>
-                            <span class="p">)</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
+                    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+                    <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">,</span>
+                    <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">timeout</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">res</span><span class="p">:</span>  <span class="c1"># type: httpx.Response</span>
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
+                        <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">GeneralFailure</span><span class="p">,</span>
+                        <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
+                            <span class="s2">&quot;Download failed&quot;</span><span class="p">,</span>
+                            <span class="n">status_code</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span>
+                            <span class="n">filename</span><span class="o">=</span><span class="n">save_filepath</span>
                         <span class="p">)</span>
+                    <span class="p">)</span>
 
-                    <span class="c1"># Get filename for saving and check if file exists (Second-time duplicate file check)</span>
-                    <span class="c1"># Priority order can be referenced from the constructor&#39;s documentation</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_designated_filename</span> <span class="ow">or</span> <span class="n">sanitize_filename</span><span class="p">(</span>
-                        <span class="n">filename_from_headers</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
-                    <span class="p">)</span> <span class="ow">or</span> <span class="n">server_path_filename</span>
-                    <span class="n">save_filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span>
-                    <span class="n">file_existed</span><span class="p">,</span> <span class="n">ret_msg</span> <span class="o">=</span> <span class="n">duplicate_file_check</span><span class="p">(</span><span class="n">save_filepath</span><span class="p">,</span> <span class="n">bucket_file_path</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">file_existed</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
-                            <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">FileExisted</span><span class="p">,</span>
-                            <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
-                                <span class="n">ret_msg</span><span class="p">,</span>
-                                <span class="n">path</span><span class="o">=</span><span class="n">save_filepath</span>
-                            <span class="p">)</span>
+                <span class="c1"># Get filename for saving and check if file exists (Second-time duplicate file check)</span>
+                <span class="c1"># Priority order can be referenced from the constructor&#39;s documentation</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_designated_filename</span> <span class="ow">or</span> <span class="n">sanitize_filename</span><span class="p">(</span>
+                    <span class="n">filename_from_headers</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+                <span class="p">)</span> <span class="ow">or</span> <span class="n">server_path_filename</span>
+                <span class="n">save_filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span>
+                <span class="n">file_existed</span><span class="p">,</span> <span class="n">ret_msg</span> <span class="o">=</span> <span class="n">duplicate_file_check</span><span class="p">(</span><span class="n">save_filepath</span><span class="p">,</span> <span class="n">bucket_file_path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">file_existed</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
+                        <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">FileExisted</span><span class="p">,</span>
+                        <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
+                            <span class="n">ret_msg</span><span class="p">,</span>
+                            <span class="n">path</span><span class="o">=</span><span class="n">save_filepath</span>
                         <span class="p">)</span>
+                    <span class="p">)</span>
 
-                    <span class="c1"># Download</span>
-                    <span class="n">temp_filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_filepath</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">temp_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                    <span class="n">total_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length_str</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">length_str</span> <span class="o">:=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
-                    <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">temp_filepath</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                        <span class="n">chunk_iterator</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">aiter_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunk_size</span><span class="p">)</span>
-                        <span class="n">t</span> <span class="o">=</span> <span class="n">tqdm_class</span><span class="p">(</span>
-                            <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span><span class="p">,</span>
-                            <span class="n">total</span><span class="o">=</span><span class="n">total_size</span><span class="p">,</span>
-                            <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">,</span>
-                            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span>
-                            <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span>
-                        <span class="p">)</span>
-                        <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunk_iterator</span><span class="p">:</span>
-                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span><span class="p">:</span>
-                                <span class="k">raise</span> <span class="n">CancelledError</span>
-                            <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
-                            <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">))</span>  <span class="c1"># Update progress bar</span>
+                <span class="c1"># Download</span>
+                <span class="n">temp_filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_filepath</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">temp_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">total_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length_str</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">length_str</span> <span class="o">:=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">temp_filepath</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">chunk_iterator</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">aiter_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunk_size</span><span class="p">)</span>
+                    <span class="n">t</span> <span class="o">=</span> <span class="n">tqdm_class</span><span class="p">(</span>
+                        <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span><span class="p">,</span>
+                        <span class="n">total</span><span class="o">=</span><span class="n">total_size</span><span class="p">,</span>
+                        <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">,</span>
+                        <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span>
+                        <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span>
+                    <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunk_iterator</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="n">CancelledError</span>
+                        <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+                        <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">))</span>  <span class="c1"># Update progress bar</span>
 
             <span class="c1"># Download finished</span>
             <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">use_bucket</span><span class="p">:</span>
@@ -23901,6 +24027,26 @@
     <div class="doc doc-contents ">
 
         <p>Number of bytes for chunk of download stream</p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h5 id="ktoolbox.downloader.downloader.Downloader.client" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">client</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">verify</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.downloader.downloader.Downloader.client" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+    <div class="doc doc-contents ">
     </div>
 
 </div>
@@ -24138,8 +24284,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/downloader/downloader.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
-<span class="normal">34</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
 <span class="normal">37</span>
@@ -24175,7 +24320,8 @@
 <span class="normal">67</span>
 <span class="normal">68</span>
 <span class="normal">69</span>
-<span class="normal">70</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">70</span>
+<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
@@ -24235,13 +24381,13 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/downloader/downloader.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">106</span>
-<span class="normal">107</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">107</span>
 <span class="normal">108</span>
 <span class="normal">109</span>
 <span class="normal">110</span>
 <span class="normal">111</span>
-<span class="normal">112</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">112</span>
+<span class="normal">113</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Cancel the download</span>
 
@@ -24390,8 +24536,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/downloader/downloader.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">114</span>
-<span class="normal">115</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">115</span>
 <span class="normal">116</span>
 <span class="normal">117</span>
 <span class="normal">118</span>
@@ -24583,56 +24728,55 @@
 
     <span class="n">tqdm_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">std_tqdm</span><span class="p">]</span> <span class="o">=</span> <span class="n">tqdm_class</span> <span class="ow">or</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">asyncio</span><span class="o">.</span><span class="n">tqdm</span>
     <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
-        <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">verify</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-            <span class="k">async</span> <span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
-                    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
-                    <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">,</span>
-                    <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">timeout</span>
-            <span class="p">)</span> <span class="k">as</span> <span class="n">res</span><span class="p">:</span>  <span class="c1"># type: httpx.Response</span>
-                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
-                        <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">GeneralFailure</span><span class="p">,</span>
-                        <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
-                            <span class="s2">&quot;Download failed&quot;</span><span class="p">,</span>
-                            <span class="n">status_code</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span>
-                            <span class="n">filename</span><span class="o">=</span><span class="n">save_filepath</span>
-                        <span class="p">)</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
+                <span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+                <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">,</span>
+                <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">timeout</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">res</span><span class="p">:</span>  <span class="c1"># type: httpx.Response</span>
+            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
+                    <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">GeneralFailure</span><span class="p">,</span>
+                    <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
+                        <span class="s2">&quot;Download failed&quot;</span><span class="p">,</span>
+                        <span class="n">status_code</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span>
+                        <span class="n">filename</span><span class="o">=</span><span class="n">save_filepath</span>
                     <span class="p">)</span>
+                <span class="p">)</span>
 
-                <span class="c1"># Get filename for saving and check if file exists (Second-time duplicate file check)</span>
-                <span class="c1"># Priority order can be referenced from the constructor&#39;s documentation</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_designated_filename</span> <span class="ow">or</span> <span class="n">sanitize_filename</span><span class="p">(</span>
-                    <span class="n">filename_from_headers</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
-                <span class="p">)</span> <span class="ow">or</span> <span class="n">server_path_filename</span>
-                <span class="n">save_filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span>
-                <span class="n">file_existed</span><span class="p">,</span> <span class="n">ret_msg</span> <span class="o">=</span> <span class="n">duplicate_file_check</span><span class="p">(</span><span class="n">save_filepath</span><span class="p">,</span> <span class="n">bucket_file_path</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">file_existed</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
-                        <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">FileExisted</span><span class="p">,</span>
-                        <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
-                            <span class="n">ret_msg</span><span class="p">,</span>
-                            <span class="n">path</span><span class="o">=</span><span class="n">save_filepath</span>
-                        <span class="p">)</span>
+            <span class="c1"># Get filename for saving and check if file exists (Second-time duplicate file check)</span>
+            <span class="c1"># Priority order can be referenced from the constructor&#39;s documentation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_designated_filename</span> <span class="ow">or</span> <span class="n">sanitize_filename</span><span class="p">(</span>
+                <span class="n">filename_from_headers</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+            <span class="p">)</span> <span class="ow">or</span> <span class="n">server_path_filename</span>
+            <span class="n">save_filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span>
+            <span class="n">file_existed</span><span class="p">,</span> <span class="n">ret_msg</span> <span class="o">=</span> <span class="n">duplicate_file_check</span><span class="p">(</span><span class="n">save_filepath</span><span class="p">,</span> <span class="n">bucket_file_path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">file_existed</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
+                    <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">FileExisted</span><span class="p">,</span>
+                    <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
+                        <span class="n">ret_msg</span><span class="p">,</span>
+                        <span class="n">path</span><span class="o">=</span><span class="n">save_filepath</span>
                     <span class="p">)</span>
+                <span class="p">)</span>
 
-                <span class="c1"># Download</span>
-                <span class="n">temp_filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_filepath</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">temp_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">total_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length_str</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">length_str</span> <span class="o">:=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
-                <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">temp_filepath</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                    <span class="n">chunk_iterator</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">aiter_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunk_size</span><span class="p">)</span>
-                    <span class="n">t</span> <span class="o">=</span> <span class="n">tqdm_class</span><span class="p">(</span>
-                        <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span><span class="p">,</span>
-                        <span class="n">total</span><span class="o">=</span><span class="n">total_size</span><span class="p">,</span>
-                        <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">,</span>
-                        <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span>
-                        <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span>
-                    <span class="p">)</span>
-                    <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunk_iterator</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span><span class="p">:</span>
-                            <span class="k">raise</span> <span class="n">CancelledError</span>
-                        <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
-                        <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">))</span>  <span class="c1"># Update progress bar</span>
+            <span class="c1"># Download</span>
+            <span class="n">temp_filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_filepath</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">temp_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">total_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length_str</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">length_str</span> <span class="o">:=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">temp_filepath</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">chunk_iterator</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">aiter_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunk_size</span><span class="p">)</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">tqdm_class</span><span class="p">(</span>
+                    <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span><span class="p">,</span>
+                    <span class="n">total</span><span class="o">=</span><span class="n">total_size</span><span class="p">,</span>
+                    <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">,</span>
+                    <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span>
+                    <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+                <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunk_iterator</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">CancelledError</span>
+                    <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+                    <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">))</span>  <span class="c1"># Update progress bar</span>
 
         <span class="c1"># Download finished</span>
         <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">use_bucket</span><span class="p">:</span>
