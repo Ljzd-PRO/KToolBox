@@ -19,23 +19,23 @@ async def search_creator(id: str = None, name: str = None, service: str = None) 
     :param service: The service for the creator
     """
 
-    async def inner(**kwargs):
-        def filter_func(creator: Creator):
-            """Filter creators with attributes"""
-            for key, value in kwargs.items():
-                if value is None:
-                    continue
-                elif creator.__getattribute__(key) != value:
-                    return False
-            return True
+    def filter_func(creator: Creator):
+        """Filter creators with attributes"""
+        if id is not None and creator.id != id:
+            return False
+        if name is not None and name not in creator.name:
+            return False
+        if service is not None and creator.service != service:
+            return False
+        return True
 
-        ret = await get_creators()
-        if not ret:
-            return ret
-        creators = ret.data
-        return ActionRet(data=iter(filter(filter_func, creators)))
-
-    return await inner(id=id, name=name, service=service)
+    ret = await get_creators()
+    if not ret:
+        base_ret = BaseRet.model_validate(ret.model_dump())
+        base_ret.data = iter([])
+        return base_ret
+    creators = ret.data
+    return ActionRet(data=iter(filter(filter_func, creators)))
 
 
 # noinspection PyShadowingBuiltins
