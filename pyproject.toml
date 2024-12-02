@@ -55,7 +55,7 @@ mkdocstrings = {version=">=0.24,<0.27", extras=["python"]}
 mike = "^2.0.0"
 
 [tool.poetry.group.test.dependencies]
-pytest = "==8.3.3"
+pytest = "==8.3.4"
 pytest-asyncio = "==0.23.5"
 pytest-cov = "==4.1.0"
 allpairspy = "==2.5.1"
