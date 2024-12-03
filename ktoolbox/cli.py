@@ -134,9 +134,9 @@ class KToolBoxCli:
             if dump:
                 async with aiofiles.open(str(dump), "w", encoding="utf-8") as f:
                     await f.write(
-                        ret.data.model_dump_json(indent=config.json_dump_indent)
+                        ret.data.post.model_dump_json(indent=config.json_dump_indent)
                     )
-            return ret.data
+            return ret.data.post
         else:
             return ret.message
 
@@ -201,9 +201,9 @@ class KToolBoxCli:
             post_id=post_id
         )
         if ret:
-            post_path = path / generate_post_path_name(ret.data)
+            post_path = path / generate_post_path_name(ret.data.post)
             job_list = await create_job_from_post(
-                post=ret.data,
+                post=ret.data.post,
                 post_path=post_path,
                 dump_post_data=dump_post_data
             )
