@@ -1,22 +1,15 @@
 ## Changes
 
-### 💡 Feature
+[//]: # (### 💡 Feature)
 
-- The `search-creator` command will include search results with similar names.
-  - For example, the search parameter `--name abc` might return author information such as: `abc, abcd, hi-abc`
-- Share an HTTPX client to reuse underlying TCP connections through an HTTP connection pool when calling APIs and downloading, 
-**significantly improving query and download speeds as well as connection stability**
+### 🪲 Fix
 
-[//]: # (### 🪲 Fix)
+- Update the API for retrieving post information and fix the `get-post` and `download-post` commands (#198) (#180)
 
-- - -
+[//]: # (### 💡 新特性)
 
-### 💡 新特性
+### 🪲 修复
 
-- search-creator 搜索作者的命令将包含那些名字相近的搜索结果
-  - 如搜索参数 `--name abc` 可能得到如下作者信息：`abc, abcd, hi-abc`
-- 共享 HTTPX 客户端，调用 API 和下载时将通过 HTTP 连接池重用底层 TCP 连接，**显著提升查询、下载速度和连接稳定性**
+- 更新获取作品信息的 API，修复 `get-post` 和 `download-post` 命令 (#198) (#180)
 
-[//]: # (### 🪲 修复)
-
-**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.10.0...v0.11.0
+**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.11.0...v0.11.1
