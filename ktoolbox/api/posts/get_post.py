@@ -1,3 +1,5 @@
+from pydantic import BaseModel
+
 from ktoolbox.api import BaseAPI, APIRet
 from ktoolbox.api.model import Post
 
@@ -8,11 +10,11 @@ class GetPost(BaseAPI):
     path = "/{service}/user/{creator_id}/post/{post_id}"
     method = "get"
 
-    class Response(Post):
-        ...
+    class Response(BaseModel):
+        post: Post
 
     @classmethod
-    async def __call__(cls, service: str, creator_id: str, post_id: str) -> APIRet[Post]:
+    async def __call__(cls, service: str, creator_id: str, post_id: str) -> APIRet[Response]:
         """
         Get a specific post
 
