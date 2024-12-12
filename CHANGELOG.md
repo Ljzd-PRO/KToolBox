@@ -2,7 +2,7 @@
 
 ### 💡 Feature
 
-- Supports resuming downloads using temporary files to restore the download process
+- Supports resuming downloads using temporary files to restore the download process - (#205) by @kgbq3nu6s9ptn3jr
 
 [//]: # (### 🪲 Fix)
 
@@ -10,7 +10,7 @@
 
 ### 💡 新特性
 
-- 支持断点续传，借助临时下载文件恢复下载
+- 支持断点续传，借助临时下载文件恢复下载 - (#205) by @kgbq3nu6s9ptn3jr
 
 [//]: # (### 🪲 修复)
 
