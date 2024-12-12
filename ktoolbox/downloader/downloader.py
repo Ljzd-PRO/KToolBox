@@ -173,13 +173,17 @@ class Downloader:
 
         tqdm_class: Type[std_tqdm] = tqdm_class or tqdm.asyncio.tqdm
         async with self._lock:
+            temp_filepath = Path(f"{save_filepath}.{config.downloader.temp_suffix}")
+            temp_size = temp_filepath.stat().st_size if temp_filepath.exists() else 0
+
             async with self.client.stream(
                     method="GET",
                     url=self._url,
                     follow_redirects=True,
-                    timeout=config.downloader.timeout
+                    timeout=config.downloader.timeout,
+                    headers={"Range": f"bytes={temp_size}-"}
             ) as res:  # type: httpx.Response
-                if res.status_code != httpx.codes.OK:
+                if res.status_code != httpx.codes.PARTIAL_CONTENT:
                     return DownloaderRet(
                         code=RetCodeEnum.GeneralFailure,
                         message=generate_msg(
@@ -206,13 +210,13 @@ class Downloader:
                     )
 
                 # Download
-                temp_filepath = Path(f"{save_filepath}.{config.downloader.temp_suffix}")
-                total_size = int(length_str) if (length_str := res.headers.get("Content-Length")) else None
-                async with aiofiles.open(str(temp_filepath), "wb", self._buffer_size) as f:
+                total_size = int(range_str.split("/")[-1]) if (range_str := res.headers.get("Content-Range")) else None
+                async with aiofiles.open(str(temp_filepath), "ab", self._buffer_size) as f:
                     chunk_iterator = res.aiter_bytes(self._chunk_size)
                     t = tqdm_class(
                         desc=self._save_filename,
                         total=total_size,
+                        initial=temp_size,
                         disable=not progress,
                         unit="B",
                         unit_scale=True

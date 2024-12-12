@@ -1,15 +1,19 @@
 ## Changes
 
-[//]: # (### 💡 Feature)
+![Downloads](https://img.shields.io/github/downloads/Ljzd-PRO/KToolBox/v0.12.0/total)
 
-### 🪲 Fix
+### 💡 Feature
 
-- Update the API for retrieving post information and fix the `get-post` and `download-post` commands (#198) (#180)
+- Supports resuming downloads using temporary files to restore the download process - (#205) by @kgbq3nu6s9ptn3jr
 
-[//]: # (### 💡 新特性)
+[//]: # (### 🪲 Fix)
 
-### 🪲 修复
+- - -
 
-- 更新获取作品信息的 API，修复 `get-post` 和 `download-post` 命令 (#198) (#180)
+### 💡 新特性
 
-**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.11.0...v0.11.1
+- 支持断点续传，借助临时下载文件恢复下载 - (#205) by @kgbq3nu6s9ptn3jr
+
+[//]: # (### 🪲 修复)
+
+**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.11.1...v0.12.0
