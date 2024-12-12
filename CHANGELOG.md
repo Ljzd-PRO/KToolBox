@@ -1,5 +1,7 @@
 ## Changes
 
+![Downloads](https://img.shields.io/github/downloads/Ljzd-PRO/KToolBox/v0.12.0/total)
+
 ### 💡 Feature
 
 - Supports resuming downloads using temporary files to restore the download process - (#205) by @kgbq3nu6s9ptn3jr
