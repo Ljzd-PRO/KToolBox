@@ -21974,7 +21974,11 @@
 <span class="normal">245</span>
 <span class="normal">246</span>
 <span class="normal">247</span>
-<span class="normal">248</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Downloader</span><span class="p">:</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Downloader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :ivar _save_filename: The actual filename for saving.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -22122,13 +22126,17 @@
 
         <span class="n">tqdm_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">std_tqdm</span><span class="p">]</span> <span class="o">=</span> <span class="n">tqdm_class</span> <span class="ow">or</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">asyncio</span><span class="o">.</span><span class="n">tqdm</span>
         <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+            <span class="n">temp_filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_filepath</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">temp_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">temp_size</span> <span class="o">=</span> <span class="n">temp_filepath</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="k">if</span> <span class="n">temp_filepath</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="mi">0</span>
+
             <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
                     <span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
                     <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">,</span>
                     <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">timeout</span>
+                    <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+                    <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Range&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;bytes=</span><span class="si">{</span><span class="n">temp_size</span><span class="si">}</span><span class="s2">-&quot;</span><span class="p">}</span>
             <span class="p">)</span> <span class="k">as</span> <span class="n">res</span><span class="p">:</span>  <span class="c1"># type: httpx.Response</span>
-                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">PARTIAL_CONTENT</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
                         <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">GeneralFailure</span><span class="p">,</span>
                         <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
@@ -22155,13 +22163,13 @@
                     <span class="p">)</span>
 
                 <span class="c1"># Download</span>
-                <span class="n">temp_filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_filepath</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">temp_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">total_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length_str</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">length_str</span> <span class="o">:=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
-                <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">temp_filepath</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">total_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">range_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="p">(</span><span class="n">range_str</span> <span class="o">:=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Range&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">temp_filepath</span><span class="p">),</span> <span class="s2">&quot;ab&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">chunk_iterator</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">aiter_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunk_size</span><span class="p">)</span>
                     <span class="n">t</span> <span class="o">=</span> <span class="n">tqdm_class</span><span class="p">(</span>
                         <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span><span class="p">,</span>
                         <span class="n">total</span><span class="o">=</span><span class="n">total_size</span><span class="p">,</span>
+                        <span class="n">initial</span><span class="o">=</span><span class="n">temp_size</span><span class="p">,</span>
                         <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">,</span>
                         <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span>
                         <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span>
@@ -22908,7 +22916,11 @@
 <span class="normal">243</span>
 <span class="normal">244</span>
 <span class="normal">245</span>
-<span class="normal">246</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@tenacity</span><span class="o">.</span><span class="n">retry</span><span class="p">(</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@tenacity</span><span class="o">.</span><span class="n">retry</span><span class="p">(</span>
     <span class="n">stop</span><span class="o">=</span><span class="n">stop_never</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">retry_stop_never</span> <span class="k">else</span> <span class="n">stop_after_attempt</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">retry_times</span><span class="p">),</span>
     <span class="n">wait</span><span class="o">=</span><span class="n">wait_fixed</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">retry_interval</span><span class="p">),</span>
     <span class="n">retry</span><span class="o">=</span><span class="n">retry_if_result</span><span class="p">(</span>
@@ -22969,13 +22981,17 @@
 
     <span class="n">tqdm_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">std_tqdm</span><span class="p">]</span> <span class="o">=</span> <span class="n">tqdm_class</span> <span class="ow">or</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">asyncio</span><span class="o">.</span><span class="n">tqdm</span>
     <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+        <span class="n">temp_filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_filepath</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">temp_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">temp_size</span> <span class="o">=</span> <span class="n">temp_filepath</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="k">if</span> <span class="n">temp_filepath</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="mi">0</span>
+
         <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
                 <span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
                 <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">,</span>
                 <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">timeout</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Range&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;bytes=</span><span class="si">{</span><span class="n">temp_size</span><span class="si">}</span><span class="s2">-&quot;</span><span class="p">}</span>
         <span class="p">)</span> <span class="k">as</span> <span class="n">res</span><span class="p">:</span>  <span class="c1"># type: httpx.Response</span>
-            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">PARTIAL_CONTENT</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
                     <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">GeneralFailure</span><span class="p">,</span>
                     <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
@@ -23002,13 +23018,13 @@
                 <span class="p">)</span>
 
             <span class="c1"># Download</span>
-            <span class="n">temp_filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_filepath</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">temp_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">total_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length_str</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">length_str</span> <span class="o">:=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
-            <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">temp_filepath</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">total_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">range_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="p">(</span><span class="n">range_str</span> <span class="o">:=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Range&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">temp_filepath</span><span class="p">),</span> <span class="s2">&quot;ab&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">chunk_iterator</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">aiter_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunk_size</span><span class="p">)</span>
                 <span class="n">t</span> <span class="o">=</span> <span class="n">tqdm_class</span><span class="p">(</span>
                     <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span><span class="p">,</span>
                     <span class="n">total</span><span class="o">=</span><span class="n">total_size</span><span class="p">,</span>
+                    <span class="n">initial</span><span class="o">=</span><span class="n">temp_size</span><span class="p">,</span>
                     <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">,</span>
                     <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span>
                     <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span>
@@ -23780,7 +23796,11 @@
 <span class="normal">245</span>
 <span class="normal">246</span>
 <span class="normal">247</span>
-<span class="normal">248</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Downloader</span><span class="p">:</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Downloader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :ivar _save_filename: The actual filename for saving.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -23928,13 +23948,17 @@
 
         <span class="n">tqdm_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">std_tqdm</span><span class="p">]</span> <span class="o">=</span> <span class="n">tqdm_class</span> <span class="ow">or</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">asyncio</span><span class="o">.</span><span class="n">tqdm</span>
         <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+            <span class="n">temp_filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_filepath</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">temp_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">temp_size</span> <span class="o">=</span> <span class="n">temp_filepath</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="k">if</span> <span class="n">temp_filepath</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="mi">0</span>
+
             <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
                     <span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
                     <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">,</span>
                     <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">timeout</span>
+                    <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+                    <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Range&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;bytes=</span><span class="si">{</span><span class="n">temp_size</span><span class="si">}</span><span class="s2">-&quot;</span><span class="p">}</span>
             <span class="p">)</span> <span class="k">as</span> <span class="n">res</span><span class="p">:</span>  <span class="c1"># type: httpx.Response</span>
-                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">PARTIAL_CONTENT</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
                         <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">GeneralFailure</span><span class="p">,</span>
                         <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
@@ -23961,13 +23985,13 @@
                     <span class="p">)</span>
 
                 <span class="c1"># Download</span>
-                <span class="n">temp_filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_filepath</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">temp_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">total_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length_str</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">length_str</span> <span class="o">:=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
-                <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">temp_filepath</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">total_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">range_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="p">(</span><span class="n">range_str</span> <span class="o">:=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Range&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">temp_filepath</span><span class="p">),</span> <span class="s2">&quot;ab&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">chunk_iterator</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">aiter_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunk_size</span><span class="p">)</span>
                     <span class="n">t</span> <span class="o">=</span> <span class="n">tqdm_class</span><span class="p">(</span>
                         <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span><span class="p">,</span>
                         <span class="n">total</span><span class="o">=</span><span class="n">total_size</span><span class="p">,</span>
+                        <span class="n">initial</span><span class="o">=</span><span class="n">temp_size</span><span class="p">,</span>
                         <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">,</span>
                         <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span>
                         <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span>
@@ -24714,7 +24738,11 @@
 <span class="normal">243</span>
 <span class="normal">244</span>
 <span class="normal">245</span>
-<span class="normal">246</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@tenacity</span><span class="o">.</span><span class="n">retry</span><span class="p">(</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@tenacity</span><span class="o">.</span><span class="n">retry</span><span class="p">(</span>
     <span class="n">stop</span><span class="o">=</span><span class="n">stop_never</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">retry_stop_never</span> <span class="k">else</span> <span class="n">stop_after_attempt</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">retry_times</span><span class="p">),</span>
     <span class="n">wait</span><span class="o">=</span><span class="n">wait_fixed</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">retry_interval</span><span class="p">),</span>
     <span class="n">retry</span><span class="o">=</span><span class="n">retry_if_result</span><span class="p">(</span>
@@ -24775,13 +24803,17 @@
 
     <span class="n">tqdm_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">std_tqdm</span><span class="p">]</span> <span class="o">=</span> <span class="n">tqdm_class</span> <span class="ow">or</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">asyncio</span><span class="o">.</span><span class="n">tqdm</span>
     <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+        <span class="n">temp_filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_filepath</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">temp_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">temp_size</span> <span class="o">=</span> <span class="n">temp_filepath</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="k">if</span> <span class="n">temp_filepath</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="mi">0</span>
+
         <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
                 <span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
                 <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">,</span>
                 <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">timeout</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Range&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;bytes=</span><span class="si">{</span><span class="n">temp_size</span><span class="si">}</span><span class="s2">-&quot;</span><span class="p">}</span>
         <span class="p">)</span> <span class="k">as</span> <span class="n">res</span><span class="p">:</span>  <span class="c1"># type: httpx.Response</span>
-            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">PARTIAL_CONTENT</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">DownloaderRet</span><span class="p">(</span>
                     <span class="n">code</span><span class="o">=</span><span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">GeneralFailure</span><span class="p">,</span>
                     <span class="n">message</span><span class="o">=</span><span class="n">generate_msg</span><span class="p">(</span>
@@ -24808,13 +24840,13 @@
                 <span class="p">)</span>
 
             <span class="c1"># Download</span>
-            <span class="n">temp_filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_filepath</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">temp_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">total_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length_str</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">length_str</span> <span class="o">:=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
-            <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">temp_filepath</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">total_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">range_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="p">(</span><span class="n">range_str</span> <span class="o">:=</span> <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Range&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">temp_filepath</span><span class="p">),</span> <span class="s2">&quot;ab&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">chunk_iterator</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">aiter_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunk_size</span><span class="p">)</span>
                 <span class="n">t</span> <span class="o">=</span> <span class="n">tqdm_class</span><span class="p">(</span>
                     <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_filename</span><span class="p">,</span>
                     <span class="n">total</span><span class="o">=</span><span class="n">total_size</span><span class="p">,</span>
+                    <span class="n">initial</span><span class="o">=</span><span class="n">temp_size</span><span class="p">,</span>
                     <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress</span><span class="p">,</span>
                     <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span>
                     <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span>
