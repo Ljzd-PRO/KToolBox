@@ -20,6 +20,7 @@
     Run `ktoolbox example-env` to generate a complete sample configuration file.
 
 - KToolBox load **`.env` or `prod.env` file** in the **working directory** or **environment variables** to store configuration
+  - The working directory refers to the directory where you execute the `ktoolbox` command, **it is not necessarily the directory where the `ktoolbox` executable is located**. It reads from where you execute it.
 - Check [Reference](reference.md) for all configuration options
 - Use `__` to specify the sub option, like `KTOOLBOX_API__SCHEME` means `api.scheme`
 - All configuration options are optional
