@@ -108,13 +108,31 @@ class PostStructureConfiguration(BaseModel):
        └─ 2.png
     ```
 
+    - Available properties for ``file``
+
+        | Property      | Type   |
+        |---------------|--------|
+        | ``id``        | String |
+        | ``user``      | String |
+        | ``service``   | String |
+        | ``title``     | String |
+        | ``added``     | Date   |
+        | ``published`` | Date   |
+        | ``edited``    | Date   |
+
     :ivar attachments: Sub path of attachment directory
     :ivar content: Sub path of post content file
     :ivar content_filepath: (**Deprecated**, Use ``content`` instead) Sub path of post content file
+    :ivar file: The format of the post `file` filename (`file` is not `attachment`, each post has only one `file`, usually the cover image) \
+    Customize the filename format by inserting an empty ``{}`` to represent the basic filename. \
+    You can use some of the [properties][ktoolbox.configuration.JobConfiguration] \
+    in Post. For example: ``{title}_{}`` could result in filenames like \
+    ``TheTitle_Stelle_lv5_logo.gif``, ``TheTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``, etc.
     """
     attachments: Path = Path("attachments")
     content: Path = Path("content.txt")
     content_filepath: Path = Path("content.txt")
+    file: str = "{id}_{}"
 
     @field_validator("content_filepath")
     def content_filepath_validator(cls, v):

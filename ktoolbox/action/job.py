@@ -69,7 +69,7 @@ async def create_job_from_post(
             )
         ):
             basic_filename = f"{i + 1}{file_path_obj.suffix}" if config.job.sequential_filename else file_path_obj.name
-            alt_filename = generate_filename(post, basic_filename)
+            alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
             jobs.append(
                 Job(
                     path=attachments_path,
@@ -84,6 +84,7 @@ async def create_job_from_post(
         post_file_name = Path(post.file.name) if is_valid_filename(post.file.name) else Path(
             urlparse(post.file.path).path
         )
+        post_file_name = Path(generate_filename(post, post_file_name.name, config.job.post_structure.file))
         if (not config.job.allow_list or any(
                 map(
                     lambda x: fnmatch(post_file_name.name, x),
@@ -98,7 +99,7 @@ async def create_job_from_post(
             jobs.append(
                 Job(
                     path=post_path,
-                    alt_filename=f"{post.id}_{post_file_name.name}",
+                    alt_filename=post_file_name.name,
                     server_path=post.file.path,
                     type=PostFileTypeEnum.File
                 )
