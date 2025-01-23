@@ -59,7 +59,7 @@ class Downloader:
         it will be used as the save path.
         """
 
-        self._url = url
+        self._url = config.downloader.reverse_proxy.format(url)
         self._path = path
         self._buffer_size = buffer_size or config.downloader.buffer_size
         self._chunk_size = chunk_size or config.downloader.chunk_size

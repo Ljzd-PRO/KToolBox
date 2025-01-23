@@ -61,6 +61,10 @@ class DownloaderConfiguration(BaseModel):
     :ivar retry_interval: Seconds of downloader retry interval
     :ivar use_bucket: Enable local storage bucket mode
     :ivar bucket_path: Path of local storage bucket
+    :ivar reverse_proxy: Reverse proxy format for download URL. \
+    Customize the filename format by inserting an empty ``{}`` to represent the original URL. \
+    For example: ``https://example.com/{}`` will be ``https://example.com/https://n1.kemono.su/data/66/83/xxxxx.jpg``;  \
+    ``https://example.com/?url={}`` will be ``https://example.com/?url=https://n1.kemono.su/data/66/83/xxxxx.jpg``
     """
     scheme: Literal["http", "https"] = "https"
     timeout: float = 30.0
@@ -73,6 +77,7 @@ class DownloaderConfiguration(BaseModel):
     retry_interval: float = 3.0
     use_bucket: bool = False
     bucket_path: Path = Path("./.ktoolbox/bucket_storage")
+    reverse_proxy: str = "{}"
 
     @model_validator(mode="after")
     def check_bucket_path(self) -> "DownloaderConfiguration":
