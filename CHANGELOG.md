@@ -14,7 +14,7 @@
     ```
   - 📖More information: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
 
-- Add support for customizing reverse proxy for download URLs
+- Add support for customizing reverse proxy for download URLs - (#216)
   - Run `ktoolbox config-editor` to edit the configuration (`Downloader -> reverse_proxy`)
   - Or manually edit `KTOOLBOX_DOWNLOADER__REVERSE_PROXY` in `.env` file or environment variables to set this option
     ```dotenv
@@ -43,7 +43,7 @@
     ```
   - 📖更多信息：[Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
 
-- 增加支持自定义下载 URL 的反向代理
+- 增加支持自定义下载 URL 的反向代理 - (#216)
   - 执行 `ktoolbox config-editor` 来编辑这项配置 (`Downloader -> reverse_proxy`)
   - 或手动编辑 `.env` 文件中的 `KTOOLBOX_DOWNLOADER__REVERSE_PROXY` 或环境变量来设置这项配置
     ```dotenv
