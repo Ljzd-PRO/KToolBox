@@ -5,10 +5,10 @@ import os
 import tempfile
 import warnings
 from pathlib import Path
-from typing import Literal, Union, Optional, Any, Set, ClassVar
+from typing import Literal, Union, Optional, Any, Set
 
 from loguru import logger
-from pydantic import BaseModel, BaseSettings, validator
+from pydantic import BaseModel, BaseSettings, validator, Field
 
 __all__ = [
     "config",
@@ -144,8 +144,7 @@ class PostStructureConfiguration(BaseModel):
 
     @validator("content_filepath")
     def content_filepath_validator(cls, v):
-        # noinspection PyUnresolvedReferences
-        if v != cls.model_fields["content_filepath"].default:
+        if v != cls.__fields__["content_filepath"].default:
             warnings.warn(
                 "`PostStructureConfiguration.content_filepath` is deprecated and is scheduled for removal in further version. "
                 "Use `PostStructureConfiguration.content` instead",
@@ -192,8 +191,8 @@ class JobConfiguration(BaseModel):
     mix_posts: bool = False
     sequential_filename: bool = False
     filename_format: str = "{}"
-    allow_list: Set[str] = set()
-    block_list: Set[str] = set()
+    allow_list: Set[str] = Field(default_factory=set)
+    block_list: Set[str] = Field(default_factory=set)
 
     @validator("allow_list", "block_list", pre=True)
     def allow_block_list_validator(cls, v):
@@ -240,8 +239,8 @@ class Configuration(BaseSettings):
     class Config(BaseSettings.Config):
         env_prefix = 'ktoolbox_'
         env_nested_delimiter = '__'
-        env_file = '.env'
+        env_file = ['.env', 'prod.env']
         env_file_encoding = 'utf-8'
 
 
-config = Configuration(_env_file=['.env', 'prod.env'])
+config = Configuration()
