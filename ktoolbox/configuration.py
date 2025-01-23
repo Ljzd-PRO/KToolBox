@@ -3,10 +3,10 @@ import logging
 import os
 import tempfile
 from pathlib import Path
-from typing import Literal, Union, Optional, Set
+from typing import Literal, Union, Optional, Set, ClassVar
 
 from loguru import logger
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, model_validator, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 __all__ = [
@@ -153,8 +153,10 @@ class JobConfiguration(BaseModel):
     mix_posts: bool = False
     sequential_filename: bool = False
     filename_format: str = "{}"
-    allow_list: Set[str] = set()
-    block_list: Set[str] = set()
+    # noinspection PyDataclass
+    allow_list: Set[str] = Field(default_factory=set)
+    # noinspection PyDataclass
+    block_list: Set[str] = Field(default_factory=set)
 
 
 class LoggerConfiguration(BaseModel):
@@ -195,13 +197,13 @@ class Configuration(BaseSettings):
     use_uvloop: bool = True
 
     # noinspection SpellCheckingInspection
-    model_config = SettingsConfigDict(
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         env_prefix='ktoolbox_',
         env_nested_delimiter='__',
-        env_file='.env',
+        env_file=['.env', 'prod.env'],
         env_file_encoding='utf-8',
         extra='ignore'
     )
 
 
-config = Configuration(_env_file=['.env', 'prod.env'])
+config = Configuration()
