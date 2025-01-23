@@ -2,11 +2,12 @@ import datetime
 import logging
 import os
 import tempfile
+import warnings
 from pathlib import Path
 from typing import Literal, Union, Optional, Set, ClassVar
 
 from loguru import logger
-from pydantic import BaseModel, model_validator, Field
+from pydantic import BaseModel, model_validator, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 __all__ = [
@@ -108,10 +109,22 @@ class PostStructureConfiguration(BaseModel):
     ```
 
     :ivar attachments: Sub path of attachment directory
-    :ivar content_filepath: Sub path of post content file
+    :ivar content: Sub path of post content file
+    :ivar content_filepath: (**Deprecated**, Use ``content`` instead) Sub path of post content file
     """
     attachments: Path = Path("attachments")
+    content: Path = Path("content.txt")
     content_filepath: Path = Path("content.txt")
+
+    @field_validator("content_filepath")
+    def content_filepath_validator(cls, v):
+        # noinspection PyUnresolvedReferences
+        if v != cls.model_fields["content_filepath"].default:
+            warnings.warn(
+                "`PostStructureConfiguration.content_filepath` is deprecated and is scheduled for removal in further version. "
+                "Use `PostStructureConfiguration.content` instead",
+                FutureWarning
+            )
 
 
 class JobConfiguration(BaseModel):

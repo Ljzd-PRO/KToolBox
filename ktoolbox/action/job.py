@@ -43,7 +43,7 @@ async def create_job_from_post(
     if post_structure:
         attachments_path = post_path / post_structure.attachments  # attachments
         attachments_path.mkdir(exist_ok=True)
-        content_path = post_path / post_structure.content_filepath  # content
+        content_path = post_path / post_structure.content  # content
         content_path.parent.mkdir(exist_ok=True)
     else:
         attachments_path = post_path
