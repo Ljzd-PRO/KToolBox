@@ -2,11 +2,12 @@ import datetime
 import logging
 import os
 import tempfile
+import warnings
 from pathlib import Path
-from typing import Literal, Union, Optional, Set
+from typing import Literal, Union, Optional, Set, ClassVar
 
 from loguru import logger
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, model_validator, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 __all__ = [
@@ -60,6 +61,10 @@ class DownloaderConfiguration(BaseModel):
     :ivar retry_interval: Seconds of downloader retry interval
     :ivar use_bucket: Enable local storage bucket mode
     :ivar bucket_path: Path of local storage bucket
+    :ivar reverse_proxy: Reverse proxy format for download URL. \
+    Customize the filename format by inserting an empty ``{}`` to represent the original URL. \
+    For example: ``https://example.com/{}`` will be ``https://example.com/https://n1.kemono.su/data/66/83/xxxxx.jpg``;  \
+    ``https://example.com/?url={}`` will be ``https://example.com/?url=https://n1.kemono.su/data/66/83/xxxxx.jpg``
     """
     scheme: Literal["http", "https"] = "https"
     timeout: float = 30.0
@@ -72,6 +77,7 @@ class DownloaderConfiguration(BaseModel):
     retry_interval: float = 3.0
     use_bucket: bool = False
     bucket_path: Path = Path("./.ktoolbox/bucket_storage")
+    reverse_proxy: str = "{}"
 
     @model_validator(mode="after")
     def check_bucket_path(self) -> "DownloaderConfiguration":
@@ -107,18 +113,48 @@ class PostStructureConfiguration(BaseModel):
        └─ 2.png
     ```
 
+    - Available properties for ``file``
+
+        | Property      | Type   |
+        |---------------|--------|
+        | ``id``        | String |
+        | ``user``      | String |
+        | ``service``   | String |
+        | ``title``     | String |
+        | ``added``     | Date   |
+        | ``published`` | Date   |
+        | ``edited``    | Date   |
+
     :ivar attachments: Sub path of attachment directory
-    :ivar content_filepath: Sub path of post content file
+    :ivar content: Sub path of post content file
+    :ivar content_filepath: (**Deprecated**, Use ``content`` instead) Sub path of post content file
+    :ivar file: The format of the post `file` filename (`file` is not `attachment`, each post has only one `file`, usually the cover image) \
+    Customize the filename format by inserting an empty ``{}`` to represent the basic filename. \
+    You can use some of the [properties][ktoolbox.configuration.JobConfiguration] \
+    in Post. For example: ``{title}_{}`` could result in filenames like \
+    ``TheTitle_Stelle_lv5_logo.gif``, ``TheTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``, etc.
     """
     attachments: Path = Path("attachments")
+    content: Path = Path("content.txt")
     content_filepath: Path = Path("content.txt")
+    file: str = "{id}_{}"
+
+    @field_validator("content_filepath")
+    def content_filepath_validator(cls, v):
+        # noinspection PyUnresolvedReferences
+        if v != cls.model_fields["content_filepath"].default:
+            warnings.warn(
+                "`PostStructureConfiguration.content_filepath` is deprecated and is scheduled for removal in further version. "
+                "Use `PostStructureConfiguration.content` instead",
+                FutureWarning
+            )
 
 
 class JobConfiguration(BaseModel):
     """
     Download jobs Configuration
 
-    - Available properties for ``post_dirname_format``
+    - Available properties for ``post_dirname_format`` and ``filename_format``
 
         | Property      | Type   |
         |---------------|--------|
@@ -133,7 +169,7 @@ class JobConfiguration(BaseModel):
     :ivar count: Number of coroutines for concurrent download
     :ivar post_dirname_format: Customize the post directory name format, you can use some of the \
     [properties][ktoolbox.configuration.JobConfiguration] in ``Post``. \
-    e.g. ``[{published}]{id}`` > ``[2024-1-1]123123``, ``{user}_{published}_{title}`` > ``234234_2024-1-1_HelloWorld``
+    e.g. ``[{published}]{id}`` > ``[2024-1-1]123123``, ``{user}_{published}_{title}`` > ``234234_2024-1-1_TheTitle``
     :ivar post_structure: Post path structure
     :ivar mix_posts: Save all files from different posts at same path in creator directory. \
     It would not create any post directory, and ``CreatorIndices`` would not been recorded.
@@ -141,7 +177,7 @@ class JobConfiguration(BaseModel):
     :ivar filename_format: Customize the filename format by inserting an empty ``{}`` to represent the basic filename.
     Similar to post_dirname_format, you can use some of the [properties][ktoolbox.configuration.JobConfiguration] \
     in Post. For example: ``{title}_{}`` could result in filenames like \
-    ``HelloWorld_b4b41de2-8736-480d-b5c3-ebf0d917561b``, ``HelloWorld_af349b25-ac08-46d7-98fb-6ce99a237b90``, etc. \
+    ``TheTitle_b4b41de2-8736-480d-b5c3-ebf0d917561b``, ``TheTitle_af349b25-ac08-46d7-98fb-6ce99a237b90``, etc. \
     You can also use it with ``sequential_filename``. For instance, \
     ``[{published}]_{}`` could result in filenames like ``[2024-1-1]_1.png``, ``[2024-1-1]_2.png``, etc.
     :ivar allow_list: Download files which match these patterns (Unix shell-style), e.g. ``["*.png"]``
@@ -153,8 +189,10 @@ class JobConfiguration(BaseModel):
     mix_posts: bool = False
     sequential_filename: bool = False
     filename_format: str = "{}"
-    allow_list: Set[str] = set()
-    block_list: Set[str] = set()
+    # noinspection PyDataclass
+    allow_list: Set[str] = Field(default_factory=set)
+    # noinspection PyDataclass
+    block_list: Set[str] = Field(default_factory=set)
 
 
 class LoggerConfiguration(BaseModel):
@@ -195,13 +233,13 @@ class Configuration(BaseSettings):
     use_uvloop: bool = True
 
     # noinspection SpellCheckingInspection
-    model_config = SettingsConfigDict(
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         env_prefix='ktoolbox_',
         env_nested_delimiter='__',
-        env_file='.env',
+        env_file=['.env', 'prod.env'],
         env_file_encoding='utf-8',
         extra='ignore'
     )
 
 
-config = Configuration(_env_file=['.env', 'prod.env'])
+config = Configuration()
