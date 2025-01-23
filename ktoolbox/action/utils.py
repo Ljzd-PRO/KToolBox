@@ -36,13 +36,13 @@ def generate_post_path_name(post: Post) -> str:
             exit(1)
 
 
-def generate_filename(post: Post, basic_name: str) -> str:
+def generate_filename(post: Post, basic_name: str, filename_format: str) -> str:
     """Generate download filename"""
-    basic_name_suffix = Path(basic_name).suffix
-    basic_name_filename = basic_name.split(basic_name_suffix)[0] if basic_name_suffix else basic_name
+    basic_name_path = Path(basic_name)
+    basic_name_filename = basic_name.replace(basic_name_path.suffix, "")
     try:
         return sanitize_filename(
-            config.job.filename_format.format(
+            filename_format.format(
                 basic_name_filename,
                 id=post.id,
                 user=post.user,
@@ -51,10 +51,11 @@ def generate_filename(post: Post, basic_name: str) -> str:
                 added=post.added.strftime(TIME_FORMAT) if post.added else "",
                 published=post.published.strftime(TIME_FORMAT) if post.published else "",
                 edited=post.edited.strftime(TIME_FORMAT) if post.edited else ""
-            ) + basic_name_suffix
+            ) + basic_name_path.suffix
         )
     except KeyError as e:
-        logger.error(f"`JobConfiguration.filename_format` contains invalid key: {e}")
+        logger.error(
+            f"`JobConfiguration.filename_format` or `PostStructureConfiguration.file` contains invalid key: {e}")
         exit(1)
 
 
