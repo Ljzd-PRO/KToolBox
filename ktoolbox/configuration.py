@@ -118,7 +118,7 @@ class JobConfiguration(BaseModel):
     """
     Download jobs Configuration
 
-    - Available properties for ``post_dirname_format``
+    - Available properties for ``post_dirname_format`` and ``filename_format``
 
         | Property      | Type   |
         |---------------|--------|
