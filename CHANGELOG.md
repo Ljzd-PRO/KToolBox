@@ -1,61 +1,40 @@
 ## Changes
 
-![Downloads](https://img.shields.io/github/downloads/Ljzd-PRO/KToolBox/v0.13.0/total)
+![Downloads](https://img.shields.io/github/downloads/Ljzd-PRO/KToolBox/v0.14.0/total)
 
 ### 💡 Feature
 
-- Add support for customizing the `Post.file` filename format (not `Post.attachments`)
-  - Run `ktoolbox config-editor` to edit the configuration (`Job -> post_structure -> file`)
-  - Or manually edit `KTOOLBOX_JOB__POST_STRUCTURE__FILE` in `.env` file or environment variables to set this option
+- Add support for setting **session key** (can be found in cookies after a successful login) for download - (#247)
+  - This configuration is **optional**. If you frequently encounter **403** errors during downloads, you can try setting this option
+  - Run `ktoolbox config-editor` to edit the configuration (`API -> session_key`)
+  - Or manually edit `KTOOLBOX_API__SESSION_KEY` in `.env` file or environment variables to set this option
     ```dotenv
-    # Example
-    # Result filename: [2023-01-01]_TheTitle_12345_UxTleZ3zP6LHA7BPNxlEWDzX.jpg
-    KTOOLBOX_JOB__POST_STRUCTURE__FILE=[{published}]_{title}_{id}_{}
+    KTOOLBOX_API__SESSION_KEY="xxxxxxx"
     ```
-  - 📖More information: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
+  - 📖More information: [Configuration-Reference-APIConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.APIConfiguration)
 
-- Add support for customizing reverse proxy for download URLs - (#216)
-  - Run `ktoolbox config-editor` to edit the configuration (`Downloader -> reverse_proxy`)
-  - Or manually edit `KTOOLBOX_DOWNLOADER__REVERSE_PROXY` in `.env` file or environment variables to set this option
-    ```dotenv
-    # Example
-    # Result download URL: https://example.com/https://n1.kemono.su/data/66/83/xxxx.jpg
-    KTOOLBOX_DOWNLOADER__REVERSE_PROXY="https://example.com/{}"
-    ```
-  - 📖More information: [Configuration-Reference-DownloaderConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.DownloaderConfiguration)
+### 🪲 Fix
 
-- Rename `PostStructure.content_filepath` to `PostStructure.content`, the old configuration is still available, but it will be removed in the future. If you use this option, you will receive a warning message.
-  - 📖More information: [Configuration-Reference-PostStructureConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.PostStructureConfiguration)
-
-[//]: # (### 🪲 Fix)
+- Fixed the issue of frequent **403 errors** during downloads (resolved by trying alternative download servers) - (#247)
+  - You will see `Download failed, trying alternative subdomains` in the log, indicating the program is attempting other download servers
+- Improved connection pool management for asynchronous requests
 
 - - -
 
 ### 💡 新特性
 
-- 增加支持自定义 `Post.file` 的文件名格式（并非 `Post.attachments`）
-  - 执行 `ktoolbox config-editor` 来编辑这项配置 (`Job -> post_structure -> file`)
-  - 或手动编辑 `.env` 文件中的 `KTOOLBOX_JOB__POST_STRUCTURE__FILE` 或环境变量来设置这项配置
+- 增加支持设置下载所用的 **session key** （登录成功后可在 Cookies 中查看） - (#247)
+  - 这项配置是**可选的**，当下载频繁出现 **403** 错误时可尝试设置该配置
+  - 执行 `ktoolbox config-editor` 来编辑这项配置 (`API -> session_key`)
+  - 或手动编辑 `.env` 文件中的 `KTOOLBOX_API__SESSION_KEY` 或环境变量来设置这项配置
     ```dotenv
-    # 示例
-    # 文件名：[2023-01-01]_TheTitle_12345_UxTleZ3zP6LHA7BPNxlEWDzX.jpg
-    KTOOLBOX_JOB__POST_STRUCTURE__FILE=[{published}]_{title}_{id}_{}
+    KTOOLBOX_API__SESSION_KEY="xxxxxxx"
     ```
-  - 📖更多信息：[Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
+  - 📖更多信息：[Configuration-Reference-APIConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.APIConfiguration)
+### 🪲 修复
 
-- 增加支持自定义下载 URL 的反向代理 - (#216)
-  - 执行 `ktoolbox config-editor` 来编辑这项配置 (`Downloader -> reverse_proxy`)
-  - 或手动编辑 `.env` 文件中的 `KTOOLBOX_DOWNLOADER__REVERSE_PROXY` 或环境变量来设置这项配置
-    ```dotenv
-    # 示例
-    # 下载 URL：https://example.com/https://n1.kemono.su/data/66/83/xxxx.jpg
-    KTOOLBOX_DOWNLOADER__REVERSE_PROXY="https://example.com/{}"
-    ```
-  - 📖更多信息：[Configuration-Reference-DownloaderConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.DownloaderConfiguration)
+- 修复下载时**频繁出现 403 错误**的问题（通过尝试其他下载服务器解决） - (#247)
+  - 你将会在日志中看到 `Download failed, trying alternative subdomains`，这表明程序正在尝试其他下载服务器
+- 改进异步请求的连接池管理
 
-- `PostStructure.content_filepath` 更名为 `PostStructure.content`，原先的配置仍可继续使用，但未来将会被移除。如果您使用了这项配置，将会收到警告信息。
-  - 📖更多信息：[Configuration-Reference-PostStructureConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.PostStructureConfiguration)
-
-[//]: # (### 🪲 修复)
-
-**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.12.0...v0.13.0
+**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.13.0...v0.14.0
