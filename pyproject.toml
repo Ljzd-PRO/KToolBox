@@ -27,7 +27,7 @@ packages = [{ include = "ktoolbox" }]
 ktoolbox = "ktoolbox.__main__:main"
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.8,<3.14"
 pydantic = {version="^1.10.13", extras=["dotenv"]}
 tenacity = "^8.2.3"
 httpx = {version=">=0.24.1,<0.28.0", extras=["socks"]}
