@@ -101,14 +101,23 @@ ktoolbox sync-creator "https://coomer.su/onlyfans/user/hollyharper11" --start-ti
     For further information visit https://errors.pydantic.dev/2.7/v/json_invalid
 ```
 
-This is generally caused by frequent requests, so you can try setting a higher number of API retry attempts.
+1. This is generally caused by frequent requests, so you can try setting a higher number of API retry attempts.
+    ```dotenv
+    # .env / prod.env
+    KTOOLBOX_API__RETRY_TIMES=10
+    ```
 
-```dotenv
-# .env / prod.env
-KTOOLBOX_API__RETRY_TIMES=10
-```
+2. You can set **session key** (can be found in cookies after a successful login) for download
+    ```dotenv
+    # .env / prod.env
+    KTOOLBOX_API__SESSION_KEY="xxxxxxx"
+    ```
 
-You can also set this through the graphical configuration editor: API - retry_times.
+You can also set these through the graphical configuration editor: `API - retry_times` and `API -> session_key`.
+
+## Frequently encounter **403** errors during downloads
+
+The solution is the same as above.
 
 ## Others
 
