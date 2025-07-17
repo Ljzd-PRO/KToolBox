@@ -5,6 +5,7 @@ from types import MappingProxyType
 from typing import List, Set, Dict
 from urllib.parse import urlunparse
 
+import httpx
 from loguru import logger
 from tqdm import tqdm as std_tqdm
 
@@ -76,68 +77,73 @@ class JobRunner:
         :return: Number of jobs that failed
         """
         failed_num = 0
-        while not self._job_queue.empty():
-            job = await self._job_queue.get()
+        async with httpx.AsyncClient(
+                verify=config.ssl_verify,
+                cookies={"session": config.api.session_key} if config.api.session_key else None
+        ) as client:
+            while not self._job_queue.empty():
+                job = await self._job_queue.get()
 
-            # Create downloader
-            url_parts = [config.downloader.scheme, config.api.files_netloc, job.server_path, '', '', '']
-            url = str(urlunparse(url_parts))
-            downloader = Downloader(
-                url=url,
-                path=job.path,
-                designated_filename=job.alt_filename,
-                server_path=job.server_path
-            )
-
-            # Create task
-            task = asyncio.create_task(
-                downloader.run(
-                    tqdm_class=self._tqdm_class,
-                    progress=self._progress
+                # Create downloader
+                url_parts = [config.downloader.scheme, config.api.files_netloc, job.server_path, '', '', '']
+                url = str(urlunparse(url_parts))
+                downloader = Downloader(
+                    url=url,
+                    path=job.path,
+                    client=client,
+                    designated_filename=job.alt_filename,
+                    server_path=job.server_path
                 )
-            )
-            self._downloaders_with_task[downloader] = task
-            # task.add_done_callback(lambda _: self._downloaders_with_task.pop(downloader))
-            #   Delete this for counting finished job tasks
 
-            # Run task
-            task_done_set, _ = await asyncio.wait([task], return_when=asyncio.FIRST_EXCEPTION)
-            task_done = task_done_set.pop()
-            try:
-                exception = task_done.exception()
-            except CancelledError as e:
-                exception = e
-            if not exception:  # raise Exception when cancelled or other exceptions
-                ret = task_done.result()
-                if ret.code == RetCodeEnum.Success:
-                    logger.success(
+                # Create task
+                task = asyncio.create_task(
+                    downloader.run(
+                        tqdm_class=self._tqdm_class,
+                        progress=self._progress
+                    )
+                )
+                self._downloaders_with_task[downloader] = task
+                # task.add_done_callback(lambda _: self._downloaders_with_task.pop(downloader))
+                #   Delete this for counting finished job tasks
+
+                # Run task
+                task_done_set, _ = await asyncio.wait([task], return_when=asyncio.FIRST_EXCEPTION)
+                task_done = task_done_set.pop()
+                try:
+                    exception = task_done.exception()
+                except CancelledError as e:
+                    exception = e
+                if not exception:  # raise Exception when cancelled or other exceptions
+                    ret = task_done.result()
+                    if ret.code == RetCodeEnum.Success:
+                        logger.success(
+                            generate_msg(
+                                "Download success",
+                                filename=ret.data
+                            )
+                        )
+                    elif ret.code == RetCodeEnum.FileExisted:
+                        logger.warning(ret.message)
+                    else:
+                        logger.error(ret.message)
+                        failed_num += 1
+                elif isinstance(exception, CancelledError):
+                    logger.warning(
                         generate_msg(
-                            "Download success",
-                            filename=ret.data
+                            "Download cancelled",
+                            filename=job.alt_filename
                         )
                     )
-                elif ret.code == RetCodeEnum.FileExisted:
-                    logger.warning(ret.message)
                 else:
-                    logger.error(ret.message)
+                    logger.error(
+                        generate_msg(
+                            "Download failed",
+                            filename=job.alt_filename,
+                            exception=exception
+                        )
+                    )
                     failed_num += 1
-            elif isinstance(exception, CancelledError):
-                logger.warning(
-                    generate_msg(
-                        "Download cancelled",
-                        filename=job.alt_filename
-                    )
-                )
-            else:
-                logger.error(
-                    generate_msg(
-                        "Download failed",
-                        filename=job.alt_filename,
-                        exception=exception
-                    )
-                )
-                failed_num += 1
-            self._job_queue.task_done()
+                self._job_queue.task_done()
         await self._job_queue.join()
         return failed_num
 
