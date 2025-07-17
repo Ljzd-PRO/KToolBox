@@ -198,7 +198,7 @@ class Downloader:
                     return DownloaderRet(
                         code=RetCodeEnum.GeneralFailure,
                         message=generate_msg(
-                            "Download failed, trying alternate subdomains",
+                            "Download failed, trying alternative subdomains",
                             nex_subdomain=new_netloc,
                             status_code=res.status_code,
                             filename=save_filepath
