@@ -34,6 +34,7 @@ class APIConfiguration(BaseModel):
     :ivar timeout: API request timeout
     :ivar retry_times: API request retry times (when request failed)
     :ivar retry_interval: Seconds of API request retry interval
+    :ivar session_key: Session key that can be found in cookies after a successful login
     """
     scheme: Literal["http", "https"] = "https"
     netloc: str = "kemono.su"
@@ -43,6 +44,7 @@ class APIConfiguration(BaseModel):
     timeout: float = 5.0
     retry_times: int = 3
     retry_interval: float = 2.0
+    session_key: str = ""
 
 
 class DownloaderConfiguration(BaseModel):

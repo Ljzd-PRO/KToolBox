@@ -29,12 +29,12 @@ class Downloader:
     """
     :ivar _save_filename: The actual filename for saving.
     """
-    client = httpx.AsyncClient(verify=config.ssl_verify)
 
     def __init__(
             self,
             url: str,
             path: Path,
+            client: httpx.AsyncClient,
             *,
             buffer_size: int = None,
             chunk_size: int = None,
@@ -52,6 +52,7 @@ class Downloader:
 
         :param url: Download URL
         :param path: Directory path to save the file, which needs to be sanitized
+        :param client: HTTPX AsyncClient
         :param buffer_size: Number of bytes for file I/O buffer
         :param chunk_size: Number of bytes for chunk of download stream
         :param designated_filename: Manually specify the filename for saving, which needs to be sanitized
@@ -59,14 +60,16 @@ class Downloader:
         it will be used as the save path.
         """
 
-        self._url = config.downloader.reverse_proxy.format(url)
+        self._url = url
         self._path = path
+        self._client = client
         self._buffer_size = buffer_size or config.downloader.buffer_size
         self._chunk_size = chunk_size or config.downloader.chunk_size
         self._designated_filename = designated_filename
         self._server_path = server_path  # /hash[:1]/hash2[1:3]/hash
         self._save_filename = designated_filename  # Prioritize the manually specified filename
 
+        self._subdomain_index = 1
         self._lock = asyncio.Lock()
         self._stop: bool = False
 
@@ -79,6 +82,11 @@ class Downloader:
     def path(self) -> Path:
         """Directory path to save the file"""
         return self._path
+
+    @cached_property
+    def client(self) -> httpx.AsyncClient:
+        """HTTPX AsyncClient"""
+        return self._client
 
     @cached_property
     def buffer_size(self) -> int:
@@ -176,14 +184,27 @@ class Downloader:
             temp_filepath = Path(f"{save_filepath}.{config.downloader.temp_suffix}")
             temp_size = temp_filepath.stat().st_size if temp_filepath.exists() else 0
 
-            async with self.client.stream(
+            async with self._client.stream(
                     method="GET",
-                    url=self._url,
+                    url=config.downloader.reverse_proxy.format(self._url),
                     follow_redirects=True,
                     timeout=config.downloader.timeout,
                     headers={"Range": f"bytes={temp_size}-"}
             ) as res:  # type: httpx.Response
-                if res.status_code != httpx.codes.PARTIAL_CONTENT:
+                if res.status_code == 403:
+                    new_netloc = f"n{self._subdomain_index}.{config.api.files_netloc}"
+                    self._url = str(res.url.copy_with(netloc=new_netloc.encode()))
+                    self._subdomain_index += 1
+                    return DownloaderRet(
+                        code=RetCodeEnum.GeneralFailure,
+                        message=generate_msg(
+                            "Download failed, trying alternative subdomains",
+                            nex_subdomain=new_netloc,
+                            status_code=res.status_code,
+                            filename=save_filepath
+                        )
+                    )
+                elif res.status_code != httpx.codes.PARTIAL_CONTENT:
                     return DownloaderRet(
                         code=RetCodeEnum.GeneralFailure,
                         message=generate_msg(

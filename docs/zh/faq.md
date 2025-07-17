@@ -98,14 +98,25 @@ ktoolbox sync-creator "https://coomer.su/onlyfans/user/hollyharper11" --start-ti
     For further information visit https://errors.pydantic.dev/2.7/v/json_invalid
 ```
 
-一般可能是因为请求频繁导致，你可以尝试设置更多的 API 重试次数
+1. 确保更新到了 [v0.14.0](https://github.com/Ljzd-PRO/KToolBox/releases/tag/v0.14.0) 或以上版本
 
-```dotenv
-# .env / prod.env
-KTOOLBOX_API__RETRY_TIMES=10
-```
+2. 一般可能是因为请求频繁导致，你可以尝试设置更多的 API 重试次数
+    ```dotenv
+    # .env / prod.env
+    KTOOLBOX_API__RETRY_TIMES=10
+    ```
 
-你也可以通过图形化配置编辑器设置：API - retry_times
+3. 你可以尝试设置下载所用的 **session key** （登录成功后可在 Cookies 中查看）
+    ```dotenv
+    # .env / prod.env
+    KTOOLBOX_API__SESSION_KEY="xxxxxxx"
+    ```
+
+你也可以通过图形化配置编辑器设置：`API - retry_times` 和 `API -> session_key`.
+
+## 下载时频繁出现 403 错误
+
+解决方法同上
 
 ## 其他
 
