@@ -1,4 +1,3 @@
-import cgi
 import os
 import urllib.parse
 from pathlib import Path
@@ -47,7 +46,7 @@ def filename_from_headers(headers: Dict[str, str]) -> Optional[str]:
 
     - Example:
     ```
-    filename_from_headers('attachment;filename*=utf-8\\'\\'README%2Emd;filename="README.md"')
+    filename_from_headers({'Content-Disposition': 'attachment;filename*=utf-8\'\'README%2Emd;filename="README.md"'})
     ```
 
     - Return:
@@ -61,7 +60,7 @@ def filename_from_headers(headers: Dict[str, str]) -> Optional[str]:
     if not (disposition := headers.get("Content-Disposition")):
         if not (disposition := headers.get("content-disposition")):
             return None
-    _, options = cgi.parse_header(disposition)  # alternative: `parse_header` in `utils.py`
+    options = parse_header(disposition)  # alternative: `parse_header` in `utils.py`
     if filename := options.get("filename*"):
         if len(name_with_charset := filename.split("''")) == 2:
             charset, name = name_with_charset
