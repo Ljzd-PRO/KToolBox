@@ -4,6 +4,7 @@
 
 ### 💡 Feature
 
+- Add support for **Python 3.12, 3.13**
 - Add support for setting **session key** (can be found in cookies after a successful login) for download - (#247)
   - This configuration is **optional**. If you frequently encounter **403** errors during downloads, you can try setting this option
   - Run `ktoolbox config-editor` to edit the configuration (`API -> session_key`)
@@ -23,6 +24,7 @@
 
 ### 💡 新特性
 
+- 增加对 **Python 3.12, 3.13** 的支持
 - 增加支持设置下载所用的 **session key** （登录成功后可在 Cookies 中查看） - (#247)
   - 这项配置是**可选的**，当下载频繁出现 **403** 错误时可尝试设置该配置
   - 执行 `ktoolbox config-editor` 来编辑这项配置 (`API -> session_key`)
@@ -31,6 +33,7 @@
     KTOOLBOX_API__SESSION_KEY="xxxxxxx"
     ```
   - 📖更多信息：[Configuration-Reference-APIConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.APIConfiguration)
+
 ### 🪲 修复
 
 - 修复下载时**频繁出现 403 错误**的问题（通过尝试其他下载服务器解决） - (#247)
