@@ -60,7 +60,7 @@ class Downloader:
         it will be used as the save path.
         """
 
-        self._url = config.downloader.reverse_proxy.format(url)
+        self._url = url
         self._path = path
         self._client = client
         self._buffer_size = buffer_size or config.downloader.buffer_size
@@ -69,6 +69,7 @@ class Downloader:
         self._server_path = server_path  # /hash[:1]/hash2[1:3]/hash
         self._save_filename = designated_filename  # Prioritize the manually specified filename
 
+        self._subdomain_index = 1
         self._lock = asyncio.Lock()
         self._stop: bool = False
 
@@ -185,12 +186,25 @@ class Downloader:
 
             async with self._client.stream(
                     method="GET",
-                    url=self._url,
+                    url=config.downloader.reverse_proxy.format(self._url),
                     follow_redirects=True,
                     timeout=config.downloader.timeout,
                     headers={"Range": f"bytes={temp_size}-"}
             ) as res:  # type: httpx.Response
-                if res.status_code != httpx.codes.PARTIAL_CONTENT:
+                if res.status_code == 403:
+                    new_netloc = f"n{self._subdomain_index}.{config.api.files_netloc}"
+                    self._url = str(res.url.copy_with(netloc=new_netloc.encode()))
+                    self._subdomain_index += 1
+                    return DownloaderRet(
+                        code=RetCodeEnum.GeneralFailure,
+                        message=generate_msg(
+                            "Download failed, trying alternate subdomains",
+                            nex_subdomain=new_netloc,
+                            status_code=res.status_code,
+                            filename=save_filepath
+                        )
+                    )
+                elif res.status_code != httpx.codes.PARTIAL_CONTENT:
                     return DownloaderRet(
                         code=RetCodeEnum.GeneralFailure,
                         message=generate_msg(
