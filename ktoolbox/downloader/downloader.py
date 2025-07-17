@@ -29,7 +29,10 @@ class Downloader:
     """
     :ivar _save_filename: The actual filename for saving.
     """
-    client = httpx.AsyncClient(verify=config.ssl_verify)
+    client = httpx.AsyncClient(
+        verify=config.ssl_verify,
+        cookies={"session": config.api.session_key} if config.api.session_key else None
+    )
 
     def __init__(
             self,

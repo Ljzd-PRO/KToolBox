@@ -68,7 +68,10 @@ class BaseAPI(ABC, Generic[_T]):
     path: str = "/"
     method: Literal["get", "post"]
     extra_validator: Optional[Callable[[str], BaseModel]] = None
-    client = httpx.AsyncClient(verify=config.ssl_verify)
+    client = httpx.AsyncClient(
+        verify=config.ssl_verify,
+        cookies={"session": config.api.session_key} if config.api.session_key else None
+    )
 
     Response = BaseModel
     """API response model"""
