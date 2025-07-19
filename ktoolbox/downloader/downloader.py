@@ -1,6 +1,6 @@
 import asyncio
 import os
-from asyncio import CancelledError
+from asyncio import CancelledError, Lock
 from functools import cached_property
 from pathlib import Path
 from typing import Callable, Any, Coroutine, Type, Optional, Set
@@ -31,6 +31,7 @@ class Downloader:
     """
     succeeded_servers: Set[int] = set()
     failure_servers: Set[int] = set()
+    wait_lock = Lock()
 
     def __init__(
             self,
@@ -72,7 +73,7 @@ class Downloader:
         self._save_filename = designated_filename  # Prioritize the manually specified filename
 
         self._next_subdomain_index = 1
-        self._lock = asyncio.Lock()
+        self._finished_lock = asyncio.Lock()
         self._stop: bool = False
 
     @cached_property
@@ -112,7 +113,7 @@ class Downloader:
 
         :return: ``False`` if the download **in process**, ``True`` otherwise
         """
-        return not self._lock.locked()
+        return not self._finished_lock.locked()
 
     def cancel(self):
         """
@@ -182,7 +183,9 @@ class Downloader:
             )
 
         tqdm_class: Type[std_tqdm] = tqdm_class or tqdm.asyncio.tqdm
-        async with self._lock:
+        async with self.wait_lock:
+            await asyncio.sleep(1 / config.downloader.tps_limit)
+        async with self._finished_lock:
             temp_filepath = Path(f"{save_filepath}.{config.downloader.temp_suffix}")
             temp_size = temp_filepath.stat().st_size if temp_filepath.exists() else 0
 
