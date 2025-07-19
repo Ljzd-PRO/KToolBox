@@ -210,7 +210,7 @@ class Downloader:
                         subdomain_index = self._next_subdomain_index
                         # Update self._next_subdomain_index
                         ## index fallback to 1 when a server after failure_servers has been tried
-                        if self._next_subdomain_index > max(self.failure_servers):
+                        if self.failure_servers and self._next_subdomain_index > max(self.failure_servers):
                             self._next_subdomain_index = 1
                             self.failure_servers.clear()
                         ## otherwise, increment the index and avoid failure_servers
