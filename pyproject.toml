@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ktoolbox-pure-py"
-version = "v0.14.0"
+version = "v0.15.0"
 description = "A useful CLI tool for downloading posts in Kemono.su / .party (Pure Python version)"
 authors = ["Ljzd-PRO <ljzd@office.ljzd-pro.asia>"]
 readme = "README.md"

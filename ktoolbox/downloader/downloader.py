@@ -1,9 +1,9 @@
 import asyncio
 import os
-from asyncio import CancelledError
+from asyncio import CancelledError, Lock
 from functools import cached_property
 from pathlib import Path
-from typing import Callable, Any, Coroutine, Type, Optional
+from typing import Callable, Any, Coroutine, Type, Optional, Set
 from urllib.parse import urlparse, unquote
 
 import aiofiles
@@ -29,6 +29,9 @@ class Downloader:
     """
     :ivar _save_filename: The actual filename for saving.
     """
+    succeeded_servers: Set[int] = set()
+    failure_servers: Set[int] = set()
+    wait_lock = Lock()
 
     def __init__(
             self,
@@ -60,7 +63,7 @@ class Downloader:
         it will be used as the save path.
         """
 
-        self._url = url
+        self._url = self._initial_url = url
         self._path = path
         self._client = client
         self._buffer_size = buffer_size or config.downloader.buffer_size
@@ -69,8 +72,8 @@ class Downloader:
         self._server_path = server_path  # /hash[:1]/hash2[1:3]/hash
         self._save_filename = designated_filename  # Prioritize the manually specified filename
 
-        self._subdomain_index = 1
-        self._lock = asyncio.Lock()
+        self._next_subdomain_index = 1
+        self._finished_lock = asyncio.Lock()
         self._stop: bool = False
 
     @cached_property
@@ -110,7 +113,7 @@ class Downloader:
 
         :return: ``False`` if the download **in process**, ``True`` otherwise
         """
-        return not self._lock.locked()
+        return not self._finished_lock.locked()
 
     def cancel(self):
         """
@@ -180,7 +183,9 @@ class Downloader:
             )
 
         tqdm_class: Type[std_tqdm] = tqdm_class or tqdm.asyncio.tqdm
-        async with self._lock:
+        async with self.wait_lock:
+            await asyncio.sleep(1 / config.downloader.tps_limit)
+        async with self._finished_lock:
             temp_filepath = Path(f"{save_filepath}.{config.downloader.temp_suffix}")
             temp_size = temp_filepath.stat().st_size if temp_filepath.exists() else 0
 
@@ -191,20 +196,44 @@ class Downloader:
                     timeout=config.downloader.timeout,
                     headers={"Range": f"bytes={temp_size}-"}
             ) as res:  # type: httpx.Response
+                try:
+                    subdomain_index = int(res.url.netloc.split(b".")[0][1:])
+                except ValueError:
+                    subdomain_index = None
                 if res.status_code == 403:
-                    new_netloc = f"n{self._subdomain_index}.{config.api.files_netloc}"
+                    if subdomain_index is not None:
+                        self.succeeded_servers.discard(subdomain_index)
+                        self.failure_servers.add(subdomain_index)
+                    # try succeeded servers first
+                    subdomain_index = next(iter(self.succeeded_servers), None)
+                    if subdomain_index is None:
+                        subdomain_index = self._next_subdomain_index
+                        # Update self._next_subdomain_index
+                        ## index fallback to 1 when a server after failure_servers has been tried
+                        if self._next_subdomain_index > max(self.failure_servers):
+                            self._next_subdomain_index = 1
+                            self.failure_servers.clear()
+                        ## otherwise, increment the index and avoid failure_servers
+                        else:
+                            self._next_subdomain_index += 1
+                            while self._next_subdomain_index in self.failure_servers:
+                                self._next_subdomain_index += 1
+                        msg = "Download failed, trying next subdomain"
+                    else:
+                        msg = "Download failed, trying succeeded subdomains"
+                    new_netloc = f"n{subdomain_index}.{config.api.files_netloc}"
                     self._url = str(res.url.copy_with(netloc=new_netloc.encode()))
-                    self._subdomain_index += 1
                     return DownloaderRet(
                         code=RetCodeEnum.GeneralFailure,
                         message=generate_msg(
-                            "Download failed, trying alternative subdomains",
+                            msg,
                             nex_subdomain=new_netloc,
                             status_code=res.status_code,
                             filename=save_filepath
                         )
                     )
                 elif res.status_code != httpx.codes.PARTIAL_CONTENT:
+                    self._url = self._initial_url
                     return DownloaderRet(
                         code=RetCodeEnum.GeneralFailure,
                         message=generate_msg(
@@ -213,6 +242,10 @@ class Downloader:
                             filename=save_filepath
                         )
                     )
+                else:
+                    if subdomain_index is not None:
+                        self.failure_servers.discard(subdomain_index)
+                        self.succeeded_servers.add(subdomain_index)
 
                 # Get filename for saving and check if file exists (Second-time duplicate file check)
                 # Priority order can be referenced from the constructor's documentation
