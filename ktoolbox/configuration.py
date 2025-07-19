@@ -61,6 +61,7 @@ class DownloaderConfiguration(BaseModel):
     :ivar retry_stop_never: Never stop downloader from retrying (when download failed) \
     (``retry_times`` will be ignored when enabled)
     :ivar retry_interval: Seconds of downloader retry interval
+    :ivar tps_limit: Maximum connections established per second
     :ivar use_bucket: Enable local storage bucket mode
     :ivar bucket_path: Path of local storage bucket
     :ivar reverse_proxy: Reverse proxy format for download URL. \
@@ -77,6 +78,7 @@ class DownloaderConfiguration(BaseModel):
     retry_times: int = 10
     retry_stop_never: bool = False
     retry_interval: float = 3.0
+    tps_limit: float = 1.0
     use_bucket: bool = False
     bucket_path: Path = Path("./.ktoolbox/bucket_storage")
     reverse_proxy: str = "{}"
