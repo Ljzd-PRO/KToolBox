@@ -132,6 +132,7 @@ class PostStructureConfiguration(BaseModel):
     :ivar attachments: Sub path of attachment directory
     :ivar content: Sub path of post content file
     :ivar content_filepath: (**Deprecated**, Use ``content`` instead) Sub path of post content file
+    :ivar external_links: Sub path of external links file (for cloud storage links found in content)
     :ivar file: The format of the post `file` filename (`file` is not `attachment`, each post has only one `file`, usually the cover image) \
     Customize the filename format by inserting an empty ``{}`` to represent the basic filename. \
     You can use some of the [properties][ktoolbox.configuration.JobConfiguration] \
@@ -141,6 +142,7 @@ class PostStructureConfiguration(BaseModel):
     attachments: Path = Path("attachments")
     content: Path = Path("content.txt")
     content_filepath: Path = Path("content.txt")
+    external_links: Path = Path("external_links.txt")
     file: str = "{id}_{}"
 
     @field_validator("content_filepath")
@@ -186,6 +188,7 @@ class JobConfiguration(BaseModel):
     ``[{published}]_{}`` could result in filenames like ``[2024-1-1]_1.png``, ``[2024-1-1]_2.png``, etc.
     :ivar allow_list: Download files which match these patterns (Unix shell-style), e.g. ``["*.png"]``
     :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``
+    :ivar extract_external_links: Extract external file sharing links from post content and save to separate file
     """
     count: int = 4
     post_dirname_format: str = "{title}"
@@ -197,6 +200,7 @@ class JobConfiguration(BaseModel):
     allow_list: Set[str] = Field(default_factory=set)
     # noinspection PyDataclass
     block_list: Set[str] = Field(default_factory=set)
+    extract_external_links: bool = True
 
 
 class LoggerConfiguration(BaseModel):
