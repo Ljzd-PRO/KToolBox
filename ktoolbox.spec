@@ -27,6 +27,7 @@ exe = EXE(
     a.datas,
     [],
     name='ktoolbox',
+    version='v0.15.1',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
