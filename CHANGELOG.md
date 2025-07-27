@@ -16,4 +16,11 @@
 
 - 更新 Kemono 及 Coomer 的站点域名为 `kemono.cr` 和 `coomer.st`
 
+## Upgrade
+
+Use this command to upgrade if you are using **pipx**:
+```shell
+pipx upgrade ktoolbox
+```
+
 **Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.15.0...v0.15.1
