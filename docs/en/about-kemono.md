@@ -1,6 +1,6 @@
 # About Kemono
 
-Description from [https://kemono.su](https://kemono.su) :
+Description from https://kemono.cr :
 
 > Kemono is a public archiver for:
 >  

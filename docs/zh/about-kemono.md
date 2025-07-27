@@ -1,6 +1,6 @@
 # 关于 Kemono
 
-官网 https://kemono.su 的介绍：
+官网 https://kemono.cr 的介绍：
 
 > Kemono is a public archiver for:
 >  

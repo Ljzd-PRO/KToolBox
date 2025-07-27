@@ -8,7 +8,7 @@
 
 <p align="center">
   KToolBox is a useful CLI tool for downloading posts content in
-  <a href="https://kemono.su/">Kemono.su / Kemono.party</a>
+  <a href="https://kemono.cr/">Kemono.cr / Kemono.su / Kemono.party</a>
 </p>
 
 <p align="center">
@@ -59,7 +59,7 @@
 - Enables excluding **specified file formats** or downloading only specified formats  
 - Allows searching for artists and posts, with options to export results  
 - Compatible with all platforms, with iOS shortcuts provided  
-- For support related to _Coomer.su / Coomer.party_, please refer to the documentation: [Coomer](https://ktoolbox.readthedocs.io/latest/coomer/)
+- For support related to _Coomer.st / Coomer.su / Coomer.party_, please refer to the documentation: [Coomer](https://ktoolbox.readthedocs.io/latest/coomer/)
 
 ## Dev Plan
 
