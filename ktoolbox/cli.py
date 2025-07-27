@@ -115,20 +115,22 @@ class KToolBoxCli:
             return ret.message
 
     @staticmethod
-    async def get_post(service: str, creator_id: str, post_id: str, *, dump: Path = None):
+    async def get_post(service: str, creator_id: str, post_id: str, revision_id: str = None, *, dump: Path = None):
         """
-        Get a specific post
+        Get a specific post or revision
 
         :param service: The service name
         :param creator_id: The creator's ID
         :param post_id: The post ID
+        :param revision_id: The revision ID (optional, for revision posts)
         :param dump: Dump the result to a JSON file
         """
         logger.info(repr(config))
         ret = await get_post_api(
             service=service,
             creator_id=creator_id,
-            post_id=post_id
+            post_id=post_id,
+            revision_id=revision_id
         )
         if ret:
             if dump:
@@ -156,6 +158,7 @@ class KToolBoxCli:
             service: str,
             creator_id: str,
             post_id: str,
+            revision_id: str = None,
             path: Union[Path, str] = Path("."),
             *,
             dump_post_data=True
@@ -168,24 +171,26 @@ class KToolBoxCli:
             service: str = None,
             creator_id: str = None,
             post_id: str = None,
+            revision_id: str = None,
             path: Union[Path, str] = Path("."),
             *,
             dump_post_data=True
     ):
         """
-        Download a specific post
+        Download a specific post or revision
 
         :param url: The post URL
         :param service: The service name
         :param creator_id: The creator's ID
         :param post_id: The post ID
+        :param revision_id: The revision ID (optional, for revision posts)
         :param path: Download path, default is current directory
         :param dump_post_data: Whether to dump post data (post.json) in post directory
         """
         logger.info(repr(config))
-        # Get service, creator_id, post_id
+        # Get service, creator_id, post_id, revision_id
         if url:
-            service, creator_id, post_id = parse_webpage_url(url)
+            service, creator_id, post_id, revision_id = parse_webpage_url(url)
         if not all([service, creator_id, post_id]):
             return generate_msg(
                 TextEnum.MissingParams.value,
@@ -198,10 +203,16 @@ class KToolBoxCli:
         ret = await get_post_api(
             service=service,
             creator_id=creator_id,
-            post_id=post_id
+            post_id=post_id,
+            revision_id=revision_id
         )
         if ret:
             post_path = path / generate_post_path_name(ret.data.post)
+            
+            # For revision posts, create a revision subfolder
+            if revision_id:
+                post_path = post_path / "revision" / revision_id
+                
             job_list = await create_job_from_post(
                 post=ret.data.post,
                 post_path=post_path,
@@ -280,7 +291,7 @@ class KToolBoxCli:
         logger.info(repr(config))
         # Get service, creator_id
         if url:
-            service, creator_id, _ = parse_webpage_url(url)
+            service, creator_id, _, _ = parse_webpage_url(url)
         if not all([service, creator_id]):
             return generate_msg(
                 TextEnum.MissingParams.value,

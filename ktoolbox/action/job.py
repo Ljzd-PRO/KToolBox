@@ -35,7 +35,7 @@ async def create_job_from_post(
      ``True`` & ``None`` -> ``config.job.post_structure``
     :param dump_post_data: Whether to dump post data (post.json) in post directory
     """
-    post_path.mkdir(exist_ok=True)
+    post_path.mkdir(parents=True, exist_ok=True)
 
     # Load ``PostStructureConfiguration``
     if post_structure in [True, None]:
