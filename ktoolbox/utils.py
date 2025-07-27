@@ -3,6 +3,7 @@ import logging
 import sys
 from pathlib import Path
 from typing import Generic, TypeVar, Optional, List, Tuple
+from urllib.parse import urlparse, parse_qs
 
 import aiofiles
 from loguru import logger
@@ -19,6 +20,7 @@ __all__ = [
     "logger_init",
     "dump_search",
     "parse_webpage_url",
+    "parse_search_url",
     "uvloop_init"
 ]
 
@@ -105,6 +107,29 @@ def parse_webpage_url(url: str) -> Tuple[Optional[str], Optional[str], Optional[
         parts += tuple(None for _ in range(7 - url_parts_len))
     _scheme, _netloc, service, _user_key, user_id, _post_key, post_id = parts
     return service, user_id, post_id
+
+
+def parse_search_url(url: str) -> Optional[str]:
+    """
+    Extract search query from a Kemono search URL
+
+    :param url: Kemono search URL like https://kemono.su/posts?q=search+term
+    :return: Search query string, or None if not a valid search URL
+    """
+    parsed = urlparse(url)
+    
+    # Check if it's a search URL (path should be /posts)
+    if parsed.path != "/posts":
+        return None
+        
+    # Parse query parameters
+    query_params = parse_qs(parsed.query)
+    
+    # Extract the 'q' parameter (search query)
+    if 'q' in query_params and query_params['q']:
+        return query_params['q'][0]  # take the first value
+        
+    return None
 
 
 def uvloop_init() -> bool:

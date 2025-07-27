@@ -3,10 +3,10 @@ from typing import Iterator, List
 from ktoolbox._enum import RetCodeEnum
 from ktoolbox.action import ActionRet
 from ktoolbox.api.model import Creator, Post
-from ktoolbox.api.posts import get_creators, get_creator_post
+from ktoolbox.api.posts import get_creators, get_creator_post, search_posts as search_posts_api
 from ktoolbox.utils import BaseRet, generate_msg
 
-__all__ = ["search_creator", "search_creator_post"]
+__all__ = ["search_creator", "search_creator_post", "search_posts"]
 
 
 # noinspection PyShadowingBuiltins
@@ -92,3 +92,17 @@ async def search_creator_post(
             )
 
     return await inner(id=id, name=name, service=service, q=q, o=o)
+
+
+async def search_posts(q: str, o: int = None) -> BaseRet[List[Post]]:
+    """
+    Search for posts by query across all creators and services.
+
+    :param q: Search query
+    :param o: Result offset, stepping of 50 is enforced
+    """
+    ret = await search_posts_api(q=q, o=o)
+    if ret:
+        return ActionRet(data=ret.data)
+    else:
+        return ret

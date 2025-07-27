@@ -11,11 +11,12 @@ from ktoolbox import __version__
 from ktoolbox._enum import TextEnum
 from ktoolbox.action import create_job_from_post, create_job_from_creator, generate_post_path_name
 from ktoolbox.action import search_creator as search_creator_action, search_creator_post as search_creator_post_action
+from ktoolbox.action import search_posts as search_posts_action
 from ktoolbox.api.misc import get_app_version
 from ktoolbox.api.posts import get_post as get_post_api
 from ktoolbox.configuration import config
 from ktoolbox.job import JobRunner
-from ktoolbox.utils import dump_search, parse_webpage_url, generate_msg
+from ktoolbox.utils import dump_search, parse_webpage_url, parse_search_url, generate_msg
 
 __all__ = ["KToolBoxCli"]
 
@@ -107,6 +108,29 @@ class KToolBoxCli:
         """
         logger.info(repr(config))
         ret = await search_creator_post_action(id=id, name=name, service=service, q=q, o=o)
+        if ret:
+            if dump:
+                await dump_search(ret.data, dump)
+            return ret.data or TextEnum.SearchResultEmpty.value
+        else:
+            return ret.message
+
+    @staticmethod
+    async def search_posts(
+            q: str,
+            o: int = None,
+            *,
+            dump: Path = None
+    ):
+        """
+        Search for posts by query across all creators and services.
+
+        :param q: Search query
+        :param o: Result offset, stepping of 50 is enforced
+        :param dump: Dump the result to a JSON file
+        """
+        logger.info(repr(config))
+        ret = await search_posts_action(q=q, o=o)
         if ret:
             if dump:
                 await dump_search(ret.data, dump)
@@ -334,3 +358,100 @@ class KToolBoxCli:
             await job_runner.start()
         else:
             return ret.message
+
+    @staticmethod
+    async def download_search(
+            url: str = None,
+            query: str = None,
+            path: Union[Path, str] = Path("."),
+            *,
+            dump_post_data: bool = True,
+            offset: int = 0,
+            limit: int = None
+    ):
+        """
+        Download all posts from a search query
+
+        :param url: Search URL like https://kemono.su/posts?q=search+term
+        :param query: Search query string (alternative to URL)
+        :param path: Download path, default is current directory
+        :param dump_post_data: Whether to dump post data (post.json) in post directory
+        :param offset: Result offset for pagination
+        :param limit: Maximum number of posts to download (downloads all if None)
+        """
+        logger.info(repr(config))
+        
+        # Extract query from URL or use provided query
+        search_query = None
+        if url:
+            search_query = parse_search_url(url)
+            if not search_query:
+                return generate_msg(
+                    "Invalid search URL format. Expected format: https://kemono.su/posts?q=search+term",
+                    url=url
+                )
+        elif query:
+            search_query = query
+        else:
+            return generate_msg(
+                "Missing search parameter",
+                use_at_lease_one=[["url"], ["query"]]
+            )
+
+        path = path if isinstance(path, Path) else Path(path)
+        
+        # Create folder name based on search query
+        folder_name = sanitize_filename(search_query.replace("+", " "))
+        search_path = path / folder_name
+        search_path.mkdir(exist_ok=True)
+        
+        # Search for posts
+        logger.info(f"Searching for posts with query: {search_query}")
+        
+        all_posts = []
+        current_offset = offset
+        
+        while True:
+            ret = await search_posts_action(q=search_query, o=current_offset)
+            if not ret:
+                return ret.message
+                
+            posts = ret.data
+            if not posts:
+                break
+                
+            all_posts.extend(posts)
+            
+            # Check if we've reached the limit
+            if limit and len(all_posts) >= limit:
+                all_posts = all_posts[:limit]
+                break
+                
+            # If we got less than 50 posts, we've reached the end
+            if len(posts) < 50:
+                break
+                
+            current_offset += 50
+            
+        if not all_posts:
+            logger.info("No posts found for the search query")
+            return TextEnum.SearchResultEmpty.value
+            
+        logger.info(f"Found {len(all_posts)} posts, starting download...")
+        
+        # Create download jobs for all posts
+        job_list = []
+        for post in all_posts:
+            post_path = search_path / generate_post_path_name(post)
+            jobs = await create_job_from_post(
+                post=post,
+                post_path=post_path,
+                dump_post_data=dump_post_data
+            )
+            job_list.extend(jobs)
+            
+        # Start downloading
+        job_runner = JobRunner(job_list=job_list)
+        await job_runner.start()
+        
+        logger.info(f"Download completed! Files saved to: {search_path}")
