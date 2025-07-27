@@ -37,9 +37,9 @@ class APIConfiguration(BaseModel):
     :ivar session_key: Session key that can be found in cookies after a successful login
     """
     scheme: Literal["http", "https"] = "https"
-    netloc: str = "kemono.su"
-    statics_netloc: str = "img.kemono.su"
-    files_netloc: str = "kemono.su"
+    netloc: str = "kemono.cr"
+    statics_netloc: str = "img.kemono.cr"
+    files_netloc: str = "kemono.cr"
     path: str = "/api/v1"
     timeout: float = 5.0
     retry_times: int = 3

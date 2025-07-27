@@ -8,7 +8,7 @@
 
 <p align="center">
   KToolBox 是一个用于下载
-  <a href="https://kemono.su/">Kemono.su / Kemono.party</a>
+  <a href="https://kemono.cr/">Kemono.cr / Kemono.su / Kemono.party</a>
   中作品内容的实用命令行工具
 </p>
 
@@ -60,7 +60,7 @@
 - 支持排除 **指定格式** 的文件或仅下载指定格式的文件
 - 可搜索画师和作品，并导出结果
 - 支持全平台，并提供 iOS 快捷指令
-- 对于 Coomer.su / Coomer.party 的支持，请查看文档 [Coomer](https://ktoolbox.readthedocs.io/latest/zh/coomer/)
+- 对于 _Coomer.st / Coomer.su / Coomer.party_ 的支持，请查看文档 [Coomer](https://ktoolbox.readthedocs.io/latest/zh/coomer/)
 
 ## 开发计划
 

@@ -1,19 +1,19 @@
 # Coomer
 
-KToolBox support downloading from Coomer.su / Coomer.party
+KToolBox support downloading from Coomer.st / Coomer.su / Coomer.party
 
 You need to modify the configuration by `.env` or `prod.env` dotenv file or system environment variables:
 ```dotenv
 # For Coomer API
-KTOOLBOX_API__NETLOC=coomer.su
+KTOOLBOX_API__NETLOC=coomer.st
 
 # For downloading files from Coomer server
-KTOOLBOX_API__FILES_NETLOC=coomer.su
+KTOOLBOX_API__FILES_NETLOC=coomer.st
 ```
 
 ## About Coomer
 
-Description from [https://coomer.su](https://coomer.su) :
+Description from [https://coomer.st](https://coomer.st) :
 
 > Coomer is a public archiver for:
 > 
