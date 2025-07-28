@@ -74,10 +74,10 @@ class BaseAPI(ABC, Generic[_T]):
     _ddos_cookie_manager: Optional[DDoSGuardCookieManager] = None
     
     @classmethod
-    def _get_ddos_cookie_manager(cls) -> Optional[DDoSGuardCookieManager]:
+    def _get_ddos_cookie_manager(cls) -> DDoSGuardCookieManager:
         """Get or create DDoS Guard cookie manager"""
-        if cls._ddos_cookie_manager is None and config.api.ddos_guard_cookies:
-            cls._ddos_cookie_manager = DDoSGuardCookieManager(config.api.ddos_guard_cookies)
+        if cls._ddos_cookie_manager is None:
+            cls._ddos_cookie_manager = DDoSGuardCookieManager()
             logger.debug("Initialized DDoS Guard cookie manager")
         return cls._ddos_cookie_manager
     
@@ -86,7 +86,7 @@ class BaseAPI(ABC, Generic[_T]):
         """Build cookies including session and DDoS Guard cookies"""
         session_cookies = {"session": config.api.session_key} if config.api.session_key else None
         ddos_manager = cls._get_ddos_cookie_manager()
-        ddos_cookies = ddos_manager.cookies if ddos_manager else None
+        ddos_cookies = ddos_manager.cookies
         
         return merge_cookies(session_cookies, ddos_cookies)
     
@@ -150,10 +150,9 @@ class BaseAPI(ABC, Generic[_T]):
                 **kwargs
             )
             
-            # Update DDoS Guard cookies from response if available
+            # Update DDoS Guard cookies from response
             ddos_manager = cls._get_ddos_cookie_manager()
-            if ddos_manager:
-                ddos_manager.update_from_response(res)
+            ddos_manager.update_from_response(res)
                 
         except Exception as e:
             return APIRet(

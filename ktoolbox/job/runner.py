@@ -39,10 +39,8 @@ class JobRunner:
         self._lock = asyncio.Lock()
         
         # Initialize DDoS Guard cookie manager for downloads
-        self._ddos_cookie_manager: Optional[DDoSGuardCookieManager] = None
-        if config.api.ddos_guard_cookies:
-            self._ddos_cookie_manager = DDoSGuardCookieManager(config.api.ddos_guard_cookies)
-            logger.debug("Initialized DDoS Guard cookie manager for downloads")
+        self._ddos_cookie_manager = DDoSGuardCookieManager()
+        logger.debug("Initialized DDoS Guard cookie manager for downloads")
 
     @property
     def finished(self):
@@ -87,7 +85,7 @@ class JobRunner:
         
         # Build cookies including session and DDoS Guard cookies
         session_cookies = {"session": config.api.session_key} if config.api.session_key else None
-        ddos_cookies = self._ddos_cookie_manager.cookies if self._ddos_cookie_manager else None
+        ddos_cookies = self._ddos_cookie_manager.cookies
         cookies = merge_cookies(session_cookies, ddos_cookies)
         
         async with httpx.AsyncClient(

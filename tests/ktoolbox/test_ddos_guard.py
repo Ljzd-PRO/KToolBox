@@ -13,20 +13,33 @@ from ktoolbox.ddos_guard import (
 class TestDDoSGuardCookieManager:
     """Test DDoS Guard cookie manager functionality"""
     
-    def test_init_empty(self):
-        """Test initialization with no cookies"""
+    def test_init_auto_generates_cookies(self):
+        """Test initialization auto-generates cookies"""
         manager = DDoSGuardCookieManager()
-        assert manager.cookies == {}
-    
-    def test_init_with_cookies(self):
-        """Test initialization with initial cookies"""
-        initial_cookies = {"ddg1": "test1", "ddg8": "test8"}
-        manager = DDoSGuardCookieManager(initial_cookies)
-        assert manager.cookies == initial_cookies
+        cookies = manager.cookies
         
-        # Ensure we get a copy, not the original
-        manager._cookies["ddg9"] = "test9"
-        assert initial_cookies == {"ddg1": "test1", "ddg8": "test8"}
+        # Check that required cookies are auto-generated
+        assert "ddg1" in cookies
+        assert "ddg8" in cookies
+        assert "ddg9" in cookies
+        assert "ddg10" in cookies
+        
+        # Check default IP is used
+        assert cookies["ddg9"] == "127.0.0.1"
+    
+    def test_init_with_custom_ip(self):
+        """Test initialization with custom IP"""
+        manager = DDoSGuardCookieManager("192.168.1.100")
+        cookies = manager.cookies
+        
+        # Check that required cookies are auto-generated
+        assert "ddg1" in cookies
+        assert "ddg8" in cookies
+        assert "ddg9" in cookies
+        assert "ddg10" in cookies
+        
+        # Check custom IP is used
+        assert cookies["ddg9"] == "192.168.1.100"
     
     def test_generate_default_cookies(self):
         """Test generation of default DDoS Guard cookies"""
@@ -76,6 +89,7 @@ class TestDDoSGuardCookieManager:
     def test_update_from_response_no_ddg_cookies(self):
         """Test updating from response with no DDoS Guard cookies"""
         manager = DDoSGuardCookieManager()
+        initial_cookies = manager.cookies.copy()  # Store initial auto-generated cookies
         
         response = Mock(spec=httpx.Response)
         response.headers = Mock()
@@ -87,12 +101,16 @@ class TestDDoSGuardCookieManager:
         updated = manager.update_from_response(response)
         
         assert updated is False
-        assert manager.cookies == {}
+        assert manager.cookies == initial_cookies  # Should remain unchanged
     
     def test_refresh_time_dependent_cookies(self):
         """Test refreshing time-dependent cookies"""
-        manager = DDoSGuardCookieManager({"ddg10": "123456789"})
+        manager = DDoSGuardCookieManager()
         old_value = manager.cookies["ddg10"]
+        
+        # Wait a tiny bit to ensure timestamp changes
+        import time
+        time.sleep(0.01)
         
         manager.refresh_time_dependent_cookies()
         
@@ -101,13 +119,18 @@ class TestDDoSGuardCookieManager:
         assert new_value.isdigit()  # Should be a timestamp
     
     def test_refresh_without_ddg10(self):
-        """Test refreshing when ddg10 is not present"""
-        manager = DDoSGuardCookieManager({"ddg1": "test"})
+        """Test refreshing when ddg10 is manually removed"""
+        manager = DDoSGuardCookieManager()
+        original_cookies = manager.cookies.copy()
+        
+        # Remove ddg10 manually
+        del manager._cookies["ddg10"]
         
         # Should not raise an error
         manager.refresh_time_dependent_cookies()
         
-        assert manager.cookies == {"ddg1": "test"}
+        # ddg10 should not be restored (only refreshes existing ddg10)
+        assert "ddg10" not in manager.cookies
 
 
 class TestGenerateDdgCookieValue:
