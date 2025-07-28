@@ -4,7 +4,7 @@ import os
 import tempfile
 import warnings
 from pathlib import Path
-from typing import Literal, Union, Optional, Set, ClassVar
+from typing import Literal, Union, Optional, Set, ClassVar, Dict
 
 from loguru import logger
 from pydantic import BaseModel, model_validator, Field, field_validator
@@ -35,6 +35,10 @@ class APIConfiguration(BaseModel):
     :ivar retry_times: API request retry times (when request failed)
     :ivar retry_interval: Seconds of API request retry interval
     :ivar session_key: Session key that can be found in cookies after a successful login
+    :ivar ddos_guard_cookies: Custom DDoS Guard cookies to bypass protection \
+    Should be a dictionary with cookie names as keys and values as strings. \
+    Common DDoS Guard cookies include ddg1, ddg5, ddg8, ddg9, ddg10. \
+    Example: {"ddg1": "value1", "ddg8": "value8", "ddg9": "your_ip", "ddg10": "timestamp_value"}
     """
     scheme: Literal["http", "https"] = "https"
     netloc: str = "kemono.cr"
@@ -45,6 +49,7 @@ class APIConfiguration(BaseModel):
     retry_times: int = 3
     retry_interval: float = 2.0
     session_key: str = ""
+    ddos_guard_cookies: Dict[str, str] = Field(default_factory=dict)
 
 
 class DownloaderConfiguration(BaseModel):
