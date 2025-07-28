@@ -64,6 +64,7 @@ class DownloaderConfiguration(BaseModel):
     :ivar tps_limit: Maximum connections established per second
     :ivar use_bucket: Enable local storage bucket mode
     :ivar bucket_path: Path of local storage bucket
+    :ivar include_revisions: Include and download revision posts when available
     :ivar reverse_proxy: Reverse proxy format for download URL. \
     Customize the filename format by inserting an empty ``{}`` to represent the original URL. \
     For example: ``https://example.com/{}`` will be ``https://example.com/https://n1.kemono.su/data/66/83/xxxxx.jpg``;  \
@@ -81,6 +82,7 @@ class DownloaderConfiguration(BaseModel):
     tps_limit: float = 1.0
     use_bucket: bool = False
     bucket_path: Path = Path("./.ktoolbox/bucket_storage")
+    include_revisions: bool = False
     reverse_proxy: str = "{}"
 
     @model_validator(mode="after")

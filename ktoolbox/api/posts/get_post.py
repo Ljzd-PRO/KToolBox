@@ -1,10 +1,16 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List, Tuple, Any
 
 from ktoolbox.api import BaseAPI, APIRet
-from ktoolbox.api.model import Post
+from ktoolbox.api.model import Post, Revision
 
 __all__ = ["GetPost", "get_post"]
+
+
+class PostProps(BaseModel):
+    """Properties object containing additional post metadata"""
+    flagged: Optional[Any] = None
+    revisions: Optional[List[Tuple[int, Revision]]] = None
 
 
 class GetPost(BaseAPI):
@@ -13,6 +19,7 @@ class GetPost(BaseAPI):
 
     class Response(BaseModel):
         post: Post
+        props: Optional[PostProps] = None
 
     @classmethod
     async def __call__(cls, service: str, creator_id: str, post_id: str, revision_id: Optional[str] = None) -> APIRet[Response]:

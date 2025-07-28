@@ -8,8 +8,8 @@ import pytest
 from ktoolbox.cli import KToolBoxCli
 from ktoolbox.utils import parse_webpage_url, generate_msg
 from ktoolbox._enum import TextEnum
-from ktoolbox.api.model import Post
-from ktoolbox.api.posts import GetPost
+from ktoolbox.api.model import Post, Revision
+from ktoolbox.api.posts import GetPost, get_post_revisions
 
 
 class TestRevisionSupport:
@@ -126,3 +126,60 @@ class TestRevisionSupport:
         # Test revision path (constructed in the __call__ method)
         revision_path = f"/fanbox/user/123/post/456/revision/789"
         assert revision_path == "/fanbox/user/123/post/456/revision/789"
+
+    def test_revision_model(self):
+        """Test that Revision model extends Post correctly"""
+        revision = Revision(
+            id="456",
+            title="Test Revision",
+            service="fanbox",
+            user="123",
+            revision_id=789
+        )
+        assert revision.id == "456"
+        assert revision.title == "Test Revision" 
+        assert revision.revision_id == 789
+        
+        # Test that it's still a Post
+        assert isinstance(revision, Post)
+
+    @pytest.mark.asyncio
+    async def test_get_post_response_structure(self):
+        """Test that GetPost.Response supports props field"""
+        from ktoolbox.api.posts.get_post import PostProps
+        
+        # Test the response structure matches expected format
+        response_data = {
+            "post": {
+                "id": "456",
+                "title": "Test Post",
+                "service": "fanbox",
+                "user": "123"
+            },
+            "props": {
+                "flagged": None,
+                "revisions": [
+                    [1, {"id": "456", "title": "Main Post", "revision_id": None}],
+                    [0, {"id": "456", "title": "Revision Post", "revision_id": 789}]
+                ]
+            }
+        }
+        
+        response = GetPost.Response(**response_data)
+        assert response.post.id == "456"
+        assert response.props is not None
+        assert response.props.revisions is not None
+        assert len(response.props.revisions) == 2
+
+    @pytest.mark.asyncio
+    async def test_get_post_revisions_api(self):
+        """Test that get_post_revisions API is properly structured"""
+        from ktoolbox.api.posts.get_post_revisions import GetPostRevisions
+        
+        # Test API path construction
+        path = GetPostRevisions.path.format(
+            service="fanbox",
+            creator_id="123",
+            post_id="456"
+        )
+        assert path == "/fanbox/user/123/post/456/revisions"
