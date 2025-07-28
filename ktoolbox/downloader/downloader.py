@@ -21,6 +21,7 @@ from ktoolbox.configuration import config
 from ktoolbox.downloader.base import DownloaderRet
 from ktoolbox.downloader.utils import filename_from_headers, duplicate_file_check
 from ktoolbox.utils import generate_msg
+from ktoolbox.ddos_guard import DDoSGuardCookieManager
 
 __all__ = ["Downloader"]
 
@@ -42,7 +43,8 @@ class Downloader:
             buffer_size: int = None,
             chunk_size: int = None,
             designated_filename: str = None,
-            server_path: str = None
+            server_path: str = None,
+            ddos_cookie_manager: Optional[DDoSGuardCookieManager] = None
     ):
         # noinspection GrazieInspection
         """
@@ -61,6 +63,7 @@ class Downloader:
         :param designated_filename: Manually specify the filename for saving, which needs to be sanitized
         :param server_path: Server path of the file. if ``DownloaderConfiguration.use_bucket`` enabled, \
         it will be used as the save path.
+        :param ddos_cookie_manager: Optional DDoS Guard cookie manager for updating cookies from responses
         """
 
         self._url = self._initial_url = url
@@ -71,6 +74,7 @@ class Downloader:
         self._designated_filename = designated_filename
         self._server_path = server_path  # /hash[:1]/hash2[1:3]/hash
         self._save_filename = designated_filename  # Prioritize the manually specified filename
+        self._ddos_cookie_manager = ddos_cookie_manager
 
         self._next_subdomain_index = 1
         self._finished_lock = asyncio.Lock()
@@ -246,6 +250,10 @@ class Downloader:
                     if subdomain_index is not None:
                         self.failure_servers.discard(subdomain_index)
                         self.succeeded_servers.add(subdomain_index)
+                    
+                    # Update DDoS Guard cookies from response if available
+                    if self._ddos_cookie_manager:
+                        self._ddos_cookie_manager.update_from_response(res)
 
                 # Get filename for saving and check if file exists (Second-time duplicate file check)
                 # Priority order can be referenced from the constructor's documentation

@@ -4,7 +4,7 @@ import os
 import tempfile
 import warnings
 from pathlib import Path
-from typing import Literal, Union, Optional, Set, ClassVar
+from typing import Literal, Union, Optional, Set, ClassVar, Dict
 
 from loguru import logger
 from pydantic import BaseModel, model_validator, Field, field_validator
