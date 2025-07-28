@@ -19,13 +19,13 @@ class TestDDoSGuardCookieManager:
         cookies = manager.cookies
         
         # Check that required cookies are auto-generated
-        assert "ddg1" in cookies
-        assert "ddg8" in cookies
-        assert "ddg9" in cookies
-        assert "ddg10" in cookies
+        assert "__ddg1_" in cookies
+        assert "__ddg8_" in cookies
+        assert "__ddg9_" in cookies
+        assert "__ddg10_" in cookies
         
         # Check default IP is used
-        assert cookies["ddg9"] == "127.0.0.1"
+        assert cookies["__ddg9_"] == "127.0.0.1"
     
     def test_init_with_custom_ip(self):
         """Test initialization with custom IP"""
@@ -33,13 +33,13 @@ class TestDDoSGuardCookieManager:
         cookies = manager.cookies
         
         # Check that required cookies are auto-generated
-        assert "ddg1" in cookies
-        assert "ddg8" in cookies
-        assert "ddg9" in cookies
-        assert "ddg10" in cookies
+        assert "__ddg1_" in cookies
+        assert "__ddg8_" in cookies
+        assert "__ddg9_" in cookies
+        assert "__ddg10_" in cookies
         
         # Check custom IP is used
-        assert cookies["ddg9"] == "192.168.1.100"
+        assert cookies["__ddg9_"] == "192.168.1.100"
     
     def test_generate_default_cookies(self):
         """Test generation of default DDoS Guard cookies"""
@@ -47,23 +47,23 @@ class TestDDoSGuardCookieManager:
         cookies = manager.generate_default_cookies("192.168.1.1")
         
         # Check that required cookies are generated
-        assert "ddg1" in cookies
-        assert "ddg8" in cookies
-        assert "ddg9" in cookies
-        assert "ddg10" in cookies
+        assert "__ddg1_" in cookies
+        assert "__ddg8_" in cookies
+        assert "__ddg9_" in cookies
+        assert "__ddg10_" in cookies
         
-        # Check ddg9 contains the IP
-        assert cookies["ddg9"] == "192.168.1.1"
+        # Check __ddg9_ contains the IP
+        assert cookies["__ddg9_"] == "192.168.1.1"
         
         # Check cookies are stored in manager
-        assert manager.cookies["ddg9"] == "192.168.1.1"
+        assert manager.cookies["__ddg9_"] == "192.168.1.1"
     
     def test_generate_default_cookies_no_ip(self):
         """Test generation of default cookies without IP"""
         manager = DDoSGuardCookieManager()
         cookies = manager.generate_default_cookies()
         
-        assert cookies["ddg9"] == "127.0.0.1"  # Default IP
+        assert cookies["__ddg9_"] == "127.0.0.1"  # Default IP
     
     def test_update_from_response(self):
         """Test updating cookies from HTTP response"""
@@ -73,16 +73,16 @@ class TestDDoSGuardCookieManager:
         response = Mock(spec=httpx.Response)
         response.headers = Mock()
         response.headers.get_list.return_value = [
-            "ddg8=newvalue8; Path=/; HttpOnly",
-            "ddg10=987654321; Path=/; HttpOnly",
+            "__ddg8_=newvalue8; Path=/; HttpOnly",
+            "__ddg10_=987654321; Path=/; HttpOnly",
             "normal_cookie=value; Path=/"
         ]
         
         updated = manager.update_from_response(response)
         
         assert updated is True
-        assert manager.cookies["ddg8"] == "newvalue8"
-        assert manager.cookies["ddg10"] == "987654321"
+        assert manager.cookies["__ddg8_"] == "newvalue8"
+        assert manager.cookies["__ddg10_"] == "987654321"
         # Normal cookie should not be added
         assert "normal_cookie" not in manager.cookies
     
@@ -106,7 +106,7 @@ class TestDDoSGuardCookieManager:
     def test_refresh_time_dependent_cookies(self):
         """Test refreshing time-dependent cookies"""
         manager = DDoSGuardCookieManager()
-        old_value = manager.cookies["ddg10"]
+        old_value = manager.cookies["__ddg10_"]
         
         # Wait a tiny bit to ensure timestamp changes
         import time
@@ -114,65 +114,65 @@ class TestDDoSGuardCookieManager:
         
         manager.refresh_time_dependent_cookies()
         
-        new_value = manager.cookies["ddg10"]
+        new_value = manager.cookies["__ddg10_"]
         assert new_value != old_value
         assert new_value.isdigit()  # Should be a timestamp
     
     def test_refresh_without_ddg10(self):
-        """Test refreshing when ddg10 is manually removed"""
+        """Test refreshing when __ddg10_ is manually removed"""
         manager = DDoSGuardCookieManager()
         original_cookies = manager.cookies.copy()
         
-        # Remove ddg10 manually
-        del manager._cookies["ddg10"]
+        # Remove __ddg10_ manually
+        del manager._cookies["__ddg10_"]
         
         # Should not raise an error
         manager.refresh_time_dependent_cookies()
         
-        # ddg10 should not be restored (only refreshes existing ddg10)
-        assert "ddg10" not in manager.cookies
+        # __ddg10_ should not be restored (only refreshes existing __ddg10_)
+        assert "__ddg10_" not in manager.cookies
 
 
 class TestGenerateDdgCookieValue:
     """Test DDoS Guard cookie value generation"""
     
     def test_generate_ddg1(self):
-        """Test ddg1 cookie generation"""
-        value = generate_ddg_cookie_value("ddg1")
+        """Test __ddg1_ cookie generation"""
+        value = generate_ddg_cookie_value("__ddg1_")
         assert len(value) == 16
         assert value.isalnum()
     
     def test_generate_ddg5(self):
-        """Test ddg5 cookie generation"""
-        value = generate_ddg_cookie_value("ddg5")
+        """Test __ddg5_ cookie generation"""
+        value = generate_ddg_cookie_value("__ddg5_")
         assert len(value) == 24
         assert value.isalnum()
     
     def test_generate_ddg8(self):
-        """Test ddg8 cookie generation"""
-        value = generate_ddg_cookie_value("ddg8")
+        """Test __ddg8_ cookie generation"""
+        value = generate_ddg_cookie_value("__ddg8_")
         assert len(value) == 16
         assert value.isalnum()
     
     def test_generate_ddg9_with_ip(self):
-        """Test ddg9 cookie generation with IP"""
-        value = generate_ddg_cookie_value("ddg9", "10.0.0.1")
+        """Test __ddg9_ cookie generation with IP"""
+        value = generate_ddg_cookie_value("__ddg9_", "10.0.0.1")
         assert value == "10.0.0.1"
     
     def test_generate_ddg9_without_ip(self):
-        """Test ddg9 cookie generation without IP"""
-        value = generate_ddg_cookie_value("ddg9")
+        """Test __ddg9_ cookie generation without IP"""
+        value = generate_ddg_cookie_value("__ddg9_")
         assert value == "127.0.0.1"
     
     def test_generate_ddg10(self):
-        """Test ddg10 cookie generation"""
-        value = generate_ddg_cookie_value("ddg10")
+        """Test __ddg10_ cookie generation"""
+        value = generate_ddg_cookie_value("__ddg10_")
         assert value.isdigit()
         assert len(value) >= 10  # Should be a timestamp
     
     def test_generate_unknown_ddg(self):
         """Test generation for unknown ddg cookie"""
-        value = generate_ddg_cookie_value("ddg99")
+        value = generate_ddg_cookie_value("__ddg99_")
         assert len(value) == 16
         assert value.isalnum()
 
@@ -193,26 +193,26 @@ class TestMergeCookies:
     
     def test_merge_ddos_only(self):
         """Test merging with only DDoS cookies"""
-        ddos = {"ddg1": "value"}
+        ddos = {"__ddg1_": "value"}
         result = merge_cookies(None, ddos)
         assert result == ddos
     
     def test_merge_both(self):
         """Test merging both types of cookies"""
         session = {"session": "sessionvalue"}
-        ddos = {"ddg1": "ddgvalue"}
+        ddos = {"__ddg1_": "ddgvalue"}
         result = merge_cookies(session, ddos)
         
-        expected = {"session": "sessionvalue", "ddg1": "ddgvalue"}
+        expected = {"session": "sessionvalue", "__ddg1_": "ddgvalue"}
         assert result == expected
     
     def test_merge_overlap_ddos_wins(self):
         """Test merging with overlapping keys - DDoS cookies should override"""
         session = {"common": "session_value", "session": "sessionvalue"}
-        ddos = {"common": "ddos_value", "ddg1": "ddgvalue"}
+        ddos = {"common": "ddos_value", "__ddg1_": "ddgvalue"}
         result = merge_cookies(session, ddos)
         
-        expected = {"common": "ddos_value", "session": "sessionvalue", "ddg1": "ddgvalue"}
+        expected = {"common": "ddos_value", "session": "sessionvalue", "__ddg1_": "ddgvalue"}
         assert result == expected
 
 
@@ -224,12 +224,12 @@ class TestUpdateCookiesFromResponse:
         manager = DDoSGuardCookieManager()
         response = Mock(spec=httpx.Response)
         response.headers = Mock()
-        response.headers.get_list.return_value = ["ddg8=newvalue; Path=/"]
+        response.headers.get_list.return_value = ["__ddg8_=newvalue; Path=/"]
         
         result = update_cookies_from_response(response, manager)
         
         assert result is True
-        assert manager.cookies["ddg8"] == "newvalue"
+        assert manager.cookies["__ddg8_"] == "newvalue"
     
     def test_update_without_manager(self):
         """Test updating cookies without a manager"""

@@ -17,24 +17,24 @@ def generate_ddg_cookie_value(cookie_name: str, client_ip: Optional[str] = None)
     """
     Generate a DDoS Guard cookie value based on the cookie name
     
-    :param cookie_name: Name of the DDoS Guard cookie (e.g., ddg1, ddg8, ddg9, ddg10)
-    :param client_ip: Client IP address for ddg9 cookie
+    :param cookie_name: Name of the DDoS Guard cookie (e.g., __ddg1_, __ddg8_, __ddg9_, __ddg10_)
+    :param client_ip: Client IP address for __ddg9_ cookie
     :return: Generated cookie value
     """
-    if cookie_name == "ddg1":
-        # ddg1 can be any random value, expires in ~1 year
+    if cookie_name == "__ddg1_":
+        # __ddg1_ can be any random value, expires in ~1 year
         return ''.join(random.choices(string.ascii_letters + string.digits, k=16))
-    elif cookie_name == "ddg5":
-        # ddg5 is not validated by DDoS Guard 
+    elif cookie_name == "__ddg5_":
+        # __ddg5_ is not validated by DDoS Guard 
         return ''.join(random.choices(string.ascii_letters + string.digits, k=24))
-    elif cookie_name == "ddg8":
-        # ddg8 is a random string value
+    elif cookie_name == "__ddg8_":
+        # __ddg8_ is a random string value
         return ''.join(random.choices(string.ascii_letters + string.digits, k=16))
-    elif cookie_name == "ddg9":
-        # ddg9 is the client IP, but can work with any IP-like value
+    elif cookie_name == "__ddg9_":
+        # __ddg9_ is the client IP, but can work with any IP-like value
         return client_ip or "127.0.0.1"
-    elif cookie_name == "ddg10":
-        # ddg10 is time/request dependent, use current timestamp
+    elif cookie_name == "__ddg10_":
+        # __ddg10_ is time/request dependent, use current timestamp
         return str(int(time.time() * 1000))
     else:
         # For any other ddg cookie, generate random value
@@ -50,7 +50,7 @@ class DDoSGuardCookieManager:
         """
         Initialize the DDoS Guard cookie manager with auto-generated cookies
         
-        :param client_ip: Client IP address for ddg9 cookie, defaults to 127.0.0.1
+        :param client_ip: Client IP address for __ddg9_ cookie, defaults to 127.0.0.1
         """
         self._cookies: Dict[str, str] = {}
         # Auto-generate default DDoS Guard cookies
@@ -65,14 +65,14 @@ class DDoSGuardCookieManager:
         """
         Generate a default set of DDoS Guard cookies
         
-        :param client_ip: Client IP address for ddg9 cookie
+        :param client_ip: Client IP address for __ddg9_ cookie
         :return: Dictionary of generated DDoS Guard cookies
         """
         ddg_cookies = {
-            "ddg1": generate_ddg_cookie_value("ddg1"),
-            "ddg8": generate_ddg_cookie_value("ddg8"),
-            "ddg9": generate_ddg_cookie_value("ddg9", client_ip),
-            "ddg10": generate_ddg_cookie_value("ddg10"),
+            "__ddg1_": generate_ddg_cookie_value("__ddg1_"),
+            "__ddg8_": generate_ddg_cookie_value("__ddg8_"),
+            "__ddg9_": generate_ddg_cookie_value("__ddg9_", client_ip),
+            "__ddg10_": generate_ddg_cookie_value("__ddg10_"),
         }
         self._cookies.update(ddg_cookies)
         logger.debug(f"Generated default DDoS Guard cookies: {list(ddg_cookies.keys())}")
@@ -89,7 +89,7 @@ class DDoSGuardCookieManager:
         
         # Extract Set-Cookie headers and update DDoS Guard cookies
         for cookie_header in response.headers.get_list("set-cookie"):
-            if "ddg" in cookie_header.lower():
+            if "__ddg" in cookie_header.lower():
                 # Parse cookie name and value
                 try:
                     cookie_parts = cookie_header.split(';')[0].strip()
@@ -98,7 +98,7 @@ class DDoSGuardCookieManager:
                         name = name.strip()
                         value = value.strip()
                         
-                        if name.startswith("ddg"):
+                        if name.startswith("__ddg") and name.endswith("_"):
                             self._cookies[name] = value
                             updated = True
                             logger.debug(f"Updated DDoS Guard cookie {name} from response")
@@ -109,12 +109,12 @@ class DDoSGuardCookieManager:
     
     def refresh_time_dependent_cookies(self):
         """
-        Refresh time-dependent DDoS Guard cookies (like ddg10)
+        Refresh time-dependent DDoS Guard cookies (like __ddg10_)
         """
-        if "ddg10" in self._cookies:
-            old_value = self._cookies["ddg10"]
-            self._cookies["ddg10"] = generate_ddg_cookie_value("ddg10")
-            logger.debug(f"Refreshed ddg10 cookie: {old_value} -> {self._cookies['ddg10']}")
+        if "__ddg10_" in self._cookies:
+            old_value = self._cookies["__ddg10_"]
+            self._cookies["__ddg10_"] = generate_ddg_cookie_value("__ddg10_")
+            logger.debug(f"Refreshed __ddg10_ cookie: {old_value} -> {self._cookies['__ddg10_']}")
 
 
 def merge_cookies(session_cookies: Optional[Dict[str, str]], 
