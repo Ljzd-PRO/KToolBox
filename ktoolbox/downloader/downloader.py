@@ -1,6 +1,7 @@
 import asyncio
 import os
 from asyncio import CancelledError, Lock
+from datetime import datetime
 from functools import cached_property
 from pathlib import Path
 from typing import Callable, Any, Coroutine, Type, Optional, Set
@@ -42,7 +43,8 @@ class Downloader:
             buffer_size: int = None,
             chunk_size: int = None,
             designated_filename: str = None,
-            server_path: str = None
+            server_path: str = None,
+            published: Optional[datetime] = None
     ):
         # noinspection GrazieInspection
         """
@@ -61,6 +63,7 @@ class Downloader:
         :param designated_filename: Manually specify the filename for saving, which needs to be sanitized
         :param server_path: Server path of the file. if ``DownloaderConfiguration.use_bucket`` enabled, \
         it will be used as the save path.
+        :param published: Published date of the post, used to set file modification time
         """
 
         self._url = self._initial_url = url
@@ -71,6 +74,7 @@ class Downloader:
         self._designated_filename = designated_filename
         self._server_path = server_path  # /hash[:1]/hash2[1:3]/hash
         self._save_filename = designated_filename  # Prioritize the manually specified filename
+        self._published = published
 
         self._next_subdomain_index = 1
         self._finished_lock = asyncio.Lock()
@@ -285,7 +289,19 @@ class Downloader:
             if config.downloader.use_bucket:
                 bucket_file_path.parent.mkdir(parents=True, exist_ok=True)
                 os.link(temp_filepath, bucket_file_path)
-            temp_filepath.rename(self._path / self._save_filename)
+            final_filepath = self._path / self._save_filename
+            temp_filepath.rename(final_filepath)
+
+            # Set file modification time if published date is available
+            if self._published:
+                try:
+                    # Convert datetime to timestamp for os.utime
+                    timestamp = self._published.timestamp()
+                    # Set both access time and modification time to the published date
+                    os.utime(final_filepath, (timestamp, timestamp))
+                except (OSError, ValueError) as e:
+                    # Log warning but don't fail the download
+                    logger.warning(f"Failed to set file modification time: {e}")
 
             # Callbacks
             if sync_callable:
