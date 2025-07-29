@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 from typing import List
 
 from ktoolbox.api import BaseAPI, APIRet
@@ -11,8 +11,8 @@ class GetPostRevisions(BaseAPI):
     path = "/{service}/user/{creator_id}/post/{post_id}/revisions"
     method = "get"
 
-    class Response(BaseModel):
-        revisions: List[Revision]
+    class Response(RootModel):
+        root: List[Revision]
 
     @classmethod
     async def __call__(cls, service: str, creator_id: str, post_id: str) -> APIRet[Response]:

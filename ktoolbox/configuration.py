@@ -137,11 +137,13 @@ class PostStructureConfiguration(BaseModel):
     You can use some of the [properties][ktoolbox.configuration.JobConfiguration] \
     in Post. For example: ``{title}_{}`` could result in filenames like \
     ``TheTitle_Stelle_lv5_logo.gif``, ``TheTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``, etc.
+    :ivar revisions: Sub path of revisions directory
     """
     attachments: Path = Path("attachments")
     content: Path = Path("content.txt")
     content_filepath: Path = Path("content.txt")
     file: str = "{id}_{}"
+    revisions: Path = Path("revisions")
 
     @field_validator("content_filepath")
     def content_filepath_validator(cls, v):

@@ -215,14 +215,13 @@ async def create_job_from_creator(
                     creator_id=creator_id,
                     post_id=post.id
                 )
-                if revisions_ret and revisions_ret.data.revisions:
-                    for revision in revisions_ret.data.revisions:
+                if revisions_ret and revisions_ret.data:
+                    for revision in revisions_ret.data:
                         if revision.revision_id:  # Only process actual revisions
-                            revision_path = post_path / "revision" / str(revision.revision_id)
+                            revision_path = post_path / config.job.post_structure.revisions / generate_post_path_name(revision)
                             revision_jobs = await create_job_from_post(
                                 post=revision,
                                 post_path=revision_path,
-                                post_structure=None,
                                 dump_post_data=True
                             )
                             job_list += revision_jobs
