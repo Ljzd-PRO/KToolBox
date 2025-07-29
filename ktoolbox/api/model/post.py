@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
-__all__ = ["File", "Attachment", "Post"]
+__all__ = ["File", "Attachment", "Post", "Revision"]
 
 
 class File(BaseModel):
@@ -31,3 +31,8 @@ class Post(BaseModel):
     edited: Optional[datetime] = None
     file: Optional[File] = None
     attachments: Optional[List[Attachment]] = None
+
+
+class Revision(Post):
+    """Revision model that extends Post with revision_id field"""
+    revision_id: Optional[int] = None
