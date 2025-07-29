@@ -124,6 +124,29 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 --end-time=2024-3-1
 ```
 
+#### 📋 Queue creators for batch download
+```bash
+# Add creators to the download queue
+ktoolbox queue-add https://kemono.su/fanbox/user/9016 --length=10
+ktoolbox queue-add --service patreon --creator_id 12345 --save_creator_indices
+
+# List all creators in queue
+ktoolbox queue-list
+
+# Remove a creator from queue (by index)
+ktoolbox queue-remove 0
+
+# Process all creators in queue
+ktoolbox queue-run
+
+# Clear the entire queue
+ktoolbox queue-clear
+```
+
+The queue system is particularly useful for downloading multiple large creators, 
+as each creator download can take hours to complete. You can queue them up during 
+the day and run the entire queue overnight.
+
 ### iOS Shortcuts
 
 Goto [Shortcuts for iOS](https://ktoolbox.readthedocs.io/latest/shortcut/) page for more details.
