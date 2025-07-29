@@ -26,7 +26,9 @@
     ```
   - 📖More information: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
 
-[//]: # (### 🪲 Fix)
+### 🪲 Fix
+
+- Removed the deprecated configuration `job.post_structure.content_filepath`, use `job.post_structure.content` instead
 
 - - -
 
@@ -54,7 +56,9 @@
     ```
   - 📖更多信息：[配置参考-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
     
-[//]: # (### 🪲 修复)
+### 🪲 修复
+
+- 移除了过时的配置 `job.post_structure.content_filepath`，请用 `job.post_structure.content` 代替
 
 ## Upgrade
 

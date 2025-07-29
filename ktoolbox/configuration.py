@@ -134,7 +134,6 @@ class PostStructureConfiguration(BaseModel):
 
     :ivar attachments: Sub path of attachment directory
     :ivar content: Sub path of post content file
-    :ivar content_filepath: (**Deprecated**, Use ``content`` instead) Sub path of post content file
     :ivar external_links: Sub path of external links file (for cloud storage links found in content)
     :ivar file: The format of the post `file` filename (`file` is not `attachment`, each post has only one `file`, usually the cover image) \
     Customize the filename format by inserting an empty ``{}`` to represent the basic filename. \
@@ -145,19 +144,9 @@ class PostStructureConfiguration(BaseModel):
     """
     attachments: Path = Path("attachments")
     content: Path = Path("content.txt")
-    content_filepath: Path = Path("content.txt")
     external_links: Path = Path("external_links.txt")
     file: str = "{id}_{}"
     revisions: Path = Path("revisions")
-
-    @validator("content_filepath")
-    def content_filepath_validator(cls, v):
-        if v != cls.__fields__["content_filepath"].default:
-            warnings.warn(
-                "`PostStructureConfiguration.content_filepath` is deprecated and is scheduled for removal in further version. "
-                "Use `PostStructureConfiguration.content` instead",
-                FutureWarning
-            )
 
 
 class JobConfiguration(BaseModel):
