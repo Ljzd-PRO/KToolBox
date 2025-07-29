@@ -1,8 +1,8 @@
-from pydantic import BaseModel, RootModel
 from typing import List
 
 from ktoolbox.api import BaseAPI, APIRet
 from ktoolbox.api.model import Revision
+from ktoolbox.model import RootModel
 
 __all__ = ["GetPostRevisions", "get_post_revisions"]
 
@@ -28,7 +28,7 @@ class GetPostRevisions(BaseAPI):
             creator_id=creator_id,
             post_id=post_id
         )
-        
+
         return await cls.request(path=path)
 
 
