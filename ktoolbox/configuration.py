@@ -4,7 +4,7 @@ import os
 import tempfile
 import warnings
 from pathlib import Path
-from typing import Literal, Union, Optional, Set, ClassVar
+from typing import Literal, Union, Optional, Set, ClassVar, Dict
 
 from loguru import logger
 from pydantic import BaseModel, model_validator, Field, field_validator
@@ -137,11 +137,13 @@ class PostStructureConfiguration(BaseModel):
     You can use some of the [properties][ktoolbox.configuration.JobConfiguration] \
     in Post. For example: ``{title}_{}`` could result in filenames like \
     ``TheTitle_Stelle_lv5_logo.gif``, ``TheTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``, etc.
+    :ivar revisions: Sub path of revisions directory
     """
     attachments: Path = Path("attachments")
     content: Path = Path("content.txt")
     content_filepath: Path = Path("content.txt")
     file: str = "{id}_{}"
+    revisions: Path = Path("revisions")
 
     @field_validator("content_filepath")
     def content_filepath_validator(cls, v):
@@ -171,6 +173,7 @@ class JobConfiguration(BaseModel):
         | ``edited``    | Date   |
 
     :ivar count: Number of coroutines for concurrent download
+    :ivar include_revisions: Include and download revision posts when available
     :ivar post_dirname_format: Customize the post directory name format, you can use some of the \
     [properties][ktoolbox.configuration.JobConfiguration] in ``Post``. \
     e.g. ``[{published}]{id}`` > ``[2024-1-1]123123``, ``{user}_{published}_{title}`` > ``234234_2024-1-1_TheTitle``
@@ -188,6 +191,7 @@ class JobConfiguration(BaseModel):
     :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``
     """
     count: int = 4
+    include_revisions: bool = False
     post_dirname_format: str = "{title}"
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
     mix_posts: bool = False
