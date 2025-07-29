@@ -116,9 +116,7 @@ async def create_job_from_post(
 
     # Extract and write external links file
     if config.job.extract_external_links and external_links_path and post.content:
-        # Use custom patterns if any are configured, otherwise use defaults
-        custom_patterns = config.job.external_link_patterns if config.job.external_link_patterns else None
-        external_links = extract_external_links(post.content, custom_patterns)
+        external_links = extract_external_links(post.content, config.job.external_link_patterns)
         if external_links:
             async with aiofiles.open(external_links_path, "w", encoding=config.downloader.encoding) as f:
                 # Write each link on a separate line

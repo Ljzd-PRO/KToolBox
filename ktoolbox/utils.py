@@ -134,7 +134,7 @@ def uvloop_init() -> bool:
     return False
 
 
-def extract_external_links(content: str, custom_patterns: Optional[Set[str]] = None) -> Set[str]:
+def extract_external_links(content: str, custom_patterns: Optional[List[str]] = None) -> Set[str]:
     """
     Extract external file sharing links from text content.
 
@@ -147,65 +147,13 @@ def extract_external_links(content: str, custom_patterns: Optional[Set[str]] = N
     - And other common file hosting services
 
     :param content: Text content to extract links from
-    :param custom_patterns: Custom regex patterns to use. If None or empty, uses default patterns.
+    :param custom_patterns: Custom regex patterns to use.
     :return: Set of unique external links found
     """
     if not content:
         return set()
 
-    # Use custom patterns if provided (even if empty), otherwise use default patterns
-    if custom_patterns is not None:
-        external_link_patterns = list(custom_patterns)
-    else:
-        # Define default patterns for common external file sharing services
-        external_link_patterns = [
-        # Google Drive
-        r'https?://drive\.google\.com/[^\s]+',
-        r'https?://docs\.google\.com/[^\s]+',
-
-        # MEGA
-        r'https?://mega\.nz/[^\s]+',
-        r'https?://mega\.co\.nz/[^\s]+',
-
-        # Dropbox
-        r'https?://(?:www\.)?dropbox\.com/[^\s]+',
-        r'https?://db\.tt/[^\s]+',
-
-        # OneDrive
-        r'https?://onedrive\.live\.com/[^\s]+',
-        r'https?://1drv\.ms/[^\s]+',
-
-        # MediaFire
-        r'https?://(?:www\.)?mediafire\.com/[^\s]+',
-
-        # WeTransfer
-        r'https?://(?:www\.)?wetransfer\.com/[^\s]+',
-        r'https?://we\.tl/[^\s]+',
-
-        # SendSpace
-        r'https?://(?:www\.)?sendspace\.com/[^\s]+',
-
-        # 4shared
-        r'https?://(?:www\.)?4shared\.com/[^\s]+',
-
-        # Zippyshare
-        r'https?://(?:www\.)?zippyshare\.com/[^\s]+',
-
-        # Uploadfiles.io
-        r'https?://(?:www\.)?uploadfiles\.io/[^\s]+',
-
-        # Box
-        r'https?://(?:www\.)?box\.com/[^\s]+',
-
-        # pCloud
-        r'https?://(?:www\.)?pcloud\.com/[^\s]+',
-
-        # Yandex Disk
-        r'https?://disk\.yandex\.[a-z]+/[^\s]+',
-
-        # Generic patterns for other file hosting services
-        r'https?://[^\s]*(?:file|upload|share|download|drive|storage)[^\s]*\.[a-z]{2,4}/[^\s]+',
-    ]
+    external_link_patterns = custom_patterns if custom_patterns is not None else []
 
     links = set()
 
