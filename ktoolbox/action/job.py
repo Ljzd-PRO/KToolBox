@@ -51,6 +51,7 @@ async def create_job_from_post(
 
     # Filter and create jobs for ``Post.attachment``
     jobs: List[Job] = []
+    file_counter = 0  # Unified counter for both attachments and content images
     for i, attachment in enumerate(post.attachments):  # type: int, Attachment
         if not attachment.path:
             continue
@@ -68,7 +69,8 @@ async def create_job_from_post(
                 config.job.block_list
             )
         ):
-            basic_filename = f"{i + 1}{file_path_obj.suffix}" if config.job.sequential_filename else file_path_obj.name
+            file_counter += 1
+            basic_filename = f"{file_counter}{file_path_obj.suffix}" if config.job.sequential_filename else file_path_obj.name
             alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
             jobs.append(
                 Job(
@@ -108,7 +110,6 @@ async def create_job_from_post(
     # Filter and create jobs for images in ``Post.content``
     if post.content:
         content_image_sources = extract_content_images(post.content)
-        content_image_counter = 0
         for image_src in content_image_sources:
             if not image_src or not image_src.strip():
                 continue
@@ -126,20 +127,18 @@ async def create_job_from_post(
             
             if not image_path or not image_path.strip():
                 continue
-            
-            content_image_counter += 1
                 
             # Generate filename from the image path
             image_file_path = Path(image_path)
+            
+            # Apply allow/block list filtering first (before incrementing counter)
             if config.job.sequential_filename:
-                # Use content prefix to distinguish from attachment files
-                basic_filename = f"content_{content_image_counter}{image_file_path.suffix}"
+                basic_filename = f"{file_counter + 1}{image_file_path.suffix}"
             else:
                 basic_filename = image_file_path.name
             
             alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
             
-            # Apply allow/block list filtering
             if (not config.job.allow_list or any(
                     map(
                         lambda x: fnmatch(alt_filename, x),
@@ -151,6 +150,12 @@ async def create_job_from_post(
                     config.job.block_list
                 )
             ):
+                file_counter += 1
+                # Regenerate filename with correct counter
+                if config.job.sequential_filename:
+                    basic_filename = f"{file_counter}{image_file_path.suffix}"
+                    alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
+                
                 jobs.append(
                     Job(
                         path=attachments_path,

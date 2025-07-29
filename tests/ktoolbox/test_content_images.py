@@ -75,14 +75,14 @@ class TestContentImageParsing:
             # Should have 2 content image jobs
             assert len(jobs) == 2
             
-            content_jobs = [job for job in jobs if "content_" in job.alt_filename]
-            assert len(content_jobs) == 2
+            # All jobs should be content image jobs
+            assert len(jobs) == 2
             
-            # Check filenames and paths
-            assert content_jobs[0].alt_filename == "content_1.png"
-            assert content_jobs[0].server_path == "/e9/a1/test.png"
-            assert content_jobs[1].alt_filename == "content_2.jpg"
-            assert content_jobs[1].server_path == "/another/image.jpg"
+            # Check filenames and paths (unified counter, no content_ prefix)
+            assert jobs[0].alt_filename == "1.png"
+            assert jobs[0].server_path == "/e9/a1/test.png"
+            assert jobs[1].alt_filename == "2.jpg"
+            assert jobs[1].server_path == "/another/image.jpg"
             
         finally:
             config.job.sequential_filename = original_sequential
@@ -112,19 +112,16 @@ class TestContentImageParsing:
             # Should have 1 attachment + 1 content image = 2 jobs
             assert len(jobs) == 2
             
-            attachment_jobs = [job for job in jobs if not "content_" in job.alt_filename]
-            content_jobs = [job for job in jobs if "content_" in job.alt_filename]
+            # Sort jobs by filename to ensure consistent ordering for testing
+            jobs_sorted = sorted(jobs, key=lambda x: x.alt_filename)
             
-            assert len(attachment_jobs) == 1
-            assert len(content_jobs) == 1
+            # Check attachment job (should be numbered 1)
+            assert jobs_sorted[0].alt_filename == "1.jpg"
+            assert jobs_sorted[0].server_path == "/attachments/file1.jpg"
             
-            # Check attachment job
-            assert attachment_jobs[0].alt_filename == "1.jpg"
-            assert attachment_jobs[0].server_path == "/attachments/file1.jpg"
-            
-            # Check content image job
-            assert content_jobs[0].alt_filename == "content_1.png"
-            assert content_jobs[0].server_path == "/content/image1.png"
+            # Check content image job (should be numbered 2, following attachment)
+            assert jobs_sorted[1].alt_filename == "2.png"
+            assert jobs_sorted[1].server_path == "/content/image1.png"
             
         finally:
             config.job.sequential_filename = original_sequential
