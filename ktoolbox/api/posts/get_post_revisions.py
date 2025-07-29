@@ -11,8 +11,8 @@ class GetPostRevisions(BaseAPI):
     path = "/{service}/user/{creator_id}/post/{post_id}/revisions"
     method = "get"
 
-    class Response(RootModel):
-        root: List[Revision]
+    class Response(RootModel[List[Revision]]):
+        __root__: List[Revision]
 
     @classmethod
     async def __call__(cls, service: str, creator_id: str, post_id: str) -> APIRet[Response]:
