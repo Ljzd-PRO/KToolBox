@@ -1,14 +1,29 @@
 # FAQ
 
-## How to solve the failure of uvloop installation?
+## How to solve the failure of uvloop/winloop installation?
 
 !!! info "It's optional"
-    uvloop can improve concurrent performance, but it's **optional**. 
-    If you don't want to install uvloop, you can ignore this step.
+    Event loop optimization (uvloop/winloop) can improve concurrent performance, but it's **optional**. 
+    If you don't want to install these packages, you can ignore this step.
 
-On **Windows**, uvloop is **not supported**. If you failed installing uvloop on Linux or macOS, 
-you can try to install it with system package manager like **apt**, **yum** or **brew**, 
-pacakge managers provide prebuilt wheels for uvloop.
+KToolBox now supports platform-specific event loop optimization:
+
+- **Windows**: Uses `winloop` for improved performance
+- **Linux/macOS**: Uses `uvloop` for improved performance
+
+### Installing event loop optimizations
+
+=== "Windows"
+    ```bash
+    pip install ktoolbox[winloop]
+    ```
+
+=== "Linux/macOS"
+    ```bash
+    pip install ktoolbox[uvloop]
+    ```
+
+If you failed installing uvloop on Linux or macOS, you can try to install it with system package manager like **apt**, **yum** or **brew**, as package managers provide prebuilt wheels for uvloop.
 
 - Install with apt
     ```bash
