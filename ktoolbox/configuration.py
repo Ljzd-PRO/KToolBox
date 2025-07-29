@@ -4,7 +4,7 @@ import os
 import tempfile
 import warnings
 from pathlib import Path
-from typing import Literal, Union, Optional, Set, ClassVar
+from typing import Literal, Union, Optional, Set, ClassVar, List
 
 from loguru import logger
 from pydantic import BaseModel, model_validator, Field, field_validator
@@ -189,6 +189,7 @@ class JobConfiguration(BaseModel):
     :ivar allow_list: Download files which match these patterns (Unix shell-style), e.g. ``["*.png"]``
     :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``
     :ivar extract_external_links: Extract external file sharing links from post content and save to separate file
+    :ivar external_link_patterns: Regex patterns for extracting external links.
     """
     count: int = 4
     post_dirname_format: str = "{title}"
@@ -201,6 +202,54 @@ class JobConfiguration(BaseModel):
     # noinspection PyDataclass
     block_list: Set[str] = Field(default_factory=set)
     extract_external_links: bool = True
+    external_link_patterns: List[str] = [
+        # Google Drive
+        r'https?://drive\.google\.com/[^\s]+',
+        r'https?://docs\.google\.com/[^\s]+',
+
+        # MEGA
+        r'https?://mega\.nz/[^\s]+',
+        r'https?://mega\.co\.nz/[^\s]+',
+
+        # Dropbox
+        r'https?://(?:www\.)?dropbox\.com/[^\s]+',
+        r'https?://db\.tt/[^\s]+',
+
+        # OneDrive
+        r'https?://onedrive\.live\.com/[^\s]+',
+        r'https?://1drv\.ms/[^\s]+',
+
+        # MediaFire
+        r'https?://(?:www\.)?mediafire\.com/[^\s]+',
+
+        # WeTransfer
+        r'https?://(?:www\.)?wetransfer\.com/[^\s]+',
+        r'https?://we\.tl/[^\s]+',
+
+        # SendSpace
+        r'https?://(?:www\.)?sendspace\.com/[^\s]+',
+
+        # 4shared
+        r'https?://(?:www\.)?4shared\.com/[^\s]+',
+
+        # Zippyshare
+        r'https?://(?:www\.)?zippyshare\.com/[^\s]+',
+
+        # Uploadfiles.io
+        r'https?://(?:www\.)?uploadfiles\.io/[^\s]+',
+
+        # Box
+        r'https?://(?:www\.)?box\.com/[^\s]+',
+
+        # pCloud
+        r'https?://(?:www\.)?pcloud\.com/[^\s]+',
+
+        # Yandex Disk
+        r'https?://disk\.yandex\.[a-z]+/[^\s]+',
+
+        # Generic patterns for other file hosting services
+        r'https?://[^\s]*(?:file|upload|share|download|drive|storage)[^\s]*\.[a-z]{2,4}/[^\s]+',
+    ]
 
 
 class LoggerConfiguration(BaseModel):

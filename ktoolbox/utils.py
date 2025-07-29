@@ -134,10 +134,10 @@ def uvloop_init() -> bool:
     return False
 
 
-def extract_external_links(content: str) -> Set[str]:
+def extract_external_links(content: str, custom_patterns: Optional[List[str]] = None) -> Set[str]:
     """
     Extract external file sharing links from text content.
-    
+
     Targets common cloud storage and file sharing services like:
     - Google Drive
     - MEGA
@@ -145,80 +145,33 @@ def extract_external_links(content: str) -> Set[str]:
     - OneDrive
     - MediaFire
     - And other common file hosting services
-    
+
     :param content: Text content to extract links from
+    :param custom_patterns: Custom regex patterns to use.
     :return: Set of unique external links found
     """
     if not content:
         return set()
-        
-    # Define patterns for common external file sharing services
-    external_link_patterns = [
-        # Google Drive
-        r'https?://drive\.google\.com/[^\s]+',
-        r'https?://docs\.google\.com/[^\s]+',
-        
-        # MEGA
-        r'https?://mega\.nz/[^\s]+',
-        r'https?://mega\.co\.nz/[^\s]+',
-        
-        # Dropbox
-        r'https?://(?:www\.)?dropbox\.com/[^\s]+',
-        r'https?://db\.tt/[^\s]+',
-        
-        # OneDrive
-        r'https?://onedrive\.live\.com/[^\s]+',
-        r'https?://1drv\.ms/[^\s]+',
-        
-        # MediaFire
-        r'https?://(?:www\.)?mediafire\.com/[^\s]+',
-        
-        # WeTransfer
-        r'https?://(?:www\.)?wetransfer\.com/[^\s]+',
-        r'https?://we\.tl/[^\s]+',
-        
-        # SendSpace
-        r'https?://(?:www\.)?sendspace\.com/[^\s]+',
-        
-        # 4shared
-        r'https?://(?:www\.)?4shared\.com/[^\s]+',
-        
-        # Zippyshare
-        r'https?://(?:www\.)?zippyshare\.com/[^\s]+',
-        
-        # Uploadfiles.io
-        r'https?://(?:www\.)?uploadfiles\.io/[^\s]+',
-        
-        # Box
-        r'https?://(?:www\.)?box\.com/[^\s]+',
-        
-        # pCloud
-        r'https?://(?:www\.)?pcloud\.com/[^\s]+',
-        
-        # Yandex Disk
-        r'https?://disk\.yandex\.[a-z]+/[^\s]+',
-        
-        # Generic patterns for other file hosting services
-        r'https?://[^\s]*(?:file|upload|share|download|drive|storage)[^\s]*\.[a-z]{2,4}/[^\s]+',
-    ]
-    
+
+    external_link_patterns = custom_patterns if custom_patterns is not None else []
+
     links = set()
-    
+
     # Combine all patterns
     combined_pattern = '|'.join(f'({pattern})' for pattern in external_link_patterns)
-    
+
     # Find all matches
     matches = re.finditer(combined_pattern, content, re.IGNORECASE)
-    
+
     for match in matches:
         # Get the full matched URL
         url = match.group(0)
-        
+
         # Clean up common trailing punctuation that might be part of text
         url = re.sub(r'[.,;!?)\]}>"\'\s]+$', '', url)
-        
+
         # Validate that it looks like a proper URL
         if len(url) > 10 and '.' in url:
             links.add(url)
-    
+
     return links
