@@ -5,7 +5,7 @@ import os
 import tempfile
 import warnings
 from pathlib import Path
-from typing import Literal, Union, Optional, Any, Set
+from typing import Literal, Union, Optional, Any, Set, List
 
 from loguru import logger
 from pydantic import BaseModel, BaseSettings, validator, Field
