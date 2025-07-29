@@ -135,6 +135,7 @@ class PostStructureConfiguration(BaseModel):
     :ivar attachments: Sub path of attachment directory
     :ivar content: Sub path of post content file
     :ivar content_filepath: (**Deprecated**, Use ``content`` instead) Sub path of post content file
+    :ivar external_links: Sub path of external links file (for cloud storage links found in content)
     :ivar file: The format of the post `file` filename (`file` is not `attachment`, each post has only one `file`, usually the cover image) \
     Customize the filename format by inserting an empty ``{}`` to represent the basic filename. \
     You can use some of the [properties][ktoolbox.configuration.JobConfiguration] \
@@ -145,6 +146,7 @@ class PostStructureConfiguration(BaseModel):
     attachments: Path = Path("attachments")
     content: Path = Path("content.txt")
     content_filepath: Path = Path("content.txt")
+    external_links: Path = Path("external_links.txt")
     file: str = "{id}_{}"
     revisions: Path = Path("revisions")
 
@@ -191,6 +193,8 @@ class JobConfiguration(BaseModel):
     ``[{published}]_{}`` could result in filenames like ``[2024-1-1]_1.png``, ``[2024-1-1]_2.png``, etc.
     :ivar allow_list: Download files which match these patterns (Unix shell-style), e.g. ``["*.png"]``
     :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``
+    :ivar extract_external_links: Extract external file sharing links from post content and save to separate file
+    :ivar external_link_patterns: Regex patterns for extracting external links.
     """
     count: int = 4
     include_revisions: bool = False
@@ -201,9 +205,62 @@ class JobConfiguration(BaseModel):
     filename_format: str = "{}"
     allow_list: Set[str] = Field(default_factory=set)
     block_list: Set[str] = Field(default_factory=set)
+    extract_external_links: bool = True
+    external_link_patterns: List[str] = [
+        # Google Drive
+        r'https?://drive\.google\.com/[^\s]+',
+        r'https?://docs\.google\.com/[^\s]+',
+
+        # MEGA
+        r'https?://mega\.nz/[^\s]+',
+        r'https?://mega\.co\.nz/[^\s]+',
+
+        # Dropbox
+        r'https?://(?:www\.)?dropbox\.com/[^\s]+',
+        r'https?://db\.tt/[^\s]+',
+
+        # OneDrive
+        r'https?://onedrive\.live\.com/[^\s]+',
+        r'https?://1drv\.ms/[^\s]+',
+
+        # MediaFire
+        r'https?://(?:www\.)?mediafire\.com/[^\s]+',
+
+        # WeTransfer
+        r'https?://(?:www\.)?wetransfer\.com/[^\s]+',
+        r'https?://we\.tl/[^\s]+',
+
+        # SendSpace
+        r'https?://(?:www\.)?sendspace\.com/[^\s]+',
+
+        # 4shared
+        r'https?://(?:www\.)?4shared\.com/[^\s]+',
+
+        # Zippyshare
+        r'https?://(?:www\.)?zippyshare\.com/[^\s]+',
+
+        # Uploadfiles.io
+        r'https?://(?:www\.)?uploadfiles\.io/[^\s]+',
+
+        # Box
+        r'https?://(?:www\.)?box\.com/[^\s]+',
+
+        # pCloud
+        r'https?://(?:www\.)?pcloud\.com/[^\s]+',
+
+        # Yandex Disk
+        r'https?://disk\.yandex\.[a-z]+/[^\s]+',
+
+        # Generic patterns for other file hosting services
+        r'https?://[^\s]*(?:file|upload|share|download|drive|storage)[^\s]*\.[a-z]{2,4}/[^\s]+',
+    ]
 
     @validator("allow_list", "block_list", pre=True)
     def allow_block_list_validator(cls, v):
+        return set(json.loads(v))
+
+    @validator("external_link_patterns", pre=True)
+    def external_link_patterns_validator(cls, v):
         return set(json.loads(v))
 
 
