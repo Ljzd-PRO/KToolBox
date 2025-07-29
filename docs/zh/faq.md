@@ -1,11 +1,28 @@
 # 常见问题
 
-## 如何解决 uvloop 安装失败的问题？
+## 如何解决 uvloop/winloop 安装失败的问题？
 
 !!! info "这是可选的"
-    uvloop 可以提高并发性能，但它是 **可选的**。如果你不想安装 uvloop，你可以跳过这个步骤。
+    事件循环优化（uvloop/winloop）可以提高并发性能，但它是 **可选的**。如果你不想安装这些包，你可以跳过这个步骤。
 
-uvloop 在 **Windows** 上 **不受支持**。如果你在 Linux 或 macOS 安装失败， 
+KToolBox 现在支持平台特定的事件循环优化：
+
+- **Windows**: 使用 `winloop` 来提升性能
+- **Linux/macOS**: 使用 `uvloop` 来提升性能
+
+### 安装事件循环优化
+
+=== "Windows"
+    ```bash
+    pip install ktoolbox[winloop]
+    ```
+
+=== "Linux/macOS"
+    ```bash
+    pip install ktoolbox[uvloop]
+    ```
+
+如果你在 Linux 或 macOS 安装 uvloop 失败， 
 你可以尝试用例如 **apt**、**yum**、**brew** 的系统包管理器安装，包管理器提供构建好的 uvloop 包。
 
 - 使用 apt 安装

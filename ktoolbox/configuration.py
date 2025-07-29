@@ -223,9 +223,10 @@ class Configuration(BaseSettings):
     :ivar logger: Logger configuration
     :ivar ssl_verify: Enable SSL certificate verification for Kemono API server and download server
     :ivar json_dump_indent: Indent of JSON file dump
-    :ivar use_uvloop: Use uvloop for asyncio (Disabled on Windows by default) \
-    uvloop will improve concurrent performance, but it is not compatible with Windows. \
-    Install uvloop by `pip install ktoolbox[uvloop]` or it will not work.
+    :ivar use_uvloop: Use uvloop/winloop for asyncio performance optimization \
+    Uses winloop on Windows and uvloop on Unix-like systems for better concurrent performance. \
+    Install winloop on Windows with `pip install ktoolbox[winloop]` \
+    or uvloop on Unix with `pip install ktoolbox[uvloop]`.
     """
     api: APIConfiguration = APIConfiguration()
     downloader: DownloaderConfiguration = DownloaderConfiguration()
