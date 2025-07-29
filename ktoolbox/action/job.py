@@ -13,6 +13,7 @@ from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.action import ActionRet, fetch_creator_posts, FetchInterruptError
 from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date, generate_filename
 from ktoolbox.api.model import Post, Attachment
+from ktoolbox.api.posts import get_post_revisions as get_post_revisions_api
 from ktoolbox.configuration import config, PostStructureConfiguration
 from ktoolbox.job import Job, CreatorIndices
 
@@ -35,7 +36,7 @@ async def create_job_from_post(
      ``True`` & ``None`` -> ``config.job.post_structure``
     :param dump_post_data: Whether to dump post data (post.json) in post directory
     """
-    post_path.mkdir(exist_ok=True)
+    post_path.mkdir(parents=True, exist_ok=True)
 
     # Load ``PostStructureConfiguration``
     if post_structure in [True, None]:
@@ -198,11 +199,34 @@ async def create_job_from_creator(
         # Get post path
         post_path = path if mix_posts else path / generate_post_path_name(post)
 
-        # Generate jobs
+        # Generate jobs for the main post
         job_list += await create_job_from_post(
             post=post,
             post_path=post_path,
             post_structure=False if mix_posts else None,
             dump_post_data=not mix_posts
         )
+        
+        # If include_revisions is enabled, fetch and download revisions for this post
+        if config.job.include_revisions and not mix_posts:
+            try:
+                revisions_ret = await get_post_revisions_api(
+                    service=service,
+                    creator_id=creator_id,
+                    post_id=post.id
+                )
+                if revisions_ret and revisions_ret.data.revisions:
+                    for revision in revisions_ret.data.revisions:
+                        if revision.revision_id:  # Only process actual revisions
+                            revision_path = post_path / "revision" / str(revision.revision_id)
+                            revision_jobs = await create_job_from_post(
+                                post=revision,
+                                post_path=revision_path,
+                                post_structure=None,
+                                dump_post_data=True
+                            )
+                            job_list += revision_jobs
+            except Exception as e:
+                logger.warning(f"Failed to fetch revisions for post {post.id}: {e}")
+        
     return ActionRet(data=job_list)
