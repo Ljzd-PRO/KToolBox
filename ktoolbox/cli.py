@@ -11,7 +11,7 @@ from ktoolbox._enum import TextEnum
 from ktoolbox.action import create_job_from_post, create_job_from_creator, generate_post_path_name
 from ktoolbox.action import search_creator as search_creator_action, search_creator_post as search_creator_post_action
 from ktoolbox.api.misc import get_app_version
-from ktoolbox.api.posts import get_post as get_post_api
+from ktoolbox.api.posts import get_post as get_post_api, get_post_revisions as get_post_revisions_api
 from ktoolbox.configuration import config
 from ktoolbox.job import JobRunner
 from ktoolbox.utils import dump_search, parse_webpage_url, generate_msg
@@ -101,20 +101,22 @@ class KToolBoxCli:
             return ret.message
 
     @staticmethod
-    async def get_post(service: str, creator_id: str, post_id: str, *, dump: Path = None):
+    async def get_post(service: str, creator_id: str, post_id: str, revision_id: str = None, *, dump: Path = None):
         """
-        Get a specific post
+        Get a specific post or revision
 
         :param service: The service name
         :param creator_id: The creator's ID
         :param post_id: The post ID
+        :param revision_id: The revision ID (optional, for revision posts)
         :param dump: Dump the result to a JSON file
         """
         logger.info(repr(config))
         ret = await get_post_api(
             service=service,
             creator_id=creator_id,
-            post_id=post_id
+            post_id=post_id,
+            revision_id=revision_id
         )
         if ret:
             if dump:
@@ -142,6 +144,7 @@ class KToolBoxCli:
             service: str,
             creator_id: str,
             post_id: str,
+            revision_id: str = None,
             path: Union[Path, str] = Path("."),
             *,
             dump_post_data=True
@@ -154,24 +157,26 @@ class KToolBoxCli:
             service: str = None,
             creator_id: str = None,
             post_id: str = None,
+            revision_id: str = None,
             path: Union[Path, str] = Path("."),
             *,
             dump_post_data=True
     ):
         """
-        Download a specific post
+        Download a specific post or revision
 
         :param url: The post URL
         :param service: The service name
         :param creator_id: The creator's ID
         :param post_id: The post ID
+        :param revision_id: The revision ID (optional, for revision posts)
         :param path: Download path, default is current directory
         :param dump_post_data: Whether to dump post data (post.json) in post directory
         """
         logger.info(repr(config))
-        # Get service, creator_id, post_id
+        # Get service, creator_id, post_id, revision_id
         if url:
-            service, creator_id, post_id = parse_webpage_url(url)
+            service, creator_id, post_id, revision_id = parse_webpage_url(url)
         if not all([service, creator_id, post_id]):
             return generate_msg(
                 TextEnum.MissingParams.value,
@@ -184,15 +189,39 @@ class KToolBoxCli:
         ret = await get_post_api(
             service=service,
             creator_id=creator_id,
-            post_id=post_id
+            post_id=post_id,
+            revision_id=revision_id
         )
         if ret:
             post_path = path / generate_post_path_name(ret.data.post)
+            
+            # For revision posts, create a revision subfolder
+            if revision_id:
+                post_path = post_path / "revision" / revision_id
+                
+            # Download the main post
             job_list = await create_job_from_post(
                 post=ret.data.post,
                 post_path=post_path,
                 dump_post_data=dump_post_data
             )
+            
+            # If include_revisions is enabled and we have revisions data
+            if (config.job.include_revisions and
+                ret.data.props and 
+                ret.data.props.revisions and 
+                not revision_id):  # Don't process revisions if we're already downloading a specific revision
+                
+                for revision_order, revision_data in ret.data.props.revisions:
+                    if revision_data.revision_id:  # Only process actual revisions, not the main post
+                        revision_path = post_path / "revision" / str(revision_data.revision_id)
+                        revision_jobs = await create_job_from_post(
+                            post=revision_data,
+                            post_path=revision_path,
+                            dump_post_data=dump_post_data
+                        )
+                        job_list.extend(revision_jobs)
+            
             job_runner = JobRunner(job_list=job_list)
             await job_runner.start()
         else:
@@ -266,7 +295,7 @@ class KToolBoxCli:
         logger.info(repr(config))
         # Get service, creator_id
         if url:
-            service, creator_id, _ = parse_webpage_url(url)
+            service, creator_id, _, _ = parse_webpage_url(url)
         if not all([service, creator_id]):
             return generate_msg(
                 TextEnum.MissingParams.value,

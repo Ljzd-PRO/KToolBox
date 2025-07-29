@@ -89,23 +89,28 @@ async def dump_search(result: List[BaseModel], path: Path):
         )
 
 
-def parse_webpage_url(url: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+def parse_webpage_url(url: str) -> Tuple[Optional[str], Optional[str], Optional[str], Optional[str]]:
     # noinspection SpellCheckingInspection
     """
-    Fetch **service**, **user_id**, **post_id** from webpage url
+    Fetch **service**, **user_id**, **post_id**, **revision_id** from webpage url
 
     Each part can be ``None`` if not found in url.
 
     :param url: Kemono Webpage url
-    :return: Tuple of **service**, **user_id**, **post_id**
+    :return: Tuple of **service**, **user_id**, **post_id**, **revision_id**
     """
     path_url = Path(url)
     parts = path_url.parts
-    if (url_parts_len := len(parts)) < 7:
-        # Pad to full size
-        parts += tuple(None for _ in range(7 - url_parts_len))
-    _scheme, _netloc, service, _user_key, user_id, _post_key, post_id = parts
-    return service, user_id, post_id
+    if (url_parts_len := len(parts)) < 9:
+        # Pad to full size (now supporting revision URLs)
+        parts += tuple(None for _ in range(9 - url_parts_len))
+    _scheme, _netloc, service, _user_key, user_id, _post_key, post_id, _revision_key, revision_id = parts
+    
+    # Only return revision_id if we have the revision keyword
+    if _revision_key != "revision":
+        revision_id = None
+    
+    return service, user_id, post_id, revision_id
 
 
 def uvloop_init() -> bool:
