@@ -68,7 +68,12 @@ async def create_job_from_post(
                 config.job.block_list
             )
         ):
-            basic_filename = f"{i + 1}{file_path_obj.suffix}" if config.job.sequential_filename else file_path_obj.name
+            if config.job.sequential_filename:
+                basic_filename = f"{i + 1}{file_path_obj.suffix}"
+            elif config.job.prefix_sequence_to_filename:
+                basic_filename = f"{i + 1}_{file_path_obj.name}"
+            else:
+                basic_filename = file_path_obj.name
             alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
             jobs.append(
                 Job(

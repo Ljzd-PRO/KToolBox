@@ -178,6 +178,9 @@ class JobConfiguration(BaseModel):
     :ivar mix_posts: Save all files from different posts at same path in creator directory. \
     It would not create any post directory, and ``CreatorIndices`` would not been recorded.
     :ivar sequential_filename: Rename attachments in numerical order, e.g. ``1.png``, ``2.png``, ...
+    :ivar prefix_sequence_to_filename: Prefix attachments with sequence numbers while preserving original filename, \
+    e.g. ``1_image.png``, ``2_image.png``, ... This option helps avoid filename conflicts while keeping the original filename information. \
+    When both ``sequential_filename`` and ``prefix_sequence_to_filename`` are enabled, ``sequential_filename`` takes precedence.
     :ivar filename_format: Customize the filename format by inserting an empty ``{}`` to represent the basic filename.
     Similar to post_dirname_format, you can use some of the [properties][ktoolbox.configuration.JobConfiguration] \
     in Post. For example: ``{title}_{}`` could result in filenames like \
@@ -192,6 +195,7 @@ class JobConfiguration(BaseModel):
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
     mix_posts: bool = False
     sequential_filename: bool = False
+    prefix_sequence_to_filename: bool = False
     filename_format: str = "{}"
     # noinspection PyDataclass
     allow_list: Set[str] = Field(default_factory=set)
