@@ -1,4 +1,5 @@
 from datetime import datetime
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Optional, List, Generator, Any, Tuple
 
@@ -9,7 +10,7 @@ from ktoolbox.api.model import Post
 from ktoolbox.configuration import config
 from ktoolbox.job import CreatorIndices
 
-__all__ = ["generate_post_path_name", "generate_filename", "filter_posts_by_date", "filter_posts_by_indices"]
+__all__ = ["generate_post_path_name", "generate_filename", "filter_posts_by_date", "filter_posts_by_indices", "extract_content_images"]
 
 TIME_FORMAT = "%Y-%m-%d"
 
@@ -115,3 +116,37 @@ def filter_posts_by_indices(posts: List[Post], indices: CreatorIndices) -> Tuple
     for post in new_list:
         new_indices.posts[post.id] = post
     return new_list, new_indices
+
+
+class _ContentImageParser(HTMLParser):
+    """HTML parser to extract image sources from content"""
+    
+    def __init__(self):
+        super().__init__()
+        self.image_sources = []
+    
+    def handle_starttag(self, tag: str, attrs: List[Tuple[str, Optional[str]]]):
+        if tag.lower() == 'img':
+            for attr_name, attr_value in attrs:
+                if attr_name.lower() == 'src' and attr_value:
+                    self.image_sources.append(attr_value)
+
+
+def extract_content_images(content: str) -> List[str]:
+    """
+    Extract image sources from HTML content
+    
+    :param content: HTML content string
+    :return: List of image source URLs/paths
+    """
+    if not content:
+        return []
+    
+    parser = _ContentImageParser()
+    try:
+        parser.feed(content)
+    except Exception as e:
+        logger.warning(f"Failed to parse HTML content for images: {e}")
+        return []
+    
+    return parser.image_sources

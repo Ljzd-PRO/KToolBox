@@ -11,7 +11,7 @@ from pathvalidate import sanitize_filename, is_valid_filename
 
 from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.action import ActionRet, fetch_creator_posts, FetchInterruptError
-from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date, generate_filename
+from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date, generate_filename, extract_content_images
 from ktoolbox.api.model import Post, Attachment
 from ktoolbox.configuration import config, PostStructureConfiguration
 from ktoolbox.job import Job, CreatorIndices
@@ -104,6 +104,58 @@ async def create_job_from_post(
                     type=PostFileTypeEnum.File
                 )
             )
+
+    # Filter and create jobs for images in ``Post.content``
+    if post.content:
+        content_image_sources = extract_content_images(post.content)
+        for i, image_src in enumerate(content_image_sources):
+            if not image_src:
+                continue
+            
+            # Handle relative paths by making them absolute
+            if image_src.startswith('/'):
+                # Relative path - construct full URL
+                image_path = image_src
+            elif image_src.startswith('http'):
+                # Absolute URL - extract path
+                image_path = urlparse(image_src).path
+            else:
+                # Skip data URLs or other non-path sources
+                continue
+            
+            if not image_path:
+                continue
+                
+            # Generate filename from the image path
+            image_file_path = Path(image_path)
+            if config.job.sequential_filename:
+                # Use content prefix to distinguish from attachment files
+                basic_filename = f"content_{i + 1}{image_file_path.suffix}"
+            else:
+                basic_filename = image_file_path.name
+            
+            alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
+            
+            # Apply allow/block list filtering
+            if (not config.job.allow_list or any(
+                    map(
+                        lambda x: fnmatch(alt_filename, x),
+                        config.job.allow_list
+                    )
+            )) and not any(
+                map(
+                    lambda x: fnmatch(alt_filename, x),
+                    config.job.block_list
+                )
+            ):
+                jobs.append(
+                    Job(
+                        path=attachments_path,
+                        alt_filename=alt_filename,
+                        server_path=image_path,
+                        type=PostFileTypeEnum.Attachment
+                    )
+                )
 
     # Write content file
     if content_path and post.content:
