@@ -15,6 +15,7 @@ from ktoolbox.api.misc import get_app_version
 from ktoolbox.api.posts import get_post as get_post_api
 from ktoolbox.configuration import config
 from ktoolbox.job import JobRunner
+from ktoolbox.queue import QueueItem, load_queue, save_queue
 from ktoolbox.utils import dump_search, parse_webpage_url, generate_msg
 
 __all__ = ["KToolBoxCli"]
@@ -334,3 +335,257 @@ class KToolBoxCli:
             await job_runner.start()
         else:
             return ret.message
+
+    @staticmethod
+    @overload
+    async def queue_add(
+            url: str,
+            path: Union[Path, str] = Path("."),
+            *,
+            save_creator_indices: bool = False,
+            mix_posts: bool = None,
+            start_time: str = None,
+            end_time: str = None,
+            offset: int = 0,
+            length: int = None
+    ):
+        ...
+
+    @staticmethod
+    @overload
+    async def queue_add(
+            service: str,
+            creator_id: str,
+            path: Union[Path, str] = Path("."),
+            *,
+            save_creator_indices: bool = False,
+            mix_posts: bool = None,
+            start_time: str = None,
+            end_time: str = None,
+            offset: int = 0,
+            length: int = None
+    ):
+        ...
+
+    @staticmethod
+    async def queue_add(
+            url: str = None,
+            service: str = None,
+            creator_id: Union[str, int] = None,
+            path: Union[Path, str] = Path("."),
+            *,
+            save_creator_indices: bool = False,
+            mix_posts: bool = None,
+            start_time: str = None,
+            end_time: str = None,
+            offset: int = 0,
+            length: int = None
+    ):
+        """
+        Add a creator to the sync queue
+
+        :param url: The creator URL
+        :param service: The service where the creator is located
+        :param creator_id: The ID of the creator
+        :param path: Download path, default is current directory
+        :param save_creator_indices: Record ``CreatorIndices`` data
+        :param mix_posts: Save all files from different posts at same path
+        :param start_time: Start time filter for posts (format: %Y-%m-%d)
+        :param end_time: End time filter for posts (format: %Y-%m-%d)
+        :param offset: Result offset (or start offset)
+        :param length: The number of posts to fetch
+        """
+        logger.info(repr(config))
+        
+        # Get service, creator_id
+        if url:
+            service, creator_id, _ = parse_webpage_url(url)
+        if not all([service, creator_id]):
+            return generate_msg(
+                TextEnum.MissingParams.value,
+                use_at_lease_one=[
+                    ["url"],
+                    ["service", "creator_id"]
+                ])
+
+        # Convert creator_id to string if it's an integer
+        creator_id = str(creator_id) if creator_id is not None else None
+        path = path if isinstance(path, Path) else Path(path)
+
+        # Create queue item
+        if url:
+            queue_item = QueueItem.from_url(
+                url=url,
+                path=path,
+                save_creator_indices=save_creator_indices,
+                mix_posts=mix_posts,
+                start_time=start_time,
+                end_time=end_time,
+                offset=offset,
+                length=length
+            )
+        else:
+            queue_item = QueueItem.from_params(
+                service=service,
+                creator_id=creator_id,
+                path=path,
+                save_creator_indices=save_creator_indices,
+                mix_posts=mix_posts,
+                start_time=start_time,
+                end_time=end_time,
+                offset=offset,
+                length=length
+            )
+
+        # Load queue, add item, save queue
+        queue = load_queue()
+        queue.add_item(queue_item)
+        
+        if save_queue(queue):
+            logger.info(f"Added creator {service}/{creator_id} to sync queue")
+            return f"Added creator {service}/{creator_id} to sync queue (position {queue.size()})"
+        else:
+            return "Failed to save queue"
+
+    @staticmethod
+    async def queue_remove(index: int):
+        """
+        Remove a creator from the sync queue by index
+
+        :param index: Index of the item to remove (0-based)
+        """
+        logger.info(repr(config))
+        
+        queue = load_queue()
+        
+        if queue.is_empty():
+            return "Queue is empty"
+        
+        if index < 0 or index >= queue.size():
+            return f"Invalid index {index}. Queue has {queue.size()} items (indices 0-{queue.size()-1})"
+        
+        removed_item = queue.remove_item(index)
+        
+        if removed_item and save_queue(queue):
+            logger.info(f"Removed creator {removed_item.service}/{removed_item.creator_id} from queue")
+            return f"Removed creator {removed_item.service}/{removed_item.creator_id} from queue"
+        else:
+            return "Failed to remove item from queue"
+
+    @staticmethod
+    async def queue_list():
+        """
+        List all creators in the sync queue
+        """
+        logger.info(repr(config))
+        
+        queue = load_queue()
+        
+        if queue.is_empty():
+            return "Queue is empty"
+        
+        result = []
+        result.append(f"Sync Creator Queue ({queue.size()} items):")
+        result.append("-" * 50)
+        
+        for i, item in enumerate(queue.items):
+            url_part = f" ({item.url})" if item.url else ""
+            path_part = f" -> {item.path}" if item.path else ""
+            params = []
+            if item.length:
+                params.append(f"length={item.length}")
+            if item.offset:
+                params.append(f"offset={item.offset}")
+            if item.start_time:
+                params.append(f"start={item.start_time}")
+            if item.end_time:
+                params.append(f"end={item.end_time}")
+            if item.mix_posts:
+                params.append("mix_posts=True")
+            if item.save_creator_indices:
+                params.append("save_indices=True")
+            
+            params_part = f" [{', '.join(params)}]" if params else ""
+            
+            result.append(f"{i:2d}. {item.service}/{item.creator_id}{url_part}{path_part}{params_part}")
+            result.append(f"    Added: {item.added_at.strftime('%Y-%m-%d %H:%M:%S')}")
+        
+        return "\n".join(result)
+
+    @staticmethod
+    async def queue_clear():
+        """
+        Clear all creators from the sync queue
+        """
+        logger.info(repr(config))
+        
+        queue = load_queue()
+        
+        if queue.is_empty():
+            return "Queue is already empty"
+        
+        item_count = queue.size()
+        queue.clear()
+        
+        if save_queue(queue):
+            logger.info(f"Cleared {item_count} items from sync queue")
+            return f"Cleared {item_count} items from sync queue"
+        else:
+            return "Failed to clear queue"
+
+    @staticmethod
+    async def queue_run():
+        """
+        Process/execute all creators in the sync queue
+        
+        Downloads all creators in the queue sequentially and clears the queue upon completion.
+        """
+        logger.info(repr(config))
+        
+        queue = load_queue()
+        
+        if queue.is_empty():
+            return "Queue is empty, nothing to process"
+        
+        logger.info(f"Starting to process {queue.size()} items in sync queue")
+        
+        successful = 0
+        failed = 0
+        
+        for i, item in enumerate(queue.items):
+            logger.info(f"Processing queue item {i+1}/{queue.size()}: {item.service}/{item.creator_id}")
+            
+            try:
+                # Use the existing sync_creator logic
+                result = await KToolBoxCli.sync_creator(
+                    url=item.url,
+                    service=item.service,
+                    creator_id=item.creator_id,
+                    path=item.path or Path("."),
+                    save_creator_indices=item.save_creator_indices,
+                    mix_posts=item.mix_posts,
+                    start_time=item.start_time,
+                    end_time=item.end_time,
+                    offset=item.offset,
+                    length=item.length
+                )
+                
+                if result is None:  # Success
+                    successful += 1
+                    logger.info(f"Successfully processed {item.service}/{item.creator_id}")
+                else:
+                    failed += 1
+                    logger.error(f"Failed to process {item.service}/{item.creator_id}: {result}")
+                    
+            except Exception as e:
+                failed += 1
+                logger.error(f"Error processing {item.service}/{item.creator_id}: {e}")
+        
+        # Clear the queue after processing
+        queue.clear()
+        if save_queue(queue):
+            logger.info("Queue cleared after processing")
+        
+        result_msg = f"Queue processing completed: {successful} successful, {failed} failed"
+        logger.info(result_msg)
+        return result_msg
