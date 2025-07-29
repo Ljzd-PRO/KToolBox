@@ -135,11 +135,24 @@ class JobRunner:
                         )
                     )
                 else:
+                    # Build error message with post context if available
+                    error_kwargs = {
+                        "filename": job.alt_filename,
+                        "exception": exception
+                    }
+                    if job.post_id:
+                        error_kwargs["post_id"] = job.post_id
+                    if job.post_title:
+                        error_kwargs["post_title"] = job.post_title
+                    if job.post_service:
+                        error_kwargs["post_service"] = job.post_service
+                    if job.post_user:
+                        error_kwargs["post_user"] = job.post_user
+                    
                     logger.error(
                         generate_msg(
                             "Download failed",
-                            filename=job.alt_filename,
-                            exception=exception
+                            **error_kwargs
                         )
                     )
                     failed_num += 1

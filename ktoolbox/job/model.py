@@ -22,6 +22,14 @@ class Job(BaseModel):
     """The `path` part of download URL"""
     type: Optional[Literal[PostFileTypeEnum.Attachment, PostFileTypeEnum.File]] = None
     """Target file type"""
+    post_id: Optional[str] = None
+    """ID of the post this file belongs to"""
+    post_title: Optional[str] = None
+    """Title of the post this file belongs to"""
+    post_service: Optional[str] = None
+    """Service of the post this file belongs to"""
+    post_user: Optional[str] = None
+    """User/creator of the post this file belongs to"""
 
 
 # class JobList(Job, UserList[Job]):
