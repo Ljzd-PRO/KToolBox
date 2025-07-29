@@ -1,6 +1,6 @@
 ## Changes
 
-![Downloads](https://img.shields.io/github/downloads/Ljzd-PRO/KToolBox/v0.15.1/total)
+![Downloads](https://img.shields.io/github/downloads/Ljzd-PRO/KToolBox/v0.16.0/total)
 
 ### 💡 Feature
 
