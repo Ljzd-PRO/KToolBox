@@ -6,7 +6,7 @@
         show_root_full_path: false
         show_if_no_docstring: true
         show_bases: false
-        members_order: source
+        members: false
         filters:
             - "!model_config"
 
@@ -16,7 +16,7 @@
         show_root_full_path: false
         show_if_no_docstring: true
         show_bases: false
-        members_order: source
+        members: false
         filters:
             - "!model_config"
 
@@ -26,7 +26,7 @@
         show_root_full_path: false
         show_if_no_docstring: true
         show_bases: false
-        members_order: source
+        members: false
         filters:
             - "!model_config"
 
@@ -36,7 +36,7 @@
         show_root_full_path: false
         show_if_no_docstring: true
         show_bases: false
-        members_order: source
+        members: false
         filters:
             - "!model_config"
 
@@ -46,7 +46,7 @@
         show_root_full_path: false
         show_if_no_docstring: true
         show_bases: false
-        members_order: source
+        members: false
         filters:
             - "!model_config"
 
@@ -56,6 +56,6 @@
         show_root_full_path: false
         show_if_no_docstring: true
         show_bases: false
-        members_order: source
+        members: false
         filters:
             - "!model_config"
