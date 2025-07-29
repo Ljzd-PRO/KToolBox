@@ -108,29 +108,32 @@ async def create_job_from_post(
     # Filter and create jobs for images in ``Post.content``
     if post.content:
         content_image_sources = extract_content_images(post.content)
-        for i, image_src in enumerate(content_image_sources):
-            if not image_src:
+        content_image_counter = 0
+        for image_src in content_image_sources:
+            if not image_src or not image_src.strip():
                 continue
             
             # Handle relative paths by making them absolute
-            if image_src.startswith('/'):
+            if image_src.startswith('/') and not image_src.startswith('//'):
                 # Relative path - construct full URL
                 image_path = image_src
-            elif image_src.startswith('http'):
+            elif image_src.startswith('http://') or image_src.startswith('https://'):
                 # Absolute URL - extract path
                 image_path = urlparse(image_src).path
             else:
-                # Skip data URLs or other non-path sources
+                # Skip data URLs, protocol-relative URLs, or other non-path sources
                 continue
             
-            if not image_path:
+            if not image_path or not image_path.strip():
                 continue
+            
+            content_image_counter += 1
                 
             # Generate filename from the image path
             image_file_path = Path(image_path)
             if config.job.sequential_filename:
                 # Use content prefix to distinguish from attachment files
-                basic_filename = f"content_{i + 1}{image_file_path.suffix}"
+                basic_filename = f"content_{content_image_counter}{image_file_path.suffix}"
             else:
                 basic_filename = image_file_path.name
             
