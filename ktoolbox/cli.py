@@ -221,7 +221,7 @@ class KToolBoxCli:
             )
             
             # If include_revisions is enabled and we have revisions data
-            if (config.downloader.include_revisions and 
+            if (config.job.include_revisions and
                 ret.data.props and 
                 ret.data.props.revisions and 
                 not revision_id):  # Don't process revisions if we're already downloading a specific revision

@@ -208,7 +208,7 @@ async def create_job_from_creator(
         )
         
         # If include_revisions is enabled, fetch and download revisions for this post
-        if config.downloader.include_revisions and not mix_posts:
+        if config.job.include_revisions and not mix_posts:
             try:
                 revisions_ret = await get_post_revisions_api(
                     service=service,

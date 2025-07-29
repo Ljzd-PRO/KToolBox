@@ -64,7 +64,6 @@ class DownloaderConfiguration(BaseModel):
     :ivar tps_limit: Maximum connections established per second
     :ivar use_bucket: Enable local storage bucket mode
     :ivar bucket_path: Path of local storage bucket
-    :ivar include_revisions: Include and download revision posts when available
     :ivar reverse_proxy: Reverse proxy format for download URL. \
     Customize the filename format by inserting an empty ``{}`` to represent the original URL. \
     For example: ``https://example.com/{}`` will be ``https://example.com/https://n1.kemono.su/data/66/83/xxxxx.jpg``;  \
@@ -82,7 +81,6 @@ class DownloaderConfiguration(BaseModel):
     tps_limit: float = 1.0
     use_bucket: bool = False
     bucket_path: Path = Path("./.ktoolbox/bucket_storage")
-    include_revisions: bool = False
     reverse_proxy: str = "{}"
 
     @model_validator(mode="after")
@@ -173,6 +171,7 @@ class JobConfiguration(BaseModel):
         | ``edited``    | Date   |
 
     :ivar count: Number of coroutines for concurrent download
+    :ivar include_revisions: Include and download revision posts when available
     :ivar post_dirname_format: Customize the post directory name format, you can use some of the \
     [properties][ktoolbox.configuration.JobConfiguration] in ``Post``. \
     e.g. ``[{published}]{id}`` > ``[2024-1-1]123123``, ``{user}_{published}_{title}`` > ``234234_2024-1-1_TheTitle``
@@ -190,6 +189,7 @@ class JobConfiguration(BaseModel):
     :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``
     """
     count: int = 4
+    include_revisions: bool = False
     post_dirname_format: str = "{title}"
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
     mix_posts: bool = False
