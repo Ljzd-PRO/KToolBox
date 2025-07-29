@@ -189,6 +189,7 @@ class JobConfiguration(BaseModel):
     :ivar allow_list: Download files which match these patterns (Unix shell-style), e.g. ``["*.png"]``
     :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``
     :ivar extract_external_links: Extract external file sharing links from post content and save to separate file
+    :ivar external_link_patterns: Custom regex patterns for extracting external links. If empty, uses default patterns for common file hosting services.
     """
     count: int = 4
     post_dirname_format: str = "{title}"
@@ -201,6 +202,8 @@ class JobConfiguration(BaseModel):
     # noinspection PyDataclass
     block_list: Set[str] = Field(default_factory=set)
     extract_external_links: bool = True
+    # noinspection PyDataclass
+    external_link_patterns: Set[str] = Field(default_factory=set)
 
 
 class LoggerConfiguration(BaseModel):
