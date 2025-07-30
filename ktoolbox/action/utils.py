@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, List, Generator, Any, Tuple
+from typing import Optional, List, Generator, Any, Tuple, Set
 
 from loguru import logger
 from pathvalidate import sanitize_filename
@@ -9,7 +9,7 @@ from ktoolbox.api.model import Post
 from ktoolbox.configuration import config
 from ktoolbox.job import CreatorIndices
 
-__all__ = ["generate_post_path_name", "generate_filename", "filter_posts_by_date", "filter_posts_by_indices"]
+__all__ = ["generate_post_path_name", "generate_filename", "filter_posts_by_date", "filter_posts_by_indices", "filter_posts_by_keywords"]
 
 TIME_FORMAT = "%Y-%m-%d"
 
@@ -115,3 +115,43 @@ def filter_posts_by_indices(posts: List[Post], indices: CreatorIndices) -> Tuple
     for post in new_list:
         new_indices.posts[post.id] = post
     return new_list, new_indices
+
+
+def _match_post_keywords(post: Post, keywords: Set[str]) -> bool:
+    """
+    Check if the post contains any of the specified keywords.
+
+    :param post: Target post object
+    :param keywords: Set of keywords to search for (case-insensitive)
+    :return: Whether the post contains any of the keywords in title or content
+    """
+    if not keywords:
+        return True
+    
+    # Combine searchable text fields
+    searchable_text = ""
+    if post.title:
+        searchable_text += post.title.lower() + " "
+    if post.content:
+        searchable_text += post.content.lower() + " "
+    
+    # Check if any keyword is found in the searchable text
+    return any(keyword.lower() in searchable_text for keyword in keywords)
+
+
+def filter_posts_by_keywords(
+        post_list: List[Post],
+        keywords: Optional[Set[str]]
+) -> Generator[Post, Any, Any]:
+    """
+    Filter posts by keywords in title and content
+
+    :param post_list: List of posts
+    :param keywords: Set of keywords to search for (case-insensitive), None means no filtering
+    """
+    if not keywords:
+        yield from post_list
+        return
+    
+    post_filter = filter(lambda x: _match_post_keywords(x, keywords), post_list)
+    yield from post_filter
