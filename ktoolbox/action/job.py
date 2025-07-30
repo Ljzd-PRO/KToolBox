@@ -147,7 +147,7 @@ async def create_job_from_creator(
      ``save_creator_indices`` will be ignored if enabled
     :param start_time: Start time of the time range
     :param end_time: End time of the time range
-    :param keywords: Set of keywords to filter posts by title and content (case-insensitive)
+    :param keywords: Set of keywords to filter posts by title (case-insensitive)
     """
     mix_posts = config.job.mix_posts if mix_posts is None else mix_posts
 

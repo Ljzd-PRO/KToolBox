@@ -30,13 +30,19 @@ class TestKeywordFiltering:
         result = _match_post_keywords(post, keywords)
         assert result is True
 
-    def test_match_post_keywords_content_match(self):
-        """Test keyword matching in post content"""
-        post = Post(title="Post Title", content="This is a great tutorial about Python")
-        keywords = {"python", "tutorial"}
+    def test_match_post_keywords_title_only(self):
+        """Test keyword matching only applies to post title, not content"""
+        post = Post(title="Amazing Artwork", content="This contains python programming tutorial")
         
+        # Keywords in title should match
+        keywords = {"amazing", "artwork"}
         result = _match_post_keywords(post, keywords)
         assert result is True
+        
+        # Keywords only in content should NOT match
+        keywords = {"python", "programming", "tutorial"}
+        result = _match_post_keywords(post, keywords)
+        assert result is False
 
     def test_match_post_keywords_no_match(self):
         """Test when no keywords match"""
@@ -88,9 +94,9 @@ class TestKeywordFiltering:
         assert len(result) == 2
 
     def test_filter_posts_by_keywords_with_filtering(self):
-        """Test actual filtering with keywords"""
+        """Test actual filtering with keywords (title only)"""
         posts = [
-            Post(id="1", title="Python Tutorial", content="Learn Python programming"),
+            Post(id="1", title="Python Tutorial", content="Learn programming"),
             Post(id="2", title="Art Gallery", content="Beautiful paintings"),
             Post(id="3", title="Java Guide", content="Programming in Java"),
             Post(id="4", title="Cooking Tips", content="Python recipes for cooking")
@@ -99,18 +105,17 @@ class TestKeywordFiltering:
         keywords = {"python"}
         result = list(filter_posts_by_keywords(posts, keywords))
         
-        # Should match posts 1 and 4 (both contain "python")
-        assert len(result) == 2
+        # Should match only post 1 (title contains "python")
+        # Post 4 should NOT match since "python" is only in content
+        assert len(result) == 1
         assert result[0].id == "1"
-        assert result[1].id == "4"
         
-        keywords = {"programming"}
+        keywords = {"java"}
         result = list(filter_posts_by_keywords(posts, keywords))
         
-        # Should match posts 1 and 3
-        assert len(result) == 2
-        assert result[0].id == "1" 
-        assert result[1].id == "3"
+        # Should match only post 3 (title contains "Java")
+        assert len(result) == 1
+        assert result[0].id == "3"
 
     def test_filter_posts_by_keywords_multiple_keywords(self):
         """Test filtering with multiple keywords (OR logic)"""

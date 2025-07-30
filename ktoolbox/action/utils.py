@@ -123,19 +123,17 @@ def _match_post_keywords(post: Post, keywords: Set[str]) -> bool:
 
     :param post: Target post object
     :param keywords: Set of keywords to search for (case-insensitive)
-    :return: Whether the post contains any of the keywords in title or content
+    :return: Whether the post contains any of the keywords in title
     """
     if not keywords:
         return True
     
-    # Combine searchable text fields
+    # Only search in post title
     searchable_text = ""
     if post.title:
-        searchable_text += post.title.lower() + " "
-    if post.content:
-        searchable_text += post.content.lower() + " "
+        searchable_text = post.title.lower()
     
-    # Check if any keyword is found in the searchable text
+    # Check if any keyword is found in the title
     return any(keyword.lower() in searchable_text for keyword in keywords)
 
 
@@ -144,7 +142,7 @@ def filter_posts_by_keywords(
         keywords: Optional[Set[str]]
 ) -> Generator[Post, Any, Any]:
     """
-    Filter posts by keywords in title and content
+    Filter posts by keywords in title
 
     :param post_list: List of posts
     :param keywords: Set of keywords to search for (case-insensitive), None means no filtering

@@ -308,7 +308,7 @@ class KToolBoxCli:
             Time format: ``%Y-%m-%d``
         :param offset: Result offset (or start offset)
         :param length: The number of posts to fetch, defaults to fetching all posts after ``offset``.
-        :param keywords: Comma-separated keywords to filter posts by title and content (case-insensitive)
+        :param keywords: Comma-separated keywords to filter posts by title (case-insensitive)
         """
         logger.info(repr(config))
         # Get service, creator_id
