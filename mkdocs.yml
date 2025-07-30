@@ -29,12 +29,14 @@ plugins:
   - tags
   - search
   - mkdocstrings:
+      custom_templates: custom_templates
       handlers:
         python:
           import:
             - https://docs.python.org/3/objects.inv
           options:
             docstring_style: sphinx
+            docstring_section_style: table
   - i18n:
       docs_structure: folder
       languages:

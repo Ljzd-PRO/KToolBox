@@ -112,11 +112,19 @@ class PostStructureConfiguration(BaseModel):
     ```
     ..
     ├─ content.txt
-    ├─ <Post file>
-    ├─ <Post data (post.json)>
-    └─ attachments
-       ├─ 1.png
-       └─ 2.png
+    ├─ external_links.txt
+    ├─ {id}_{}.png (file)
+    ├─ post.json (metadata)
+    ├─ attachments
+    │    ├─ 1.png
+    │    └─ 2.png
+    └─ revisions
+         ├─ <PostStructure>
+         │    ├─ ...
+         │    └─ ...
+         └─ <PostStructure>
+              ├─ ...
+              └─ ...
     ```
 
     - Available properties for ``file``
