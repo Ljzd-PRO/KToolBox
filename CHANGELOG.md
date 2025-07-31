@@ -4,10 +4,10 @@
 
 ### 💡 Feature
 
-- Add **winloop** support for **Windows** platforms as uvloop alternative
-- **Preserve image metadata** (published date) when downloading files
+- Add **winloop** support for **Windows** platforms as uvloop alternative - #268 (@IvanmaAcademic)
+- **Preserve image metadata** (**modified/creation time**) when downloading files - #248
 - Include **filename** in downloader **retry logging** for better traceability
-- Add **keyword filtering** support to `sync-creator` command (title)
+- Add **keyword filtering** support to `sync-creator` command (title) - #292
   - Use the new command option `--keywords`
   - Examples:
     ```shell
@@ -17,7 +17,7 @@
     # Filter with multiple keywords (OR logic)
     ktoolbox sync_creator https://kemono.cr/fanbox/user/xxxx --keywords "表情、効果音差分,Live2Dアニメ"
     ```
-- Add **selective sequential filename** feature with excludes option
+- Add **selective sequential filename** feature with excludes option - #191
   - For example, if you want to name post images sequentially (1.jpg, 2.jpg, ...) but keep the original filenames for
   videos or archives (such as "March Collection.zip"), you can use this configuration option.
   - Run `ktoolbox config-editor` to edit this configurations (`Job -> sequential_filename_excludes`)
@@ -35,10 +35,10 @@
 
 ### 💡 新特性
 
-- 为 **Windows** 平台新增 **winloop** 支持，作为 uvloop 的替代方案
-- 下载文件时**保留图片元数据**（发布日期）
+- 为 **Windows** 平台新增 **winloop** 支持，作为 uvloop 的替代方案 - #268 (@IvanmaAcademic)
+- 下载文件时**保留图片元数据**（**修改/创建 日期**） - #248
 - 下载器**重试日志**中包含**文件名**，以便更好地追踪
-- `sync-creator` 命令新增**关键词过滤**功能（标题）
+- `sync-creator` 命令新增**关键词过滤**功能（标题） - #292
   - 使用新命令选项 `--keywords`
   - 示例：
     ```shell
@@ -48,7 +48,7 @@
     # 使用多个关键词过滤（“或”逻辑）
     ktoolbox sync_creator https://kemono.cr/fanbox/user/xxxx --keywords "表情、効果音差分,Live2Dアニメ"
     ```
-- 新增**选择性顺序文件名**功能，可设置排除项
+- 新增**选择性顺序文件名**功能，可设置排除项 - #191
   - 例如当你想按顺序命名作品图片（1.jpg, 2.jpg, ...）但又希望保留视频或压缩包的原始文件名（如“3月合集.zip”）时，你可以用这个配置项
   - 可运行 `ktoolbox config-editor` 编辑此配置（`Job -> sequential_filename_excludes`）
   - 或手动在 `.env` 文件或环境变量中编辑
