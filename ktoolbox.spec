@@ -1,6 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 import pkg_resources
+import sys
 
 template_dir = pkg_resources.resource_filename('settings_doc', 'templates')
 
@@ -11,7 +12,7 @@ a = Analysis(
     datas=[
         (template_dir + '/*', 'settings_doc/templates'),
     ],
-    hiddenimports=['winloop._noop'],
+    hiddenimports=['winloop._noop'] if sys.platform == 'win32' else [],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -36,7 +37,7 @@ exe = EXE(
     console=True,
     disable_windowed_traceback=False,
     argv_emulation=False,
-    target_arch=None,
+    target_arch='universal2' if sys.platform == 'darwin' else None,
     codesign_identity=None,
     entitlements_file=None,
 )
