@@ -20,5 +20,5 @@ runs:
         architecture: "x64"
         cache: "poetry"
 
-    - run: poetry install --with test,docs,pyinstaller --extras urwid,${{ runner.os == 'Windows' && 'winloop' || 'uvloop' }}
+    - run: poetry install --with test,docs,pyinstaller --extras urwid --extras ${{ runner.os == 'Windows' && 'winloop' || 'uvloop' }}
       shell: bash
