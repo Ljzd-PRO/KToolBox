@@ -16,7 +16,12 @@ runs:
   using: "composite"
   steps:
     - name: Create Executable
-      run: poetry run pyinstaller ${{ inputs.spec-path }} --distpath ${{ inputs.dist-path }}
+      run: |
+        if [[ "$RUNNER_OS" == "macOS" ]]; then
+          poetry run pyinstaller ${{ inputs.spec-path }} --distpath ${{ inputs.dist-path }} --target-arch universal2
+        else
+          poetry run pyinstaller ${{ inputs.spec-path }} --distpath ${{ inputs.dist-path }}
+        fi
       shell: bash
 
     - name: Copy Extra Files
