@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Union, overload, Set
+from typing import Union, overload, Set, Optional
 
 import aiofiles
 from loguru import logger
@@ -352,7 +352,7 @@ class KToolBoxCli:
         creator_path.mkdir(exist_ok=True)
         
         # Parse keywords
-        keyword_set: Set[str] = None
+        keyword_set: Optional[Set[str]] = None
         if keywords:
             keyword_set = set(kw.strip() for kw in keywords.split(',') if kw.strip())
             if keyword_set:
