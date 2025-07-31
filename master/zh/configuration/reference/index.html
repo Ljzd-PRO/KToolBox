@@ -1249,6 +1249,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.JobConfiguration.sequential_filename_excludes" class="md-nav__link">
+    <span class="md-ellipsis">
+      sequential_filename_excludes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ktoolbox.configuration.JobConfiguration.filename_format" class="md-nav__link">
     <span class="md-ellipsis">
       filename_format
@@ -1910,6 +1919,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.JobConfiguration.sequential_filename_excludes" class="md-nav__link">
+    <span class="md-ellipsis">
+      sequential_filename_excludes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ktoolbox.configuration.JobConfiguration.filename_format" class="md-nav__link">
     <span class="md-ellipsis">
       filename_format
@@ -2159,7 +2177,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Use uvloop for asyncio (Disabled on Windows by default)     uvloop will improve concurrent performance, but it is not compatible with Windows.     Install uvloop by <code>pip install ktoolbox[uvloop]</code> or it will not work.</p>
+                <p>Use uvloop/winloop for asyncio performance optimization     Uses winloop on Windows and uvloop on Unix-like systems for better concurrent performance.     Install winloop on Windows with <code>pip install ktoolbox[winloop]</code>     or uvloop on Unix with <code>pip install ktoolbox[uvloop]</code>.</p>
               </div>
             </td>
             <td>
@@ -2173,10 +2191,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">267</span>
-<span class="normal">268</span>
-<span class="normal">269</span>
-<span class="normal">270</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">270</span>
 <span class="normal">271</span>
 <span class="normal">272</span>
 <span class="normal">273</span>
@@ -2204,7 +2219,11 @@
 <span class="normal">295</span>
 <span class="normal">296</span>
 <span class="normal">297</span>
-<span class="normal">298</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Configuration</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Configuration</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
     <span class="c1"># noinspection SpellCheckingInspection,GrazieInspection</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    KToolBox Configuration</span>
@@ -2215,9 +2234,10 @@
 <span class="sd">    :ivar logger: Logger configuration</span>
 <span class="sd">    :ivar ssl_verify: Enable SSL certificate verification for Kemono API server and download server</span>
 <span class="sd">    :ivar json_dump_indent: Indent of JSON file dump</span>
-<span class="sd">    :ivar use_uvloop: Use uvloop for asyncio (Disabled on Windows by default) \</span>
-<span class="sd">    uvloop will improve concurrent performance, but it is not compatible with Windows. \</span>
-<span class="sd">    Install uvloop by `pip install ktoolbox[uvloop]` or it will not work.</span>
+<span class="sd">    :ivar use_uvloop: Use uvloop/winloop for asyncio performance optimization \</span>
+<span class="sd">    Uses winloop on Windows and uvloop on Unix-like systems for better concurrent performance. \</span>
+<span class="sd">    Install winloop on Windows with `pip install ktoolbox[winloop]` \</span>
+<span class="sd">    or uvloop on Unix with `pip install ktoolbox[uvloop]`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">api</span><span class="p">:</span> <span class="n">APIConfiguration</span> <span class="o">=</span> <span class="n">APIConfiguration</span><span class="p">()</span>
     <span class="n">downloader</span><span class="p">:</span> <span class="n">DownloaderConfiguration</span> <span class="o">=</span> <span class="n">DownloaderConfiguration</span><span class="p">()</span>
@@ -4068,6 +4088,22 @@
             </td>
           </tr>
           <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.JobConfiguration.sequential_filename_excludes" href="../../../api/#ktoolbox.configuration.JobConfiguration.sequential_filename_excludes">sequential_filename_excludes</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Set" href="https://docs.python.org/3/library/typing.html#typing.Set">Set</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File extensions to exclude from sequential naming when <code>sequential_filename</code> is enabled.     Files with these extensions will keep their original names. e.g. <code>[".psd", ".zip", ".mp4"]</code></p>
+              </div>
+            </td>
+            <td>
+              <code>
+                      Field(default_factory=set)
+              </code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.JobConfiguration.filename_format" href="../../../api/#ktoolbox.configuration.JobConfiguration.filename_format">filename_format</a></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
@@ -4247,7 +4283,10 @@
 <span class="normal">248</span>
 <span class="normal">249</span>
 <span class="normal">250</span>
-<span class="normal">251</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">JobConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">JobConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Download jobs Configuration</span>
 
@@ -4272,6 +4311,8 @@
 <span class="sd">    :ivar mix_posts: Save all files from different posts at same path in creator directory. \</span>
 <span class="sd">    It would not create any post directory, and ``CreatorIndices`` would not been recorded.</span>
 <span class="sd">    :ivar sequential_filename: Rename attachments in numerical order, e.g. ``1.png``, ``2.png``, ...</span>
+<span class="sd">    :ivar sequential_filename_excludes: File extensions to exclude from sequential naming when ``sequential_filename`` is enabled. \</span>
+<span class="sd">    Files with these extensions will keep their original names. e.g. ``[&quot;.psd&quot;, &quot;.zip&quot;, &quot;.mp4&quot;]``</span>
 <span class="sd">    :ivar filename_format: Customize the filename format by inserting an empty ``{}`` to represent the basic filename.</span>
 <span class="sd">    Similar to post_dirname_format, you can use some of the [properties][ktoolbox.configuration.JobConfiguration] \</span>
 <span class="sd">    in Post. For example: ``{title}_{}`` could result in filenames like \</span>
@@ -4289,6 +4330,7 @@
     <span class="n">post_structure</span><span class="p">:</span> <span class="n">PostStructureConfiguration</span> <span class="o">=</span> <span class="n">PostStructureConfiguration</span><span class="p">()</span>
     <span class="n">mix_posts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">sequential_filename</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">sequential_filename_excludes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">)</span>
     <span class="n">filename_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span>
     <span class="c1"># noinspection PyDataclass</span>
     <span class="n">allow_list</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">)</span>
@@ -4469,6 +4511,26 @@
   </span>
 
 <a href="#ktoolbox.configuration.JobConfiguration.sequential_filename" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ktoolbox.configuration.JobConfiguration.sequential_filename_excludes" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">sequential_filename_excludes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.configuration.JobConfiguration.sequential_filename_excludes" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
     <div class="doc doc-contents ">
@@ -4667,17 +4729,17 @@
 
               <details class="quote">
                 <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">257</span>
 <span class="normal">258</span>
 <span class="normal">259</span>
 <span class="normal">260</span>
 <span class="normal">261</span>
 <span class="normal">262</span>
 <span class="normal">263</span>
-<span class="normal">264</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">LoggerConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">LoggerConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Logger configuration</span>
 

@@ -1498,7 +1498,20 @@
 <span class="normal">362</span>
 <span class="normal">363</span>
 <span class="normal">364</span>
-<span class="normal">365</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">KToolBoxCli</span><span class="p">:</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">KToolBoxCli</span><span class="p">:</span>
     <span class="nd">@staticmethod</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">():</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Show KToolBox version&quot;&quot;&quot;</span>
@@ -1728,7 +1741,8 @@
             <span class="n">save_creator_indices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
             <span class="n">mix_posts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">start_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">end_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">end_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">keywords</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
         <span class="o">...</span>
 
@@ -1742,7 +1756,8 @@
             <span class="n">save_creator_indices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
             <span class="n">mix_posts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">start_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">end_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">end_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">keywords</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
         <span class="o">...</span>
 
@@ -1758,7 +1773,8 @@
             <span class="n">start_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">end_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">keywords</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sync posts from a creator</span>
@@ -1783,6 +1799,7 @@
 <span class="sd">            Time format: ``%Y-%m-%d``</span>
 <span class="sd">        :param offset: Result offset (or start offset)</span>
 <span class="sd">        :param length: The number of posts to fetch, defaults to fetching all posts after ``offset``.</span>
+<span class="sd">        :param keywords: Comma-separated keywords to filter posts by title (case-insensitive)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
         <span class="c1"># Get service, creator_id</span>
@@ -1824,6 +1841,14 @@
         <span class="n">creator_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="n">sanitize_filename</span><span class="p">(</span><span class="n">creator_name</span><span class="p">)</span>
 
         <span class="n">creator_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Parse keywords</span>
+        <span class="n">keyword_set</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">keywords</span><span class="p">:</span>
+            <span class="n">keyword_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kw</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">keywords</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">kw</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">keyword_set</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Filtering posts by keywords: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">keyword_set</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="n">ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_job_from_creator</span><span class="p">(</span>
             <span class="n">service</span><span class="o">=</span><span class="n">service</span><span class="p">,</span>
             <span class="n">creator_id</span><span class="o">=</span><span class="n">creator_id</span><span class="p">,</span>
@@ -1834,7 +1859,8 @@
             <span class="n">save_creator_indices</span><span class="o">=</span><span class="n">save_creator_indices</span><span class="p">,</span>
             <span class="n">mix_posts</span><span class="o">=</span><span class="n">mix_posts</span><span class="p">,</span>
             <span class="n">start_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start_time</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">start_time</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">end_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end_time</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">end_time</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">end_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end_time</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">end_time</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">keywords</span><span class="o">=</span><span class="n">keyword_set</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
             <span class="n">job_runner</span> <span class="o">=</span> <span class="n">JobRunner</span><span class="p">(</span><span class="n">job_list</span><span class="o">=</span><span class="n">ret</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
@@ -2938,14 +2964,26 @@
                   <code>None</code>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code>keywords</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Comma-separated keywords to filter posts by title (case-insensitive)</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
       </tbody>
     </table>
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/cli.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">271</span>
-<span class="normal">272</span>
-<span class="normal">273</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">273</span>
 <span class="normal">274</span>
 <span class="normal">275</span>
 <span class="normal">276</span>
@@ -3037,7 +3075,20 @@
 <span class="normal">362</span>
 <span class="normal">363</span>
 <span class="normal">364</span>
-<span class="normal">365</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">sync_creator</span><span class="p">(</span>
         <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">service</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3049,7 +3100,8 @@
         <span class="n">start_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">end_time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">keywords</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sync posts from a creator</span>
@@ -3074,6 +3126,7 @@
 <span class="sd">        Time format: ``%Y-%m-%d``</span>
 <span class="sd">    :param offset: Result offset (or start offset)</span>
 <span class="sd">    :param length: The number of posts to fetch, defaults to fetching all posts after ``offset``.</span>
+<span class="sd">    :param keywords: Comma-separated keywords to filter posts by title (case-insensitive)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
     <span class="c1"># Get service, creator_id</span>
@@ -3115,6 +3168,14 @@
     <span class="n">creator_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="n">sanitize_filename</span><span class="p">(</span><span class="n">creator_name</span><span class="p">)</span>
 
     <span class="n">creator_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Parse keywords</span>
+    <span class="n">keyword_set</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">keywords</span><span class="p">:</span>
+        <span class="n">keyword_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kw</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">keywords</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">kw</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">keyword_set</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Filtering posts by keywords: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">keyword_set</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
     <span class="n">ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_job_from_creator</span><span class="p">(</span>
         <span class="n">service</span><span class="o">=</span><span class="n">service</span><span class="p">,</span>
         <span class="n">creator_id</span><span class="o">=</span><span class="n">creator_id</span><span class="p">,</span>
@@ -3125,7 +3186,8 @@
         <span class="n">save_creator_indices</span><span class="o">=</span><span class="n">save_creator_indices</span><span class="p">,</span>
         <span class="n">mix_posts</span><span class="o">=</span><span class="n">mix_posts</span><span class="p">,</span>
         <span class="n">start_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start_time</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">start_time</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">end_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end_time</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">end_time</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">end_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end_time</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">end_time</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">keywords</span><span class="o">=</span><span class="n">keyword_set</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
         <span class="n">job_runner</span> <span class="o">=</span> <span class="n">JobRunner</span><span class="p">(</span><span class="n">job_list</span><span class="o">=</span><span class="n">ret</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>

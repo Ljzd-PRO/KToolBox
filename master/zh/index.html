@@ -1065,16 +1065,28 @@
 <h2 id="_2">使用方法<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <h3 id="_3">安装<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
 <p>你可以从 <a href="https://github.com/Ljzd-PRO/KToolBox/releases">releases</a> 页面下载可执行文件使用</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">手动安装 - 一般情况</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">一般情况</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block"></div>
 </div>
 </div>
 <p>推荐使用 pipx
    <div class="highlight"><pre><span></span><code>pip3<span class="w"> </span>install<span class="w"> </span>pipx
+<span class="c1"># Windows</span>
+pipx<span class="w"> </span>install<span class="w"> </span>ktoolbox<span class="o">[</span>urwid,winloop<span class="o">]</span>
+<span class="c1"># Linux / macOS</span>
+pipx<span class="w"> </span>install<span class="w"> </span>ktoolbox<span class="o">[</span>urwid,uvloop<span class="o">]</span>
+</code></pre></div></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:1"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">纯 Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<p>如果你在使用 <a href="https://pyodide.org/en/stable/">pyodide</a>，或者如果你只能使用纯Python，无法编译 <a href="https://docs.pydantic.dev/latest/">pydantic</a> v2.x.x
+   <div class="highlight"><pre><span></span><code>pip3<span class="w"> </span>install<span class="w"> </span>pipx
 pipx<span class="w"> </span>install<span class="w"> </span>ktoolbox
 </code></pre></div></p>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:1"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">手动安装 - 对于 iOS a-Shell</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:1"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">对于 iOS a-Shell</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code>pip3<span class="w"> </span>install<span class="w"> </span>ktoolbox-pure-py
