@@ -19,7 +19,7 @@ from tqdm import tqdm as std_tqdm
 from ktoolbox._enum import RetCodeEnum
 from ktoolbox.configuration import config
 from ktoolbox.downloader.base import DownloaderRet
-from ktoolbox.downloader.utils import filename_from_headers, duplicate_file_check
+from ktoolbox.downloader.utils import filename_from_headers, duplicate_file_check, utime_from_headers
 from ktoolbox.utils import generate_msg
 
 __all__ = ["Downloader"]
@@ -290,19 +290,8 @@ class Downloader:
             final_filepath = self._path / self._save_filename
             temp_filepath.rename(final_filepath)
 
-            # Set file times using Last-Modified and Date headers from the response
-            last_modified = res.headers.get("Last-Modified")
-            date_header = res.headers.get("Date")
             try:
-                import email.utils
-                # Prefer Last-Modified for modification time
-                mtime = email.utils.parsedate_to_datetime(last_modified).timestamp() if last_modified else None
-                # Use Date for creation time
-                ctime = email.utils.parsedate_to_datetime(date_header).timestamp() if date_header else None
-                # Set times if available
-                if mtime or ctime:
-                    atime = mtime or ctime  # Access time can be the same as modification time
-                    os.utime(final_filepath, (atime, mtime or ctime))
+                utime_from_headers(res.headers, final_filepath)
             except (OSError, ValueError, TypeError) as e:
                 logger.warning(
                     generate_msg(
