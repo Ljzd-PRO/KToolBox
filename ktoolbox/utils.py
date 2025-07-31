@@ -1,8 +1,9 @@
 import asyncio
 import logging
+import re
 import sys
 from pathlib import Path
-from typing import Generic, TypeVar, Optional, List, Tuple
+from typing import Generic, TypeVar, Optional, List, Tuple, Set
 
 import aiofiles
 from loguru import logger
@@ -19,7 +20,8 @@ __all__ = [
     "logger_init",
     "dump_search",
     "parse_webpage_url",
-    "uvloop_init"
+    "uvloop_init",
+    "extract_external_links"
 ]
 
 _T = TypeVar('_T')
@@ -135,3 +137,46 @@ def uvloop_init() -> bool:
                 logger.success("Set event loop policy to uvloop successfully.")
                 return True
     return False
+
+
+def extract_external_links(content: str, custom_patterns: Optional[List[str]] = None) -> Set[str]:
+    """
+    Extract external file sharing links from text content.
+
+    Targets common cloud storage and file sharing services like:
+    - Google Drive
+    - MEGA
+    - Dropbox
+    - OneDrive
+    - MediaFire
+    - And other common file hosting services
+
+    :param content: Text content to extract links from
+    :param custom_patterns: Custom regex patterns to use.
+    :return: Set of unique external links found
+    """
+    if not content:
+        return set()
+
+    external_link_patterns = custom_patterns if custom_patterns is not None else []
+
+    links = set()
+
+    # Combine all patterns
+    combined_pattern = '|'.join(f'({pattern})' for pattern in external_link_patterns)
+
+    # Find all matches
+    matches = re.finditer(combined_pattern, content, re.IGNORECASE)
+
+    for match in matches:
+        # Get the full matched URL
+        url = match.group(0)
+
+        # Clean up common trailing punctuation that might be part of text
+        url = re.sub(r'[.,;!?)\]}>"\'\s]+$', '', url)
+
+        # Validate that it looks like a proper URL
+        if len(url) > 10 and '.' in url:
+            links.add(url)
+
+    return links

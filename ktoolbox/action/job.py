@@ -16,6 +16,7 @@ from ktoolbox.api.model import Post, Attachment
 from ktoolbox.api.posts import get_post_revisions as get_post_revisions_api
 from ktoolbox.configuration import config, PostStructureConfiguration
 from ktoolbox.job import Job, CreatorIndices
+from ktoolbox.utils import extract_external_links
 
 __all__ = ["create_job_from_post", "create_job_from_creator"]
 
@@ -46,9 +47,12 @@ async def create_job_from_post(
         attachments_path.mkdir(exist_ok=True)
         content_path = post_path / post_structure.content  # content
         content_path.parent.mkdir(exist_ok=True)
+        external_links_path = post_path / post_structure.external_links  # external_links
+        external_links_path.parent.mkdir(exist_ok=True)
     else:
         attachments_path = post_path
         content_path = None
+        external_links_path = None
 
     # Filter and create jobs for ``Post.attachment``
     jobs: List[Job] = []
@@ -110,6 +114,16 @@ async def create_job_from_post(
     if content_path and post.content:
         async with aiofiles.open(content_path, "w", encoding=config.downloader.encoding) as f:
             await f.write(post.content)
+
+    # Extract and write external links file
+    if config.job.extract_external_links and external_links_path and post.content:
+        external_links = extract_external_links(post.content, config.job.external_link_patterns)
+        if external_links:
+            async with aiofiles.open(external_links_path, "w", encoding=config.downloader.encoding) as f:
+                # Write each link on a separate line
+                for link in sorted(external_links):
+                    await f.write(f"{link}\n")
+
     if dump_post_data:
         async with aiofiles.open(str(post_path / DataStorageNameEnum.PostData.value), "w", encoding="utf-8") as f:
             await f.write(
@@ -193,6 +207,9 @@ async def create_job_from_creator(
                     encoding="utf-8"
             ) as f:
                 await f.write(indices.model_dump_json(indent=config.json_dump_indent))
+
+    logger.info("`job.include_revisions` is enabled and will fetch post revisions, "
+                "which may take time. Disable if not needed.")
 
     job_list: List[Job] = []
     for post in post_list:

@@ -2,7 +2,7 @@ import asyncio
 from asyncio import CancelledError
 from functools import cached_property
 from types import MappingProxyType
-from typing import List, Set, Dict, Optional
+from typing import List, Set, Dict
 from urllib.parse import urlunparse
 
 import httpx
@@ -14,7 +14,6 @@ from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
 from ktoolbox.job import Job
 from ktoolbox.utils import generate_msg
-from ktoolbox.ddos_guard import DDoSGuardCookieManager, merge_cookies
 
 __all__ = ["JobRunner"]
 
@@ -37,10 +36,6 @@ class JobRunner:
         self._downloaders_with_task: Dict[Downloader, asyncio.Task] = {}
         self._concurrent_tasks: Set[asyncio.Task] = set()
         self._lock = asyncio.Lock()
-        
-        # Initialize DDoS Guard cookie manager for downloads
-        self._ddos_cookie_manager = DDoSGuardCookieManager()
-        logger.debug("Initialized DDoS Guard cookie manager for downloads")
 
     @property
     def finished(self):
@@ -82,15 +77,9 @@ class JobRunner:
         :return: Number of jobs that failed
         """
         failed_num = 0
-        
-        # Build cookies including session and DDoS Guard cookies
-        session_cookies = {"session": config.api.session_key} if config.api.session_key else None
-        ddos_cookies = self._ddos_cookie_manager.cookies
-        cookies = merge_cookies(session_cookies, ddos_cookies)
-        
         async with httpx.AsyncClient(
                 verify=config.ssl_verify,
-                cookies=cookies
+                cookies={"session": config.api.session_key} if config.api.session_key else None
         ) as client:
             while not self._job_queue.empty():
                 job = await self._job_queue.get()
@@ -103,8 +92,7 @@ class JobRunner:
                     path=job.path,
                     client=client,
                     designated_filename=job.alt_filename,
-                    server_path=job.server_path,
-                    ddos_cookie_manager=self._ddos_cookie_manager
+                    server_path=job.server_path
                 )
 
                 # Create task

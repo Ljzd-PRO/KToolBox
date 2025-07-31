@@ -28,6 +28,15 @@
 ## `.env` / `prod.env` file example
 
 ```dotenv
+##############################################################################
+#  It is recommended to use the graphical configuration editor for editing.  #
+#  Run `ktoolbox config-editor` to launch it.                                #
+##############################################################################
+
+# (Optional) Session key that can be found in cookies after a successful login
+# Use when 403 Error
+#KTOOLBOX_API__SESSION_KEY=xxxxx
+
 # Download 10 files at the same time.
 KTOOLBOX_JOB__COUNT=10
 
@@ -43,7 +52,7 @@ KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
 # For example: `{title}_{}` > `HelloWorld_b4b41de2-8736-480d-b5c3-ebf0d917561b`, etc.
 # You can also use it with `sequential_filename`. For instance,
 # `[{published}]_{}` > `[2024-1-1]_1.png`, `[2024-1-1]_2.png`, etc.
-KTOOLBOX_JOB__FILENAME_FORMAT=[{published}]_{}
+KTOOLBOX_JOB__FILENAME_FORMAT=[{published}]_{title}_{id}_{}
 
 # Prefix the post directory name with its release/publish date, e.g. `[2024-1-1]HelloWorld`
 KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title}
