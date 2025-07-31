@@ -1,5 +1,6 @@
-from pydantic import BaseModel, RootModel
 from typing import List
+
+from pydantic import RootModel
 
 from ktoolbox.api import BaseAPI, APIRet
 from ktoolbox.api.model import Revision
