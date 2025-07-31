@@ -1,69 +1,63 @@
 ## Changes
 
-![Downloads](https://img.shields.io/github/downloads/Ljzd-PRO/KToolBox/v0.17.0/total)
+![Downloads](https://img.shields.io/github/downloads/Ljzd-PRO/KToolBox/v0.18.0/total)
 
 ### 💡 Feature
 
-- Support download **images embedded in post HTML content** - #218
-- Add external links extraction feature for **cloud storage URLs** - #232 (@xxkzn)
-  - New configurations:
-    - `job.extract_external_links`: Whether to extract external file sharing links from post content and save to separate file
-    - `job.external_link_patterns`: Regex patterns for extracting external links
-  - These configuration are **optional**, with the feature enabled by default. The regular expression includes the following services:
-    - Google Drive
-    - MEGA
-    - Dropbox
-    - OneDrive
-    - MediaFire
-    - And other common file hosting services
-  - Run `ktoolbox config-editor` to edit these configurations (`Job -> extract_external_links`, `Job -> external_link_patterns`)
-  - Or manually edit them `.env` file or environment variables
+- Add **winloop** support for **Windows** platforms as uvloop alternative
+- **Preserve image metadata** (published date) when downloading files
+- Add **keyword filtering** support to `sync-creator` command (title)
+  - Use the new command option `--keywords`
+  - Examples:
+    ```shell
+    # Filter posts containing "表情、効果音差分" in title
+    ktoolbox sync_creator https://kemono.cr/fanbox/user/xxxx --keywords "表情、効果音差分"
+
+    # Filter with multiple keywords (OR logic)
+    ktoolbox sync_creator https://kemono.cr/fanbox/user/xxxx --keywords "表情、効果音差分,Live2Dアニメ"
+    ```
+- Add **selective sequential filename** feature with excludes option
+  - For example, if you want to name post images sequentially (1.jpg, 2.jpg, ...) but keep the original filenames for
+  videos or archives (such as "March Collection.zip"), you can use this configuration option.
+  - Run `ktoolbox config-editor` to edit this configurations (`Job -> sequential_filename_excludes`)
+  - Or manually edit it in `.env` file or environment variables
     ```dotenv
-    # This feature is enabled by default
-    KTOOLBOX_JOB__EXTRACT_EXTERNAL_LINKS=True
-    # Setting up lists and regular expressions in dotenv is relatively complex and cumbersome. It is recommended to use the aforementioned graphical configuration editor for these settings.
-    KTOOLBOX_JOB__EXTERNAL_LINK_PATTERNS='["https?://drive\\.google\\.com/[^\\s]+", "https?://docs\\.google\\.com/[^\\s]+", "https?://mega\\.nz/[^\\s]+", "https?://mega\\.co\\.nz/[^\\s]+", "https?://(?:www\\.)?dropbox\\.com/[^\\s]+", "https?://db\\.tt/[^\\s]+", "https?://onedrive\\.live\\.com/[^\\s]+", "https?://1drv\\.ms/[^\\s]+", "https?://(?:www\\.)?mediafire\\.com/[^\\s]+", "https?://(?:www\\.)?wetransfer\\.com/[^\\s]+", "https?://we\\.tl/[^\\s]+", "https?://(?:www\\.)?sendspace\\.com/[^\\s]+", "https?://(?:www\\.)?4shared\\.com/[^\\s]+", "https?://(?:www\\.)?zippyshare\\.com/[^\\s]+", "https?://(?:www\\.)?uploadfiles\\.io/[^\\s]+", "https?://(?:www\\.)?box\\.com/[^\\s]+", "https?://(?:www\\.)?pcloud\\.com/[^\\s]+", "https?://disk\\.yandex\\.[a-z]+/[^\\s]+", "https?://[^\\s]*(?:file|upload|share|download|drive|storage)[^\\s]*\\.[a-z]{2,4}/[^\\s]+"]'
+    # Enable sequential naming but exclude certain file types
+    KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
+    KTOOLBOX_JOB__SEQUENTIAL_FILENAME_EXCLUDES='[".psd", ".zip", ".mp4"]'
     ```
   - 📖More information: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
 
-### 🪲 Fix
-
-- Removed the deprecated configuration `job.post_structure.content_filepath`, use `job.post_structure.content` instead
-- Fixed an issue where the `sync-creator` command lacked handling for 404 responses when fetching post revisions
-  (i\.e\. no revision version exists), which caused **slow task creation** - #294
-- Fixed the issue of **duplicate Cookies** in DDoS Guard management (manual management is no longer performed)
+[//]: # (### 🪲 Fix)
 
 - - -
 
 ### 💡 新特性
 
-- 支持下载**帖子 HTML 内容中嵌入的图片** - #218
-- 新增**云存储 URL 外链提取**功能 - #232 (@xxkzn)
-  - 新增配置项：
-    - `job.extract_external_links`：是否从帖子内容中提取外部文件分享链接并保存到单独文件
-    - `job.external_link_patterns`：用于提取外链的正则表达式模式
-  - 这些配置项为**可选**，该功能默认启用。正则表达式已包含以下服务：
-    - Google Drive
-    - MEGA
-    - Dropbox
-    - OneDrive
-    - MediaFire
-    - 及其他常见文件托管服务
-  - 可运行 `ktoolbox config-editor` 编辑这些配置（`Job -> extract_external_links`，`Job -> external_link_patterns`）
-  - 或手动编辑 `.env` 文件或环境变量
+- 为 **Windows** 平台新增 **winloop** 支持，作为 uvloop 的替代方案
+- 下载文件时**保留图片元数据**（发布日期）
+- `sync-creator` 命令新增**关键词过滤**功能（标题）
+  - 使用新命令选项 `--keywords`
+  - 示例：
+    ```shell
+    # 过滤标题包含“表情、効果音差分”的帖子
+    ktoolbox sync_creator https://kemono.cr/fanbox/user/xxxx --keywords "表情、効果音差分"
+
+    # 使用多个关键词过滤（“或”逻辑）
+    ktoolbox sync_creator https://kemono.cr/fanbox/user/xxxx --keywords "表情、効果音差分,Live2Dアニメ"
+    ```
+- 新增**选择性顺序文件名**功能，可设置排除项
+  - 例如当你想按顺序命名作品图片（1.jpg, 2.jpg, ...）但又希望保留视频或压缩包的原始文件名（如“3月合集.zip”）时，你可以用这个配置项
+  - 可运行 `ktoolbox config-editor` 编辑此配置（`Job -> sequential_filename_excludes`）
+  - 或手动在 `.env` 文件或环境变量中编辑
     ```dotenv
-    # 此功能默认启用
-    KTOOLBOX_JOB__EXTRACT_EXTERNAL_LINKS=True
-    # 在 dotenv 中设置列表和正则表达式较为复杂，推荐使用上述图形化配置编辑器进行设置。
-    KTOOLBOX_JOB__EXTERNAL_LINK_PATTERNS='["https?://drive\\.google\\.com/[^\\s]+", "https?://docs\\.google\\.com/[^\\s]+", "https?://mega\\.nz/[^\\s]+", "https?://mega\\.co\\.nz/[^\\s]+", "https?://(?:www\\.)?dropbox\\.com/[^\\s]+", "https?://db\\.tt/[^\\s]+", "https?://onedrive\\.live\\.com/[^\\s]+", "https?://1drv\\.ms/[^\\s]+", "https?://(?:www\\.)?mediafire\\.com/[^\\s]+", "https?://(?:www\\.)?wetransfer\\.com/[^\\s]+", "https?://we\\.tl/[^\\s]+", "https?://(?:www\\.)?sendspace\\.com/[^\\s]+", "https?://(?:www\\.)?4shared\\.com/[^\\s]+", "https?://(?:www\\.)?zippyshare\\.com/[^\\s]+", "https?://(?:www\\.)?uploadfiles\\.io/[^\\s]+", "https?://(?:www\\.)?box\\.com/[^\\s]+", "https?://(?:www\\.)?pcloud\\.com/[^\\s]+", "https?://disk\\.yandex\\.[a-z]+/[^\\s]+", "https?://[^\\s]*(?:file|upload|share|download|drive|storage)[^\\s]*\\.[a-z]{2,4}/[^\\s]+"]'
+    # 启用顺序命名但排除部分文件类型
+    KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
+    KTOOLBOX_JOB__SEQUENTIAL_FILENAME_EXCLUDES='[".psd", ".zip", ".mp4"]'
     ```
   - 📖更多信息：[配置参考-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
     
-### 🪲 修复
-
-- 移除了过时的配置 `job.post_structure.content_filepath`，请用 `job.post_structure.content` 代替
-- 修复 `sync-creator` 命令在 **获取帖子修订（revision）** 时缺少 404 响应的处理（即帖子无修订版本）导致的**任务创建缓慢**的问题 - #294
-- 修复 DDoS Guard Cookies 管理出现**重复 Cookie** 的问题（不再进行手动管理）
+[//]: # (### 🪲 修复)
 
 ## Upgrade
 
@@ -72,4 +66,4 @@ Use this command to upgrade if you are using **pipx**:
 pipx upgrade ktoolbox
 ```
 
-**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.16.0...v0.17.0
+**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.17.0...v0.18.0
