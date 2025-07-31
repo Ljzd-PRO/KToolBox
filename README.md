@@ -149,25 +149,6 @@ Goto [Configuration-Guide](https://ktoolbox.readthedocs.io/latest/configuration/
   - 🔗[PyPI](https://pypi.org/project/ktoolbox-pure-py/)
 - Development branch: [🔗devel](https://github.com/Ljzd-PRO/KToolBox/tree/devel)
 
-## About Kemono
-
-Description from https://kemono.su :
-
-> Kemono is a public archiver for:
->  
-> - Patreon
-> - Pixiv Fanbox
-> - Discord
-> - Fantia
-> - Afdian
-> - Boosty
-> - DLsite
-> - Gumroad
-> - SubscribeStar
-> 
-> Contributors here upload content and share it here for easy searching and organization. \
-> To get started viewing content, either search for creators on the artists page, or search for content on the posts page.
-
 ## Code Coverage
 
 ![codecov.io](https://codecov.io/gh/Ljzd-PRO/KToolBox/graphs/sunburst.svg?token=5XK9CYQHQN)
