@@ -295,7 +295,7 @@ class Downloader:
             except (OSError, ValueError, TypeError) as e:
                 logger.warning(
                     generate_msg(
-                        f"Failed to set file time from headers",
+                        "Failed to set file time from headers",
                         file=self._save_filename,
                         exception=e
                     )
