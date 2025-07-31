@@ -56,6 +56,7 @@ async def create_job_from_post(
 
     # Filter and create jobs for ``Post.attachment``
     jobs: List[Job] = []
+    sequential_counter = 1  # Counter for sequential filenames
     for i, attachment in enumerate(post.attachments):  # type: int, Attachment
         if not attachment.path:
             continue
@@ -73,7 +74,14 @@ async def create_job_from_post(
                 config.job.block_list
             )
         ):
-            basic_filename = f"{i + 1}{file_path_obj.suffix}" if config.job.sequential_filename else file_path_obj.name
+            # Check if file extension should be excluded from sequential naming
+            should_use_sequential = (config.job.sequential_filename and 
+                                   file_path_obj.suffix.lower() not in config.job.sequential_filename_excludes)
+            if should_use_sequential:
+                basic_filename = f"{sequential_counter}{file_path_obj.suffix}"
+                sequential_counter += 1
+            else:
+                basic_filename = file_path_obj.name
             alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
             jobs.append(
                 Job(
