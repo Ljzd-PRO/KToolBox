@@ -6,6 +6,7 @@
 
 - Add **winloop** support for **Windows** platforms as uvloop alternative
 - **Preserve image metadata** (published date) when downloading files
+- Include **filename** in downloader **retry logging** for better traceability
 - Add **keyword filtering** support to `sync-creator` command (title)
   - Use the new command option `--keywords`
   - Examples:
@@ -36,6 +37,7 @@
 
 - 为 **Windows** 平台新增 **winloop** 支持，作为 uvloop 的替代方案
 - 下载文件时**保留图片元数据**（发布日期）
+- 下载器**重试日志**中包含**文件名**，以便更好地追踪
 - `sync-creator` 命令新增**关键词过滤**功能（标题）
   - 使用新命令选项 `--keywords`
   - 示例：
