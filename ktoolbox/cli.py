@@ -228,7 +228,7 @@ class KToolBoxCli:
                 
                 for revision_order, revision_data in ret.data.props.revisions:
                     if revision_data.revision_id:  # Only process actual revisions, not the main post
-                        revision_path = post_path / "revision" / str(revision_data.revision_id)
+                        revision_path = post_path / config.job.post_structure.revisions / generate_post_path_name(revision_data)
                         revision_jobs = await create_job_from_post(
                             post=revision_data,
                             post_path=revision_path,
