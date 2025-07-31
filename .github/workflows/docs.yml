@@ -40,6 +40,30 @@ jobs:
         with:
           path: site
 
+  documentation-pdf:
+    name: Build documentation with PDF
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python environment
+        uses: ./.github/actions/setup-python
+
+      - name: Generate documentation PDFs
+        env:
+          ENABLE_PDF_EXPORT: 1
+        run: |
+          poetry run mkdocs build --clean
+
+      - name: Upload PDF artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ktoolbox-documentation-pdf
+          path: |
+            site/pdf/KToolBox-documentation.pdf
+            site/zh/pdf/KToolBox-documentation.pdf
+          retention-days: 30
+
 # GitHub Pages will deploy from gh-pages branch automatically
 
 #      - name: Deploy to GitHub Pages

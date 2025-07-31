@@ -37,6 +37,13 @@ plugins:
           options:
             docstring_style: sphinx
             docstring_section_style: table
+  - with-pdf:
+      author: "Ljzd-PRO"
+      copyright: "Copyright © 2023 by Ljzd-PRO"
+      cover_title: "KToolBox Documentation"
+      cover_subtitle: "A useful CLI tool for downloading posts in Kemono.cr / .su / .party"
+      output_path: pdf/KToolBox-documentation.pdf
+      enabled_if_env: ENABLE_PDF_EXPORT
   - i18n:
       docs_structure: folder
       languages:

@@ -14,6 +14,19 @@ build:
     - pip install poetry
     - poetry install --with docs
     - poetry run mkdocs build --clean --site-dir $READTHEDOCS_OUTPUT/html --config-file mkdocs.yml
+    # Generate PDFs if enabled
+    - |
+      if [ "$READTHEDOCS_VERSION" = "latest" ] || [ "$READTHEDOCS_VERSION" = "stable" ]; then
+        ENABLE_PDF_EXPORT=1 poetry run mkdocs build --clean --site-dir /tmp/pdf_build --config-file mkdocs.yml
+        # Copy PDFs to the output directory
+        mkdir -p $READTHEDOCS_OUTPUT/html/pdf
+        if [ -f /tmp/pdf_build/pdf/KToolBox-documentation.pdf ]; then
+          cp /tmp/pdf_build/pdf/KToolBox-documentation.pdf $READTHEDOCS_OUTPUT/html/pdf/
+        fi
+        if [ -f /tmp/pdf_build/zh/pdf/KToolBox-documentation.pdf ]; then
+          cp /tmp/pdf_build/zh/pdf/KToolBox-documentation.pdf $READTHEDOCS_OUTPUT/html/pdf/KToolBox-documentation-zh.pdf
+        fi
+      fi
 
 mkdocs:
   configuration: mkdocs.yml
