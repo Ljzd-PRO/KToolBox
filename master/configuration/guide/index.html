@@ -1011,7 +1011,16 @@ it will make configuration editing simple and convenient.</p>
 <li>All configuration options are optional</li>
 </ul>
 <h2 id="env-prodenv-file-example"><code>.env</code> / <code>prod.env</code> file example<a class="headerlink" href="#env-prodenv-file-example" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code># Download 10 files at the same time.
+<div class="highlight"><pre><span></span><code>##############################################################################
+#  It is recommended to use the graphical configuration editor for editing.  #
+#  Run `ktoolbox config-editor` to launch it.                                #
+##############################################################################
+
+# (Optional) Session key that can be found in cookies after a successful login
+# Use when 403 Error
+#KTOOLBOX_API__SESSION_KEY=xxxxx
+
+# Download 10 files at the same time.
 KTOOLBOX_JOB__COUNT=10
 
 # Set post attachments directory path as `./`, it means to save all attachments files in post directory
@@ -1026,7 +1035,7 @@ KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
 # For example: `{title}_{}` &gt; `HelloWorld_b4b41de2-8736-480d-b5c3-ebf0d917561b`, etc.
 # You can also use it with `sequential_filename`. For instance,
 # `[{published}]_{}` &gt; `[2024-1-1]_1.png`, `[2024-1-1]_2.png`, etc.
-KTOOLBOX_JOB__FILENAME_FORMAT=[{published}]_{}
+KTOOLBOX_JOB__FILENAME_FORMAT=[{published}]_{title}_{id}_{}
 
 # Prefix the post directory name with its release/publish date, e.g. `[2024-1-1]HelloWorld`
 KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title}

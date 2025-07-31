@@ -1012,24 +1012,33 @@
 <li>所有配置选项都是可选的</li>
 </ul>
 <h2 id="env-prodenv"><code>.env</code> / <code>prod.env</code> 文件示例<a class="headerlink" href="#env-prodenv" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code># 可同时下载10个文件
+<div class="highlight"><pre><span></span><code>##############################################################################
+#  推荐使用图形化配置编辑器进行编辑。                                         #
+#  运行 `ktoolbox config-editor` 启动编辑器。                                #
+##############################################################################
+
+# （可选）会话密钥，可在成功登录后的 cookies 中找到
+# 403 错误时使用
+#KTOOLBOX_API__SESSION_KEY=xxxxx
+
+# 同时下载 10 个文件。
 KTOOLBOX_JOB__COUNT=10
 
-# 设置作品附件目录为 `./`, 这意味着所有附件将直接保存在作品目录下
-# 而不会创建一个子目录来储存
+# 设置帖子附件目录路径为 `./`，表示将所有附件文件保存在帖子目录下
+# 不会为附件单独创建子目录
 KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 
-# 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
+# 附件按数字顺序重命名，例如 `1.png`、`2.png`、……
 KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
 
-# 通过插入一个代表了基本文件名的空白的 `{}` 以自定义文件名格式 
-# 与 `post_dirname_format` 类似，你可以使用一些 `Post` 类里的属性
-# 例如 `{title}_{}` &gt; `HelloWorld_b4b41de2-8736-480d-b5c3-ebf0d917561b`
-# 你也可以和 `sequential_filename` 搭配使用
-# 例如 `[{published}]_{}` &gt; `[2024-1-1]_1.png`, `[2024-1-1]_2.png`
-KTOOLBOX_JOB__FILENAME_FORMAT=[{published}]_{}
+# 通过插入空的 `{}` 自定义文件名格式，表示基础文件名。
+# 类似于 `post_dirname_format`，可以使用 `Post` 中的一些属性。
+# 例如：`{title}_{}` &gt; `HelloWorld_b4b41de2-8736-480d-b5c3-ebf0d917561b` 等。
+# 也可以与 `sequential_filename` 一起使用。例如，
+# `[{published}]_{}` &gt; `[2024-1-1]_1.png`、`[2024-1-1]_2.png` 等。
+KTOOLBOX_JOB__FILENAME_FORMAT=[{published}]_{title}_{id}_{}
 
-# 将发布日期作为作品目录名的开头，例如 `[2024-1-1]HelloWorld`
+# 帖子目录名以发布时间作为前缀，例如 `[2024-1-1]HelloWorld`
 KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title}
 </code></pre></div>
 
