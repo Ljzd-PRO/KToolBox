@@ -60,7 +60,10 @@
    推荐使用 pipx
    ```bash
    pip3 install pipx
-   pipx install ktoolbox
+   # Windows
+   pipx install ktoolbox[urwid,winloop]
+   # Linux / macOS
+   pipx install ktoolbox[urwid,uvloop]
    ```
 
 === "纯 Python"

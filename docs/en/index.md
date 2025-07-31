@@ -59,7 +59,10 @@ You can use executables from [releases](https://github.com/Ljzd-PRO/KToolBox/rel
     Recommend to use pipx
     ```bash
     pip3 install pipx
-    pipx install ktoolbox
+    # Windows
+    pipx install ktoolbox[urwid,winloop]
+    # Linux / macOS
+    pipx install ktoolbox[urwid,uvloop]
     ```
 
 === "Pure Python"
