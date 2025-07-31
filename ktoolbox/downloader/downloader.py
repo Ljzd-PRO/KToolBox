@@ -1,7 +1,6 @@
 import asyncio
 import os
 from asyncio import CancelledError, Lock
-from datetime import datetime
 from functools import cached_property
 from pathlib import Path
 from typing import Callable, Any, Coroutine, Type, Optional, Set
@@ -124,6 +123,7 @@ class Downloader:
         """
         self._stop = True
 
+    # noinspection PyProtectedMember
     @tenacity.retry(
         stop=stop_never if config.downloader.retry_stop_never else stop_after_attempt(config.downloader.retry_times),
         wait=wait_fixed(config.downloader.retry_interval),
@@ -135,6 +135,7 @@ class Downloader:
         before_sleep=lambda x: logger.warning(
             generate_msg(
                 f"Retrying ({x.attempt_number})",
+                file=x.args[0]._save_filename,
                 message=x.outcome.result().message if not x.outcome.failed else None,
                 exception=x.outcome.exception()
             )
