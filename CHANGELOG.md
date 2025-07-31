@@ -29,6 +29,9 @@
 ### 🪲 Fix
 
 - Removed the deprecated configuration `job.post_structure.content_filepath`, use `job.post_structure.content` instead
+- Fixed an issue where the `sync-creator` command lacked handling for 404 responses when fetching post revisions
+  (i\.e\. no revision version exists), which caused **slow task creation** - #294
+- Fixed the issue of **duplicate Cookies** in DDoS Guard management (manual management is no longer performed)
 
 - - -
 
@@ -59,6 +62,8 @@
 ### 🪲 修复
 
 - 移除了过时的配置 `job.post_structure.content_filepath`，请用 `job.post_structure.content` 代替
+- 修复 `sync-creator` 命令在 **获取帖子修订（revision）** 时缺少 404 响应的处理（即帖子无修订版本）导致的**任务创建缓慢**的问题 - #294
+- 修复 DDoS Guard Cookies 管理出现**重复 Cookie** 的问题（不再进行手动管理）
 
 ## Upgrade
 

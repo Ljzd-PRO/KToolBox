@@ -11,7 +11,7 @@ from ktoolbox._enum import TextEnum
 from ktoolbox.action import create_job_from_post, create_job_from_creator, generate_post_path_name
 from ktoolbox.action import search_creator as search_creator_action, search_creator_post as search_creator_post_action
 from ktoolbox.api.misc import get_app_version
-from ktoolbox.api.posts import get_post as get_post_api, get_post_revisions as get_post_revisions_api
+from ktoolbox.api.posts import get_post as get_post_api
 from ktoolbox.configuration import config
 from ktoolbox.job import JobRunner
 from ktoolbox.utils import dump_search, parse_webpage_url, generate_msg
@@ -214,7 +214,7 @@ class KToolBoxCli:
                 
                 for revision_order, revision_data in ret.data.props.revisions:
                     if revision_data.revision_id:  # Only process actual revisions, not the main post
-                        revision_path = post_path / "revision" / str(revision_data.revision_id)
+                        revision_path = post_path / config.job.post_structure.revisions / generate_post_path_name(revision_data)
                         revision_jobs = await create_job_from_post(
                             post=revision_data,
                             post_path=revision_path,

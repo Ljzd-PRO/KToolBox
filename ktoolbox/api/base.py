@@ -13,7 +13,6 @@ from ktoolbox._enum import RetCodeEnum
 from ktoolbox.model import RootModel
 from ktoolbox.configuration import config
 from ktoolbox.utils import BaseRet, generate_msg
-from ktoolbox.ddos_guard import DDoSGuardCookieManager, merge_cookies
 
 __all__ = ["APITenacityStop", "APIRet", "BaseAPI"]
 
@@ -70,30 +69,9 @@ class BaseAPI(ABC, Generic[_T]):
     path: str = "/"
     method: Literal["get", "post"]
     extra_validator: Optional[Callable[[str], BaseModel]] = None
-    
-    # Initialize DDoS Guard cookie manager
-    _ddos_cookie_manager: Optional[DDoSGuardCookieManager] = None
-    
-    @classmethod
-    def _get_ddos_cookie_manager(cls) -> DDoSGuardCookieManager:
-        """Get or create DDoS Guard cookie manager"""
-        if cls._ddos_cookie_manager is None:
-            cls._ddos_cookie_manager = DDoSGuardCookieManager()
-            logger.debug("Initialized DDoS Guard cookie manager")
-        return cls._ddos_cookie_manager
-    
-    @classmethod
-    def _build_cookies(cls) -> Optional[dict]:
-        """Build cookies including session and DDoS Guard cookies"""
-        session_cookies = {"session": config.api.session_key} if config.api.session_key else None
-        ddos_manager = cls._get_ddos_cookie_manager()
-        ddos_cookies = ddos_manager.cookies
-        
-        return merge_cookies(session_cookies, ddos_cookies)
-    
     client = httpx.AsyncClient(
         verify=config.ssl_verify,
-        cookies=None  # We'll set cookies dynamically
+        cookies={"session": config.api.session_key} if config.api.session_key else None
     )
 
     Response = BaseModel
@@ -114,7 +92,7 @@ class BaseAPI(ABC, Generic[_T]):
                     message=str(e),
                     exception=e
                 )
-            elif isinstance(e, ValidationError):
+            else:
                 return APIRet(
                     code=RetCodeEnum.ValidationError,
                     message=str(e),
@@ -136,12 +114,6 @@ class BaseAPI(ABC, Generic[_T]):
             path = cls.path
         url_parts = [config.api.scheme, config.api.netloc, f"{config.api.path}{path}", '', '', '']
         url = str(urlunparse(url_parts))
-        
-        # Build cookies dynamically to include any updates
-        cookies = cls._build_cookies()
-        if cookies:
-            kwargs.setdefault('cookies', {}).update(cookies)
-        
         try:
             res = await cls.client.request(
                 method=cls.method,
@@ -150,11 +122,6 @@ class BaseAPI(ABC, Generic[_T]):
                 follow_redirects=True,
                 **kwargs
             )
-            
-            # Update DDoS Guard cookies from response
-            ddos_manager = cls._get_ddos_cookie_manager()
-            ddos_manager.update_from_response(res)
-                
         except Exception as e:
             return APIRet(
                 code=RetCodeEnum.NetWorkError,
