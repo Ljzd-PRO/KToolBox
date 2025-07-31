@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Union, overload
+from typing import Union, overload, Set
 
 import aiofiles
 from loguru import logger
@@ -236,7 +236,8 @@ class KToolBoxCli:
             save_creator_indices: bool = True,
             mix_posts: bool = None,
             start_time: str = None,
-            end_time: str = None
+            end_time: str = None,
+            keywords: str = None
     ):
         ...
 
@@ -250,7 +251,8 @@ class KToolBoxCli:
             save_creator_indices: bool = True,
             mix_posts: bool = None,
             start_time: str = None,
-            end_time: str = None
+            end_time: str = None,
+            keywords: str = None
     ):
         ...
 
@@ -266,7 +268,8 @@ class KToolBoxCli:
             start_time: str = None,
             end_time: str = None,
             offset: int = 0,
-            length: int = None
+            length: int = None,
+            keywords: str = None
     ):
         """
         Sync posts from a creator
@@ -291,6 +294,7 @@ class KToolBoxCli:
             Time format: ``%Y-%m-%d``
         :param offset: Result offset (or start offset)
         :param length: The number of posts to fetch, defaults to fetching all posts after ``offset``.
+        :param keywords: Comma-separated keywords to filter posts by title (case-insensitive)
         """
         logger.info(repr(config))
         # Get service, creator_id
@@ -332,6 +336,14 @@ class KToolBoxCli:
         creator_path = path / sanitize_filename(creator_name)
 
         creator_path.mkdir(exist_ok=True)
+        
+        # Parse keywords
+        keyword_set: Set[str] = None
+        if keywords:
+            keyword_set = set(kw.strip() for kw in keywords.split(',') if kw.strip())
+            if keyword_set:
+                logger.info(f"Filtering posts by keywords: {', '.join(keyword_set)}")
+        
         ret = await create_job_from_creator(
             service=service,
             creator_id=creator_id,
@@ -342,7 +354,8 @@ class KToolBoxCli:
             save_creator_indices=save_creator_indices,
             mix_posts=mix_posts,
             start_time=datetime.strptime(start_time, "%Y-%m-%d") if start_time else None,
-            end_time=datetime.strptime(end_time, "%Y-%m-%d") if end_time else None
+            end_time=datetime.strptime(end_time, "%Y-%m-%d") if end_time else None,
+            keywords=keyword_set
         )
         if ret:
             job_runner = JobRunner(job_list=ret.data)

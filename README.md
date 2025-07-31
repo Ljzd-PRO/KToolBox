@@ -82,7 +82,8 @@ Manually install:
   pipx install ktoolbox
   ```
 
-- For [a-Shell](https://github.com/holzschu/a-shell)
+- For [a-Shell](https://github.com/holzschu/a-shell) or [pyodide](https://pyodide.org/en/stable/), 
+  or if you can only use pure Python and you cannot compile [pydantic](https://docs.pydantic.dev/latest/) v2.x.x
   ```bash
   pip3 install ktoolbox-pure-py
   ```
@@ -147,25 +148,6 @@ Goto [Configuration-Guide](https://ktoolbox.readthedocs.io/latest/configuration/
   - For example, you can use it on iOS terminal App [a-Shell](https://github.com/holzschu/a-shell)
   - 🔗[PyPI](https://pypi.org/project/ktoolbox-pure-py/)
 - Development branch: [🔗devel](https://github.com/Ljzd-PRO/KToolBox/tree/devel)
-
-## About Kemono
-
-Description from https://kemono.su :
-
-> Kemono is a public archiver for:
->  
-> - Patreon
-> - Pixiv Fanbox
-> - Discord
-> - Fantia
-> - Afdian
-> - Boosty
-> - DLsite
-> - Gumroad
-> - SubscribeStar
-> 
-> Contributors here upload content and share it here for easy searching and organization. \
-> To get started viewing content, either search for creators on the artists page, or search for content on the posts page.
 
 ## Code Coverage
 

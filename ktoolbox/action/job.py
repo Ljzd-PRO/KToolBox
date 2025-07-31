@@ -2,7 +2,7 @@ from datetime import datetime
 from fnmatch import fnmatch
 from itertools import count
 from pathlib import Path
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Set
 from urllib.parse import urlparse
 
 import aiofiles
@@ -11,7 +11,7 @@ from pathvalidate import sanitize_filename, is_valid_filename
 
 from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.action import ActionRet, fetch_creator_posts, FetchInterruptError
-from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date, generate_filename
+from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date, generate_filename, filter_posts_by_keywords
 from ktoolbox.api.model import Post, Attachment
 from ktoolbox.api.posts import get_post_revisions as get_post_revisions_api
 from ktoolbox.configuration import config, PostStructureConfiguration
@@ -56,6 +56,7 @@ async def create_job_from_post(
 
     # Filter and create jobs for ``Post.attachment``
     jobs: List[Job] = []
+    sequential_counter = 1  # Counter for sequential filenames
     for i, attachment in enumerate(post.attachments):  # type: int, Attachment
         if not attachment.path:
             continue
@@ -73,14 +74,22 @@ async def create_job_from_post(
                 config.job.block_list
             )
         ):
-            basic_filename = f"{i + 1}{file_path_obj.suffix}" if config.job.sequential_filename else file_path_obj.name
+            # Check if file extension should be excluded from sequential naming
+            should_use_sequential = (config.job.sequential_filename and 
+                                   file_path_obj.suffix.lower() not in config.job.sequential_filename_excludes)
+            if should_use_sequential:
+                basic_filename = f"{sequential_counter}{file_path_obj.suffix}"
+                sequential_counter += 1
+            else:
+                basic_filename = file_path_obj.name
             alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
             jobs.append(
                 Job(
                     path=attachments_path,
                     alt_filename=alt_filename,
                     server_path=attachment.path,
-                    type=PostFileTypeEnum.Attachment
+                    type=PostFileTypeEnum.Attachment,
+                    published=post.published or post.added
                 )
             )
 
@@ -106,7 +115,8 @@ async def create_job_from_post(
                     path=post_path,
                     alt_filename=post_file_name.name,
                     server_path=post.file.path,
-                    type=PostFileTypeEnum.File
+                    type=PostFileTypeEnum.File,
+                    published=post.published or post.added
                 )
             )
 
@@ -144,7 +154,8 @@ async def create_job_from_creator(
         save_creator_indices: bool = False,
         mix_posts: bool = None,
         start_time: Optional[datetime],
-        end_time: Optional[datetime]
+        end_time: Optional[datetime],
+        keywords: Optional[Set[str]] = None
 ) -> ActionRet[List[Job]]:
     """
     Create a list of download job from a creator
@@ -160,6 +171,7 @@ async def create_job_from_creator(
      ``save_creator_indices`` will be ignored if enabled
     :param start_time: Start time of the time range
     :param end_time: End time of the time range
+    :param keywords: Set of keywords to filter posts by title (case-insensitive)
     """
     mix_posts = config.job.mix_posts if mix_posts is None else mix_posts
 
@@ -190,7 +202,12 @@ async def create_job_from_creator(
     # Filter posts by publish time
     if start_time or end_time:
         post_list = list(filter_posts_by_date(post_list, start_time, end_time))
-    logger.info(f"Get {len(post_list)} posts, start creating jobs")
+        
+    # Filter posts by keywords
+    if keywords:
+        post_list = list(filter_posts_by_keywords(post_list, keywords))
+        
+    logger.info(f"Get {len(post_list)} posts after filtering, start creating jobs")
 
     # Filter posts and generate ``CreatorIndices``
     if not mix_posts:

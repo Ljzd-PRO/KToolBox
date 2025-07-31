@@ -56,14 +56,21 @@
 
 你可以从 [releases](https://github.com/Ljzd-PRO/KToolBox/releases) 页面下载可执行文件使用
 
-=== "手动安装 - 一般情况"
+=== "一般情况"
    推荐使用 pipx
    ```bash
    pip3 install pipx
    pipx install ktoolbox
    ```
 
-=== "手动安装 - 对于 iOS a-Shell"
+=== "纯 Python"
+   如果你在使用 [pyodide](https://pyodide.org/en/stable/)，或者如果你只能使用纯Python，无法编译 [pydantic](https://docs.pydantic.dev/latest/) v2.x.x
+   ```bash
+   pip3 install pipx
+   pipx install ktoolbox
+   ```
+
+=== "对于 iOS a-Shell"
     ```bash
     pip3 install ktoolbox-pure-py
     ```

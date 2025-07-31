@@ -19,7 +19,7 @@ from tqdm import tqdm as std_tqdm
 from ktoolbox._enum import RetCodeEnum
 from ktoolbox.configuration import config
 from ktoolbox.downloader.base import DownloaderRet
-from ktoolbox.downloader.utils import filename_from_headers, duplicate_file_check
+from ktoolbox.downloader.utils import filename_from_headers, duplicate_file_check, utime_from_headers
 from ktoolbox.utils import generate_msg
 
 __all__ = ["Downloader"]
@@ -123,6 +123,7 @@ class Downloader:
         """
         self._stop = True
 
+    # noinspection PyProtectedMember
     @tenacity.retry(
         stop=stop_never if config.downloader.retry_stop_never else stop_after_attempt(config.downloader.retry_times),
         wait=wait_fixed(config.downloader.retry_interval),
@@ -134,6 +135,7 @@ class Downloader:
         before_sleep=lambda x: logger.warning(
             generate_msg(
                 f"Retrying ({x.attempt_number})",
+                file=x.args[0]._save_filename,
                 message=x.outcome.result().message if not x.outcome.failed else None,
                 exception=x.outcome.exception()
             )
@@ -285,7 +287,19 @@ class Downloader:
             if config.downloader.use_bucket:
                 bucket_file_path.parent.mkdir(parents=True, exist_ok=True)
                 os.link(temp_filepath, bucket_file_path)
-            temp_filepath.rename(self._path / self._save_filename)
+            final_filepath = self._path / self._save_filename
+            temp_filepath.rename(final_filepath)
+
+            try:
+                utime_from_headers(res.headers, final_filepath)
+            except (OSError, ValueError, TypeError) as e:
+                logger.warning(
+                    generate_msg(
+                        "Failed to set file time from headers",
+                        file=self._save_filename,
+                        exception=e
+                    )
+                )
 
             # Callbacks
             if sync_callable:

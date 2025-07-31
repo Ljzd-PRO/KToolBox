@@ -117,14 +117,29 @@ def parse_webpage_url(url: str) -> Tuple[Optional[str], Optional[str], Optional[
 
 def uvloop_init() -> bool:
     """
-    Set event loop policy to uvloop if available.
+    Set event loop policy to uvloop or winloop if available.
+    
+    Uses winloop on Windows and uvloop on Unix-like systems for performance optimization.
 
-    :return: If uvloop enabled successfully
+    :return: If event loop policy was set successfully
     """
     if config.use_uvloop:
         if sys.platform == "win32":
-            logger.debug("uvloop is not supported on Windows, but it's optional.")
+            # Try to use winloop on Windows
+            try:
+                # noinspection PyUnresolvedReferences
+                import winloop
+            except ModuleNotFoundError:
+                logger.debug(
+                    "winloop is not installed, but it's optional. "
+                    "You can install it with `pip install ktoolbox[winloop]`"
+                )
+            else:
+                asyncio.set_event_loop_policy(winloop.EventLoopPolicy())
+                logger.success("Set event loop policy to winloop successfully.")
+                return True
         else:
+            # Try to use uvloop on Unix-like systems
             try:
                 # noinspection PyUnresolvedReferences
                 import uvloop
