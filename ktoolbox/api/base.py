@@ -91,7 +91,7 @@ class BaseAPI(ABC, Generic[_T]):
                     message=str(e),
                     exception=e
                 )
-            elif isinstance(e, ValidationError):
+            else:
                 return APIRet(
                     code=RetCodeEnum.ValidationError,
                     message=str(e),
