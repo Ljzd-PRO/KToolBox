@@ -17,7 +17,7 @@
   - This feature is enabled only when the configuration option `use_uvloop` (`KTOOLBOX_USE_UVLOOP`) is set to its default value `True`
 
 - **Preserve image metadata** (**modified/creation time**) when downloading files - #248
-- Include **filename** in downloader **retry logging** for better traceability
+- Include filename, post name, post id, URL in downloader **retry logging** for better traceability - #223 (@LuanaNight)
 - Add **keyword filtering** support to `sync-creator` command (title) - #292
   - Use the new command option `--keywords`
   - Examples:
@@ -58,7 +58,7 @@
     ```
   - 当配置项 `use_uvloop`（`KTOOLBOX_USE_UVLOOP`）设为默认值 `True` 时才会启用
 - 下载文件时**保留图片元数据**（**修改/创建 日期**） - #248
-- 下载器**重试日志**中包含**文件名**，以便更好地追踪
+- 下载器**重试日志**中包含文件名、作品名称、作品ID、URL，以便更好地追踪 - #223 (@LuanaNight)
 - `sync-creator` 命令新增**关键词过滤**功能（标题） - #292
   - 使用新命令选项 `--keywords`
   - 示例：
