@@ -5,6 +5,17 @@
 ### 💡 Feature
 
 - Add **winloop** support for **Windows** platforms as uvloop alternative - #268 (@IvanmaAcademic)
+  - uvloop or winloop can improve the asynchronous performance of the program
+  - The executables provided on the **GitHub Releases** page **already include** uvloop or winloop
+  - If you installed via **pipx**, you can run the following commands to add uvloop or winloop
+    ```shell
+    # Windows
+    pipx install ktoolbox[urwid,winloop] --force
+    # Linux / macOS
+    pipx install ktoolbox[urwid,uvloop] --force
+    ```
+  - This feature is enabled only when the configuration option `use_uvloop` (`KTOOLBOX_USE_UVLOOP`) is set to its default value `True`
+
 - **Preserve image metadata** (**modified/creation time**) when downloading files - #248
 - Include **filename** in downloader **retry logging** for better traceability
 - Add **keyword filtering** support to `sync-creator` command (title) - #292
@@ -36,6 +47,16 @@
 ### 💡 新特性
 
 - 为 **Windows** 平台新增 **winloop** 支持，作为 uvloop 的替代方案 - #268 (@IvanmaAcademic)
+  - uvloop 或 winloop 能够提升程序的异步性能
+  - **GitHub Releases** 页面中提供的可执行文件**已经包含**了 uvloop 或 winloop
+  - 如果你是用 **pipx** 安装的，你可以执行下面的命令来增加包含 uvloop 或 winloop
+    ```shell
+    # Windows
+    pipx install ktoolbox[urwid,winloop] --force
+    # Linux / macOS
+    pipx install ktoolbox[urwid,uvloop] --force
+    ```
+  - 当配置项 `use_uvloop`（`KTOOLBOX_USE_UVLOOP`）设为默认值 `True` 时才会启用
 - 下载文件时**保留图片元数据**（**修改/创建 日期**） - #248
 - 下载器**重试日志**中包含**文件名**，以便更好地追踪
 - `sync-creator` 命令新增**关键词过滤**功能（标题） - #292
