@@ -1,4 +1,3 @@
-from datetime import datetime
 from pathlib import Path
 from typing import List, Optional, Literal, Dict
 
@@ -23,8 +22,8 @@ class Job(BaseModel):
     """The `path` part of download URL"""
     type: Optional[Literal[PostFileTypeEnum.Attachment, PostFileTypeEnum.File]] = None
     """Target file type"""
-    published: Optional[datetime] = None
-    """Published date of the post (or added date as fallback), used to set file modification time"""
+    post: Optional[Post] = None
+    """Post object"""
 
 
 # class JobList(Job, UserList[Job]):

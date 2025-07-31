@@ -89,7 +89,7 @@ async def create_job_from_post(
                     alt_filename=alt_filename,
                     server_path=attachment.path,
                     type=PostFileTypeEnum.Attachment,
-                    published=post.published or post.added
+                    post=post
                 )
             )
 
@@ -116,7 +116,7 @@ async def create_job_from_post(
                     alt_filename=post_file_name.name,
                     server_path=post.file.path,
                     type=PostFileTypeEnum.File,
-                    published=post.published or post.added
+                    post=post
                 )
             )
 
