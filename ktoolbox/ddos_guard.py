@@ -46,15 +46,13 @@ class DDoSGuardCookieManager:
     Manager for DDoS Guard cookies to help bypass protection
     """
     
-    def __init__(self, client_ip: Optional[str] = None):
+    def __init__(self, initial_cookies: Optional[Dict[str, str]] = None):
         """
-        Initialize the DDoS Guard cookie manager with auto-generated cookies
+        Initialize the DDoS Guard cookie manager
         
-        :param client_ip: Client IP address for ddg9 cookie, defaults to 127.0.0.1
+        :param initial_cookies: Initial DDoS Guard cookies to use
         """
-        self._cookies: Dict[str, str] = {}
-        # Auto-generate default DDoS Guard cookies
-        self.generate_default_cookies(client_ip)
+        self._cookies: Dict[str, str] = initial_cookies.copy() if initial_cookies else {}
         
     @property
     def cookies(self) -> Dict[str, str]:
