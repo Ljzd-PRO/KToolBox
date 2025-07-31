@@ -31,7 +31,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        os: [ windows-latest, ubuntu-latest, macos-latest, macos-13 ]
 
     steps:
       - uses: actions/checkout@v4
@@ -47,5 +47,5 @@ jobs:
       - name: Upload Executable
         uses: actions/upload-artifact@v4
         with:
-          name: ktoolbox-executable-${{ runner.os }}-${{ runner.os == 'macOS' && 'universal2' || 'x86_64' }}
+          name: ktoolbox-executable-${{ runner.os }}-${{ runner.arch }}
           path: dist
