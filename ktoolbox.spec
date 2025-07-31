@@ -11,7 +11,7 @@ a = Analysis(
     datas=[
         (template_dir + '/*', 'settings_doc/templates'),
     ],
-    hiddenimports=[],
+    hiddenimports=['winloop._noop'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
