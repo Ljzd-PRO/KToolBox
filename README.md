@@ -82,7 +82,8 @@ Manually install:
   pipx install ktoolbox
   ```
 
-- For [a-Shell](https://github.com/holzschu/a-shell)
+- For [a-Shell](https://github.com/holzschu/a-shell) or [pyodide](https://pyodide.org/en/stable/), 
+  or if you can only use pure Python and you cannot compile [pydantic](https://docs.pydantic.dev/latest/) v2.x.x
   ```bash
   pip3 install ktoolbox-pure-py
   ```

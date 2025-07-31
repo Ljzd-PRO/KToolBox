@@ -55,14 +55,21 @@
 
 You can use executables from [releases](https://github.com/Ljzd-PRO/KToolBox/releases) page
 
-=== "Manually Install - Normal"
+=== "Normal"
     Recommend to use pipx
     ```bash
     pip3 install pipx
     pipx install ktoolbox
     ```
 
-=== "Manually Install - For iOS a-Shell"
+=== "Pure Python"
+    If you are using pyodide, or you can only use pure Python and you cannot compile [pydantic](https://docs.pydantic.dev/latest/) v2.x.x
+    ```bash
+    pip3 install pipx
+    pipx install ktoolbox-pure-py
+    ```
+
+=== "For iOS a-Shell"
     ```bash
     pip3 install ktoolbox-pure-py
     ```
