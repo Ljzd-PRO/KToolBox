@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 import httpx
 from loguru import logger
 
-__all__ = ["generate_ddg_cookie_value", "DDoSGuardCookieManager", "merge_cookies", "update_cookies_from_response"]
+__all__ = ["DDoSGuardCookieManager", "merge_cookies", "update_cookies_from_response"]
 
 
 def generate_ddg_cookie_value(cookie_name: str, client_ip: Optional[str] = None) -> str:
@@ -78,13 +78,34 @@ class DDoSGuardCookieManager:
         logger.debug(f"Generated default DDoS Guard cookies: {list(ddg_cookies.keys())}")
         return ddg_cookies
     
-    def update_from_response(self, response: httpx.Response):
+    def update_from_response(self, response: httpx.Response) -> bool:
         """
         Update DDoS Guard cookies from HTTP response
         
         :param response: HTTP response that may contain DDoS Guard cookies
+        :return: True if any DDoS Guard cookies were updated
         """
-        self._cookies.update(response.cookies)
+        updated = False
+        
+        # Extract Set-Cookie headers and update DDoS Guard cookies
+        for cookie_header in response.headers.get_list("set-cookie"):
+            if "__ddg" in cookie_header.lower():
+                # Parse cookie name and value
+                try:
+                    cookie_parts = cookie_header.split(';')[0].strip()
+                    if '=' in cookie_parts:
+                        name, value = cookie_parts.split('=', 1)
+                        name = name.strip()
+                        value = value.strip()
+                        
+                        if name.startswith("__ddg") and name.endswith("_"):
+                            self._cookies[name] = value
+                            updated = True
+                            logger.debug(f"Updated DDoS Guard cookie {name} from response")
+                except Exception as e:
+                    logger.warning(f"Failed to parse DDoS Guard cookie from response: {e}")
+        
+        return updated
     
     def refresh_time_dependent_cookies(self):
         """
@@ -128,6 +149,5 @@ def update_cookies_from_response(response: httpx.Response,
     """
     if not cookie_manager:
         return False
-
-    cookie_manager.update_from_response(response)
-    return True
+    
+    return cookie_manager.update_from_response(response)
