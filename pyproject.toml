@@ -38,7 +38,8 @@ loguru = "^0.7.2"
 aiofiles = "^23.2.1"
 pathvalidate = "^3.2.0"
 settings-doc = "^4.3.1"
-uvloop = {version=">=0.19,<0.22", optional=true}
+uvloop = {version=">=0.19,<0.22", optional=true, markers = "sys_platform != 'win32'"}
+winloop = {version=">=0.1.6", optional=true, markers = "sys_platform == 'win32'"}
 urwid = [
     {version="^2.6.16", optional=true, markers = "sys_platform != 'win32'"},
     {version="^2.6.16", extras=["curses"], optional=true, markers = "sys_platform == 'win32'"}
@@ -77,6 +78,7 @@ optional = true
 
 [tool.poetry.extras]
 uvloop = ["uvloop"]
+winloop = ["winloop"] 
 urwid = ["urwid"]
 
 [build-system]
