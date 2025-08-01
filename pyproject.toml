@@ -54,7 +54,7 @@ mkdocs-static-i18n = "^1.2.0"
 mkdocs-material = "^9.4.14"
 mkdocstrings = {version=">=0.24,<0.27", extras=["python"]}
 mike = "^2.0.0"
-mkdocs-with-pdf = "^0.9.3"
+mkdocs-to-pdf = {version=">=0.10.1,<=0.11.0", optional=true, markers = "python_version >= '3.9'"}
 
 [tool.poetry.group.test.dependencies]
 pytest = "==8.3.3"
