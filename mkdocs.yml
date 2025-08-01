@@ -37,6 +37,7 @@ plugins:
           options:
             docstring_style: sphinx
             docstring_section_style: table
+            show_source: false
   - with-pdf:
       author: "Ljzd-PRO"
       copyright: "Copyright © 2023 by Ljzd-PRO"
