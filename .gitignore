@@ -152,11 +152,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# Test artifacts
-test_external_links_fix.py
-文化祭打ち上げの裏ワザ/
-test_search_*.json
-
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
