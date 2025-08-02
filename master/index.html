@@ -1049,15 +1049,29 @@
 
 <h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Supports concurrent downloads  </li>
-<li>Automatically retries API calls and downloads after failures  </li>
-<li>Allows downloading individual posts or <strong>all posts</strong> of a specified artist  </li>
-<li>Can <strong>update downloaded</strong> artist directories to the latest state  </li>
-<li>Supports customizable <strong>file and directory naming formats</strong> and <strong>directory structures</strong> for downloaded posts/artists  </li>
-<li>Enables excluding <strong>specified file formats</strong> or downloading only specified formats  </li>
-<li>Allows searching for artists and posts, with options to export results  </li>
-<li>Compatible with all platforms, with iOS shortcuts provided  </li>
-<li>For support related to <em>Coomer.su / Coomer.party</em>, please refer to the documentation: <a href="https://ktoolbox.readthedocs.io/latest/coomer/">Coomer</a></li>
+<li>Support concurrent downloading of multiple files</li>
+<li>Automatically retry on API call or download failure</li>
+<li>Support downloading a single post or <strong>all posts</strong> of a specified artist</li>
+<li>Can <strong>update downloaded</strong> artist directories to the latest state</li>
+<li>Support customizing the <strong>file and directory name format</strong> and <strong>directory structure</strong> for downloaded posts/artists</li>
+<li>For example, the post directory can be set to the format <code>[2025-01-02]_TheTitle</code>, and image files can be named sequentially as <code>1.jpg</code>, <code>2.jpg</code>, etc.</li>
+<li>If you want to store all images from an artist's posts in a single directory for preview, you can use the <code>job.mix_posts</code> config option with a custom filename format to get a directory with hundreds or thousands of images<ul>
+<li>Such as <code>[2025-01-02]_TheTitle_1.jpg</code>, <code>[2025-01-02]_TheTitle_2.jpg</code>, <code>[2025-01-02]_TheTitle_3.jpg</code>, etc.</li>
+</ul>
+</li>
+<li>Support excluding <strong>specified file formats</strong> or downloading only specified formats</li>
+<li>For example, if you don't want to download large and duplicate PSD or archive files, you can exclude <code>.psd</code> and <code>.zip</code> files in the config</li>
+<li>Support filtering downloads by post <strong>title keywords</strong></li>
+<li>For example, if you only want to download posts whose titles contain "表情" or "効果音差分", you can use the <code>sync-creator</code> command with the <code>--keywords</code> option</li>
+<li>Support filtering downloads by post <strong>publish date range</strong></li>
+<li>Can parse and download images contained in the multi-info text of the post page HTML</li>
+<li>These posts are characterized by images not loading immediately when the browser enters the page, and no preview images</li>
+<li>Can collect <strong>cloud drive links</strong> listed on the post page and save them to a text file</li>
+<li>Can search for artists and posts, and export results</li>
+<li>If you want to process artist and post data yourself, you can use this feature to export JSON data</li>
+<li>Cross-platform support, with iOS shortcuts provided</li>
+<li>The pure Python branch can run on iOS a-Shell or in the browser via Pyodide</li>
+<li>For <em>Coomer.st / Coomer.su / Coomer.party</em> support, please refer to the documentation <a href="https://ktoolbox.readthedocs.io/latest/zh/coomer/">Coomer</a></li>
 </ul>
 <h2 id="tutorial">Tutorial<a class="headerlink" href="#tutorial" title="Permanent link">&para;</a></h2>
 <h3 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h3>

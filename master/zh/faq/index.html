@@ -905,7 +905,7 @@
         <li class="md-nav__item">
   <a href="#attachments" class="md-nav__link">
     <span class="md-ellipsis">
-      我不需要作品目录下的 attachments 文件夹
+      我不需要帖子目录下的 attachments 文件夹
     </span>
   </a>
   
@@ -1057,7 +1057,7 @@
         <li class="md-nav__item">
   <a href="#attachments" class="md-nav__link">
     <span class="md-ellipsis">
-      我不需要作品目录下的 attachments 文件夹
+      我不需要帖子目录下的 attachments 文件夹
     </span>
   </a>
   
@@ -1181,12 +1181,12 @@
     <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3-uvloop
 </code></pre></div></li>
 </ul>
-<h2 id="attachments">我不需要作品目录下的 <code>attachments</code> 文件夹<a class="headerlink" href="#attachments" title="Permanent link">&para;</a></h2>
+<h2 id="attachments">我不需要帖子目录下的 <code>attachments</code> 文件夹<a class="headerlink" href="#attachments" title="Permanent link">&para;</a></h2>
 <p>你可以设置配置选项 <code>job.post_structure.attachments</code> 为 <code>./</code></p>
 <p>通过 dotenv 文件 <code>prod.env</code> 或系统环境变量来设置配置：
 <div class="highlight"><pre><span></span><code>KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 </code></pre></div></p>
-<p><code>./</code> 表示附件文件将会直接下载到作品目录下。</p>
+<p><code>./</code> 表示附件文件将会直接下载到帖子目录下。</p>
 <div class="admonition info">
 <p class="admonition-title">提示</p>
 <p>更多详情，请参考 <a href="../configuration/guide/">配置-向导</a> 页面。</p>
@@ -1194,12 +1194,12 @@
 <h2 id="-_">命令和标志（选项）应当使用 <code>-</code> 还是 <code>_</code> 作为分隔符？<a class="headerlink" href="#-_" title="Permanent link">&para;</a></h2>
 <p>两者都支持，推荐使用 <code>-</code>。</p>
 <h2 id="_3">文件名过长<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>在一些情况下，文件名或作品目录名过长而导致下载失败。为了解决这个问题，你可以设置 <strong>序列化文件名</strong> 或使用 <strong>自定义作品目录名</strong></p>
+<p>在一些情况下，文件名或帖子目录名过长而导致下载失败。为了解决这个问题，你可以设置 <strong>序列化文件名</strong> 或使用 <strong>自定义帖子目录名</strong></p>
 <p>通过 dotenv 文件 <code>prod.env</code> 或系统环境变量来设置配置：
 <div class="highlight"><pre><span></span><code># 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
 KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
 
-# 设置作品目录名为其发布日期和ID，例如 `[2024-1-1]11223344`
+# 设置帖子目录名为其发布日期和ID，例如 `[2024-1-1]11223344`
 KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}
 </code></pre></div></p>
 <h2 id="_4">如何配置代理？<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>

@@ -952,7 +952,7 @@
           <li class="md-nav__item">
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
-      ⬇️🖼️ 下载指定的作品
+      ⬇️🖼️ 下载指定的帖子
     </span>
   </a>
   
@@ -961,7 +961,7 @@
           <li class="md-nav__item">
   <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
-      ⬇️🖌️ 下载作者的所有作品
+      ⬇️🖌️ 下载作者的所有帖子
     </span>
   </a>
   
@@ -1021,7 +1021,7 @@
 <p style="text-align: center">
   KToolBox 是一个用于下载
   <a href="https://kemono.su/">Kemono.su / Kemono.party</a>
-  中作品内容的实用命令行工具
+  中帖子内容的实用命令行工具
 </p>
 
 <p style="text-align: center">
@@ -1052,15 +1052,29 @@
 
 <h2 id="_1">功能<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <ul>
-<li>支持并发下载</li>
+<li>支持多文件并发下载</li>
 <li>API 调用和下载失败后 <strong>自动重试</strong></li>
-<li>支持下载单个作品以及指定的画师的 <strong>所有作品</strong></li>
+<li>支持下载单个帖子以及指定的画师的 <strong>全部帖子</strong></li>
 <li>可 <strong>更新已下载</strong> 的画师目录至最新状态</li>
-<li>支持自定义下载的作品/画师 <strong>文件和目录名格式</strong>、<strong>目录结构</strong></li>
+<li>支持自定义下载的帖子/画师的 <strong>文件和目录名格式</strong>、<strong>目录结构</strong></li>
+<li>例如帖子目录可设置为 <code>[2025-01-02]_TheTitle</code> 的格式，图片文件设置为按顺序的 <code>1.jpg</code>、<code>2.jpg</code> 等</li>
+<li>当你希望将某作者的所有帖子图片统一存放至一个目录下，以便预览，可以使用 <code>job.mix_posts</code> 配置项搭配自定义文件名格式，你将得到几百上千张图片的目录<ul>
+<li>如 <code>[2025-01-02]_TheTitle_1.jpg</code>、<code>[2025-01-02]_TheTitle_2.jpg</code>、<code>[2025-01-02]_TheTitle_3.jpg</code> 等</li>
+</ul>
+</li>
 <li>支持排除 <strong>指定格式</strong> 的文件或仅下载指定格式的文件</li>
-<li>可搜索画师和作品，并导出结果</li>
+<li>例如当你不想下载庞大重复的 PSD 和压缩包文件时，可以在配置中排除 <code>.psd</code> 和 <code>.zip</code> 文件</li>
+<li>支持按帖子**标题关键词**过滤下载</li>
+<li>例如你只想下载标题中包含“表情、効果音差分”的帖子，可以使用 <code>sync-creator</code> 命令的 <code>--keywords</code> 选项</li>
+<li>支持按帖子发布日期**时间范围**过滤下载</li>
+<li>能够解析帖子页面 HTML 多信息文本中包含的图片并下载</li>
+<li>这类帖子特征为：浏览器页面刚进入时图片可能没有加载出来，且没有预览图</li>
+<li>能够收集帖子页面中列出的**网盘链接**并保存至文本文件</li>
+<li>可搜索画师和帖子，并导出结果</li>
+<li>如果你希望自己处理画师和帖子数据，可以使用该功能导出 JSON 数据</li>
 <li>支持全平台，并提供 iOS 快捷指令</li>
-<li>对于 Coomer.su / Coomer.party 的支持，请查看文档 <a href="https://ktoolbox.readthedocs.io/latest/zh/coomer/">Coomer</a></li>
+<li>纯 Python 分支可在 iOS 的 a-Shell 或浏览器的 Pyodide 上运行</li>
+<li>对于 <em>Coomer.st / Coomer.su / Coomer.party</em> 的支持，请查看文档 <a href="https://ktoolbox.readthedocs.io/latest/zh/coomer/">Coomer</a></li>
 </ul>
 <h2 id="_2">使用方法<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <h3 id="_3">安装<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
@@ -1106,31 +1120,31 @@ pipx<span class="w"> </span>install<span class="w"> </span>ktoolbox
 <h4 id="_6">❓ 获取某个命令的帮助信息<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>download-post<span class="w"> </span>-h
 </code></pre></div>
-<h4 id="_7">⬇️🖼️ 下载指定的作品<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h4>
+<h4 id="_7">⬇️🖼️ 下载指定的帖子<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>download-post<span class="w"> </span>https://kemono.su/fanbox/user/49494721/post/6608808
 </code></pre></div>
 <details class="info">
 <summary>如果部分文件下载失败</summary>
 <p>如果部分文件下载失败，你可以尝试重新运行命令，已下载完成的文件会被 <strong>跳过</strong>。</p>
 </details>
-<h4 id="_8">⬇️🖌️ 下载作者的所有作品<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># 下载作者/画师的所有作品</span>
+<h4 id="_8">⬇️🖌️ 下载作者的所有帖子<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># 下载作者/画师的所有帖子</span>
 ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016
 
-<span class="c1"># 下载作者/画师最新的 10 个作品</span>
+<span class="c1"># 下载作者/画师最新的 10 个帖子</span>
 ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--length<span class="o">=</span><span class="m">10</span>
 
-<span class="c1"># 下载作者/画师最新的第 11 至 15 个作品</span>
+<span class="c1"># 下载作者/画师最新的第 11 至 15 个帖子</span>
 ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--offset<span class="o">=</span><span class="m">10</span><span class="w"> </span>--length<span class="o">=</span><span class="m">5</span>
 
-<span class="c1"># 下载作者/画师从 2024-1-1 到 2024-3-1 的作品</span>
+<span class="c1"># 下载作者/画师从 2024-1-1 到 2024-3-1 的帖子</span>
 ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--start-time<span class="o">=</span><span class="m">2024</span>-1-1<span class="w"> </span>--end-time<span class="o">=</span><span class="m">2024</span>-3-1
 </code></pre></div>
 <h3 id="_9">配置<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
 <ul>
 <li>同时下载10个文件</li>
 <li>按照数字顺序重命名附件, 例如 <code>1.png</code>, <code>2.png</code>, ...</li>
-<li>将发布日期作为作品目录名的开头，例如 <code>[2024-1-1]HelloWorld</code></li>
+<li>将发布日期作为帖子目录名的开头，例如 <code>[2024-1-1]HelloWorld</code></li>
 <li>...</li>
 </ul>
 <p>前往 <a href="https://ktoolbox.readthedocs.io/latest/zh/configuration/guide/">配置-向导</a> 页面查看更多详情。</p>
