@@ -52,7 +52,7 @@ Context:
                 {% if attribute.value %}
                   {{ attribute.value|e }}
                 {% else %}
-                  {% for member_name, member in obj.members.items() %}
+                  {% for member_name, member in obj.members.items() or obj.inherited_members.items() %}
                     {% if member_name == attribute.name and member.value %}
                       {{ member.value|e }}
                     {% endif %}
