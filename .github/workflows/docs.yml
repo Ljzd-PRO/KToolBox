@@ -33,6 +33,12 @@ jobs:
       - name: Build and push
         run: |
           git pull
+          # Check if translation cache exists and apply translations if available
+          if [ -f "docs/translations/api_translations.json" ] && [ -s "docs/translations/api_translations.json" ]; then
+            echo "Found translation cache, applying translations..."
+            poetry run mkdocs build
+            poetry run python scripts/translate_docs.py || echo "Translation step failed, continuing with English-only docs"
+          fi
           poetry run mike deploy --push --update-aliases master latest
 
       - name: Upload to GitHub Pages
