@@ -22,6 +22,8 @@ class Job(BaseModel):
     """The `path` part of download URL"""
     type: Optional[Literal[PostFileTypeEnum.Attachment, PostFileTypeEnum.File]] = None
     """Target file type"""
+    post: Optional[Post] = None
+    """Post object"""
 
 
 # class JobList(Job, UserList[Job]):

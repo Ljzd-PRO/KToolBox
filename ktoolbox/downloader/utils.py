@@ -1,11 +1,12 @@
+import email.utils
 import os
 import urllib.parse
 from pathlib import Path
-from typing import Optional, Dict, Tuple
+from typing import Optional, Dict, Tuple, Union
 
 from ktoolbox.configuration import config
 
-__all__ = ["filename_from_headers", "duplicate_file_check"]
+__all__ = ["filename_from_headers", "duplicate_file_check", "utime_from_headers"]
 
 
 def parse_header(line: str) -> Dict[str, Optional[str]]:
@@ -91,3 +92,24 @@ def duplicate_file_check(local_file_path: Path, bucket_file_path: Path = None) -
         return True, ret_msg
     else:
         return False, None
+
+
+def utime_from_headers(headers: Dict[str, str], path: Union[Path, str]) -> Optional[Exception]:
+    """
+    Run ``os.utime`` on specific file using ``Last-Modified`` or ``Date`` in HTTP headers.
+
+    :param headers: HTTP Headers
+    :param path: File path
+    :raise: OSError, ValueError, TypeError
+    """
+    # Set file times using Last-Modified and Date headers from the response
+    last_modified = headers.get("Last-Modified")
+    date_header = headers.get("Date")
+    # Prefer Last-Modified for modification time
+    mtime = email.utils.parsedate_to_datetime(last_modified).timestamp() if last_modified else None
+    # Use Date for creation time
+    ctime = email.utils.parsedate_to_datetime(date_header).timestamp() if date_header else None
+    # Set times if available
+    if mtime or ctime:
+        atime = mtime or ctime  # Access time can be the same as modification time
+        os.utime(path, (atime, mtime or ctime))

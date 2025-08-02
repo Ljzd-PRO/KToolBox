@@ -15,8 +15,6 @@ jobs:
 
       - name: Setup Python environment
         uses: ./.github/actions/setup-python
-        with:
-          python-version: "3.11"
 
       - name: Build package with Poetry
         run: poetry build
@@ -31,7 +29,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        os: [ windows-latest, ubuntu-latest, macos-latest, macos-13 ]
 
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +37,7 @@ jobs:
       - name: Setup Python environment
         uses: ./.github/actions/setup-python
         with:
-          python-version: "3.11"
+          python-version: "3.13"
 
       - name: Create Executable
         uses: ./.github/actions/pyinstaller
@@ -47,5 +45,5 @@ jobs:
       - name: Upload Executable
         uses: actions/upload-artifact@v4
         with:
-          name: ktoolbox-executable-${{ runner.os }}-x86_64
+          name: ktoolbox-executable-${{ runner.os }}-${{ runner.arch }}
           path: dist

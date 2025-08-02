@@ -92,7 +92,8 @@ class JobRunner:
                     path=job.path,
                     client=client,
                     designated_filename=job.alt_filename,
-                    server_path=job.server_path
+                    server_path=job.server_path,
+                    post=job.post
                 )
 
                 # Create task

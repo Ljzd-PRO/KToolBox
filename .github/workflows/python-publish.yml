@@ -15,8 +15,6 @@ jobs:
 
       - name: Setup Python environment
         uses: ./.github/actions/setup-python
-        with:
-          python-version: "3.11"
 
       - name: Build package with Poetry
         run: poetry build

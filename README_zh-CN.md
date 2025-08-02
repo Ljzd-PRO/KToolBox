@@ -80,10 +80,15 @@
 - 推荐
   ```bash
   pip3 install pipx
-  pipx install ktoolbox
+  
+  # Windows
+  pipx install ktoolbox[urwid,winloop]
+  # Linux / macOS
+  pipx install ktoolbox[urwid,uvloop]
   ```
 
-- 对于 iOS [a-Shell](https://github.com/holzschu/a-shell)
+- 对于 iOS [a-Shell](https://github.com/holzschu/a-shell) 或 [pyodide](https://pyodide.org/en/stable/)，
+或者如果你只能使用纯Python，无法编译 [pydantic](https://docs.pydantic.dev/latest/) v2.x.x
   ```bash
   pip3 install ktoolbox-pure-py
   ```

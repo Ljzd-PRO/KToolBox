@@ -17,9 +17,10 @@ from tenacity.stop import stop_after_attempt, stop_never
 from tqdm import tqdm as std_tqdm
 
 from ktoolbox._enum import RetCodeEnum
+from ktoolbox.api.model import Post
 from ktoolbox.configuration import config
 from ktoolbox.downloader.base import DownloaderRet
-from ktoolbox.downloader.utils import filename_from_headers, duplicate_file_check
+from ktoolbox.downloader.utils import filename_from_headers, duplicate_file_check, utime_from_headers
 from ktoolbox.utils import generate_msg
 
 __all__ = ["Downloader"]
@@ -42,7 +43,8 @@ class Downloader:
             buffer_size: int = None,
             chunk_size: int = None,
             designated_filename: str = None,
-            server_path: str = None
+            server_path: str = None,
+            post: Post = None
     ):
         # noinspection GrazieInspection
         """
@@ -61,6 +63,7 @@ class Downloader:
         :param designated_filename: Manually specify the filename for saving, which needs to be sanitized
         :param server_path: Server path of the file. if ``DownloaderConfiguration.use_bucket`` enabled, \
         it will be used as the save path.
+        :param post: Post object, use for logging.
         """
 
         self._url = self._initial_url = url
@@ -71,6 +74,7 @@ class Downloader:
         self._designated_filename = designated_filename
         self._server_path = server_path  # /hash[:1]/hash2[1:3]/hash
         self._save_filename = designated_filename  # Prioritize the manually specified filename
+        self._post = post
 
         self._next_subdomain_index = 1
         self._finished_lock = asyncio.Lock()
@@ -100,6 +104,11 @@ class Downloader:
     def chunk_size(self) -> int:
         """Number of bytes for chunk of download stream"""
         return self._chunk_size
+
+    @cached_property
+    def post(self) -> Post:
+        """Post that the file belongs to"""
+        return self._post
 
     @property
     def filename(self) -> Optional[str]:
@@ -134,8 +143,12 @@ class Downloader:
         before_sleep=lambda x: logger.warning(
             generate_msg(
                 f"Retrying ({x.attempt_number})",
+                file=x.args[0].filename,
+                post_name=x.args[0].post.title if x.args[0].post else None,
+                post_id=x.args[0].post.id if x.args[0].post else None,
                 message=x.outcome.result().message if not x.outcome.failed else None,
-                exception=x.outcome.exception()
+                exception=x.outcome.exception(),
+                url=x.args[0].url
             )
         ),
         reraise=True
@@ -285,7 +298,19 @@ class Downloader:
             if config.downloader.use_bucket:
                 bucket_file_path.parent.mkdir(parents=True, exist_ok=True)
                 os.link(temp_filepath, bucket_file_path)
-            temp_filepath.rename(self._path / self._save_filename)
+            final_filepath = self._path / self._save_filename
+            temp_filepath.rename(final_filepath)
+
+            try:
+                utime_from_headers(res.headers, final_filepath)
+            except (OSError, ValueError, TypeError) as e:
+                logger.warning(
+                    generate_msg(
+                        "Failed to set file time from headers",
+                        file=self._save_filename,
+                        exception=e
+                    )
+                )
 
             # Callbacks
             if sync_callable:

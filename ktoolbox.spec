@@ -1,6 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 import pkg_resources
+import sys
 
 template_dir = pkg_resources.resource_filename('settings_doc', 'templates')
 
@@ -11,7 +12,7 @@ a = Analysis(
     datas=[
         (template_dir + '/*', 'settings_doc/templates'),
     ],
-    hiddenimports=[],
+    hiddenimports=['winloop._noop'] if sys.platform == 'win32' else [],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
