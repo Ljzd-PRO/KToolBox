@@ -8,7 +8,6 @@
         show_if_no_docstring: true
         show_bases: false
         members: false
-        locale: zh
         filters:
             - "!model_config"
 
@@ -20,7 +19,6 @@
         show_if_no_docstring: true
         show_bases: false
         members: false
-        locale: zh
         filters:
             - "!model_config"
 
@@ -32,7 +30,6 @@
         show_if_no_docstring: true
         show_bases: false
         members: false
-        locale: zh
         filters:
             - "!model_config"
 
@@ -44,7 +41,6 @@
         show_if_no_docstring: true
         show_bases: false
         members: false
-        locale: zh
         filters:
             - "!model_config"
 
@@ -56,7 +52,6 @@
         show_if_no_docstring: true
         show_bases: false
         members: false
-        locale: zh
         filters:
             - "!model_config"
 
@@ -68,6 +63,5 @@
         show_if_no_docstring: true
         show_bases: false
         members: false
-        locale: zh
         filters:
             - "!model_config"
