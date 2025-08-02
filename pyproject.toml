@@ -54,6 +54,10 @@ mkdocs-static-i18n = "^1.2.0"
 mkdocs-material = "^9.4.14"
 mkdocstrings = {version=">=0.24,<0.27", extras=["python"]}
 mike = "^2.0.0"
+translate = "^3.6.1"
+beautifulsoup4 = "^4.13.4"
+translate = "^3.6.1"
+beautifulsoup4 = "^4.13.4"
 
 [tool.poetry.group.test.dependencies]
 pytest = "==8.3.3"
