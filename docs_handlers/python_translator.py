@@ -1,6 +1,8 @@
 """Custom Python handler with translation support for mkdocstrings."""
 
 import os
+import json
+import requests
 from typing import Any, Dict, Optional
 
 from mkdocstrings_handlers.python.handler import PythonHandler
@@ -10,7 +12,7 @@ class TranslatablePythonHandler(PythonHandler):
     """Python handler with automatic translation support.
     
     This handler extends the default Python handler to provide automatic
-    translation of docstrings and documentation content using the MyMemory API.
+    translation of docstrings and documentation content using MyMemory API or OpenAI API.
     Translation is enabled via the ENABLE_TRANSLATION environment variable.
     """
     
@@ -24,12 +26,29 @@ class TranslatablePythonHandler(PythonHandler):
         """
         super().__init__(handler=handler, theme=theme, **kwargs)
         self._translation_enabled = os.getenv("ENABLE_TRANSLATION", "false").lower() == "true"
+        self._platform = os.getenv("TRANSLATE_PLATFORM", "my_memory")
         self._target_language = None
         self._translator = None
+        self._openai_config = {}
         
         if self._translation_enabled:
-            self._setup_translator()
+            if self._platform == 'openai':
+                self._setup_openai()
+            else:
+                self._setup_translator()
     
+    def _setup_openai(self) -> None:
+        """Set up OpenAI configuration."""
+        self._openai_config = {
+            'base_url': os.getenv('OPENAI_BASE_URL', 'https://api.openai.com/v1'),
+            'api_key': os.getenv('OPENAI_API_KEY', ''),
+            'model': os.getenv('OPENAI_MODEL', 'gpt-3.5-turbo'),
+        }
+        
+        if not self._openai_config['api_key']:
+            print("Warning: OPENAI_API_KEY not set. OpenAI translation disabled.")
+            self._translation_enabled = False
+
     def _setup_translator(self) -> None:
         """Set up the translator with MyMemory API."""
         try:
@@ -59,6 +78,83 @@ class TranslatablePythonHandler(PythonHandler):
             return config_extra.get('language')
         return None
     
+    def _translate_with_openai(self, text: str, target_language: str) -> str:
+        """Translate text using OpenAI API."""
+        if not self._openai_config['api_key'] or not text.strip():
+            return text
+            
+        # Skip translation if target is English
+        if target_language == "en":
+            return text
+            
+        try:
+            # Fixed translation mappings
+            translation_mappings = {
+                'post': '帖子',
+                'artist': '画师'
+            }
+            
+            # Apply fixed mappings first
+            translated_text = text
+            for en_word, zh_word in translation_mappings.items():
+                translated_text = translated_text.replace(en_word, zh_word)
+            
+            # If the text only contained mapped words, return it
+            if translated_text != text:
+                return translated_text
+            
+            # Prepare OpenAI request
+            headers = {
+                'Authorization': f'Bearer {self._openai_config["api_key"]}',
+                'Content-Type': 'application/json'
+            }
+            
+            # Determine target language name for prompt
+            lang_name = "Chinese" if target_language == "zh" else target_language
+            
+            # Strict prompt to ensure clean translation output
+            system_prompt = f"""You are a professional English to {lang_name} translator. 
+Translate the given English text to {lang_name}.
+IMPORTANT RULES:
+1. Return ONLY the translated {lang_name} text, no additional content
+2. Do NOT wrap the response in markdown code blocks
+3. Do NOT add explanations, comments, or extra formatting
+4. Use these specific translations: post -> 帖子, artist -> 画师
+5. Keep technical terms and code elements unchanged when appropriate"""
+            
+            data = {
+                'model': self._openai_config['model'],
+                'messages': [
+                    {'role': 'system', 'content': system_prompt},
+                    {'role': 'user', 'content': f'Translate to {lang_name}: {text}'}
+                ],
+                'temperature': 0.3,
+                'max_tokens': 1000
+            }
+            
+            # Make API request
+            response = requests.post(
+                f"{self._openai_config['base_url']}/chat/completions",
+                headers=headers,
+                json=data,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                if 'choices' in result and len(result['choices']) > 0:
+                    translated = result['choices'][0]['message']['content'].strip()
+                    # Clean up any potential markdown formatting
+                    translated = translated.replace('```', '').replace('`', '')
+                    return translated
+            else:
+                print(f"OpenAI API error: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            print(f"OpenAI translation error: {e}")
+            
+        return text
+
     def _translate_text(self, text: str, target_language: str) -> str:
         """Translate text to the target language.
         
@@ -69,37 +165,42 @@ class TranslatablePythonHandler(PythonHandler):
         Returns:
             Translated text or original text if translation fails.
         """
-        if not hasattr(self, '_api_key') or not text.strip():
+        if not text.strip():
             return text
             
-        try:
-            from translate import Translator
-            
-            # Skip translation if target is English
-            if target_language == "en":
+        if self._platform == 'openai':
+            return self._translate_with_openai(text, target_language)
+        elif self._platform == 'my_memory' and hasattr(self, '_api_key'):
+            try:
+                from translate import Translator
+                
+                # Skip translation if target is English
+                if target_language == "en":
+                    return text
+                
+                # Create translator for this specific language pair
+                if hasattr(self, '_api_key') and self._api_key:
+                    translator = Translator(
+                        to_lang=target_language, 
+                        from_lang="en", 
+                        provider="mymemory",
+                        secret_access_key=self._api_key
+                    )
+                else:
+                    # Fallback to free tier
+                    translator = Translator(
+                        to_lang=target_language, 
+                        from_lang="en", 
+                        provider="mymemory"
+                    )
+                
+                result = translator.translate(text)
+                return result if isinstance(result, str) else str(result)
+                
+            except Exception as e:
+                print(f"MyMemory translation warning: {e}")
                 return text
-            
-            # Create translator for this specific language pair
-            if hasattr(self, '_api_key') and self._api_key:
-                translator = Translator(
-                    to_lang=target_language, 
-                    from_lang="en", 
-                    provider="mymemory",
-                    secret_access_key=self._api_key
-                )
-            else:
-                # Fallback to free tier
-                translator = Translator(
-                    to_lang=target_language, 
-                    from_lang="en", 
-                    provider="mymemory"
-                )
-            
-            result = translator.translate(text)
-            return result if isinstance(result, str) else str(result)
-            
-        except Exception as e:
-            print(f"Translation warning: {e}")
+        else:
             return text
     
     def collect(self, identifier: str, config: Dict[str, Any]) -> Any:

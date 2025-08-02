@@ -17,6 +17,14 @@ on:
         required: false
         default: 'false'
         type: boolean
+      translation_platform:
+        description: 'Translation platform to use'
+        required: false
+        default: 'my_memory'
+        type: choice
+        options:
+          - my_memory
+          - openai
 
 permissions:
   contents: write
@@ -38,8 +46,12 @@ jobs:
 
       - name: Build and push
         env:
-          ENABLE_TRANSLATION: ${{ github.event.inputs.enable_translation || 'false' }}
+          ENABLE_TRANSLATION: ${{ github.event.inputs.enable_translation || vars.ENABLE_TRANSLATION || 'false' }}
+          TRANSLATE_PLATFORM: ${{ github.event.inputs.translation_platform || vars.TRANSLATE_PLATFORM || 'my_memory' }}
           MY_MEMORY_API_KEY: ${{ secrets.MY_MEMORY_API_KEY }}
+          OPENAI_BASE_URL: ${{ vars.OPENAI_BASE_URL || secrets.OPENAI_BASE_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || secrets.OPENAI_MODEL }}
         run: |
           git pull
           poetry run mike deploy --push --update-aliases master latest
