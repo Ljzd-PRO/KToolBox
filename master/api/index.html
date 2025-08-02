@@ -34764,7 +34764,8 @@
 
               <details class="quote">
                 <summary>Source code in <code>ktoolbox/utils.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">31</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
+<span class="normal">31</span>
 <span class="normal">32</span>
 <span class="normal">33</span>
 <span class="normal">34</span>
@@ -34773,8 +34774,7 @@
 <span class="normal">37</span>
 <span class="normal">38</span>
 <span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BaseRet</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">_T</span><span class="p">]):</span>
+<span class="normal">40</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BaseRet</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">_T</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base data model of function return value&quot;&quot;&quot;</span>
     <span class="n">code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">Success</span><span class="o">.</span><span class="n">value</span>
     <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
@@ -34913,8 +34913,8 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/utils.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">40</span>
-<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">39</span>
+<span class="normal">40</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="n">RetCodeEnum</span><span class="o">.</span><span class="n">Success</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -34948,12 +34948,12 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/utils.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">86</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">85</span>
+<span class="normal">86</span>
 <span class="normal">87</span>
 <span class="normal">88</span>
 <span class="normal">89</span>
-<span class="normal">90</span>
-<span class="normal">91</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">dump_search</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">],</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+<span class="normal">90</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">dump_search</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">],</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
     <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
             <span class="n">SearchResult</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">result</span><span class="p">)</span>
@@ -35053,7 +35053,8 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/utils.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">158</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">157</span>
+<span class="normal">158</span>
 <span class="normal">159</span>
 <span class="normal">160</span>
 <span class="normal">161</span>
@@ -35092,20 +35093,7 @@
 <span class="normal">194</span>
 <span class="normal">195</span>
 <span class="normal">196</span>
-<span class="normal">197</span>
-<span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">extract_external_links</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">custom_patterns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">197</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">extract_external_links</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">custom_patterns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract external file sharing links from text content.</span>
 
@@ -35138,20 +35126,8 @@
         <span class="c1"># Get the full matched URL</span>
         <span class="n">url</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-        <span class="c1"># Clean up HTML markup and common trailing punctuation that might be part of text</span>
-        <span class="c1"># Stop at common HTML boundary characters and quotes</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[&quot;</span><span class="se">\&#39;</span><span class="s1">&gt;][^&lt;]*$&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>  <span class="c1"># Remove quote + content to end  </span>
-
-        <span class="c1"># Additional cleanup: Remove HTML tags that might have been captured  </span>
-        <span class="n">url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;&lt;[^&gt;]*&gt;.*$&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>  <span class="c1"># Remove any HTML tags and everything after</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;&quot;[^&quot;]*$&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>  <span class="c1"># Remove quote and everything after it</span>
-
-        <span class="c1"># Remove trailing HTML tag fragments and punctuation</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;&lt;/[^&gt;]*&gt;?$&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>  <span class="c1"># Remove closing tags or partial tags at end</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[.,;!?)\]}&gt;&quot;</span><span class="se">\&#39;</span><span class="s1">\s]+$&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>  <span class="c1"># Remove trailing punctuation</span>
-
-        <span class="c1"># Decode HTML entities (like &amp;amp; -&gt; &amp;, &amp;lt; -&gt; &lt;, etc.)</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">unescape</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="c1"># Clean up common trailing punctuation that might be part of text</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[.,;!?)\]}&gt;&quot;</span><span class="se">\&#39;</span><span class="s1">\s]+$&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
 
         <span class="c1"># Validate that it looks like a proper URL</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">10</span> <span class="ow">and</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">url</span><span class="p">:</span>
@@ -35221,15 +35197,15 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/utils.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">44</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">43</span>
+<span class="normal">44</span>
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span>
 <span class="normal">48</span>
 <span class="normal">49</span>
 <span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generate_msg</span><span class="p">(</span><span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="normal">51</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generate_msg</span><span class="p">(</span><span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate message for ``BaseRet`` and logger</span>
 
@@ -35302,7 +35278,8 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/utils.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">55</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">54</span>
+<span class="normal">55</span>
 <span class="normal">56</span>
 <span class="normal">57</span>
 <span class="normal">58</span>
@@ -35329,8 +35306,7 @@
 <span class="normal">79</span>
 <span class="normal">80</span>
 <span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">logger_init</span><span class="p">(</span><span class="n">cli_use</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">disable_stdout</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">logger_init</span><span class="p">(</span><span class="n">cli_use</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">disable_stdout</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialize ``loguru`` logger</span>
 
@@ -35433,7 +35409,8 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/utils.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 93</span>
+<span class="normal"> 94</span>
 <span class="normal"> 95</span>
 <span class="normal"> 96</span>
 <span class="normal"> 97</span>
@@ -35453,8 +35430,7 @@
 <span class="normal">111</span>
 <span class="normal">112</span>
 <span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">parse_webpage_url</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="normal">114</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">parse_webpage_url</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
     <span class="c1"># noinspection SpellCheckingInspection</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fetch **service**, **user_id**, **post_id**, **revision_id** from webpage url</span>
@@ -35521,7 +35497,8 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/utils.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">118</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">117</span>
+<span class="normal">118</span>
 <span class="normal">119</span>
 <span class="normal">120</span>
 <span class="normal">121</span>
@@ -35557,8 +35534,7 @@
 <span class="normal">151</span>
 <span class="normal">152</span>
 <span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">uvloop_init</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="normal">154</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">uvloop_init</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set event loop policy to uvloop or winloop if available.</span>
 
