@@ -38,7 +38,7 @@ plugins:
             docstring_style: sphinx
             docstring_section_style: table
             show_source: false
-  - to-pdf:
+  - with-pdf:
       author: "Ljzd-PRO"
       copyright: "Copyright © 2023 by Ljzd-PRO"
       cover_title: "KToolBox Documentation"
