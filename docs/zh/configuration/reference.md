@@ -1,6 +1,6 @@
 # 参考
 
-::: ktoolbox.configuration.Configuration
+::: ktoolbox._configuration_zh.Configuration
     options:
         show_labels: false
         show_root_heading: true
@@ -11,7 +11,7 @@
         filters:
             - "!model_config"
 
-::: ktoolbox.configuration.APIConfiguration
+::: ktoolbox._configuration_zh.APIConfiguration
     options:
         show_labels: false
         show_root_heading: true
@@ -22,7 +22,7 @@
         filters:
             - "!model_config"
 
-::: ktoolbox.configuration.DownloaderConfiguration
+::: ktoolbox._configuration_zh.DownloaderConfiguration
     options:
         show_labels: false
         show_root_heading: true
@@ -33,7 +33,7 @@
         filters:
             - "!model_config"
 
-::: ktoolbox.configuration.PostStructureConfiguration
+::: ktoolbox._configuration_zh.PostStructureConfiguration
     options:
         show_labels: false
         show_root_heading: true
@@ -44,7 +44,7 @@
         filters:
             - "!model_config"
 
-::: ktoolbox.configuration.JobConfiguration
+::: ktoolbox._configuration_zh.JobConfiguration
     options:
         show_labels: false
         show_root_heading: true
@@ -55,7 +55,7 @@
         filters:
             - "!model_config"
 
-::: ktoolbox.configuration.LoggerConfiguration
+::: ktoolbox._configuration_zh.LoggerConfiguration
     options:
         show_labels: false
         show_root_heading: true
