@@ -28,6 +28,10 @@ nav:
 plugins:
   - tags
   - search
+  - translation:
+      enabled: false  # Will be overridden by environment variable
+      target_language: zh
+      source_language: en
   - mkdocstrings:
       custom_templates: custom_templates
       handlers:

@@ -11,6 +11,12 @@ on:
       - "docs/**"
       - "mkdocs.yml"
   workflow_dispatch:
+    inputs:
+      enable_translation:
+        description: 'Enable automatic translation for documentation'
+        required: false
+        default: 'false'
+        type: boolean
 
 permissions:
   contents: write
@@ -31,6 +37,9 @@ jobs:
         uses: ./.github/actions/setup-python
 
       - name: Build and push
+        env:
+          ENABLE_TRANSLATION: ${{ github.event.inputs.enable_translation || 'false' }}
+          MY_MEMORY_API_KEY: ${{ secrets.MY_MEMORY_API_KEY }}
         run: |
           git pull
           poetry run mike deploy --push --update-aliases master latest

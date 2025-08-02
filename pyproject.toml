@@ -26,6 +26,12 @@ packages = [{ include = "ktoolbox" }]
 [tool.poetry.scripts]
 ktoolbox = "ktoolbox.__main__:main"
 
+[tool.poetry.plugins."mkdocstrings.handlers"]
+python_translator = "docs_handlers.python_translator:get_handler"
+
+[tool.poetry.plugins."mkdocs.plugins"]
+translation = "docs_handlers.translation_plugin:TranslationPlugin"
+
 [tool.poetry.dependencies]
 python = ">=3.8.1,<3.14"
 pydantic = "^2.4.2"
@@ -54,6 +60,7 @@ mkdocs-static-i18n = "^1.2.0"
 mkdocs-material = "^9.4.14"
 mkdocstrings = {version=">=0.24,<0.27", extras=["python"]}
 mike = "^2.0.0"
+translate = "^3.6.1"
 
 [tool.poetry.group.test.dependencies]
 pytest = "==8.3.3"
