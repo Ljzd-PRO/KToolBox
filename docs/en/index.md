@@ -39,15 +39,27 @@
 
 ## Features
 
-- Supports concurrent downloads  
-- Automatically retries API calls and downloads after failures  
-- Allows downloading individual posts or **all posts** of a specified artist  
-- Can **update downloaded** artist directories to the latest state  
-- Supports customizable **file and directory naming formats** and **directory structures** for downloaded posts/artists  
-- Enables excluding **specified file formats** or downloading only specified formats  
-- Allows searching for artists and posts, with options to export results  
-- Compatible with all platforms, with iOS shortcuts provided  
-- For support related to _Coomer.su / Coomer.party_, please refer to the documentation: [Coomer](https://ktoolbox.readthedocs.io/latest/coomer/)
+- Support concurrent downloading of multiple files
+- Automatically retry on API call or download failure
+- Support downloading a single post or **all posts** of a specified artist
+- Can **update downloaded** artist directories to the latest state
+- Support customizing the **file and directory name format** and **directory structure** for downloaded posts/artists
+  - For example, the post directory can be set to the format `[2025-01-02]_TheTitle`, and image files can be named sequentially as `1.jpg`, `2.jpg`, etc.
+  - If you want to store all images from an artist's posts in a single directory for preview, you can use the `job.mix_posts` config option with a custom filename format to get a directory with hundreds or thousands of images
+    - Such as `[2025-01-02]_TheTitle_1.jpg`, `[2025-01-02]_TheTitle_2.jpg`, `[2025-01-02]_TheTitle_3.jpg`, etc.
+- Support excluding **specified file formats** or downloading only specified formats
+  - For example, if you don't want to download large and duplicate PSD or archive files, you can exclude `.psd` and `.zip` files in the config
+- Support filtering downloads by post **title keywords**
+  - For example, if you only want to download posts whose titles contain "表情" or "効果音差分", you can use the `sync-creator` command with the `--keywords` option
+- Support filtering downloads by post **publish date range**
+- Can parse and download images contained in the multi-info text of the post page HTML
+  - These posts are characterized by images not loading immediately when the browser enters the page, and no preview images
+- Can collect **cloud drive links** listed on the post page and save them to a text file
+- Can search for artists and posts, and export results
+  - If you want to process artist and post data yourself, you can use this feature to export JSON data
+- Cross-platform support, with iOS shortcuts provided
+  - The pure Python branch can run on iOS a-Shell or in the browser via Pyodide
+- For _Coomer.st / Coomer.su / Coomer.party_ support, please refer to the documentation [Coomer](https://ktoolbox.readthedocs.io/latest/zh/coomer/)
 
 ## Tutorial
 

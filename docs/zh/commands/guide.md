@@ -34,7 +34,7 @@ ktoolbox config-editor
 ktoolbox example-env
 ```
 
-## 下载指定的作品
+## 下载指定的帖子
 
 `download-post`
 
@@ -44,41 +44,41 @@ ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
 ??? info "如果部分文件下载失败"
     如果部分文件下载失败，你可以尝试重新运行命令，已下载完成的文件会被 **跳过**。
   
-## 下载作者的所有作品
+## 下载作者的所有帖子
 
 `sync-creator`
 
 ```bash
-# 下载作者/画师的所有作品
+# 下载作者/画师的所有帖子
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 ```
 ??? info "关于 `creator-indices.ktoolbox` 文件"
-    默认情况下你会在作者目录下得到一个 `creator-indices.ktoolbox` 文件，它包含目录下的所有作品的信息和路径。
+    默认情况下你会在作者目录下得到一个 `creator-indices.ktoolbox` 文件，它包含目录下的所有帖子的信息和路径。
 
 ??? tip "更新作者目录"
     你可以再次运行命令，文件名相同的文件将会被跳过。
 
-## 下载指定数量的作品
+## 下载指定数量的帖子
 
 `sync-creator`
 
-- `--offset`：作品结果偏移量（或起始偏移量）
-- `--length`：要获取的作品数量，默认获取所有作品
+- `--offset`：帖子结果偏移量（或起始偏移量）
+- `--length`：要获取的帖子数量，默认获取所有帖子
 
 ```bash
-# 下载作者/画师最新的 10 个作品
+# 下载作者/画师最新的 10 个帖子
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --length=10
 
-# 下载作者/画师最新的第 11 至 15 个作品
+# 下载作者/画师最新的第 11 至 15 个帖子
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 ```
 
-## 下载在指定时间范围内发布的作品
+## 下载在指定时间范围内发布的帖子
 
 `sync-creator`
 
-- `--start-time`：下载指定开始时间范围内的作品
-- `--end-time`：下载指定结束时间范围内的作品
+- `--start-time`：下载指定开始时间范围内的帖子
+- `--end-time`：下载指定结束时间范围内的帖子
 
 ```bash
 # 从 2023-8-5 到 2023-12-6

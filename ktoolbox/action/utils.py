@@ -9,7 +9,14 @@ from ktoolbox.api.model import Post
 from ktoolbox.configuration import config
 from ktoolbox.job import CreatorIndices
 
-__all__ = ["generate_post_path_name", "generate_filename", "filter_posts_by_date", "filter_posts_by_indices", "filter_posts_by_keywords"]
+__all__ = [
+    "generate_post_path_name",
+    "generate_filename",
+    "filter_posts_by_date",
+    "filter_posts_by_indices",
+    "match_post_keywords",
+    "filter_posts_by_keywords"
+]
 
 TIME_FORMAT = "%Y-%m-%d"
 
@@ -117,7 +124,7 @@ def filter_posts_by_indices(posts: List[Post], indices: CreatorIndices) -> Tuple
     return new_list, new_indices
 
 
-def _match_post_keywords(post: Post, keywords: Set[str]) -> bool:
+def match_post_keywords(post: Post, keywords: Set[str]) -> bool:
     """
     Check if the post contains any of the specified keywords.
 
@@ -151,5 +158,5 @@ def filter_posts_by_keywords(
         yield from post_list
         return
     
-    post_filter = filter(lambda x: _match_post_keywords(x, keywords), post_list)
+    post_filter = filter(lambda x: match_post_keywords(x, keywords), post_list)
     yield from post_filter

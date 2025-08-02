@@ -15,7 +15,7 @@ Visit shortcut URLs below or download shortcut files at [`shortcuts/`](https://g
 #### Chinese
 
 - [KToolBox 管理器](https://www.icloud.com/shortcuts/2f9c2a6b74f140758fb0f5620d032f31)
-- [下载 Kemono 作品](https://www.icloud.com/shortcuts/b12036bb0c6148bea761de06e3b65667)
+- [下载 Kemono 帖子](https://www.icloud.com/shortcuts/b12036bb0c6148bea761de06e3b65667)
 
 ## Usage
 
