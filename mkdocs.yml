@@ -34,7 +34,6 @@ plugins:
         python:
           import:
             - https://docs.python.org/3/objects.inv
-          locale: zh
           options:
             docstring_style: sphinx
             docstring_section_style: table
