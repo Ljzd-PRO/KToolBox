@@ -31,9 +31,6 @@ class TranslationPlugin(BasePlugin):
         env_enabled = os.getenv("ENABLE_TRANSLATION", "false").lower() == "true"
         env_api_key = os.getenv("MY_MEMORY_API_KEY", "")
         
-        print(f"Translation plugin: Environment ENABLE_TRANSLATION={env_enabled}")
-        print(f"Translation plugin: API key present={bool(env_api_key)}")
-        
         # Override config with environment variables if set
         if env_enabled:
             self.config['enabled'] = True
@@ -41,7 +38,6 @@ class TranslationPlugin(BasePlugin):
             self.config['api_key'] = env_api_key
             
         self._translation_enabled = self.config['enabled']
-        print(f"Translation plugin: Translation enabled={self._translation_enabled}")
         
         if self._translation_enabled:
             self._setup_translator()
@@ -78,7 +74,7 @@ class TranslationPlugin(BasePlugin):
     def _should_translate_page(self, page: Page) -> bool:
         """Determine if a page should be translated based on its path."""
         # Only translate Chinese pages
-        return '/zh/' in page.file.src_path
+        return page.file.src_path.startswith('zh/')
         
     def _translate_text(self, text: str) -> str:
         """Translate text content."""
@@ -97,18 +93,17 @@ class TranslationPlugin(BasePlugin):
         if not self._translation_enabled:
             return html_content
             
-        print(f"Translation plugin: Processing page with {len(html_content)} characters")
-        
         # Pattern to match docstring content in mkdocstrings output
         patterns = [
-            # String values like __description__ = 'A useful CLI tool...'
+            # String values like __description__ = 'A useful CLI tool...' (HTML entities)
             (r"<span class=\"s[12]\">&#39;([^&#]+)&#39;</span>", 
              lambda m: f"<span class=\"s1\">&#39;{self._translate_text(m.group(1))}&#39;</span>"),
-            # Docstring descriptions in paragraphs
-            (r'<p>([^<>{}\[\]]+)</p>', lambda m: f'<p>{self._translate_text(m.group(1))}</p>'),
-            # Code comments 
-            (r'<span class="c1"># ([^<\n]+)</span>', 
-             lambda m: f'<span class="c1"># {self._translate_text(m.group(1))}</span>'),
+            # String values like __description__ = 'A useful CLI tool...' (regular quotes)
+            (r"<span class=\"s[12]\">'([^']+)'</span>", 
+             lambda m: f"<span class=\"s1\">'{self._translate_text(m.group(1))}'</span>"),
+            # Double quoted strings
+            (r'<span class="s[12]">"([^"]+)"</span>', 
+             lambda m: f'<span class="s1">"{self._translate_text(m.group(1))}"</span>'),
         ]
         
         translated_content = html_content
@@ -116,19 +111,19 @@ class TranslationPlugin(BasePlugin):
         
         for pattern, replacement in patterns:
             matches = list(re.finditer(pattern, translated_content, re.IGNORECASE | re.DOTALL))
-            print(f"Found {len(matches)} matches for pattern: {pattern[:50]}...")
             
             for match in reversed(matches):  # Reverse to maintain positions
                 original_text = match.group(1)
                 # Skip if text is too short or contains only code/numbers
-                if (len(original_text.strip()) < 5 or 
+                if (len(original_text.strip()) < 15 or 
                     original_text.strip().isdigit() or
                     original_text.startswith('http') or
-                    original_text.count('_') > len(original_text) * 0.3):
+                    original_text.count('_') > len(original_text) * 0.3 or
+                    original_text.count('%') > 2):
                     continue
                     
                 translated_text = self._translate_text(original_text)
-                if translated_text != original_text:
+                if translated_text != original_text and "MYMEMORY WARNING" not in translated_text:
                     translations_made += 1
                     if callable(replacement):
                         # Get the replacement function result
@@ -143,9 +138,7 @@ class TranslationPlugin(BasePlugin):
                         new_content + 
                         translated_content[match.end():]
                     )
-                    print(f"Translated: '{original_text}' -> '{translated_text}'")
                 
-        print(f"Translation plugin: Made {translations_made} translations")
         return translated_content
     
     def on_page_content(self, html: str, page: Page, config: MkDocsConfig, files: Files) -> str:
@@ -157,3 +150,13 @@ class TranslationPlugin(BasePlugin):
             return self._translate_docstring_content(html)
             
         return html
+    
+    def on_post_page(self, output: str, page: Page, config: MkDocsConfig) -> str:
+        """Process page output after all processing."""
+        if not self._translation_enabled:
+            return output
+            
+        if self._should_translate_page(page):
+            return self._translate_docstring_content(output)
+            
+        return output

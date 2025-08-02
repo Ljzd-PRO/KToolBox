@@ -28,10 +28,6 @@ nav:
 plugins:
   - tags
   - search
-  - translation:
-      enabled: false  # Will be overridden by environment variable
-      target_language: zh
-      source_language: en
   - mkdocstrings:
       custom_templates: custom_templates
       handlers:
@@ -41,6 +37,13 @@ plugins:
           options:
             docstring_style: sphinx
             docstring_section_style: table
+  - translation:
+      # Automatic translation of API documentation
+      # Enabled via ENABLE_TRANSLATION environment variable (workflow_dispatch parameter)
+      # Uses MyMemory API with key from MY_MEMORY_API_KEY secret/env var
+      enabled: false  # Will be overridden by environment variable
+      target_language: zh
+      source_language: en
   - i18n:
       docs_structure: folder
       languages:
