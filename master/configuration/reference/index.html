@@ -1215,6 +1215,75 @@
       </tbody>
     </table>
 
+              <details class="quote">
+                <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Configuration</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+    <span class="c1"># noinspection SpellCheckingInspection,GrazieInspection</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    KToolBox Configuration</span>
+
+<span class="sd">    :ivar api: Kemono API Configuration</span>
+<span class="sd">    :ivar downloader: File Downloader Configuration</span>
+<span class="sd">    :ivar job: Download jobs Configuration</span>
+<span class="sd">    :ivar logger: Logger configuration</span>
+<span class="sd">    :ivar ssl_verify: Enable SSL certificate verification for Kemono API server and download server</span>
+<span class="sd">    :ivar json_dump_indent: Indent of JSON file dump</span>
+<span class="sd">    :ivar use_uvloop: Use uvloop/winloop for asyncio performance optimization \</span>
+<span class="sd">    Uses winloop on Windows and uvloop on Unix-like systems for better concurrent performance. \</span>
+<span class="sd">    Install winloop on Windows with `pip install ktoolbox[winloop]` \</span>
+<span class="sd">    or uvloop on Unix with `pip install ktoolbox[uvloop]`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">api</span><span class="p">:</span> <span class="n">APIConfiguration</span> <span class="o">=</span> <span class="n">APIConfiguration</span><span class="p">()</span>
+    <span class="n">downloader</span><span class="p">:</span> <span class="n">DownloaderConfiguration</span> <span class="o">=</span> <span class="n">DownloaderConfiguration</span><span class="p">()</span>
+    <span class="n">job</span><span class="p">:</span> <span class="n">JobConfiguration</span> <span class="o">=</span> <span class="n">JobConfiguration</span><span class="p">()</span>
+    <span class="n">logger</span><span class="p">:</span> <span class="n">LoggerConfiguration</span> <span class="o">=</span> <span class="n">LoggerConfiguration</span><span class="p">()</span>
+
+    <span class="n">ssl_verify</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">json_dump_indent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">use_uvloop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># noinspection SpellCheckingInspection</span>
+    <span class="n">model_config</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">SettingsConfigDict</span><span class="p">]</span> <span class="o">=</span> <span class="n">SettingsConfigDict</span><span class="p">(</span>
+        <span class="n">env_prefix</span><span class="o">=</span><span class="s1">&#39;ktoolbox_&#39;</span><span class="p">,</span>
+        <span class="n">env_nested_delimiter</span><span class="o">=</span><span class="s1">&#39;__&#39;</span><span class="p">,</span>
+        <span class="n">env_file</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;.env&#39;</span><span class="p">,</span> <span class="s1">&#39;prod.env&#39;</span><span class="p">],</span>
+        <span class="n">env_file_encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span>
+        <span class="n">extra</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
 
 
 
@@ -1411,6 +1480,55 @@
       </tbody>
     </table>
 
+              <details class="quote">
+                <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">APIConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Kemono API Configuration</span>
+
+<span class="sd">    :ivar scheme: Kemono API URL scheme</span>
+<span class="sd">    :ivar netloc: Kemono API URL netloc</span>
+<span class="sd">    :ivar statics_netloc: URL netloc of Kemono server for static files (e.g. images)</span>
+<span class="sd">    :ivar files_netloc: URL netloc of Kemono server for post files</span>
+<span class="sd">    :ivar path: Kemono API URL root path</span>
+<span class="sd">    :ivar timeout: API request timeout</span>
+<span class="sd">    :ivar retry_times: API request retry times (when request failed)</span>
+<span class="sd">    :ivar retry_interval: Seconds of API request retry interval</span>
+<span class="sd">    :ivar session_key: Session key that can be found in cookies after a successful login</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scheme</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;http&quot;</span><span class="p">,</span> <span class="s2">&quot;https&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;https&quot;</span>
+    <span class="n">netloc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;kemono.cr&quot;</span>
+    <span class="n">statics_netloc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;img.kemono.cr&quot;</span>
+    <span class="n">files_netloc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;kemono.cr&quot;</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/api/v1&quot;</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span>
+    <span class="n">retry_times</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">retry_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span>
+    <span class="n">session_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+              </details>
 
 
 
@@ -1671,6 +1789,113 @@
       </tbody>
     </table>
 
+              <details class="quote">
+                <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">DownloaderConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    File Downloader Configuration</span>
+
+<span class="sd">    :ivar scheme: Downloader URL scheme</span>
+<span class="sd">    :ivar timeout: Downloader request timeout</span>
+<span class="sd">    :ivar encoding: Charset for filename parsing and post content text saving</span>
+<span class="sd">    :ivar buffer_size: Number of bytes of file I/O buffer for each downloading file</span>
+<span class="sd">    :ivar chunk_size: Number of bytes of chunk of downloader stream</span>
+<span class="sd">    :ivar temp_suffix: Temp filename suffix of downloading files</span>
+<span class="sd">    :ivar retry_times: Downloader retry times (when download failed)</span>
+<span class="sd">    :ivar retry_stop_never: Never stop downloader from retrying (when download failed) \</span>
+<span class="sd">    (``retry_times`` will be ignored when enabled)</span>
+<span class="sd">    :ivar retry_interval: Seconds of downloader retry interval</span>
+<span class="sd">    :ivar tps_limit: Maximum connections established per second</span>
+<span class="sd">    :ivar use_bucket: Enable local storage bucket mode</span>
+<span class="sd">    :ivar bucket_path: Path of local storage bucket</span>
+<span class="sd">    :ivar reverse_proxy: Reverse proxy format for download URL. \</span>
+<span class="sd">    Customize the filename format by inserting an empty ``{}`` to represent the original URL. \</span>
+<span class="sd">    For example: ``https://example.com/{}`` will be ``https://example.com/https://n1.kemono.su/data/66/83/xxxxx.jpg``;  \</span>
+<span class="sd">    ``https://example.com/?url={}`` will be ``https://example.com/?url=https://n1.kemono.su/data/66/83/xxxxx.jpg``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scheme</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;http&quot;</span><span class="p">,</span> <span class="s2">&quot;https&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;https&quot;</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">30.0</span>
+    <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span>
+    <span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20480</span>
+    <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span>
+    <span class="n">temp_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;tmp&quot;</span>
+    <span class="n">retry_times</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">retry_stop_never</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">retry_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">3.0</span>
+    <span class="n">tps_limit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">use_bucket</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">bucket_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;./.ktoolbox/bucket_storage&quot;</span><span class="p">)</span>
+    <span class="n">reverse_proxy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span>
+
+    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_bucket_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DownloaderConfiguration&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_bucket</span><span class="p">:</span>
+            <span class="c1"># noinspection PyBroadException</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">bucket_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket_path</span><span class="p">)</span>
+                <span class="n">bucket_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryFile</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">bucket_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">temp_file</span><span class="p">:</span>
+                    <span class="n">temp_link_file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bucket_path</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">temp_file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.hlink&quot;</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">temp_file</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">temp_link_file_path</span><span class="p">)</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">temp_link_file_path</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">use_bucket</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`DownloaderConfiguration.bucket_path` is not available, &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;`DownloaderConfiguration.use_bucket` has been disabled.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+</code></pre></div></td></tr></table></div>
+              </details>
 
 
 
@@ -1865,6 +2090,111 @@
       </tbody>
     </table>
 
+              <details class="quote">
+                <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">PostStructureConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="c1"># noinspection SpellCheckingInspection</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Post path structure model</span>
+
+<span class="sd">    - Default:</span>
+<span class="sd">    ```</span>
+<span class="sd">    ..</span>
+<span class="sd">    ├─ content.txt</span>
+<span class="sd">    ├─ external_links.txt</span>
+<span class="sd">    ├─ {id}_{}.png (file)</span>
+<span class="sd">    ├─ post.json (metadata)</span>
+<span class="sd">    ├─ attachments</span>
+<span class="sd">    │    ├─ 1.png</span>
+<span class="sd">    │    └─ 2.png</span>
+<span class="sd">    └─ revisions</span>
+<span class="sd">         ├─ &lt;PostStructure&gt;</span>
+<span class="sd">         │    ├─ ...</span>
+<span class="sd">         │    └─ ...</span>
+<span class="sd">         └─ &lt;PostStructure&gt;</span>
+<span class="sd">              ├─ ...</span>
+<span class="sd">              └─ ...</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    - Available properties for ``file``</span>
+
+<span class="sd">        | Property      | Type   |</span>
+<span class="sd">        |---------------|--------|</span>
+<span class="sd">        | ``id``        | String |</span>
+<span class="sd">        | ``user``      | String |</span>
+<span class="sd">        | ``service``   | String |</span>
+<span class="sd">        | ``title``     | String |</span>
+<span class="sd">        | ``added``     | Date   |</span>
+<span class="sd">        | ``published`` | Date   |</span>
+<span class="sd">        | ``edited``    | Date   |</span>
+
+<span class="sd">    :ivar attachments: Sub path of attachment directory</span>
+<span class="sd">    :ivar content: Sub path of post content file</span>
+<span class="sd">    :ivar external_links: Sub path of external links file (for cloud storage links found in content)</span>
+<span class="sd">    :ivar file: The format of the post `file` filename (`file` is not `attachment`, each post has only one `file`, usually the cover image) \</span>
+<span class="sd">    Customize the filename format by inserting an empty ``{}`` to represent the basic filename. \</span>
+<span class="sd">    You can use some of the [properties][ktoolbox.configuration.JobConfiguration] \</span>
+<span class="sd">    in Post. For example: ``{title}_{}`` could result in filenames like \</span>
+<span class="sd">    ``TheTitle_Stelle_lv5_logo.gif``, ``TheTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``, etc.</span>
+<span class="sd">    :ivar revisions: Sub path of revisions directory</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">attachments</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;attachments&quot;</span><span class="p">)</span>
+    <span class="n">content</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;content.txt&quot;</span><span class="p">)</span>
+    <span class="n">external_links</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;external_links.txt&quot;</span><span class="p">)</span>
+    <span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{id}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span>
+    <span class="n">revisions</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;revisions&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
 
 
 
@@ -2152,6 +2482,207 @@
       </tbody>
     </table>
 
+              <details class="quote">
+                <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">JobConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Download jobs Configuration</span>
+
+<span class="sd">    - Available properties for ``post_dirname_format`` and ``filename_format``</span>
+
+<span class="sd">        | Property      | Type   |</span>
+<span class="sd">        |---------------|--------|</span>
+<span class="sd">        | ``id``        | String |</span>
+<span class="sd">        | ``user``      | String |</span>
+<span class="sd">        | ``service``   | String |</span>
+<span class="sd">        | ``title``     | String |</span>
+<span class="sd">        | ``added``     | Date   |</span>
+<span class="sd">        | ``published`` | Date   |</span>
+<span class="sd">        | ``edited``    | Date   |</span>
+
+<span class="sd">    :ivar count: Number of coroutines for concurrent download</span>
+<span class="sd">    :ivar include_revisions: Include and download revision posts when available</span>
+<span class="sd">    :ivar post_dirname_format: Customize the post directory name format, you can use some of the \</span>
+<span class="sd">    [properties][ktoolbox.configuration.JobConfiguration] in ``Post``. \</span>
+<span class="sd">    e.g. ``[{published}]{id}`` &gt; ``[2024-1-1]123123``, ``{user}_{published}_{title}`` &gt; ``234234_2024-1-1_TheTitle``</span>
+<span class="sd">    :ivar post_structure: Post path structure</span>
+<span class="sd">    :ivar mix_posts: Save all files from different posts at same path in creator directory. \</span>
+<span class="sd">    It would not create any post directory, and ``CreatorIndices`` would not been recorded.</span>
+<span class="sd">    :ivar sequential_filename: Rename attachments in numerical order, e.g. ``1.png``, ``2.png``, ...</span>
+<span class="sd">    :ivar sequential_filename_excludes: File extensions to exclude from sequential naming when ``sequential_filename`` is enabled. \</span>
+<span class="sd">    Files with these extensions will keep their original names. e.g. ``[&quot;.psd&quot;, &quot;.zip&quot;, &quot;.mp4&quot;]``</span>
+<span class="sd">    :ivar filename_format: Customize the filename format by inserting an empty ``{}`` to represent the basic filename.</span>
+<span class="sd">    Similar to post_dirname_format, you can use some of the [properties][ktoolbox.configuration.JobConfiguration] \</span>
+<span class="sd">    in Post. For example: ``{title}_{}`` could result in filenames like \</span>
+<span class="sd">    ``TheTitle_b4b41de2-8736-480d-b5c3-ebf0d917561b``, ``TheTitle_af349b25-ac08-46d7-98fb-6ce99a237b90``, etc. \</span>
+<span class="sd">    You can also use it with ``sequential_filename``. For instance, \</span>
+<span class="sd">    ``[{published}]_{}`` could result in filenames like ``[2024-1-1]_1.png``, ``[2024-1-1]_2.png``, etc.</span>
+<span class="sd">    :ivar allow_list: Download files which match these patterns (Unix shell-style), e.g. ``[&quot;*.png&quot;]``</span>
+<span class="sd">    :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``[&quot;*.psd&quot;,&quot;*.zip&quot;]``</span>
+<span class="sd">    :ivar extract_external_links: Extract external file sharing links from post content and save to separate file</span>
+<span class="sd">    :ivar external_link_patterns: Regex patterns for extracting external links.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">include_revisions</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">post_dirname_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{title}</span><span class="s2">&quot;</span>
+    <span class="n">post_structure</span><span class="p">:</span> <span class="n">PostStructureConfiguration</span> <span class="o">=</span> <span class="n">PostStructureConfiguration</span><span class="p">()</span>
+    <span class="n">mix_posts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">sequential_filename</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">sequential_filename_excludes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">)</span>
+    <span class="n">filename_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span>
+    <span class="c1"># noinspection PyDataclass</span>
+    <span class="n">allow_list</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">)</span>
+    <span class="c1"># noinspection PyDataclass</span>
+    <span class="n">block_list</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">)</span>
+    <span class="n">extract_external_links</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">external_link_patterns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="c1"># Google Drive</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://drive\.google\.com/[^\s]+&#39;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://docs\.google\.com/[^\s]+&#39;</span><span class="p">,</span>
+
+        <span class="c1"># MEGA</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://mega\.nz/[^\s]+&#39;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://mega\.co\.nz/[^\s]+&#39;</span><span class="p">,</span>
+
+        <span class="c1"># Dropbox</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://(?:www\.)?dropbox\.com/[^\s]+&#39;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://db\.tt/[^\s]+&#39;</span><span class="p">,</span>
+
+        <span class="c1"># OneDrive</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://onedrive\.live\.com/[^\s]+&#39;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://1drv\.ms/[^\s]+&#39;</span><span class="p">,</span>
+
+        <span class="c1"># MediaFire</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://(?:www\.)?mediafire\.com/[^\s]+&#39;</span><span class="p">,</span>
+
+        <span class="c1"># WeTransfer</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://(?:www\.)?wetransfer\.com/[^\s]+&#39;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://we\.tl/[^\s]+&#39;</span><span class="p">,</span>
+
+        <span class="c1"># SendSpace</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://(?:www\.)?sendspace\.com/[^\s]+&#39;</span><span class="p">,</span>
+
+        <span class="c1"># 4shared</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://(?:www\.)?4shared\.com/[^\s]+&#39;</span><span class="p">,</span>
+
+        <span class="c1"># Zippyshare</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://(?:www\.)?zippyshare\.com/[^\s]+&#39;</span><span class="p">,</span>
+
+        <span class="c1"># Uploadfiles.io</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://(?:www\.)?uploadfiles\.io/[^\s]+&#39;</span><span class="p">,</span>
+
+        <span class="c1"># Box</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://(?:www\.)?box\.com/[^\s]+&#39;</span><span class="p">,</span>
+
+        <span class="c1"># pCloud</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://(?:www\.)?pcloud\.com/[^\s]+&#39;</span><span class="p">,</span>
+
+        <span class="c1"># Yandex Disk</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://disk\.yandex\.[a-z]+/[^\s]+&#39;</span><span class="p">,</span>
+
+        <span class="c1"># Generic patterns for other file hosting services</span>
+        <span class="sa">r</span><span class="s1">&#39;https?://[^\s]*(?:file|upload|share|download|drive|storage)[^\s]*\.[a-z]{2,4}/[^\s]+&#39;</span><span class="p">,</span>
+    <span class="p">]</span>
+</code></pre></div></td></tr></table></div>
+              </details>
 
 
 
@@ -2252,6 +2783,31 @@
       </tbody>
     </table>
 
+              <details class="quote">
+                <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">LoggerConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Logger configuration</span>
+
+<span class="sd">    :ivar path: Path to save logs, ``None`` for disable log file output</span>
+<span class="sd">    :ivar level: Log filter level</span>
+<span class="sd">    :ivar rotation: Log rotation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">level</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLevelName</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+    <span class="n">rotation</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1 week&quot;</span>
+</code></pre></div></td></tr></table></div>
+              </details>
 
 
 
