@@ -1,6 +1,13 @@
 {
+  "Attributes": "属性",
+  "Example": "示例", 
   "Parameters": "参数",
-  "Returns": "返回",
   "Raises": "抛出异常",
-  "Example": "示例"
+  "Returns": "返回",
+  "Source": "源码",
+  "Type": "类型",
+  "Default": "默认值",
+  "Description": "描述",
+  "Note": "注意",
+  "Warning": "警告"
 }
