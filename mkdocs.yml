@@ -150,10 +150,6 @@ extra:
           data: 0
           note: >-
             Thanks for your feedback! You can submit more advice on Issues or Discussion page of our GitHub Repository.
-  alternate:
-    - name: 中文（简体）
-      link: /zh/
-      lang: zh
 
 markdown_extensions:
 
