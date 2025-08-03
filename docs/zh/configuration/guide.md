@@ -11,8 +11,8 @@
 
     === "截图"
 
-        ![KToolBox 配置编辑器](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-2.png)
-        ![KToolBox 配置编辑器](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-3.png)
+        <img src="https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-2.png" alt="KToolBox 配置编辑器">
+        <img src="https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-3.png" alt="KToolBox 配置编辑器">
 
 !!! tip "生成示例 `.env` 文件"
 

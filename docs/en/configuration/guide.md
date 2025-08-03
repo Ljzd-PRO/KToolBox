@@ -12,8 +12,8 @@
 
     === "Screenshot"
 
-        ![KToolBox Configuration Editor](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-2.png){ loading=lazy }
-        ![KToolBox Configuration Editor](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-3.png){ loading=lazy }
+        <img src="https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-2.png" alt="KToolBox Configuration Editor">
+        <img src="https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-3.png" alt="KToolBox Configuration Editor">
 
 !!! tip "Generate Example `.env` File"
 
