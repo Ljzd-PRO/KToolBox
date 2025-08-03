@@ -159,7 +159,7 @@ extras = ["regex"]
 name = "beautifulsoup4"
 version = "4.13.4"
 description = "Screen-scraping library"
-optional = false
+optional = true
 python-versions = ">=3.7.0"
 files = [
     {file = "beautifulsoup4-4.13.4-py3-none-any.whl", hash = "sha256:9bbbb14bfde9d79f38b8cd5f8c7c85f4b8f2523190ebed90e950a8dea4cb1c4b"},
@@ -227,7 +227,7 @@ uvloop = ["uvloop (>=0.15.2)"]
 name = "brotli"
 version = "1.1.0"
 description = "Python bindings for the Brotli compression library"
-optional = false
+optional = true
 python-versions = "*"
 files = [
     {file = "Brotli-1.1.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:e1140c64812cb9b06c922e77f1c26a75ec5e3f0fb2bf92cc8c58720dec276752"},
@@ -319,7 +319,7 @@ files = [
 name = "brotlicffi"
 version = "1.1.0.0"
 description = "Python CFFI bindings to the Brotli library"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "brotlicffi-1.1.0.0-cp37-abi3-macosx_10_9_x86_64.whl", hash = "sha256:9b7ae6bd1a3f0df532b6d67ff674099a96d22bc0948955cb338488c31bfb8851"},
@@ -369,7 +369,7 @@ files = [
 name = "cffi"
 version = "1.17.1"
 description = "Foreign Function Interface for Python calling C code."
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "cffi-1.17.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:df8b1c11f177bc2313ec4b2d46baec87a5f3e71fc8b45dab2ee7cae86d9aba14"},
@@ -672,7 +672,7 @@ toml = ["tomli"]
 name = "cssselect2"
 version = "0.8.0"
 description = "CSS selectors for Python ElementTree"
-optional = false
+optional = true
 python-versions = ">=3.9"
 files = [
     {file = "cssselect2-0.8.0-py3-none-any.whl", hash = "sha256:46fc70ebc41ced7a32cd42d58b1884d72ade23d21e5a4eaaf022401c13f0e76e"},
@@ -809,7 +809,7 @@ termcolor = "*"
 name = "fonttools"
 version = "4.59.0"
 description = "Tools to manipulate font files"
-optional = false
+optional = true
 python-versions = ">=3.9"
 files = [
     {file = "fonttools-4.59.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:524133c1be38445c5c0575eacea42dbd44374b310b1ffc4b60ff01d881fabb96"},
@@ -932,7 +932,7 @@ files = [
 name = "html5lib"
 version = "1.1"
 description = "HTML parser based on the WHATWG HTML specification"
-optional = false
+optional = true
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 files = [
     {file = "html5lib-1.1-py2.py3-none-any.whl", hash = "sha256:0d78f8fde1c230e99fe37986a60526d7049ed4bf8a9fadbad5f00e22e58e041d"},
@@ -1153,7 +1153,7 @@ referencing = ">=0.31.0"
 name = "libsass"
 version = "0.23.0"
 description = "Sass for Python: A straightforward binding of libsass for Python."
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "libsass-0.23.0-cp38-abi3-macosx_11_0_x86_64.whl", hash = "sha256:34cae047cbbfc4ffa832a61cbb110f3c95f5471c6170c842d3fed161e40814dc"},
@@ -1444,7 +1444,7 @@ material = ["mkdocs-material (>=9.2.5)"]
 name = "mkdocs-to-pdf"
 version = "0.10.1"
 description = "Generate a single PDF file from an `mkdocs` repository"
-optional = false
+optional = true
 python-versions = ">=3.9"
 files = [
     {file = "mkdocs_to_pdf-0.10.1-py3-none-any.whl", hash = "sha256:14e7f7e2696de024e8da328f32158abf8d7f6abe9ea65dac45d821d899615d9c"},
@@ -1626,7 +1626,7 @@ files = [
 name = "pillow"
 version = "11.3.0"
 description = "Python Imaging Library (Fork)"
-optional = false
+optional = true
 python-versions = ">=3.9"
 files = [
     {file = "pillow-11.3.0-cp310-cp310-macosx_10_10_x86_64.whl", hash = "sha256:1b9c17fd4ace828b3003dfd1e30bff24863e0eb59b535e8f80194d9cc7ecf860"},
@@ -1818,7 +1818,7 @@ ssv = ["swagger-spec-validator (>=2.4,<3.0)"]
 name = "pycparser"
 version = "2.22"
 description = "C parser in Python"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "pycparser-2.22-py3-none-any.whl", hash = "sha256:c3702b6d3dd8c7abc1afa565d7e63d53a1d0bd86cdc24edd75470f4de499cfcc"},
@@ -1982,7 +1982,7 @@ yaml = ["pyyaml (>=6.0.1)"]
 name = "pydyf"
 version = "0.10.0"
 description = "A low-level PDF generator."
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "pydyf-0.10.0-py3-none-any.whl", hash = "sha256:ef76b6c0976a091a9e15827fb5800e5e37e7cd1a3ca4d4bd19d10a14ea8c0ae3"},
@@ -2094,7 +2094,7 @@ diagrams = ["jinja2", "railroad-diagrams"]
 name = "pyphen"
 version = "0.17.2"
 description = "Pure Python module to hyphenate text"
-optional = false
+optional = true
 python-versions = ">=3.9"
 files = [
     {file = "pyphen-0.17.2-py3-none-any.whl", hash = "sha256:3a07fb017cb2341e1d9ff31b8634efb1ae4dc4b130468c7c39dd3d32e7c3affd"},
@@ -2602,7 +2602,7 @@ files = [
 name = "soupsieve"
 version = "2.7"
 description = "A modern CSS selector implementation for Beautiful Soup."
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "soupsieve-2.7-py3-none-any.whl", hash = "sha256:6e60cc5c1ffaf1cebcc12e8188320b72071e922c2e897f737cadce79ad5d30c4"},
@@ -2642,7 +2642,7 @@ tests = ["pytest", "pytest-cov"]
 name = "tinycss2"
 version = "1.4.0"
 description = "A tiny CSS parser"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "tinycss2-1.4.0-py3-none-any.whl", hash = "sha256:3a49cf47b7675da0b15d0c6e1df8df4ebd96e9394bb905a5775adb0d884c5289"},
@@ -2910,7 +2910,7 @@ files = [
 name = "weasyprint"
 version = "62.3"
 description = "The Awesome Document Factory"
-optional = false
+optional = true
 python-versions = ">=3.9"
 files = [
     {file = "weasyprint-62.3-py3-none-any.whl", hash = "sha256:d31048646ce15084e135b33e334a61f526aa68d2f679fcc109ed0e0f5edaed21"},
@@ -2935,7 +2935,7 @@ test = ["pytest", "ruff"]
 name = "webencodings"
 version = "0.5.1"
 description = "Character encoding aliases for legacy web content"
-optional = false
+optional = true
 python-versions = "*"
 files = [
     {file = "webencodings-0.5.1-py2.py3-none-any.whl", hash = "sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78"},
@@ -3050,7 +3050,7 @@ type = ["pytest-mypy"]
 name = "zopfli"
 version = "0.2.3.post1"
 description = "Zopfli module for python"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "zopfli-0.2.3.post1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:e0137dd64a493ba6a4be37405cfd6febe650a98cc1e9dca8f6b8c63b1db11b41"},
@@ -3137,4 +3137,4 @@ winloop = ["winloop"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1,<3.14"
-content-hash = "207176ca973c64b087fed07c27269d6bce2400e898bf758eb6186928793f8467"
+content-hash = "657f06a172e2418369020516f618c7d47c796092fc69395fad906df963a5a0f8"
