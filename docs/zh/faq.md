@@ -30,7 +30,7 @@ KToolBox 现在支持平台特定的事件循环优化：
     sudo apt install python3-uvloop
     ```
 
-## 我不需要作品目录下的 `attachments` 文件夹
+## 我不需要帖子目录下的 `attachments` 文件夹
 
 你可以设置配置选项 `job.post_structure.attachments` 为 `./`
 
@@ -39,7 +39,7 @@ KToolBox 现在支持平台特定的事件循环优化：
 KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 ```
 
-`./` 表示附件文件将会直接下载到作品目录下。
+`./` 表示附件文件将会直接下载到帖子目录下。
 
 !!! info "提示"
     更多详情，请参考 [配置-向导](configuration/guide.md) 页面。
@@ -50,14 +50,14 @@ KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 
 ## 文件名过长
 
-在一些情况下，文件名或作品目录名过长而导致下载失败。为了解决这个问题，你可以设置 **序列化文件名** 或使用 **自定义作品目录名**
+在一些情况下，文件名或帖子目录名过长而导致下载失败。为了解决这个问题，你可以设置 **序列化文件名** 或使用 **自定义帖子目录名**
 
 通过 dotenv 文件 `prod.env` 或系统环境变量来设置配置：
 ```dotenv
 # 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
 KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
 
-# 设置作品目录名为其发布日期和ID，例如 `[2024-1-1]11223344`
+# 设置帖子目录名为其发布日期和ID，例如 `[2024-1-1]11223344`
 KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}
 ```
 

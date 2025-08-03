@@ -9,7 +9,7 @@
 <p align="center">
   KToolBox 是一个用于下载
   <a href="https://kemono.cr/">Kemono.cr / Kemono.su / Kemono.party</a>
-  中作品内容的实用命令行工具
+  中帖子内容的实用命令行工具
 </p>
 
 <p align="center">
@@ -52,14 +52,26 @@
 
 ## 功能
 
-- 支持并发下载
+- 支持多文件并发下载
 - API 调用和下载失败后 **自动重试**
-- 支持下载单个作品以及指定的画师的 **所有作品**
+- 支持下载单个帖子以及指定的画师的 **全部帖子**
 - 可 **更新已下载** 的画师目录至最新状态
-- 支持自定义下载的作品/画师 **文件和目录名格式**、**目录结构**
+- 支持自定义下载的帖子/画师的 **文件和目录名格式**、**目录结构**
+  - 例如帖子目录可设置为 `[2025-01-02]_TheTitle` 的格式，图片文件设置为按顺序的 `1.jpg`、`2.jpg` 等
+  - 当你希望将某作者的所有帖子图片统一存放至一个目录下，以便预览，可以使用 `job.mix_posts` 配置项搭配自定义文件名格式，你将得到几百上千张图片的目录
+    - 如 `[2025-01-02]_TheTitle_1.jpg`、`[2025-01-02]_TheTitle_2.jpg`、`[2025-01-02]_TheTitle_3.jpg` 等
 - 支持排除 **指定格式** 的文件或仅下载指定格式的文件
-- 可搜索画师和作品，并导出结果
+  - 例如当你不想下载庞大重复的 PSD 和压缩包文件时，可以在配置中排除 `.psd` 和 `.zip` 文件
+- 支持按帖子**标题关键词**过滤下载
+  - 例如你只想下载标题中包含“表情、効果音差分”的帖子，可以使用 `sync-creator` 命令的 `--keywords` 选项
+- 支持按帖子发布日期**时间范围**过滤下载
+- 能够解析帖子页面 HTML 多信息文本中包含的图片并下载
+  - 这类帖子特征为：浏览器页面刚进入时图片可能没有加载出来，且没有预览图
+- 能够收集帖子页面中列出的**网盘链接**并保存至文本文件
+- 可搜索画师和帖子，并导出结果
+  - 如果你希望自己处理画师和帖子数据，可以使用该功能导出 JSON 数据
 - 支持全平台，并提供 iOS 快捷指令
+  - 纯 Python 分支可在 iOS 的 a-Shell 或浏览器的 Pyodide 上运行
 - 对于 _Coomer.st / Coomer.su / Coomer.party_ 的支持，请查看文档 [Coomer](https://ktoolbox.readthedocs.io/latest/zh/coomer/)
 
 ## 开发计划
@@ -107,25 +119,25 @@ ktoolbox -h
 ktoolbox download-post -h
 ```
 
-#### ⬇️🖼️ 下载指定的作品
+#### ⬇️🖼️ 下载指定的帖子
 ```bash
 ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
 ```
 
 如果部分文件下载失败，你可以尝试重新运行命令，已下载完成的文件会被 **跳过**。
   
-#### ⬇️🖌️ 下载作者的所有作品
+#### ⬇️🖌️ 下载作者的所有帖子
 ```bash
-# 下载作者/画师的所有作品
+# 下载作者/画师的所有帖子
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016
 
-# 下载作者/画师最新的 10 个作品
+# 下载作者/画师最新的 10 个帖子
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --length=10
 
-# 下载作者/画师最新的第 11 至 15 个作品
+# 下载作者/画师最新的第 11 至 15 个帖子
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 
-# 下载作者/画师从 2024-1-1 到 2024-3-1 的作品
+# 下载作者/画师从 2024-1-1 到 2024-3-1 的帖子
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 --end-time=2024-3-1
 ```
 
@@ -137,7 +149,7 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 -
 
 - 同时下载10个文件
 - 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
-- 将发布日期作为作品目录名的开头，例如 `[2024-1-1]HelloWorld`
+- 将发布日期作为帖子目录名的开头，例如 `[2024-1-1]HelloWorld`
 - ...
 
 前往 [配置-向导](https://ktoolbox.readthedocs.io/latest/zh/configuration/guide/) 页面查看更多详情。

@@ -58,7 +58,7 @@
     ```
   - 当配置项 `use_uvloop`（`KTOOLBOX_USE_UVLOOP`）设为默认值 `True` 时才会启用
 - 下载文件时**保留图片元数据**（**修改/创建 日期**） - #248
-- 下载器**重试日志**中包含文件名、作品名称、作品ID、URL，以便更好地追踪 - #223 (@LuanaNight)
+- 下载器**重试日志**中包含文件名、帖子名称、帖子ID、URL，以便更好地追踪 - #223 (@LuanaNight)
 - `sync-creator` 命令新增**关键词过滤**功能（标题） - #292
   - 使用新命令选项 `--keywords`
   - 示例：
@@ -70,7 +70,7 @@
     ktoolbox sync_creator https://kemono.cr/fanbox/user/xxxx --keywords "表情、効果音差分,Live2Dアニメ"
     ```
 - 新增**选择性顺序文件名**功能，可设置排除项 - #191
-  - 例如当你想按顺序命名作品图片（1.jpg, 2.jpg, ...）但又希望保留视频或压缩包的原始文件名（如“3月合集.zip”）时，你可以用这个配置项
+  - 例如当你想按顺序命名帖子图片（1.jpg, 2.jpg, ...）但又希望保留视频或压缩包的原始文件名（如“3月合集.zip”）时，你可以用这个配置项
   - 可运行 `ktoolbox config-editor` 编辑此配置（`Job -> sequential_filename_excludes`）
   - 或手动在 `.env` 文件或环境变量中编辑
     ```dotenv
