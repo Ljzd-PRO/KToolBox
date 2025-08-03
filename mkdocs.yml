@@ -45,7 +45,6 @@ plugins:
       cover_subtitle: "A useful CLI tool for downloading posts in Kemono.cr / .su / .party"
       output_path: pdf/KToolBox-documentation.pdf
       enabled_if_env: ENABLE_PDF_EXPORT
-      render_js: true
       exclude_pages:
         - api.md
   - i18n:
