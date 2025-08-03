@@ -50,6 +50,12 @@
     <a href="./README.md">English</a> | <a href="./README_zh-CN.md">中文</a>
 </p>
 
+<p align="center">
+  <a href='https://ko-fi.com/N4N51J14RW'>
+    <img src='https://ko-fi.com/img/githubbutton_sm.svg' alt='ko-fi' />
+  </a>
+</p>
+
 ## 功能
 
 - 支持多文件并发下载
