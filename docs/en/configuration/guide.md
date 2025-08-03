@@ -10,11 +10,6 @@
         - Press `<Esc>` for back, `<Enter>` for select
         - You can also use the GUI with the mouse
 
-    === "Screenshot"
-
-        ![KToolBox Configuration Editor](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-2.png){ loading=lazy }
-        ![KToolBox Configuration Editor](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-3.png){ loading=lazy }
-
 !!! tip "Generate Example `.env` File"
 
     Run `ktoolbox example-env` to generate a complete sample configuration file.

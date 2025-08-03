@@ -9,11 +9,6 @@
         - 按下 `<Esc>` 来返回，按 `<Enter>` 来选择 
         - 你也可以通过鼠标使用这个 GUI
 
-    === "截图"
-
-        ![KToolBox 配置编辑器](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-2.png){ loading=lazy }
-        ![KToolBox 配置编辑器](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-3.png){ loading=lazy }
-
 !!! tip "生成示例 `.env` 文件"
 
     运行 `ktoolbox example-env` 来生成完整的配置文件样例。
