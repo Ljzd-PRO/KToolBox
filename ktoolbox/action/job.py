@@ -225,8 +225,9 @@ async def create_job_from_creator(
             ) as f:
                 await f.write(indices.json(indent=config.json_dump_indent))
 
-    logger.info("`job.include_revisions` is enabled and will fetch post revisions, "
-                "which may take time. Disable if not needed.")
+    if config.job.include_revisions:
+        logger.info("`job.include_revisions` is enabled and will fetch post revisions, "
+                    "which may take time. Disable if not needed.")
 
     job_list: List[Job] = []
     for post in post_list:
