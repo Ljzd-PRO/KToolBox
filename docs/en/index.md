@@ -37,6 +37,12 @@
   </a>
 </p>
 
+<p style="text-align: center">
+  <a href='https://ko-fi.com/N4N51J14RW'>
+    <img src='https://ko-fi.com/img/githubbutton_sm.svg' alt='ko-fi' />
+  </a>
+</p>
+
 ## Features
 
 - Support concurrent downloading of multiple files
