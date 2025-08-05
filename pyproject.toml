@@ -46,7 +46,7 @@ urwid = [
 ]
 
 [tool.poetry.group.pyinstaller.dependencies]
-pyinstaller = "==6.11.1"
+pyinstaller = "==6.15.0"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.5.3"
