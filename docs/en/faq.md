@@ -134,6 +134,7 @@ You can also set these through the graphical configuration editor: `API - retry_
 
 The solution is the same as above.
 
-## Others
+## Where can I find more information about KToolBox?
 
-A community-shared usage guide: [#141](https://github.com/Ljzd-PRO/KToolBox/issues/141)
+- Guide: Use **AI(Copilot Spaces)** for command params and configuration help: [#304](https://github.com/Ljzd-PRO/KToolBox/issues/304)
+- A community-shared usage guide: [#141](https://github.com/Ljzd-PRO/KToolBox/issues/141)

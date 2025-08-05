@@ -133,13 +133,23 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 
 # Download posts from the creator/artist from 2024-1-1 to 2024-3-1
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 --end-time=2024-3-1
+
+# Download posts from the creator/artist whose title contains "表情"
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --keywords "表情"
+
+# Download posts from the creator/artist whose title contains "表情" or "効果音差分"
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --keywords "表情,効果音差分"
 ```
 
 ### Configuration
 
 - Download 10 files at the same time
-- Rename attachments in numerical order
-- Prefix the post directory name with its release/publish date
+- Rename attachments in numerical order, e.g. `1.png`, `2.png`, ...
+- Prefix the post directory name with its release/publish date, e.g. `[2024-1-1]HelloWorld`
+- Use the post title as the prefix for file names, e.g. `HelloWorld_1.png`, `HelloWorld_2.png`, ...
+- Download revisions of posts
+- Exclude `.psd` and `.zip` files
+- Extract cloud drive links from posts and save them to a text file
 - ...
 
 Goto [Configuration-Guide](https://ktoolbox.readthedocs.io/latest/configuration/guide/) page for more details.

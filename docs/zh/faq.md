@@ -135,6 +135,7 @@ ktoolbox sync-creator "https://coomer.su/onlyfans/user/hollyharper11" --start-ti
 
 解决方法同上
 
-## 其他
+## 我在哪里可以找到更多帮助？
 
-一个社区分享的使用向导：[#141](https://github.com/Ljzd-PRO/KToolBox/issues/141)
+- 向导：用 **AI（Copilot Spaces）** 获取命令参数和配置帮助：[#304](https://github.com/Ljzd-PRO/KToolBox/issues/304)
+- 一个社区分享的使用向导：[#141](https://github.com/Ljzd-PRO/KToolBox/issues/141)
