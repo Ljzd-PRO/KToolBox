@@ -132,6 +132,12 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 
 # 下载作者/画师从 2024-1-1 到 2024-3-1 的帖子
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 --end-time=2024-3-1
+
+# 下载作者/画师标题中包含“表情”的帖子
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --keywords "表情"
+
+# 下载作者/画师标题中包含“表情、効果音差分”的帖子
+ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --keywords "表情,効果音差分"
 ```
 
 ### 配置
@@ -139,6 +145,10 @@ ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 -
 - 同时下载10个文件
 - 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
 - 将发布日期作为帖子目录名的开头，例如 `[2024-1-1]HelloWorld`
+- 将帖子标题作为文件名的开头，例如 `HelloWorld_1.png`, `HelloWorld_2.png`, ...
+- 下载帖子修订版本
+- 排除下载 `.psd` 和 `.zip` 文件
+- 从帖子中提取云盘链接并保存到文本文件
 - ...
 
 前往 [配置-向导](https://ktoolbox.readthedocs.io/latest/zh/configuration/guide/) 页面查看更多详情。
