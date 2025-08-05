@@ -1,5 +1,7 @@
 # 参考
 
-::: ktoolbox.cli.KToolBoxCli
+::: ktoolbox._cli_zh.KToolBoxCli
     options:
+        show_labels: false
         show_signature: false
+        show_source: false

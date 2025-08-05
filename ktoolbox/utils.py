@@ -1,4 +1,5 @@
 import asyncio
+import html
 import logging
 import re
 import sys
@@ -188,8 +189,20 @@ def extract_external_links(content: str, custom_patterns: Optional[List[str]] = 
         # Get the full matched URL
         url = match.group(0)
 
-        # Clean up common trailing punctuation that might be part of text
-        url = re.sub(r'[.,;!?)\]}>"\'\s]+$', '', url)
+        # Clean up HTML markup and common trailing punctuation that might be part of text
+        # Stop at common HTML boundary characters and quotes
+        url = re.sub(r'["\'>][^<]*$', '', url)  # Remove quote + content to end  
+        
+        # Additional cleanup: Remove HTML tags that might have been captured  
+        url = re.sub(r'<[^>]*>.*$', '', url)  # Remove any HTML tags and everything after
+        url = re.sub(r'"[^"]*$', '', url)  # Remove quote and everything after it
+        
+        # Remove trailing HTML tag fragments and punctuation
+        url = re.sub(r'</[^>]*>?$', '', url)  # Remove closing tags or partial tags at end
+        url = re.sub(r'[.,;!?)\]}>"\'\s]+$', '', url)  # Remove trailing punctuation
+        
+        # Decode HTML entities (like &amp; -> &, &lt; -> <, etc.)
+        url = html.unescape(url)
 
         # Validate that it looks like a proper URL
         if len(url) > 10 and '.' in url:
