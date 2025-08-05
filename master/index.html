@@ -1138,12 +1138,22 @@ ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemo
 
 <span class="c1"># Download posts from the creator/artist from 2024-1-1 to 2024-3-1</span>
 ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--start-time<span class="o">=</span><span class="m">2024</span>-1-1<span class="w"> </span>--end-time<span class="o">=</span><span class="m">2024</span>-3-1
+
+<span class="c1"># Download posts from the creator/artist whose title contains &quot;表情&quot;</span>
+ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--keywords<span class="w"> </span><span class="s2">&quot;表情&quot;</span>
+
+<span class="c1"># Download posts from the creator/artist whose title contains &quot;表情&quot; or &quot;効果音差分&quot;</span>
+ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--keywords<span class="w"> </span><span class="s2">&quot;表情,効果音差分&quot;</span>
 </code></pre></div>
 <h3 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Download 10 files at the same time</li>
-<li>Rename attachments in numerical order</li>
-<li>Prefix the post directory name with its release/publish date</li>
+<li>Rename attachments in numerical order, e.g. <code>1.png</code>, <code>2.png</code>, ...</li>
+<li>Prefix the post directory name with its release/publish date, e.g. <code>[2024-1-1]HelloWorld</code></li>
+<li>Use the post title as the prefix for file names, e.g. <code>HelloWorld_1.png</code>, <code>HelloWorld_2.png</code>, ...</li>
+<li>Download revisions of posts</li>
+<li>Exclude <code>.psd</code> and <code>.zip</code> files</li>
+<li>Extract cloud drive links from posts and save them to a text file</li>
 <li>...</li>
 </ul>
 <p>Goto <a href="https://ktoolbox.readthedocs.io/latest/configuration/guide/">Configuration-Guide</a> page for more details.</p>

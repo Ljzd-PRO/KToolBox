@@ -9881,7 +9881,7 @@
 
 
 <h2 id="ktoolbox.__version__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;v0.18.1&#39;</span></code>
+            <code class="highlight language-python"><span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;v0.18.2&#39;</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
@@ -10438,7 +10438,8 @@
 <span class="normal">262</span>
 <span class="normal">263</span>
 <span class="normal">264</span>
-<span class="normal">265</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_creator</span><span class="p">(</span>
+<span class="normal">265</span>
+<span class="normal">266</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_creator</span><span class="p">(</span>
         <span class="n">service</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">creator_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
@@ -10520,8 +10521,9 @@
             <span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">indices</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">json_dump_indent</span><span class="p">))</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;`job.include_revisions` is enabled and will fetch post revisions, &quot;</span>
-                <span class="s2">&quot;which may take time. Disable if not needed.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">include_revisions</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;`job.include_revisions` is enabled and will fetch post revisions, &quot;</span>
+                    <span class="s2">&quot;which may take time. Disable if not needed.&quot;</span><span class="p">)</span>
 
     <span class="n">job_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Job</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">post</span> <span class="ow">in</span> <span class="n">post_list</span><span class="p">:</span>
@@ -12748,7 +12750,8 @@
 <span class="normal">262</span>
 <span class="normal">263</span>
 <span class="normal">264</span>
-<span class="normal">265</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_creator</span><span class="p">(</span>
+<span class="normal">265</span>
+<span class="normal">266</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_creator</span><span class="p">(</span>
         <span class="n">service</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">creator_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
@@ -12830,8 +12833,9 @@
             <span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">indices</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">json_dump_indent</span><span class="p">))</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;`job.include_revisions` is enabled and will fetch post revisions, &quot;</span>
-                <span class="s2">&quot;which may take time. Disable if not needed.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">include_revisions</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;`job.include_revisions` is enabled and will fetch post revisions, &quot;</span>
+                    <span class="s2">&quot;which may take time. Disable if not needed.&quot;</span><span class="p">)</span>
 
     <span class="n">job_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Job</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">post</span> <span class="ow">in</span> <span class="n">post_list</span><span class="p">:</span>

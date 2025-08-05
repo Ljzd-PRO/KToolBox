@@ -1145,12 +1145,22 @@ ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemo
 
 <span class="c1"># 下载作者/画师从 2024-1-1 到 2024-3-1 的帖子</span>
 ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--start-time<span class="o">=</span><span class="m">2024</span>-1-1<span class="w"> </span>--end-time<span class="o">=</span><span class="m">2024</span>-3-1
+
+<span class="c1"># 下载作者/画师标题中包含“表情”的帖子</span>
+ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--keywords<span class="w"> </span><span class="s2">&quot;表情&quot;</span>
+
+<span class="c1"># 下载作者/画师标题中包含“表情、効果音差分”的帖子</span>
+ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--keywords<span class="w"> </span><span class="s2">&quot;表情,効果音差分&quot;</span>
 </code></pre></div>
 <h3 id="_9">配置<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
 <ul>
 <li>同时下载10个文件</li>
 <li>按照数字顺序重命名附件, 例如 <code>1.png</code>, <code>2.png</code>, ...</li>
 <li>将发布日期作为帖子目录名的开头，例如 <code>[2024-1-1]HelloWorld</code></li>
+<li>将帖子标题作为文件名的开头，例如 <code>HelloWorld_1.png</code>, <code>HelloWorld_2.png</code>, ...</li>
+<li>下载帖子修订版本</li>
+<li>排除下载 <code>.psd</code> 和 <code>.zip</code> 文件</li>
+<li>从帖子中提取云盘链接并保存到文本文件</li>
 <li>...</li>
 </ul>
 <p>前往 <a href="https://ktoolbox.readthedocs.io/latest/zh/configuration/guide/">配置-向导</a> 页面查看更多详情。</p>
