@@ -15,7 +15,8 @@ __all__ = [
     "filter_posts_by_date",
     "filter_posts_by_indices",
     "match_post_keywords",
-    "filter_posts_by_keywords"
+    "filter_posts_by_keywords",
+    "filter_posts_by_keywords_exclude"
 ]
 
 TIME_FORMAT = "%Y-%m-%d"
@@ -159,4 +160,23 @@ def filter_posts_by_keywords(
         return
     
     post_filter = filter(lambda x: match_post_keywords(x, keywords), post_list)
+    yield from post_filter
+
+
+def filter_posts_by_keywords_exclude(
+        post_list: List[Post],
+        keywords_exclude: Optional[Set[str]]
+) -> Generator[Post, Any, Any]:
+    """
+    Filter out posts that contain any of the specified keywords in title
+
+    :param post_list: List of posts
+    :param keywords_exclude: Set of keywords to exclude (case-insensitive), None means no filtering
+    """
+    if not keywords_exclude:
+        yield from post_list
+        return
+    
+    # Exclude posts that match any of the exclude keywords
+    post_filter = filter(lambda x: not match_post_keywords(x, keywords_exclude), post_list)
     yield from post_filter
