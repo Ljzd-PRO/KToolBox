@@ -237,7 +237,8 @@ class KToolBoxCli:
             mix_posts: bool = None,
             start_time: str = None,
             end_time: str = None,
-            keywords: str = None
+            keywords: str = None,
+            keywords_exclude: str = None
     ):
         ...
 
@@ -252,7 +253,8 @@ class KToolBoxCli:
             mix_posts: bool = None,
             start_time: str = None,
             end_time: str = None,
-            keywords: str = None
+            keywords: str = None,
+            keywords_exclude: str = None
     ):
         ...
 
@@ -269,7 +271,8 @@ class KToolBoxCli:
             end_time: str = None,
             offset: int = 0,
             length: int = None,
-            keywords: str = None
+            keywords: str = None,
+            keywords_exclude: str = None
     ):
         """
         Sync posts from a creator
@@ -295,6 +298,7 @@ class KToolBoxCli:
         :param offset: Result offset (or start offset)
         :param length: The number of posts to fetch, defaults to fetching all posts after ``offset``.
         :param keywords: Comma-separated keywords to filter posts by title (case-insensitive)
+        :param keywords_exclude: Comma-separated keywords to exclude posts by title (case-insensitive)
         """
         logger.info(repr(config))
         # Get service, creator_id
@@ -344,6 +348,13 @@ class KToolBoxCli:
             if keyword_set:
                 logger.info(f"Filtering posts by keywords: {', '.join(keyword_set)}")
         
+        # Parse exclude keywords
+        keyword_exclude_set: Optional[Set[str]] = None
+        if keywords_exclude:
+            keyword_exclude_set = set(kw.strip() for kw in keywords_exclude.split(',') if kw.strip())
+            if keyword_exclude_set:
+                logger.info(f"Excluding posts by keywords: {', '.join(keyword_exclude_set)}")
+        
         ret = await create_job_from_creator(
             service=service,
             creator_id=creator_id,
@@ -355,7 +366,8 @@ class KToolBoxCli:
             mix_posts=mix_posts,
             start_time=datetime.strptime(start_time, "%Y-%m-%d") if start_time else None,
             end_time=datetime.strptime(end_time, "%Y-%m-%d") if end_time else None,
-            keywords=keyword_set
+            keywords=keyword_set,
+            keywords_exclude=keyword_exclude_set
         )
         if ret:
             job_runner = JobRunner(job_list=ret.data)

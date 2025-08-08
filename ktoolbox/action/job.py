@@ -11,7 +11,7 @@ from pathvalidate import sanitize_filename, is_valid_filename
 
 from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.action import ActionRet, fetch_creator_posts, FetchInterruptError
-from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date, generate_filename, filter_posts_by_keywords
+from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date, generate_filename, filter_posts_by_keywords, filter_posts_by_keywords_exclude, generate_grouped_post_path
 from ktoolbox.api.model import Post, Attachment
 from ktoolbox.api.posts import get_post_revisions as get_post_revisions_api
 from ktoolbox.configuration import config, PostStructureConfiguration
@@ -155,7 +155,8 @@ async def create_job_from_creator(
         mix_posts: bool = None,
         start_time: Optional[datetime],
         end_time: Optional[datetime],
-        keywords: Optional[Set[str]] = None
+        keywords: Optional[Set[str]] = None,
+        keywords_exclude: Optional[Set[str]] = None
 ) -> ActionRet[List[Job]]:
     """
     Create a list of download job from a creator
@@ -172,6 +173,7 @@ async def create_job_from_creator(
     :param start_time: Start time of the time range
     :param end_time: End time of the time range
     :param keywords: Set of keywords to filter posts by title (case-insensitive)
+    :param keywords_exclude: Set of keywords to exclude posts by title (case-insensitive)
     """
     mix_posts = config.job.mix_posts if mix_posts is None else mix_posts
 
@@ -207,16 +209,26 @@ async def create_job_from_creator(
     if keywords:
         post_list = list(filter_posts_by_keywords(post_list, keywords))
         
+    # Filter out posts by exclude keywords
+    if keywords_exclude:
+        post_list = list(filter_posts_by_keywords_exclude(post_list, keywords_exclude))
+        
     logger.info(f"Get {len(post_list)} posts after filtering, start creating jobs")
 
     # Filter posts and generate ``CreatorIndices``
     if not mix_posts:
         if save_creator_indices:
+            # Generate posts_path with year/month grouping if enabled
+            posts_path = {}
+            for post in post_list:
+                grouped_base_path = generate_grouped_post_path(post, path)
+                posts_path[post.id] = grouped_base_path / sanitize_filename(post.title)
+            
             indices = CreatorIndices(
                 creator_id=creator_id,
                 service=service,
                 posts={post.id: post for post in post_list},
-                posts_path={post.id: path / sanitize_filename(post.title) for post in post_list}
+                posts_path=posts_path
             )
             async with aiofiles.open(
                     path / DataStorageNameEnum.CreatorIndicesData.value,
@@ -232,7 +244,12 @@ async def create_job_from_creator(
     job_list: List[Job] = []
     for post in post_list:
         # Get post path
-        post_path = path if mix_posts else path / generate_post_path_name(post)
+        if mix_posts:
+            post_path = path
+        else:
+            # Apply year/month grouping if enabled
+            grouped_base_path = generate_grouped_post_path(post, path)
+            post_path = grouped_base_path / generate_post_path_name(post)
 
         # Generate jobs for the main post
         job_list += await create_job_from_post(
