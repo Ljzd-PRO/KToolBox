@@ -169,6 +169,13 @@ class JobConfiguration(BaseModel):
         | ``published`` | Date   |
         | ``edited``    | Date   |
 
+    - Available properties for ``year_dirname_format`` and ``month_dirname_format``
+
+        | Property      | Type   |
+        |---------------|--------|
+        | ``year``      | String |
+        | ``month``     | String |
+
     :ivar count: Number of coroutines for concurrent download
     :ivar include_revisions: Include and download revision posts when available
     :ivar post_dirname_format: Customize the post directory name format, you can use some of the \
@@ -190,6 +197,12 @@ class JobConfiguration(BaseModel):
     :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``
     :ivar extract_external_links: Extract external file sharing links from post content and save to separate file
     :ivar external_link_patterns: Regex patterns for extracting external links.
+    :ivar group_by_year: Group posts by year in separate directories based on published date
+    :ivar group_by_month: Group posts by month in separate directories based on published date (requires group_by_year)
+    :ivar year_dirname_format: Customize the year directory name format. Available properties: ``year``. \
+    e.g. ``{year}`` > ``2024``, ``Year_{year}`` > ``Year_2024``
+    :ivar month_dirname_format: Customize the month directory name format. Available properties: ``year``, ``month``. \
+    e.g. ``{year}-{month}`` > ``2024-01``, ``{year}_{month}`` > ``2024_01``
     """
     count: int = 4
     include_revisions: bool = False
@@ -252,6 +265,10 @@ class JobConfiguration(BaseModel):
         # Generic patterns for other file hosting services
         r'https?://[^\s]*(?:file|upload|share|download|drive|storage)[^\s]*\.[a-z]{2,4}/[^\s]+',
     ]
+    group_by_year: bool = False
+    group_by_month: bool = False
+    year_dirname_format: str = "{year}"
+    month_dirname_format: str = "{year}-{month:02d}"
 
 
 class LoggerConfiguration(BaseModel):

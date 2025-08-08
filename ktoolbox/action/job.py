@@ -11,7 +11,7 @@ from pathvalidate import sanitize_filename, is_valid_filename
 
 from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.action import ActionRet, fetch_creator_posts, FetchInterruptError
-from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date, generate_filename, filter_posts_by_keywords
+from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date, generate_filename, filter_posts_by_keywords, generate_grouped_post_path
 from ktoolbox.api.model import Post, Attachment
 from ktoolbox.api.posts import get_post_revisions as get_post_revisions_api
 from ktoolbox.configuration import config, PostStructureConfiguration
@@ -212,11 +212,17 @@ async def create_job_from_creator(
     # Filter posts and generate ``CreatorIndices``
     if not mix_posts:
         if save_creator_indices:
+            # Generate posts_path with year/month grouping if enabled
+            posts_path = {}
+            for post in post_list:
+                grouped_base_path = generate_grouped_post_path(post, path)
+                posts_path[post.id] = grouped_base_path / sanitize_filename(post.title)
+            
             indices = CreatorIndices(
                 creator_id=creator_id,
                 service=service,
                 posts={post.id: post for post in post_list},
-                posts_path={post.id: path / sanitize_filename(post.title) for post in post_list}
+                posts_path=posts_path
             )
             async with aiofiles.open(
                     path / DataStorageNameEnum.CreatorIndicesData.value,
@@ -232,7 +238,12 @@ async def create_job_from_creator(
     job_list: List[Job] = []
     for post in post_list:
         # Get post path
-        post_path = path if mix_posts else path / generate_post_path_name(post)
+        if mix_posts:
+            post_path = path
+        else:
+            # Apply year/month grouping if enabled
+            grouped_base_path = generate_grouped_post_path(post, path)
+            post_path = grouped_base_path / generate_post_path_name(post)
 
         # Generate jobs for the main post
         job_list += await create_job_from_post(

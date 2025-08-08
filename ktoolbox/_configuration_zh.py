@@ -101,6 +101,13 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
         | ``published``| 日期   |
         | ``edited``   | 日期   |
 
+    - ``year_dirname_format`` 和 ``month_dirname_format`` 可用属性
+
+        | 属性         | 类型   |
+        |--------------|--------|
+        | ``year``     | 字符串 |
+        | ``month``    | 字符串 |
+
     :ivar count: 并发下载的协程数量
     :ivar include_revisions: 下载时包含修订帖子
     :ivar post_dirname_format: 自定义帖子目录名格式，可使用 [属性][ktoolbox.configuration.JobConfiguration]。例如：``[{published}]{id}`` > ``[2024-1-1]123123``，``{user}_{published}_{title}`` > ``234234_2024-1-1_TheTitle``
@@ -113,6 +120,10 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
     :ivar block_list: 不下载匹配这些模式（Unix shell 风格）的文件，如 ``["*.psd","*.zip"]``
     :ivar extract_external_links: 从帖子内容中提取外部文件分享链接并保存到单独文件
     :ivar external_link_patterns: 用于提取外部链接的正则表达式模式
+    :ivar group_by_year: 根据发布日期按年分组到不同目录
+    :ivar group_by_month: 根据发布日期按月分组到不同目录（需要启用 group_by_year）
+    :ivar year_dirname_format: 自定义年份目录名格式。可用属性：``year``。例如：``{year}`` > ``2024``，``Year_{year}`` > ``Year_2024``
+    :ivar month_dirname_format: 自定义月份目录名格式。可用属性：``year``、``month``。例如：``{year}-{month}`` > ``2024-01``，``{year}_{month}`` > ``2024_01``
     """
     ...
 
