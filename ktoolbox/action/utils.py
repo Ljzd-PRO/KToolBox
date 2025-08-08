@@ -12,6 +12,9 @@ from ktoolbox.job import CreatorIndices
 __all__ = [
     "generate_post_path_name",
     "generate_filename",
+    "generate_year_dirname",
+    "generate_month_dirname",
+    "generate_grouped_post_path",
     "filter_posts_by_date",
     "filter_posts_by_indices",
     "match_post_keywords",
@@ -42,6 +45,64 @@ def generate_post_path_name(post: Post) -> str:
         except KeyError as e:
             logger.error(f"`JobConfiguration.post_dirname_format` contains invalid key: {e}")
             exit(1)
+
+
+def generate_year_dirname(post: Post) -> str:
+    """Generate year directory name for post grouping."""
+    # Use published date, fall back to added date
+    post_date = post.published or post.added
+    if not post_date:
+        return "unknown"
+    
+    try:
+        return sanitize_filename(
+            config.job.year_dirname_format.format(
+                year=post_date.year
+            )
+        )
+    except KeyError as e:
+        logger.error(f"`JobConfiguration.year_dirname_format` contains invalid key: {e}")
+        exit(1)
+
+
+def generate_month_dirname(post: Post) -> str:
+    """Generate month directory name for post grouping."""
+    # Use published date, fall back to added date
+    post_date = post.published or post.added
+    if not post_date:
+        return "unknown"
+    
+    try:
+        return sanitize_filename(
+            config.job.month_dirname_format.format(
+                year=post_date.year,
+                month=post_date.month
+            )
+        )
+    except KeyError as e:
+        logger.error(f"`JobConfiguration.month_dirname_format` contains invalid key: {e}")
+        exit(1)
+
+
+def generate_grouped_post_path(post: Post, base_path: Path) -> Path:
+    """
+    Generate the full path for a post considering year/month grouping.
+    
+    :param post: Post object
+    :param base_path: Base path (usually creator directory)
+    :return: Full path where the post should be saved
+    """
+    result_path = base_path
+    
+    if config.job.group_by_year:
+        year_dirname = generate_year_dirname(post)
+        result_path = result_path / year_dirname
+        
+        if config.job.group_by_month:
+            month_dirname = generate_month_dirname(post)
+            result_path = result_path / month_dirname
+    
+    return result_path
 
 
 def generate_filename(post: Post, basic_name: str, filename_format: str) -> str:
