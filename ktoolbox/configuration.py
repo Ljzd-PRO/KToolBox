@@ -203,6 +203,8 @@ class JobConfiguration(BaseModel):
     e.g. ``{year}`` > ``2024``, ``Year_{year}`` > ``Year_2024``
     :ivar month_dirname_format: Customize the month directory name format. Available properties: ``year``, ``month``. \
     e.g. ``{year}-{month}`` > ``2024-01``, ``{year}_{month}`` > ``2024_01``
+    :ivar keywords: keywords to filter posts by title (case-insensitive)
+    :ivar keywords_exclude: keywords to exclude posts by title (case-insensitive)
     """
     count: int = 4
     include_revisions: bool = False
@@ -269,6 +271,8 @@ class JobConfiguration(BaseModel):
     group_by_month: bool = False
     year_dirname_format: str = "{year}"
     month_dirname_format: str = "{year}-{month:02d}"
+    keywords: Set[str] = Field(default_factory=set)
+    keywords_exclude: Set[str] = Field(default_factory=set)
 
 
 class LoggerConfiguration(BaseModel):

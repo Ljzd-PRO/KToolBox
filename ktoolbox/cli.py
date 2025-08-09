@@ -353,16 +353,13 @@ class KToolBoxCli:
             return creator_ret.message
 
         creator_path = path / sanitize_filename(creator_name)
-
         creator_path.mkdir(exist_ok=True)
 
-        # Parse keywords
-        keyword_set = set(keywords) if keywords else set()
+        keyword_set = set(keywords) if keywords else config.job.keywords
         if keywords:
             logger.info(f"Filtering posts by keywords: {', '.join(keyword_set)}")
 
-        # Parse exclude keywords
-        keyword_exclude_set = set(keywords_exclude) if keywords_exclude else set()
+        keyword_exclude_set = set(keywords_exclude) if keywords_exclude else config.job.keywords_exclude
         if keywords_exclude:
             logger.info(f"Excluding posts by keywords: {', '.join(keyword_exclude_set)}")
 
