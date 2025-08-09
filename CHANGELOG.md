@@ -59,7 +59,9 @@
   - 📖More information: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
 
 
-[//]: # (### 🪲 Fix)
+### 🪲 Fix
+
+- Fixed the issue where the `--keywords` parameter could not be parsed correctly in the `sync-creator` command
 
 - - -
 
@@ -119,7 +121,9 @@
     ```
   - 📖更多信息：[配置参考-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
 
-[//]: # (### 🪲 修复)
+### 🪲 修复
+
+- 修复 `--keywords` 参数在 `sync-creator` 命令中无法正确解析的问题
 
 ## Upgrade
 
