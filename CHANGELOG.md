@@ -15,6 +15,17 @@
   # Method 3: Combined filtering (most flexible)
   ktoolbox sync_creator --url="https://kemono.cr/fanbox/user/32165989" --keywords="ブルアカ" --keywords_exclude="全体公開,結果発表"
   ```
+- The `--keywords` and `--keywords-exclude` features for keyword filtering and exclusion can now also be set in the configuration
+  - New configuration options:
+    - `job.keywords`: Keyword filtering (default is empty)
+    - `job.keywords_exclude`: Keyword exclusion (default is empty)
+  - You can edit these configurations by running `ktoolbox config-editor` (`Job -> ...`)
+  - Or manually edit them in the `.env` file or environment variables
+    ```dotenv
+    KTOOLBOX_JOB__KEYWORDS='["expression", "sound effect variation"]'
+    KTOOLBOX_JOB__KEYWORDS_EXCLUDE='["public", "result announcement"]'
+    ```
+  - 📖More information: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
 - Add **year/month** **grouping** functionality for post organization - #306
   - You can group downloaded posts by year and month with customizable directory naming formats
   - New configuration options:
@@ -26,12 +37,12 @@
   - Or manually edit them in `.env` file or environment variables
     ```dotenv
     # Environment variables (Defaults to False)
-    export KTOOLBOX_JOB__GROUP_BY_YEAR=True
-    export KTOOLBOX_JOB__GROUP_BY_MONTH=True
+    KTOOLBOX_JOB__GROUP_BY_YEAR=True
+    KTOOLBOX_JOB__GROUP_BY_MONTH=True
   
     # Custom style naming
-    export KTOOLBOX_JOB__YEAR_DIRNAME_FORMAT="Year {year}"
-    export KTOOLBOX_JOB__MONTH_DIRNAME_FORMAT="Month {month:02d}"
+    KTOOLBOX_JOB__YEAR_DIRNAME_FORMAT="Year {year}"
+    KTOOLBOX_JOB__MONTH_DIRNAME_FORMAT="Month {month:02d}"
     ```
     Resulting directory structure:
     ```
@@ -48,7 +59,9 @@
   - 📖More information: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
 
 
-[//]: # (### 🪲 Fix)
+### 🪲 Fix
+
+- Fixed the issue where the `--keywords` parameter could not be parsed correctly in the `sync-creator` command
 
 - - -
 
@@ -65,6 +78,17 @@
   # 方法3：组合筛选（最灵活）
   ktoolbox sync_creator --url="https://kemono.cr/fanbox/user/32165989" --keywords="ブルアカ" --keywords_exclude="全体公開,結果発表"
   ```
+- 关键词筛选和关键词排除的 `--keywords` 和 `--keywords-exclude` 功能现在也可以在配置中设置
+  - 新配置项：
+    - `job.keywords`：关键词筛选（默认为空）
+    - `job.keywords_exclude`：关键词排除（默认为空）
+  - 可通过运行 `ktoolbox config-editor` 编辑这些配置（`Job -> ...`）
+  - 或手动在 `.env` 文件或环境变量中编辑
+    ```dotenv
+    KTOOLBOX_JOB__KEYWORDS='["表情", "効果音差分"]'
+    KTOOLBOX_JOB__KEYWORDS_EXCLUDE='["全体公開", "結果発表"]'
+    ```
+  - 📖更多信息：[配置参考-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
 - 新增按**年份/月**分组功能用于帖子整理 - #306
   - 可按年份和月份分组下载的帖子，支持自定义目录命名格式
   - 新配置项：
@@ -75,13 +99,13 @@
   - 可通过运行 `ktoolbox config-editor` 编辑这些配置（`Job -> ...`）
   - 或手动在 `.env` 文件或环境变量中编辑
     ```dotenv
-    # 环境变量（默认 False）
-    export KTOOLBOX_JOB__GROUP_BY_YEAR=True
-    export KTOOLBOX_JOB__GROUP_BY_MONTH=True
+    # 是否启用（默认 False）
+    KTOOLBOX_JOB__GROUP_BY_YEAR=True
+    KTOOLBOX_JOB__GROUP_BY_MONTH=True
   
     # 自定义目录命名
-    export KTOOLBOX_JOB__YEAR_DIRNAME_FORMAT="{year}年"
-    export KTOOLBOX_JOB__MONTH_DIRNAME_FORMAT="{month:02d}月"
+    KTOOLBOX_JOB__YEAR_DIRNAME_FORMAT="{year}年"
+    KTOOLBOX_JOB__MONTH_DIRNAME_FORMAT="{month:02d}月"
     ```
     目录结构示例：
     ```
@@ -97,7 +121,9 @@
     ```
   - 📖更多信息：[配置参考-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
 
-[//]: # (### 🪲 修复)
+### 🪲 修复
+
+- 修复 `--keywords` 参数在 `sync-creator` 命令中无法正确解析的问题
 
 ## Upgrade
 
