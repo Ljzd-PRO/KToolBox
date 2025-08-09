@@ -1945,6 +1945,27 @@
 </tbody>
 </table>
 </li>
+<li>
+<p><code>year_dirname_format</code> 和 <code>month_dirname_format</code> 可用属性</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>year</code></td>
+<td>字符串</td>
+</tr>
+<tr>
+<td><code>month</code></td>
+<td>字符串</td>
+</tr>
+</tbody>
+</table>
+</li>
 </ul>
 
 
@@ -2148,6 +2169,70 @@
             <td>
               <code>
                       [&#39;https?://drive\\.google\\.com/[^\\s]+&#39;, &#39;https?://docs\\.google\\.com/[^\\s]+&#39;, &#39;https?://mega\\.nz/[^\\s]+&#39;, &#39;https?://mega\\.co\\.nz/[^\\s]+&#39;, &#39;https?://(?:www\\.)?dropbox\\.com/[^\\s]+&#39;, &#39;https?://db\\.tt/[^\\s]+&#39;, &#39;https?://onedrive\\.live\\.com/[^\\s]+&#39;, &#39;https?://1drv\\.ms/[^\\s]+&#39;, &#39;https?://(?:www\\.)?mediafire\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?wetransfer\\.com/[^\\s]+&#39;, &#39;https?://we\\.tl/[^\\s]+&#39;, &#39;https?://(?:www\\.)?sendspace\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?4shared\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?zippyshare\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?uploadfiles\\.io/[^\\s]+&#39;, &#39;https?://(?:www\\.)?box\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?pcloud\\.com/[^\\s]+&#39;, &#39;https?://disk\\.yandex\\.[a-z]+/[^\\s]+&#39;, &#39;https?://[^\\s]*(?:file|upload|share|download|drive|storage)[^\\s]*\\.[a-z]{2,4}/[^\\s]+&#39;]
+              </code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="ktoolbox._configuration_zh.JobConfiguration.group_by_year" href="../../../api/#ktoolbox.configuration.JobConfiguration.group_by_year">group_by_year</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>根据发布日期按年分组到不同目录</p>
+              </div>
+            </td>
+            <td>
+              <code>
+                      False
+              </code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="ktoolbox._configuration_zh.JobConfiguration.group_by_month" href="../../../api/#ktoolbox.configuration.JobConfiguration.group_by_month">group_by_month</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>根据发布日期按月分组到不同目录（需要启用 group_by_year）</p>
+              </div>
+            </td>
+            <td>
+              <code>
+                      False
+              </code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="ktoolbox._configuration_zh.JobConfiguration.year_dirname_format" href="../../../api/#ktoolbox.configuration.JobConfiguration.year_dirname_format">year_dirname_format</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>自定义年份目录名格式。可用属性：<code>year</code>。例如：<code>{year}</code> &gt; <code>2024</code>，<code>Year_{year}</code> &gt; <code>Year_2024</code></p>
+              </div>
+            </td>
+            <td>
+              <code>
+                      &#39;{year}&#39;
+              </code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="ktoolbox._configuration_zh.JobConfiguration.month_dirname_format" href="../../../api/#ktoolbox.configuration.JobConfiguration.month_dirname_format">month_dirname_format</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>自定义月份目录名格式。可用属性：<code>year</code>、<code>month</code>。例如：<code>{year}-{month}</code> &gt; <code>2024-01</code>，<code>{year}_{month}</code> &gt; <code>2024_01</code></p>
+              </div>
+            </td>
+            <td>
+              <code>
+                      &#39;{year}-{month:02d}&#39;
               </code>
             </td>
           </tr>

@@ -1943,6 +1943,27 @@
 </tbody>
 </table>
 </li>
+<li>
+<p>Available properties for <code>year_dirname_format</code> and <code>month_dirname_format</code></p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>year</code></td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>month</code></td>
+<td>String</td>
+</tr>
+</tbody>
+</table>
+</li>
 </ul>
 
 
@@ -2146,6 +2167,102 @@
             <td>
               <code>
                       [&#39;https?://drive\\.google\\.com/[^\\s]+&#39;, &#39;https?://docs\\.google\\.com/[^\\s]+&#39;, &#39;https?://mega\\.nz/[^\\s]+&#39;, &#39;https?://mega\\.co\\.nz/[^\\s]+&#39;, &#39;https?://(?:www\\.)?dropbox\\.com/[^\\s]+&#39;, &#39;https?://db\\.tt/[^\\s]+&#39;, &#39;https?://onedrive\\.live\\.com/[^\\s]+&#39;, &#39;https?://1drv\\.ms/[^\\s]+&#39;, &#39;https?://(?:www\\.)?mediafire\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?wetransfer\\.com/[^\\s]+&#39;, &#39;https?://we\\.tl/[^\\s]+&#39;, &#39;https?://(?:www\\.)?sendspace\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?4shared\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?zippyshare\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?uploadfiles\\.io/[^\\s]+&#39;, &#39;https?://(?:www\\.)?box\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?pcloud\\.com/[^\\s]+&#39;, &#39;https?://disk\\.yandex\\.[a-z]+/[^\\s]+&#39;, &#39;https?://[^\\s]*(?:file|upload|share|download|drive|storage)[^\\s]*\\.[a-z]{2,4}/[^\\s]+&#39;]
+              </code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.JobConfiguration.group_by_year" href="../../api/#ktoolbox.configuration.JobConfiguration.group_by_year">group_by_year</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Group posts by year in separate directories based on published date</p>
+              </div>
+            </td>
+            <td>
+              <code>
+                      False
+              </code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.JobConfiguration.group_by_month" href="../../api/#ktoolbox.configuration.JobConfiguration.group_by_month">group_by_month</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Group posts by month in separate directories based on published date (requires group_by_year)</p>
+              </div>
+            </td>
+            <td>
+              <code>
+                      False
+              </code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.JobConfiguration.year_dirname_format" href="../../api/#ktoolbox.configuration.JobConfiguration.year_dirname_format">year_dirname_format</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Customize the year directory name format. Available properties: <code>year</code>.     e.g. <code>{year}</code> &gt; <code>2024</code>, <code>Year_{year}</code> &gt; <code>Year_2024</code></p>
+              </div>
+            </td>
+            <td>
+              <code>
+                      &#39;{year}&#39;
+              </code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.JobConfiguration.month_dirname_format" href="../../api/#ktoolbox.configuration.JobConfiguration.month_dirname_format">month_dirname_format</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Customize the month directory name format. Available properties: <code>year</code>, <code>month</code>.     e.g. <code>{year}-{month}</code> &gt; <code>2024-01</code>, <code>{year}_{month}</code> &gt; <code>2024_01</code></p>
+              </div>
+            </td>
+            <td>
+              <code>
+                      &#39;{year}-{month:02d}&#39;
+              </code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.JobConfiguration.keywords" href="../../api/#ktoolbox.configuration.JobConfiguration.keywords">keywords</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Set" href="https://docs.python.org/3/library/typing.html#typing.Set">Set</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>keywords to filter posts by title (case-insensitive)</p>
+              </div>
+            </td>
+            <td>
+              <code>
+                      Field(default_factory=set)
+              </code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.JobConfiguration.keywords_exclude" href="../../api/#ktoolbox.configuration.JobConfiguration.keywords_exclude">keywords_exclude</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Set" href="https://docs.python.org/3/library/typing.html#typing.Set">Set</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>keywords to exclude posts by title (case-insensitive)</p>
+              </div>
+            </td>
+            <td>
+              <code>
+                      Field(default_factory=set)
               </code>
             </td>
           </tr>
