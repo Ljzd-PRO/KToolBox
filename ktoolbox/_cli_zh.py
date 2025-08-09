@@ -173,7 +173,8 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             mix_posts: bool = None,
             start_time: str = None,
             end_time: str = None,
-            keywords: str = None
+            keywords: str = None,
+            keywords_exclude: str = None
     ):
         """
         同步创作者所有帖子（通过 URL）
@@ -185,6 +186,7 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
         :param start_time: 帖子发布时间范围起始
         :param end_time: 帖子发布时间范围结束
         :param keywords: 按标题过滤帖子，逗号分隔关键词
+        :param keywords_exclude: 按标题排除帖子，逗号分隔关键词
         """
         ...
 
@@ -199,7 +201,8 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             mix_posts: bool = None,
             start_time: str = None,
             end_time: str = None,
-            keywords: str = None
+            keywords: str = None,
+            keywords_exclude: str = None
     ):
         """
         同步创作者所有帖子（通过参数）
@@ -212,6 +215,7 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
         :param start_time: 帖子发布时间范围起始
         :param end_time: 帖子发布时间范围结束
         :param keywords: 按标题过滤帖子，逗号分隔关键词
+        :param keywords_exclude: 按标题排除帖子，逗号分隔关键词
         """
         ...
 
@@ -228,7 +232,8 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             end_time: str = None,
             offset: int = 0,
             length: int = None,
-            keywords: str = None
+            keywords: str = None,
+            keywords_exclude: str = None
     ):
         """
         同步创作者所有帖子
@@ -248,6 +253,7 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
         :param offset: 结果偏移量
         :param length: 获取帖子数量，默认为全部
         :param keywords: 按标题过滤帖子，逗号分隔关键词
+        :param keywords_exclude: 按标题排除帖子，逗号分隔关键词
         """
         return await super().sync_creator(
             url=url,
@@ -260,5 +266,6 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             end_time=end_time,
             offset=offset,
             length=length,
-            keywords=keywords
+            keywords=keywords,
+            keywords_exclude=keywords_exclude
         )

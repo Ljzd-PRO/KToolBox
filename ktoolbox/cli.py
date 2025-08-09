@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Union, overload, Set, Optional
+from typing import Union, overload, Tuple
 
 import aiofiles
 from loguru import logger
@@ -208,34 +208,35 @@ class KToolBoxCli:
         )
         if ret:
             post_path = path / generate_post_path_name(ret.data.post)
-            
+
             # For revision posts, create a revision subfolder
             if revision_id:
                 post_path = post_path / "revision" / revision_id
-                
+
             # Download the main post
             job_list = await create_job_from_post(
                 post=ret.data.post,
                 post_path=post_path,
                 dump_post_data=dump_post_data
             )
-            
+
             # If include_revisions is enabled and we have revisions data
             if (config.job.include_revisions and
-                ret.data.props and 
-                ret.data.props.revisions and 
-                not revision_id):  # Don't process revisions if we're already downloading a specific revision
-                
+                    ret.data.props and
+                    ret.data.props.revisions and
+                    not revision_id):  # Don't process revisions if we're already downloading a specific revision
+
                 for revision_order, revision_data in ret.data.props.revisions:
                     if revision_data.revision_id:  # Only process actual revisions, not the main post
-                        revision_path = post_path / config.job.post_structure.revisions / generate_post_path_name(revision_data)
+                        revision_path = post_path / config.job.post_structure.revisions / generate_post_path_name(
+                            revision_data)
                         revision_jobs = await create_job_from_post(
                             post=revision_data,
                             post_path=revision_path,
                             dump_post_data=dump_post_data
                         )
                         job_list.extend(revision_jobs)
-            
+
             job_runner = JobRunner(job_list=job_list)
             await job_runner.start()
         else:
@@ -251,7 +252,8 @@ class KToolBoxCli:
             mix_posts: bool = None,
             start_time: str = None,
             end_time: str = None,
-            keywords: str = None
+            keywords: str = None,
+            keywords_exclude: str = None
     ):
         ...
 
@@ -266,7 +268,8 @@ class KToolBoxCli:
             mix_posts: bool = None,
             start_time: str = None,
             end_time: str = None,
-            keywords: str = None
+            keywords: str = None,
+            keywords_exclude: str = None
     ):
         ...
 
@@ -283,7 +286,8 @@ class KToolBoxCli:
             end_time: str = None,
             offset: int = 0,
             length: int = None,
-            keywords: str = None
+            keywords: Tuple[str] = None,
+            keywords_exclude: Tuple[str] = None
     ):
         """
         Sync posts from a creator
@@ -309,6 +313,7 @@ class KToolBoxCli:
         :param offset: Result offset (or start offset)
         :param length: The number of posts to fetch, defaults to fetching all posts after ``offset``.
         :param keywords: Comma-separated keywords to filter posts by title (case-insensitive)
+        :param keywords_exclude: Comma-separated keywords to exclude posts by title (case-insensitive)
         """
         logger.info(repr(config))
         # Get service, creator_id
@@ -348,16 +353,18 @@ class KToolBoxCli:
             return creator_ret.message
 
         creator_path = path / sanitize_filename(creator_name)
-
         creator_path.mkdir(exist_ok=True)
-        
-        # Parse keywords
-        keyword_set: Optional[Set[str]] = None
+
+        keywords = [keywords] if isinstance(keywords, str) else keywords
+        keyword_set = set(keywords) if keywords else config.job.keywords
         if keywords:
-            keyword_set = set(kw.strip() for kw in keywords.split(',') if kw.strip())
-            if keyword_set:
-                logger.info(f"Filtering posts by keywords: {', '.join(keyword_set)}")
-        
+            logger.info(f"Filtering posts by keywords: {', '.join(keyword_set)}")
+
+        keywords_exclude = [keywords_exclude] if isinstance(keywords_exclude, str) else keywords_exclude
+        keyword_exclude_set = set(keywords_exclude) if keywords_exclude else config.job.keywords_exclude
+        if keywords_exclude:
+            logger.info(f"Excluding posts by keywords: {', '.join(keyword_exclude_set)}")
+
         ret = await create_job_from_creator(
             service=service,
             creator_id=creator_id,
@@ -369,7 +376,8 @@ class KToolBoxCli:
             mix_posts=mix_posts,
             start_time=datetime.strptime(start_time, "%Y-%m-%d") if start_time else None,
             end_time=datetime.strptime(end_time, "%Y-%m-%d") if end_time else None,
-            keywords=keyword_set
+            keywords=keyword_set,
+            keywords_exclude=keyword_exclude_set
         )
         if ret:
             job_runner = JobRunner(job_list=ret.data)
