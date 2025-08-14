@@ -85,18 +85,11 @@ class BaseAPI(ABC, Generic[_T]):
             else:
                 res_model = cls.Response.model_validate_json(res.text)
         except (ValueError, ValidationError) as e:
-            if isinstance(e, ValueError):
-                return APIRet(
-                    code=RetCodeEnum.JsonDecodeError,
-                    message=str(e),
-                    exception=e
-                )
-            else:
-                return APIRet(
-                    code=RetCodeEnum.ValidationError,
-                    message=str(e),
-                    exception=e
-                )
+            return APIRet(
+                code=RetCodeEnum.JsonDecodeError if isinstance(e, ValueError) else RetCodeEnum.ValidationError,
+                message=generate_msg(url=res.url, status_code=res.status_code, response=res.text),
+                exception=e
+            )
         else:
             data = res_model.root if isinstance(res_model, RootModel) else res_model
             return APIRet(data=data)
@@ -124,7 +117,7 @@ class BaseAPI(ABC, Generic[_T]):
         except Exception as e:
             return APIRet(
                 code=RetCodeEnum.NetWorkError,
-                message=str(e),
+                message=generate_msg(url=url),
                 exception=e
             )
         else:
