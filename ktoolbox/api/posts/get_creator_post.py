@@ -9,7 +9,7 @@ __all__ = ["GetCreatorPost", "get_creator_post"]
 
 
 class GetCreatorPost(BaseAPI):
-    path = "/{service}/user/{creator_id}"
+    path = "/{service}/user/{creator_id}/posts"
     method = "get"
 
     class Response(RootModel[List[Post]]):
