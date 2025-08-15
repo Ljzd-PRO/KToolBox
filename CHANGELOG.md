@@ -2,7 +2,9 @@
 
 ![Downloads](https://img.shields.io/github/downloads/Ljzd-PRO/KToolBox/v0.19.1/total)
 
-[//]: # (### 💡 Feature)
+### 💡 Feature
+
+- Improved the error log format to make it easier to read and understand
 
 ### 🪲 Fix
 
@@ -11,7 +13,9 @@
 
 - - -
 
-[//]: # (### 💡 新特性)
+### 💡 新特性
+
+- 改进报错的日志格式，使其更易于阅读和理解
 
 ### 🪲 修复
 
