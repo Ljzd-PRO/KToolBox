@@ -23,7 +23,7 @@ class GetCreators(BaseAPI):
 
         List all creators with details. I blame DDG for .txt.
         """
-        return await cls.request()
+        return await cls.request(headers={"Accept": "text/css"})
 
 
 get_creators = GetCreators.__call__
