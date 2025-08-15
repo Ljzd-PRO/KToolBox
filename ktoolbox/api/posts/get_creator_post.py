@@ -1,11 +1,14 @@
-from typing import List
+from typing import List, TypeVar
 
+import httpx
 from pydantic import RootModel
 
 from ktoolbox.api import BaseAPI, APIRet
 from ktoolbox.api.model import Post
 
 __all__ = ["GetCreatorPost", "get_creator_post"]
+
+_T = TypeVar('_T')
 
 
 class GetCreatorPost(BaseAPI):
@@ -32,6 +35,10 @@ class GetCreatorPost(BaseAPI):
                 "o": o
             }
         )
+
+    @classmethod
+    def handle_res(cls, res: httpx.Response) -> APIRet[_T]:
+        return APIRet(data=[]) if res.status_code == 404 else super().handle_res(res)
 
 
 get_creator_post = GetCreatorPost.__call__
