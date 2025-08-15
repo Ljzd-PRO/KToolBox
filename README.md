@@ -69,6 +69,7 @@
   - For example, if you don't want to download large and duplicate PSD or archive files, you can exclude `.psd` and `.zip` files in the config
 - Support filtering downloads by post **title keywords**
   - For example, if you only want to download posts whose titles contain "表情" or "効果音差分", you can use the `sync-creator` command with the `--keywords` option
+  - You can also exclude posts with specific keywords in the title using the `--keywords-exclude` option
 - Support filtering downloads by post **publish date range**
 - Can parse and download images contained in the multi-info text of the post page HTML
   - These posts are characterized by images not loading immediately when the browser enters the page, and no preview images

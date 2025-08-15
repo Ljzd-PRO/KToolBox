@@ -9,7 +9,7 @@ __all__ = ["GetCreators", "get_creators"]
 
 class GetCreators(BaseAPI):
     """List All Creators"""
-    path = "/creators.txt"
+    path = "/creators"
     method = "get"
 
     class Response(RootModel[List[Creator]]):

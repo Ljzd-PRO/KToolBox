@@ -50,7 +50,11 @@ def generate_msg(title: str = None, **kwargs):
     :param kwargs: Extra data
     """
     title: str = title or ""
-    return f"{title} - {kwargs}" if kwargs else title
+    extra_data = ", ".join(f"{k}: {v}" for k, v in kwargs.items())
+    if title:
+        return f"{title} - {extra_data}" if kwargs else title
+    else:
+        return extra_data if kwargs else ""
 
 
 def logger_init(cli_use: bool = False, disable_stdout: bool = False):
