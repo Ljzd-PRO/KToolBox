@@ -11,9 +11,10 @@ from pathvalidate import sanitize_filename, is_valid_filename
 
 from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.action import ActionRet, fetch_creator_posts, FetchInterruptError
-from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date, generate_filename, filter_posts_by_keywords, filter_posts_by_keywords_exclude, generate_grouped_post_path
-from ktoolbox.api.model import Post, Attachment
-from ktoolbox.api.posts import get_post_revisions as get_post_revisions_api
+from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date, generate_filename, \
+    filter_posts_by_keywords, filter_posts_by_keywords_exclude, generate_grouped_post_path
+from ktoolbox.api.model import Post, Attachment, Revision
+from ktoolbox.api.posts import get_post_revisions as get_post_revisions_api, get_post as get_post_api
 from ktoolbox.configuration import config, PostStructureConfiguration
 from ktoolbox.job import Job, CreatorIndices
 from ktoolbox.utils import extract_external_links
@@ -22,7 +23,7 @@ __all__ = ["create_job_from_post", "create_job_from_creator"]
 
 
 async def create_job_from_post(
-        post: Post,
+        post: Union[Post, Revision],
         post_path: Path,
         *,
         post_structure: Union[PostStructureConfiguration, bool] = None,
@@ -75,8 +76,8 @@ async def create_job_from_post(
             )
         ):
             # Check if file extension should be excluded from sequential naming
-            should_use_sequential = (config.job.sequential_filename and 
-                                   file_path_obj.suffix.lower() not in config.job.sequential_filename_excludes)
+            should_use_sequential = (config.job.sequential_filename and
+                                     file_path_obj.suffix.lower() not in config.job.sequential_filename_excludes)
             if should_use_sequential:
                 basic_filename = f"{sequential_counter}{file_path_obj.suffix}"
                 sequential_counter += 1
@@ -119,6 +120,17 @@ async def create_job_from_post(
                     post=post
                 )
             )
+
+    # If post has no content, fetch it from get_post API
+    if not post.content:
+        get_post_ret = await get_post_api(
+            service=post.service,
+            creator_id=post.user,
+            post_id=post.id,
+            revision_id=post.revision_id if isinstance(post, Revision) else None
+        )
+        if get_post_ret:
+            post = get_post_ret.data.post
 
     # Write content file
     if content_path and post.content:
@@ -204,15 +216,15 @@ async def create_job_from_creator(
     # Filter posts by publish time
     if start_time or end_time:
         post_list = list(filter_posts_by_date(post_list, start_time, end_time))
-        
+
     # Filter posts by keywords
     if keywords:
         post_list = list(filter_posts_by_keywords(post_list, keywords))
-        
+
     # Filter out posts by exclude keywords
     if keywords_exclude:
         post_list = list(filter_posts_by_keywords_exclude(post_list, keywords_exclude))
-        
+
     logger.info(f"Get {len(post_list)} posts after filtering, start creating jobs")
 
     # Filter posts and generate ``CreatorIndices``
@@ -223,7 +235,7 @@ async def create_job_from_creator(
             for post in post_list:
                 grouped_base_path = generate_grouped_post_path(post, path)
                 posts_path[post.id] = grouped_base_path / sanitize_filename(post.title)
-            
+
             indices = CreatorIndices(
                 creator_id=creator_id,
                 service=service,
@@ -258,7 +270,7 @@ async def create_job_from_creator(
             post_structure=False if mix_posts else None,
             dump_post_data=not mix_posts
         )
-        
+
         # If include_revisions is enabled, fetch and download revisions for this post
         if config.job.include_revisions and not mix_posts:
             try:
@@ -270,7 +282,8 @@ async def create_job_from_creator(
                 if revisions_ret and revisions_ret.data:
                     for revision in revisions_ret.data:
                         if revision.revision_id:  # Only process actual revisions
-                            revision_path = post_path / config.job.post_structure.revisions / generate_post_path_name(revision)
+                            revision_path = post_path / config.job.post_structure.revisions / generate_post_path_name(
+                                revision)
                             revision_jobs = await create_job_from_post(
                                 post=revision,
                                 post_path=revision_path,
@@ -279,5 +292,5 @@ async def create_job_from_creator(
                             job_list += revision_jobs
             except Exception as e:
                 logger.warning(f"Failed to fetch revisions for post {post.id}: {e}")
-        
+
     return ActionRet(data=job_list)
