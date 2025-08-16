@@ -10151,7 +10151,7 @@
 
 
 <h2 id="ktoolbox.__version__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;v0.19.1&#39;</span></code>
+            <code class="highlight language-python"><span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;v0.19.2&#39;</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
@@ -10603,19 +10603,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/action/job.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">158</span>
 <span class="normal">159</span>
 <span class="normal">160</span>
 <span class="normal">161</span>
@@ -10740,7 +10728,20 @@
 <span class="normal">280</span>
 <span class="normal">281</span>
 <span class="normal">282</span>
-<span class="normal">283</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_creator</span><span class="p">(</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_creator</span><span class="p">(</span>
         <span class="n">service</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">creator_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
@@ -10867,7 +10868,8 @@
                 <span class="k">if</span> <span class="n">revisions_ret</span> <span class="ow">and</span> <span class="n">revisions_ret</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">revision</span> <span class="ow">in</span> <span class="n">revisions_ret</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">revision</span><span class="o">.</span><span class="n">revision_id</span><span class="p">:</span>  <span class="c1"># Only process actual revisions</span>
-                            <span class="n">revision_path</span> <span class="o">=</span> <span class="n">post_path</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">post_structure</span><span class="o">.</span><span class="n">revisions</span> <span class="o">/</span> <span class="n">generate_post_path_name</span><span class="p">(</span><span class="n">revision</span><span class="p">)</span>
+                            <span class="n">revision_path</span> <span class="o">=</span> <span class="n">post_path</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">post_structure</span><span class="o">.</span><span class="n">revisions</span> <span class="o">/</span> <span class="n">generate_post_path_name</span><span class="p">(</span>
+                                <span class="n">revision</span><span class="p">)</span>
                             <span class="n">revision_jobs</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_job_from_post</span><span class="p">(</span>
                                 <span class="n">post</span><span class="o">=</span><span class="n">revision</span><span class="p">,</span>
                                 <span class="n">post_path</span><span class="o">=</span><span class="n">revision_path</span><span class="p">,</span>
@@ -10916,7 +10918,7 @@
           <tr class="doc-section-item">
             <td><code>post</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ktoolbox.api.model.Post" href="../../api/#ktoolbox.api.model.Post">Post</a></code>
+                  <code><a class="autorefs autorefs-external" title="typing.Union" href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a class="autorefs autorefs-internal" title="ktoolbox.api.model.Post" href="../../api/#ktoolbox.api.model.Post">Post</a>, <a class="autorefs autorefs-internal" title="ktoolbox.api.model.Revision" href="../../api/#ktoolbox.api.model.Revision">Revision</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -10974,8 +10976,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/action/job.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 24</span>
-<span class="normal"> 25</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 25</span>
 <span class="normal"> 26</span>
 <span class="normal"> 27</span>
 <span class="normal"> 28</span>
@@ -11093,8 +11094,20 @@
 <span class="normal">140</span>
 <span class="normal">141</span>
 <span class="normal">142</span>
-<span class="normal">143</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_post</span><span class="p">(</span>
-        <span class="n">post</span><span class="p">:</span> <span class="n">Post</span><span class="p">,</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_post</span><span class="p">(</span>
+        <span class="n">post</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Post</span><span class="p">,</span> <span class="n">Revision</span><span class="p">],</span>
         <span class="n">post_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">post_structure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">PostStructureConfiguration</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -11147,8 +11160,8 @@
             <span class="p">)</span>
         <span class="p">):</span>
             <span class="c1"># Check if file extension should be excluded from sequential naming</span>
-            <span class="n">should_use_sequential</span> <span class="o">=</span> <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename</span> <span class="ow">and</span> 
-                                   <span class="n">file_path_obj</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename_excludes</span><span class="p">)</span>
+            <span class="n">should_use_sequential</span> <span class="o">=</span> <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename</span> <span class="ow">and</span>
+                                     <span class="n">file_path_obj</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename_excludes</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">should_use_sequential</span><span class="p">:</span>
                 <span class="n">basic_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sequential_counter</span><span class="si">}{</span><span class="n">file_path_obj</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="n">sequential_counter</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -11191,6 +11204,17 @@
                     <span class="n">post</span><span class="o">=</span><span class="n">post</span>
                 <span class="p">)</span>
             <span class="p">)</span>
+
+    <span class="c1"># If post has no content, fetch it from get_post API</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">post</span><span class="o">.</span><span class="n">content</span><span class="p">:</span>
+        <span class="n">get_post_ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_post_api</span><span class="p">(</span>
+            <span class="n">service</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">service</span><span class="p">,</span>
+            <span class="n">creator_id</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+            <span class="n">post_id</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="n">revision_id</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">revision_id</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">post</span><span class="p">,</span> <span class="n">Revision</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">get_post_ret</span><span class="p">:</span>
+            <span class="n">post</span> <span class="o">=</span> <span class="n">get_post_ret</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">post</span>
 
     <span class="c1"># Write content file</span>
     <span class="k">if</span> <span class="n">content_path</span> <span class="ow">and</span> <span class="n">post</span><span class="o">.</span><span class="n">content</span><span class="p">:</span>
@@ -13290,19 +13314,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/action/job.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">158</span>
 <span class="normal">159</span>
 <span class="normal">160</span>
 <span class="normal">161</span>
@@ -13427,7 +13439,20 @@
 <span class="normal">280</span>
 <span class="normal">281</span>
 <span class="normal">282</span>
-<span class="normal">283</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_creator</span><span class="p">(</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_creator</span><span class="p">(</span>
         <span class="n">service</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">creator_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
@@ -13554,7 +13579,8 @@
                 <span class="k">if</span> <span class="n">revisions_ret</span> <span class="ow">and</span> <span class="n">revisions_ret</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">revision</span> <span class="ow">in</span> <span class="n">revisions_ret</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">revision</span><span class="o">.</span><span class="n">revision_id</span><span class="p">:</span>  <span class="c1"># Only process actual revisions</span>
-                            <span class="n">revision_path</span> <span class="o">=</span> <span class="n">post_path</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">post_structure</span><span class="o">.</span><span class="n">revisions</span> <span class="o">/</span> <span class="n">generate_post_path_name</span><span class="p">(</span><span class="n">revision</span><span class="p">)</span>
+                            <span class="n">revision_path</span> <span class="o">=</span> <span class="n">post_path</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">post_structure</span><span class="o">.</span><span class="n">revisions</span> <span class="o">/</span> <span class="n">generate_post_path_name</span><span class="p">(</span>
+                                <span class="n">revision</span><span class="p">)</span>
                             <span class="n">revision_jobs</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_job_from_post</span><span class="p">(</span>
                                 <span class="n">post</span><span class="o">=</span><span class="n">revision</span><span class="p">,</span>
                                 <span class="n">post_path</span><span class="o">=</span><span class="n">revision_path</span><span class="p">,</span>
@@ -13603,7 +13629,7 @@
           <tr class="doc-section-item">
             <td><code>post</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ktoolbox.api.model.Post" href="../../api/#ktoolbox.api.model.Post">Post</a></code>
+                  <code><a class="autorefs autorefs-external" title="typing.Union" href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a class="autorefs autorefs-internal" title="ktoolbox.api.model.Post" href="../../api/#ktoolbox.api.model.Post">Post</a>, <a class="autorefs autorefs-internal" title="ktoolbox.api.model.Revision" href="../../api/#ktoolbox.api.model.Revision">Revision</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -13661,8 +13687,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/action/job.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 24</span>
-<span class="normal"> 25</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 25</span>
 <span class="normal"> 26</span>
 <span class="normal"> 27</span>
 <span class="normal"> 28</span>
@@ -13780,8 +13805,20 @@
 <span class="normal">140</span>
 <span class="normal">141</span>
 <span class="normal">142</span>
-<span class="normal">143</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_post</span><span class="p">(</span>
-        <span class="n">post</span><span class="p">:</span> <span class="n">Post</span><span class="p">,</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_post</span><span class="p">(</span>
+        <span class="n">post</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Post</span><span class="p">,</span> <span class="n">Revision</span><span class="p">],</span>
         <span class="n">post_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">post_structure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">PostStructureConfiguration</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -13834,8 +13871,8 @@
             <span class="p">)</span>
         <span class="p">):</span>
             <span class="c1"># Check if file extension should be excluded from sequential naming</span>
-            <span class="n">should_use_sequential</span> <span class="o">=</span> <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename</span> <span class="ow">and</span> 
-                                   <span class="n">file_path_obj</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename_excludes</span><span class="p">)</span>
+            <span class="n">should_use_sequential</span> <span class="o">=</span> <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename</span> <span class="ow">and</span>
+                                     <span class="n">file_path_obj</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename_excludes</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">should_use_sequential</span><span class="p">:</span>
                 <span class="n">basic_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sequential_counter</span><span class="si">}{</span><span class="n">file_path_obj</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="n">sequential_counter</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -13878,6 +13915,17 @@
                     <span class="n">post</span><span class="o">=</span><span class="n">post</span>
                 <span class="p">)</span>
             <span class="p">)</span>
+
+    <span class="c1"># If post has no content, fetch it from get_post API</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">post</span><span class="o">.</span><span class="n">content</span><span class="p">:</span>
+        <span class="n">get_post_ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_post_api</span><span class="p">(</span>
+            <span class="n">service</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">service</span><span class="p">,</span>
+            <span class="n">creator_id</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+            <span class="n">post_id</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="n">revision_id</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">revision_id</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">post</span><span class="p">,</span> <span class="n">Revision</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">get_post_ret</span><span class="p">:</span>
+            <span class="n">post</span> <span class="o">=</span> <span class="n">get_post_ret</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">post</span>
 
     <span class="c1"># Write content file</span>
     <span class="k">if</span> <span class="n">content_path</span> <span class="ow">and</span> <span class="n">post</span><span class="o">.</span><span class="n">content</span><span class="p">:</span>
