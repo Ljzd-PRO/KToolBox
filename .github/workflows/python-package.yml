@@ -56,11 +56,6 @@ jobs:
             python-arch: "x64"
             qemu: true
             qemu-arch: aarch64
-          - os: ubuntu-latest
-            arch: armv7
-            python-arch: "x64"
-            qemu: true
-            qemu-arch: arm
 
     steps:
       - uses: actions/checkout@v4
