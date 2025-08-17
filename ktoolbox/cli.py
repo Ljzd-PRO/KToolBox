@@ -48,6 +48,19 @@ class KToolBoxCli:
             )
 
     @staticmethod
+    def webui():
+        """Launch KToolBox Web UI server"""
+        try:
+            from ktoolbox.webui import run_webui
+            run_webui()
+        except ModuleNotFoundError:
+            logger.error(
+                "You need to install extra dependencies to use the Web UI, "
+                "run `pip install ktoolbox[webui]` "
+                "or `pipx install ktoolbox[webui] --force` if you are using pipx"
+            )
+
+    @staticmethod
     async def example_env():
         """Generate an example configuration ``.env`` file."""
         print(

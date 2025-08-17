@@ -80,6 +80,12 @@ optional = true
 uvloop = ["uvloop"]
 winloop = ["winloop"] 
 urwid = ["urwid"]
+webui = ["fastapi", "uvicorn"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+id = ["urwid"]
 
 [build-system]
 requires = ["poetry-core"]

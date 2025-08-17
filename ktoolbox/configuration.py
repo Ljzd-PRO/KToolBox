@@ -16,6 +16,7 @@ __all__ = [
     "PostStructureConfiguration",
     "JobConfiguration",
     "LoggerConfiguration",
+    "WebUIConfiguration",
     "Configuration"
 ]
 
@@ -288,6 +289,25 @@ class LoggerConfiguration(BaseModel):
     rotation: Union[str, int, datetime.time, datetime.timedelta] = "1 week"
 
 
+class WebUIConfiguration(BaseModel):
+    """
+    Web UI Configuration
+
+    :ivar enabled: Enable Web UI
+    :ivar host: Web UI server host
+    :ivar port: Web UI server port
+    :ivar username: Username for Web UI authentication
+    :ivar password: Password for Web UI authentication
+    :ivar debug: Enable debug mode (shows API docs)
+    """
+    enabled: bool = False
+    host: str = "127.0.0.1"
+    port: int = 8888
+    username: str = "admin"
+    password: str = "admin"
+    debug: bool = False
+
+
 class Configuration(BaseSettings):
     # noinspection SpellCheckingInspection,GrazieInspection
     """
@@ -297,6 +317,7 @@ class Configuration(BaseSettings):
     :ivar downloader: File Downloader Configuration
     :ivar job: Download jobs Configuration
     :ivar logger: Logger configuration
+    :ivar webui: Web UI configuration
     :ivar ssl_verify: Enable SSL certificate verification for Kemono API server and download server
     :ivar json_dump_indent: Indent of JSON file dump
     :ivar use_uvloop: Use uvloop/winloop for asyncio performance optimization \
@@ -308,6 +329,7 @@ class Configuration(BaseSettings):
     downloader: DownloaderConfiguration = DownloaderConfiguration()
     job: JobConfiguration = JobConfiguration()
     logger: LoggerConfiguration = LoggerConfiguration()
+    webui: WebUIConfiguration = WebUIConfiguration()
 
     ssl_verify: bool = True
     json_dump_indent: int = 4
