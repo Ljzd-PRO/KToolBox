@@ -302,7 +302,7 @@ class WebUIConfiguration(BaseModel):
     """
     enabled: bool = False
     host: str = "127.0.0.1"
-    port: int = 8888
+    port: int = 8890
     username: str = "admin"
     password: str = "admin"
     debug: bool = False

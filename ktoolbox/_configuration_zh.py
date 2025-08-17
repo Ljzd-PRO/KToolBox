@@ -148,7 +148,16 @@ class Configuration(ktoolbox.configuration.Configuration):
     :ivar downloader: 文件下载器配置
     :ivar job: 下载任务配置
     :ivar logger: 日志配置
+    :ivar webui: Web UI 配置
     :ivar ssl_verify: 对 Kemono API 服务器和下载服务器启用 SSL 证书验证
+    :ivar json_dump_indent: JSON 文件保存时的缩进
+    :ivar use_uvloop: 使用 uvloop/winloop 优化 asyncio 性能 \
+    Windows 下使用 winloop，类 Unix 系统下使用 uvloop，提高并发性能。\
+    Windows 下安装 winloop：`pip install ktoolbox[winloop]` \
+    Unix 下安装 uvloop：`pip install ktoolbox[uvloop]`
+    """
+    ...
+�下载服务器启用 SSL 证书验证
     :ivar json_dump_indent: JSON 文件保存时的缩进
     :ivar use_uvloop: 使用 uvloop/winloop 优化 asyncio 性能 \
     Windows 下使用 winloop，类 Unix 系统下使用 uvloop，提高并发性能。\
