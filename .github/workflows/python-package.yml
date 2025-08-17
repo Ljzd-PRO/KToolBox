@@ -86,7 +86,7 @@ jobs:
             -w /workspace \
             python:3.13-slim-bullseye \
             bash -c "
-              apt-get update && apt-get install -y git &&
+              apt-get update && apt-get install -y git binutils &&
               pip install poetry &&
               poetry install --with pyinstaller --extras urwid --extras uvloop &&
               poetry run pyinstaller ktoolbox.spec --distpath dist &&
