@@ -91,9 +91,8 @@ jobs:
             -w /workspace \
             python:3.13-slim-bullseye \
             bash -c "
-              apt-get update && apt-get install -y pipx git &&
-              pipx install poetry &&
-              export PATH=/root/.local/bin:\$PATH &&
+              apt-get update && apt-get install -y git &&
+              pip install poetry &&
               poetry install --with pyinstaller --extras urwid --extras uvloop &&
               poetry run pyinstaller ktoolbox.spec --distpath dist &&
               cp README.md README_zh-CN.md example.env .env LICENSE dist/
