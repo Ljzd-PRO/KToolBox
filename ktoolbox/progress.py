@@ -16,7 +16,40 @@ from dataclasses import dataclass, field
 
 from tqdm import tqdm as std_tqdm
 
-__all__ = ["ProgressManager", "ManagedTqdm", "ColorTheme"]
+__all__ = ["ProgressManager", "ManagedTqdm", "ColorTheme", "setup_logger_for_progress"]
+
+# Global reference to active progress manager for logger integration
+_active_progress_manager: Optional['ProgressManager'] = None
+
+
+def setup_logger_for_progress(progress_manager: 'ProgressManager' = None):
+    """Setup logger to work with progress manager"""
+    global _active_progress_manager
+    _active_progress_manager = progress_manager
+
+
+class ProgressAwareHandler:
+    """Custom loguru handler that works with progress manager"""
+    
+    def __init__(self, original_handler):
+        self.original_handler = original_handler
+    
+    def write(self, message):
+        global _active_progress_manager
+        if _active_progress_manager and _active_progress_manager._running:
+            # Temporarily clear progress display
+            _active_progress_manager.temporary_clear_for_log()
+            self.original_handler.write(message)
+            # Small delay to ensure message is visible
+            time.sleep(0.05)
+            # Restore progress display
+            _active_progress_manager.restore_display()
+        else:
+            self.original_handler.write(message)
+    
+    def flush(self):
+        if hasattr(self.original_handler, 'flush'):
+            self.original_handler.flush()
 
 
 class ColorTheme:
@@ -131,6 +164,9 @@ class ProgressManager:
         self._last_display_time = 0
         self._update_interval = 0.1  # Update every 100ms
         
+        # Display deduplication
+        self._last_display_content = ""
+        
     def set_job_totals(self, total: int, completed: int = 0, failed: int = 0):
         """Set the total number of jobs for overall progress tracking"""
         with self._lock:
@@ -149,15 +185,7 @@ class ProgressManager:
     def create_progress_bar(self, desc: str, total: Optional[int] = None, 
                           unit: str = "B", unit_scale: bool = True) -> 'ManagedTqdm':
         """Create a new managed progress bar"""
-        progress_id = f"{desc}_{id(desc)}"
-        
-        with self._lock:
-            self._progress_bars[progress_id] = ProgressState(
-                desc=desc, total=total, unit=unit, unit_scale=unit_scale
-            )
-            if progress_id not in self._display_order:
-                self._display_order.append(progress_id)
-        
+        # Don't create progress state here - let ManagedTqdm do it with proper unique ID
         return ManagedTqdm(desc=desc, total=total, unit=unit, unit_scale=unit_scale, manager=self)
     
     def update_progress(self, progress_id: str, current: int, desc: str = None, failed: bool = False):
@@ -216,6 +244,8 @@ class ProgressManager:
             # Hide cursor
             self.file.write('\033[?25l')
             self.file.flush()
+            # Set as active progress manager for logger integration
+            setup_logger_for_progress(self)
     
     def stop_display(self):
         """Stop the progress display loop"""
@@ -225,16 +255,37 @@ class ProgressManager:
             self._clear_display()
             self.file.write('\033[?25h\n')
             self.file.flush()
+            # Remove from logger integration
+            setup_logger_for_progress(None)
     
     def _clear_display(self):
         """Clear the current display area"""
-        if self._lines_written > 0:
-            # Move cursor up and clear lines
+        if self._lines_written > 0 and self.file.isatty():
+            # Move cursor up to the start of our display area
             self.file.write(f'\033[{self._lines_written}A')
+            # Clear each line and move to next
             for _ in range(self._lines_written):
-                self.file.write('\033[2K\n')
+                self.file.write('\033[2K\033[1B')  # Clear line and move down
+            # Move cursor back to start of display area
             self.file.write(f'\033[{self._lines_written}A')
+            self.file.flush()
             self._lines_written = 0
+    
+    def temporary_clear_for_log(self, log_message: str = None):
+        """Temporarily clear display to allow log output"""
+        if self._running and self.file.isatty():
+            self._clear_display()
+            # Reset last display content so we redraw after logging
+            self._last_display_content = ""
+            if log_message:
+                self.file.write(log_message + '\n')
+                self.file.flush()
+    
+    def restore_display(self):
+        """Restore display after log output"""
+        if self._running and self.file.isatty():
+            # Force immediate display update
+            self.update_display()
     
     def _format_size(self, size: Optional[int], unit_scale: bool = True) -> str:
         """Format a size value with appropriate units"""
@@ -458,9 +509,6 @@ class ProgressManager:
         self._last_display_time = current_time
         
         with self._lock:
-            # Clear previous display
-            self._clear_display()
-            
             # Render new display
             lines = []
             
@@ -474,12 +522,25 @@ class ProgressManager:
             progress_lines = self._render_progress_bars()
             lines.extend(progress_lines)
             
-            # Write to terminal
+            # Write to terminal only if we have content and it's different from last display
             if lines:
-                output = '\n'.join(lines) + '\n'
-                self.file.write(output)
-                self.file.flush()
-                self._lines_written = len(lines)
+                # Remove trailing empty lines
+                while lines and lines[-1] == "":
+                    lines.pop()
+                
+                if lines:  # Check again after removing empty lines
+                    display_content = '\n'.join(lines)
+                    
+                    # Only update if content has changed
+                    if display_content != self._last_display_content:
+                        # Clear previous display
+                        self._clear_display()
+                        
+                        output = display_content + '\n'
+                        self.file.write(output)
+                        self.file.flush()
+                        self._lines_written = len(lines)
+                        self._last_display_content = display_content
 
 
 class ManagedTqdm:

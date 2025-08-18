@@ -14,7 +14,7 @@ from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
 from ktoolbox.job import Job
 from ktoolbox.utils import generate_msg
-from ktoolbox.progress import ProgressManager, create_managed_tqdm_class
+from ktoolbox.progress import ProgressManager, create_managed_tqdm_class, setup_logger_for_progress
 
 __all__ = ["JobRunner"]
 
@@ -140,21 +140,24 @@ class JobRunner:
                     ret = task_done.result()
                     if ret.code == RetCodeEnum.FileExisted:
                         logger.info(ret.message)
+                        # Treat file existed as successful download
+                        if self._progress_manager:
+                            self._progress_manager.update_job_progress(
+                                completed=self.done_size + 1
+                            )
                     elif ret.code != RetCodeEnum.Success:
                         logger.error(ret.message)
                         failed_num += 1
                         # Update progress manager with failed job
                         if self._progress_manager:
                             self._progress_manager.update_job_progress(
-                                completed=self.done_size, 
-                                failed=self.done_size + failed_num - len([p for p in self._downloaders_with_task.values() if p.done()])
+                                failed=failed_num
                             )
                     else:
                         # Update progress manager with completed job
                         if self._progress_manager:
                             self._progress_manager.update_job_progress(
-                                completed=self.done_size + 1,
-                                failed=self.done_size + failed_num - len([p for p in self._downloaders_with_task.values() if p.done()])
+                                completed=self.done_size + 1
                             )
                 elif isinstance(exception, CancelledError):
                     logger.warning(
@@ -175,8 +178,7 @@ class JobRunner:
                     # Update progress manager with failed job
                     if self._progress_manager:
                         self._progress_manager.update_job_progress(
-                            completed=self.done_size,
-                            failed=self.done_size + failed_num - len([p for p in self._downloaders_with_task.values() if p.done()])
+                            failed=failed_num
                         )
                 self._job_queue.task_done()
         await self._job_queue.join()
@@ -207,6 +209,8 @@ class JobRunner:
         if self._progress_manager:
             self._progress_manager.set_job_totals(self._total_jobs_count)
             self._progress_manager.start_display()
+            # Setup logger integration to work with progress display
+            setup_logger_for_progress(self._progress_manager)
         
         try:
             async with self._lock:
@@ -243,6 +247,8 @@ class JobRunner:
             # Clean up progress manager
             if self._progress_manager:
                 self._progress_manager.stop_display()
+                # Remove logger integration
+                setup_logger_for_progress(None)
                 
         if failed_num:
             logger.warning(f"{failed_num} jobs failed, download finished")
