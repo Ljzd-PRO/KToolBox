@@ -52,6 +52,12 @@ async def create_job_from_post(
         content_path = None
         external_links_path = None
 
+    if dump_post_data:
+        async with aiofiles.open(str(post_path / DataStorageNameEnum.PostData.value), "w", encoding="utf-8") as f:
+            await f.write(
+                post.model_dump_json(indent=config.json_dump_indent)
+            )
+
     # Filter and create jobs for ``Post.attachment``
     jobs: List[Job] = []
     sequential_counter = 1  # Counter for sequential filenames
@@ -130,25 +136,21 @@ async def create_job_from_post(
             if get_post_ret:
                 post = get_post_ret.data.post
 
-        # Write content file
-        if config.job.extract_content:
-            async with aiofiles.open(content_path, "w", encoding=config.downloader.encoding) as f:
-                await f.write(post.content)
+        # If post content is still empty, skip content extraction
+        if post.content:
+            # Write content file
+            if config.job.extract_content:
+                async with aiofiles.open(content_path, "w", encoding=config.downloader.encoding) as f:
+                    await f.write(post.content)
 
-        # Extract and write external links file
-        if config.job.extract_external_links:
-            external_links = extract_external_links(post.content, config.job.external_link_patterns)
-            if external_links:
-                async with aiofiles.open(external_links_path, "w", encoding=config.downloader.encoding) as f:
-                    # Write each link on a separate line
-                    for link in sorted(external_links):
-                        await f.write(f"{link}\n")
-
-    if dump_post_data:
-        async with aiofiles.open(str(post_path / DataStorageNameEnum.PostData.value), "w", encoding="utf-8") as f:
-            await f.write(
-                post.model_dump_json(indent=config.json_dump_indent)
-            )
+            # Extract and write external links file
+            if config.job.extract_external_links:
+                external_links = extract_external_links(post.content, config.job.external_link_patterns)
+                if external_links:
+                    async with aiofiles.open(external_links_path, "w", encoding=config.downloader.encoding) as f:
+                        # Write each link on a separate line
+                        for link in sorted(external_links):
+                            await f.write(f"{link}\n")
 
     return jobs
 
