@@ -123,7 +123,46 @@ static_dir = webui_dir / "static"
 
 # Mount static files if they exist
 if static_dir.exists():
-    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+    # Mount the nested static directory for React build assets
+    nested_static_dir = static_dir / "static"
+    if nested_static_dir.exists():
+        app.mount("/static", StaticFiles(directory=str(nested_static_dir)), name="static")
+
+
+@app.get("/favicon.ico")
+async def serve_favicon():
+    """Serve favicon"""
+    favicon_file = static_dir / "favicon.ico"
+    if favicon_file.exists():
+        return FileResponse(str(favicon_file))
+    return HTTPException(404)
+
+
+@app.get("/manifest.json")
+async def serve_manifest():
+    """Serve manifest"""
+    manifest_file = static_dir / "manifest.json"
+    if manifest_file.exists():
+        return FileResponse(str(manifest_file))
+    return HTTPException(404)
+
+
+@app.get("/logo192.png")
+async def serve_logo192():
+    """Serve logo192"""
+    logo_file = static_dir / "logo192.png"
+    if logo_file.exists():
+        return FileResponse(str(logo_file))
+    return HTTPException(404)
+
+
+@app.get("/logo512.png")
+async def serve_logo512():
+    """Serve logo512"""
+    logo_file = static_dir / "logo512.png"
+    if logo_file.exists():
+        return FileResponse(str(logo_file))
+    return HTTPException(404)
 
 
 @app.get("/")
@@ -156,6 +195,7 @@ async def serve_frontend():
         </body>
         </html>
         """
+
 
 
 # API Routes
@@ -355,6 +395,21 @@ async def delete_task(task_id: str):
     
     del tasks[task_id]
     return {"message": "Task deleted successfully"}
+
+
+# Catch-all route for React Router (must be last)
+@app.get("/{path:path}")
+async def serve_frontend_routes(path: str):
+    """Serve the frontend HTML page for any route (for React Router)"""
+    # Skip API routes
+    if path.startswith("api/"):
+        raise HTTPException(404)
+    
+    html_file = static_dir / "index.html"
+    if html_file.exists():
+        return FileResponse(str(html_file))
+    else:
+        raise HTTPException(404)
 
 
 def start_webui(host: str = "127.0.0.1", port: int = 8000, open_browser: bool = True):
