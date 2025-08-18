@@ -22,7 +22,8 @@ __all__ = [
     "dump_search",
     "parse_webpage_url",
     "uvloop_init",
-    "extract_external_links"
+    "extract_external_links",
+    "check_for_updates"
 ]
 
 _T = TypeVar('_T')
@@ -212,3 +213,50 @@ def extract_external_links(content: str, custom_patterns: Optional[List[str]] = 
             links.add(url)
 
     return links
+
+
+async def check_for_updates() -> None:
+    """
+    Check for updates from GitHub and PyPI (backup).
+    Show information if a newer version is available.
+    """
+    try:
+        import httpx
+        from ktoolbox import __version__
+        
+        current_version = __version__.lstrip('v')  # Remove 'v' prefix if present
+        
+        # First try GitHub API
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                response = await client.get("https://api.github.com/repos/Ljzd-PRO/KToolBox/releases/latest")
+                if response.status_code == 200:
+                    data = response.json()
+                    latest_version = data["tag_name"].lstrip('v')
+                    if latest_version != current_version:
+                        logger.info(f"Update available: {latest_version} (current: {current_version})")
+                        logger.info(f"Release URL: {data['html_url']}")
+                        return
+                    else:
+                        logger.debug("You are using the latest version")
+                        return
+        except Exception as e:
+            logger.debug(f"Failed to check GitHub for updates: {e}")
+        
+        # Fallback to PyPI API  
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                response = await client.get("https://pypi.org/pypi/ktoolbox/json")
+                if response.status_code == 200:
+                    data = response.json()
+                    latest_version = data["info"]["version"].lstrip('v')
+                    if latest_version != current_version:
+                        logger.info(f"Update available: {latest_version} (current: {current_version})")
+                        logger.info("Run 'pip install --upgrade ktoolbox' or 'pipx upgrade ktoolbox' to update")
+                    else:
+                        logger.debug("You are using the latest version")
+        except Exception as e:
+            logger.debug(f"Failed to check PyPI for updates: {e}")
+            
+    except Exception as e:
+        logger.debug(f"Update check failed: {e}")
