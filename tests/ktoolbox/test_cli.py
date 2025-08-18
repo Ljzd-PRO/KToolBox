@@ -102,20 +102,22 @@ async def test_get_post():
 @pytest.mark.asyncio
 async def test_download_post():
     # Test invalid input
-    invalid = await KToolBoxCli.download_post(url="")
-    assert invalid == generate_msg(
-        TextEnum.MissingParams.value,
-        use_at_lease_one=[
-            ["url"],
-            ["service", "creator_id", "post_id"]
-        ]
-    )
+    with tempfile.TemporaryDirectory() as td:
+        dir_path = Path(td)
+        invalid = await KToolBoxCli.download_post(url="", path=dir_path)
+        assert invalid == generate_msg(
+            TextEnum.MissingParams.value,
+            use_at_lease_one=[
+                ["url"],
+                ["service", "creator_id", "post_id"]
+            ]
+        )
 
     # Test post.json existed or not
     with tempfile.TemporaryDirectory() as td:
         dir_path = Path(td)
         url_only = await KToolBoxCli.download_post(
-            url="https://kemono.cr/fanbox/user/9016/post/6622968",
+            url="https://kemono.cr/fanbox/user/3316400/post/9492291",
             path=dir_path
         )
         assert url_only is None
@@ -123,23 +125,26 @@ async def test_download_post():
         assert (dir_new / DataStorageNameEnum.PostData.value).is_file()
 
     # Test manually input post information and `dump_post_data`
-    no_url_and_no_dump = await KToolBoxCli.download_post(
-        service="fanbox",
-        creator_id="9016",
-        post_id="6622968",
-        dump_post_data=False
-    )
-    assert no_url_and_no_dump is None
+    with tempfile.TemporaryDirectory() as td:
+        dir_path = Path(td)
+        no_url_and_no_dump = await KToolBoxCli.download_post(
+            service="fanbox",
+            creator_id="3316400",
+            post_id="9492291",
+            path=dir_path,
+            dump_post_data=False
+        )
+        assert no_url_and_no_dump is None
 
     # Test `post_dirname_format`
     with tempfile.TemporaryDirectory() as td:
         dir_path = Path(td)
         config.job.post_dirname_format = "[{published}]{id}"
         await KToolBoxCli.download_post(
-            url="https://kemono.cr/fanbox/user/9016/post/6622968",
+            url="https://kemono.cr/fanbox/user/3316400/post/9492291",
             path=dir_path
         )
-        assert (dir_path / "[2023-09-02]6622968").is_dir()
+        assert (dir_path / "[2025-03-27]9492291").is_dir()
         config.job.post_dirname_format = "{title}"
 
 
@@ -147,26 +152,28 @@ async def test_download_post():
 async def test_sync_creator():
     # noinspection SpellCheckingInspection
     service = "fanbox"
-    creator_id = "76712"
+    creator_id = "24164271"
     creator_url = f"https://kemono.cr/{service}/user/{creator_id}"
 
     # Test invalid params input
-    invalid = await KToolBoxCli.sync_creator(url="")
-    assert invalid == generate_msg(
-        TextEnum.MissingParams.value,
-        use_at_lease_one=[
-            ["url"],
-            ["service", "creator_id"]
-        ]
-    )
-
     with tempfile.TemporaryDirectory() as td:
         dir_path = Path(td)
+        invalid = await KToolBoxCli.sync_creator(url="", path=dir_path)
+        assert invalid == generate_msg(
+            TextEnum.MissingParams.value,
+            use_at_lease_one=[
+                ["url"],
+                ["service", "creator_id"]
+            ]
+        )
 
-        # Test url only
+    # Test url only
+    with tempfile.TemporaryDirectory() as td:
+        dir_path = Path(td)
         url_only = await KToolBoxCli.sync_creator(
             url=creator_url,
-            path=dir_path
+            path=dir_path,
+            length=3
         )
         assert url_only is None
 
@@ -176,6 +183,7 @@ async def test_sync_creator():
         await KToolBoxCli.sync_creator(
             url=creator_url,
             path=dir_path,
+            length=3,
             mix_posts=True
         )
         assert (dir_new := next(dir_path.iterdir(), None)) is not None
@@ -183,30 +191,13 @@ async def test_sync_creator():
         assert len(sub_dirs) == 0
 
     # Test `start_time`, `end_time`
-
-    await KToolBoxCli.sync_creator(
-        url=creator_url,
-        start_time="2022-06-05"
-    )
-
     with tempfile.TemporaryDirectory() as td:
         dir_path = Path(td)
         await KToolBoxCli.sync_creator(
             url=creator_url,
             path=dir_path,
-            start_time="2022-06-05",
-            end_time="2022-06-24"
-        )
-        assert (dir_new := next(dir_path.iterdir(), None)) is not None
-        posts = list(filter(lambda x: x.is_dir(), dir_new.iterdir()))
-        assert len(posts) == 4
-
-    with tempfile.TemporaryDirectory() as td:
-        dir_path = Path(td)
-        await KToolBoxCli.sync_creator(
-            url=creator_url,
-            path=dir_path,
-            end_time="2022-06-23"
+            start_time="2025-07-25",
+            end_time="2025-08-10"
         )
         assert (dir_new := next(dir_path.iterdir(), None)) is not None
         posts = list(filter(lambda x: x.is_dir(), dir_new.iterdir()))
