@@ -3,10 +3,11 @@ Centralized Progress Management for KToolBox
 
 This module provides a centralized progress display system that prevents
 multiple concurrent progress bars from interfering with each other.
-Inspired by rclone's progress display approach.
+Inspired by rclone's progress display approach with enhanced visual effects.
 """
 
 import asyncio
+import os
 import sys
 import threading
 import time
@@ -15,7 +16,70 @@ from dataclasses import dataclass, field
 
 from tqdm import tqdm as std_tqdm
 
-__all__ = ["ProgressManager", "ManagedTqdm"]
+__all__ = ["ProgressManager", "ManagedTqdm", "ColorTheme"]
+
+
+class ColorTheme:
+    """ANSI color codes and themes for progress display"""
+    
+    # ANSI Color codes
+    RESET = '\033[0m'
+    BOLD = '\033[1m'
+    
+    # Basic colors
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    BLUE = '\033[34m'
+    MAGENTA = '\033[35m'
+    CYAN = '\033[36m'
+    WHITE = '\033[37m'
+    
+    # Bright colors
+    BRIGHT_RED = '\033[91m'
+    BRIGHT_GREEN = '\033[92m'
+    BRIGHT_YELLOW = '\033[93m'
+    BRIGHT_BLUE = '\033[94m'
+    BRIGHT_MAGENTA = '\033[95m'
+    BRIGHT_CYAN = '\033[96m'
+    BRIGHT_WHITE = '\033[97m'
+    
+    # Background colors
+    BG_GREEN = '\033[42m'
+    BG_RED = '\033[41m'
+    BG_YELLOW = '\033[43m'
+    
+    # Emojis
+    DOWNLOAD = "📥"
+    COMPLETED = "✅"
+    FAILED = "❌"
+    RUNNING = "🔄"
+    WAITING = "⏳"
+    SPEED = "⚡"
+    ROCKET = "🚀"
+    
+    # Animation frames for spinner
+    SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+    
+    @classmethod
+    def colorize(cls, text: str, color: str, bold: bool = False) -> str:
+        """Apply color to text with optional bold"""
+        if not cls.supports_color():
+            return text
+        prefix = cls.BOLD + color if bold else color
+        return f"{prefix}{text}{cls.RESET}"
+    
+    @classmethod
+    def supports_color(cls) -> bool:
+        """Check if terminal supports color"""
+        return (
+            hasattr(sys.stdout, 'isatty') and sys.stdout.isatty() and
+            not sys.platform.startswith('win') or 'ANSICON' in os.environ
+        )
+
+
+# Animation state for spinners
+_animation_state = {'frame': 0, 'last_update': 0}
 
 
 @dataclass
@@ -29,23 +93,30 @@ class ProgressState:
     rate: Optional[float] = None
     last_update: float = field(default_factory=time.time)
     finished: bool = False
+    failed: bool = False
+    paused: bool = False
 
 
 class ProgressManager:
     """
     Centralized progress manager that coordinates multiple progress bars
-    in a fixed terminal display area.
+    in a fixed terminal display area with enhanced visual effects.
     """
     
-    def __init__(self, max_workers: int = 5, file: Optional[TextIO] = None):
+    def __init__(self, max_workers: int = 5, file: Optional[TextIO] = None, 
+                 use_colors: bool = True, use_emojis: bool = True):
         """
         Initialize the progress manager.
         
         :param max_workers: Maximum number of concurrent progress bars to display
         :param file: Output stream (defaults to sys.stdout)
+        :param use_colors: Enable color output
+        :param use_emojis: Enable emoji indicators
         """
         self.max_workers = max_workers
         self.file = file or sys.stdout
+        self.use_colors = use_colors and ColorTheme.supports_color()
+        self.use_emojis = use_emojis
         self._progress_bars: Dict[str, ProgressState] = {}
         self._display_order: List[str] = []
         self._lock = threading.RLock()
@@ -87,14 +158,15 @@ class ProgressManager:
             if progress_id not in self._display_order:
                 self._display_order.append(progress_id)
         
-        return ManagedTqdm(self, progress_id)
+        return ManagedTqdm(desc=desc, total=total, unit=unit, unit_scale=unit_scale, manager=self)
     
-    def update_progress(self, progress_id: str, current: int, desc: str = None):
+    def update_progress(self, progress_id: str, current: int, desc: str = None, failed: bool = False):
         """Update progress for a specific progress bar"""
         with self._lock:
             if progress_id in self._progress_bars:
                 state = self._progress_bars[progress_id]
                 state.current = current
+                state.failed = failed
                 if desc:
                     state.desc = desc
                 state.last_update = time.time()
@@ -109,14 +181,17 @@ class ProgressManager:
                 state._last_current = current
                 state._last_time = state.last_update
     
-    def finish_progress(self, progress_id: str):
+    def finish_progress(self, progress_id: str, failed: bool = False):
         """Mark a progress bar as finished"""
         with self._lock:
             if progress_id in self._progress_bars:
                 self._progress_bars[progress_id].finished = True
-                # Schedule removal after a short delay
+                self._progress_bars[progress_id].failed = failed
+                # Remove finished progress bar immediately in sync context
+                # to avoid coroutine warnings
                 try:
-                    # Only create task if we're in an async context
+                    loop = asyncio.get_running_loop()
+                    # Only create task if we're in an async context with a running loop
                     asyncio.create_task(self._remove_finished_after_delay(progress_id))
                 except RuntimeError:
                     # No event loop running, remove immediately
@@ -189,7 +264,7 @@ class ProgressManager:
         return f"{self._format_size(int(rate))}/s"
     
     def _render_overall_progress(self) -> List[str]:
-        """Render the overall job progress"""
+        """Render the overall job progress with colors and emojis"""
         lines = []
         
         if self._total_jobs > 0:
@@ -198,11 +273,53 @@ class ProgressManager:
             
             progress_pct = (self._completed_jobs / self._total_jobs) * 100 if self._total_jobs > 0 else 0
             
-            lines.append(f"Jobs: {self._completed_jobs}/{self._total_jobs} completed ({progress_pct:.1f}%), "
-                        f"{running} running, {waiting} waiting")
+            # Determine overall status emoji and color
+            if self.use_emojis:
+                if running > 0:
+                    status_emoji = f"{ColorTheme.RUNNING} "
+                elif self._failed_jobs > 0:
+                    status_emoji = f"{ColorTheme.FAILED} "
+                else:
+                    status_emoji = f"{ColorTheme.COMPLETED} "
+            else:
+                status_emoji = ""
+            
+            # Color the progress percentage based on completion
+            if self.use_colors:
+                if progress_pct >= 100:
+                    pct_colored = ColorTheme.colorize(f"{progress_pct:.1f}%", ColorTheme.BRIGHT_GREEN, bold=True)
+                elif progress_pct >= 75:
+                    pct_colored = ColorTheme.colorize(f"{progress_pct:.1f}%", ColorTheme.BRIGHT_CYAN, bold=True)
+                elif progress_pct >= 50:
+                    pct_colored = ColorTheme.colorize(f"{progress_pct:.1f}%", ColorTheme.BRIGHT_YELLOW, bold=True)
+                else:
+                    pct_colored = ColorTheme.colorize(f"{progress_pct:.1f}%", ColorTheme.BRIGHT_WHITE, bold=True)
+            else:
+                pct_colored = f"{progress_pct:.1f}%"
+            
+            # Color status numbers
+            if self.use_colors:
+                completed_colored = ColorTheme.colorize(str(self._completed_jobs), ColorTheme.BRIGHT_GREEN)
+                total_colored = ColorTheme.colorize(str(self._total_jobs), ColorTheme.BRIGHT_WHITE)
+                running_colored = ColorTheme.colorize(str(running), ColorTheme.BRIGHT_CYAN)
+                waiting_colored = ColorTheme.colorize(str(waiting), ColorTheme.BRIGHT_YELLOW)
+            else:
+                completed_colored = str(self._completed_jobs)
+                total_colored = str(self._total_jobs)
+                running_colored = str(running)
+                waiting_colored = str(waiting)
+            
+            line = f"{status_emoji}Jobs: {completed_colored}/{total_colored} completed ({pct_colored}), " \
+                   f"{running_colored} running, {waiting_colored} waiting"
+            lines.append(line)
             
             if self._failed_jobs > 0:
-                lines.append(f"Failed: {self._failed_jobs}")
+                failed_emoji = f"{ColorTheme.FAILED} " if self.use_emojis else ""
+                if self.use_colors:
+                    failed_colored = ColorTheme.colorize(str(self._failed_jobs), ColorTheme.BRIGHT_RED, bold=True)
+                else:
+                    failed_colored = str(self._failed_jobs)
+                lines.append(f"{failed_emoji}Failed: {failed_colored}")
         
         return lines
     
@@ -226,31 +343,108 @@ class ProgressManager:
         return lines
     
     def _render_single_progress_bar(self, state: ProgressState) -> str:
-        """Render a single progress bar"""
+        """Render a single progress bar with colors and animations"""
         # Progress bar width
         bar_width = 30
+        
+        # Determine status emoji
+        if self.use_emojis:
+            if state.failed:
+                status_emoji = ColorTheme.FAILED
+            elif state.finished:
+                status_emoji = ColorTheme.COMPLETED
+            elif state.paused:
+                status_emoji = ColorTheme.WAITING
+            else:
+                # Animated spinner for active downloads
+                current_time = time.time()
+                if current_time - _animation_state['last_update'] > 0.1:
+                    _animation_state['frame'] = (_animation_state['frame'] + 1) % len(ColorTheme.SPINNER_FRAMES)
+                    _animation_state['last_update'] = current_time
+                status_emoji = ColorTheme.SPINNER_FRAMES[_animation_state['frame']]
+        else:
+            status_emoji = ""
         
         if state.total is not None and state.total > 0:
             progress = min(state.current / state.total, 1.0)
             filled = int(bar_width * progress)
-            bar = '█' * filled + '░' * (bar_width - filled)
-            percentage = f"{progress * 100:5.1f}%"
+            
+            # Create colored progress bar
+            if self.use_colors:
+                if state.failed:
+                    # Red for failed
+                    bar_filled = ColorTheme.colorize('█' * filled, ColorTheme.BRIGHT_RED)
+                    bar_empty = ColorTheme.colorize('░' * (bar_width - filled), ColorTheme.RED)
+                elif state.finished:
+                    # Green for completed
+                    bar_filled = ColorTheme.colorize('█' * filled, ColorTheme.BRIGHT_GREEN)
+                    bar_empty = ColorTheme.colorize('░' * (bar_width - filled), ColorTheme.GREEN)
+                else:
+                    # Cyan for in progress
+                    bar_filled = ColorTheme.colorize('█' * filled, ColorTheme.BRIGHT_CYAN)
+                    bar_empty = ColorTheme.colorize('░' * (bar_width - filled), ColorTheme.CYAN)
+                bar = bar_filled + bar_empty
+            else:
+                bar = '█' * filled + '░' * (bar_width - filled)
+                
+            # Color the percentage
+            percentage_val = progress * 100
+            if self.use_colors:
+                if percentage_val >= 100:
+                    percentage = ColorTheme.colorize(f"{percentage_val:5.1f}%", ColorTheme.BRIGHT_GREEN, bold=True)
+                elif percentage_val >= 75:
+                    percentage = ColorTheme.colorize(f"{percentage_val:5.1f}%", ColorTheme.BRIGHT_CYAN)
+                else:
+                    percentage = ColorTheme.colorize(f"{percentage_val:5.1f}%", ColorTheme.BRIGHT_WHITE)
+            else:
+                percentage = f"{percentage_val:5.1f}%"
         else:
-            # Indeterminate progress
-            bar = '█' * 3 + '░' * (bar_width - 3)
-            percentage = "  ?  %"
+            # Indeterminate progress with animated bar
+            if self.use_colors:
+                # Moving progress indicator
+                pos = _animation_state['frame'] % bar_width
+                bar_chars = ['░'] * bar_width
+                for i in range(max(0, pos-2), min(bar_width, pos+3)):
+                    bar_chars[i] = '█'
+                bar = ColorTheme.colorize(''.join(bar_chars), ColorTheme.BRIGHT_YELLOW)
+            else:
+                bar = '█' * 3 + '░' * (bar_width - 3)
+            percentage = ColorTheme.colorize("  ?  %", ColorTheme.BRIGHT_YELLOW) if self.use_colors else "  ?  %"
         
-        # Format sizes
+        # Format sizes with color
         current_str = self._format_size(state.current, state.unit_scale)
         total_str = self._format_size(state.total, state.unit_scale) if state.total else "?"
-        rate_str = self._format_rate(state.rate, state.unit)
         
-        # Truncate description if too long
+        if self.use_colors:
+            current_str = ColorTheme.colorize(current_str, ColorTheme.BRIGHT_WHITE, bold=True)
+            total_str = ColorTheme.colorize(total_str, ColorTheme.BRIGHT_WHITE)
+        
+        # Format rate with speed emoji
+        rate_str = self._format_rate(state.rate, state.unit)
+        if self.use_colors and state.rate and state.rate > 0:
+            rate_str = ColorTheme.colorize(rate_str, ColorTheme.BRIGHT_MAGENTA)
+        
+        if self.use_emojis and state.rate and state.rate > 0:
+            rate_str = f"{ColorTheme.SPEED} {rate_str}"
+        
+        # Truncate description if too long and add color
         desc = state.desc
         if len(desc) > 25:
             desc = desc[:22] + "..."
         
-        return f"{desc:25} |{bar}| {current_str}/{total_str} {percentage} {rate_str}"
+        if self.use_colors:
+            if state.failed:
+                desc = ColorTheme.colorize(desc, ColorTheme.BRIGHT_RED)
+            elif state.finished:
+                desc = ColorTheme.colorize(desc, ColorTheme.BRIGHT_GREEN)
+            else:
+                desc = ColorTheme.colorize(desc, ColorTheme.BRIGHT_CYAN)
+        
+        # Add emoji prefix
+        if self.use_emojis:
+            desc = f"{status_emoji} {desc}"
+        
+        return f"{desc:30} |{bar}| {current_str}/{total_str} {percentage} {rate_str}"
     
     def update_display(self):
         """Update the terminal display"""
@@ -345,7 +539,7 @@ class ManagedTqdm:
             return self._fallback.close()
             
         if self.manager and self.progress_id:
-            self.manager.finish_progress(self.progress_id)
+            self.manager.finish_progress(self.progress_id, failed=getattr(self, '_failed', False))
     
     def __enter__(self):
         if self._fallback:
@@ -356,6 +550,26 @@ class ManagedTqdm:
         if self._fallback:
             return self._fallback.__exit__(exc_type, exc_val, exc_tb)
         self.close()
+    
+    def set_failed(self, failed: bool = True):
+        """Mark the progress bar as failed"""
+        if self._fallback:
+            return  # Not supported in fallback mode
+            
+        self._failed = failed
+        if self.manager and self.progress_id:
+            self.manager.update_progress(self.progress_id, self._current, self._desc, failed=failed)
+    
+    def set_paused(self, paused: bool = True):
+        """Mark the progress bar as paused"""
+        if self._fallback:
+            return  # Not supported in fallback mode
+            
+        self._paused = paused
+        if self.manager and self.progress_id:
+            with self.manager._lock:
+                if self.progress_id in self.manager._progress_bars:
+                    self.manager._progress_bars[self.progress_id].paused = paused
     
     # Properties to maintain compatibility with tqdm
     @property

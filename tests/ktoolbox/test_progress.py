@@ -1,7 +1,7 @@
 import asyncio
 import pytest
 from unittest.mock import Mock, patch
-from ktoolbox.progress import ProgressManager, ManagedTqdm, create_managed_tqdm_class
+from ktoolbox.progress import ProgressManager, ManagedTqdm, create_managed_tqdm_class, ColorTheme
 
 
 class TestProgressManager:
@@ -141,3 +141,152 @@ class TestJobRunnerIntegration:
         
         assert runner._total_jobs_count == 3
         assert runner._progress_manager._total_jobs == 3
+
+
+class TestColorTheme:
+    """Test the ColorTheme class for enhanced visuals"""
+    
+    def test_color_codes(self):
+        """Test that color codes are properly defined"""
+        assert ColorTheme.RESET == '\033[0m'
+        assert ColorTheme.BOLD == '\033[1m'
+        assert ColorTheme.GREEN == '\033[32m'
+        assert ColorTheme.BRIGHT_GREEN == '\033[92m'
+    
+    def test_emojis(self):
+        """Test that emojis are properly defined"""
+        assert ColorTheme.DOWNLOAD == "📥"
+        assert ColorTheme.COMPLETED == "✅"
+        assert ColorTheme.FAILED == "❌"
+        assert ColorTheme.RUNNING == "🔄"
+        assert ColorTheme.WAITING == "⏳"
+        assert ColorTheme.SPEED == "⚡"
+    
+    def test_spinner_frames(self):
+        """Test that spinner animation frames are defined"""
+        assert len(ColorTheme.SPINNER_FRAMES) > 0
+        assert all(isinstance(frame, str) for frame in ColorTheme.SPINNER_FRAMES)
+    
+    def test_colorize_without_color_support(self):
+        """Test colorize returns plain text when colors not supported"""
+        with patch.object(ColorTheme, 'supports_color', return_value=False):
+            result = ColorTheme.colorize("test", ColorTheme.GREEN)
+            assert result == "test"
+    
+    def test_colorize_with_color_support(self):
+        """Test colorize adds ANSI codes when colors supported"""
+        with patch.object(ColorTheme, 'supports_color', return_value=True):
+            result = ColorTheme.colorize("test", ColorTheme.GREEN)
+            assert result == f"{ColorTheme.GREEN}test{ColorTheme.RESET}"
+    
+    def test_colorize_with_bold(self):
+        """Test colorize adds bold formatting"""
+        with patch.object(ColorTheme, 'supports_color', return_value=True):
+            result = ColorTheme.colorize("test", ColorTheme.GREEN, bold=True)
+            assert result == f"{ColorTheme.BOLD}{ColorTheme.GREEN}test{ColorTheme.RESET}"
+
+
+class TestEnhancedProgressManager:
+    """Test enhanced progress manager features"""
+    
+    def test_progress_manager_with_visual_options(self):
+        """Test creating ProgressManager with visual options"""
+        manager = ProgressManager(max_workers=3, use_colors=True, use_emojis=True)
+        assert manager.use_colors is True  # May be False if terminal doesn't support colors
+        assert manager.use_emojis is True
+        
+        manager2 = ProgressManager(max_workers=3, use_colors=False, use_emojis=False)
+        assert manager2.use_colors is False
+        assert manager2.use_emojis is False
+    
+    def test_enhanced_progress_state(self):
+        """Test ProgressState has enhanced fields"""
+        manager = ProgressManager()
+        pbar = manager.create_progress_bar("test", total=100)
+        
+        progress_id = pbar.progress_id
+        state = manager._progress_bars[progress_id]
+        
+        # Check enhanced fields
+        assert hasattr(state, 'failed')
+        assert hasattr(state, 'paused')
+        assert state.failed is False
+        assert state.paused is False
+    
+    def test_managed_tqdm_enhanced_methods(self):
+        """Test ManagedTqdm enhanced methods"""
+        manager = ProgressManager()
+        pbar = ManagedTqdm(desc="test", total=100, manager=manager)
+        
+        # Test enhanced methods
+        assert hasattr(pbar, 'set_failed')
+        assert hasattr(pbar, 'set_paused')
+        
+        # Test methods work without error
+        pbar.set_failed(True)
+        pbar.set_paused(True)
+        pbar.set_failed(False)
+        pbar.set_paused(False)
+        
+        pbar.close()
+    
+    def test_enhanced_job_runner_parameters(self):
+        """Test JobRunner accepts enhanced visual parameters"""
+        with patch('ktoolbox.job.runner.config') as mock_config:
+            mock_config.job.count = 3
+            
+            from ktoolbox.job.runner import JobRunner
+            
+            # Test with enhanced parameters
+            runner = JobRunner(
+                centralized_progress=True,
+                use_colors=True,
+                use_emojis=True
+            )
+            
+            assert runner._progress_manager.use_colors is True  # May be False if no terminal support
+            assert runner._progress_manager.use_emojis is True
+            
+            # Test disabling enhancements
+            runner2 = JobRunner(
+                centralized_progress=True,
+                use_colors=False,
+                use_emojis=False
+            )
+            
+            assert runner2._progress_manager.use_colors is False
+            assert runner2._progress_manager.use_emojis is False
+    
+    def test_render_overall_progress_with_enhancements(self):
+        """Test that enhanced overall progress rendering works"""
+        manager = ProgressManager(use_colors=True, use_emojis=True)
+        manager.set_job_totals(10, 5, 1)
+        
+        # Should not crash and return list of strings
+        lines = manager._render_overall_progress()
+        assert isinstance(lines, list)
+        assert len(lines) > 0
+        assert all(isinstance(line, str) for line in lines)
+    
+    def test_render_single_progress_bar_with_enhancements(self):
+        """Test enhanced progress bar rendering"""
+        from ktoolbox.progress import ProgressState
+        
+        manager = ProgressManager(use_colors=True, use_emojis=True)
+        
+        # Test normal progress
+        state = ProgressState(desc="test.jpg", total=1000, current=500)
+        line = manager._render_single_progress_bar(state)
+        assert isinstance(line, str)
+        assert "test.jpg" in line
+        
+        # Test failed state
+        state.failed = True
+        line = manager._render_single_progress_bar(state)
+        assert isinstance(line, str)
+        
+        # Test finished state
+        state.failed = False
+        state.finished = True
+        line = manager._render_single_progress_bar(state)
+        assert isinstance(line, str)

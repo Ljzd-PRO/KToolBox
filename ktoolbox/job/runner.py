@@ -21,7 +21,7 @@ __all__ = ["JobRunner"]
 
 class JobRunner:
     def __init__(self, *, job_list: List[Job] = None, tqdm_class: std_tqdm = None, progress: bool = True, 
-                 centralized_progress: bool = True):
+                 centralized_progress: bool = True, use_colors: bool = True, use_emojis: bool = True):
         """
         Create a job runner
 
@@ -29,6 +29,8 @@ class JobRunner:
         :param tqdm_class: ``tqdm`` class to replace default ``tqdm.asyncio.tqdm``
         :param progress: Show progress bar
         :param centralized_progress: Use centralized progress manager to prevent display chaos
+        :param use_colors: Enable colorful progress bars (requires ANSI terminal support)
+        :param use_emojis: Enable emoji indicators in progress bars
         """
         job_list = job_list or []
         self._job_queue: asyncio.Queue[Job] = asyncio.Queue()
@@ -40,8 +42,12 @@ class JobRunner:
         self._centralized_progress = centralized_progress and progress
         
         if self._centralized_progress:
-            # Use centralized progress manager
-            self._progress_manager = ProgressManager(max_workers=config.job.count)
+            # Use centralized progress manager with enhanced visuals
+            self._progress_manager = ProgressManager(
+                max_workers=config.job.count,
+                use_colors=use_colors,
+                use_emojis=use_emojis
+            )
             self._tqdm_class = tqdm_class or create_managed_tqdm_class(self._progress_manager)
         else:
             # Use traditional tqdm
