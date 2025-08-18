@@ -116,16 +116,9 @@ class JobRunner:
                     exception = e
                 if not exception:  # raise Exception when cancelled or other exceptions
                     ret = task_done.result()
-                    if ret.code == RetCodeEnum.Success:
-                        logger.success(
-                            generate_msg(
-                                "Download success",
-                                filename=ret.data
-                            )
-                        )
-                    elif ret.code == RetCodeEnum.FileExisted:
-                        logger.warning(ret.message)
-                    else:
+                    if ret.code == RetCodeEnum.FileExisted:
+                        logger.info(ret.message)
+                    elif ret.code != RetCodeEnum.Success:
                         logger.error(ret.message)
                         failed_num += 1
                 elif isinstance(exception, CancelledError):
