@@ -248,7 +248,10 @@ async def create_job_from_creator(
                 await f.write(indices.model_dump_json(indent=config.json_dump_indent))
 
     if config.job.include_revisions:
-        logger.info("`job.include_revisions` is enabled and will fetch post revisions, "
+        logger.warning("`job.include_revisions` is enabled and will fetch post revisions, "
+                    "which may take time. Disable if not needed.")
+    if config.job.extract_content or config.job.extract_external_links:
+        logger.warning("`job.extract_content` or `job.extract_external_links` is enabled and will fetch post content one by one, "
                     "which may take time. Disable if not needed.")
 
     job_list: List[Job] = []
