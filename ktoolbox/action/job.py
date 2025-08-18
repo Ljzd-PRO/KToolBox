@@ -17,7 +17,7 @@ from ktoolbox.api.model import Post, Attachment, Revision
 from ktoolbox.api.posts import get_post_revisions as get_post_revisions_api, get_post as get_post_api
 from ktoolbox.configuration import config
 from ktoolbox.job import Job, CreatorIndices
-from ktoolbox.utils import extract_external_links
+from ktoolbox.utils import extract_external_links, generate_msg
 
 __all__ = ["create_job_from_post", "create_job_from_creator"]
 
@@ -135,6 +135,17 @@ async def create_job_from_post(
             )
             if get_post_ret:
                 post = get_post_ret.data.post
+            else:
+                logger.error(
+                    generate_msg(
+                        "Failed to fetch post content",
+                        post_name=post.title or "Unknown",
+                        post_id=post.id,
+                        creator_id=post.user,
+                        service=post.service
+                    )
+                )
+                exit(1)
 
         # If post content is still empty, skip content extraction
         if post.content:
