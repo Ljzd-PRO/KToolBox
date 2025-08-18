@@ -43,6 +43,8 @@ class WebUIState:
         self.current_job_runner: Optional[JobRunner] = None
         self.job_stats: Dict[str, Any] = {}
         self.logs: List[str] = []
+        self.sync_creator_task: Optional[asyncio.Task] = None
+        self.download_post_task: Optional[asyncio.Task] = None
         
     def is_busy(self) -> bool:
         """Check if any long-running operation is active"""
@@ -55,6 +57,7 @@ class WebUIState:
     def stop_sync_creator(self):
         """Mark sync_creator as finished"""
         self.sync_creator_running = False
+        self.sync_creator_task = None
         
     def start_download_post(self):
         """Mark download_post as running"""
@@ -63,6 +66,21 @@ class WebUIState:
     def stop_download_post(self):
         """Mark download_post as finished"""
         self.download_post_running = False
+        self.download_post_task = None
+        
+    def cancel_sync_creator(self):
+        """Cancel sync_creator operation"""
+        if self.sync_creator_task and not self.sync_creator_task.done():
+            self.sync_creator_task.cancel()
+            self.add_log("Sync creator operation cancelled by user")
+        self.stop_sync_creator()
+        
+    def cancel_download_post(self):
+        """Cancel download_post operation"""
+        if self.download_post_task and not self.download_post_task.done():
+            self.download_post_task.cancel()
+            self.add_log("Download post operation cancelled by user")
+        self.stop_download_post()
         
     def update_job_stats(self, job_runner: JobRunner):
         """Update job statistics from JobRunner"""
@@ -179,13 +197,23 @@ async def run_download_post_async(
         state.stop_download_post()
 
 
-def run_async_command(coro):
+def run_async_command(coro, state: WebUIState, operation: str):
     """Run async command in a thread"""
     def target():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         try:
-            loop.run_until_complete(coro)
+            task = loop.create_task(coro)
+            if operation == "sync_creator":
+                state.sync_creator_task = task
+            elif operation == "download_post":
+                state.download_post_task = task
+            loop.run_until_complete(task)
+        except asyncio.CancelledError:
+            state.add_log(f"{operation} was cancelled")
+        except Exception as e:
+            state.add_log(f"{operation} error: {str(e)}")
+            logger.error(f"WebUI {operation} error: {e}")
         finally:
             loop.close()
     
@@ -236,8 +264,9 @@ def render_sync_creator_section():
     if state.sync_creator_running:
         st.warning("🔄 Sync creator is currently running. Please wait for it to complete.")
         if st.button("Cancel Sync Creator", key="cancel_sync", type="secondary"):
-            # TODO: Implement cancellation
-            st.warning("Cancellation not yet implemented")
+            state.cancel_sync_creator()
+            st.success("Sync creator operation cancelled!")
+            st.rerun()
     else:
         # Validate inputs
         valid_input = False
@@ -262,7 +291,7 @@ def render_sync_creator_section():
                 keywords=keywords,
                 keywords_exclude=keywords_exclude
             )
-            run_async_command(coro)
+            run_async_command(coro, state, "sync_creator")
             st.success("Sync creator started!")
             st.rerun()
 
@@ -303,8 +332,9 @@ def render_download_post_section():
     if state.download_post_running:
         st.warning("🔄 Download post is currently running. Please wait for it to complete.")
         if st.button("Cancel Download Post", key="cancel_download", type="secondary"):
-            # TODO: Implement cancellation
-            st.warning("Cancellation not yet implemented")
+            state.cancel_download_post()
+            st.success("Download post operation cancelled!")
+            st.rerun()
     else:
         # Validate inputs
         valid_input = False
@@ -324,7 +354,7 @@ def render_download_post_section():
                 path=path,
                 dump_post_data=dump_post_data
             )
-            run_async_command(coro)
+            run_async_command(coro, state, "download_post")
             st.success("Download post started!")
             st.rerun()
 
@@ -345,37 +375,61 @@ def render_other_commands_section():
                 loop.close()
             except Exception as e:
                 st.error(f"Error getting version: {e}")
+                logger.error(f"WebUI version command error: {e}")
         
         if st.button("Show Site Version", key="show_site_version"):
             try:
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                site_version = loop.run_until_complete(KToolBoxCli.site_version())
-                st.success(f"Site Version: {site_version}")
-                loop.close()
+                with st.spinner("Fetching site version..."):
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    site_version = loop.run_until_complete(KToolBoxCli.site_version())
+                    if site_version:
+                        st.success(f"Site Version: {site_version}")
+                    else:
+                        st.warning("Could not fetch site version")
+                    loop.close()
             except Exception as e:
                 st.error(f"Error getting site version: {e}")
+                logger.error(f"WebUI site_version command error: {e}")
     
     with col2:
         if st.button("Launch Config Editor", key="launch_config_editor"):
             try:
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                loop.run_until_complete(KToolBoxCli.config_editor())
-                st.success("Config editor launched (check terminal)")
-                loop.close()
+                # Since config editor is a terminal app, just show info message
+                st.info("Config editor is a terminal application. To use it, run: `ktoolbox config-editor` in your terminal.")
             except Exception as e:
-                st.error(f"Error launching config editor: {e}")
+                st.error(f"Error with config editor: {e}")
+                logger.error(f"WebUI config_editor command error: {e}")
                 
         if st.button("Generate Example .env", key="generate_env"):
             try:
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
-                loop.run_until_complete(KToolBoxCli.example_env())
-                st.success("Example .env file generated")
+                
+                # Capture the output instead of printing to stdout
+                import io
+                import contextlib
+                
+                f = io.StringIO()
+                with contextlib.redirect_stdout(f):
+                    loop.run_until_complete(KToolBoxCli.example_env())
+                
+                env_content = f.getvalue()
+                if env_content:
+                    st.success("Example .env content generated:")
+                    st.code(env_content, language="bash")
+                    st.download_button(
+                        label="Download .env file",
+                        data=env_content,
+                        file_name="example.env",
+                        mime="text/plain"
+                    )
+                else:
+                    st.warning("No .env content generated")
                 loop.close()
             except Exception as e:
                 st.error(f"Error generating .env: {e}")
+                logger.error(f"WebUI example_env command error: {e}")
     
     with col3:
         st.write("**Search Commands**")
@@ -438,7 +492,7 @@ def render_status_section():
 def main():
     """Main Streamlit app"""
     if st is None:
-        st.error("Streamlit is not installed. Please install it with: pip install ktoolbox[streamlit]")
+        print("Streamlit is not installed. Please install it with: pip install ktoolbox[streamlit]")
         return
     
     if KToolBoxCli is None:
