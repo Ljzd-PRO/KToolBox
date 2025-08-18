@@ -24,6 +24,7 @@ class Post(BaseModel):
     service: Optional[str] = None
     title: Optional[str] = None
     content: Optional[str] = None
+    substring: Optional[str] = None
     embed: Optional[Dict[str, Any]] = None
     shared_file: Optional[bool] = None
     added: Optional[datetime] = None

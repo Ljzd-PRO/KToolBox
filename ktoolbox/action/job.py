@@ -124,8 +124,8 @@ async def create_job_from_post(
                     post=post
                 )
             )
-
-    if post_dir and (config.job.extract_content or config.job.extract_external_links):
+    # ``post.substring`` is used to determine if the post has content, but it's only partial
+    if post.substring and post_dir and (config.job.extract_content or config.job.extract_external_links):
         # If post has no content, fetch it from get_post API
         if not post.content:
             get_post_ret = await get_post_api(
