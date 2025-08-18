@@ -36,6 +36,7 @@ async def create_job_from_post(
     :param post_path: Path of the post directory, which needs to be sanitized
     :param post_dir: Whether to create post directory
     :param dump_post_data: Whether to dump post data (post.json) in post directory
+    :raise FetchInterruptError: If fetching post content fails
     """
     post_path.mkdir(parents=True, exist_ok=True)
 
@@ -145,7 +146,7 @@ async def create_job_from_post(
                         service=post.service
                     )
                 )
-                exit(1)
+                raise FetchInterruptError(ret=get_post_ret)
 
         # If post content is still empty, skip content extraction
         if post.content:
@@ -278,12 +279,15 @@ async def create_job_from_creator(
             post_path = grouped_base_path / generate_post_path_name(post)
 
         # Generate jobs for the main post
-        job_list += await create_job_from_post(
-            post=post,
-            post_path=post_path,
-            post_dir=not mix_posts,
-            dump_post_data=not mix_posts
-        )
+        try:
+            job_list += await create_job_from_post(
+                post=post,
+                post_path=post_path,
+                post_dir=not mix_posts,
+                dump_post_data=not mix_posts
+            )
+        except FetchInterruptError as e:
+            return ActionRet(**e.ret.model_dump(mode="python"))
 
         # If include_revisions is enabled, fetch and download revisions for this post
         if config.job.include_revisions and not mix_posts:
@@ -298,11 +302,14 @@ async def create_job_from_creator(
                         if revision.revision_id:  # Only process actual revisions
                             revision_path = post_path / config.job.post_structure.revisions / generate_post_path_name(
                                 revision)
-                            revision_jobs = await create_job_from_post(
-                                post=revision,
-                                post_path=revision_path,
-                                dump_post_data=True
-                            )
+                            try:
+                                revision_jobs = await create_job_from_post(
+                                    post=revision,
+                                    post_path=revision_path,
+                                    dump_post_data=True
+                                )
+                            except FetchInterruptError as e:
+                                return ActionRet(**e.ret.model_dump(mode="python"))
                             job_list += revision_jobs
             except Exception as e:
                 logger.warning(f"Failed to fetch revisions for post {post.id}: {e}")
