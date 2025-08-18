@@ -301,16 +301,18 @@ class Downloader:
             final_filepath = self._path / self._save_filename
             temp_filepath.rename(final_filepath)
 
-            try:
-                utime_from_headers(res.headers, final_filepath)
-            except (OSError, ValueError, TypeError) as e:
-                logger.warning(
-                    generate_msg(
-                        "Failed to set file time from headers",
-                        file=self._save_filename,
-                        exception=e
+            # Set file time from headers
+            if config.downloader.keep_metadata:
+                try:
+                    utime_from_headers(res.headers, final_filepath)
+                except (OSError, ValueError, TypeError) as e:
+                    logger.warning(
+                        generate_msg(
+                            "Failed to set file time from headers",
+                            file=self._save_filename,
+                            exception=e
+                        )
                     )
-                )
 
             # Callbacks
             if sync_callable:

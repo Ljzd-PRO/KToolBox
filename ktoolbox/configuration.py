@@ -67,6 +67,7 @@ class DownloaderConfiguration(BaseModel):
     Customize the filename format by inserting an empty ``{}`` to represent the original URL. \
     For example: ``https://example.com/{}`` will be ``https://example.com/https://n1.kemono.su/data/66/83/xxxxx.jpg``;  \
     ``https://example.com/?url={}`` will be ``https://example.com/?url=https://n1.kemono.su/data/66/83/xxxxx.jpg``
+    :ivar keep_metadata: Keep the file metadata when downloading files (e.g. last modified time, etc.)
     """
     scheme: Literal["http", "https"] = "https"
     timeout: float = 30.0
@@ -81,6 +82,7 @@ class DownloaderConfiguration(BaseModel):
     use_bucket: bool = False
     bucket_path: Path = Path("./.ktoolbox/bucket_storage")
     reverse_proxy: str = "{}"
+    keep_metadata: bool = True
 
     def __init__(self, /, **data: Any):
         super().__init__(**data)

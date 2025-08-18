@@ -36,6 +36,7 @@ class DownloaderConfiguration(ktoolbox.configuration.DownloaderConfiguration):
     :ivar use_bucket: 启用本地存储桶模式
     :ivar bucket_path: 本地存储桶路径
     :ivar reverse_proxy: 下载 URL 的反向代理格式。通过插入空的 ``{}`` 自定义文件名格式以表示原始 URL。例如：``https://example.com/{}`` 会变成 ``https://example.com/https://n1.kemono.su/data/66/83/xxxxx.jpg``；``https://example.com/?url={}`` 会变成 ``https://example.com/?url=https://n1.kemono.su/data/66/83/xxxxx.jpg``
+    :ivar keep_metadata: 下载文件时保留文件元数据（例如最后修改时间等）
     """
     ...
 
@@ -126,7 +127,7 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
     :ivar year_dirname_format: 自定义年份目录名格式。可用属性：``year``。例如：``{year}`` > ``2024``，``Year_{year}`` > ``Year_2024``
     :ivar month_dirname_format: 自定义月份目录名格式。可用属性：``year``、``month``。例如：``{year}-{month}`` > ``2024-01``，``{year}_{month}`` > ``2024_01``
     """
-    ...
+    post_structure: PostStructureConfiguration = PostStructureConfiguration()
 
 
 class LoggerConfiguration(ktoolbox.configuration.LoggerConfiguration):
@@ -156,4 +157,7 @@ class Configuration(ktoolbox.configuration.Configuration):
     Windows 下安装 winloop：`pip install ktoolbox[winloop]` \
     Unix 下安装 uvloop：`pip install ktoolbox[uvloop]`
     """
-    ...
+    api: APIConfiguration = APIConfiguration()
+    downloader: DownloaderConfiguration = DownloaderConfiguration()
+    job: JobConfiguration = JobConfiguration()
+    logger: LoggerConfiguration = LoggerConfiguration()
