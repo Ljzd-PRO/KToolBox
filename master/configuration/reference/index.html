@@ -1499,7 +1499,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Charset for filename parsing and post content text saving</p>
+                <p>Charset for filename parsing and post <code>content</code>, <code>external_links</code> saving</p>
               </div>
             </td>
             <td>
@@ -1665,6 +1665,22 @@
             <td>
               <code>
                       &#39;{}&#39;
+              </code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.DownloaderConfiguration.keep_metadata" href="../../api/#ktoolbox.configuration.DownloaderConfiguration.keep_metadata">keep_metadata</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Keep the file metadata when downloading files (e.g. last modified time, etc.)</p>
+              </div>
+            </td>
+            <td>
+              <code>
+                      True
               </code>
             </td>
           </tr>
@@ -2139,34 +2155,34 @@
             </td>
           </tr>
           <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.JobConfiguration.extract_content" href="../../api/#ktoolbox.configuration.JobConfiguration.extract_content">extract_content</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Extract post content and save to separate file (filename was defined in <code>config.job.post_structure.content</code>)</p>
+              </div>
+            </td>
+            <td>
+              <code>
+                      False
+              </code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.JobConfiguration.extract_external_links" href="../../api/#ktoolbox.configuration.JobConfiguration.extract_external_links">extract_external_links</a></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Extract external file sharing links from post content and save to separate file</p>
+                <p>Extract external file sharing links from post content and save to separate file     (filename was defined in <code>config.job.post_structure.external_links</code>)     :ivar external_link_patterns: Regex patterns for extracting external links.</p>
               </div>
             </td>
             <td>
               <code>
-                      True
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.JobConfiguration.external_link_patterns" href="../../api/#ktoolbox.configuration.JobConfiguration.external_link_patterns">external_link_patterns</a></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Regex patterns for extracting external links.</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      [&#39;https?://drive\\.google\\.com/[^\\s]+&#39;, &#39;https?://docs\\.google\\.com/[^\\s]+&#39;, &#39;https?://mega\\.nz/[^\\s]+&#39;, &#39;https?://mega\\.co\\.nz/[^\\s]+&#39;, &#39;https?://(?:www\\.)?dropbox\\.com/[^\\s]+&#39;, &#39;https?://db\\.tt/[^\\s]+&#39;, &#39;https?://onedrive\\.live\\.com/[^\\s]+&#39;, &#39;https?://1drv\\.ms/[^\\s]+&#39;, &#39;https?://(?:www\\.)?mediafire\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?wetransfer\\.com/[^\\s]+&#39;, &#39;https?://we\\.tl/[^\\s]+&#39;, &#39;https?://(?:www\\.)?sendspace\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?4shared\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?zippyshare\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?uploadfiles\\.io/[^\\s]+&#39;, &#39;https?://(?:www\\.)?box\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?pcloud\\.com/[^\\s]+&#39;, &#39;https?://disk\\.yandex\\.[a-z]+/[^\\s]+&#39;, &#39;https?://[^\\s]*(?:file|upload|share|download|drive|storage)[^\\s]*\\.[a-z]{2,4}/[^\\s]+&#39;]
+                      False
               </code>
             </td>
           </tr>
