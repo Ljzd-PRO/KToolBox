@@ -239,6 +239,7 @@ class KToolBoxCli:
 
             job_runner = JobRunner(job_list=job_list)
             await job_runner.start()
+            return ""
         else:
             return ret.message
 
@@ -382,5 +383,6 @@ class KToolBoxCli:
         if ret:
             job_runner = JobRunner(job_list=ret.data)
             await job_runner.start()
+            return ""
         else:
             return ret.message
