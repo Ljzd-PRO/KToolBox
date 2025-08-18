@@ -52,7 +52,7 @@ class DownloaderConfiguration(BaseModel):
 
     :ivar scheme: Downloader URL scheme
     :ivar timeout: Downloader request timeout
-    :ivar encoding: Charset for filename parsing and post content text saving
+    :ivar encoding: Charset for filename parsing and post ``content``, ``external_links`` saving
     :ivar buffer_size: Number of bytes of file I/O buffer for each downloading file
     :ivar chunk_size: Number of bytes of chunk of downloader stream
     :ivar temp_suffix: Temp filename suffix of downloading files
@@ -104,7 +104,7 @@ class DownloaderConfiguration(BaseModel):
 
 
 class PostStructureConfiguration(BaseModel):
-    # noinspection SpellCheckingInspection
+    # noinspection SpellCheckingInspection,GrazieInspection
     """
     Post path structure model
 
@@ -198,7 +198,9 @@ class JobConfiguration(BaseModel):
     ``[{published}]_{}`` could result in filenames like ``[2024-1-1]_1.png``, ``[2024-1-1]_2.png``, etc.
     :ivar allow_list: Download files which match these patterns (Unix shell-style), e.g. ``["*.png"]``
     :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``
-    :ivar extract_external_links: Extract external file sharing links from post content and save to separate file
+    :ivar extract_content: Extract post content and save to separate file (filename was defined in ``config.job.post_structure.content``)
+    :ivar extract_external_links: Extract external file sharing links from post content and save to separate file \
+    (filename was defined in ``config.job.post_structure.external_links``) \
     :ivar external_link_patterns: Regex patterns for extracting external links.
     :ivar group_by_year: Group posts by year in separate directories based on published date
     :ivar group_by_month: Group posts by month in separate directories based on published date (requires group_by_year)
@@ -219,7 +221,9 @@ class JobConfiguration(BaseModel):
     filename_format: str = "{}"
     allow_list: Set[str] = Field(default_factory=set)
     block_list: Set[str] = Field(default_factory=set)
-    extract_external_links: bool = True
+    extract_content: bool = False
+    extract_external_links: bool = False
+    # noinspection SpellCheckingInspection
     external_link_patterns: List[str] = [
         # Google Drive
         r'https?://drive\.google\.com/[^\s]+',

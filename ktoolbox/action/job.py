@@ -15,9 +15,9 @@ from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date,
     filter_posts_by_keywords, filter_posts_by_keywords_exclude, generate_grouped_post_path
 from ktoolbox.api.model import Post, Attachment, Revision
 from ktoolbox.api.posts import get_post_revisions as get_post_revisions_api, get_post as get_post_api
-from ktoolbox.configuration import config, PostStructureConfiguration
+from ktoolbox.configuration import config
 from ktoolbox.job import Job, CreatorIndices
-from ktoolbox.utils import extract_external_links
+from ktoolbox.utils import extract_external_links, generate_msg
 
 __all__ = ["create_job_from_post", "create_job_from_creator"]
 
@@ -26,7 +26,7 @@ async def create_job_from_post(
         post: Union[Post, Revision],
         post_path: Path,
         *,
-        post_structure: Union[PostStructureConfiguration, bool] = None,
+        post_dir: bool = True,
         dump_post_data: bool = True
 ) -> List[Job]:
     """
@@ -34,26 +34,29 @@ async def create_job_from_post(
 
     :param post: post data
     :param post_path: Path of the post directory, which needs to be sanitized
-    :param post_structure: post path structure, ``False`` -> disable, \
-     ``True`` & ``None`` -> ``config.job.post_structure``
+    :param post_dir: Whether to create post directory
     :param dump_post_data: Whether to dump post data (post.json) in post directory
     """
     post_path.mkdir(parents=True, exist_ok=True)
 
     # Load ``PostStructureConfiguration``
-    if post_structure in [True, None]:
-        post_structure = config.job.post_structure
-    if post_structure:
-        attachments_path = post_path / post_structure.attachments  # attachments
+    if post_dir:
+        attachments_path = post_path / config.job.post_structure.attachments  # attachments
         attachments_path.mkdir(exist_ok=True)
-        content_path = post_path / post_structure.content  # content
+        content_path = post_path / config.job.post_structure.content  # content
         content_path.parent.mkdir(exist_ok=True)
-        external_links_path = post_path / post_structure.external_links  # external_links
+        external_links_path = post_path / config.job.post_structure.external_links  # external_links
         external_links_path.parent.mkdir(exist_ok=True)
     else:
         attachments_path = post_path
         content_path = None
         external_links_path = None
+
+    if dump_post_data:
+        async with aiofiles.open(str(post_path / DataStorageNameEnum.PostData.value), "w", encoding="utf-8") as f:
+            await f.write(
+                post.json(indent=config.json_dump_indent)
+            )
 
     # Filter and create jobs for ``Post.attachment``
     jobs: List[Job] = []
@@ -121,36 +124,44 @@ async def create_job_from_post(
                 )
             )
 
-    # If post has no content, fetch it from get_post API
-    if not post.content:
-        get_post_ret = await get_post_api(
-            service=post.service,
-            creator_id=post.user,
-            post_id=post.id,
-            revision_id=post.revision_id if isinstance(post, Revision) else None
-        )
-        if get_post_ret:
-            post = get_post_ret.data.post
-
-    # Write content file
-    if content_path and post.content:
-        async with aiofiles.open(content_path, "w", encoding=config.downloader.encoding) as f:
-            await f.write(post.content)
-
-    # Extract and write external links file
-    if config.job.extract_external_links and external_links_path and post.content:
-        external_links = extract_external_links(post.content, config.job.external_link_patterns)
-        if external_links:
-            async with aiofiles.open(external_links_path, "w", encoding=config.downloader.encoding) as f:
-                # Write each link on a separate line
-                for link in sorted(external_links):
-                    await f.write(f"{link}\n")
-
-    if dump_post_data:
-        async with aiofiles.open(str(post_path / DataStorageNameEnum.PostData.value), "w", encoding="utf-8") as f:
-            await f.write(
-                post.json(indent=config.json_dump_indent)
+    if post_dir and (config.job.extract_content or config.job.extract_external_links):
+        # If post has no content, fetch it from get_post API
+        if not post.content:
+            get_post_ret = await get_post_api(
+                service=post.service,
+                creator_id=post.user,
+                post_id=post.id,
+                revision_id=post.revision_id if isinstance(post, Revision) else None
             )
+            if get_post_ret:
+                post = get_post_ret.data.post
+            else:
+                logger.error(
+                    generate_msg(
+                        "Failed to fetch post content",
+                        post_name=post.title or "Unknown",
+                        post_id=post.id,
+                        creator_id=post.user,
+                        service=post.service
+                    )
+                )
+                exit(1)
+
+        # If post content is still empty, skip content extraction
+        if post.content:
+            # Write content file
+            if config.job.extract_content:
+                async with aiofiles.open(content_path, "w", encoding=config.downloader.encoding) as f:
+                    await f.write(post.content)
+
+            # Extract and write external links file
+            if config.job.extract_external_links:
+                external_links = extract_external_links(post.content, config.job.external_link_patterns)
+                if external_links:
+                    async with aiofiles.open(external_links_path, "w", encoding=config.downloader.encoding) as f:
+                        # Write each link on a separate line
+                        for link in sorted(external_links):
+                            await f.write(f"{link}\n")
 
     return jobs
 
@@ -250,7 +261,10 @@ async def create_job_from_creator(
                 await f.write(indices.json(indent=config.json_dump_indent))
 
     if config.job.include_revisions:
-        logger.info("`job.include_revisions` is enabled and will fetch post revisions, "
+        logger.warning("`job.include_revisions` is enabled and will fetch post revisions, "
+                    "which may take time. Disable if not needed.")
+    if config.job.extract_content or config.job.extract_external_links:
+        logger.warning("`job.extract_content` or `job.extract_external_links` is enabled and will fetch post content one by one, "
                     "which may take time. Disable if not needed.")
 
     job_list: List[Job] = []
@@ -267,7 +281,7 @@ async def create_job_from_creator(
         job_list += await create_job_from_post(
             post=post,
             post_path=post_path,
-            post_structure=False if mix_posts else None,
+            post_dir=not mix_posts,
             dump_post_data=not mix_posts
         )
 
