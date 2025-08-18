@@ -159,11 +159,13 @@ class JobRunner:
                         f"Completed: {self.done_size} "
                         f"({(self.done_size / (self.waiting_size + self.processing_size + self.done_size)) * 100:.2f}%)")
 
-    async def start(self):
+    async def start(self) -> int:
         """
         Start processing jobs concurrently
 
         It will **Block** until other call of ``self.start()`` method finished
+
+        :return: Number of jobs that failed
         """
         failed_num = 0
         async with self._lock:
@@ -182,9 +184,9 @@ class JobRunner:
                 except CancelledError:
                     pass
         if failed_num:
-            logger.warning(generate_msg(f"{failed_num} jobs failed, download finished"))
+            logger.warning(f"{failed_num} jobs failed, download finished")
         else:
-            logger.success(generate_msg("All jobs in queue finished"))
+            logger.success("All jobs in queue finished")
         return failed_num
 
     async def add_jobs(self, *jobs: Job):
