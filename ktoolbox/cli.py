@@ -57,6 +57,38 @@ class KToolBoxCli:
             )
         )
 
+    @staticmethod
+    def webui():
+        """Launch Streamlit Web UI for remote interaction"""
+        try:
+            import streamlit.web.cli as stcli
+            import sys
+            from pathlib import Path
+            
+            # Get the path to webui.py
+            webui_script = Path(__file__).parent / "webui.py"
+            
+            # Set up streamlit arguments
+            sys.argv = [
+                "streamlit",
+                "run",
+                str(webui_script),
+                "--server.port=8501",
+                "--server.address=0.0.0.0",
+                "--server.headless=true",
+                "--browser.serverAddress=localhost"
+            ]
+            
+            # Run streamlit
+            stcli.main()
+            
+        except ModuleNotFoundError:
+            logger.error(
+                "You need to install extra dependencies to use the web UI, "
+                "run `pip install ktoolbox[streamlit]` "
+                "or `pipx install ktoolbox[streamlit] --force` if you are using pipx"
+            )
+
     # noinspection PyShadowingBuiltins
     @staticmethod
     async def search_creator(
