@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Downloaded content (ignore downloaded posts)
+コハル*
+*コハル*
+
 # C extensions
 *.so
 
