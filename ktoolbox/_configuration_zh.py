@@ -25,7 +25,7 @@ class DownloaderConfiguration(ktoolbox.configuration.DownloaderConfiguration):
 
     :ivar scheme: 下载器的 URL 协议
     :ivar timeout: 下载器请求超时时间
-    :ivar encoding: 文件名解析和帖子内容文本保存的字符集
+    :ivar encoding: 文件名解析和帖子 ``内容``、``external_links`` 保存的字符集
     :ivar buffer_size: 每个下载文件的文件 I/O 缓冲区字节数
     :ivar chunk_size: 下载器流的分块字节数
     :ivar temp_suffix: 下载文件的临时文件名后缀
@@ -118,7 +118,8 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
     :ivar filename_format: 通过插入空的 ``{}`` 自定义文件名格式，表示基本文件名。可使用 [属性][ktoolbox.configuration.JobConfiguration]。例如：``{title}_{}`` 可能生成 ``TheTitle_b4b41de2-8736-480d-b5c3-ebf0d917561b``、``TheTitle_af349b25-ac08-46d7-98fb-6ce99a237b90`` 等。也可与 ``sequential_filename`` 结合使用，如 ``[{published}]_{}`` 可能生成 ``[2024-1-1]_1.png``、``[2024-1-1]_2.png`` 等。
     :ivar allow_list: 下载匹配这些模式（Unix shell 风格）的文件，如 ``["*.png"]``
     :ivar block_list: 不下载匹配这些模式（Unix shell 风格）的文件，如 ``["*.psd","*.zip"]``
-    :ivar extract_external_links: 从帖子内容中提取外部文件分享链接并保存到单独文件
+    :ivar extract_content: 提取帖子内容并保存到单独文件（文件名由 ``config.job.post_structure.content`` 定义）
+    :ivar extract_external_links: 从帖子内容中提取外部文件分享链接并保存到单独文件（文件名由 ``config.job.post_structure.external_links`` 定义）
     :ivar external_link_patterns: 用于提取外部链接的正则表达式模式
     :ivar group_by_year: 根据发布日期按年分组到不同目录
     :ivar group_by_month: 根据发布日期按月分组到不同目录（需要启用 group_by_year）

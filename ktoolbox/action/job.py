@@ -15,7 +15,7 @@ from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date,
     filter_posts_by_keywords, filter_posts_by_keywords_exclude, generate_grouped_post_path
 from ktoolbox.api.model import Post, Attachment, Revision
 from ktoolbox.api.posts import get_post_revisions as get_post_revisions_api, get_post as get_post_api
-from ktoolbox.configuration import config, PostStructureConfiguration
+from ktoolbox.configuration import config
 from ktoolbox.job import Job, CreatorIndices
 from ktoolbox.utils import extract_external_links
 
@@ -26,7 +26,7 @@ async def create_job_from_post(
         post: Union[Post, Revision],
         post_path: Path,
         *,
-        post_structure: Union[PostStructureConfiguration, bool] = None,
+        post_dir: bool = True,
         dump_post_data: bool = True
 ) -> List[Job]:
     """
@@ -34,21 +34,18 @@ async def create_job_from_post(
 
     :param post: post data
     :param post_path: Path of the post directory, which needs to be sanitized
-    :param post_structure: post path structure, ``False`` -> disable, \
-     ``True`` & ``None`` -> ``config.job.post_structure``
+    :param post_dir: Whether to create post directory
     :param dump_post_data: Whether to dump post data (post.json) in post directory
     """
     post_path.mkdir(parents=True, exist_ok=True)
 
     # Load ``PostStructureConfiguration``
-    if post_structure in [True, None]:
-        post_structure = config.job.post_structure
-    if post_structure:
-        attachments_path = post_path / post_structure.attachments  # attachments
+    if post_dir:
+        attachments_path = post_path / config.job.post_structure.attachments  # attachments
         attachments_path.mkdir(exist_ok=True)
-        content_path = post_path / post_structure.content  # content
+        content_path = post_path / config.job.post_structure.content  # content
         content_path.parent.mkdir(exist_ok=True)
-        external_links_path = post_path / post_structure.external_links  # external_links
+        external_links_path = post_path / config.job.post_structure.external_links  # external_links
         external_links_path.parent.mkdir(exist_ok=True)
     else:
         attachments_path = post_path
@@ -121,30 +118,31 @@ async def create_job_from_post(
                 )
             )
 
-    # If post has no content, fetch it from get_post API
-    if not post.content:
-        get_post_ret = await get_post_api(
-            service=post.service,
-            creator_id=post.user,
-            post_id=post.id,
-            revision_id=post.revision_id if isinstance(post, Revision) else None
-        )
-        if get_post_ret:
-            post = get_post_ret.data.post
+    if post_dir and (config.job.extract_content or config.job.extract_external_links):
+        # If post has no content, fetch it from get_post API
+        if not post.content:
+            get_post_ret = await get_post_api(
+                service=post.service,
+                creator_id=post.user,
+                post_id=post.id,
+                revision_id=post.revision_id if isinstance(post, Revision) else None
+            )
+            if get_post_ret:
+                post = get_post_ret.data.post
 
-    # Write content file
-    if content_path and post.content:
-        async with aiofiles.open(content_path, "w", encoding=config.downloader.encoding) as f:
-            await f.write(post.content)
+        # Write content file
+        if config.job.extract_content:
+            async with aiofiles.open(content_path, "w", encoding=config.downloader.encoding) as f:
+                await f.write(post.content)
 
-    # Extract and write external links file
-    if config.job.extract_external_links and external_links_path and post.content:
-        external_links = extract_external_links(post.content, config.job.external_link_patterns)
-        if external_links:
-            async with aiofiles.open(external_links_path, "w", encoding=config.downloader.encoding) as f:
-                # Write each link on a separate line
-                for link in sorted(external_links):
-                    await f.write(f"{link}\n")
+        # Extract and write external links file
+        if config.job.extract_external_links:
+            external_links = extract_external_links(post.content, config.job.external_link_patterns)
+            if external_links:
+                async with aiofiles.open(external_links_path, "w", encoding=config.downloader.encoding) as f:
+                    # Write each link on a separate line
+                    for link in sorted(external_links):
+                        await f.write(f"{link}\n")
 
     if dump_post_data:
         async with aiofiles.open(str(post_path / DataStorageNameEnum.PostData.value), "w", encoding="utf-8") as f:
@@ -267,7 +265,7 @@ async def create_job_from_creator(
         job_list += await create_job_from_post(
             post=post,
             post_path=post_path,
-            post_structure=False if mix_posts else None,
+            post_dir=not mix_posts,
             dump_post_data=not mix_posts
         )
 
