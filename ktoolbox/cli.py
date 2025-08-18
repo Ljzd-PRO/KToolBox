@@ -48,6 +48,21 @@ class KToolBoxCli:
             )
 
     @staticmethod
+    async def webui(host: str = "127.0.0.1", port: int = 8000, no_browser: bool = False):
+        """Launch KToolBox Web UI"""
+        try:
+            from ktoolbox.webui import start_webui
+            start_webui(host=host, port=port, open_browser=not no_browser)
+        except ModuleNotFoundError:
+            logger.error(
+                "You need to install extra dependencies to use the WebUI, "
+                "run `pip install ktoolbox[webui]` "
+                "or `pipx install ktoolbox[webui] --force` if you are using pipx"
+            )
+        except Exception as e:
+            logger.error(f"Failed to start WebUI: {e}")
+
+    @staticmethod
     async def example_env():
         """Generate an example configuration ``.env`` file."""
         print(
