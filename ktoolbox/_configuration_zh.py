@@ -127,7 +127,7 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
     :ivar year_dirname_format: 自定义年份目录名格式。可用属性：``year``。例如：``{year}`` > ``2024``，``Year_{year}`` > ``Year_2024``
     :ivar month_dirname_format: 自定义月份目录名格式。可用属性：``year``、``month``。例如：``{year}-{month}`` > ``2024-01``，``{year}_{month}`` > ``2024_01``
     """
-    ...
+    post_structure: PostStructureConfiguration = PostStructureConfiguration()
 
 
 class LoggerConfiguration(ktoolbox.configuration.LoggerConfiguration):
@@ -157,4 +157,7 @@ class Configuration(ktoolbox.configuration.Configuration):
     Windows 下安装 winloop：`pip install ktoolbox[winloop]` \
     Unix 下安装 uvloop：`pip install ktoolbox[uvloop]`
     """
-    ...
+    api: APIConfiguration = APIConfiguration()
+    downloader: DownloaderConfiguration = DownloaderConfiguration()
+    job: JobConfiguration = JobConfiguration()
+    logger: LoggerConfiguration = LoggerConfiguration()
