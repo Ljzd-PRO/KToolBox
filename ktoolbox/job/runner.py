@@ -2,7 +2,7 @@ import asyncio
 from asyncio import CancelledError
 from functools import cached_property
 from types import MappingProxyType
-from typing import List, Set, Dict
+from typing import List, Set, Dict, Optional
 from urllib.parse import urlunparse
 
 import httpx
@@ -14,28 +14,44 @@ from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
 from ktoolbox.job import Job
 from ktoolbox.utils import generate_msg
+from ktoolbox.progress import ProgressManager, create_managed_tqdm_class
 
 __all__ = ["JobRunner"]
 
 
 class JobRunner:
-    def __init__(self, *, job_list: List[Job] = None, tqdm_class: std_tqdm = None, progress: bool = True):
+    def __init__(self, *, job_list: List[Job] = None, tqdm_class: std_tqdm = None, progress: bool = True, 
+                 centralized_progress: bool = True):
         """
         Create a job runner
 
         :param job_list: Jobs to initial ``self._job_queue``
         :param tqdm_class: ``tqdm`` class to replace default ``tqdm.asyncio.tqdm``
         :param progress: Show progress bar
+        :param centralized_progress: Use centralized progress manager to prevent display chaos
         """
         job_list = job_list or []
         self._job_queue: asyncio.Queue[Job] = asyncio.Queue()
         for job in job_list:
             self._job_queue.put_nowait(job)
-        self._tqdm_class = tqdm_class
+        
+        # Initialize progress management
         self._progress = progress
+        self._centralized_progress = centralized_progress and progress
+        
+        if self._centralized_progress:
+            # Use centralized progress manager
+            self._progress_manager = ProgressManager(max_workers=config.downloader.max_concurrent_download)
+            self._tqdm_class = tqdm_class or create_managed_tqdm_class(self._progress_manager)
+        else:
+            # Use traditional tqdm
+            self._progress_manager = None
+            self._tqdm_class = tqdm_class
+            
         self._downloaders_with_task: Dict[Downloader, asyncio.Task] = {}
         self._concurrent_tasks: Set[asyncio.Task] = set()
         self._lock = asyncio.Lock()
+        self._total_jobs_count = len(job_list)
 
     @property
     def finished(self):
@@ -121,6 +137,19 @@ class JobRunner:
                     elif ret.code != RetCodeEnum.Success:
                         logger.error(ret.message)
                         failed_num += 1
+                        # Update progress manager with failed job
+                        if self._progress_manager:
+                            self._progress_manager.update_job_progress(
+                                completed=self.done_size, 
+                                failed=self.done_size + failed_num - len([p for p in self._downloaders_with_task.values() if p.done()])
+                            )
+                    else:
+                        # Update progress manager with completed job
+                        if self._progress_manager:
+                            self._progress_manager.update_job_progress(
+                                completed=self.done_size + 1,
+                                failed=self.done_size + failed_num - len([p for p in self._downloaders_with_task.values() if p.done()])
+                            )
                 elif isinstance(exception, CancelledError):
                     logger.warning(
                         generate_msg(
@@ -137,6 +166,12 @@ class JobRunner:
                         )
                     )
                     failed_num += 1
+                    # Update progress manager with failed job
+                    if self._progress_manager:
+                        self._progress_manager.update_job_progress(
+                            completed=self.done_size,
+                            failed=self.done_size + failed_num - len([p for p in self._downloaders_with_task.values() if p.done()])
+                        )
                 self._job_queue.task_done()
         await self._job_queue.join()
         return failed_num
@@ -161,31 +196,73 @@ class JobRunner:
         :return: Number of jobs that failed
         """
         failed_num = 0
-        async with self._lock:
-            self._concurrent_tasks.clear()
-            for _ in range(config.job.count):
-                task = asyncio.create_task(self.processor())
-                self._concurrent_tasks.add(task)
-                task.add_done_callback(self._concurrent_tasks.discard)
-            _, (task_done_set, _) = await asyncio.gather(
-                self._watch_status(),
-                asyncio.wait(self._concurrent_tasks)
-            )
-            for task in task_done_set:
+        
+        # Initialize progress manager if using centralized progress
+        if self._progress_manager:
+            self._progress_manager.set_job_totals(self._total_jobs_count)
+            self._progress_manager.start_display()
+        
+        try:
+            async with self._lock:
+                self._concurrent_tasks.clear()
+                for _ in range(config.job.count):
+                    task = asyncio.create_task(self.processor())
+                    self._concurrent_tasks.add(task)
+                    task.add_done_callback(self._concurrent_tasks.discard)
+                    
+                # Start background display update if using centralized progress
+                display_task = None
+                if self._progress_manager:
+                    display_task = asyncio.create_task(self._update_display_loop())
+                
                 try:
-                    failed_num += task.result()
-                except CancelledError:
-                    pass
+                    _, (task_done_set, _) = await asyncio.gather(
+                        self._watch_status(),
+                        asyncio.wait(self._concurrent_tasks)
+                    )
+                finally:
+                    if display_task:
+                        display_task.cancel()
+                        try:
+                            await display_task
+                        except asyncio.CancelledError:
+                            pass
+                
+                for task in task_done_set:
+                    try:
+                        failed_num += task.result()
+                    except CancelledError:
+                        pass
+        finally:
+            # Clean up progress manager
+            if self._progress_manager:
+                self._progress_manager.stop_display()
+                
         if failed_num:
             logger.warning(f"{failed_num} jobs failed, download finished")
         else:
             logger.success("All jobs in queue finished")
         return failed_num
 
+    async def _update_display_loop(self):
+        """Background task to update the progress display"""
+        try:
+            while True:
+                if self._progress_manager:
+                    self._progress_manager.update_display()
+                await asyncio.sleep(0.1)  # Update 10 times per second
+        except asyncio.CancelledError:
+            pass
+
     async def add_jobs(self, *jobs: Job):
         """Add jobs to ``self._job_queue``"""
         for job in jobs:
             await self._job_queue.put(job)
+        
+        # Update total job count for progress tracking
+        self._total_jobs_count += len(jobs)
+        if self._progress_manager:
+            self._progress_manager.set_job_totals(self._total_jobs_count)
 
     @staticmethod
     async def _force_cancel(target: asyncio.Task, wait_time: float = None) -> bool:
