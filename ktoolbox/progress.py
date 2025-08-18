@@ -114,8 +114,16 @@ class ProgressManager:
         with self._lock:
             if progress_id in self._progress_bars:
                 self._progress_bars[progress_id].finished = True
-                # Remove from display after a short delay
-                asyncio.create_task(self._remove_finished_after_delay(progress_id))
+                # Schedule removal after a short delay
+                try:
+                    # Only create task if we're in an async context
+                    asyncio.create_task(self._remove_finished_after_delay(progress_id))
+                except RuntimeError:
+                    # No event loop running, remove immediately
+                    if progress_id in self._progress_bars:
+                        del self._progress_bars[progress_id]
+                    if progress_id in self._display_order:
+                        self._display_order.remove(progress_id)
     
     async def _remove_finished_after_delay(self, progress_id: str, delay: float = 1.0):
         """Remove a finished progress bar after a delay"""

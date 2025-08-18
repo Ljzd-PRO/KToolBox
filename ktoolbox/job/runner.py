@@ -41,7 +41,7 @@ class JobRunner:
         
         if self._centralized_progress:
             # Use centralized progress manager
-            self._progress_manager = ProgressManager(max_workers=config.downloader.max_concurrent_download)
+            self._progress_manager = ProgressManager(max_workers=config.job.count)
             self._tqdm_class = tqdm_class or create_managed_tqdm_class(self._progress_manager)
         else:
             # Use traditional tqdm
