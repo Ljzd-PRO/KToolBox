@@ -1,4 +1,6 @@
 [run]
 branch = True
 source = ktoolbox
-omit = tests/*
+omit = tests/*,
+       ktoolbox/_cli_zh.py,
+       ktoolbox/_configuration_zh.py
