@@ -9,7 +9,7 @@ from settings_doc import render, OutputFormat
 
 from ktoolbox import __version__
 from ktoolbox._enum import TextEnum
-from ktoolbox.action import create_job_from_post, create_job_from_creator, generate_post_path_name
+from ktoolbox.action import create_job_from_post, create_job_from_creator, generate_post_path_name, FetchInterruptError
 from ktoolbox.action import search_creator as search_creator_action, search_creator_post as search_creator_post_action
 from ktoolbox.api.misc import get_app_version
 from ktoolbox.api.posts import get_post as get_post_api
@@ -214,11 +214,14 @@ class KToolBoxCli:
                 post_path = post_path / "revision" / revision_id
 
             # Download the main post
-            job_list = await create_job_from_post(
-                post=ret.data.post,
-                post_path=post_path,
-                dump_post_data=dump_post_data
-            )
+            try:
+                job_list = await create_job_from_post(
+                    post=ret.data.post,
+                    post_path=post_path,
+                    dump_post_data=dump_post_data
+                )
+            except FetchInterruptError:
+                return None
 
             # If include_revisions is enabled and we have revisions data
             if (config.job.include_revisions and
@@ -230,15 +233,19 @@ class KToolBoxCli:
                     if revision_data.revision_id:  # Only process actual revisions, not the main post
                         revision_path = post_path / config.job.post_structure.revisions / generate_post_path_name(
                             revision_data)
-                        revision_jobs = await create_job_from_post(
-                            post=revision_data,
-                            post_path=revision_path,
-                            dump_post_data=dump_post_data
-                        )
+                        try:
+                            revision_jobs = await create_job_from_post(
+                                post=revision_data,
+                                post_path=revision_path,
+                                dump_post_data=dump_post_data
+                            )
+                        except FetchInterruptError:
+                            return None
                         job_list.extend(revision_jobs)
 
             job_runner = JobRunner(job_list=job_list)
             await job_runner.start()
+            return None
         else:
             return ret.message
 
@@ -382,5 +389,6 @@ class KToolBoxCli:
         if ret:
             job_runner = JobRunner(job_list=ret.data)
             await job_runner.start()
+            return None
         else:
             return ret.message

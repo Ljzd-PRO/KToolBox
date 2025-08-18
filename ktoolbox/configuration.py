@@ -52,7 +52,7 @@ class DownloaderConfiguration(BaseModel):
 
     :ivar scheme: Downloader URL scheme
     :ivar timeout: Downloader request timeout
-    :ivar encoding: Charset for filename parsing and post content text saving
+    :ivar encoding: Charset for filename parsing and post ``content``, ``external_links`` saving
     :ivar buffer_size: Number of bytes of file I/O buffer for each downloading file
     :ivar chunk_size: Number of bytes of chunk of downloader stream
     :ivar temp_suffix: Temp filename suffix of downloading files
@@ -67,6 +67,7 @@ class DownloaderConfiguration(BaseModel):
     Customize the filename format by inserting an empty ``{}`` to represent the original URL. \
     For example: ``https://example.com/{}`` will be ``https://example.com/https://n1.kemono.su/data/66/83/xxxxx.jpg``;  \
     ``https://example.com/?url={}`` will be ``https://example.com/?url=https://n1.kemono.su/data/66/83/xxxxx.jpg``
+    :ivar keep_metadata: Keep the file metadata when downloading files (e.g. last modified time, etc.)
     """
     scheme: Literal["http", "https"] = "https"
     timeout: float = 30.0
@@ -81,6 +82,7 @@ class DownloaderConfiguration(BaseModel):
     use_bucket: bool = False
     bucket_path: Path = Path("./.ktoolbox/bucket_storage")
     reverse_proxy: str = "{}"
+    keep_metadata: bool = True
 
     @model_validator(mode="after")
     def check_bucket_path(self) -> "DownloaderConfiguration":
@@ -101,7 +103,7 @@ class DownloaderConfiguration(BaseModel):
 
 
 class PostStructureConfiguration(BaseModel):
-    # noinspection SpellCheckingInspection
+    # noinspection SpellCheckingInspection,GrazieInspection
     """
     Post path structure model
 
@@ -195,7 +197,9 @@ class JobConfiguration(BaseModel):
     ``[{published}]_{}`` could result in filenames like ``[2024-1-1]_1.png``, ``[2024-1-1]_2.png``, etc.
     :ivar allow_list: Download files which match these patterns (Unix shell-style), e.g. ``["*.png"]``
     :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``
-    :ivar extract_external_links: Extract external file sharing links from post content and save to separate file
+    :ivar extract_content: Extract post content and save to separate file (filename was defined in ``config.job.post_structure.content``)
+    :ivar extract_external_links: Extract external file sharing links from post content and save to separate file \
+    (filename was defined in ``config.job.post_structure.external_links``) \
     :ivar external_link_patterns: Regex patterns for extracting external links.
     :ivar group_by_year: Group posts by year in separate directories based on published date
     :ivar group_by_month: Group posts by month in separate directories based on published date (requires group_by_year)
@@ -218,7 +222,9 @@ class JobConfiguration(BaseModel):
     allow_list: Set[str] = Field(default_factory=set)
     # noinspection PyDataclass
     block_list: Set[str] = Field(default_factory=set)
-    extract_external_links: bool = True
+    extract_content: bool = False
+    extract_external_links: bool = False
+    # noinspection SpellCheckingInspection
     external_link_patterns: List[str] = [
         # Google Drive
         r'https?://drive\.google\.com/[^\s]+',

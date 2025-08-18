@@ -74,7 +74,7 @@ def logger_init(cli_use: bool = False, disable_stdout: bool = False):
                    "<level>{level: <8}</level> | "
                    "<cyan>{name}</cyan> - <level>{message}</level>",
             level=logging.INFO,
-            filter=lambda record: record["level"].name != "SUCCESS"
+            filter=lambda record: record["level"].name != "DEBUG"
         )
     if path := config.logger.path:
         path.mkdir(exist_ok=True)

@@ -34,8 +34,9 @@ def parse_header(line: str) -> Dict[str, Optional[str]]:
     for item in line.split(";"):
         if len(pair := item.split("=")) == 1:
             dict_value[pair[0]] = None
-        else:
-            dict_value.setdefault(*pair)
+        elif len(pair) == 2:
+            key, value = pair
+            dict_value.setdefault(key, value)
     return dict_value
 
 
