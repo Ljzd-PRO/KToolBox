@@ -29,21 +29,72 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ windows-latest, ubuntu-latest, macos-latest, macos-13 ]
+        include:
+          # Windows builds
+          - os: windows-latest
+            arch: x64
+            python-arch: "x64"
+          - os: windows-latest
+            arch: x86
+            python-arch: "x86"
+          
+          # macOS builds  
+          - os: macos-latest
+            arch: arm64
+            python-arch: "x64"
+          - os: macos-13
+            arch: x64
+            python-arch: "x64"
+          
+          # Linux builds with QEMU support
+          - os: ubuntu-latest
+            arch: x64
+            python-arch: "x64"
+            qemu: false
+          - os: ubuntu-latest
+            arch: arm64
+            python-arch: "x64"
+            qemu: true
+            qemu-arch: aarch64
 
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up QEMU
+        if: matrix.qemu == true
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: ${{ matrix.qemu-arch }}
+
       - name: Setup Python environment
+        if: matrix.qemu != true
         uses: ./.github/actions/setup-python
         with:
           python-version: "3.13"
+          architecture: ${{ matrix.python-arch }}
 
-      - name: Create Executable
+      - name: Create Executable (Native)
+        if: matrix.qemu != true
         uses: ./.github/actions/pyinstaller
+
+      - name: Create Executable (QEMU)
+        if: matrix.qemu == true
+        run: |
+          # For QEMU builds, we need to build inside an emulated container
+          docker run --rm --platform linux/${{ matrix.qemu-arch }} \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            python:3.13-slim-bullseye \
+            bash -c "
+              apt-get update && apt-get install -y git binutils &&
+              pip install poetry &&
+              poetry install --with pyinstaller --extras urwid --extras uvloop &&
+              poetry run pyinstaller ktoolbox.spec --distpath dist &&
+              cp README.md README_zh-CN.md example.env .env LICENSE dist/
+            "
 
       - name: Upload Executable
         uses: actions/upload-artifact@v4
         with:
-          name: ktoolbox-executable-${{ runner.os }}-${{ runner.arch }}
+          name: ktoolbox-executable-${{ runner.os }}-${{ matrix.arch }}
           path: dist

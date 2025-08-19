@@ -14,15 +14,31 @@ from ktoolbox.api.misc import get_app_version
 from ktoolbox.api.posts import get_post as get_post_api
 from ktoolbox.configuration import config
 from ktoolbox.job import JobRunner
-from ktoolbox.utils import dump_search, parse_webpage_url, generate_msg
+from ktoolbox.utils import dump_search, parse_webpage_url, generate_msg, check_for_updates
 
 __all__ = ["KToolBoxCli"]
 
 
 class KToolBoxCli:
+    _update_checked = False  # Class variable to track if update check was performed
+    
+    @classmethod
+    async def _ensure_update_check(cls):
+        """Ensure update check is performed once per session"""
+        if not cls._update_checked:
+            try:
+                await check_for_updates()
+            except Exception:
+                # Silently fail update check to not interfere with main functionality
+                pass
+            finally:
+                cls._update_checked = True
+    
     @staticmethod
     async def version():
         """Show KToolBox version"""
+        # Always check for updates when version is explicitly requested
+        await check_for_updates()
         return __version__
 
     @staticmethod
@@ -173,6 +189,9 @@ class KToolBoxCli:
         :param path: Download path, default is current directory
         :param dump_post_data: Whether to dump post data (post.json) in post directory
         """
+        # Check for updates on first command run
+        await KToolBoxCli._ensure_update_check()
+        
         logger.info(repr(config))
         # Get service, creator_id, post_id, revision_id
         if url:
@@ -241,12 +260,14 @@ class KToolBoxCli:
             url: str,
             path: Union[Path, str] = Path("."),
             *,
-            save_creator_indices: bool = True,
+            save_creator_indices: bool = False,
             mix_posts: bool = None,
             start_time: str = None,
             end_time: str = None,
-            keywords: str = None,
-            keywords_exclude: str = None
+            offset: int = 0,
+            length: int = None,
+            keywords: Tuple[str] = None,
+            keywords_exclude: Tuple[str] = None
     ):
         ...
 
@@ -257,12 +278,14 @@ class KToolBoxCli:
             creator_id: str,
             path: Union[Path, str] = Path("."),
             *,
-            save_creator_indices: bool = True,
+            save_creator_indices: bool = False,
             mix_posts: bool = None,
             start_time: str = None,
             end_time: str = None,
-            keywords: str = None,
-            keywords_exclude: str = None
+            offset: int = 0,
+            length: int = None,
+            keywords: Tuple[str] = None,
+            keywords_exclude: Tuple[str] = None
     ):
         ...
 
@@ -308,6 +331,8 @@ class KToolBoxCli:
         :param keywords: Comma-separated keywords to filter posts by title (case-insensitive)
         :param keywords_exclude: Comma-separated keywords to exclude posts by title (case-insensitive)
         """
+        # Check for updates on first command run
+        await KToolBoxCli._ensure_update_check()
         logger.info(repr(config))
         # Get service, creator_id
         if url:

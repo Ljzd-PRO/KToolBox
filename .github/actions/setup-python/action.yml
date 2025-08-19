@@ -6,6 +6,10 @@ inputs:
     description: Python version
     required: false
     default: "3.11"
+  architecture:
+    description: Python architecture
+    required: false
+    default: "x64"
 
 runs:
   using: "composite"
@@ -17,7 +21,7 @@ runs:
     - uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python-version }}
-        architecture: "x64"
+        architecture: ${{ inputs.architecture }}
         cache: "poetry"
 
     - run: poetry install --with test,docs,pyinstaller
