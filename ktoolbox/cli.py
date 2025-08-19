@@ -341,6 +341,8 @@ class KToolBoxCli:
         :param keywords: Comma-separated keywords to filter posts by title (case-insensitive)
         :param keywords_exclude: Comma-separated keywords to exclude posts by title (case-insensitive)
         """
+        # Check for updates on first command run
+        await KToolBoxCli._ensure_update_check()
         logger.info(repr(config))
         # Get service, creator_id
         if url:
