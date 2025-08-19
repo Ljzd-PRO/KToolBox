@@ -255,12 +255,14 @@ class KToolBoxCli:
             url: str,
             path: Union[Path, str] = Path("."),
             *,
-            save_creator_indices: bool = True,
+            save_creator_indices: bool = False,
             mix_posts: bool = None,
             start_time: str = None,
             end_time: str = None,
-            keywords: str = None,
-            keywords_exclude: str = None
+            offset: int = 0,
+            length: int = None,
+            keywords: Tuple[str] = None,
+            keywords_exclude: Tuple[str] = None
     ):
         ...
 
@@ -271,12 +273,14 @@ class KToolBoxCli:
             creator_id: str,
             path: Union[Path, str] = Path("."),
             *,
-            save_creator_indices: bool = True,
+            save_creator_indices: bool = False,
             mix_posts: bool = None,
             start_time: str = None,
             end_time: str = None,
-            keywords: str = None,
-            keywords_exclude: str = None
+            offset: int = 0,
+            length: int = None,
+            keywords: Tuple[str] = None,
+            keywords_exclude: Tuple[str] = None
     ):
         ...
 
