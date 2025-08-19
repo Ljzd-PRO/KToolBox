@@ -2,9 +2,12 @@
 Streamlit Web UI for KToolBox
 """
 import asyncio
+import json
+import os
 import sys
 import threading
 import time
+import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict, Any, List, Tuple
@@ -34,51 +37,173 @@ except ImportError as e:
     generate_msg = None
 
 
-class WebUIState:
-    """Manages state for long-running operations"""
+# Persistent state file location
+STATE_FILE = Path.home() / ".ktoolbox_webui_state.json"
+
+# Global thread tracking
+_active_threads: Dict[str, threading.Thread] = {}
+_cancellation_events: Dict[str, threading.Event] = {}
+
+
+class PersistentWebUIState:
+    """Manages persistent state for long-running operations that survives browser refresh"""
     
     def __init__(self):
+        self.session_id = str(uuid.uuid4())
         self.sync_creator_running = False
         self.download_post_running = False
         self.current_job_runner: Optional[JobRunner] = None
         self.job_stats: Dict[str, Any] = {}
         self.logs: List[str] = []
-        self.sync_creator_task: Optional[asyncio.Task] = None
-        self.download_post_task: Optional[asyncio.Task] = None
+        self.sync_creator_session_id: Optional[str] = None
+        self.download_post_session_id: Optional[str] = None
+        self._show_recovery_message = False
+        self._load_state()
+        
+    def _get_state_data(self) -> Dict[str, Any]:
+        """Get current state as dictionary"""
+        return {
+            "sync_creator_running": self.sync_creator_running,
+            "download_post_running": self.download_post_running,
+            "job_stats": self.job_stats,
+            "logs": self.logs[-100:],  # Keep only last 100 logs
+            "sync_creator_session_id": self.sync_creator_session_id,
+            "download_post_session_id": self.download_post_session_id,
+            "last_update": datetime.now().isoformat()
+        }
+        
+    def _save_state(self):
+        """Save state to persistent file"""
+        try:
+            with open(STATE_FILE, 'w') as f:
+                json.dump(self._get_state_data(), f, indent=2)
+        except Exception as e:
+            logger.warning(f"Failed to save WebUI state: {e}")
+            
+    def _load_state(self):
+        """Load state from persistent file"""
+        try:
+            if STATE_FILE.exists():
+                with open(STATE_FILE, 'r') as f:
+                    data = json.load(f)
+                    
+                # Check if state is recent (within last hour)
+                last_update = datetime.fromisoformat(data.get("last_update", "2000-01-01"))
+                if (datetime.now() - last_update).total_seconds() > 3600:
+                    # State is too old, reset to clean state
+                    self._clear_old_state()
+                    return
+                    
+                self.sync_creator_running = data.get("sync_creator_running", False)
+                self.download_post_running = data.get("download_post_running", False)
+                self.job_stats = data.get("job_stats", {})
+                self.logs = data.get("logs", [])
+                self.sync_creator_session_id = data.get("sync_creator_session_id")
+                self.download_post_session_id = data.get("download_post_session_id")
+                
+                # Verify if reported running operations are actually still running
+                self._verify_running_operations()
+                
+        except Exception as e:
+            logger.warning(f"Failed to load WebUI state: {e}")
+            self._clear_old_state()
+    
+    def _clear_old_state(self):
+        """Clear old state and reset to defaults"""
+        self.sync_creator_running = False
+        self.download_post_running = False
+        self.job_stats = {}
+        self.logs = []
+        self.sync_creator_session_id = None
+        self.download_post_session_id = None
+        self._show_recovery_message = False
+        try:
+            if STATE_FILE.exists():
+                STATE_FILE.unlink()
+        except Exception:
+            pass
+            
+    def _verify_running_operations(self):
+        """Verify if operations marked as running are actually still running"""
+        global _active_threads
+        
+        recovery_needed = False
+        
+        # Check sync_creator
+        if self.sync_creator_running and self.sync_creator_session_id:
+            thread = _active_threads.get(self.sync_creator_session_id)
+            if not thread or not thread.is_alive():
+                self.sync_creator_running = False
+                self.sync_creator_session_id = None
+                self.add_log("Sync creator operation was interrupted (possibly by browser refresh)")
+                recovery_needed = True
+                
+        # Check download_post 
+        if self.download_post_running and self.download_post_session_id:
+            thread = _active_threads.get(self.download_post_session_id)
+            if not thread or not thread.is_alive():
+                self.download_post_running = False
+                self.download_post_session_id = None
+                self.add_log("Download post operation was interrupted (possibly by browser refresh)")
+                recovery_needed = True
+                
+        if recovery_needed:
+            self._show_recovery_message = True
+                
+        self._save_state()
         
     def is_busy(self) -> bool:
         """Check if any long-running operation is active"""
+        self._verify_running_operations()
         return self.sync_creator_running or self.download_post_running
         
-    def start_sync_creator(self):
-        """Mark sync_creator as running"""
+    def start_sync_creator(self, session_id: str):
+        """Mark sync_creator as running with session tracking"""
         self.sync_creator_running = True
+        self.sync_creator_session_id = session_id
+        self._save_state()
         
     def stop_sync_creator(self):
         """Mark sync_creator as finished"""
+        if self.sync_creator_session_id:
+            _active_threads.pop(self.sync_creator_session_id, None)
+            _cancellation_events.pop(self.sync_creator_session_id, None)
         self.sync_creator_running = False
-        self.sync_creator_task = None
+        self.sync_creator_session_id = None
+        self._save_state()
         
-    def start_download_post(self):
-        """Mark download_post as running"""
+    def start_download_post(self, session_id: str):
+        """Mark download_post as running with session tracking"""
         self.download_post_running = True
+        self.download_post_session_id = session_id
+        self._save_state()
         
     def stop_download_post(self):
         """Mark download_post as finished"""
+        if self.download_post_session_id:
+            _active_threads.pop(self.download_post_session_id, None)
+            _cancellation_events.pop(self.download_post_session_id, None)
         self.download_post_running = False
-        self.download_post_task = None
+        self.download_post_session_id = None
+        self._save_state()
         
     def cancel_sync_creator(self):
         """Cancel sync_creator operation"""
-        if self.sync_creator_task and not self.sync_creator_task.done():
-            self.sync_creator_task.cancel()
+        if self.sync_creator_session_id:
+            # Signal cancellation
+            event = _cancellation_events.get(self.sync_creator_session_id)
+            if event:
+                event.set()
             self.add_log("Sync creator operation cancelled by user")
         self.stop_sync_creator()
         
     def cancel_download_post(self):
         """Cancel download_post operation"""
-        if self.download_post_task and not self.download_post_task.done():
-            self.download_post_task.cancel()
+        if self.download_post_session_id:
+            # Signal cancellation
+            event = _cancellation_events.get(self.download_post_session_id)
+            if event:
+                event.set()
             self.add_log("Download post operation cancelled by user")
         self.stop_download_post()
         
@@ -92,6 +217,7 @@ class WebUIState:
                 "done": job_runner.done_size,
                 "finished": job_runner.finished
             }
+            self._save_state()
             
     def add_log(self, message: str):
         """Add log message"""
@@ -100,17 +226,25 @@ class WebUIState:
         # Keep only last 100 logs
         if len(self.logs) > 100:
             self.logs = self.logs[-100:]
+        self._save_state()
+    
+    def clear_logs(self):
+        """Clear all logs"""
+        self.logs = []
+        self._save_state()
 
 
-def get_webui_state() -> WebUIState:
-    """Get or create WebUI state from Streamlit session state"""
+def get_webui_state() -> PersistentWebUIState:
+    """Get or create WebUI state from Streamlit session state with persistence"""
     if 'webui_state' not in st.session_state:
-        st.session_state.webui_state = WebUIState()
+        st.session_state.webui_state = PersistentWebUIState()
     return st.session_state.webui_state
 
 
 async def run_sync_creator_async(
-    state: WebUIState,
+    state: PersistentWebUIState,
+    session_id: str,
+    cancellation_event: threading.Event,
     url: str = None,
     service: str = None,
     creator_id: str = None,
@@ -124,14 +258,19 @@ async def run_sync_creator_async(
     keywords: str = None,
     keywords_exclude: str = None
 ):
-    """Run sync_creator command asynchronously"""
+    """Run sync_creator command asynchronously with cancellation support"""
     try:
-        state.start_sync_creator()
+        state.start_sync_creator(session_id)
         state.add_log(f"Starting sync_creator for {'URL: ' + url if url else f'Service: {service}, Creator: {creator_id}'}")
         
         # Convert keywords from string to tuple if provided
         keywords_tuple = tuple(keywords.split(',')) if keywords and keywords.strip() else None
         keywords_exclude_tuple = tuple(keywords_exclude.split(',')) if keywords_exclude and keywords_exclude.strip() else None
+        
+        # Check for cancellation before starting
+        if cancellation_event.is_set():
+            state.add_log("sync_creator cancelled before starting")
+            return
         
         result = await KToolBoxCli.sync_creator(
             url=url,
@@ -148,11 +287,18 @@ async def run_sync_creator_async(
             keywords_exclude=keywords_exclude_tuple
         )
         
+        # Check for cancellation after completion
+        if cancellation_event.is_set():
+            state.add_log("sync_creator was cancelled during execution")
+            return
+        
         if result is None:
             state.add_log("sync_creator completed successfully")
         else:
             state.add_log(f"sync_creator failed: {result}")
             
+    except asyncio.CancelledError:
+        state.add_log("sync_creator was cancelled")
     except Exception as e:
         state.add_log(f"sync_creator error: {str(e)}")
         logger.error(f"WebUI sync_creator error: {e}")
@@ -161,7 +307,9 @@ async def run_sync_creator_async(
 
 
 async def run_download_post_async(
-    state: WebUIState,
+    state: PersistentWebUIState,
+    session_id: str,
+    cancellation_event: threading.Event,
     url: str = None,
     service: str = None,
     creator_id: str = None,
@@ -170,10 +318,15 @@ async def run_download_post_async(
     path: str = ".",
     dump_post_data: bool = True
 ):
-    """Run download_post command asynchronously"""
+    """Run download_post command asynchronously with cancellation support"""
     try:
-        state.start_download_post()
+        state.start_download_post(session_id)
         state.add_log(f"Starting download_post for {'URL: ' + url if url else f'Service: {service}, Creator: {creator_id}, Post: {post_id}'}")
+        
+        # Check for cancellation before starting
+        if cancellation_event.is_set():
+            state.add_log("download_post cancelled before starting")
+            return
         
         result = await KToolBoxCli.download_post(
             url=url,
@@ -185,11 +338,18 @@ async def run_download_post_async(
             dump_post_data=dump_post_data
         )
         
+        # Check for cancellation after completion
+        if cancellation_event.is_set():
+            state.add_log("download_post was cancelled during execution")
+            return
+        
         if result is None:
             state.add_log("download_post completed successfully")
         else:
             state.add_log(f"download_post failed: {result}")
             
+    except asyncio.CancelledError:
+        state.add_log("download_post was cancelled")
     except Exception as e:
         state.add_log(f"download_post error: {str(e)}")
         logger.error(f"WebUI download_post error: {e}")
@@ -197,18 +357,19 @@ async def run_download_post_async(
         state.stop_download_post()
 
 
-def run_async_command(coro, state: WebUIState, operation: str):
-    """Run async command in a thread"""
+def run_async_command(coro, state: PersistentWebUIState, operation: str):
+    """Run async command in a thread with proper session tracking"""
+    session_id = str(uuid.uuid4())
+    cancellation_event = threading.Event()
+    
+    # Store the cancellation event for later use
+    _cancellation_events[session_id] = cancellation_event
+    
     def target():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         try:
-            task = loop.create_task(coro)
-            if operation == "sync_creator":
-                state.sync_creator_task = task
-            elif operation == "download_post":
-                state.download_post_task = task
-            loop.run_until_complete(task)
+            loop.run_until_complete(coro)
         except asyncio.CancelledError:
             state.add_log(f"{operation} was cancelled")
         except Exception as e:
@@ -216,9 +377,15 @@ def run_async_command(coro, state: WebUIState, operation: str):
             logger.error(f"WebUI {operation} error: {e}")
         finally:
             loop.close()
+            # Clean up session tracking
+            _active_threads.pop(session_id, None)
+            _cancellation_events.pop(session_id, None)
     
-    thread = threading.Thread(target=target, daemon=True)
+    thread = threading.Thread(target=target, daemon=True, name=f"ktoolbox-{operation}-{session_id[:8]}")
+    _active_threads[session_id] = thread
     thread.start()
+    
+    return session_id
 
 
 def render_sync_creator_section():
@@ -276,8 +443,13 @@ def render_sync_creator_section():
             valid_input = True
         
         if st.button("Start Sync Creator", disabled=not valid_input or state.is_busy(), key="start_sync", type="primary"):
+            session_id = str(uuid.uuid4())
+            cancellation_event = threading.Event()
+            
             coro = run_sync_creator_async(
                 state=state,
+                session_id=session_id,
+                cancellation_event=cancellation_event,
                 url=url,
                 service=service,
                 creator_id=creator_id,
@@ -344,8 +516,13 @@ def render_download_post_section():
             valid_input = True
         
         if st.button("Start Download Post", disabled=not valid_input or state.is_busy(), key="start_download", type="primary"):
+            session_id = str(uuid.uuid4())
+            cancellation_event = threading.Event()
+            
             coro = run_download_post_async(
                 state=state,
+                session_id=session_id,
+                cancellation_event=cancellation_event,
                 url=url,
                 service=service,
                 creator_id=creator_id,
@@ -485,7 +662,7 @@ def render_status_section():
         st.text_area("", value=log_text, height=200, key="logs_display")
         
         if st.button("Clear Logs", key="clear_logs"):
-            state.logs = []
+            state.clear_logs()
             st.rerun()
 
 
@@ -508,6 +685,15 @@ def main():
     
     st.title("🧰 KToolBox Web UI")
     st.write("Remote interface for KToolBox CLI commands")
+    
+    # Get state early to check for recovery scenarios
+    state = get_webui_state()
+    
+    # Show recovery message if operations were interrupted
+    if hasattr(state, '_show_recovery_message'):
+        if state._show_recovery_message:
+            st.warning("⚠️ Some operations may have been interrupted by a browser refresh. Check the Status & Progress section for details.")
+            state._show_recovery_message = False
     
     # Sidebar for navigation
     with st.sidebar:
