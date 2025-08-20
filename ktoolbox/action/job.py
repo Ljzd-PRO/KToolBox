@@ -17,7 +17,7 @@ from ktoolbox.api.model import Post, Attachment, Revision
 from ktoolbox.api.posts import get_post_revisions as get_post_revisions_api, get_post as get_post_api
 from ktoolbox.configuration import config
 from ktoolbox.job import Job, CreatorIndices
-from ktoolbox.utils import extract_external_links, generate_msg
+from ktoolbox.utils import extract_external_links, extract_content_images, generate_msg
 
 __all__ = ["create_job_from_post", "create_job_from_creator"]
 
@@ -48,10 +48,13 @@ async def create_job_from_post(
         content_path.parent.mkdir(exist_ok=True)
         external_links_path = post_path / config.job.post_structure.external_links  # external_links
         external_links_path.parent.mkdir(exist_ok=True)
+        content_images_path = post_path / config.job.post_structure.content_images  # content_images
+        content_images_path.mkdir(exist_ok=True)
     else:
         attachments_path = post_path
         content_path = None
         external_links_path = None
+        content_images_path = None
 
     if dump_post_data:
         async with aiofiles.open(str(post_path / DataStorageNameEnum.PostData.value), "w", encoding="utf-8") as f:
@@ -125,7 +128,7 @@ async def create_job_from_post(
                 )
             )
     # ``post.substring`` is used to determine if the post has content, but it's only partial
-    if post.substring and post_dir and (config.job.extract_content or config.job.extract_external_links):
+    if post.substring and post_dir and (config.job.extract_content or config.job.extract_external_links or config.job.extract_content_images):
         # If post has no content, fetch it from get_post API
         if not post.content:
             get_post_ret = await get_post_api(
@@ -163,6 +166,38 @@ async def create_job_from_post(
                         # Write each link on a separate line
                         for link in sorted(external_links):
                             await f.write(f"{link}\n")
+
+            # Extract and download content images
+            if config.job.extract_content_images:
+                content_images = extract_content_images(post.content, post.service)
+                if content_images:
+                    content_image_counter = 1
+                    for image_url in sorted(content_images):
+                        # Extract filename from URL or create a numbered one
+                        url_path = urlparse(image_url).path
+                        if url_path:
+                            original_filename = Path(url_path).name
+                            if not original_filename or not is_valid_filename(original_filename):
+                                # Extract extension from URL or use .jpg as default
+                                ext = Path(url_path).suffix or '.jpg'
+                                original_filename = f"content_image_{content_image_counter}{ext}"
+                        else:
+                            original_filename = f"content_image_{content_image_counter}.jpg"
+                        
+                        # Generate unique filename using the post properties
+                        final_filename = generate_filename(post, original_filename, config.job.filename_format)
+                        
+                        # Create download job for the content image
+                        jobs.append(
+                            Job(
+                                path=content_images_path,
+                                alt_filename=final_filename,
+                                server_path=image_url,
+                                type=PostFileTypeEnum.Attachment,  # Treat as attachment type
+                                post=post
+                            )
+                        )
+                        content_image_counter += 1
 
     return jobs
 
@@ -264,8 +299,8 @@ async def create_job_from_creator(
     if config.job.include_revisions:
         logger.warning("`job.include_revisions` is enabled and will fetch post revisions, "
                     "which may take time. Disable if not needed.")
-    if config.job.extract_content or config.job.extract_external_links:
-        logger.warning("`job.extract_content` or `job.extract_external_links` is enabled and will fetch post content one by one, "
+    if config.job.extract_content or config.job.extract_external_links or config.job.extract_content_images:
+        logger.warning("`job.extract_content`, `job.extract_external_links`, or `job.extract_content_images` is enabled and will fetch post content one by one, "
                     "which may take time. Disable if not needed.")
 
     job_list: List[Job] = []

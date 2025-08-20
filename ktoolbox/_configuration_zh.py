@@ -121,6 +121,7 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
     :ivar block_list: 不下载匹配这些模式（Unix shell 风格）的文件，如 ``["*.psd","*.zip"]``
     :ivar extract_content: 提取帖子内容并保存到单独文件（文件名由 ``config.job.post_structure.content`` 定义）
     :ivar extract_external_links: 从帖子内容中提取外部文件分享链接并保存到单独文件（文件名由 ``config.job.post_structure.external_links`` 定义）
+    :ivar extract_content_images: 从帖子内容HTML中提取并下载图片（图片将保存在 ``config.job.post_structure.content_images`` 定义的目录中）
     :ivar external_link_patterns: 用于提取外部链接的正则表达式模式
     :ivar group_by_year: 根据发布日期按年分组到不同目录
     :ivar group_by_month: 根据发布日期按月分组到不同目录（需要启用 group_by_year）

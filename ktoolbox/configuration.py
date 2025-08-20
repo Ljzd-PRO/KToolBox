@@ -117,6 +117,9 @@ class PostStructureConfiguration(BaseModel):
     ├─ attachments
     │    ├─ 1.png
     │    └─ 2.png
+    ├─ content_images
+    │    ├─ content_image_1.jpg
+    │    └─ content_image_2.png
     └─ revisions
          ├─ <PostStructure>
          │    ├─ ...
@@ -141,6 +144,7 @@ class PostStructureConfiguration(BaseModel):
     :ivar attachments: Sub path of attachment directory
     :ivar content: Sub path of post content file
     :ivar external_links: Sub path of external links file (for cloud storage links found in content)
+    :ivar content_images: Sub path of content images directory (for images found in post content HTML)
     :ivar file: The format of the post `file` filename (`file` is not `attachment`, each post has only one `file`, usually the cover image) \
     Customize the filename format by inserting an empty ``{}`` to represent the basic filename. \
     You can use some of the [properties][ktoolbox.configuration.JobConfiguration] \
@@ -151,6 +155,7 @@ class PostStructureConfiguration(BaseModel):
     attachments: Path = Path("attachments")
     content: Path = Path("content.txt")
     external_links: Path = Path("external_links.txt")
+    content_images: Path = Path("content_images")
     file: str = "{id}_{}"
     revisions: Path = Path("revisions")
 
@@ -200,6 +205,7 @@ class JobConfiguration(BaseModel):
     :ivar extract_content: Extract post content and save to separate file (filename was defined in ``config.job.post_structure.content``)
     :ivar extract_external_links: Extract external file sharing links from post content and save to separate file \
     (filename was defined in ``config.job.post_structure.external_links``) \
+    :ivar extract_content_images: Extract and download images from post content HTML (images will be saved in directory defined by ``config.job.post_structure.content_images``)
     :ivar external_link_patterns: Regex patterns for extracting external links.
     :ivar group_by_year: Group posts by year in separate directories based on published date
     :ivar group_by_month: Group posts by month in separate directories based on published date (requires group_by_year)
@@ -224,6 +230,7 @@ class JobConfiguration(BaseModel):
     block_list: Set[str] = Field(default_factory=set)
     extract_content: bool = False
     extract_external_links: bool = False
+    extract_content_images: bool = False
     # noinspection SpellCheckingInspection
     external_link_patterns: List[str] = [
         # Google Drive

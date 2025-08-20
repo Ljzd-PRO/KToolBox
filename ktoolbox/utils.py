@@ -5,6 +5,7 @@ import re
 import sys
 from pathlib import Path
 from typing import Generic, TypeVar, Optional, List, Tuple, Set
+from urllib.parse import urljoin, urlparse
 
 import aiofiles
 from loguru import logger
@@ -22,7 +23,8 @@ __all__ = [
     "dump_search",
     "parse_webpage_url",
     "uvloop_init",
-    "extract_external_links"
+    "extract_external_links",
+    "extract_content_images"
 ]
 
 _T = TypeVar('_T')
@@ -212,3 +214,93 @@ def extract_external_links(content: str, custom_patterns: Optional[List[str]] = 
             links.add(url)
 
     return links
+
+
+def extract_content_images(content: str, service: str = None, base_url: str = None) -> Set[str]:
+    """
+    Extract image URLs from HTML content.
+
+    Looks for images in various HTML elements:
+    - <img> tags (src attribute)  
+    - <a> tags linking to images
+    - <picture> and <source> tags
+    - Background images in style attributes
+
+    :param content: HTML content to extract images from
+    :param service: Service name (e.g., 'patreon', 'fanbox') for building complete URLs
+    :param base_url: Base URL for resolving relative URLs
+    :return: Set of unique image URLs found
+    """
+    if not content:
+        return set()
+
+    # Default base URL based on service or use kemono.cr
+    if not base_url:
+        if service:
+            base_url = f"https://kemono.cr/{service}"
+        else:
+            base_url = "https://kemono.cr"
+
+    image_urls = set()
+
+    # Pattern for img tags with src attributes (handle both quoted and unquoted)
+    img_patterns = [
+        r'<img[^>]+src=["\']([^"\']+)["\'][^>]*>',
+    ]
+
+    # Pattern for links to images 
+    link_patterns = [
+        r'<a[^>]+href=["\']([^"\']+\.(?:jpg|jpeg|png|gif|bmp|webp|svg)(?:\?[^"\']*)?)["\'][^>]*>',
+    ]
+
+    # Pattern for picture/source tags
+    picture_patterns = [
+        r'<source[^>]+src=["\']([^"\']+)["\'][^>]*>',
+        r'<source[^>]+srcset=["\']([^"\']+)["\'][^>]*>',
+    ]
+
+    # Pattern for background images in style attributes
+    style_patterns = [
+        r'style=["\'][^"\']*background-image:\s*url\(["\']?([^)"\'>]+)["\']?\)',
+    ]
+
+    all_patterns = img_patterns + link_patterns + picture_patterns + style_patterns
+
+    for pattern in all_patterns:
+        matches = re.finditer(pattern, content, re.IGNORECASE)
+        for match in matches:
+            url = match.group(1)
+            
+            # Clean up the URL
+            url = html.unescape(url.strip())
+            
+            # Skip empty URLs or non-image data URLs
+            if not url or url.startswith('data:') and not url.startswith('data:image'):
+                continue
+                
+            # For srcset attributes, take the first URL
+            if ',' in url:
+                url = url.split(',')[0].strip()
+                # Remove resolution descriptors like "2x" or "1920w"
+                url = re.sub(r'\s+\d+[wx]$', '', url)
+            
+            # Convert relative URLs to absolute
+            if url.startswith('//'):
+                url = 'https:' + url
+            elif url.startswith('/'):
+                # For absolute paths, use the base_url directly
+                url = urljoin(base_url.rstrip('/') + '/', url.lstrip('/'))
+            elif not url.startswith(('http://', 'https://')):
+                # For relative paths
+                url = urljoin(base_url, url)
+            
+            # Validate that it looks like an image URL
+            parsed = urlparse(url)
+            if parsed.netloc and ('.' in parsed.netloc or 'localhost' in parsed.netloc):
+                # Check if URL ends with image extension or contains image indicators
+                url_lower = url.lower()
+                if any(ext in url_lower for ext in ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg']) or \
+                   any(indicator in url_lower for indicator in ['image', 'img', 'picture', 'photo']):
+                    image_urls.add(url)
+
+    return image_urls
