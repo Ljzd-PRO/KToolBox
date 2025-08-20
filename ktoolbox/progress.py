@@ -11,8 +11,8 @@ import os
 import sys
 import threading
 import time
-from dataclasses import dataclass, field
 from typing import Dict, List, Optional, TextIO
+from dataclasses import dataclass, field
 
 from tqdm import tqdm as std_tqdm
 
@@ -106,8 +106,8 @@ class ColorTheme:
     def supports_color(cls) -> bool:
         """Check if terminal supports color"""
         return (
-                hasattr(sys.stdout, 'isatty') and sys.stdout.isatty() and
-                not sys.platform.startswith('win') or 'ANSICON' in os.environ
+            hasattr(sys.stdout, 'isatty') and sys.stdout.isatty() and
+            not sys.platform.startswith('win') or 'ANSICON' in os.environ
         )
 
 
@@ -183,7 +183,7 @@ class ProgressManager:
                 self._failed_jobs = failed
 
     def create_progress_bar(self, desc: str, total: Optional[int] = None,
-                            unit: str = "B", unit_scale: bool = True) -> 'ManagedTqdm':
+                          unit: str = "B", unit_scale: bool = True) -> 'ManagedTqdm':
         """Create a new managed progress bar"""
         # Don't create progress state here - let ManagedTqdm do it with proper unique ID
         return ManagedTqdm(desc=desc, total=total, unit=unit, unit_scale=unit_scale, manager=self)
@@ -456,7 +456,7 @@ class ProgressManager:
                 # Moving progress indicator
                 pos = _animation_state['frame'] % bar_width
                 bar_chars = ['░'] * bar_width
-                for i in range(max(0, pos - 2), min(bar_width, pos + 3)):
+                for i in range(max(0, pos-2), min(bar_width, pos+3)):
                     bar_chars[i] = '█'
                 bar = ColorTheme.colorize(''.join(bar_chars), ColorTheme.BRIGHT_YELLOW)
             else:
@@ -557,7 +557,7 @@ class ManagedTqdm:
         # If no manager provided or disabled, fall back to standard tqdm
         if manager is None or disable:
             self._fallback = std_tqdm(desc=desc, total=total, initial=initial,
-                                      disable=disable, unit=unit, unit_scale=unit_scale, **kwargs)
+                                    disable=disable, unit=unit, unit_scale=unit_scale, **kwargs)
             self.manager = None
             self.progress_id = None
         else:
@@ -685,7 +685,6 @@ def create_managed_tqdm_class(progress_manager: ProgressManager):
     Create a tqdm class factory that uses the given ProgressManager.
     This allows us to create a drop-in replacement for tqdm.
     """
-
     class ManagedTqdmClass(ManagedTqdm):
         def __init__(self, *args, **kwargs):
             kwargs['manager'] = progress_manager
