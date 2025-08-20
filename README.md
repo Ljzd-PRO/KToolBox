@@ -93,6 +93,10 @@ See [documentation](https://ktoolbox.readthedocs.io/) for more details.
 
 You can use executables from [releases](https://github.com/Ljzd-PRO/KToolBox/releases) page
 
+!!! warning "Antivirus False Positives"
+    Some antivirus software may flag the executable as a threat (false positive). 
+    This is common with PyInstaller executables. See our [FAQ](https://ktoolbox.readthedocs.io/latest/faq/#antivirus-software-flags-the-executable-as-a-virusthreat) for solutions.
+
 Manually install:
 
 - Recommend

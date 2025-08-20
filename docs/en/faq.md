@@ -134,6 +134,31 @@ You can also set these through the graphical configuration editor: `API - retry_
 
 The solution is the same as above.
 
+## Antivirus software flags the executable as a virus/threat
+
+This is a **false positive**. KToolBox is completely safe and open-source software.
+
+**Why this happens:**
+- PyInstaller executables are commonly flagged by antivirus engines due to their packing method
+- Downloaded executables from the internet are often treated with suspicion
+- Some heuristic engines flag any "download manager" type software
+
+**Solutions:**
+1. **Add an exception** in your antivirus software for the KToolBox executable
+2. **Use pip installation** instead: `pip install ktoolbox` (recommended)
+3. **Build from source** if you're still concerned:
+   ```bash
+   git clone https://github.com/Ljzd-PRO/KToolBox.git
+   cd KToolBox
+   poetry install --with pyinstaller
+   poetry run pyinstaller ktoolbox.spec
+   ```
+
+**Security assurance:**
+- All releases are built automatically using GitHub Actions (publicly visible)
+- Source code is completely open and auditable
+- No malicious code exists in this project
+
 ## Where can I find more information about KToolBox?
 
 - Guide: Use **AI(Copilot Spaces)** for command params and configuration help: [#304](https://github.com/Ljzd-PRO/KToolBox/issues/304)

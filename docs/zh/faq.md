@@ -135,6 +135,31 @@ ktoolbox sync-creator "https://coomer.su/onlyfans/user/hollyharper11" --start-ti
 
 解决方法同上
 
+## 杀毒软件将可执行文件标记为病毒/威胁
+
+这是**误报**。KToolBox 是完全安全的开源软件。
+
+**为什么会发生这种情况：**
+- PyInstaller 可执行文件由于其打包方法经常被杀毒引擎标记
+- 从网络下载的可执行文件通常被怀疑对待
+- 一些启发式引擎会标记任何"下载管理器"类型的软件
+
+**解决方案：**
+1. **在杀毒软件中添加例外** 对 KToolBox 可执行文件
+2. **使用 pip 安装**：`pip install ktoolbox`（推荐）
+3. **从源码构建** 如果你仍有顾虑：
+   ```bash
+   git clone https://github.com/Ljzd-PRO/KToolBox.git
+   cd KToolBox
+   poetry install --with pyinstaller
+   poetry run pyinstaller ktoolbox.spec
+   ```
+
+**安全保证：**
+- 所有发布版本都使用 GitHub Actions 自动构建（公开可见）
+- 源代码完全开放且可审计
+- 此项目中不存在恶意代码
+
 ## 我在哪里可以找到更多帮助？
 
 - 向导：用 **AI（Copilot Spaces）** 获取命令参数和配置帮助：[#304](https://github.com/Ljzd-PRO/KToolBox/issues/304)
