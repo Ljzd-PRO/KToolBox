@@ -570,17 +570,21 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "fire"
-version = "0.7.0"
+version = "0.7.1"
 description = "A library for automatically generating command line interfaces."
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 groups = ["main"]
 files = [
-    {file = "fire-0.7.0.tar.gz", hash = "sha256:961550f07936eaf65ad1dc8360f2b2bf8408fad46abbfa4d2a3794f8d2a95cdf"},
+    {file = "fire-0.7.1-py3-none-any.whl", hash = "sha256:e43fd8a5033a9001e7e2973bab96070694b9f12f2e0ecf96d4683971b5ab1882"},
+    {file = "fire-0.7.1.tar.gz", hash = "sha256:3b208f05c736de98fb343310d090dcc4d8c78b2a89ea4f32b837c586270a9cbf"},
 ]
 
 [package.dependencies]
 termcolor = "*"
+
+[package.extras]
+test = ["hypothesis (<6.136.0)", "levenshtein (<=0.27.1)", "pip", "pylint (<3.3.8)", "pytest (<=8.4.1)", "pytest-pylint (<=1.1.2)", "pytest-runner (<7.0.0)", "setuptools (<=80.9.0)", "termcolor (<3.2.0)"]
 
 [[package]]
 name = "genson"
@@ -1084,19 +1088,20 @@ pyyaml = ">=5.1"
 
 [[package]]
 name = "mkdocs-material"
-version = "9.6.16"
+version = "9.6.17"
 description = "Documentation that simply works"
 optional = false
 python-versions = ">=3.8"
 groups = ["docs"]
 files = [
-    {file = "mkdocs_material-9.6.16-py3-none-any.whl", hash = "sha256:8d1a1282b892fe1fdf77bfeb08c485ba3909dd743c9ba69a19a40f637c6ec18c"},
-    {file = "mkdocs_material-9.6.16.tar.gz", hash = "sha256:d07011df4a5c02ee0877496d9f1bfc986cfb93d964799b032dd99fe34c0e9d19"},
+    {file = "mkdocs_material-9.6.17-py3-none-any.whl", hash = "sha256:221dd8b37a63f52e580bcab4a7e0290e4a6f59bd66190be9c3d40767e05f9417"},
+    {file = "mkdocs_material-9.6.17.tar.gz", hash = "sha256:48ae7aec72a3f9f501a70be3fbd329c96ff5f5a385b67a1563e5ed5ce064affe"},
 ]
 
 [package.dependencies]
 babel = ">=2.10,<3.0"
 backrefs = ">=5.7.post1,<6.0"
+click = "<8.2.2"
 colorama = ">=0.4,<1.0"
 jinja2 = ">=3.1,<4.0"
 markdown = ">=3.2,<4.0"
