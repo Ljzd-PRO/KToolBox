@@ -327,10 +327,10 @@ async def create_job_from_creator(
     if config.job.include_revisions:
         logger.warning("`job.include_revisions` is enabled and will fetch post revisions, "
                        "which may take time. Disable if not needed.")
-    if config.job.extract_content or config.job.extract_external_links:
+    if config.job.extract_content or config.job.extract_external_links or config.job.extract_content_images:
         logger.warning(
-            "`job.extract_content` or `job.extract_external_links` is enabled and will fetch post content one by one, "
-            "which may take time. Disable if not needed.")
+            "`job.extract_content` or `job.extract_external_links` or `job.extract_content_images` is enabled "
+            "and will fetch post content one by one, which may take time. Disable if not needed.")
 
     job_list: List[Job] = []
     for post in post_list:
