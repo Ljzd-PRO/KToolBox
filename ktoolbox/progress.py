@@ -112,7 +112,7 @@ class ColorTheme:
 
 
 # Animation state for spinners
-_animation_state = {'frame': 0, 'last_update': 0}
+_animation_state = {'frame': 0, 'last_update': 0.0}
 
 
 @dataclass
