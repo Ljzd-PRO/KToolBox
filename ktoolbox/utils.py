@@ -260,4 +260,4 @@ async def check_for_updates() -> None:
             logger.debug(f"Failed to check PyPI for updates: {e}")
             
     except Exception as e:
-        logger.debug(f"Update check failed: {e}")
+        logger.warning(f"Update check encountered an unexpected error: {e!r}")
