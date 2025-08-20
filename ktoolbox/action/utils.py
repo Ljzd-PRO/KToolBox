@@ -1,4 +1,5 @@
 from datetime import datetime
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Optional, List, Generator, Any, Tuple, Set
 
@@ -19,10 +20,25 @@ __all__ = [
     "filter_posts_by_indices",
     "match_post_keywords",
     "filter_posts_by_keywords",
-    "filter_posts_by_keywords_exclude"
+    "filter_posts_by_keywords_exclude",
+    "extract_content_images"
 ]
 
 TIME_FORMAT = "%Y-%m-%d"
+
+
+class _ContentImageParser(HTMLParser):
+    """HTML parser to extract image sources from content"""
+
+    def __init__(self):
+        super().__init__()
+        self.image_sources = []
+
+    def handle_starttag(self, tag: str, attrs: List[Tuple[str, Optional[str]]]):
+        if tag.lower() == 'img':
+            for attr_name, attr_value in attrs:
+                if attr_name.lower() == 'src' and attr_value:
+                    self.image_sources.append(attr_value)
 
 
 def generate_post_path_name(post: Post) -> str:
@@ -53,7 +69,7 @@ def generate_year_dirname(post: Post) -> str:
     post_date = post.published or post.added
     if not post_date:
         return "unknown"
-    
+
     try:
         return sanitize_filename(
             config.job.year_dirname_format.format(
@@ -71,7 +87,7 @@ def generate_month_dirname(post: Post) -> str:
     post_date = post.published or post.added
     if not post_date:
         return "unknown"
-    
+
     try:
         return sanitize_filename(
             config.job.month_dirname_format.format(
@@ -93,15 +109,15 @@ def generate_grouped_post_path(post: Post, base_path: Path) -> Path:
     :return: Full path where the post should be saved
     """
     result_path = base_path
-    
+
     if config.job.group_by_year:
         year_dirname = generate_year_dirname(post)
         result_path = result_path / year_dirname
-        
+
         if config.job.group_by_month:
             month_dirname = generate_month_dirname(post)
             result_path = result_path / month_dirname
-    
+
     return result_path
 
 
@@ -196,12 +212,12 @@ def match_post_keywords(post: Post, keywords: Set[str]) -> bool:
     """
     if not keywords:
         return True
-    
+
     # Only search in post title
     searchable_text = ""
     if post.title:
         searchable_text = post.title.lower()
-    
+
     # Check if any keyword is found in the title
     return any(keyword.lower() in searchable_text for keyword in keywords)
 
@@ -219,7 +235,7 @@ def filter_posts_by_keywords(
     if not keywords:
         yield from post_list
         return
-    
+
     post_filter = filter(lambda x: match_post_keywords(x, keywords), post_list)
     yield from post_filter
 
@@ -237,7 +253,27 @@ def filter_posts_by_keywords_exclude(
     if not keywords_exclude:
         yield from post_list
         return
-    
+
     # Exclude posts that match any of the exclude keywords
     post_filter = filter(lambda x: not match_post_keywords(x, keywords_exclude), post_list)
     yield from post_filter
+
+
+def extract_content_images(content: str) -> List[str]:
+    """
+    Extract image sources from HTML content
+
+    :param content: HTML content string
+    :return: List of image source URLs/paths
+    """
+    if not content:
+        return []
+
+    parser = _ContentImageParser()
+    try:
+        parser.feed(content)
+    except Exception as e:
+        logger.warning(f"Failed to parse HTML content for images: {e}")
+        return []
+
+    return parser.image_sources
