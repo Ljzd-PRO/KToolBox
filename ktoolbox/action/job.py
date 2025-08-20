@@ -12,7 +12,7 @@ from pathvalidate import sanitize_filename, is_valid_filename
 from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.action import ActionRet, fetch_creator_posts, FetchInterruptError
 from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date, generate_filename, \
-    filter_posts_by_keywords, filter_posts_by_keywords_exclude, generate_grouped_post_path
+    filter_posts_by_keywords, filter_posts_by_keywords_exclude, generate_grouped_post_path, extract_content_images
 from ktoolbox.api.model import Post, Attachment, Revision
 from ktoolbox.api.posts import get_post_revisions as get_post_revisions_api, get_post as get_post_api
 from ktoolbox.configuration import config
@@ -125,7 +125,9 @@ async def create_job_from_post(
                 )
             )
     # ``post.substring`` is used to determine if the post has content, but it's only partial
-    if (post.content or post.substring) and post_dir and (config.job.extract_content or config.job.extract_external_links):
+    if (post.content or post.substring) and post_dir and (
+            config.job.extract_content or config.job.extract_external_links or config.job.extract_content_images
+    ):
         # If post has no content, fetch it from get_post API
         if not post.content:
             get_post_ret = await get_post_api(
@@ -163,6 +165,67 @@ async def create_job_from_post(
                         # Write each link on a separate line
                         for link in sorted(external_links):
                             await f.write(f"{link}\n")
+
+            # Extract content images
+            if config.job.extract_content_images:
+                content_image_sources = extract_content_images(post.content)
+                for image_src in content_image_sources:
+                    if not image_src or not image_src.strip():
+                        continue
+
+                    # Handle relative paths by making them absolute
+                    # noinspection HttpUrlsUsage
+                    if image_src.startswith('/') and not image_src.startswith('//'):
+                        # Relative path - construct full URL
+                        image_path = image_src
+                    elif image_src.startswith('http://') or image_src.startswith('https://'):
+                        # Absolute URL - extract path
+                        image_path = urlparse(image_src).path
+                    else:
+                        # Skip data URLs, protocol-relative URLs, or other non-path sources
+                        continue
+
+                    if not image_path or not image_path.strip():
+                        continue
+
+                    # Generate filename from the image path
+                    image_file_path = Path(image_path)
+
+                    # Apply "allow/block list" filtering first (before incrementing counter)
+                    if config.job.sequential_filename:
+                        basic_filename = f"{sequential_counter + 1}{image_file_path.suffix}"
+                    else:
+                        basic_filename = image_file_path.name
+
+                    alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
+
+                    if (not config.job.allow_list or any(
+                            map(
+                                lambda x: fnmatch(alt_filename, x),
+                                config.job.allow_list
+                            )
+                    )) and not any(
+                        map(
+                            lambda x: fnmatch(alt_filename, x),
+                            config.job.block_list
+                        )
+                    ):
+                        # Regenerate filename with correct counter
+                        should_use_sequential = (config.job.sequential_filename and
+                                                 image_file_path.suffix.lower() not in config.job.sequential_filename_excludes)
+                        if should_use_sequential:
+                            basic_filename = f"{sequential_counter}{image_file_path.suffix}"
+                            alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
+                            sequential_counter += 1
+
+                        jobs.append(
+                            Job(
+                                path=attachments_path,
+                                alt_filename=alt_filename,
+                                server_path=image_path,
+                                type=PostFileTypeEnum.Attachment
+                            )
+                        )
 
     return jobs
 
@@ -263,10 +326,11 @@ async def create_job_from_creator(
 
     if config.job.include_revisions:
         logger.warning("`job.include_revisions` is enabled and will fetch post revisions, "
-                    "which may take time. Disable if not needed.")
-    if config.job.extract_content or config.job.extract_external_links:
-        logger.warning("`job.extract_content` or `job.extract_external_links` is enabled and will fetch post content one by one, "
-                    "which may take time. Disable if not needed.")
+                       "which may take time. Disable if not needed.")
+    if config.job.extract_content or config.job.extract_external_links or config.job.extract_content_images:
+        logger.warning(
+            "`job.extract_content` or `job.extract_external_links` or `job.extract_content_images` is enabled "
+            "and will fetch post content one by one, which may take time. Disable if not needed.")
 
     job_list: List[Job] = []
     for post in post_list:
