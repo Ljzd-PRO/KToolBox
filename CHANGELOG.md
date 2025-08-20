@@ -29,7 +29,8 @@
 
 ### 🪲 Fixes
 
-- Fixed the issue where the `download-post` command would **still not generate the text content file** (`content.txt`) and external links file (`external_links.txt`) even when the `job.extract_content` and `job.extract_external_links` options were enabled
+- Fixed the issue where the `download-post` command would **still not generate the text content file** (`content.txt`) 
+and external links file (`external_links.txt`) even when the `job.extract_content` and `job.extract_external_links` options were enabled - #332
 
 - - -
 
@@ -61,7 +62,7 @@
 ### 🪲 修复
 
 - 修复即使启用了 `job.extract_content` 和 `job.extract_external_links` 配置项，`download-post` 命令
-仍然**不会生成文本内容文件**（`content.txt`）和外部链接文件（`external_links.txt`）的问题
+仍然**不会生成文本内容文件**（`content.txt`）和外部链接文件（`external_links.txt`）的问题 - #332
 
 ## Upgrade
 
