@@ -96,5 +96,5 @@ jobs:
       - name: Upload Executable
         uses: actions/upload-artifact@v4
         with:
-          name: ktoolbox-executable-${{ runner.os }}-${{ matrix.arch }}
+          name: ktoolbox-${{ runner.os }}-${{ matrix.arch }}
           path: dist
