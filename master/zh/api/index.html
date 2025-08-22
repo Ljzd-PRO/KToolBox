@@ -52,6 +52,8 @@
     
       <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -27356,12 +27358,28 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Extract external file sharing links from post content and save to separate file     (filename was defined in <code>config.job.post_structure.external_links</code>)     :ivar external_link_patterns: Regex patterns for extracting external links.</p>
+                <p>Extract external file sharing links from post content and save to separate file     (filename was defined in <code>config.job.post_structure.external_links</code>)</p>
               </div>
             </td>
             <td>
               <code>
                       False
+              </code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>external_link_patterns</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Regex patterns for extracting external links.</p>
+              </div>
+            </td>
+            <td>
+              <code>
+                      [&#39;https?://drive\\.google\\.com/[^\\s]+&#39;, &#39;https?://docs\\.google\\.com/[^\\s]+&#39;, &#39;https?://mega\\.nz/[^\\s]+&#39;, &#39;https?://mega\\.co\\.nz/[^\\s]+&#39;, &#39;https?://(?:www\\.)?dropbox\\.com/[^\\s]+&#39;, &#39;https?://db\\.tt/[^\\s]+&#39;, &#39;https?://onedrive\\.live\\.com/[^\\s]+&#39;, &#39;https?://1drv\\.ms/[^\\s]+&#39;, &#39;https?://(?:www\\.)?mediafire\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?wetransfer\\.com/[^\\s]+&#39;, &#39;https?://we\\.tl/[^\\s]+&#39;, &#39;https?://(?:www\\.)?sendspace\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?4shared\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?zippyshare\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?uploadfiles\\.io/[^\\s]+&#39;, &#39;https?://(?:www\\.)?box\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?pcloud\\.com/[^\\s]+&#39;, &#39;https?://disk\\.yandex\\.[a-z]+/[^\\s]+&#39;, &#39;https?://[^\\s]*(?:file|upload|share|download|drive|storage)[^\\s]*\\.[a-z]{2,4}/[^\\s]+&#39;]
               </code>
             </td>
           </tr>
@@ -27672,7 +27690,7 @@
 <span class="sd">    :ivar extract_content: Extract post content and save to separate file (filename was defined in ``config.job.post_structure.content``)</span>
 <span class="sd">    :ivar extract_content_images: Extract images from post content and download them.</span>
 <span class="sd">    :ivar extract_external_links: Extract external file sharing links from post content and save to separate file \</span>
-<span class="sd">    (filename was defined in ``config.job.post_structure.external_links``) \</span>
+<span class="sd">    (filename was defined in ``config.job.post_structure.external_links``)</span>
 <span class="sd">    :ivar external_link_patterns: Regex patterns for extracting external links.</span>
 <span class="sd">    :ivar group_by_year: Group posts by year in separate directories based on published date</span>
 <span class="sd">    :ivar group_by_month: Group posts by month in separate directories based on published date (requires group_by_year)</span>

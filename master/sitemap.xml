@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
-        <loc>https://ktoolbox.readthedocs.io/master/PROGRESS_DISPLAY/</loc>
-        <lastmod>2025-08-22</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/PROGRESS_DISPLAY/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/PROGRESS_DISPLAY/"/>
-    </url>
-    <url>
         <loc>https://ktoolbox.readthedocs.io/master/</loc>
         <lastmod>2025-08-22</lastmod>
         <changefreq>daily</changefreq>
@@ -83,13 +76,6 @@
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/configuration/reference/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/reference/"/>
-    </url>
-    <url>
-        <loc>https://ktoolbox.readthedocs.io/master/zh/PROGRESS_DISPLAY/</loc>
-        <lastmod>2025-08-22</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/PROGRESS_DISPLAY/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterPROGRESS_DISPLAY/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/</loc>
