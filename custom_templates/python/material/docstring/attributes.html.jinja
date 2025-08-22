@@ -15,6 +15,12 @@ Context:
   {{ log.debug("Rendering attributes section") }}
 {% endblock logs %}
 
+<style>
+.md-grid {
+  max-width: 1920px !important;
+}
+</style>
+
 {% import "language"|get_template as lang with context %}
 {#- Language module providing the `t` translation method. -#}
 
