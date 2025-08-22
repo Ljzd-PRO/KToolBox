@@ -912,6 +912,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      如何关闭封面图功能？
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#-_" class="md-nav__link">
     <span class="md-ellipsis">
       命令和标志（选项）应当使用 - 还是 _ 作为分隔符？
@@ -921,7 +930,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       文件名过长
     </span>
@@ -930,7 +939,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       如何配置代理？
     </span>
@@ -939,7 +948,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       图形化配置编辑器无法打开
     </span>
@@ -966,7 +975,16 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      杀毒软件将可执行文件标记为病毒/威胁
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
       我在哪里可以找到更多帮助？
     </span>
@@ -1064,6 +1082,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      如何关闭封面图功能？
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#-_" class="md-nav__link">
     <span class="md-ellipsis">
       命令和标志（选项）应当使用 - 还是 _ 作为分隔符？
@@ -1073,7 +1100,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       文件名过长
     </span>
@@ -1082,7 +1109,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       如何配置代理？
     </span>
@@ -1091,7 +1118,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       图形化配置编辑器无法打开
     </span>
@@ -1118,7 +1145,16 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      杀毒软件将可执行文件标记为病毒/威胁
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
       我在哪里可以找到更多帮助？
     </span>
@@ -1191,9 +1227,27 @@
 <p class="admonition-title">提示</p>
 <p>更多详情，请参考 <a href="../configuration/guide/">配置-向导</a> 页面。</p>
 </div>
+<h2 id="_3">如何关闭封面图功能？<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>你可以设置配置选项 <code>job.download_file</code> 为 <code>False</code> 来关闭封面图（文件）下载功能。</p>
+<p>通过 dotenv 文件 <code>prod.env</code> 或系统环境变量来设置配置：
+<div class="highlight"><pre><span></span><code># 关闭封面图下载
+KTOOLBOX_JOB__DOWNLOAD_FILE=False
+
+# 如果你也想关闭附件下载，可以设置
+#KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=False
+</code></pre></div></p>
+<p>这样设置后，KToolBox 将只下载附件（attachments），跳过封面图（file）下载。这对于有些作者的图片名称是乱码、需要依赖重命名功能按网页顺序排序的情况很有用。</p>
+<div class="admonition info">
+<p class="admonition-title">提示</p>
+<ul>
+<li><code>download_file</code>: 控制是否下载帖子文件（通常为封面图片）</li>
+<li><code>download_attachments</code>: 控制是否下载帖子附件</li>
+<li>两个选项都默认为 <code>True</code>，确保向后兼容性</li>
+</ul>
+</div>
 <h2 id="-_">命令和标志（选项）应当使用 <code>-</code> 还是 <code>_</code> 作为分隔符？<a class="headerlink" href="#-_" title="Permanent link">&para;</a></h2>
 <p>两者都支持，推荐使用 <code>-</code>。</p>
-<h2 id="_3">文件名过长<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h2 id="_4">文件名过长<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>在一些情况下，文件名或帖子目录名过长而导致下载失败。为了解决这个问题，你可以设置 <strong>序列化文件名</strong> 或使用 <strong>自定义帖子目录名</strong></p>
 <p>通过 dotenv 文件 <code>prod.env</code> 或系统环境变量来设置配置：
 <div class="highlight"><pre><span></span><code># 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
@@ -1202,7 +1256,7 @@ KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
 # 设置帖子目录名为其发布日期和ID，例如 `[2024-1-1]11223344`
 KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}
 </code></pre></div></p>
-<h2 id="_4">如何配置代理？<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h2 id="_5">如何配置代理？<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <p>可以通过设置 <code>HTTPS_PROXY</code>, <code>HTTP_PROXY</code>, <code>ALL_PROXY</code> 环境变量实现</p>
 <p>参考：<a href="https://www.python-httpx.org/environment_variables/#http_proxy-https_proxy-all_proxy">HTTPX - Environment Variables</a></p>
 <p>例如这样设置：</p>
@@ -1214,7 +1268,7 @@ KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}
 <div class="highlight"><pre><span></span><code><span class="c"># Windows PowerShell</span>
 <span class="nv">$env:HTTP_PROXY</span><span class="p">=</span><span class="s2">&quot;http://127.0.0.1:7897&quot;</span><span class="p">;</span> <span class="nv">$env:HTTPS_PROXY</span><span class="p">=</span><span class="s2">&quot;http://127.0.0.1:7897&quot;</span>
 </code></pre></div>
-<h2 id="_5">图形化配置编辑器无法打开<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h2 id="_6">图形化配置编辑器无法打开<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">注意</p>
 <p><a href="https://pypi.org/project/ktoolbox-pure-py/"><code>ktoolbox-pure-py</code></a> 不支持图形化配置编辑器</p>
@@ -1258,7 +1312,26 @@ KTOOLBOX_API__SESSION_KEY=&quot;xxxxxxx&quot;
 <p>你也可以通过图形化配置编辑器设置：<code>API - retry_times</code> 和 <code>API -&gt; session_key</code>.</p>
 <h2 id="403">下载时频繁出现 403 错误<a class="headerlink" href="#403" title="Permanent link">&para;</a></h2>
 <p>解决方法同上</p>
-<h2 id="_6">我在哪里可以找到更多帮助？<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_7">杀毒软件将可执行文件标记为病毒/威胁<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<p>这是**误报**。KToolBox 是完全安全的开源软件。</p>
+<p><strong>为什么会发生这种情况：</strong>
+- PyInstaller 可执行文件由于其打包方法经常被杀毒引擎标记
+- 从网络下载的可执行文件通常被怀疑对待
+- 一些启发式引擎会标记任何"下载管理器"类型的软件</p>
+<p><strong>解决方案：</strong>
+1. <strong>在杀毒软件中添加例外</strong> 对 KToolBox 可执行文件
+2. <strong>使用 pipx 或 pip 安装</strong>
+3. <strong>从源码构建</strong> 如果你仍有顾虑：
+   <div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Ljzd-PRO/KToolBox.git
+<span class="nb">cd</span><span class="w"> </span>KToolBox
+poetry<span class="w"> </span>install<span class="w"> </span>--with<span class="w"> </span>pyinstaller
+poetry<span class="w"> </span>run<span class="w"> </span>pyinstaller<span class="w"> </span>ktoolbox.spec
+</code></pre></div></p>
+<p><strong>安全保证：</strong>
+- 所有发布版本都使用 GitHub Actions 自动构建（公开可见）
+- 源代码完全开放且可审计
+- 此项目中不存在恶意代码</p>
+<h2 id="_8">我在哪里可以找到更多帮助？<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
 <ul>
 <li>向导：用 <strong>AI（Copilot Spaces）</strong> 获取命令参数和配置帮助：<a href="https://github.com/Ljzd-PRO/KToolBox/issues/304">#304</a></li>
 <li>一个社区分享的使用向导：<a href="https://github.com/Ljzd-PRO/KToolBox/issues/141">#141</a></li>

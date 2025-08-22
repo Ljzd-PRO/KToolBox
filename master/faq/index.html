@@ -910,6 +910,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#how-to-disable-cover-image-download" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to disable cover image download?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#commands-and-flags-should-use-or-_-as-seperator" class="md-nav__link">
     <span class="md-ellipsis">
       Commands and flags should use - or _ as seperator?
@@ -958,6 +967,15 @@
   <a href="#frequently-encounter-403-errors-during-downloads" class="md-nav__link">
     <span class="md-ellipsis">
       Frequently encounter 403 errors during downloads
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#antivirus-software-flags-the-executable-as-a-virusthreat" class="md-nav__link">
+    <span class="md-ellipsis">
+      Antivirus software flags the executable as a virus/threat
     </span>
   </a>
   
@@ -1062,6 +1080,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#how-to-disable-cover-image-download" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to disable cover image download?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#commands-and-flags-should-use-or-_-as-seperator" class="md-nav__link">
     <span class="md-ellipsis">
       Commands and flags should use - or _ as seperator?
@@ -1110,6 +1137,15 @@
   <a href="#frequently-encounter-403-errors-during-downloads" class="md-nav__link">
     <span class="md-ellipsis">
       Frequently encounter 403 errors during downloads
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#antivirus-software-flags-the-executable-as-a-virusthreat" class="md-nav__link">
+    <span class="md-ellipsis">
+      Antivirus software flags the executable as a virus/threat
     </span>
   </a>
   
@@ -1189,6 +1225,24 @@ If you don't want to install these packages, you can ignore this step.</p>
 <p class="admonition-title">Notice</p>
 <p>For more information, please visit <a href="../configuration/guide/">Configuration-Guide</a> page.</p>
 </div>
+<h2 id="how-to-disable-cover-image-download">How to disable cover image download?<a class="headerlink" href="#how-to-disable-cover-image-download" title="Permanent link">&para;</a></h2>
+<p>You can set configuration option <code>job.download_file</code> to <code>False</code> to disable cover image (file) download functionality.</p>
+<p>Set the configuration by <code>prod.env</code> dotenv file or system environment variables:
+<div class="highlight"><pre><span></span><code># Disable cover image download
+KTOOLBOX_JOB__DOWNLOAD_FILE=False
+
+# If you also want to disable attachment downloads, you can set
+#KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=False
+</code></pre></div></p>
+<p>With this setting, KToolBox will only download attachments and skip file downloads. This is useful when some authors have garbled image names that require renaming functionality to sort by webpage order.</p>
+<div class="admonition info">
+<p class="admonition-title">Notice</p>
+<ul>
+<li><code>download_file</code>: Controls whether to download post file (usually cover image)</li>
+<li><code>download_attachments</code>: Controls whether to download post attachments  </li>
+<li>Both options default to <code>True</code> for backward compatibility</li>
+</ul>
+</div>
 <h2 id="commands-and-flags-should-use-or-_-as-seperator">Commands and flags should use <code>-</code> or <code>_</code> as seperator?<a class="headerlink" href="#commands-and-flags-should-use-or-_-as-seperator" title="Permanent link">&para;</a></h2>
 <p>Both is support, <code>-</code> is suggested.</p>
 <h2 id="filename-too-long">Filename too long<a class="headerlink" href="#filename-too-long" title="Permanent link">&para;</a></h2>
@@ -1254,6 +1308,25 @@ KTOOLBOX_API__SESSION_KEY=&quot;xxxxxxx&quot;
 <p>You can also set these through the graphical configuration editor: <code>API - retry_times</code> and <code>API -&gt; session_key</code>.</p>
 <h2 id="frequently-encounter-403-errors-during-downloads">Frequently encounter <strong>403</strong> errors during downloads<a class="headerlink" href="#frequently-encounter-403-errors-during-downloads" title="Permanent link">&para;</a></h2>
 <p>The solution is the same as above.</p>
+<h2 id="antivirus-software-flags-the-executable-as-a-virusthreat">Antivirus software flags the executable as a virus/threat<a class="headerlink" href="#antivirus-software-flags-the-executable-as-a-virusthreat" title="Permanent link">&para;</a></h2>
+<p>This is a <strong>false positive</strong>. KToolBox is completely safe and open-source software.</p>
+<p><strong>Why this happens:</strong>
+- PyInstaller executables are commonly flagged by antivirus engines due to their packing method
+- Downloaded executables from the internet are often treated with suspicion
+- Some heuristic engines flag any "download manager" type software</p>
+<p><strong>Solutions:</strong>
+1. <strong>Add an exception</strong> in your antivirus software for the KToolBox executable
+2. <strong>Use pipx or pip installation</strong> instead
+3. <strong>Build from source</strong> if you're still concerned:
+   <div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Ljzd-PRO/KToolBox.git
+<span class="nb">cd</span><span class="w"> </span>KToolBox
+poetry<span class="w"> </span>install<span class="w"> </span>--with<span class="w"> </span>pyinstaller
+poetry<span class="w"> </span>run<span class="w"> </span>pyinstaller<span class="w"> </span>ktoolbox.spec
+</code></pre></div></p>
+<p><strong>Security assurance:</strong>
+- All releases are built automatically using GitHub Actions (publicly visible)
+- Source code is completely open and auditable
+- No malicious code exists in this project</p>
 <h2 id="where-can-i-find-more-information-about-ktoolbox">Where can I find more information about KToolBox?<a class="headerlink" href="#where-can-i-find-more-information-about-ktoolbox" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Guide: Use <strong>AI(Copilot Spaces)</strong> for command params and configuration help: <a href="https://github.com/Ljzd-PRO/KToolBox/issues/304">#304</a></li>

@@ -3626,6 +3626,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.JobConfiguration.download_attachments" class="md-nav__link">
+    <span class="md-ellipsis">
+      download_attachments
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.JobConfiguration.download_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      download_file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ktoolbox.configuration.JobConfiguration.external_link_patterns" class="md-nav__link">
     <span class="md-ellipsis">
       external_link_patterns
@@ -9072,6 +9090,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.JobConfiguration.download_attachments" class="md-nav__link">
+    <span class="md-ellipsis">
+      download_attachments
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ktoolbox.configuration.JobConfiguration.download_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      download_file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ktoolbox.configuration.JobConfiguration.external_link_patterns" class="md-nav__link">
     <span class="md-ellipsis">
       external_link_patterns
@@ -11841,7 +11877,7 @@
 
 
 <h2 id="ktoolbox.__version__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;v0.21.1&#39;</span></code>
+            <code class="highlight language-python"><span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;v0.22.0&#39;</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
@@ -12303,8 +12339,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/action/job.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">233</span>
-<span class="normal">234</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">234</span>
 <span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span>
@@ -12451,7 +12486,8 @@
 <span class="normal">378</span>
 <span class="normal">379</span>
 <span class="normal">380</span>
-<span class="normal">381</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_creator</span><span class="p">(</span>
+<span class="normal">381</span>
+<span class="normal">382</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_creator</span><span class="p">(</span>
         <span class="n">service</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">creator_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
@@ -12924,7 +12960,8 @@
 <span class="normal">227</span>
 <span class="normal">228</span>
 <span class="normal">229</span>
-<span class="normal">230</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_post</span><span class="p">(</span>
+<span class="normal">230</span>
+<span class="normal">231</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_post</span><span class="p">(</span>
         <span class="n">post</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Post</span><span class="p">,</span> <span class="n">Revision</span><span class="p">],</span>
         <span class="n">post_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -12964,44 +13001,45 @@
     <span class="c1"># Filter and create jobs for ``Post.attachment``</span>
     <span class="n">jobs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Job</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">sequential_counter</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Counter for sequential filenames</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">attachments</span><span class="p">):</span>  <span class="c1"># type: int, Attachment</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">attachment</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
-            <span class="k">continue</span>
-        <span class="n">file_path_obj</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">attachment</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_valid_filename</span><span class="p">(</span><span class="n">attachment</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span>
-            <span class="n">urlparse</span><span class="p">(</span><span class="n">attachment</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">path</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">allow_list</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">download_attachments</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">attachments</span><span class="p">):</span>  <span class="c1"># type: int, Attachment</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">attachment</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">file_path_obj</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">attachment</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_valid_filename</span><span class="p">(</span><span class="n">attachment</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span>
+                <span class="n">urlparse</span><span class="p">(</span><span class="n">attachment</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">path</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">allow_list</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span>
+                    <span class="nb">map</span><span class="p">(</span>
+                        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">file_path_obj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span>
+                        <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">allow_list</span>
+                    <span class="p">)</span>
+            <span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
                 <span class="nb">map</span><span class="p">(</span>
                     <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">file_path_obj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span>
-                    <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">allow_list</span>
+                    <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">block_list</span>
                 <span class="p">)</span>
-        <span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
-            <span class="nb">map</span><span class="p">(</span>
-                <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">file_path_obj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span>
-                <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">block_list</span>
-            <span class="p">)</span>
-        <span class="p">):</span>
-            <span class="c1"># Check if file extension should be excluded from sequential naming</span>
-            <span class="n">should_use_sequential</span> <span class="o">=</span> <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename</span> <span class="ow">and</span>
-                                     <span class="n">file_path_obj</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename_excludes</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">should_use_sequential</span><span class="p">:</span>
-                <span class="n">basic_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sequential_counter</span><span class="si">}{</span><span class="n">file_path_obj</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="n">sequential_counter</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">basic_filename</span> <span class="o">=</span> <span class="n">file_path_obj</span><span class="o">.</span><span class="n">name</span>
-            <span class="n">alt_filename</span> <span class="o">=</span> <span class="n">generate_filename</span><span class="p">(</span><span class="n">post</span><span class="p">,</span> <span class="n">basic_filename</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">filename_format</span><span class="p">)</span>
-            <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">Job</span><span class="p">(</span>
-                    <span class="n">path</span><span class="o">=</span><span class="n">attachments_path</span><span class="p">,</span>
-                    <span class="n">alt_filename</span><span class="o">=</span><span class="n">alt_filename</span><span class="p">,</span>
-                    <span class="n">server_path</span><span class="o">=</span><span class="n">attachment</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
-                    <span class="nb">type</span><span class="o">=</span><span class="n">PostFileTypeEnum</span><span class="o">.</span><span class="n">Attachment</span><span class="p">,</span>
-                    <span class="n">post</span><span class="o">=</span><span class="n">post</span>
+            <span class="p">):</span>
+                <span class="c1"># Check if file extension should be excluded from sequential naming</span>
+                <span class="n">should_use_sequential</span> <span class="o">=</span> <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename</span> <span class="ow">and</span>
+                                         <span class="n">file_path_obj</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename_excludes</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">should_use_sequential</span><span class="p">:</span>
+                    <span class="n">basic_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sequential_counter</span><span class="si">}{</span><span class="n">file_path_obj</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">sequential_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">basic_filename</span> <span class="o">=</span> <span class="n">file_path_obj</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">alt_filename</span> <span class="o">=</span> <span class="n">generate_filename</span><span class="p">(</span><span class="n">post</span><span class="p">,</span> <span class="n">basic_filename</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">filename_format</span><span class="p">)</span>
+                <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">Job</span><span class="p">(</span>
+                        <span class="n">path</span><span class="o">=</span><span class="n">attachments_path</span><span class="p">,</span>
+                        <span class="n">alt_filename</span><span class="o">=</span><span class="n">alt_filename</span><span class="p">,</span>
+                        <span class="n">server_path</span><span class="o">=</span><span class="n">attachment</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="n">PostFileTypeEnum</span><span class="o">.</span><span class="n">Attachment</span><span class="p">,</span>
+                        <span class="n">post</span><span class="o">=</span><span class="n">post</span>
+                    <span class="p">)</span>
                 <span class="p">)</span>
-            <span class="p">)</span>
 
     <span class="c1"># Filter and create jobs for ``Post.file``</span>
-    <span class="k">if</span> <span class="n">post</span><span class="o">.</span><span class="n">file</span> <span class="ow">and</span> <span class="n">post</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">download_file</span> <span class="ow">and</span> <span class="n">post</span><span class="o">.</span><span class="n">file</span> <span class="ow">and</span> <span class="n">post</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
         <span class="n">post_file_name</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_valid_filename</span><span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span>
             <span class="n">urlparse</span><span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">path</span>
         <span class="p">)</span>
@@ -15315,8 +15353,7 @@
 
             <details class="quote">
               <summary>Source code in <code>ktoolbox/action/job.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">233</span>
-<span class="normal">234</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">234</span>
 <span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span>
@@ -15463,7 +15500,8 @@
 <span class="normal">378</span>
 <span class="normal">379</span>
 <span class="normal">380</span>
-<span class="normal">381</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_creator</span><span class="p">(</span>
+<span class="normal">381</span>
+<span class="normal">382</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_creator</span><span class="p">(</span>
         <span class="n">service</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">creator_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
@@ -15936,7 +15974,8 @@
 <span class="normal">227</span>
 <span class="normal">228</span>
 <span class="normal">229</span>
-<span class="normal">230</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_post</span><span class="p">(</span>
+<span class="normal">230</span>
+<span class="normal">231</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_from_post</span><span class="p">(</span>
         <span class="n">post</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Post</span><span class="p">,</span> <span class="n">Revision</span><span class="p">],</span>
         <span class="n">post_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -15976,44 +16015,45 @@
     <span class="c1"># Filter and create jobs for ``Post.attachment``</span>
     <span class="n">jobs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Job</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">sequential_counter</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Counter for sequential filenames</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">attachments</span><span class="p">):</span>  <span class="c1"># type: int, Attachment</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">attachment</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
-            <span class="k">continue</span>
-        <span class="n">file_path_obj</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">attachment</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_valid_filename</span><span class="p">(</span><span class="n">attachment</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span>
-            <span class="n">urlparse</span><span class="p">(</span><span class="n">attachment</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">path</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">allow_list</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">download_attachments</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">attachments</span><span class="p">):</span>  <span class="c1"># type: int, Attachment</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">attachment</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">file_path_obj</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">attachment</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_valid_filename</span><span class="p">(</span><span class="n">attachment</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span>
+                <span class="n">urlparse</span><span class="p">(</span><span class="n">attachment</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">path</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">allow_list</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span>
+                    <span class="nb">map</span><span class="p">(</span>
+                        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">file_path_obj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span>
+                        <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">allow_list</span>
+                    <span class="p">)</span>
+            <span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
                 <span class="nb">map</span><span class="p">(</span>
                     <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">file_path_obj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span>
-                    <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">allow_list</span>
+                    <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">block_list</span>
                 <span class="p">)</span>
-        <span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
-            <span class="nb">map</span><span class="p">(</span>
-                <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">file_path_obj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span>
-                <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">block_list</span>
-            <span class="p">)</span>
-        <span class="p">):</span>
-            <span class="c1"># Check if file extension should be excluded from sequential naming</span>
-            <span class="n">should_use_sequential</span> <span class="o">=</span> <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename</span> <span class="ow">and</span>
-                                     <span class="n">file_path_obj</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename_excludes</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">should_use_sequential</span><span class="p">:</span>
-                <span class="n">basic_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sequential_counter</span><span class="si">}{</span><span class="n">file_path_obj</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="n">sequential_counter</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">basic_filename</span> <span class="o">=</span> <span class="n">file_path_obj</span><span class="o">.</span><span class="n">name</span>
-            <span class="n">alt_filename</span> <span class="o">=</span> <span class="n">generate_filename</span><span class="p">(</span><span class="n">post</span><span class="p">,</span> <span class="n">basic_filename</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">filename_format</span><span class="p">)</span>
-            <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">Job</span><span class="p">(</span>
-                    <span class="n">path</span><span class="o">=</span><span class="n">attachments_path</span><span class="p">,</span>
-                    <span class="n">alt_filename</span><span class="o">=</span><span class="n">alt_filename</span><span class="p">,</span>
-                    <span class="n">server_path</span><span class="o">=</span><span class="n">attachment</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
-                    <span class="nb">type</span><span class="o">=</span><span class="n">PostFileTypeEnum</span><span class="o">.</span><span class="n">Attachment</span><span class="p">,</span>
-                    <span class="n">post</span><span class="o">=</span><span class="n">post</span>
+            <span class="p">):</span>
+                <span class="c1"># Check if file extension should be excluded from sequential naming</span>
+                <span class="n">should_use_sequential</span> <span class="o">=</span> <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename</span> <span class="ow">and</span>
+                                         <span class="n">file_path_obj</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">sequential_filename_excludes</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">should_use_sequential</span><span class="p">:</span>
+                    <span class="n">basic_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sequential_counter</span><span class="si">}{</span><span class="n">file_path_obj</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">sequential_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">basic_filename</span> <span class="o">=</span> <span class="n">file_path_obj</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">alt_filename</span> <span class="o">=</span> <span class="n">generate_filename</span><span class="p">(</span><span class="n">post</span><span class="p">,</span> <span class="n">basic_filename</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">filename_format</span><span class="p">)</span>
+                <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">Job</span><span class="p">(</span>
+                        <span class="n">path</span><span class="o">=</span><span class="n">attachments_path</span><span class="p">,</span>
+                        <span class="n">alt_filename</span><span class="o">=</span><span class="n">alt_filename</span><span class="p">,</span>
+                        <span class="n">server_path</span><span class="o">=</span><span class="n">attachment</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="n">PostFileTypeEnum</span><span class="o">.</span><span class="n">Attachment</span><span class="p">,</span>
+                        <span class="n">post</span><span class="o">=</span><span class="n">post</span>
+                    <span class="p">)</span>
                 <span class="p">)</span>
-            <span class="p">)</span>
 
     <span class="c1"># Filter and create jobs for ``Post.file``</span>
-    <span class="k">if</span> <span class="n">post</span><span class="o">.</span><span class="n">file</span> <span class="ow">and</span> <span class="n">post</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">download_file</span> <span class="ow">and</span> <span class="n">post</span><span class="o">.</span><span class="n">file</span> <span class="ow">and</span> <span class="n">post</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
         <span class="n">post_file_name</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_valid_filename</span><span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span>
             <span class="n">urlparse</span><span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">path</span>
         <span class="p">)</span>
@@ -26055,11 +26095,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">299</span>
-<span class="normal">300</span>
-<span class="normal">301</span>
-<span class="normal">302</span>
-<span class="normal">303</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">303</span>
 <span class="normal">304</span>
 <span class="normal">305</span>
 <span class="normal">306</span>
@@ -26087,7 +26123,11 @@
 <span class="normal">328</span>
 <span class="normal">329</span>
 <span class="normal">330</span>
-<span class="normal">331</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Configuration</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Configuration</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
     <span class="c1"># noinspection SpellCheckingInspection,GrazieInspection</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    KToolBox Configuration</span>
@@ -27419,6 +27459,38 @@
               </code>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.JobConfiguration.download_file" href="#ktoolbox.configuration.JobConfiguration.download_file">download_file</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Download post file (usually cover image). Set to False to skip file downloads.</p>
+              </div>
+            </td>
+            <td>
+              <code>
+                      True
+              </code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.JobConfiguration.download_attachments" href="#ktoolbox.configuration.JobConfiguration.download_attachments">download_attachments</a></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Download post attachments. Set to False to skip attachment downloads.</p>
+              </div>
+            </td>
+            <td>
+              <code>
+                      True
+              </code>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -27549,7 +27621,11 @@
 <span class="normal">280</span>
 <span class="normal">281</span>
 <span class="normal">282</span>
-<span class="normal">283</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">JobConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">JobConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Download jobs Configuration</span>
 
@@ -27604,6 +27680,8 @@
 <span class="sd">    e.g. ``{year}-{month}`` &gt; ``2024-01``, ``{year}_{month}`` &gt; ``2024_01``</span>
 <span class="sd">    :ivar keywords: keywords to filter posts by title (case-insensitive)</span>
 <span class="sd">    :ivar keywords_exclude: keywords to exclude posts by title (case-insensitive)</span>
+<span class="sd">    :ivar download_file: Download post file (usually cover image). Set to False to skip file downloads.</span>
+<span class="sd">    :ivar download_attachments: Download post attachments. Set to False to skip attachment downloads.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
     <span class="n">include_revisions</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -27675,6 +27753,8 @@
     <span class="n">month_dirname_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{year}</span><span class="s2">-</span><span class="si">{month:02d}</span><span class="s2">&quot;</span>
     <span class="n">keywords</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">)</span>
     <span class="n">keywords_exclude</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">)</span>
+    <span class="n">download_file</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">download_attachments</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -27741,6 +27821,46 @@
   </span>
 
 <a href="#ktoolbox.configuration.JobConfiguration.count" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ktoolbox.configuration.JobConfiguration.download_attachments" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">download_attachments</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.configuration.JobConfiguration.download_attachments" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ktoolbox.configuration.JobConfiguration.download_file" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">download_file</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#ktoolbox.configuration.JobConfiguration.download_file" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
     <div class="doc doc-contents ">
@@ -28181,17 +28301,17 @@
 
               <details class="quote">
                 <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">286</span>
-<span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
-<span class="normal">290</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">290</span>
 <span class="normal">291</span>
 <span class="normal">292</span>
 <span class="normal">293</span>
 <span class="normal">294</span>
 <span class="normal">295</span>
-<span class="normal">296</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">LoggerConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">LoggerConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Logger configuration</span>
 
