@@ -62,44 +62,45 @@ async def create_job_from_post(
     # Filter and create jobs for ``Post.attachment``
     jobs: List[Job] = []
     sequential_counter = 1  # Counter for sequential filenames
-    for i, attachment in enumerate(post.attachments):  # type: int, Attachment
-        if not attachment.path:
-            continue
-        file_path_obj = Path(attachment.name) if is_valid_filename(attachment.name) else Path(
-            urlparse(attachment.path).path
-        )
-        if (not config.job.allow_list or any(
+    if config.job.download_attachments:
+        for i, attachment in enumerate(post.attachments):  # type: int, Attachment
+            if not attachment.path:
+                continue
+            file_path_obj = Path(attachment.name) if is_valid_filename(attachment.name) else Path(
+                urlparse(attachment.path).path
+            )
+            if (not config.job.allow_list or any(
+                    map(
+                        lambda x: fnmatch(file_path_obj.name, x),
+                        config.job.allow_list
+                    )
+            )) and not any(
                 map(
                     lambda x: fnmatch(file_path_obj.name, x),
-                    config.job.allow_list
+                    config.job.block_list
                 )
-        )) and not any(
-            map(
-                lambda x: fnmatch(file_path_obj.name, x),
-                config.job.block_list
-            )
-        ):
-            # Check if file extension should be excluded from sequential naming
-            should_use_sequential = (config.job.sequential_filename and
-                                     file_path_obj.suffix.lower() not in config.job.sequential_filename_excludes)
-            if should_use_sequential:
-                basic_filename = f"{sequential_counter}{file_path_obj.suffix}"
-                sequential_counter += 1
-            else:
-                basic_filename = file_path_obj.name
-            alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
-            jobs.append(
-                Job(
-                    path=attachments_path,
-                    alt_filename=alt_filename,
-                    server_path=attachment.path,
-                    type=PostFileTypeEnum.Attachment,
-                    post=post
+            ):
+                # Check if file extension should be excluded from sequential naming
+                should_use_sequential = (config.job.sequential_filename and
+                                         file_path_obj.suffix.lower() not in config.job.sequential_filename_excludes)
+                if should_use_sequential:
+                    basic_filename = f"{sequential_counter}{file_path_obj.suffix}"
+                    sequential_counter += 1
+                else:
+                    basic_filename = file_path_obj.name
+                alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
+                jobs.append(
+                    Job(
+                        path=attachments_path,
+                        alt_filename=alt_filename,
+                        server_path=attachment.path,
+                        type=PostFileTypeEnum.Attachment,
+                        post=post
+                    )
                 )
-            )
 
     # Filter and create jobs for ``Post.file``
-    if post.file and post.file.path:
+    if config.job.download_file and post.file and post.file.path:
         post_file_name = Path(post.file.name) if is_valid_filename(post.file.name) else Path(
             urlparse(post.file.path).path
         )

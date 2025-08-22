@@ -44,6 +44,26 @@ KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 !!! info "提示"
     更多详情，请参考 [配置-向导](configuration/guide.md) 页面。
 
+## 如何关闭封面图功能？
+
+你可以设置配置选项 `job.download_file` 为 `False` 来关闭封面图（文件）下载功能。
+
+通过 dotenv 文件 `prod.env` 或系统环境变量来设置配置：
+```dotenv
+# 关闭封面图下载
+KTOOLBOX_JOB__DOWNLOAD_FILE=False
+
+# 如果你也想关闭附件下载，可以设置
+#KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=False
+```
+
+这样设置后，KToolBox 将只下载附件（attachments），跳过封面图（file）下载。这对于有些作者的图片名称是乱码、需要依赖重命名功能按网页顺序排序的情况很有用。
+
+!!! info "提示"
+    - `download_file`: 控制是否下载帖子文件（通常为封面图片）
+    - `download_attachments`: 控制是否下载帖子附件
+    - 两个选项都默认为 `True`，确保向后兼容性
+
 ## 命令和标志（选项）应当使用 `-` 还是 `_` 作为分隔符？
 
 两者都支持，推荐使用 `-`。

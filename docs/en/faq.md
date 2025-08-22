@@ -44,6 +44,26 @@ KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 !!! info "Notice"
     For more information, please visit [Configuration-Guide](configuration/guide.md) page.
 
+## How to disable cover image download?
+
+You can set configuration option `job.download_file` to `False` to disable cover image (file) download functionality.
+
+Set the configuration by `prod.env` dotenv file or system environment variables:
+```dotenv
+# Disable cover image download
+KTOOLBOX_JOB__DOWNLOAD_FILE=False
+
+# If you also want to disable attachment downloads, you can set
+#KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=False
+```
+
+With this setting, KToolBox will only download attachments and skip file downloads. This is useful when some authors have garbled image names that require renaming functionality to sort by webpage order.
+
+!!! info "Notice"
+    - `download_file`: Controls whether to download post file (usually cover image)
+    - `download_attachments`: Controls whether to download post attachments  
+    - Both options default to `True` for backward compatibility
+
 ## Commands and flags should use `-` or `_` as seperator?
 
 Both is support, `-` is suggested.
