@@ -126,6 +126,10 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
     :ivar group_by_month: 根据发布日期按月分组到不同目录（需要启用 group_by_year）
     :ivar year_dirname_format: 自定义年份目录名格式。可用属性：``year``。例如：``{year}`` > ``2024``，``Year_{year}`` > ``Year_2024``
     :ivar month_dirname_format: 自定义月份目录名格式。可用属性：``year``、``month``。例如：``{year}-{month}`` > ``2024-01``，``{year}_{month}`` > ``2024_01``
+    :ivar keywords: 按帖子标题关键词过滤（不区分大小写）
+    :ivar keywords_exclude: 按帖子标题关键词排除（不区分大小写）
+    :ivar download_file: 是否下载帖子文件（通常为封面图片）。设置为 False 可跳过文件下载。
+    :ivar download_attachments: 是否下载帖子附件。设置为 False 可跳过附件下载。
     """
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
 
