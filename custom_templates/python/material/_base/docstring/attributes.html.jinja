@@ -28,13 +28,13 @@ Context:
           <th>{{ lang.t("Name") }}</th>
           <th>{{ lang.t("Type") }}</th>
           <th>{{ lang.t("Description") }}</th>
-          <th>Default Value</th>
+          <th>{{ lang.t("Default") }}</th>
         </tr>
       </thead>
       <tbody>
         {% for attribute in section.value %}
           <tr class="doc-section-item">
-            <td><code><autoref identifier="{{ obj.path }}.{{ attribute.name }}" optional hover>{{ attribute.name }}</autoref></code></td>
+            <td><code>{{ attribute.name }}</code></td>
             <td>
               {% if attribute.annotation %}
                 {% with expression = attribute.annotation %}
@@ -52,7 +52,12 @@ Context:
                 {% if attribute.value %}
                   {{ attribute.value|e }}
                 {% else %}
-                  {% for member_name, member in obj.members.items() or obj.inherited_members.items() %}
+                  {% for member_name, member in obj.members.items() %}
+                    {% if member_name == attribute.name and member.value %}
+                      {{ member.value|e }}
+                    {% endif %}
+                  {% endfor %}
+                  {% for member_name, member in obj.inherited_members.items() %}
                     {% if member_name == attribute.name and member.value %}
                       {{ member.value|e }}
                     {% endif %}
