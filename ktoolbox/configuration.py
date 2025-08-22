@@ -210,6 +210,8 @@ class JobConfiguration(BaseModel):
     e.g. ``{year}-{month}`` > ``2024-01``, ``{year}_{month}`` > ``2024_01``
     :ivar keywords: keywords to filter posts by title (case-insensitive)
     :ivar keywords_exclude: keywords to exclude posts by title (case-insensitive)
+    :ivar download_file: Download post file (usually cover image). Set to False to skip file downloads.
+    :ivar download_attachments: Download post attachments. Set to False to skip attachment downloads.
     """
     count: int = 4
     include_revisions: bool = False
@@ -281,6 +283,8 @@ class JobConfiguration(BaseModel):
     month_dirname_format: str = "{year}-{month:02d}"
     keywords: Set[str] = Field(default_factory=set)
     keywords_exclude: Set[str] = Field(default_factory=set)
+    download_file: bool = True
+    download_attachments: bool = True
 
 
 class LoggerConfiguration(BaseModel):
