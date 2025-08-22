@@ -131,9 +131,6 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
 
-extra_css:
-  - stylesheets/extra.css
-
 extra:
   version:
     provider: mike
