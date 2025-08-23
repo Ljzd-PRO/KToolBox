@@ -68,6 +68,8 @@ class DownloaderConfiguration(BaseModel):
     For example: ``https://example.com/{}`` will be ``https://example.com/https://n1.kemono.su/data/66/83/xxxxx.jpg``;  \
     ``https://example.com/?url={}`` will be ``https://example.com/?url=https://n1.kemono.su/data/66/83/xxxxx.jpg``
     :ivar keep_metadata: Keep the file metadata when downloading files (e.g. last modified time, etc.)
+    :ivar verify_file_integrity: Verify downloaded file size matches expected Content-Length
+    :ivar checksum_verification: Enable SHA-256 checksum verification for downloaded files
     """
     scheme: Literal["http", "https"] = "https"
     timeout: float = 30.0
@@ -83,6 +85,8 @@ class DownloaderConfiguration(BaseModel):
     bucket_path: Path = Path("./.ktoolbox/bucket_storage")
     reverse_proxy: str = "{}"
     keep_metadata: bool = True
+    verify_file_integrity: bool = True
+    checksum_verification: bool = False
 
     @model_validator(mode="after")
     def check_bucket_path(self) -> "DownloaderConfiguration":
