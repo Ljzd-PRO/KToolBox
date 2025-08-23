@@ -246,7 +246,7 @@ class Downloader:
                             filename=save_filepath
                         )
                     )
-                elif res.status_code != httpx.codes.PARTIAL_CONTENT:
+                elif res.status_code not in (httpx.codes.PARTIAL_CONTENT, httpx.codes.OK):
                     self._url = self._initial_url
                     return DownloaderRet(
                         code=RetCodeEnum.GeneralFailure,
