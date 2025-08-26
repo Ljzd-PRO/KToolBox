@@ -145,7 +145,10 @@ class PostStructureConfiguration(BaseModel):
     Customize the filename format by inserting an empty ``{}`` to represent the basic filename. \
     You can use some of the [properties][ktoolbox.configuration.JobConfiguration] \
     in Post. For example: ``{title}_{}`` could result in filenames like \
-    ``TheTitle_Stelle_lv5_logo.gif``, ``TheTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``, etc.
+    ``TheTitle_Stelle_lv5_logo.gif``, ``TheTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``, etc. \
+    Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example: \
+    ``{title:.6}_{}`` could shorten the title length to 6 characters like \
+    ``HiEveryoneThisIsALongTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg`` to ``HiEver_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``
     :ivar revisions: Sub path of revisions directory
     """
     attachments: Path = Path("attachments")
@@ -178,11 +181,18 @@ class JobConfiguration(BaseModel):
         | ``year``      | String |
         | ``month``     | String |
 
+    - Python Format Specification Mini-Language reference:
+
+        https://docs.python.org/3.13/library/string.html#format-specification-mini-language
+
     :ivar count: Number of coroutines for concurrent download
     :ivar include_revisions: Include and download revision posts when available
     :ivar post_dirname_format: Customize the post directory name format, you can use some of the \
     [properties][ktoolbox.configuration.JobConfiguration] in ``Post``. \
-    e.g. ``[{published}]{id}`` > ``[2024-1-1]123123``, ``{user}_{published}_{title}`` > ``234234_2024-1-1_TheTitle``
+    e.g. ``[{published}]{id}`` could result dirname ``[2024-1-1]123123``, \
+    ``{user}_{published}_{title}`` could result dirname like ``234234_2024-1-1_TheTitle``. \
+    Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example: \
+    ``{title:.6}`` could shorten the title length to 6 characters like ``HiEveryoneThisIsALongTitle`` to ``HiEver``
     :ivar post_structure: Post path structure
     :ivar mix_posts: Save all files from different posts at same path in creator directory. \
     It would not create any post directory, and ``CreatorIndices`` would not been recorded.
@@ -194,7 +204,10 @@ class JobConfiguration(BaseModel):
     in Post. For example: ``{title}_{}`` could result in filenames like \
     ``TheTitle_b4b41de2-8736-480d-b5c3-ebf0d917561b``, ``TheTitle_af349b25-ac08-46d7-98fb-6ce99a237b90``, etc. \
     You can also use it with ``sequential_filename``. For instance, \
-    ``[{published}]_{}`` could result in filenames like ``[2024-1-1]_1.png``, ``[2024-1-1]_2.png``, etc.
+    ``[{published}]_{}`` could result in filenames like ``[2024-1-1]_1.png``, ``[2024-1-1]_2.png``, etc. \
+    Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example: \
+    ``{published}_{:03d}`` could result in filenames like ``2024-1-1_001.png``, ``2024-1-1_002.png`` and \
+    ``{title:.6}`` could shorten the title length to 6 characters like ``HiEveryoneThisIsALongTitle`` to ``HiEver``
     :ivar allow_list: Download files which match these patterns (Unix shell-style), e.g. ``["*.png"]``
     :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``
     :ivar extract_content: Extract post content and save to separate file (filename was defined in ``config.job.post_structure.content``)
