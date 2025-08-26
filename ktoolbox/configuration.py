@@ -213,7 +213,7 @@ class JobConfiguration(BaseModel):
     :ivar extract_content: Extract post content and save to separate file (filename was defined in ``config.job.post_structure.content``)
     :ivar extract_content_images: Extract images from post content and download them.
     :ivar extract_external_links: Extract external file sharing links from post content and save to separate file \
-    (filename was defined in ``config.job.post_structure.external_links``) \
+    (filename was defined in ``config.job.post_structure.external_links``)
     :ivar external_link_patterns: Regex patterns for extracting external links.
     :ivar group_by_year: Group posts by year in separate directories based on published date
     :ivar group_by_month: Group posts by month in separate directories based on published date (requires group_by_year)
