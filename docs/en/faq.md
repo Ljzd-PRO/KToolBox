@@ -179,6 +179,22 @@ This is a **false positive**. KToolBox is completely safe and open-source softwa
 - Source code is completely open and auditable
 - No malicious code exists in this project
 
+## Post title too long to create directory or download file
+
+!!! tip "Tip"
+    For more information about Python format specification mini-language, please refer to [Format Specification Mini-Language](https://docs.python.org/3.13/library/string.html#format-specification-mini-language)
+
+In some cases, overly long post titles may cause download failures. To solve this problem, you can use the Python format specification mini-language to limit the title length in the **custom post directory name format**.
+
+You can set this configuration via the graphical configuration editor, dotenv file `.env`, or system environment variables:
+```dotenv
+# Set the post directory name to the first 30 characters of its title
+KTOOLBOX_JOB__POST_DIRNAME_FORMAT={title:.30}
+
+# If you need to include the title in a custom filename format, you can also limit its length
+KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
+```
+
 ## Where can I find more information about KToolBox?
 
 - Guide: Use **AI(Copilot Spaces)** for command params and configuration help: [#304](https://github.com/Ljzd-PRO/KToolBox/issues/304)
