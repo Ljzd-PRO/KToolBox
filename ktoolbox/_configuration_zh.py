@@ -35,7 +35,9 @@ class DownloaderConfiguration(ktoolbox.configuration.DownloaderConfiguration):
     :ivar tps_limit: 每秒最大连接数
     :ivar use_bucket: 启用本地存储桶模式
     :ivar bucket_path: 本地存储桶路径
-    :ivar reverse_proxy: 下载 URL 的反向代理格式。通过插入空的 ``{}`` 自定义文件名格式以表示原始 URL。例如：``https://example.com/{}`` 会变成 ``https://example.com/https://n1.kemono.su/data/66/83/xxxxx.jpg``；``https://example.com/?url={}`` 会变成 ``https://example.com/?url=https://n1.kemono.su/data/66/83/xxxxx.jpg``
+    :ivar reverse_proxy: 下载 URL 的反向代理格式。通过插入空的 ``{}`` 自定义文件名格式以表示原始 URL。\
+    例如：``https://example.com/{}`` 会变成 ``https://example.com/https://n1.kemono.su/data/66/83/xxxxx.jpg``；\
+    ``https://example.com/?url={}`` 会变成 ``https://example.com/?url=https://n1.kemono.su/data/66/83/xxxxx.jpg``
     :ivar keep_metadata: 下载文件时保留文件元数据（例如最后修改时间等）
     """
     ...
