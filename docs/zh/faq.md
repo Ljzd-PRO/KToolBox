@@ -180,6 +180,22 @@ ktoolbox sync-creator "https://coomer.su/onlyfans/user/hollyharper11" --start-ti
 - 源代码完全开放且可审计
 - 此项目中不存在恶意代码
 
+## 帖子标题太长导致无法创建目录或下载文件
+
+!!! tip "提示"
+    Python 格式规格迷你语言的更多信息，请参考 [格式规格迷你语言](https://docs.python.org/zh-cn/3.13/library/string.html#format-specification-mini-language)
+
+在某些情况下，帖子标题过长会导致下载失败。为了解决这个问题，你可以在 **自定义帖子目录名格式** 中使用 Python 格式规格迷你语言对标题进行长度限制。
+
+通过图形化配置编辑器或 dotenv 文件 `.env` 和系统环境变量来设置配置：
+```dotenv
+# 设置帖子目录名为其标题的前 30 个字符
+KTOOLBOX_JOB__POST_DIRNAME_FORMAT={title:.30}
+
+# 如果你需要在自定义的文件名格式中添加标题，也可以进行长度限制
+KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
+```
+
 ## 我在哪里可以找到更多帮助？
 
 - 向导：用 **AI（Copilot Spaces）** 获取命令参数和配置帮助：[#304](https://github.com/Ljzd-PRO/KToolBox/issues/304)
