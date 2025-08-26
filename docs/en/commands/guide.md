@@ -53,9 +53,6 @@ ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
 # Download all posts of the creator/artist
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016
 ```
-??? info "About `creator-indices.ktoolbox` file"
-    By default, you will get a `creator-indices.ktoolbox` file in the creator directory, 
-    it contains the information and filepath of posts inside the directory.
 
 ??? tip "Update creator directory"
     You can rerun the command, files with the same filename will be skipped.
