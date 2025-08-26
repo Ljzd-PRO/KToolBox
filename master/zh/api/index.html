@@ -26109,20 +26109,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">303</span>
-<span class="normal">304</span>
-<span class="normal">305</span>
-<span class="normal">306</span>
-<span class="normal">307</span>
-<span class="normal">308</span>
-<span class="normal">309</span>
-<span class="normal">310</span>
-<span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">316</span>
 <span class="normal">317</span>
 <span class="normal">318</span>
 <span class="normal">319</span>
@@ -26141,7 +26128,20 @@
 <span class="normal">332</span>
 <span class="normal">333</span>
 <span class="normal">334</span>
-<span class="normal">335</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Configuration</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Configuration</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
     <span class="c1"># noinspection SpellCheckingInspection,GrazieInspection</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    KToolBox Configuration</span>
@@ -27161,6 +27161,10 @@
 </tbody>
 </table>
 </li>
+<li>
+<p>Python Format Specification Mini-Language reference:</p>
+<p>https://docs.python.org/3.13/library/string.html#format-specification-mini-language</p>
+</li>
 </ul>
 
 
@@ -27220,7 +27224,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Customize the post directory name format, you can use some of the     <a class="autorefs autorefs-internal" href="../../api/#ktoolbox.configuration.JobConfiguration">properties</a> in <code>Post</code>.     e.g. <code>[{published}]{id}</code> &gt; <code>[2024-1-1]123123</code>, <code>{user}_{published}_{title}</code> &gt; <code>234234_2024-1-1_TheTitle</code></p>
+                <p>Customize the post directory name format, you can use some of the     <a class="autorefs autorefs-internal" href="../../api/#ktoolbox.configuration.JobConfiguration">properties</a> in <code>Post</code>.     e.g. <code>[{published}]{id}</code> could result dirname <code>[2024-1-1]123123</code>,     <code>{user}_{published}_{title}</code> could result dirname like <code>234234_2024-1-1_TheTitle</code>.     Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example:     <code>{title:.6}</code> could shorten the title length to 6 characters like <code>HiEveryoneThisIsALongTitle</code> to <code>HiEver</code></p>
               </div>
             </td>
             <td>
@@ -27300,7 +27304,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Customize the filename format by inserting an empty <code>{}</code> to represent the basic filename. Similar to post_dirname_format, you can use some of the <a class="autorefs autorefs-internal" href="../../api/#ktoolbox.configuration.JobConfiguration">properties</a>     in Post. For example: <code>{title}_{}</code> could result in filenames like     <code>TheTitle_b4b41de2-8736-480d-b5c3-ebf0d917561b</code>, <code>TheTitle_af349b25-ac08-46d7-98fb-6ce99a237b90</code>, etc.     You can also use it with <code>sequential_filename</code>. For instance,     <code>[{published}]_{}</code> could result in filenames like <code>[2024-1-1]_1.png</code>, <code>[2024-1-1]_2.png</code>, etc.</p>
+                <p>Customize the filename format by inserting an empty <code>{}</code> to represent the basic filename. Similar to post_dirname_format, you can use some of the <a class="autorefs autorefs-internal" href="../../api/#ktoolbox.configuration.JobConfiguration">properties</a>     in Post. For example: <code>{title}_{}</code> could result in filenames like     <code>TheTitle_b4b41de2-8736-480d-b5c3-ebf0d917561b</code>, <code>TheTitle_af349b25-ac08-46d7-98fb-6ce99a237b90</code>, etc.     You can also use it with <code>sequential_filename</code>. For instance,     <code>[{published}]_{}</code> could result in filenames like <code>[2024-1-1]_1.png</code>, <code>[2024-1-1]_2.png</code>, etc.     Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example:     <code>{published}_{:03d}</code> could result in filenames like <code>2024-1-1_001.png</code>, <code>2024-1-1_002.png</code> and     <code>{title:.6}</code> could shorten the title length to 6 characters like <code>HiEveryoneThisIsALongTitle</code> to <code>HiEver</code></p>
               </div>
             </td>
             <td>
@@ -27538,10 +27542,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">161</span>
 <span class="normal">162</span>
 <span class="normal">163</span>
 <span class="normal">164</span>
@@ -27667,7 +27668,20 @@
 <span class="normal">284</span>
 <span class="normal">285</span>
 <span class="normal">286</span>
-<span class="normal">287</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">JobConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">JobConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Download jobs Configuration</span>
 
@@ -27690,11 +27704,18 @@
 <span class="sd">        | ``year``      | String |</span>
 <span class="sd">        | ``month``     | String |</span>
 
+<span class="sd">    - Python Format Specification Mini-Language reference:</span>
+
+<span class="sd">        https://docs.python.org/3.13/library/string.html#format-specification-mini-language</span>
+
 <span class="sd">    :ivar count: Number of coroutines for concurrent download</span>
 <span class="sd">    :ivar include_revisions: Include and download revision posts when available</span>
 <span class="sd">    :ivar post_dirname_format: Customize the post directory name format, you can use some of the \</span>
 <span class="sd">    [properties][ktoolbox.configuration.JobConfiguration] in ``Post``. \</span>
-<span class="sd">    e.g. ``[{published}]{id}`` &gt; ``[2024-1-1]123123``, ``{user}_{published}_{title}`` &gt; ``234234_2024-1-1_TheTitle``</span>
+<span class="sd">    e.g. ``[{published}]{id}`` could result dirname ``[2024-1-1]123123``, \</span>
+<span class="sd">    ``{user}_{published}_{title}`` could result dirname like ``234234_2024-1-1_TheTitle``. \</span>
+<span class="sd">    Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example: \</span>
+<span class="sd">    ``{title:.6}`` could shorten the title length to 6 characters like ``HiEveryoneThisIsALongTitle`` to ``HiEver``</span>
 <span class="sd">    :ivar post_structure: Post path structure</span>
 <span class="sd">    :ivar mix_posts: Save all files from different posts at same path in creator directory. \</span>
 <span class="sd">    It would not create any post directory, and ``CreatorIndices`` would not been recorded.</span>
@@ -27706,7 +27727,10 @@
 <span class="sd">    in Post. For example: ``{title}_{}`` could result in filenames like \</span>
 <span class="sd">    ``TheTitle_b4b41de2-8736-480d-b5c3-ebf0d917561b``, ``TheTitle_af349b25-ac08-46d7-98fb-6ce99a237b90``, etc. \</span>
 <span class="sd">    You can also use it with ``sequential_filename``. For instance, \</span>
-<span class="sd">    ``[{published}]_{}`` could result in filenames like ``[2024-1-1]_1.png``, ``[2024-1-1]_2.png``, etc.</span>
+<span class="sd">    ``[{published}]_{}`` could result in filenames like ``[2024-1-1]_1.png``, ``[2024-1-1]_2.png``, etc. \</span>
+<span class="sd">    Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example: \</span>
+<span class="sd">    ``{published}_{:03d}`` could result in filenames like ``2024-1-1_001.png``, ``2024-1-1_002.png`` and \</span>
+<span class="sd">    ``{title:.6}`` could shorten the title length to 6 characters like ``HiEveryoneThisIsALongTitle`` to ``HiEver``</span>
 <span class="sd">    :ivar allow_list: Download files which match these patterns (Unix shell-style), e.g. ``[&quot;*.png&quot;]``</span>
 <span class="sd">    :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``[&quot;*.psd&quot;,&quot;*.zip&quot;]``</span>
 <span class="sd">    :ivar extract_content: Extract post content and save to separate file (filename was defined in ``config.job.post_structure.content``)</span>
@@ -28349,17 +28373,17 @@
 
               <details class="quote">
                 <summary>Source code in <code>ktoolbox/configuration.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">290</span>
-<span class="normal">291</span>
-<span class="normal">292</span>
-<span class="normal">293</span>
-<span class="normal">294</span>
-<span class="normal">295</span>
-<span class="normal">296</span>
-<span class="normal">297</span>
-<span class="normal">298</span>
-<span class="normal">299</span>
-<span class="normal">300</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">LoggerConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">LoggerConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Logger configuration</span>
 
@@ -28606,7 +28630,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The format of the post <code>file</code> filename (<code>file</code> is not <code>attachment</code>, each post has only one <code>file</code>, usually the cover image)     Customize the filename format by inserting an empty <code>{}</code> to represent the basic filename.     You can use some of the <a class="autorefs autorefs-internal" href="../../api/#ktoolbox.configuration.JobConfiguration">properties</a>     in Post. For example: <code>{title}_{}</code> could result in filenames like     <code>TheTitle_Stelle_lv5_logo.gif</code>, <code>TheTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg</code>, etc.</p>
+                <p>The format of the post <code>file</code> filename (<code>file</code> is not <code>attachment</code>, each post has only one <code>file</code>, usually the cover image)     Customize the filename format by inserting an empty <code>{}</code> to represent the basic filename.     You can use some of the <a class="autorefs autorefs-internal" href="../../api/#ktoolbox.configuration.JobConfiguration">properties</a>     in Post. For example: <code>{title}_{}</code> could result in filenames like     <code>TheTitle_Stelle_lv5_logo.gif</code>, <code>TheTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg</code>, etc.     Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example:     <code>{title:.6}_{}</code> could shorten the title length to 6 characters like     <code>HiEveryoneThisIsALongTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg</code> to <code>HiEver_ScxHjZIdxt5cnjaAwf3ql2p7.jpg</code></p>
               </div>
             </td>
             <td>
@@ -28686,7 +28710,10 @@
 <span class="normal">152</span>
 <span class="normal">153</span>
 <span class="normal">154</span>
-<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">PostStructureConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">PostStructureConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="c1"># noinspection SpellCheckingInspection,GrazieInspection</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Post path structure model</span>
@@ -28729,7 +28756,10 @@
 <span class="sd">    Customize the filename format by inserting an empty ``{}`` to represent the basic filename. \</span>
 <span class="sd">    You can use some of the [properties][ktoolbox.configuration.JobConfiguration] \</span>
 <span class="sd">    in Post. For example: ``{title}_{}`` could result in filenames like \</span>
-<span class="sd">    ``TheTitle_Stelle_lv5_logo.gif``, ``TheTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``, etc.</span>
+<span class="sd">    ``TheTitle_Stelle_lv5_logo.gif``, ``TheTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``, etc. \</span>
+<span class="sd">    Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example: \</span>
+<span class="sd">    ``{title:.6}_{}`` could shorten the title length to 6 characters like \</span>
+<span class="sd">    ``HiEveryoneThisIsALongTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg`` to ``HiEver_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``</span>
 <span class="sd">    :ivar revisions: Sub path of revisions directory</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">attachments</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;attachments&quot;</span><span class="p">)</span>

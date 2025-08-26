@@ -982,6 +982,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#post-title-too-long-to-create-directory-or-download-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Post title too long to create directory or download file
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-can-i-find-more-information-about-ktoolbox" class="md-nav__link">
     <span class="md-ellipsis">
       Where can I find more information about KToolBox?
@@ -1146,6 +1155,15 @@
   <a href="#antivirus-software-flags-the-executable-as-a-virusthreat" class="md-nav__link">
     <span class="md-ellipsis">
       Antivirus software flags the executable as a virus/threat
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#post-title-too-long-to-create-directory-or-download-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Post title too long to create directory or download file
     </span>
   </a>
   
@@ -1327,6 +1345,19 @@ poetry<span class="w"> </span>run<span class="w"> </span>pyinstaller<span class=
 - All releases are built automatically using GitHub Actions (publicly visible)
 - Source code is completely open and auditable
 - No malicious code exists in this project</p>
+<h2 id="post-title-too-long-to-create-directory-or-download-file">Post title too long to create directory or download file<a class="headerlink" href="#post-title-too-long-to-create-directory-or-download-file" title="Permanent link">&para;</a></h2>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>For more information about Python format specification mini-language, please refer to <a href="https://docs.python.org/3.13/library/string.html#format-specification-mini-language">Format Specification Mini-Language</a></p>
+</div>
+<p>In some cases, overly long post titles may cause download failures. To solve this problem, you can use the Python format specification mini-language to limit the title length in the <strong>custom post directory name format</strong>.</p>
+<p>You can set this configuration via the graphical configuration editor, dotenv file <code>.env</code>, or system environment variables:
+<div class="highlight"><pre><span></span><code># Set the post directory name to the first 30 characters of its title
+KTOOLBOX_JOB__POST_DIRNAME_FORMAT={title:.30}
+
+# If you need to include the title in a custom filename format, you can also limit its length
+KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
+</code></pre></div></p>
 <h2 id="where-can-i-find-more-information-about-ktoolbox">Where can I find more information about KToolBox?<a class="headerlink" href="#where-can-i-find-more-information-about-ktoolbox" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Guide: Use <strong>AI(Copilot Spaces)</strong> for command params and configuration help: <a href="https://github.com/Ljzd-PRO/KToolBox/issues/304">#304</a></li>
