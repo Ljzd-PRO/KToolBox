@@ -52,6 +52,6 @@ Thank you for your contribution!
 通过贡献您的代码，您同意将您的工作授权给项目根据项目的许可证。
 
 ## 5. 反馈
-如果您有其他问题或需要帮助，可以通过 [📫ljzd@office.ljzd-pro.asia](mailto:ljzd@office.ljzd-pro.asia) 联系我们。
+如果您有其他问题或需要帮助，可以通过 [📫ljzd@office.ljzd-pro.asia](mailto:me@ljzd.link) 联系我们。
 
 谢谢您的贡献！
