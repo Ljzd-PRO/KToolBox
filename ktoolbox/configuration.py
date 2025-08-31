@@ -206,7 +206,6 @@ class JobConfiguration(BaseModel):
     You can also use it with ``sequential_filename``. For instance, \
     ``[{published}]_{}`` could result in filenames like ``[2024-1-1]_1.png``, ``[2024-1-1]_2.png``, etc. \
     Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example: \
-    ``{published}_{:03d}`` could result in filenames like ``2024-1-1_001.png``, ``2024-1-1_002.png`` and \
     ``{title:.6}`` could shorten the title length to 6 characters like ``HiEveryoneThisIsALongTitle`` to ``HiEver``
     :ivar allow_list: Download files which match these patterns (Unix shell-style), e.g. ``["*.png"]``
     :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``

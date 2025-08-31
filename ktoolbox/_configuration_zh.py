@@ -132,8 +132,7 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
     :ivar filename_format: 通过插入空的 ``{}`` 自定义文件名格式，表示基本文件名。可使用 [属性][ktoolbox._configuration_zh.JobConfiguration]。\
     例如：``{title}_{}`` 可能生成 ``TheTitle_b4b41de2-8736-480d-b5c3-ebf0d917561b``、``TheTitle_af349b25-ac08-46d7-98fb-6ce99a237b90`` 等。\
     也可与 ``sequential_filename`` 结合使用，如 ``[{published}]_{}`` 可能生成 ``[2024-1-1]_1.png``、``[2024-1-1]_2.png`` 等。\
-    同时，你也可以使用 Python 格式规格迷你语言的格式化功能，例如：``{published}_{:03d}`` 可以生成类似 ``2024-1-1_001.png``、``2024-1-1_002.png`` 这样的文件名，\
-    ``{title:.6}`` 可以将标题长度缩短为 6 个字符，像 ``HiEveryoneThisIsALongTitle`` 会变成 ``HiEver``
+    同时，你也可以使用 Python 格式规格迷你语言的格式化功能，例如：``{title:.6}`` 可以将标题长度缩短为 6 个字符，像 ``HiEveryoneThisIsALongTitle`` 会变成 ``HiEver``
     :ivar allow_list: 下载匹配这些模式（Unix shell 风格）的文件，如 ``["*.png"]``
     :ivar block_list: 不下载匹配这些模式（Unix shell 风格）的文件，如 ``["*.psd","*.zip"]``
     :ivar extract_content: 提取帖子内容并保存到单独文件（文件名由 ``config.job.post_structure.content`` 定义）
