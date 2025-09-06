@@ -278,6 +278,63 @@ class Downloader:
 
                 # Download
                 total_size = int(range_str.split("/")[-1]) if (range_str := res.headers.get("Content-Range")) else None
+                
+                # Check file size filtering if enabled and we have the total size
+                if total_size is not None and (config.job.min_file_size is not None or config.job.max_file_size is not None):
+                    # Check minimum size
+                    if config.job.min_file_size is not None and total_size < config.job.min_file_size:
+                        logger.debug(f"Skipping file {self._save_filename} (size: {total_size} bytes) - below minimum size {config.job.min_file_size}")
+                        return DownloaderRet(
+                            code=RetCodeEnum.FileExisted,  # Use FileExisted to indicate it was skipped intentionally
+                            message=generate_msg(
+                                f"File skipped due to size filtering (size: {total_size} bytes, below minimum: {config.job.min_file_size})",
+                                path=save_filepath
+                            )
+                        )
+                    
+                    # Check maximum size  
+                    if config.job.max_file_size is not None and total_size > config.job.max_file_size:
+                        logger.debug(f"Skipping file {self._save_filename} (size: {total_size} bytes) - above maximum size {config.job.max_file_size}")
+                        return DownloaderRet(
+                            code=RetCodeEnum.FileExisted,  # Use FileExisted to indicate it was skipped intentionally
+                            message=generate_msg(
+                                f"File skipped due to size filtering (size: {total_size} bytes, above maximum: {config.job.max_file_size})",
+                                path=save_filepath
+                            )
+                        )
+                        
+                # If no Content-Range header, try to get size from Content-Length
+                if total_size is None:
+                    content_length = res.headers.get("Content-Length")
+                    if content_length:
+                        try:
+                            total_size = int(content_length)
+                            # Apply size filtering with Content-Length
+                            if config.job.min_file_size is not None or config.job.max_file_size is not None:
+                                # Check minimum size
+                                if config.job.min_file_size is not None and total_size < config.job.min_file_size:
+                                    logger.debug(f"Skipping file {self._save_filename} (size: {total_size} bytes) - below minimum size {config.job.min_file_size}")
+                                    return DownloaderRet(
+                                        code=RetCodeEnum.FileExisted,  # Use FileExisted to indicate it was skipped intentionally
+                                        message=generate_msg(
+                                            f"File skipped due to size filtering (size: {total_size} bytes, below minimum: {config.job.min_file_size})",
+                                            path=save_filepath
+                                        )
+                                    )
+                                
+                                # Check maximum size  
+                                if config.job.max_file_size is not None and total_size > config.job.max_file_size:
+                                    logger.debug(f"Skipping file {self._save_filename} (size: {total_size} bytes) - above maximum size {config.job.max_file_size}")
+                                    return DownloaderRet(
+                                        code=RetCodeEnum.FileExisted,  # Use FileExisted to indicate it was skipped intentionally
+                                        message=generate_msg(
+                                            f"File skipped due to size filtering (size: {total_size} bytes, above maximum: {config.job.max_file_size})",
+                                            path=save_filepath
+                                        )
+                                    )
+                        except ValueError:
+                            # Invalid Content-Length, continue with download
+                            pass
                 async with aiofiles.open(str(temp_filepath), "ab", self._buffer_size) as f:
                     chunk_iterator = res.aiter_bytes(self._chunk_size)
                     t = tqdm_class(

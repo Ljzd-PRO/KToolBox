@@ -146,6 +146,8 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
     :ivar keywords_exclude: 按帖子标题关键词排除（不区分大小写）
     :ivar download_file: 是否下载帖子文件（通常为封面图片）。设置为 False 可跳过文件下载。
     :ivar download_attachments: 是否下载帖子附件。设置为 False 可跳过附件下载。
+    :ivar min_file_size: 最小文件大小（字节）。小于此大小的文件将被跳过。设置为 None 禁用最小文件大小过滤。
+    :ivar max_file_size: 最大文件大小（字节）。大于此大小的文件将被跳过。设置为 None 禁用最大文件大小过滤。
     """
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
 
