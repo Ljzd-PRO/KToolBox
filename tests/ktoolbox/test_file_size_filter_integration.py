@@ -1,12 +1,10 @@
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from unittest.mock import AsyncMock
-from typing import Optional
 
 import pytest
 
-from ktoolbox.action.job import create_job_from_post, _should_filter_by_size
+from ktoolbox.action.job import create_job_from_post
 from ktoolbox.api.model import Post, Attachment, File
 from ktoolbox.configuration import config
 
@@ -28,8 +26,8 @@ def mock_post():
     )
 
 
-class TestBasicFileSizeFilter:
-    """Basic file size filtering tests."""
+class TestFileSizeFilterIntegration:
+    """Test that file size filtering is deferred to download time."""
 
     @pytest.fixture(autouse=True)
     def reset_config(self):
@@ -41,15 +39,17 @@ class TestBasicFileSizeFilter:
         yield
 
     @pytest.mark.asyncio
-    async def test_no_size_filtering_without_client(self, mock_post):
-        """Test that without client, no size filtering occurs."""
-        config.job.max_file_size = 1000000  # 1MB
+    async def test_jobs_created_regardless_of_size_limits(self, mock_post):
+        """Test that jobs are created regardless of configured size limits."""
+        # Set aggressive size limits
+        config.job.min_file_size = 999999999  # 999MB minimum
+        config.job.max_file_size = 1000       # 1KB maximum (impossible)
         
         with tempfile.TemporaryDirectory() as temp_dir:
             post_path = Path(temp_dir) / "test_post"
-            jobs = await create_job_from_post(mock_post, post_path, dump_post_data=False, client=None)
+            jobs = await create_job_from_post(mock_post, post_path, dump_post_data=False)
             
-            # Should have all 3 jobs regardless of size limits (no client = no filtering)
+            # Should still create all 3 jobs (filtering happens at download time)
             assert len(jobs) == 3
             job_filenames = {job.alt_filename for job in jobs}
             assert "image.jpg" in job_filenames
@@ -57,28 +57,17 @@ class TestBasicFileSizeFilter:
             assert "test_post_123_cover.jpg" in job_filenames  # Post file gets prefixed with ID
 
     @pytest.mark.asyncio
-    async def test_no_size_filtering_without_limits(self, mock_post):
-        """Test that without size limits, no filtering occurs."""
+    async def test_jobs_created_without_size_limits(self, mock_post):
+        """Test that jobs are created when no size limits are configured."""
         # No size limits configured
-        mock_client = AsyncMock()
         
         with tempfile.TemporaryDirectory() as temp_dir:
             post_path = Path(temp_dir) / "test_post"
-            jobs = await create_job_from_post(mock_post, post_path, dump_post_data=False, client=mock_client)
+            jobs = await create_job_from_post(mock_post, post_path, dump_post_data=False)
             
-            # Should have all 3 jobs
+            # Should create all 3 jobs
             assert len(jobs) == 3
-
-    @pytest.mark.asyncio
-    async def test_should_filter_by_size_no_limits(self):
-        """Test filtering function with no size limits."""
-        mock_client = AsyncMock()
-        result = await _should_filter_by_size("/test/file.jpg", mock_client)
-        assert result is False
-
-    @pytest.mark.asyncio
-    async def test_should_filter_by_size_no_client(self):
-        """Test filtering function with no client."""
-        config.job.max_file_size = 1000000
-        result = await _should_filter_by_size("/test/file.jpg", None)
-        assert result is False
+            job_filenames = {job.alt_filename for job in jobs}
+            assert "image.jpg" in job_filenames
+            assert "video.mp4" in job_filenames
+            assert "test_post_123_cover.jpg" in job_filenames

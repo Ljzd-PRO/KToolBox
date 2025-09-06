@@ -18,47 +18,10 @@ from ktoolbox.api.model import Post, Attachment, Revision
 from ktoolbox.api.posts import get_post_revisions as get_post_revisions_api, get_post as get_post_api
 from ktoolbox.configuration import config
 from ktoolbox.job import Job, CreatorIndices
-from ktoolbox.utils import extract_external_links, generate_msg, get_file_size
+from ktoolbox.utils import extract_external_links, generate_msg
 
 __all__ = ["create_job_from_post", "create_job_from_creator"]
 
-
-async def _should_filter_by_size(file_path: str, client: Optional[httpx.AsyncClient]) -> bool:
-    """
-    Check if a file should be filtered out based on its size
-    
-    :param file_path: Server path of the file
-    :param client: HTTP client for making HEAD requests
-    :return: True if file should be filtered out (skipped), False otherwise
-    """
-    # Skip size filtering if no client provided or no size limits configured
-    if not client or (config.job.min_file_size is None and config.job.max_file_size is None):
-        return False
-    
-    # Build full URL for size checking
-    if not file_path.startswith(('http://', 'https://')):
-        # Construct URL from server path
-        url = f"{config.downloader.scheme}://{config.api.files_netloc}{file_path}"
-    else:
-        url = file_path
-    
-    file_size = await get_file_size(url, client)
-    
-    # If we can't get file size, don't filter it out (let download proceed)
-    if file_size is None:
-        return False
-    
-    # Check minimum size
-    if config.job.min_file_size is not None and file_size < config.job.min_file_size:
-        logger.debug(f"Skipping file {file_path} (size: {file_size} bytes) - below minimum size {config.job.min_file_size}")
-        return True
-    
-    # Check maximum size  
-    if config.job.max_file_size is not None and file_size > config.job.max_file_size:
-        logger.debug(f"Skipping file {file_path} (size: {file_size} bytes) - above maximum size {config.job.max_file_size}")
-        return True
-    
-    return False
 
 
 async def create_job_from_post(
@@ -66,8 +29,7 @@ async def create_job_from_post(
         post_path: Path,
         *,
         post_dir: bool = True,
-        dump_post_data: bool = True,
-        client: Optional[httpx.AsyncClient] = None
+        dump_post_data: bool = True
 ) -> List[Job]:
     """
     Create a list of download job from a post data
@@ -76,7 +38,6 @@ async def create_job_from_post(
     :param post_path: Path of the post directory, which needs to be sanitized
     :param post_dir: Whether to create post directory
     :param dump_post_data: Whether to dump post data (post.json) in post directory
-    :param client: HTTP client for file size checking. If None, file size filtering will be skipped.
     :raise FetchInterruptError: If fetching post content fails
     """
     post_path.mkdir(parents=True, exist_ok=True)
@@ -121,10 +82,6 @@ async def create_job_from_post(
                     config.job.block_list
                 )
             ):
-                # Check file size filtering
-                if await _should_filter_by_size(attachment.path, client):
-                    continue
-                    
                 # Check if file extension should be excluded from sequential naming
                 should_use_sequential = (config.job.sequential_filename and
                                          file_path_obj.suffix.lower() not in config.job.sequential_filename_excludes)
@@ -161,17 +118,16 @@ async def create_job_from_post(
                 config.job.block_list
             )
         ):
-            # Check file size filtering for post file
-            if not await _should_filter_by_size(post.file.path, client):
-                jobs.append(
-                    Job(
-                        path=post_path,
-                        alt_filename=post_file_name.name,
-                        server_path=post.file.path,
-                        type=PostFileTypeEnum.File,
-                        post=post
-                    )
+            # Jobs for post file (no size filtering check needed here)
+            jobs.append(
+                Job(
+                    path=post_path,
+                    alt_filename=post_file_name.name,
+                    server_path=post.file.path,
+                    type=PostFileTypeEnum.File,
+                    post=post
                 )
+            )
     # ``post.substring`` is used to determine if the post has content, but it's only partial
     if (post.content or post.substring) and post_dir and (
             config.job.extract_content or config.job.extract_external_links or config.job.extract_content_images
@@ -258,10 +214,8 @@ async def create_job_from_post(
                             config.job.block_list
                         )
                     ):
-                        # Check file size filtering for content images
-                        if await _should_filter_by_size(image_path, client):
-                            continue
-                            
+                        # No size filtering check needed here, will be done during download
+                        
                         # Regenerate filename with correct counter
                         should_use_sequential = (config.job.sequential_filename and
                                                  image_file_path.suffix.lower() not in config.job.sequential_filename_excludes)
@@ -384,15 +338,6 @@ async def create_job_from_creator(
             "`job.extract_content` or `job.extract_external_links` or `job.extract_content_images` is enabled "
             "and will fetch post content one by one, which may take time. Disable if not needed.")
 
-    # Create HTTP client for file size checking if size filtering is enabled
-    client = None
-    if config.job.min_file_size is not None or config.job.max_file_size is not None:
-        client = httpx.AsyncClient(
-            timeout=config.downloader.timeout,
-            verify=config.ssl_verify,
-            follow_redirects=True
-        )
-
     try:
         job_list: List[Job] = []
         for post in post_list:
@@ -410,8 +355,7 @@ async def create_job_from_creator(
                     post=post,
                     post_path=post_path,
                     post_dir=not mix_posts,
-                    dump_post_data=not mix_posts,
-                    client=client
+                    dump_post_data=not mix_posts
                 )
             except FetchInterruptError as e:
                 return ActionRet(**e.ret.model_dump(mode="python"))
@@ -433,8 +377,7 @@ async def create_job_from_creator(
                                     revision_jobs = await create_job_from_post(
                                         post=revision,
                                         post_path=revision_path,
-                                        dump_post_data=True,
-                                        client=client
+                                        dump_post_data=True
                                     )
                                 except FetchInterruptError as e:
                                     return ActionRet(**e.ret.model_dump(mode="python"))
@@ -443,7 +386,5 @@ async def create_job_from_creator(
                     logger.warning(f"Failed to fetch revisions for post {post.id}: {e}")
 
         return ActionRet(data=job_list)
-    finally:
-        # Close HTTP client if it was created
-        if client:
-            await client.aclose()
+    except FetchInterruptError as e:
+        return ActionRet(**e.ret.model_dump(mode="python"))
