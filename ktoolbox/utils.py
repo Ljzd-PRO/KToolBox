@@ -4,12 +4,15 @@ import logging
 import re
 import sys
 from pathlib import Path
-from typing import Generic, TypeVar, Optional, List, Tuple, Set
+from typing import Generic, TypeVar, Optional, List, Tuple, Set, TYPE_CHECKING
 
 import aiofiles
 from loguru import logger
 from pydantic import BaseModel, ConfigDict
 from tqdm import tqdm
+
+if TYPE_CHECKING:
+    import httpx
 
 from ktoolbox._enum import RetCodeEnum, DataStorageNameEnum
 from ktoolbox.configuration import config
@@ -23,7 +26,8 @@ __all__ = [
     "parse_webpage_url",
     "uvloop_init",
     "extract_external_links",
-    "check_for_updates"
+    "check_for_updates",
+    "get_file_size"
 ]
 
 _T = TypeVar('_T')
@@ -213,6 +217,57 @@ def extract_external_links(content: str, custom_patterns: Optional[List[str]] = 
             links.add(url)
 
     return links
+
+
+async def get_file_size(url: str, client: "httpx.AsyncClient") -> Optional[int]:
+    """
+    Get file size from URL using HEAD request
+    
+    :param url: The URL to check
+    :param client: HTTP client to use for the request
+    :return: File size in bytes, or None if cannot be determined
+    """
+    try:
+        # Use HEAD request to get file size without downloading the file
+        response = await client.head(
+            url=config.downloader.reverse_proxy.format(url),
+            follow_redirects=True,
+            timeout=config.downloader.timeout
+        )
+        
+        if response.status_code == 200:
+            # Try to get size from Content-Length header
+            content_length = response.headers.get("Content-Length")
+            if content_length:
+                return int(content_length)
+                
+        # If HEAD request fails or no Content-Length, try a GET request with Range header
+        # to get the Content-Range which contains the total size
+        response = await client.get(
+            url=config.downloader.reverse_proxy.format(url),
+            headers={"Range": "bytes=0-0"},
+            follow_redirects=True,
+            timeout=config.downloader.timeout
+        )
+        
+        if response.status_code in (200, 206):  # 206 is Partial Content
+            content_range = response.headers.get("Content-Range")
+            if content_range:
+                # Content-Range format: "bytes 0-0/12345" where 12345 is total size
+                range_str = content_range.split("/")[-1]
+                if range_str.isdigit():
+                    return int(range_str)
+                    
+            # Fallback: if Content-Length is available in GET response
+            content_length = response.headers.get("Content-Length")
+            if content_length:
+                return int(content_length)
+        
+        return None
+        
+    except Exception as e:
+        logger.debug(f"Failed to get file size for {url}: {e}")
+        return None
 
 
 async def check_for_updates() -> None:
