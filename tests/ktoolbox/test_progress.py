@@ -392,8 +392,7 @@ class TestEnhancedProgressManager:
     
     def test_rich_unicode_progress_bars(self):
         """Test that Rich-based Unicode progress bars work correctly"""
-        from ktoolbox.progress import RICH_AVAILABLE
-        
+
         # Test with Rich enabled (when available)
         manager = ProgressManager(max_workers=3, use_colors=True, use_emojis=False)
         
@@ -403,7 +402,7 @@ class TestEnhancedProgressManager:
         
         line = manager._render_single_progress_bar(manager._progress_bars[pbar.progress_id])
         
-        if RICH_AVAILABLE:
+        if ColorTheme.supports_color():
             # Should contain Unicode characters when Rich is available
             assert '━' in line, f"Should contain Unicode progress char '━', but got: {line}"
             assert '╺' in line, f"Should contain Unicode indicator '╺', but got: {line}"
