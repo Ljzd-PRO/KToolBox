@@ -16,7 +16,8 @@
     KTOOLBOX_JOB__MAX_FILE_SIZE=52428800
     ```
   - 📖 More info: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
-- Improved progress bar output: fixed the issue where download file progress bars **kept reordering**, and added visual overall progress bar
+- Improved progress bar output, fixed the issue of the download file progress bar **constantly reordering**,
+added a **visual overall progress bar**, and also enhanced the **color rendering** of the progress bar
     ```
     🔄   [==>---------------------------] 9% \| Jobs: 173/1870 \| 3 running \| 1694 waiting \| 5.7MB/s
     
@@ -53,7 +54,7 @@
     KTOOLBOX_JOB__MAX_FILE_SIZE=52428800
     ```
   - 📖 更多信息：[Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/zh/configuration/reference/#ktoolbox._configuration_zh.JobConfiguration)
-- 改进进度条输出，修复了下载文件进度条**不断重新排序**的问题，并增加了可视化的总进度条
+- 改进进度条输出，修复了下载文件进度条**不断重新排序**的问题，并增加了**可视化的总进度条**，同时增加了进度条的**颜色渲染**
   ```
   🔄   [==>---------------------------] 9% | Jobs: 173/1870 | 3 running | 1694 waiting | 5.7MB/s
 
