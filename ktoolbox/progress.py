@@ -15,6 +15,13 @@ from typing import Dict, List, Optional, TextIO
 from dataclasses import dataclass, field
 
 from tqdm import tqdm as std_tqdm
+try:
+    from rich.console import Console
+    from rich.text import Text
+    from rich.style import Style as RichStyle
+    RICH_AVAILABLE = True
+except ImportError:
+    RICH_AVAILABLE = False
 
 __all__ = ["ProgressManager", "ManagedTqdm", "ColorTheme", "setup_logger_for_progress", "create_managed_tqdm_class"]
 
@@ -53,9 +60,12 @@ class ProgressAwareHandler:
 
 
 class ColorTheme:
-    """ANSI color codes and themes for progress display"""
+    """Rich-based color themes and styles for progress display"""
 
-    # ANSI Color codes
+    # Rich console for color support detection and rendering
+    _console = Console() if RICH_AVAILABLE else None
+
+    # ANSI Color codes (fallback when Rich not available)
     RESET = '\033[0m'
     BOLD = '\033[1m'
 
@@ -82,6 +92,27 @@ class ColorTheme:
     BG_RED = '\033[41m'
     BG_YELLOW = '\033[43m'
 
+    # Rich style mappings
+    if RICH_AVAILABLE:
+        RICH_STYLES = {
+            RED: "red",
+            GREEN: "green",
+            YELLOW: "yellow",
+            BLUE: "blue", 
+            MAGENTA: "magenta",
+            CYAN: "cyan",
+            WHITE: "white",
+            BRIGHT_RED: "bright_red",
+            BRIGHT_GREEN: "bright_green",
+            BRIGHT_YELLOW: "bright_yellow",
+            BRIGHT_BLUE: "bright_blue",
+            BRIGHT_MAGENTA: "bright_magenta",
+            BRIGHT_CYAN: "bright_cyan",
+            BRIGHT_WHITE: "bright_white",
+        }
+    else:
+        RICH_STYLES = {}
+
     # Emojis
     DOWNLOAD = "📥"
     COMPLETED = "✅"
@@ -96,19 +127,42 @@ class ColorTheme:
 
     @classmethod
     def colorize(cls, text: str, color: str, bold: bool = False) -> str:
-        """Apply color to text with optional bold"""
+        """Apply color to text with optional bold using Rich when available"""
         if not cls.supports_color():
             return text
-        prefix = cls.BOLD + color if bold else color
-        return f"{prefix}{text}{cls.RESET}"
+        
+        if RICH_AVAILABLE:
+            # Use Rich for more robust color support
+            rich_color = cls.RICH_STYLES.get(color, color)
+            style = f"bold {rich_color}" if bold else rich_color
+            
+            # Create a Text object and render it to get the styled string
+            from rich.text import Text
+            from rich.console import Console
+            
+            text_obj = Text(text, style=style)
+            # Create a temporary console that forces color output for testing
+            console = Console(force_terminal=True, width=1000)
+            with console.capture() as capture:
+                console.print(text_obj, end="")
+            return capture.get()
+        else:
+            # Fallback to ANSI codes
+            prefix = cls.BOLD + color if bold else color
+            return f"{prefix}{text}{cls.RESET}"
 
     @classmethod
     def supports_color(cls) -> bool:
-        """Check if terminal supports color"""
-        return (
-            hasattr(sys.stdout, 'isatty') and sys.stdout.isatty() and
-            not sys.platform.startswith('win') or 'ANSICON' in os.environ
-        )
+        """Check if terminal supports color using Rich when available"""
+        if RICH_AVAILABLE and cls._console:
+            # Rich handles color support detection better
+            return cls._console.is_terminal and not cls._console.options.legacy_windows
+        else:
+            # Fallback to manual detection
+            return (
+                hasattr(sys.stdout, 'isatty') and sys.stdout.isatty() and
+                not sys.platform.startswith('win') or 'ANSICON' in os.environ
+            )
 
 
 # Animation state for spinners
@@ -316,7 +370,7 @@ class ProgressManager:
         return f"{self._format_size(int(rate))}/s"
 
     def _render_overall_progress(self) -> List[str]:
-        """Render the overall job progress with colors and emojis"""
+        """Render the overall job progress with colors and emojis, including visual progress bar"""
         lines = []
 
         if self._total_jobs > 0:
@@ -324,6 +378,7 @@ class ProgressManager:
             waiting = max(0, self._total_jobs - self._completed_jobs - self._failed_jobs - running)
 
             progress_pct = (self._completed_jobs / self._total_jobs) * 100 if self._total_jobs > 0 else 0
+            progress_ratio = self._completed_jobs / self._total_jobs if self._total_jobs > 0 else 0
 
             # Determine overall status emoji and color
             if self.use_emojis:
@@ -336,18 +391,42 @@ class ProgressManager:
             else:
                 status_emoji = ""
 
-            # Color the progress percentage based on completion
+            # Create visual progress bar
+            bar_width = 30
+            filled = int(bar_width * progress_ratio)
+            
             if self.use_colors:
                 if progress_pct >= 100:
-                    pct_colored = ColorTheme.colorize(f"{progress_pct:.1f}%", ColorTheme.BRIGHT_GREEN, bold=True)
+                    bar_filled = ColorTheme.colorize('=' * filled, ColorTheme.BRIGHT_GREEN)
+                    bar_empty = ColorTheme.colorize('-' * (bar_width - filled), ColorTheme.GREEN)
                 elif progress_pct >= 75:
-                    pct_colored = ColorTheme.colorize(f"{progress_pct:.1f}%", ColorTheme.BRIGHT_CYAN, bold=True)
-                elif progress_pct >= 50:
-                    pct_colored = ColorTheme.colorize(f"{progress_pct:.1f}%", ColorTheme.BRIGHT_YELLOW, bold=True)
+                    bar_filled = ColorTheme.colorize('=' * filled, ColorTheme.BRIGHT_CYAN)
+                    bar_empty = ColorTheme.colorize('>' + '-' * (bar_width - filled), ColorTheme.CYAN)
                 else:
-                    pct_colored = ColorTheme.colorize(f"{progress_pct:.1f}%", ColorTheme.BRIGHT_WHITE, bold=True)
+                    bar_filled = ColorTheme.colorize('=' * filled, ColorTheme.BRIGHT_YELLOW)
+                    bar_empty = ColorTheme.colorize('>' + '-' * (bar_width - filled), ColorTheme.YELLOW)
+                
+                bar_display = bar_filled + bar_empty
             else:
-                pct_colored = f"{progress_pct:.1f}%"
+                bar_filled = '=' * filled
+                bar_empty = '-' * (bar_width - filled)
+                if filled < bar_width and progress_pct < 100:
+                    bar_display = bar_filled + '>' + bar_empty[1:] if filled > 0 else '>' + bar_empty[1:]
+                else:
+                    bar_display = bar_filled + bar_empty
+
+            # Color the progress percentage
+            if self.use_colors:
+                if progress_pct >= 100:
+                    pct_colored = ColorTheme.colorize(f"{progress_pct:.0f}%", ColorTheme.BRIGHT_GREEN, bold=True)
+                elif progress_pct >= 75:
+                    pct_colored = ColorTheme.colorize(f"{progress_pct:.0f}%", ColorTheme.BRIGHT_CYAN, bold=True)
+                elif progress_pct >= 50:
+                    pct_colored = ColorTheme.colorize(f"{progress_pct:.0f}%", ColorTheme.BRIGHT_YELLOW, bold=True)
+                else:
+                    pct_colored = ColorTheme.colorize(f"{progress_pct:.0f}%", ColorTheme.BRIGHT_WHITE, bold=True)
+            else:
+                pct_colored = f"{progress_pct:.0f}%"
 
             # Color status numbers
             if self.use_colors:
@@ -361,10 +440,44 @@ class ProgressManager:
                 running_colored = str(running)
                 waiting_colored = str(waiting)
 
-            line = f"{status_emoji}Jobs: {completed_colored}/{total_colored} completed ({pct_colored}), " \
-                   f"{running_colored} running, {waiting_colored} waiting"
+            # Calculate overall download speed from active progress bars
+            total_rate = 0
+            active_count = 0
+            for state in self._progress_bars.values():
+                if not state.finished and state.rate and state.rate > 0:
+                    total_rate += state.rate
+                    active_count += 1
+            
+            # Format overall speed
+            if total_rate > 0:
+                speed_str = self._format_rate(total_rate)
+                if self.use_colors:
+                    speed_str = ColorTheme.colorize(speed_str, ColorTheme.BRIGHT_MAGENTA)
+            else:
+                speed_str = ""
+
+            # Build the main progress line in the requested format
+            # [================>----------------] 23% | Jobs: 10/44 | 4 running | 30 waiting | 4.5 MB/s
+            line_parts = []
+            
+            if status_emoji:  # Only add emoji if it's not empty
+                line_parts.append(status_emoji)
+            
+            line_parts.extend([
+                f"[{bar_display}]",
+                pct_colored,
+                f"| Jobs: {completed_colored}/{total_colored}",
+                f"| {running_colored} running",
+                f"| {waiting_colored} waiting"
+            ])
+            
+            if speed_str:
+                line_parts.append(f"| {speed_str}")
+            
+            line = " ".join(line_parts)
             lines.append(line)
 
+            # Show failed jobs on a separate line if any
             if self._failed_jobs > 0:
                 failed_emoji = f"{ColorTheme.FAILED} " if self.use_emojis else ""
                 if self.use_colors:
@@ -379,14 +492,13 @@ class ProgressManager:
         """Render individual progress bars"""
         lines = []
 
-        # Show only active progress bars (up to max_workers)
-        active_progress = [
-            (pid, state) for pid, state in self._progress_bars.items()
-            if not state.finished
-        ]
-
-        # Sort by last update time (most recent first)
-        active_progress.sort(key=lambda x: x[1].last_update, reverse=True)
+        # Show only active progress bars in stable order (up to max_workers)
+        # Use display_order to maintain consistent positioning instead of sorting by update time
+        active_progress = []
+        for progress_id in self._display_order:
+            if (progress_id in self._progress_bars and 
+                not self._progress_bars[progress_id].finished):
+                active_progress.append((progress_id, self._progress_bars[progress_id]))
 
         for progress_id, state in active_progress[:self.max_workers]:
             line = self._render_single_progress_bar(state)
@@ -421,8 +533,40 @@ class ProgressManager:
             progress = min(state.current / state.total, 1.0)
             filled = int(bar_width * progress)
 
-            # Create colored progress bar
-            if self.use_colors:
+            # Create colored progress bar with Unicode characters when Rich is available
+            if self.use_colors and RICH_AVAILABLE:
+                # Use Unicode characters: ━━━╺━━━━━━━ with Rich colors
+                if state.failed:
+                    # Red for failed
+                    if filled > 0:
+                        if filled < bar_width:
+                            bar_filled = ColorTheme.colorize('━' * (filled - 1), 'bright_red')
+                            bar_empty = ColorTheme.colorize('╺' + '━' * (bar_width - filled), 'bright_black')
+                        else:
+                            bar_filled = ColorTheme.colorize('━' * filled, 'bright_red')
+                            bar_empty = ''
+                    else:
+                        bar_filled = ''
+                        bar_empty = ColorTheme.colorize('━' * bar_width, 'bright_black')
+                elif state.finished:
+                    # Green for completed
+                    bar_filled = ColorTheme.colorize('━' * filled, 'bright_green')
+                    bar_empty = ColorTheme.colorize('━' * (bar_width - filled), 'bright_black')
+                else:
+                    # Pink/Magenta for in progress
+                    if filled > 0:
+                        if filled < bar_width:
+                            bar_filled = ColorTheme.colorize('━' * (filled - 1), 'bright_magenta')
+                            bar_empty = ColorTheme.colorize('╺' + '━' * (bar_width - filled), 'bright_black')
+                        else:
+                            bar_filled = ColorTheme.colorize('━' * filled, 'bright_magenta')
+                            bar_empty = ''
+                    else:
+                        bar_filled = ''
+                        bar_empty = ColorTheme.colorize('━' * bar_width, 'bright_black')
+                bar = bar_filled + bar_empty
+            elif self.use_colors:
+                # Fallback to original characters with ANSI colors when Rich not available
                 if state.failed:
                     # Red for failed
                     bar_filled = ColorTheme.colorize('█' * filled, ColorTheme.BRIGHT_RED)
@@ -437,6 +581,7 @@ class ProgressManager:
                     bar_empty = ColorTheme.colorize('░' * (bar_width - filled), ColorTheme.CYAN)
                 bar = bar_filled + bar_empty
             else:
+                # No colors - use original characters
                 bar = '█' * filled + '░' * (bar_width - filled)
 
             # Color the percentage
@@ -452,8 +597,16 @@ class ProgressManager:
                 percentage = f"{percentage_val:5.1f}%"
         else:
             # Indeterminate progress with animated bar
-            if self.use_colors:
-                # Moving progress indicator
+            if self.use_colors and RICH_AVAILABLE:
+                # Moving progress indicator with Unicode characters
+                pos = _animation_state['frame'] % bar_width
+                bar_chars = ['━'] * bar_width
+                for i in range(max(0, pos-2), min(bar_width, pos+3)):
+                    bar_chars[i] = '━'
+                bar_chars[pos] = '╺'  # Current position indicator
+                bar = ColorTheme.colorize(''.join(bar_chars), 'bright_yellow')
+            elif self.use_colors:
+                # Fallback to original characters
                 pos = _animation_state['frame'] % bar_width
                 bar_chars = ['░'] * bar_width
                 for i in range(max(0, pos-2), min(bar_width, pos+3)):

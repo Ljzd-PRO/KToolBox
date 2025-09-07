@@ -78,7 +78,7 @@ class DownloaderConfiguration(BaseModel):
     retry_times: int = 10
     retry_stop_never: bool = False
     retry_interval: float = 3.0
-    tps_limit: float = 1.0
+    tps_limit: float = 5.0
     use_bucket: bool = False
     bucket_path: Path = Path("./.ktoolbox/bucket_storage")
     reverse_proxy: str = "{}"
@@ -224,6 +224,10 @@ class JobConfiguration(BaseModel):
     :ivar keywords_exclude: keywords to exclude posts by title (case-insensitive)
     :ivar download_file: Download post file (usually cover image). Set to False to skip file downloads.
     :ivar download_attachments: Download post attachments. Set to False to skip attachment downloads.
+    :ivar min_file_size: Minimum file size in bytes to download. Files smaller than this will be skipped. \
+    Set to None to disable minimum size filtering.
+    :ivar max_file_size: Maximum file size in bytes to download. Files larger than this will be skipped. \
+    Set to None to disable maximum size filtering.
     """
     count: int = 4
     include_revisions: bool = False
@@ -297,6 +301,8 @@ class JobConfiguration(BaseModel):
     keywords_exclude: Set[str] = Field(default_factory=set)
     download_file: bool = True
     download_attachments: bool = True
+    min_file_size: Optional[int] = None
+    max_file_size: Optional[int] = None
 
 
 class LoggerConfiguration(BaseModel):

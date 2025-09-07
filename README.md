@@ -67,6 +67,9 @@
     - Such as `[2025-01-02]_TheTitle_1.jpg`, `[2025-01-02]_TheTitle_2.jpg`, `[2025-01-02]_TheTitle_3.jpg`, etc.
 - Support excluding **specified file formats** or downloading only specified formats
   - For example, if you don't want to download large and duplicate PSD or archive files, you can exclude `.psd` and `.zip` files in the config
+- Support filtering downloads by **file size**
+  - For example, if you want to avoid downloading large video files when running out of disk space, you can set a maximum file size limit in the config
+  - You can also set a minimum file size to skip downloading thumbnail or preview images
 - Support filtering downloads by post **title keywords**
   - For example, if you only want to download posts whose titles contain "表情" or "効果音差分", you can use the `sync-creator` command with the `--keywords` option
   - You can also exclude posts with specific keywords in the title using the `--keywords-exclude` option

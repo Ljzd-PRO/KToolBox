@@ -1,52 +1,86 @@
 ## Changes
 
-![Downloads](https://img.shields.io/github/downloads/Ljzd-PRO/KToolBox/v0.22.0/total)
+![Downloads](https://img.shields.io/github/downloads/Ljzd-PRO/KToolBox/v0.23.0/total)
 
 ### ✨ Features
 
-- Added `job.download_file` and `job.download_attachments` configuration options to control **whether to download files and attachments in posts**
-  - Related configuration options:
-    - `job.download_file` (default: `True`): Whether to download the file corresponding to the `file` field of the post (usually the cover image)
-    - `job.download_attachments` (default: `True`): Whether to download files corresponding to the `attachments` field of the post (usually original images, compressed packages, etc.)
-  - These options are enabled by default to maintain the same behavior as previous versions
-  - You can edit these options via `ktoolbox config-editor` (`Job -> ...`)
-  - Or manually edit them in the `.env` file or environment variables:
+- Added configuration options to support **filtering** downloads by **file size** - #343
+  - You can set the minimum and maximum file size (in bytes) via `job.min_file_size` and `job.max_file_size`
+  - Both options can be set together to define a file size range
+  - Configure these options using the graphical config editor, or set them in the dotenv file `.env` or via system environment variables:
     ```dotenv
-    # Whether to download the file corresponding to the `file` field of the post (usually the cover image)
-    # Download enabled by default
-    KTOOLBOX_JOB__DOWNLOAD_FILE=False
+    # Skip files smaller than 1 MB (to avoid downloading thumbnails)
+    KTOOLBOX_JOB__MIN_FILE_SIZE=1048576
 
-    # Whether to download files corresponding to the `attachments` field of the post (usually original images, compressed packages, etc.)
-    # Download enabled by default
-    KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
+    # Skip files larger than 50 MB (to save disk space)
+    KTOOLBOX_JOB__MAX_FILE_SIZE=52428800
     ```
-  - 📖 More information: [Configuration Reference - JobConfiguration](https://ktoolbox.readthedocs.io/latest/zh/configuration/reference/#ktoolbox._configuration_zh.JobConfiguration)
+  - 📖 More info: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
+- Improved progress bar output - #345
+  - Fixed the issue of the download file progress bar **constantly reordering**
+  - Added **visual overall progress bar**
+  - Added display of **total download speed**
+  - Enhanced the **color rendering** of the progress bar
+    ```
+    🔄   [==>---------------------------] 9% | Jobs: 173/1870 | 3 running | 1694 waiting | 5.7MB/s
+    
+    ⠹ 0bh1EKTGt5Zg9nNaDAi25P...    |███████████████████████████░░░| 3.7MB/4.0MB  92.5% ⚡ 1.9MB/s  
+    ⠹ YV30J8ftUbE9dUkkJVCqvN...    |███░░░░░░░░░░░░░░░░░░░░░░░░░░░| 527.0KB/4.1MB  12.5% ⚡ 1.9MB/s  
+    ⠹ KvKMSpwB4rRknTPKhEiXle...    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 95.0KB/3.8MB   2.5% ⚡ 1.9MB/s  
+    ```
 
-[//]: # (### 🪲 Fixes)
+### 🪲 Fixes
+
+- **Increased** the default **tps limit** (maximum number of connections established per second)
+  - This setting is optional. To **improve download efficiency** in general cases, the default value has been increased from `1.0` to `5.0`
+  - If you frequently encounter **403** errors during downloads, try setting this value lower, such as `1.0`
+  - Run `ktoolbox config-editor` to edit this setting (`Downloader -> tps_limit`)
+  - Or manually edit the `KTOOLBOX_DOWNLOADER__TPS_LIMIT` in the `.env` file or set it via environment variables
+    ```dotenv
+    KTOOLBOX_DOWNLOADER__TPS_LIMIT=1.0
+    ```
+  - 📖 More info: [Configuration-Reference-DownloaderConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.DownloaderConfiguration)
 
 - - -
 
 ### ✨ 新特性
 
-- 新增 `job.download_file` 和 `job.download_attachments` 配置项，控制**是否下载帖子中的文件和附件**
-  - 相关配置项：
-    - `job.download_file`（默认值：`True`）：是否下载帖子的 `file` 字段对应的文件（通常是帖子封面图）
-    - `job.download_attachments`（默认值：`True`）：是否下载帖子的 `attachments` 字段对应的文件（通常是帖子中的正式原图、压缩包等附件）
-  - 该配置项默认均为开启状态，保持与之前版本一致的行为
-  - 可通过运行 `ktoolbox config-editor` 编辑这些配置（`Job -> ...`）
-  - 或手动在 `.env` 文件或环境变量中编辑：
+- 增加配置项以支持**按文件大小过滤**下载 - #343
+  - 通过配置 `job.min_file_size` 和 `job.max_file_size` 来设置最小和最大文件大小（单位：字节）
+  - 你可以同时设置这两个选项来定义一个文件大小范围
+  - 通过图形化配置编辑器或在 dotenv 文件 `.env` 或系统环境变量中设置这些配置：
     ```dotenv
-    # 是否下载帖子的 `file` 字段对应的文件（通常是帖子封面图）
-    # 默认开启下载
-    KTOOLBOX_JOB__DOWNLOAD_FILE=False
+    # 跳过小于 1 MB 的文件 （避免下载到缩略图）
+    KTOOLBOX_JOB__MIN_FILE_SIZE=1048576
     
-    # 是否下载帖子的 `attachments` 字段对应的文件（通常是帖子中的正式原图、压缩包等附件）
-    # 默认开启下载
-    KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
+    # 跳过大于 50 MB 的文件 （节省磁盘空间）
+    KTOOLBOX_JOB__MAX_FILE_SIZE=52428800
     ```
-  - 📖更多信息：[配置参考-JobConfiguration](https://ktoolbox.readthedocs.io/latest/zh/configuration/reference/#ktoolbox._configuration_zh.JobConfiguration)
+  - 📖 更多信息：[Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/zh/configuration/reference/#ktoolbox._configuration_zh.JobConfiguration)
+- 改进进度条输出 - #345
+  - 修复了下载文件进度条**不断重新排序**的问题
+  - 增加了**可视化的总进度条**
+  - 增加了下载**总速度**显示
+  - 增加了进度条的**颜色渲染**
+  ```
+  🔄   [==>---------------------------] 9% | Jobs: 173/1870 | 3 running | 1694 waiting | 5.7MB/s
 
-[//]: # (### 🪲 修复)
+  ⠹ 0bh1EKTGt5Zg9nNaDAi25P...    |███████████████████████████░░░| 3.7MB/4.0MB  92.5% ⚡ 1.9MB/s
+  ⠹ YV30J8ftUbE9dUkkJVCqvN...    |███░░░░░░░░░░░░░░░░░░░░░░░░░░░| 527.0KB/4.1MB  12.5% ⚡ 1.9MB/s
+  ⠹ KvKMSpwB4rRknTPKhEiXle...    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 95.0KB/3.8MB   2.5% ⚡ 1.9MB/s
+  ```
+
+### 🪲 修复
+
+- **提高**了默认的 **tps limit** （每秒最多建立的连接数）
+  - 这项配置是可选的，为了**提高一般情况下的下载效率**，现在的默认值从 `1.0` 提升到了 `5.0`
+  - 当下载频繁出现 **403** 错误时，可尝试将此设置改为较低值，如 `1.0`
+  - 执行 `ktoolbox config-editor` 来编辑这项配置 (`Downloader -> tps_limit`)
+  - 或手动编辑 `.env` 文件中的 `KTOOLBOX_DOWNLOADER__TPS_LIMIT` 或环境变量来设置这项配置
+    ```dotenv
+    KTOOLBOX_DOWNLOADER__TPS_LIMIT=1.0
+    ```
+  - 📖更多信息：[Configuration-Reference-DownloaderConfiguration](https://ktoolbox.readthedocs.io/latest/zh/configuration/reference/#ktoolbox._configuration_zh.DownloaderConfiguration)
 
 ## Upgrade
 
@@ -55,4 +89,4 @@ Use this command to upgrade if you are using **pipx**:
 pipx upgrade ktoolbox
 ```
 
-**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.21.1...v0.22.0
+**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.22.0...v0.23.0
