@@ -15,6 +15,13 @@ from typing import Dict, List, Optional, TextIO
 from dataclasses import dataclass, field
 
 from tqdm import tqdm as std_tqdm
+try:
+    import colorama
+    from colorama import Fore, Back, Style
+    colorama.init(autoreset=True)
+    COLORAMA_AVAILABLE = True
+except ImportError:
+    COLORAMA_AVAILABLE = False
 
 __all__ = ["ProgressManager", "ManagedTqdm", "ColorTheme", "setup_logger_for_progress", "create_managed_tqdm_class"]
 
@@ -96,19 +103,31 @@ class ColorTheme:
 
     @classmethod
     def colorize(cls, text: str, color: str, bold: bool = False) -> str:
-        """Apply color to text with optional bold"""
+        """Apply color to text with optional bold using colorama when available"""
         if not cls.supports_color():
             return text
-        prefix = cls.BOLD + color if bold else color
-        return f"{prefix}{text}{cls.RESET}"
+        
+        if COLORAMA_AVAILABLE:
+            # Use colorama for more robust color support
+            style = Style.BRIGHT if bold else ''
+            return f"{style}{color}{text}{Style.RESET_ALL}"
+        else:
+            # Fallback to ANSI codes
+            prefix = cls.BOLD + color if bold else color
+            return f"{prefix}{text}{cls.RESET}"
 
     @classmethod
     def supports_color(cls) -> bool:
-        """Check if terminal supports color"""
-        return (
-            hasattr(sys.stdout, 'isatty') and sys.stdout.isatty() and
-            not sys.platform.startswith('win') or 'ANSICON' in os.environ
-        )
+        """Check if terminal supports color using colorama when available"""
+        if COLORAMA_AVAILABLE:
+            # Colorama handles color support detection
+            return True
+        else:
+            # Fallback to manual detection
+            return (
+                hasattr(sys.stdout, 'isatty') and sys.stdout.isatty() and
+                not sys.platform.startswith('win') or 'ANSICON' in os.environ
+            )
 
 
 # Animation state for spinners
@@ -408,14 +427,18 @@ class ProgressManager:
 
             # Build the main progress line in the requested format
             # [================>----------------] 23% | Jobs: 10/44 | 4 running | 30 waiting | 4.5 MB/s
-            line_parts = [
-                f"{status_emoji}",
-                f" [{bar_display}]",
+            line_parts = []
+            
+            if status_emoji:  # Only add emoji if it's not empty
+                line_parts.append(status_emoji)
+            
+            line_parts.extend([
+                f"[{bar_display}]",
                 pct_colored,
                 f"| Jobs: {completed_colored}/{total_colored}",
                 f"| {running_colored} running",
                 f"| {waiting_colored} waiting"
-            ]
+            ])
             
             if speed_str:
                 line_parts.append(f"| {speed_str}")
@@ -479,8 +502,40 @@ class ProgressManager:
             progress = min(state.current / state.total, 1.0)
             filled = int(bar_width * progress)
 
-            # Create colored progress bar
-            if self.use_colors:
+            # Create colored progress bar with new Unicode characters when colorama is available
+            if self.use_colors and COLORAMA_AVAILABLE:
+                # Use new Unicode characters: ━━━╺━━━━━━━ with colorama colors
+                if state.failed:
+                    # Red for failed
+                    if filled > 0:
+                        if filled < bar_width:
+                            bar_filled = Fore.LIGHTRED_EX + '━' * (filled - 1) + '╺'
+                            bar_empty = Fore.LIGHTBLACK_EX + '━' * (bar_width - filled)
+                        else:
+                            bar_filled = Fore.LIGHTRED_EX + '━' * filled
+                            bar_empty = ''
+                    else:
+                        bar_filled = ''
+                        bar_empty = Fore.LIGHTBLACK_EX + '━' * bar_width
+                elif state.finished:
+                    # Green for completed
+                    bar_filled = Fore.LIGHTGREEN_EX + '━' * filled
+                    bar_empty = Fore.LIGHTBLACK_EX + '━' * (bar_width - filled)
+                else:
+                    # Pink/Magenta for in progress
+                    if filled > 0:
+                        if filled < bar_width:
+                            bar_filled = Fore.LIGHTMAGENTA_EX + '━' * (filled - 1) + '╺'
+                            bar_empty = Fore.LIGHTBLACK_EX + '━' * (bar_width - filled)
+                        else:
+                            bar_filled = Fore.LIGHTMAGENTA_EX + '━' * filled
+                            bar_empty = ''
+                    else:
+                        bar_filled = ''
+                        bar_empty = Fore.LIGHTBLACK_EX + '━' * bar_width
+                bar = bar_filled + bar_empty + Style.RESET_ALL
+            elif self.use_colors:
+                # Fallback to original characters with ANSI colors when colorama not available
                 if state.failed:
                     # Red for failed
                     bar_filled = ColorTheme.colorize('█' * filled, ColorTheme.BRIGHT_RED)
@@ -495,6 +550,7 @@ class ProgressManager:
                     bar_empty = ColorTheme.colorize('░' * (bar_width - filled), ColorTheme.CYAN)
                 bar = bar_filled + bar_empty
             else:
+                # No colors - use original characters
                 bar = '█' * filled + '░' * (bar_width - filled)
 
             # Color the percentage
@@ -510,8 +566,16 @@ class ProgressManager:
                 percentage = f"{percentage_val:5.1f}%"
         else:
             # Indeterminate progress with animated bar
-            if self.use_colors:
-                # Moving progress indicator
+            if self.use_colors and COLORAMA_AVAILABLE:
+                # Moving progress indicator with new Unicode characters
+                pos = _animation_state['frame'] % bar_width
+                bar_chars = ['━'] * bar_width
+                for i in range(max(0, pos-2), min(bar_width, pos+3)):
+                    bar_chars[i] = '━'
+                bar_chars[pos] = '╺'  # Current position indicator
+                bar = Fore.LIGHTYELLOW_EX + ''.join(bar_chars) + Style.RESET_ALL
+            elif self.use_colors:
+                # Fallback to original characters
                 pos = _animation_state['frame'] % bar_width
                 bar_chars = ['░'] * bar_width
                 for i in range(max(0, pos-2), min(bar_width, pos+3)):
