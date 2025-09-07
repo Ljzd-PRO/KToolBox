@@ -52,8 +52,6 @@ ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
 # 下载作者/画师的所有帖子
 ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
 ```
-??? info "关于 `creator-indices.ktoolbox` 文件"
-    默认情况下你会在作者目录下得到一个 `creator-indices.ktoolbox` 文件，它包含目录下的所有帖子的信息和路径。
 
 ??? tip "更新作者目录"
     你可以再次运行命令，文件名相同的文件将会被跳过。

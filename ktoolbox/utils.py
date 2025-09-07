@@ -113,18 +113,18 @@ def parse_webpage_url(url: str) -> Tuple[Optional[str], Optional[str], Optional[
         # Pad to full size (now supporting revision URLs)
         parts += tuple(None for _ in range(9 - url_parts_len))
     _scheme, _netloc, service, _user_key, user_id, _post_key, post_id, _revision_key, revision_id = parts
-    
+
     # Only return revision_id if we have the revision keyword
     if _revision_key != "revision":
         revision_id = None
-    
+
     return service, user_id, post_id, revision_id
 
 
 def uvloop_init() -> bool:
     """
     Set event loop policy to uvloop or winloop if available.
-    
+
     Uses winloop on Windows and uvloop on Unix-like systems for performance optimization.
 
     :return: If event loop policy was set successfully
@@ -196,16 +196,16 @@ def extract_external_links(content: str, custom_patterns: Optional[List[str]] = 
 
         # Clean up HTML markup and common trailing punctuation that might be part of text
         # Stop at common HTML boundary characters and quotes
-        url = re.sub(r'["\'>][^<]*$', '', url)  # Remove quote + content to end  
-        
-        # Additional cleanup: Remove HTML tags that might have been captured  
+        url = re.sub(r'["\'>][^<]*$', '', url)  # Remove quote + content to end
+
+        # Additional cleanup: Remove HTML tags that might have been captured
         url = re.sub(r'<[^>]*>.*$', '', url)  # Remove any HTML tags and everything after
         url = re.sub(r'"[^"]*$', '', url)  # Remove quote and everything after it
-        
+
         # Remove trailing HTML tag fragments and punctuation
         url = re.sub(r'</[^>]*>?$', '', url)  # Remove closing tags or partial tags at end
         url = re.sub(r'[.,;!?)\]}>"\'\s]+$', '', url)  # Remove trailing punctuation
-        
+
         # Decode HTML entities (like &amp; -> &, &lt; -> <, etc.)
         url = html.unescape(url)
 
@@ -224,9 +224,9 @@ async def check_for_updates() -> None:
     try:
         import httpx
         from ktoolbox import __version__
-        
+
         current_version = __version__.lstrip('v')  # Remove 'v' prefix if present
-        
+
         # First try GitHub API
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
@@ -243,8 +243,8 @@ async def check_for_updates() -> None:
                         return
         except Exception as e:
             logger.debug(f"Failed to check GitHub for updates: {e}")
-        
-        # Fallback to PyPI API  
+
+        # Fallback to PyPI API
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
                 response = await client.get("https://pypi.org/pypi/ktoolbox/json")
@@ -258,6 +258,6 @@ async def check_for_updates() -> None:
                         logger.debug("You are using the latest version")
         except Exception as e:
             logger.debug(f"Failed to check PyPI for updates: {e}")
-            
+
     except Exception as e:
         logger.warning(f"Update check encountered an unexpected error: {e!r}")

@@ -78,7 +78,7 @@ class DownloaderConfiguration(BaseModel):
     retry_times: int = 10
     retry_stop_never: bool = False
     retry_interval: float = 3.0
-    tps_limit: float = 1.0
+    tps_limit: float = 5.0
     use_bucket: bool = False
     bucket_path: Path = Path("./.ktoolbox/bucket_storage")
     reverse_proxy: str = "{}"
@@ -148,7 +148,10 @@ class PostStructureConfiguration(BaseModel):
     Customize the filename format by inserting an empty ``{}`` to represent the basic filename. \
     You can use some of the [properties][ktoolbox.configuration.JobConfiguration] \
     in Post. For example: ``{title}_{}`` could result in filenames like \
-    ``TheTitle_Stelle_lv5_logo.gif``, ``TheTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``, etc.
+    ``TheTitle_Stelle_lv5_logo.gif``, ``TheTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``, etc. \
+    Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example: \
+    ``{title:.6}_{}`` could shorten the title length to 6 characters like \
+    ``HiEveryoneThisIsALongTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg`` to ``HiEver_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``
     :ivar revisions: Sub path of revisions directory
     """
     attachments: Path = Path("attachments")
@@ -181,11 +184,18 @@ class JobConfiguration(BaseModel):
         | ``year``      | String |
         | ``month``     | String |
 
+    - Python Format Specification Mini-Language reference:
+
+        https://docs.python.org/3.13/library/string.html#format-specification-mini-language
+
     :ivar count: Number of coroutines for concurrent download
     :ivar include_revisions: Include and download revision posts when available
     :ivar post_dirname_format: Customize the post directory name format, you can use some of the \
     [properties][ktoolbox.configuration.JobConfiguration] in ``Post``. \
-    e.g. ``[{published}]{id}`` > ``[2024-1-1]123123``, ``{user}_{published}_{title}`` > ``234234_2024-1-1_TheTitle``
+    e.g. ``[{published}]{id}`` could result dirname ``[2024-1-1]123123``, \
+    ``{user}_{published}_{title}`` could result dirname like ``234234_2024-1-1_TheTitle``. \
+    Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example: \
+    ``{title:.6}`` could shorten the title length to 6 characters like ``HiEveryoneThisIsALongTitle`` to ``HiEver``
     :ivar post_structure: Post path structure
     :ivar mix_posts: Save all files from different posts at same path in creator directory. \
     It would not create any post directory, and ``CreatorIndices`` would not been recorded.
@@ -197,13 +207,15 @@ class JobConfiguration(BaseModel):
     in Post. For example: ``{title}_{}`` could result in filenames like \
     ``TheTitle_b4b41de2-8736-480d-b5c3-ebf0d917561b``, ``TheTitle_af349b25-ac08-46d7-98fb-6ce99a237b90``, etc. \
     You can also use it with ``sequential_filename``. For instance, \
-    ``[{published}]_{}`` could result in filenames like ``[2024-1-1]_1.png``, ``[2024-1-1]_2.png``, etc.
+    ``[{published}]_{}`` could result in filenames like ``[2024-1-1]_1.png``, ``[2024-1-1]_2.png``, etc. \
+    Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example: \
+    ``{title:.6}`` could shorten the title length to 6 characters like ``HiEveryoneThisIsALongTitle`` to ``HiEver``
     :ivar allow_list: Download files which match these patterns (Unix shell-style), e.g. ``["*.png"]``
     :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``
     :ivar extract_content: Extract post content and save to separate file (filename was defined in ``config.job.post_structure.content``)
     :ivar extract_content_images: Extract images from post content and download them.
     :ivar extract_external_links: Extract external file sharing links from post content and save to separate file \
-    (filename was defined in ``config.job.post_structure.external_links``) \
+    (filename was defined in ``config.job.post_structure.external_links``)
     :ivar external_link_patterns: Regex patterns for extracting external links.
     :ivar group_by_year: Group posts by year in separate directories based on published date
     :ivar group_by_month: Group posts by month in separate directories based on published date (requires group_by_year)
@@ -215,6 +227,10 @@ class JobConfiguration(BaseModel):
     :ivar keywords_exclude: keywords to exclude posts by title (case-insensitive)
     :ivar download_file: Download post file (usually cover image). Set to False to skip file downloads.
     :ivar download_attachments: Download post attachments. Set to False to skip attachment downloads.
+    :ivar min_file_size: Minimum file size in bytes to download. Files smaller than this will be skipped. \
+    Set to None to disable minimum size filtering.
+    :ivar max_file_size: Maximum file size in bytes to download. Files larger than this will be skipped. \
+    Set to None to disable maximum size filtering.
     """
     count: int = 4
     include_revisions: bool = False
@@ -286,6 +302,8 @@ class JobConfiguration(BaseModel):
     keywords_exclude: Set[str] = Field(default_factory=set)
     download_file: bool = True
     download_attachments: bool = True
+    min_file_size: Optional[int] = None
+    max_file_size: Optional[int] = None
 
     @validator("allow_list", "block_list", pre=True)
     def allow_block_list_validator(cls, v):

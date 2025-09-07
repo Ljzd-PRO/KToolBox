@@ -174,16 +174,23 @@ class TestColorTheme:
             assert result == "test"
     
     def test_colorize_with_color_support(self):
-        """Test colorize adds ANSI codes when colors supported"""
+        """Test colorize adds colors when colors supported"""
         with patch.object(ColorTheme, 'supports_color', return_value=True):
             result = ColorTheme.colorize("test", ColorTheme.GREEN)
-            assert result == f"{ColorTheme.GREEN}test{ColorTheme.RESET}"
+            # Rich should apply colors - just check that the result is different from plain text
+            # and contains ANSI escape sequences
+            assert result != "test"
+            assert '\033[' in result  # Contains ANSI escape sequence
     
     def test_colorize_with_bold(self):
         """Test colorize adds bold formatting"""
         with patch.object(ColorTheme, 'supports_color', return_value=True):
             result = ColorTheme.colorize("test", ColorTheme.GREEN, bold=True)
-            assert result == f"{ColorTheme.BOLD}{ColorTheme.GREEN}test{ColorTheme.RESET}"
+            # Rich should apply bold colors - check that result is styled and different from non-bold
+            non_bold = ColorTheme.colorize("test", ColorTheme.GREEN, bold=False)
+            assert result != "test"
+            assert result != non_bold
+            assert '\033[' in result  # Contains ANSI escape sequence
 
 
 class TestEnhancedProgressManager:
@@ -286,3 +293,200 @@ class TestEnhancedProgressManager:
         state.finished = True
         line = manager._render_single_progress_bar(state)
         assert isinstance(line, str)
+    
+    def test_stable_progress_bar_ordering(self):
+        """Test that progress bars maintain stable ordering regardless of update times"""
+        import time
+        
+        manager = ProgressManager(max_workers=5, use_colors=False, use_emojis=False)
+        
+        # Create multiple progress bars in a specific order
+        pbar1 = manager.create_progress_bar("file1.jpg", total=100)
+        pbar2 = manager.create_progress_bar("file2.png", total=200)
+        pbar3 = manager.create_progress_bar("file3.mp4", total=300)
+        
+        # Update them in different order and at different times
+        # This simulates real download scenario where files finish at different times
+        pbar3.update(50)  # Update file3 first (most recent update)
+        time.sleep(0.001)  # Small delay to ensure different timestamps
+        pbar1.update(25)  # Update file1 second
+        time.sleep(0.001)
+        pbar2.update(75)  # Update file2 last (least recent update)
+        
+        # Render progress bars
+        lines = manager._render_progress_bars()
+        
+        # Verify we have the expected number of progress bars
+        assert len(lines) == 3
+        
+        # Check that they appear in creation order, not update order
+        # This is the key improvement: stable ordering instead of sorting by update time
+        assert "file1.jpg" in lines[0], f"file1.jpg should be first, but got: {lines[0]}"
+        assert "file2.png" in lines[1], f"file2.png should be second, but got: {lines[1]}"
+        assert "file3.mp4" in lines[2], f"file3.mp4 should be third, but got: {lines[2]}"
+        
+        # Clean up progress bars
+        pbar1.close()
+        pbar2.close()
+        pbar3.close()
+    
+    def test_overall_progress_bar_display(self):
+        """Test that overall progress displays visual progress bar in correct format"""
+        manager = ProgressManager(max_workers=5, use_colors=False, use_emojis=False)
+        
+        # Test with some completed jobs
+        manager.set_job_totals(44, completed=10, failed=0)
+        
+        # Create some active progress bars with rates to test speed calculation
+        pbar1 = manager.create_progress_bar("file1.jpg", total=1000)
+        pbar2 = manager.create_progress_bar("file2.png", total=2000)
+        
+        # Update progress and set rates
+        pbar1.update(500)
+        pbar2.update(800)
+        
+        with manager._lock:
+            if pbar1.progress_id in manager._progress_bars:
+                manager._progress_bars[pbar1.progress_id].rate = 1500000  # 1.5 MB/s
+            if pbar2.progress_id in manager._progress_bars:
+                manager._progress_bars[pbar2.progress_id].rate = 3000000  # 3.0 MB/s
+        
+        lines = manager._render_overall_progress()
+        
+        # Should have one main progress line
+        assert len(lines) == 1
+        progress_line = lines[0]
+        
+        # Check format: [progress_bar] percentage% | Jobs: X/Y | N running | M waiting | speed
+        assert progress_line.startswith('['), f"Should start with '[', but got: {progress_line}"
+        assert '] 23% |' in progress_line, f"Should contain '] 23% |', but got: {progress_line}"
+        assert 'Jobs: 10/44' in progress_line, f"Should contain 'Jobs: 10/44', but got: {progress_line}"
+        assert '2 running' in progress_line, f"Should contain '2 running', but got: {progress_line}"
+        assert '32 waiting' in progress_line, f"Should contain '32 waiting', but got: {progress_line}"
+        assert 'MB/s' in progress_line, f"Should contain speed 'MB/s', but got: {progress_line}"
+        
+        # Test edge cases
+        # 0% completion
+        manager_zero = ProgressManager(max_workers=5, use_colors=False, use_emojis=False)
+        manager_zero.set_job_totals(100, completed=0, failed=0)
+        lines_zero = manager_zero._render_overall_progress()
+        assert '[>-----------------------------] 0%' in lines_zero[0]
+        
+        # 100% completion
+        manager_complete = ProgressManager(max_workers=5, use_colors=False, use_emojis=False)
+        manager_complete.set_job_totals(100, completed=100, failed=0)
+        lines_complete = manager_complete._render_overall_progress()
+        assert '[==============================] 100%' in lines_complete[0]
+        
+        # With failed jobs
+        manager_failed = ProgressManager(max_workers=5, use_colors=False, use_emojis=False)
+        manager_failed.set_job_totals(100, completed=80, failed=5)
+        lines_failed = manager_failed._render_overall_progress()
+        assert len(lines_failed) == 2  # Main line + failed line
+        assert '[========================>-----] 80%' in lines_failed[0]
+        assert 'Failed: 5' in lines_failed[1]
+        
+        # Clean up
+        pbar1.close()
+        pbar2.close()
+    
+    def test_rich_unicode_progress_bars(self):
+        """Test that Rich-based Unicode progress bars work correctly"""
+
+        # Test with Rich enabled (when available)
+        manager = ProgressManager(max_workers=3, use_colors=True, use_emojis=False)
+        
+        # Create a progress bar and render it
+        pbar = manager.create_progress_bar("test_unicode.jpg", total=100)
+        pbar.update(50)  # 50% progress
+        
+        line = manager._render_single_progress_bar(manager._progress_bars[pbar.progress_id])
+        
+        if ColorTheme.supports_color():
+            # Should contain Unicode characters when Rich is available
+            assert '━' in line, f"Should contain Unicode progress char '━', but got: {line}"
+            assert '╺' in line, f"Should contain Unicode indicator '╺', but got: {line}"
+        else:
+            # Should fallback to original characters when Rich not available
+            assert ('█' in line or '░' in line), f"Should contain fallback chars when Rich unavailable, but got: {line}"
+        
+        pbar.close()
+    
+    def test_rich_fallback_behavior(self):
+        """Test that progress bars work correctly when Rich is not available"""
+        import unittest.mock
+        
+        # Mock Rich as unavailable
+        with unittest.mock.patch('ktoolbox.progress.RICH_AVAILABLE', False):
+            manager = ProgressManager(max_workers=3, use_colors=True, use_emojis=False)
+            
+            pbar = manager.create_progress_bar("test_fallback.jpg", total=100)
+            pbar.update(50)
+            
+            line = manager._render_single_progress_bar(manager._progress_bars[pbar.progress_id])
+            
+            # Should use fallback characters
+            assert ('█' in line or '░' in line), f"Should use fallback characters, but got: {line}"
+            # Should NOT contain Unicode characters
+            assert '━' not in line, f"Should not contain Unicode chars in fallback mode, but got: {line}"
+            assert '╺' not in line, f"Should not contain Unicode indicator in fallback mode, but got: {line}"
+            
+            pbar.close()
+        """Test that overall progress displays visual progress bar in correct format"""
+        manager = ProgressManager(max_workers=5, use_colors=False, use_emojis=False)
+        
+        # Test with some completed jobs
+        manager.set_job_totals(44, completed=10, failed=0)
+        
+        # Create some active progress bars with rates to test speed calculation
+        pbar1 = manager.create_progress_bar("file1.jpg", total=1000)
+        pbar2 = manager.create_progress_bar("file2.png", total=2000)
+        
+        # Update progress and set rates
+        pbar1.update(500)
+        pbar2.update(800)
+        
+        with manager._lock:
+            if pbar1.progress_id in manager._progress_bars:
+                manager._progress_bars[pbar1.progress_id].rate = 1500000  # 1.5 MB/s
+            if pbar2.progress_id in manager._progress_bars:
+                manager._progress_bars[pbar2.progress_id].rate = 3000000  # 3.0 MB/s
+        
+        lines = manager._render_overall_progress()
+        
+        # Should have one main progress line
+        assert len(lines) == 1
+        progress_line = lines[0]
+        
+        # Check format: [progress_bar] percentage% | Jobs: X/Y | N running | M waiting | speed
+        assert progress_line.startswith('['), f"Should start with '[', but got: {progress_line}"
+        assert '] 23% |' in progress_line, f"Should contain '] 23% |', but got: {progress_line}"
+        assert 'Jobs: 10/44' in progress_line, f"Should contain 'Jobs: 10/44', but got: {progress_line}"
+        assert '2 running' in progress_line, f"Should contain '2 running', but got: {progress_line}"
+        assert '32 waiting' in progress_line, f"Should contain '32 waiting', but got: {progress_line}"
+        assert 'MB/s' in progress_line, f"Should contain speed 'MB/s', but got: {progress_line}"
+        
+        # Test edge cases
+        # 0% completion
+        manager_zero = ProgressManager(max_workers=5, use_colors=False, use_emojis=False)
+        manager_zero.set_job_totals(100, completed=0, failed=0)
+        lines_zero = manager_zero._render_overall_progress()
+        assert '[>-----------------------------] 0%' in lines_zero[0]
+        
+        # 100% completion
+        manager_complete = ProgressManager(max_workers=5, use_colors=False, use_emojis=False)
+        manager_complete.set_job_totals(100, completed=100, failed=0)
+        lines_complete = manager_complete._render_overall_progress()
+        assert '[==============================] 100%' in lines_complete[0]
+        
+        # With failed jobs
+        manager_failed = ProgressManager(max_workers=5, use_colors=False, use_emojis=False)
+        manager_failed.set_job_totals(100, completed=80, failed=5)
+        lines_failed = manager_failed._render_overall_progress()
+        assert len(lines_failed) == 2  # Main line + failed line
+        assert '[========================>-----] 80%' in lines_failed[0]
+        assert 'Failed: 5' in lines_failed[1]
+        
+        # Clean up
+        pbar1.close()
+        pbar2.close()

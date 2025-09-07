@@ -4,6 +4,7 @@ on:
     branches:
       - master
     paths:
+      - 'custom_templates/**'
       - "ktoolbox/**"
       - ".github/actions/setup-python/**"
       - ".github/workflows/docs.yml"
