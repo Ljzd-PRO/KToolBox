@@ -6,7 +6,6 @@ from typing import List, Union, Optional, Set
 from urllib.parse import urlparse
 
 import aiofiles
-import httpx
 from loguru import logger
 from pathvalidate import sanitize_filename, is_valid_filename
 
@@ -21,7 +20,6 @@ from ktoolbox.job import Job, CreatorIndices
 from ktoolbox.utils import extract_external_links, generate_msg
 
 __all__ = ["create_job_from_post", "create_job_from_creator"]
-
 
 
 async def create_job_from_post(
@@ -118,7 +116,6 @@ async def create_job_from_post(
                 config.job.block_list
             )
         ):
-            # Jobs for post file (no size filtering check needed here)
             jobs.append(
                 Job(
                     path=post_path,
@@ -214,8 +211,6 @@ async def create_job_from_post(
                             config.job.block_list
                         )
                     ):
-                        # No size filtering check needed here, will be done during download
-                        
                         # Regenerate filename with correct counter
                         should_use_sequential = (config.job.sequential_filename and
                                                  image_file_path.suffix.lower() not in config.job.sequential_filename_excludes)
@@ -338,53 +333,50 @@ async def create_job_from_creator(
             "`job.extract_content` or `job.extract_external_links` or `job.extract_content_images` is enabled "
             "and will fetch post content one by one, which may take time. Disable if not needed.")
 
-    try:
-        job_list: List[Job] = []
-        for post in post_list:
-            # Get post path
-            if mix_posts:
-                post_path = path
-            else:
-                # Apply year/month grouping if enabled
-                grouped_base_path = generate_grouped_post_path(post, path)
-                post_path = grouped_base_path / generate_post_path_name(post)
+    job_list: List[Job] = []
+    for post in post_list:
+        # Get post path
+        if mix_posts:
+            post_path = path
+        else:
+            # Apply year/month grouping if enabled
+            grouped_base_path = generate_grouped_post_path(post, path)
+            post_path = grouped_base_path / generate_post_path_name(post)
 
-            # Generate jobs for the main post
+        # Generate jobs for the main post
+        try:
+            job_list += await create_job_from_post(
+                post=post,
+                post_path=post_path,
+                post_dir=not mix_posts,
+                dump_post_data=not mix_posts
+            )
+        except FetchInterruptError as e:
+            return ActionRet(**e.ret.model_dump(mode="python"))
+
+        # If include_revisions is enabled, fetch and download revisions for this post
+        if config.job.include_revisions and not mix_posts:
             try:
-                job_list += await create_job_from_post(
-                    post=post,
-                    post_path=post_path,
-                    post_dir=not mix_posts,
-                    dump_post_data=not mix_posts
+                revisions_ret = await get_post_revisions_api(
+                    service=service,
+                    creator_id=creator_id,
+                    post_id=post.id
                 )
-            except FetchInterruptError as e:
-                return ActionRet(**e.ret.model_dump(mode="python"))
+                if revisions_ret and revisions_ret.data:
+                    for revision in revisions_ret.data:
+                        if revision.revision_id:  # Only process actual revisions
+                            revision_path = post_path / config.job.post_structure.revisions / generate_post_path_name(
+                                revision)
+                            try:
+                                revision_jobs = await create_job_from_post(
+                                    post=revision,
+                                    post_path=revision_path,
+                                    dump_post_data=True
+                                )
+                            except FetchInterruptError as e:
+                                return ActionRet(**e.ret.model_dump(mode="python"))
+                            job_list += revision_jobs
+            except Exception as e:
+                logger.warning(f"Failed to fetch revisions for post {post.id}: {e}")
 
-            # If include_revisions is enabled, fetch and download revisions for this post
-            if config.job.include_revisions and not mix_posts:
-                try:
-                    revisions_ret = await get_post_revisions_api(
-                        service=service,
-                        creator_id=creator_id,
-                        post_id=post.id
-                    )
-                    if revisions_ret and revisions_ret.data:
-                        for revision in revisions_ret.data:
-                            if revision.revision_id:  # Only process actual revisions
-                                revision_path = post_path / config.job.post_structure.revisions / generate_post_path_name(
-                                    revision)
-                                try:
-                                    revision_jobs = await create_job_from_post(
-                                        post=revision,
-                                        post_path=revision_path,
-                                        dump_post_data=True
-                                    )
-                                except FetchInterruptError as e:
-                                    return ActionRet(**e.ret.model_dump(mode="python"))
-                                job_list += revision_jobs
-                except Exception as e:
-                    logger.warning(f"Failed to fetch revisions for post {post.id}: {e}")
-
-        return ActionRet(data=job_list)
-    except FetchInterruptError as e:
-        return ActionRet(**e.ret.model_dump(mode="python"))
+    return ActionRet(data=job_list)

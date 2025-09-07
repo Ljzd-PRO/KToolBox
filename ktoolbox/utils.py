@@ -4,15 +4,12 @@ import logging
 import re
 import sys
 from pathlib import Path
-from typing import Generic, TypeVar, Optional, List, Tuple, Set, TYPE_CHECKING
+from typing import Generic, TypeVar, Optional, List, Tuple, Set
 
 import aiofiles
 from loguru import logger
 from pydantic import BaseModel, ConfigDict
 from tqdm import tqdm
-
-if TYPE_CHECKING:
-    import httpx
 
 from ktoolbox._enum import RetCodeEnum, DataStorageNameEnum
 from ktoolbox.configuration import config
@@ -26,8 +23,7 @@ __all__ = [
     "parse_webpage_url",
     "uvloop_init",
     "extract_external_links",
-    "check_for_updates",
-    "get_file_size"
+    "check_for_updates"
 ]
 
 _T = TypeVar('_T')
@@ -116,18 +112,18 @@ def parse_webpage_url(url: str) -> Tuple[Optional[str], Optional[str], Optional[
         # Pad to full size (now supporting revision URLs)
         parts += tuple(None for _ in range(9 - url_parts_len))
     _scheme, _netloc, service, _user_key, user_id, _post_key, post_id, _revision_key, revision_id = parts
-    
+
     # Only return revision_id if we have the revision keyword
     if _revision_key != "revision":
         revision_id = None
-    
+
     return service, user_id, post_id, revision_id
 
 
 def uvloop_init() -> bool:
     """
     Set event loop policy to uvloop or winloop if available.
-    
+
     Uses winloop on Windows and uvloop on Unix-like systems for performance optimization.
 
     :return: If event loop policy was set successfully
@@ -199,16 +195,16 @@ def extract_external_links(content: str, custom_patterns: Optional[List[str]] = 
 
         # Clean up HTML markup and common trailing punctuation that might be part of text
         # Stop at common HTML boundary characters and quotes
-        url = re.sub(r'["\'>][^<]*$', '', url)  # Remove quote + content to end  
-        
-        # Additional cleanup: Remove HTML tags that might have been captured  
+        url = re.sub(r'["\'>][^<]*$', '', url)  # Remove quote + content to end
+
+        # Additional cleanup: Remove HTML tags that might have been captured
         url = re.sub(r'<[^>]*>.*$', '', url)  # Remove any HTML tags and everything after
         url = re.sub(r'"[^"]*$', '', url)  # Remove quote and everything after it
-        
+
         # Remove trailing HTML tag fragments and punctuation
         url = re.sub(r'</[^>]*>?$', '', url)  # Remove closing tags or partial tags at end
         url = re.sub(r'[.,;!?)\]}>"\'\s]+$', '', url)  # Remove trailing punctuation
-        
+
         # Decode HTML entities (like &amp; -> &, &lt; -> <, etc.)
         url = html.unescape(url)
 
@@ -219,57 +215,6 @@ def extract_external_links(content: str, custom_patterns: Optional[List[str]] = 
     return links
 
 
-async def get_file_size(url: str, client: "httpx.AsyncClient") -> Optional[int]:
-    """
-    Get file size from URL using HEAD request
-    
-    :param url: The URL to check
-    :param client: HTTP client to use for the request
-    :return: File size in bytes, or None if cannot be determined
-    """
-    try:
-        # Use HEAD request to get file size without downloading the file
-        response = await client.head(
-            url=config.downloader.reverse_proxy.format(url),
-            follow_redirects=True,
-            timeout=config.downloader.timeout
-        )
-        
-        if response.status_code == 200:
-            # Try to get size from Content-Length header
-            content_length = response.headers.get("Content-Length")
-            if content_length:
-                return int(content_length)
-                
-        # If HEAD request fails or no Content-Length, try a GET request with Range header
-        # to get the Content-Range which contains the total size
-        response = await client.get(
-            url=config.downloader.reverse_proxy.format(url),
-            headers={"Range": "bytes=0-0"},
-            follow_redirects=True,
-            timeout=config.downloader.timeout
-        )
-        
-        if response.status_code in (200, 206):  # 206 is Partial Content
-            content_range = response.headers.get("Content-Range")
-            if content_range:
-                # Content-Range format: "bytes 0-0/12345" where 12345 is total size
-                range_str = content_range.split("/")[-1]
-                if range_str.isdigit():
-                    return int(range_str)
-                    
-            # Fallback: if Content-Length is available in GET response
-            content_length = response.headers.get("Content-Length")
-            if content_length:
-                return int(content_length)
-        
-        return None
-        
-    except Exception as e:
-        logger.debug(f"Failed to get file size for {url}: {e}")
-        return None
-
-
 async def check_for_updates() -> None:
     """
     Check for updates from GitHub and PyPI (backup).
@@ -278,9 +223,9 @@ async def check_for_updates() -> None:
     try:
         import httpx
         from ktoolbox import __version__
-        
+
         current_version = __version__.lstrip('v')  # Remove 'v' prefix if present
-        
+
         # First try GitHub API
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
@@ -297,8 +242,8 @@ async def check_for_updates() -> None:
                         return
         except Exception as e:
             logger.debug(f"Failed to check GitHub for updates: {e}")
-        
-        # Fallback to PyPI API  
+
+        # Fallback to PyPI API
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
                 response = await client.get("https://pypi.org/pypi/ktoolbox/json")
@@ -312,6 +257,6 @@ async def check_for_updates() -> None:
                         logger.debug("You are using the latest version")
         except Exception as e:
             logger.debug(f"Failed to check PyPI for updates: {e}")
-            
+
     except Exception as e:
         logger.warning(f"Update check encountered an unexpected error: {e!r}")
