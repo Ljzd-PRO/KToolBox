@@ -379,14 +379,13 @@ class ProgressManager:
         """Render individual progress bars"""
         lines = []
 
-        # Show only active progress bars (up to max_workers)
-        active_progress = [
-            (pid, state) for pid, state in self._progress_bars.items()
-            if not state.finished
-        ]
-
-        # Sort by last update time (most recent first)
-        active_progress.sort(key=lambda x: x[1].last_update, reverse=True)
+        # Show only active progress bars in stable order (up to max_workers)
+        # Use display_order to maintain consistent positioning instead of sorting by update time
+        active_progress = []
+        for progress_id in self._display_order:
+            if (progress_id in self._progress_bars and 
+                not self._progress_bars[progress_id].finished):
+                active_progress.append((progress_id, self._progress_bars[progress_id]))
 
         for progress_id, state in active_progress[:self.max_workers]:
             line = self._render_single_progress_bar(state)

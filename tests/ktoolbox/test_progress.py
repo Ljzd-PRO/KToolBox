@@ -286,3 +286,39 @@ class TestEnhancedProgressManager:
         state.finished = True
         line = manager._render_single_progress_bar(state)
         assert isinstance(line, str)
+    
+    def test_stable_progress_bar_ordering(self):
+        """Test that progress bars maintain stable ordering regardless of update times"""
+        import time
+        
+        manager = ProgressManager(max_workers=5, use_colors=False, use_emojis=False)
+        
+        # Create multiple progress bars in a specific order
+        pbar1 = manager.create_progress_bar("file1.jpg", total=100)
+        pbar2 = manager.create_progress_bar("file2.png", total=200)
+        pbar3 = manager.create_progress_bar("file3.mp4", total=300)
+        
+        # Update them in different order and at different times
+        # This simulates real download scenario where files finish at different times
+        pbar3.update(50)  # Update file3 first (most recent update)
+        time.sleep(0.001)  # Small delay to ensure different timestamps
+        pbar1.update(25)  # Update file1 second
+        time.sleep(0.001)
+        pbar2.update(75)  # Update file2 last (least recent update)
+        
+        # Render progress bars
+        lines = manager._render_progress_bars()
+        
+        # Verify we have the expected number of progress bars
+        assert len(lines) == 3
+        
+        # Check that they appear in creation order, not update order
+        # This is the key improvement: stable ordering instead of sorting by update time
+        assert "file1.jpg" in lines[0], f"file1.jpg should be first, but got: {lines[0]}"
+        assert "file2.png" in lines[1], f"file2.png should be second, but got: {lines[1]}"
+        assert "file3.mp4" in lines[2], f"file3.mp4 should be third, but got: {lines[2]}"
+        
+        # Clean up progress bars
+        pbar1.close()
+        pbar2.close()
+        pbar3.close()
