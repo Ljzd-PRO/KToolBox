@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 import os
 from asyncio import CancelledError, Lock
 from functools import cached_property
@@ -245,7 +246,7 @@ class Downloader:
                             filename=save_filepath
                         )
                     )
-                elif res.status_code != httpx.codes.PARTIAL_CONTENT:
+                elif res.status_code not in (httpx.codes.PARTIAL_CONTENT, httpx.codes.OK):
                     self._url = self._initial_url
                     return DownloaderRet(
                         code=RetCodeEnum.GeneralFailure,
@@ -278,6 +279,13 @@ class Downloader:
 
                 # Download
                 total_size = int(range_str.split("/")[-1]) if (range_str := res.headers.get("Content-Range")) else None
+                # Also check Content-Length if Content-Range is not available
+                if total_size is None:
+                    total_size = int(res.headers.get("Content-Length", 0)) or None
+                
+                downloaded_size = temp_size
+                sha256_hash = hashlib.sha256() if config.downloader.checksum_verification else None
+                
                 async with aiofiles.open(str(temp_filepath), "ab", self._buffer_size) as f:
                     chunk_iterator = res.aiter_bytes(self._chunk_size)
                     t = tqdm_class(
@@ -292,14 +300,96 @@ class Downloader:
                         if self._stop:
                             raise CancelledError
                         await f.write(chunk)
+                        downloaded_size += len(chunk)
+                        if sha256_hash:
+                            sha256_hash.update(chunk)
                         t.update(len(chunk))  # Update progress bar
 
-            # Download finished
+                # Verify file integrity if enabled
+                if config.downloader.verify_file_integrity and total_size is not None:
+                    actual_size = temp_filepath.stat().st_size
+                    if actual_size != total_size:
+                        # Remove incomplete file
+                        if temp_filepath.exists():
+                            temp_filepath.unlink()
+                        return DownloaderRet(
+                            code=RetCodeEnum.GeneralFailure,
+                            message=generate_msg(
+                                "File integrity check failed: size mismatch",
+                                expected_size=total_size,
+                                actual_size=actual_size,
+                                filename=save_filepath
+                            )
+                        )
+
+            # Download finished - ensure atomic file operations
+            final_filepath = self._path / self._save_filename
+            
+            # Handle bucket storage if enabled
             if config.downloader.use_bucket:
                 bucket_file_path.parent.mkdir(parents=True, exist_ok=True)
-                os.link(temp_filepath, bucket_file_path)
-            final_filepath = self._path / self._save_filename
-            temp_filepath.rename(final_filepath)
+                try:
+                    os.link(temp_filepath, bucket_file_path)
+                except OSError as e:
+                    logger.warning(
+                        generate_msg(
+                            "Failed to create bucket link",
+                            file=self._save_filename,
+                            exception=e
+                        )
+                    )
+            
+            # Atomic rename with retry for PermissionError
+            max_rename_attempts = 3
+            for attempt in range(max_rename_attempts):
+                try:
+                    temp_filepath.rename(final_filepath)
+                    break
+                except PermissionError as e:
+                    if attempt < max_rename_attempts - 1:
+                        logger.warning(
+                            generate_msg(
+                                f"PermissionError during rename, retrying ({attempt + 1}/{max_rename_attempts})",
+                                file=self._save_filename,
+                                exception=e
+                            )
+                        )
+                        await asyncio.sleep(0.1 * (attempt + 1))  # Exponential backoff
+                    else:
+                        # Final attempt failed - remove temp file and return error
+                        if temp_filepath.exists():
+                            temp_filepath.unlink()
+                        return DownloaderRet(
+                            code=RetCodeEnum.GeneralFailure,
+                            message=generate_msg(
+                                "Failed to rename file after multiple attempts",
+                                file=self._save_filename,
+                                exception=e
+                            )
+                        )
+                except OSError as e:
+                    # Other OS errors - remove temp file and return error
+                    if temp_filepath.exists():
+                        temp_filepath.unlink()
+                    return DownloaderRet(
+                        code=RetCodeEnum.GeneralFailure,
+                        message=generate_msg(
+                            "Failed to rename file",
+                            file=self._save_filename,
+                            exception=e
+                        )
+                    )
+
+            # Log checksum information if verification was enabled
+            if config.downloader.checksum_verification and sha256_hash:
+                checksum = sha256_hash.hexdigest()
+                logger.info(
+                    generate_msg(
+                        "Download completed with checksum",
+                        file=self._save_filename,
+                        sha256=checksum
+                    )
+                )
 
             # Set file time from headers
             if config.downloader.keep_metadata:
