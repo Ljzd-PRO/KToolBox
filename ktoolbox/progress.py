@@ -401,16 +401,12 @@ class ProgressManager:
                     bar_empty = ColorTheme.colorize('-' * (bar_width - filled), ColorTheme.GREEN)
                 elif progress_pct >= 75:
                     bar_filled = ColorTheme.colorize('=' * filled, ColorTheme.BRIGHT_CYAN)
-                    bar_empty = ColorTheme.colorize('-' * (bar_width - filled), ColorTheme.CYAN)
+                    bar_empty = ColorTheme.colorize('>' + '-' * (bar_width - filled), ColorTheme.CYAN)
                 else:
                     bar_filled = ColorTheme.colorize('=' * filled, ColorTheme.BRIGHT_YELLOW)
-                    bar_empty = ColorTheme.colorize('-' * (bar_width - filled), ColorTheme.YELLOW)
+                    bar_empty = ColorTheme.colorize('>' + '-' * (bar_width - filled), ColorTheme.YELLOW)
                 
-                # Add progress indicator
-                if filled < bar_width and progress_pct < 100:
-                    bar_display = bar_filled + '>' + bar_empty[1:] if filled > 0 else '>' + bar_empty[1:]
-                else:
-                    bar_display = bar_filled + bar_empty
+                bar_display = bar_filled + bar_empty
             else:
                 bar_filled = '=' * filled
                 bar_empty = '-' * (bar_width - filled)
@@ -544,8 +540,8 @@ class ProgressManager:
                     # Red for failed
                     if filled > 0:
                         if filled < bar_width:
-                            bar_filled = ColorTheme.colorize('━' * (filled - 1) + '╺', 'bright_red')
-                            bar_empty = ColorTheme.colorize('━' * (bar_width - filled), 'bright_black')
+                            bar_filled = ColorTheme.colorize('━' * (filled - 1), 'bright_red')
+                            bar_empty = ColorTheme.colorize('╺' + '━' * (bar_width - filled), 'bright_black')
                         else:
                             bar_filled = ColorTheme.colorize('━' * filled, 'bright_red')
                             bar_empty = ''
@@ -560,8 +556,8 @@ class ProgressManager:
                     # Pink/Magenta for in progress
                     if filled > 0:
                         if filled < bar_width:
-                            bar_filled = ColorTheme.colorize('━' * (filled - 1) + '╺', 'bright_magenta')
-                            bar_empty = ColorTheme.colorize('━' * (bar_width - filled), 'bright_black')
+                            bar_filled = ColorTheme.colorize('━' * (filled - 1), 'bright_magenta')
+                            bar_empty = ColorTheme.colorize('╺' + '━' * (bar_width - filled), 'bright_black')
                         else:
                             bar_filled = ColorTheme.colorize('━' * filled, 'bright_magenta')
                             bar_empty = ''
