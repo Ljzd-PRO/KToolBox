@@ -326,6 +326,17 @@ class ProgressManager:
             progress_pct = (self._completed_jobs / self._total_jobs) * 100 if self._total_jobs > 0 else 0
             progress_ratio = self._completed_jobs / self._total_jobs if self._total_jobs > 0 else 0
 
+            # Determine overall status emoji and color
+            if self.use_emojis:
+                if running > 0:
+                    status_emoji = f"{ColorTheme.RUNNING} "
+                elif self._failed_jobs > 0:
+                    status_emoji = f"{ColorTheme.FAILED} "
+                else:
+                    status_emoji = f"{ColorTheme.COMPLETED} "
+            else:
+                status_emoji = ""
+
             # Create visual progress bar
             bar_width = 30
             filled = int(bar_width * progress_ratio)
@@ -398,7 +409,8 @@ class ProgressManager:
             # Build the main progress line in the requested format
             # [================>----------------] 23% | Jobs: 10/44 | 4 running | 30 waiting | 4.5 MB/s
             line_parts = [
-                f"[{bar_display}]",
+                f"{status_emoji}",
+                f" [{bar_display}]",
                 pct_colored,
                 f"| Jobs: {completed_colored}/{total_colored}",
                 f"| {running_colored} running",
