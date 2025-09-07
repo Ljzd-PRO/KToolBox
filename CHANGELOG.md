@@ -4,7 +4,7 @@
 
 ### ✨ Features
 
-- Added configuration options to support filtering downloads by file size
+- Added configuration options to support **filtering** downloads by **file size**
   - You can set the minimum and maximum file size (in bytes) via `job.min_file_size` and `job.max_file_size`
   - Both options can be set together to define a file size range
   - Configure these options using the graphical config editor, or set them in the dotenv file `.env` or via system environment variables:
@@ -16,6 +16,14 @@
     KTOOLBOX_JOB__MAX_FILE_SIZE=52428800
     ```
   - 📖 More info: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
+- Improved progress bar output: fixed the issue where download file progress bars **kept reordering**, and added visual overall progress bar
+    ```
+    🔄   [==>---------------------------] 9% \| Jobs: 173/1870 \| 3 running \| 1694 waiting \| 5.7MB/s
+    
+    ⠹ 0bh1EKTGt5Zg9nNaDAi25P...    \|███████████████████████████░░░\| 3.7MB/4.0MB  92.5% ⚡ 1.9MB/s  
+    ⠹ YV30J8ftUbE9dUkkJVCqvN...    \|███░░░░░░░░░░░░░░░░░░░░░░░░░░░\| 527.0KB/4.1MB  12.5% ⚡ 1.9MB/s  
+    ⠹ KvKMSpwB4rRknTPKhEiXle...    \|░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\| 95.0KB/3.8MB   2.5% ⚡ 1.9MB/s  
+    ```
 
 ### 🪲 Fixes
 
@@ -33,7 +41,7 @@
 
 ### ✨ 新特性
 
-- 增加配置项以支持按文件大小过滤下载
+- 增加配置项以支持**按文件大小过滤**下载
   - 通过配置 `job.min_file_size` 和 `job.max_file_size` 来设置最小和最大文件大小（单位：字节）
   - 你可以同时设置这两个选项来定义一个文件大小范围
   - 通过图形化配置编辑器或在 dotenv 文件 `.env` 或系统环境变量中设置这些配置：
@@ -45,6 +53,14 @@
     KTOOLBOX_JOB__MAX_FILE_SIZE=52428800
     ```
   - 📖 更多信息：[Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/zh/configuration/reference/#ktoolbox._configuration_zh.JobConfiguration)
+- 改进进度条输出，修复了下载文件进度条**不断重新排序**的问题，并增加了可视化的总进度条
+  ```
+  🔄   [==>---------------------------] 9% | Jobs: 173/1870 | 3 running | 1694 waiting | 5.7MB/s
+
+  ⠹ 0bh1EKTGt5Zg9nNaDAi25P...    |███████████████████████████░░░| 3.7MB/4.0MB  92.5% ⚡ 1.9MB/s
+  ⠹ YV30J8ftUbE9dUkkJVCqvN...    |███░░░░░░░░░░░░░░░░░░░░░░░░░░░| 527.0KB/4.1MB  12.5% ⚡ 1.9MB/s
+  ⠹ KvKMSpwB4rRknTPKhEiXle...    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 95.0KB/3.8MB   2.5% ⚡ 1.9MB/s
+  ```
 
 ### 🪲 修复
 
