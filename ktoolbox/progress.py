@@ -316,7 +316,7 @@ class ProgressManager:
         return f"{self._format_size(int(rate))}/s"
 
     def _render_overall_progress(self) -> List[str]:
-        """Render the overall job progress with colors and emojis"""
+        """Render the overall job progress with colors and emojis, including visual progress bar"""
         lines = []
 
         if self._total_jobs > 0:
@@ -324,30 +324,48 @@ class ProgressManager:
             waiting = max(0, self._total_jobs - self._completed_jobs - self._failed_jobs - running)
 
             progress_pct = (self._completed_jobs / self._total_jobs) * 100 if self._total_jobs > 0 else 0
+            progress_ratio = self._completed_jobs / self._total_jobs if self._total_jobs > 0 else 0
 
-            # Determine overall status emoji and color
-            if self.use_emojis:
-                if running > 0:
-                    status_emoji = f"{ColorTheme.RUNNING} "
-                elif self._failed_jobs > 0:
-                    status_emoji = f"{ColorTheme.FAILED} "
-                else:
-                    status_emoji = f"{ColorTheme.COMPLETED} "
-            else:
-                status_emoji = ""
-
-            # Color the progress percentage based on completion
+            # Create visual progress bar
+            bar_width = 30
+            filled = int(bar_width * progress_ratio)
+            
             if self.use_colors:
                 if progress_pct >= 100:
-                    pct_colored = ColorTheme.colorize(f"{progress_pct:.1f}%", ColorTheme.BRIGHT_GREEN, bold=True)
+                    bar_filled = ColorTheme.colorize('=' * filled, ColorTheme.BRIGHT_GREEN)
+                    bar_empty = ColorTheme.colorize('-' * (bar_width - filled), ColorTheme.GREEN)
                 elif progress_pct >= 75:
-                    pct_colored = ColorTheme.colorize(f"{progress_pct:.1f}%", ColorTheme.BRIGHT_CYAN, bold=True)
-                elif progress_pct >= 50:
-                    pct_colored = ColorTheme.colorize(f"{progress_pct:.1f}%", ColorTheme.BRIGHT_YELLOW, bold=True)
+                    bar_filled = ColorTheme.colorize('=' * filled, ColorTheme.BRIGHT_CYAN)
+                    bar_empty = ColorTheme.colorize('-' * (bar_width - filled), ColorTheme.CYAN)
                 else:
-                    pct_colored = ColorTheme.colorize(f"{progress_pct:.1f}%", ColorTheme.BRIGHT_WHITE, bold=True)
+                    bar_filled = ColorTheme.colorize('=' * filled, ColorTheme.BRIGHT_YELLOW)
+                    bar_empty = ColorTheme.colorize('-' * (bar_width - filled), ColorTheme.YELLOW)
+                
+                # Add progress indicator
+                if filled < bar_width and progress_pct < 100:
+                    bar_display = bar_filled + '>' + bar_empty[1:] if filled > 0 else '>' + bar_empty[1:]
+                else:
+                    bar_display = bar_filled + bar_empty
             else:
-                pct_colored = f"{progress_pct:.1f}%"
+                bar_filled = '=' * filled
+                bar_empty = '-' * (bar_width - filled)
+                if filled < bar_width and progress_pct < 100:
+                    bar_display = bar_filled + '>' + bar_empty[1:] if filled > 0 else '>' + bar_empty[1:]
+                else:
+                    bar_display = bar_filled + bar_empty
+
+            # Color the progress percentage
+            if self.use_colors:
+                if progress_pct >= 100:
+                    pct_colored = ColorTheme.colorize(f"{progress_pct:.0f}%", ColorTheme.BRIGHT_GREEN, bold=True)
+                elif progress_pct >= 75:
+                    pct_colored = ColorTheme.colorize(f"{progress_pct:.0f}%", ColorTheme.BRIGHT_CYAN, bold=True)
+                elif progress_pct >= 50:
+                    pct_colored = ColorTheme.colorize(f"{progress_pct:.0f}%", ColorTheme.BRIGHT_YELLOW, bold=True)
+                else:
+                    pct_colored = ColorTheme.colorize(f"{progress_pct:.0f}%", ColorTheme.BRIGHT_WHITE, bold=True)
+            else:
+                pct_colored = f"{progress_pct:.0f}%"
 
             # Color status numbers
             if self.use_colors:
@@ -361,10 +379,39 @@ class ProgressManager:
                 running_colored = str(running)
                 waiting_colored = str(waiting)
 
-            line = f"{status_emoji}Jobs: {completed_colored}/{total_colored} completed ({pct_colored}), " \
-                   f"{running_colored} running, {waiting_colored} waiting"
+            # Calculate overall download speed from active progress bars
+            total_rate = 0
+            active_count = 0
+            for state in self._progress_bars.values():
+                if not state.finished and state.rate and state.rate > 0:
+                    total_rate += state.rate
+                    active_count += 1
+            
+            # Format overall speed
+            if total_rate > 0:
+                speed_str = self._format_rate(total_rate)
+                if self.use_colors:
+                    speed_str = ColorTheme.colorize(speed_str, ColorTheme.BRIGHT_MAGENTA)
+            else:
+                speed_str = ""
+
+            # Build the main progress line in the requested format
+            # [================>----------------] 23% | Jobs: 10/44 | 4 running | 30 waiting | 4.5 MB/s
+            line_parts = [
+                f"[{bar_display}]",
+                pct_colored,
+                f"| Jobs: {completed_colored}/{total_colored}",
+                f"| {running_colored} running",
+                f"| {waiting_colored} waiting"
+            ]
+            
+            if speed_str:
+                line_parts.append(f"| {speed_str}")
+            
+            line = " ".join(line_parts)
             lines.append(line)
 
+            # Show failed jobs on a separate line if any
             if self._failed_jobs > 0:
                 failed_emoji = f"{ColorTheme.FAILED} " if self.use_emojis else ""
                 if self.use_colors:

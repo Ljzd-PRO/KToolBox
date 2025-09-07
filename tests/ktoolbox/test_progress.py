@@ -322,3 +322,63 @@ class TestEnhancedProgressManager:
         pbar1.close()
         pbar2.close()
         pbar3.close()
+    
+    def test_overall_progress_bar_display(self):
+        """Test that overall progress displays visual progress bar in correct format"""
+        manager = ProgressManager(max_workers=5, use_colors=False, use_emojis=False)
+        
+        # Test with some completed jobs
+        manager.set_job_totals(44, completed=10, failed=0)
+        
+        # Create some active progress bars with rates to test speed calculation
+        pbar1 = manager.create_progress_bar("file1.jpg", total=1000)
+        pbar2 = manager.create_progress_bar("file2.png", total=2000)
+        
+        # Update progress and set rates
+        pbar1.update(500)
+        pbar2.update(800)
+        
+        with manager._lock:
+            if pbar1.progress_id in manager._progress_bars:
+                manager._progress_bars[pbar1.progress_id].rate = 1500000  # 1.5 MB/s
+            if pbar2.progress_id in manager._progress_bars:
+                manager._progress_bars[pbar2.progress_id].rate = 3000000  # 3.0 MB/s
+        
+        lines = manager._render_overall_progress()
+        
+        # Should have one main progress line
+        assert len(lines) == 1
+        progress_line = lines[0]
+        
+        # Check format: [progress_bar] percentage% | Jobs: X/Y | N running | M waiting | speed
+        assert progress_line.startswith('['), f"Should start with '[', but got: {progress_line}"
+        assert '] 23% |' in progress_line, f"Should contain '] 23% |', but got: {progress_line}"
+        assert 'Jobs: 10/44' in progress_line, f"Should contain 'Jobs: 10/44', but got: {progress_line}"
+        assert '2 running' in progress_line, f"Should contain '2 running', but got: {progress_line}"
+        assert '32 waiting' in progress_line, f"Should contain '32 waiting', but got: {progress_line}"
+        assert 'MB/s' in progress_line, f"Should contain speed 'MB/s', but got: {progress_line}"
+        
+        # Test edge cases
+        # 0% completion
+        manager_zero = ProgressManager(max_workers=5, use_colors=False, use_emojis=False)
+        manager_zero.set_job_totals(100, completed=0, failed=0)
+        lines_zero = manager_zero._render_overall_progress()
+        assert '[>-----------------------------] 0%' in lines_zero[0]
+        
+        # 100% completion
+        manager_complete = ProgressManager(max_workers=5, use_colors=False, use_emojis=False)
+        manager_complete.set_job_totals(100, completed=100, failed=0)
+        lines_complete = manager_complete._render_overall_progress()
+        assert '[==============================] 100%' in lines_complete[0]
+        
+        # With failed jobs
+        manager_failed = ProgressManager(max_workers=5, use_colors=False, use_emojis=False)
+        manager_failed.set_job_totals(100, completed=80, failed=5)
+        lines_failed = manager_failed._render_overall_progress()
+        assert len(lines_failed) == 2  # Main line + failed line
+        assert '[========================>-----] 80%' in lines_failed[0]
+        assert 'Failed: 5' in lines_failed[1]
+        
+        # Clean up
+        pbar1.close()
+        pbar2.close()
