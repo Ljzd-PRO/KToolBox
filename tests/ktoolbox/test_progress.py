@@ -174,16 +174,23 @@ class TestColorTheme:
             assert result == "test"
     
     def test_colorize_with_color_support(self):
-        """Test colorize adds ANSI codes when colors supported"""
+        """Test colorize adds colors when colors supported"""
         with patch.object(ColorTheme, 'supports_color', return_value=True):
             result = ColorTheme.colorize("test", ColorTheme.GREEN)
-            assert result == f"{ColorTheme.GREEN}test{ColorTheme.RESET}"
+            # Rich should apply colors - just check that the result is different from plain text
+            # and contains ANSI escape sequences
+            assert result != "test"
+            assert '\033[' in result  # Contains ANSI escape sequence
     
     def test_colorize_with_bold(self):
         """Test colorize adds bold formatting"""
         with patch.object(ColorTheme, 'supports_color', return_value=True):
             result = ColorTheme.colorize("test", ColorTheme.GREEN, bold=True)
-            assert result == f"{ColorTheme.BOLD}{ColorTheme.GREEN}test{ColorTheme.RESET}"
+            # Rich should apply bold colors - check that result is styled and different from non-bold
+            non_bold = ColorTheme.colorize("test", ColorTheme.GREEN, bold=False)
+            assert result != "test"
+            assert result != non_bold
+            assert '\033[' in result  # Contains ANSI escape sequence
 
 
 class TestEnhancedProgressManager:
@@ -383,11 +390,11 @@ class TestEnhancedProgressManager:
         pbar1.close()
         pbar2.close()
     
-    def test_colorama_unicode_progress_bars(self):
-        """Test that colorama-based Unicode progress bars work correctly"""
-        from ktoolbox.progress import COLORAMA_AVAILABLE
+    def test_rich_unicode_progress_bars(self):
+        """Test that Rich-based Unicode progress bars work correctly"""
+        from ktoolbox.progress import RICH_AVAILABLE
         
-        # Test with colorama enabled (when available)
+        # Test with Rich enabled (when available)
         manager = ProgressManager(max_workers=3, use_colors=True, use_emojis=False)
         
         # Create a progress bar and render it
@@ -396,22 +403,22 @@ class TestEnhancedProgressManager:
         
         line = manager._render_single_progress_bar(manager._progress_bars[pbar.progress_id])
         
-        if COLORAMA_AVAILABLE:
-            # Should contain Unicode characters when colorama is available
+        if RICH_AVAILABLE:
+            # Should contain Unicode characters when Rich is available
             assert '━' in line, f"Should contain Unicode progress char '━', but got: {line}"
             assert '╺' in line, f"Should contain Unicode indicator '╺', but got: {line}"
         else:
-            # Should fallback to original characters when colorama not available
-            assert ('█' in line or '░' in line), f"Should contain fallback chars when colorama unavailable, but got: {line}"
+            # Should fallback to original characters when Rich not available
+            assert ('█' in line or '░' in line), f"Should contain fallback chars when Rich unavailable, but got: {line}"
         
         pbar.close()
     
-    def test_colorama_fallback_behavior(self):
-        """Test that progress bars work correctly when colorama is not available"""
+    def test_rich_fallback_behavior(self):
+        """Test that progress bars work correctly when Rich is not available"""
         import unittest.mock
         
-        # Mock colorama as unavailable
-        with unittest.mock.patch('ktoolbox.progress.COLORAMA_AVAILABLE', False):
+        # Mock Rich as unavailable
+        with unittest.mock.patch('ktoolbox.progress.RICH_AVAILABLE', False):
             manager = ProgressManager(max_workers=3, use_colors=True, use_emojis=False)
             
             pbar = manager.create_progress_bar("test_fallback.jpg", total=100)

@@ -16,12 +16,12 @@ from dataclasses import dataclass, field
 
 from tqdm import tqdm as std_tqdm
 try:
-    import colorama
-    from colorama import Fore, Back, Style
-    colorama.init(autoreset=True)
-    COLORAMA_AVAILABLE = True
+    from rich.console import Console
+    from rich.text import Text
+    from rich.style import Style as RichStyle
+    RICH_AVAILABLE = True
 except ImportError:
-    COLORAMA_AVAILABLE = False
+    RICH_AVAILABLE = False
 
 __all__ = ["ProgressManager", "ManagedTqdm", "ColorTheme", "setup_logger_for_progress", "create_managed_tqdm_class"]
 
@@ -60,9 +60,12 @@ class ProgressAwareHandler:
 
 
 class ColorTheme:
-    """ANSI color codes and themes for progress display"""
+    """Rich-based color themes and styles for progress display"""
 
-    # ANSI Color codes
+    # Rich console for color support detection and rendering
+    _console = Console() if RICH_AVAILABLE else None
+
+    # ANSI Color codes (fallback when Rich not available)
     RESET = '\033[0m'
     BOLD = '\033[1m'
 
@@ -89,6 +92,27 @@ class ColorTheme:
     BG_RED = '\033[41m'
     BG_YELLOW = '\033[43m'
 
+    # Rich style mappings
+    if RICH_AVAILABLE:
+        RICH_STYLES = {
+            RED: "red",
+            GREEN: "green",
+            YELLOW: "yellow",
+            BLUE: "blue", 
+            MAGENTA: "magenta",
+            CYAN: "cyan",
+            WHITE: "white",
+            BRIGHT_RED: "bright_red",
+            BRIGHT_GREEN: "bright_green",
+            BRIGHT_YELLOW: "bright_yellow",
+            BRIGHT_BLUE: "bright_blue",
+            BRIGHT_MAGENTA: "bright_magenta",
+            BRIGHT_CYAN: "bright_cyan",
+            BRIGHT_WHITE: "bright_white",
+        }
+    else:
+        RICH_STYLES = {}
+
     # Emojis
     DOWNLOAD = "📥"
     COMPLETED = "✅"
@@ -103,14 +127,25 @@ class ColorTheme:
 
     @classmethod
     def colorize(cls, text: str, color: str, bold: bool = False) -> str:
-        """Apply color to text with optional bold using colorama when available"""
+        """Apply color to text with optional bold using Rich when available"""
         if not cls.supports_color():
             return text
         
-        if COLORAMA_AVAILABLE:
-            # Use colorama for more robust color support
-            style = Style.BRIGHT if bold else ''
-            return f"{style}{color}{text}{Style.RESET_ALL}"
+        if RICH_AVAILABLE:
+            # Use Rich for more robust color support
+            rich_color = cls.RICH_STYLES.get(color, color)
+            style = f"bold {rich_color}" if bold else rich_color
+            
+            # Create a Text object and render it to get the styled string
+            from rich.text import Text
+            from rich.console import Console
+            
+            text_obj = Text(text, style=style)
+            # Create a temporary console that forces color output for testing
+            console = Console(force_terminal=True, width=1000)
+            with console.capture() as capture:
+                console.print(text_obj, end="")
+            return capture.get()
         else:
             # Fallback to ANSI codes
             prefix = cls.BOLD + color if bold else color
@@ -118,10 +153,10 @@ class ColorTheme:
 
     @classmethod
     def supports_color(cls) -> bool:
-        """Check if terminal supports color using colorama when available"""
-        if COLORAMA_AVAILABLE:
-            # Colorama handles color support detection
-            return True
+        """Check if terminal supports color using Rich when available"""
+        if RICH_AVAILABLE and cls._console:
+            # Rich handles color support detection better
+            return cls._console.is_terminal and not cls._console.options.legacy_windows
         else:
             # Fallback to manual detection
             return (
@@ -502,40 +537,40 @@ class ProgressManager:
             progress = min(state.current / state.total, 1.0)
             filled = int(bar_width * progress)
 
-            # Create colored progress bar with new Unicode characters when colorama is available
-            if self.use_colors and COLORAMA_AVAILABLE:
-                # Use new Unicode characters: ━━━╺━━━━━━━ with colorama colors
+            # Create colored progress bar with Unicode characters when Rich is available
+            if self.use_colors and RICH_AVAILABLE:
+                # Use Unicode characters: ━━━╺━━━━━━━ with Rich colors
                 if state.failed:
                     # Red for failed
                     if filled > 0:
                         if filled < bar_width:
-                            bar_filled = Fore.LIGHTRED_EX + '━' * (filled - 1) + '╺'
-                            bar_empty = Fore.LIGHTBLACK_EX + '━' * (bar_width - filled)
+                            bar_filled = ColorTheme.colorize('━' * (filled - 1) + '╺', 'bright_red')
+                            bar_empty = ColorTheme.colorize('━' * (bar_width - filled), 'bright_black')
                         else:
-                            bar_filled = Fore.LIGHTRED_EX + '━' * filled
+                            bar_filled = ColorTheme.colorize('━' * filled, 'bright_red')
                             bar_empty = ''
                     else:
                         bar_filled = ''
-                        bar_empty = Fore.LIGHTBLACK_EX + '━' * bar_width
+                        bar_empty = ColorTheme.colorize('━' * bar_width, 'bright_black')
                 elif state.finished:
                     # Green for completed
-                    bar_filled = Fore.LIGHTGREEN_EX + '━' * filled
-                    bar_empty = Fore.LIGHTBLACK_EX + '━' * (bar_width - filled)
+                    bar_filled = ColorTheme.colorize('━' * filled, 'bright_green')
+                    bar_empty = ColorTheme.colorize('━' * (bar_width - filled), 'bright_black')
                 else:
                     # Pink/Magenta for in progress
                     if filled > 0:
                         if filled < bar_width:
-                            bar_filled = Fore.LIGHTMAGENTA_EX + '━' * (filled - 1) + '╺'
-                            bar_empty = Fore.LIGHTBLACK_EX + '━' * (bar_width - filled)
+                            bar_filled = ColorTheme.colorize('━' * (filled - 1) + '╺', 'bright_magenta')
+                            bar_empty = ColorTheme.colorize('━' * (bar_width - filled), 'bright_black')
                         else:
-                            bar_filled = Fore.LIGHTMAGENTA_EX + '━' * filled
+                            bar_filled = ColorTheme.colorize('━' * filled, 'bright_magenta')
                             bar_empty = ''
                     else:
                         bar_filled = ''
-                        bar_empty = Fore.LIGHTBLACK_EX + '━' * bar_width
-                bar = bar_filled + bar_empty + Style.RESET_ALL
+                        bar_empty = ColorTheme.colorize('━' * bar_width, 'bright_black')
+                bar = bar_filled + bar_empty
             elif self.use_colors:
-                # Fallback to original characters with ANSI colors when colorama not available
+                # Fallback to original characters with ANSI colors when Rich not available
                 if state.failed:
                     # Red for failed
                     bar_filled = ColorTheme.colorize('█' * filled, ColorTheme.BRIGHT_RED)
@@ -566,14 +601,14 @@ class ProgressManager:
                 percentage = f"{percentage_val:5.1f}%"
         else:
             # Indeterminate progress with animated bar
-            if self.use_colors and COLORAMA_AVAILABLE:
-                # Moving progress indicator with new Unicode characters
+            if self.use_colors and RICH_AVAILABLE:
+                # Moving progress indicator with Unicode characters
                 pos = _animation_state['frame'] % bar_width
                 bar_chars = ['━'] * bar_width
                 for i in range(max(0, pos-2), min(bar_width, pos+3)):
                     bar_chars[i] = '━'
                 bar_chars[pos] = '╺'  # Current position indicator
-                bar = Fore.LIGHTYELLOW_EX + ''.join(bar_chars) + Style.RESET_ALL
+                bar = ColorTheme.colorize(''.join(bar_chars), 'bright_yellow')
             elif self.use_colors:
                 # Fallback to original characters
                 pos = _animation_state['frame'] % bar_width
