@@ -35,7 +35,9 @@ class DownloaderConfiguration(ktoolbox.configuration.DownloaderConfiguration):
     :ivar tps_limit: 每秒最大连接数
     :ivar use_bucket: 启用本地存储桶模式
     :ivar bucket_path: 本地存储桶路径
-    :ivar reverse_proxy: 下载 URL 的反向代理格式。通过插入空的 ``{}`` 自定义文件名格式以表示原始 URL。例如：``https://example.com/{}`` 会变成 ``https://example.com/https://n1.kemono.su/data/66/83/xxxxx.jpg``；``https://example.com/?url={}`` 会变成 ``https://example.com/?url=https://n1.kemono.su/data/66/83/xxxxx.jpg``
+    :ivar reverse_proxy: 下载 URL 的反向代理格式。通过插入空的 ``{}`` 自定义文件名格式以表示原始 URL。\
+    例如：``https://example.com/{}`` 会变成 ``https://example.com/https://n1.kemono.su/data/66/83/xxxxx.jpg``；\
+    ``https://example.com/?url={}`` 会变成 ``https://example.com/?url=https://n1.kemono.su/data/66/83/xxxxx.jpg``
     :ivar keep_metadata: 下载文件时保留文件元数据（例如最后修改时间等）
     """
     ...
@@ -81,7 +83,7 @@ class PostStructureConfiguration(ktoolbox.configuration.PostStructureConfigurati
     :ivar content: 帖子内容文件的子路径
     :ivar external_links: 外部链接文件的子路径（用于保存内容中发现的云存储链接）
     :ivar file: 帖子 `file` 文件名的格式（`file` 不是 `attachment`，每个帖子只有一个 `file`，通常为封面图片）。\
-    通过插入空的 ``{}`` 自定义文件名格式。可使用 [属性][ktoolbox.configuration.JobConfiguration]。\
+    通过插入空的 ``{}`` 自定义文件名格式。可使用 [属性][ktoolbox._configuration_zh.JobConfiguration]。\
     例如：``{title}_{}`` 可能生成 ``TheTitle_Stelle_lv5_logo.gif``、``TheTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg`` 等文件名。\
     同时，你也可以使用 Python 格式规格迷你语言的格式化功能，例如：``{title:.6}_{}`` 可以将标题长度缩短为 6 个字符，\
     像 ``HiEveryoneThisIsALongTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg`` 会变成 ``HiEver_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``
@@ -119,7 +121,7 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
 
     :ivar count: 并发下载的协程数量
     :ivar include_revisions: 下载时包含修订帖子
-    :ivar post_dirname_format: 自定义帖子目录名格式，可使用 [属性][ktoolbox.configuration.JobConfiguration]。\
+    :ivar post_dirname_format: 自定义帖子目录名格式，可使用 [属性][ktoolbox._configuration_zh.JobConfiguration]。\
     例如：``[{published}]{id}`` 可以生成类似 ``[2024-1-1]123123`` 的目录名，\
     ``{user}_{published}_{title}`` 可以生成类似 ``234234_2024-1-1_TheTitle`` 的目录名。\
     同时，你也可以使用 Python 格式规格迷你语言的格式化功能，例如：``{title:.6}`` 可以将标题长度缩短为 6 个字符，像 ``HiEveryoneThisIsALongTitle`` 会变成 ``HiEver``
@@ -127,11 +129,10 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
     :ivar mix_posts: 在创作者目录下将不同帖子的所有文件保存到同一路径，不创建帖子目录，且不会记录 ``CreatorIndices``
     :ivar sequential_filename: 附件按数字顺序重命名，如 ``1.png``、``2.png`` 等
     :ivar sequential_filename_excludes: 启用 ``sequential_filename`` 时排除按顺序命名的文件扩展名，这些文件将保留原始名称。例如 ``[".psd", ".zip", ".mp4"]``
-    :ivar filename_format: 通过插入空的 ``{}`` 自定义文件名格式，表示基本文件名。可使用 [属性][ktoolbox.configuration.JobConfiguration]。\
+    :ivar filename_format: 通过插入空的 ``{}`` 自定义文件名格式，表示基本文件名。可使用 [属性][ktoolbox._configuration_zh.JobConfiguration]。\
     例如：``{title}_{}`` 可能生成 ``TheTitle_b4b41de2-8736-480d-b5c3-ebf0d917561b``、``TheTitle_af349b25-ac08-46d7-98fb-6ce99a237b90`` 等。\
     也可与 ``sequential_filename`` 结合使用，如 ``[{published}]_{}`` 可能生成 ``[2024-1-1]_1.png``、``[2024-1-1]_2.png`` 等。\
-    同时，你也可以使用 Python 格式规格迷你语言的格式化功能，例如：``{published}_{:03d}`` 可以生成类似 ``2024-1-1_001.png``、``2024-1-1_002.png`` 这样的文件名，\
-    ``{title:.6}`` 可以将标题长度缩短为 6 个字符，像 ``HiEveryoneThisIsALongTitle`` 会变成 ``HiEver``
+    同时，你也可以使用 Python 格式规格迷你语言的格式化功能，例如：``{title:.6}`` 可以将标题长度缩短为 6 个字符，像 ``HiEveryoneThisIsALongTitle`` 会变成 ``HiEver``
     :ivar allow_list: 下载匹配这些模式（Unix shell 风格）的文件，如 ``["*.png"]``
     :ivar block_list: 不下载匹配这些模式（Unix shell 风格）的文件，如 ``["*.psd","*.zip"]``
     :ivar extract_content: 提取帖子内容并保存到单独文件（文件名由 ``config.job.post_structure.content`` 定义）
@@ -145,6 +146,8 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
     :ivar keywords_exclude: 按帖子标题关键词排除（不区分大小写）
     :ivar download_file: 是否下载帖子文件（通常为封面图片）。设置为 False 可跳过文件下载。
     :ivar download_attachments: 是否下载帖子附件。设置为 False 可跳过附件下载。
+    :ivar min_file_size: 最小文件大小（字节）。小于此大小的文件将被跳过。设置为 None 禁用最小文件大小过滤。
+    :ivar max_file_size: 最大文件大小（字节）。大于此大小的文件将被跳过。设置为 None 禁用最大文件大小过滤。
     """
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
 

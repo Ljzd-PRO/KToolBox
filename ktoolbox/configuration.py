@@ -206,7 +206,6 @@ class JobConfiguration(BaseModel):
     You can also use it with ``sequential_filename``. For instance, \
     ``[{published}]_{}`` could result in filenames like ``[2024-1-1]_1.png``, ``[2024-1-1]_2.png``, etc. \
     Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example: \
-    ``{published}_{:03d}`` could result in filenames like ``2024-1-1_001.png``, ``2024-1-1_002.png`` and \
     ``{title:.6}`` could shorten the title length to 6 characters like ``HiEveryoneThisIsALongTitle`` to ``HiEver``
     :ivar allow_list: Download files which match these patterns (Unix shell-style), e.g. ``["*.png"]``
     :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``
@@ -225,6 +224,10 @@ class JobConfiguration(BaseModel):
     :ivar keywords_exclude: keywords to exclude posts by title (case-insensitive)
     :ivar download_file: Download post file (usually cover image). Set to False to skip file downloads.
     :ivar download_attachments: Download post attachments. Set to False to skip attachment downloads.
+    :ivar min_file_size: Minimum file size in bytes to download. Files smaller than this will be skipped. \
+    Set to None to disable minimum size filtering.
+    :ivar max_file_size: Maximum file size in bytes to download. Files larger than this will be skipped. \
+    Set to None to disable maximum size filtering.
     """
     count: int = 4
     include_revisions: bool = False
@@ -298,6 +301,8 @@ class JobConfiguration(BaseModel):
     keywords_exclude: Set[str] = Field(default_factory=set)
     download_file: bool = True
     download_attachments: bool = True
+    min_file_size: Optional[int] = None
+    max_file_size: Optional[int] = None
 
 
 class LoggerConfiguration(BaseModel):
