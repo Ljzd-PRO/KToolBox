@@ -4,7 +4,7 @@
 
 ### ✨ Features
 
-- Added configuration options to support **filtering** downloads by **file size**
+- Added configuration options to support **filtering** downloads by **file size** - #343
   - You can set the minimum and maximum file size (in bytes) via `job.min_file_size` and `job.max_file_size`
   - Both options can be set together to define a file size range
   - Configure these options using the graphical config editor, or set them in the dotenv file `.env` or via system environment variables:
@@ -16,7 +16,7 @@
     KTOOLBOX_JOB__MAX_FILE_SIZE=52428800
     ```
   - 📖 More info: [Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.JobConfiguration)
-- Improved progress bar output
+- Improved progress bar output - #345
   - Fixed the issue of the download file progress bar **constantly reordering**
   - Added **visual overall progress bar**
   - Added display of **total download speed**
@@ -45,7 +45,7 @@
 
 ### ✨ 新特性
 
-- 增加配置项以支持**按文件大小过滤**下载
+- 增加配置项以支持**按文件大小过滤**下载 - #343
   - 通过配置 `job.min_file_size` 和 `job.max_file_size` 来设置最小和最大文件大小（单位：字节）
   - 你可以同时设置这两个选项来定义一个文件大小范围
   - 通过图形化配置编辑器或在 dotenv 文件 `.env` 或系统环境变量中设置这些配置：
@@ -57,7 +57,7 @@
     KTOOLBOX_JOB__MAX_FILE_SIZE=52428800
     ```
   - 📖 更多信息：[Configuration-Reference-JobConfiguration](https://ktoolbox.readthedocs.io/latest/zh/configuration/reference/#ktoolbox._configuration_zh.JobConfiguration)
-- 改进进度条输出
+- 改进进度条输出 - #345
   - 修复了下载文件进度条**不断重新排序**的问题
   - 增加了**可视化的总进度条**
   - 增加了下载**总速度**显示
