@@ -78,7 +78,7 @@ class DownloaderConfiguration(BaseModel):
     retry_times: int = 10
     retry_stop_never: bool = False
     retry_interval: float = 3.0
-    tps_limit: float = 1.0
+    tps_limit: float = 5.0
     use_bucket: bool = False
     bucket_path: Path = Path("./.ktoolbox/bucket_storage")
     reverse_proxy: str = "{}"
