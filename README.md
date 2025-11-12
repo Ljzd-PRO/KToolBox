@@ -103,9 +103,9 @@ Manually install:
   pip3 install pipx
   
   # Windows
-  pipx install ktoolbox[urwid,winloop]
+  pipx install "ktoolbox[urwid,winloop]"
   # Linux / macOS
-  pipx install ktoolbox[urwid,uvloop]
+  pipx install "ktoolbox[urwid,uvloop]"
   ```
 
 - For [a-Shell](https://github.com/holzschu/a-shell) or [pyodide](https://pyodide.org/en/stable/), 
