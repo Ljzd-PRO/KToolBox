@@ -1,0 +1,94 @@
+name: Build & Publish for WinGet
+
+on:
+  release:
+    types: [published]
+
+env:
+  PYINSTALLER_VERSION: 6.15.0
+
+jobs:
+  # Use the existing Python package workflow (reusable) to build executables
+  build-windows:
+    name: Build executables (reuse existing workflow)
+    uses: ./.github/workflows/python-package.yml
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Fetch the built executable artifact from the previous job, pick up the .exe and upload as Release asset
+  fetch-exe:
+    name: Fetch built EXE and upload as release asset
+    runs-on: ubuntu-latest
+    needs: build-windows
+
+    steps:
+      - name: Download all artifacts from build
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Find and copy EXE to dist/
+        run: |
+          mkdir -p dist
+          EXE_PATH=$(find ./artifacts -type f -iname "KToolBox*.exe" -print -quit)
+          if [ -z "$EXE_PATH" ]; then
+            EXE_PATH=$(find ./artifacts -type f -iname "*.exe" -print -quit)
+          fi
+          if [ -z "$EXE_PATH" ]; then
+            echo "No .exe artifact found" >&2
+            exit 1
+          fi
+          echo "Found exe: $EXE_PATH"
+          cp "$EXE_PATH" dist/KToolBox.exe
+
+      - name: Upload release asset (exe)
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: dist/KToolBox.exe
+          asset_name: KToolBox-${{ github.event.release.tag_name }}-win-x64.exe
+          asset_content_type: application/octet-stream
+
+  submit-winget-manifest:
+    name: Submit/Update WinGet manifest via wingetcreate
+    runs-on: windows-latest
+    needs: fetch-exe
+    if: always()
+
+    env:
+      RELEASE_TAG: ${{ github.event.release.tag_name }}
+      ASSET_NAME: KToolBox-${{ github.event.release.tag_name }}-win-x64.exe
+      ASSET_URL: https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/${{ env.ASSET_NAME }}
+      PACKAGE_ID: ${{ secrets.WINGET_PACKAGE_ID }} # e.g. "Ljzd-PRO.KToolBox"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET runtime (required by wingetcreate)
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.x'
+
+      - name: Download wingetcreate
+        run: |
+          Invoke-WebRequest https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
+
+      - name: Show generated package info
+        run: |
+          echo "Asset URL: $ASSET_URL"
+          echo "Package id: $PACKAGE_ID"
+
+      - name: Submit update to winget-pkgs (update existing package)
+        if: env.PACKAGE_ID != ''
+        run: |
+          .\wingetcreate.exe update $PACKAGE_ID -u "$ASSET_URL" -v "$RELEASE_TAG" -t "${{ secrets.WINGET_CREATE_GITHUB_TOKEN }}" --submit
+
+      - name: Create new package on winget-pkgs (if PACKAGE_ID not set)
+        if: env.PACKAGE_ID == ''
+        run: |
+          echo "PACKAGE_ID not set; create a new package manually using wingetcreate or set WINGET_PACKAGE_ID secret to enable automatic updates."
+
+      - name: Note about PR
+        run: |
+          echo "If wingetcreate completed, it will open a PR against microsoft/winget-pkgs; ensure the PAT stored in WINGET_CREATE_GITHUB_TOKEN has the 'public_repo' scope."
