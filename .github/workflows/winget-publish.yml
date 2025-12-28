@@ -18,9 +18,8 @@ on:
         description: 'Create as draft: true/false'
         required: false
         default: 'false'
-  push:
-    tags:
-      - "*"
+  release:
+    types: [published]
 
 jobs:
   # Use the existing Python package workflow (reusable) to build executables
