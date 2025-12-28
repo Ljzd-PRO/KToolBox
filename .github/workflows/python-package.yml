@@ -42,7 +42,7 @@ jobs:
           - os: macos-latest
             arch: arm64
             python-arch: "x64"
-          - os: macos-15
+          - os: macos-15-intel
             arch: x64
             python-arch: "x64"
           
