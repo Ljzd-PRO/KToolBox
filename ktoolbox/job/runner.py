@@ -196,17 +196,21 @@ class JobRunner:
         """
         Watch running, completed, failed jobs
         """
-        while not self._job_queue.empty():
-            await asyncio.sleep(30)
-            existed = self._progress_manager._existed_jobs if self._progress_manager else 0
-            total = (self.waiting_size + self.processing_size + self.done_size)
-            percent = (self.done_size / total) * 100 if total > 0 else 0
-            logger.info(
-                f"Waiting: {self.waiting_size} / "
-                f"Running: {self.processing_size} / "
-                f"Completed: {self.done_size} "
-                f"({percent:.2f}%) | Existed: {existed}"
-            )
+        try:
+            while not self._job_queue.empty():
+                await asyncio.sleep(30)
+                existed = self._progress_manager._existed_jobs if self._progress_manager else 0
+                total = (self.waiting_size + self.processing_size + self.done_size)
+                percent = (self.done_size / total) * 100 if total > 0 else 0
+                logger.info(
+                    f"Waiting: {self.waiting_size} / "
+                    f"Running: {self.processing_size} / "
+                    f"Completed: {self.done_size} "
+                    f"({percent:.2f}%) | Existed: {existed}"
+                )
+        except asyncio.CancelledError:
+            # Exit promptly when cancelled to allow fast shutdown
+            return
 
     async def start(self) -> int:
         """
@@ -237,10 +241,21 @@ class JobRunner:
             if self._progress_manager:
                 display_task = asyncio.create_task(self._update_display_loop())
 
-            _, (task_done_set, _) = await asyncio.gather(
-                self._watch_status(),
-                asyncio.wait(self._concurrent_tasks)
-            )
+            # Start watcher as a background task so we can cancel it promptly when downloads finish
+            watch_task = None
+            if self._progress_manager:
+                watch_task = asyncio.create_task(self._watch_status())
+
+            # Wait for all concurrent processor tasks to finish
+            task_done_set, _ = await asyncio.wait(self._concurrent_tasks)
+
+            # Cancel watcher promptly to avoid waiting for its sleep interval
+            if watch_task:
+                watch_task.cancel()
+                try:
+                    await watch_task
+                except asyncio.CancelledError:
+                    pass
 
             if display_task:
                 display_task.cancel()

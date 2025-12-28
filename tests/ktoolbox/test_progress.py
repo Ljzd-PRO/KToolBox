@@ -171,15 +171,16 @@ class TestJobRunnerIntegration:
             return DownloaderRet(code=RetCodeEnum.FileExisted, message='Download file already exists, skipping')
 
         with patch('ktoolbox.job.runner.Downloader.run', new=fake_run):
-            failed_num = await runner.processor()
+            with patch('ktoolbox.job.runner.logger') as mock_logger:
+                failed_num = await runner.processor()
 
-            # No failures expected
-            assert failed_num == 0
-            # existed count should be incremented
-            assert runner._progress_manager._existed_jobs == 1
-            # ensure the message was printed to stderr by loguru handler
-            out, err = capsys.readouterr()
-            assert 'Download file already exists' in err
+                # No failures expected
+                assert failed_num == 0
+                # existed count should be incremented
+                assert runner._progress_manager._existed_jobs == 1
+                # ensure the message was logged at DEBUG level
+                assert mock_logger.debug.called
+                assert any('Download file already exists' in str(call) for call in mock_logger.debug.call_args_list)
 
     @patch('ktoolbox.job.runner.config')
     @pytest.mark.asyncio
@@ -221,6 +222,59 @@ class TestJobRunnerIntegration:
             assert runner._progress_manager._completed_jobs <= runner._progress_manager._total_jobs
             # existed should equal total
             assert runner._progress_manager._existed_jobs == len(jobs)
+
+    @patch('ktoolbox.job.runner.config')
+    @pytest.mark.asyncio
+    async def test_start_cancels_watcher_and_returns_quickly(self, mock_config):
+        """The background watcher should be cancelled promptly and start() should return quickly"""
+        mock_config.job.count = 2
+        mock_config.downloader.scheme = 'https'
+        mock_config.api.files_netloc = 'example.com'
+        mock_config.ssl_verify = True
+
+        from ktoolbox.job.runner import JobRunner
+        from ktoolbox.downloader.base import DownloaderRet
+        from ktoolbox._enum import RetCodeEnum
+        from pathlib import Path
+        import time
+
+        # Create small set of jobs
+        jobs = []
+        for i in range(2):
+            job = Mock()
+            job.server_path = f'/a/{i}/c'
+            job.alt_filename = None
+            job.path = Path('.')
+            job.post = None
+            jobs.append(job)
+
+        runner = JobRunner(job_list=jobs, centralized_progress=True)
+        runner._progress_manager.set_job_totals(len(jobs))
+
+        async def fake_run(*args, **kwargs):
+            return DownloaderRet(code=RetCodeEnum.Success, data='file')
+
+        # Replace downloader.run with a quick successful result
+        with patch('ktoolbox.job.runner.Downloader.run', new=fake_run):
+            # Provide a fake long-running watch that should be cancelled
+            async def fake_watch_status():
+                try:
+                    await asyncio.sleep(5)
+                except asyncio.CancelledError:
+                    # Mark that we were cancelled and re-raise
+                    runner._watch_cancelled = True
+                    raise
+
+            runner._watch_status = fake_watch_status
+
+            start = time.monotonic()
+            failed_num = await runner.start()
+            elapsed = time.monotonic() - start
+
+            assert failed_num == 0
+            # Ensure we returned quickly (well under the watch sleep)
+            assert elapsed < 2.0, f"start() took too long: {elapsed}s"
+            assert getattr(runner, '_watch_cancelled', False) is True
 
 
 class TestColorTheme:
