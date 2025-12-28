@@ -44,8 +44,15 @@ KTOOLBOX_JOB__COUNT=10
 # without making a new sub directory to storage them
 KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 
+# Customize the attachments directory name using post properties
+# This will create folders like "Title_of_Post" instead of "attachments"
+KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS_DIRNAME_FORMAT={title}
+
 # Rename attachments in numerical order, e.g. `1.png`, `2.png`, ...
 KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
+
+# Preserve original filename while using sequential numbering, e.g. `1_OriginalFileName.png`, `2_OriginalFileName.png`, ...
+KTOOLBOX_JOB__SEQUENTIAL_FILENAME_INDENTATION=True
 
 # Customize the filename format by inserting an empty `{}` to represent the basic filename.
 # Similar to `post_dirname_format`, you can use some of the properties in `Post`.

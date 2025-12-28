@@ -44,6 +44,37 @@ KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 !!! info "Notice"
     For more information, please visit [Configuration-Guide](configuration/guide.md) page.
 
+## How to customize the attachments folder name?
+
+You can customize the attachments folder name using post properties like title, ID, etc. using the `attachments_dirname_format` configuration.
+
+Set the configuration by `prod.env` dotenv file or system environment variables:
+```dotenv
+# Use post title as attachments folder name
+KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS_DIRNAME_FORMAT={title}
+
+# Use post ID and title combined
+KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS_DIRNAME_FORMAT={id}_{title}
+
+# Use published date and title
+KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS_DIRNAME_FORMAT={published}_{title}
+```
+
+This will create folder structures like:
+```
+Post_Directory/
+├─ content.txt
+├─ post.json
+└─ Title_of_Post/         # Instead of "attachments"
+   ├─ 1.jpg
+   └─ 2.png
+```
+
+Available properties: `{id}`, `{user}`, `{service}`, `{title}`, `{added}`, `{published}`, `{edited}`
+
+!!! info "Notice"
+    For more information, please visit [Configuration-Guide](configuration/guide.md) page.
+
 ## How to disable cover image download?
 
 You can set configuration option `job.download_file` to `False` to disable cover image (file) download functionality.
@@ -67,6 +98,40 @@ With this setting, KToolBox will only download attachments and skip file downloa
 ## Commands and flags should use `-` or `_` as seperator?
 
 Both is support, `-` is suggested.
+
+## Filename too long
+
+In some cases, the filename or the post directory name can be too long and caused download failure.
+To solve this issue, you can set **sequential filename** or use **custom post directory name**
+
+Set the configuration by `prod.env` dotenv file or system environment variables:
+```dotenv
+# Rename attachments in numerical order, e.g. `1.png`, `2.png`, ...
+KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
+
+# Set the post directory name to its release/publish date and ID, e.g. `[2024-1-1]11223344`
+KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}
+```
+
+## How to preserve original filenames while using sequential numbering?
+
+When using sequential filename mode, you can preserve the original filename while adding sequential numbers as a prefix by enabling `sequential_filename_indentation`.
+
+Set the configuration by `prod.env` dotenv file or system environment variables:
+```dotenv
+# Enable sequential filename numbering
+KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
+
+# Preserve original filename with sequential prefix, e.g. `1_OriginalFileName.png`, `2_OriginalFileName.png`, ...
+KTOOLBOX_JOB__SEQUENTIAL_FILENAME_INDENTATION=True
+```
+
+This will create filenames like:
+- Without indentation: `1.png`, `2.jpg`, `3.gif`
+- With indentation: `1_OriginalImage.png`, `2_PhotoFile.jpg`, `3_Animation.gif`
+
+!!! info "Notice"
+    This feature works together with `sequential_filename_excludes` to exclude certain file types from sequential numbering.
 
 ## Filename too long
 
