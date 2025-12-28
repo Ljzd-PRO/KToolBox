@@ -1,0 +1,141 @@
+name: Build & Publish for WinGet
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g., v0.24.0)'
+        required: true
+      release_name:
+        description: 'Release name (optional)'
+        required: false
+        default: ''
+      body:
+        description: 'Release body (optional)'
+        required: false
+        default: ''
+      draft:
+        description: 'Create as draft: true/false'
+        required: false
+        default: 'false'
+  release:
+    types: [published]
+
+jobs:
+  # Use the existing Python package workflow (reusable) to build executables
+  build-windows:
+    name: Build executables (reuse existing workflow)
+    uses: ./.github/workflows/python-package.yml
+
+  # Fetch the built executable artifact from the previous job, pick up the .exe and upload as Release asset
+  fetch-exe:
+    name: Fetch built EXE and upload as release asset
+    runs-on: ubuntu-latest
+    needs: build-windows
+
+    outputs:
+      release_tag: ${{ steps.set_release_vars.outputs.release_tag }}
+      asset_name: ${{ steps.set_release_vars.outputs.asset_name }}
+      asset_url: ${{ steps.set_release_vars.outputs.asset_url }}
+
+    steps:
+      - name: Download all artifacts from build
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Create or get Release (when manually dispatched)
+        id: create_release
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          release_name: ${{ github.event.inputs.release_name || github.event.inputs.tag }}
+          body: ${{ github.event.inputs.body }}
+          draft: ${{ github.event.inputs.draft }}
+
+      - name: Set release variables
+        id: set_release_vars
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            RELEASE="${{ github.event.inputs.tag }}"
+          else
+            RELEASE="${{ github.event.release.tag_name }}"
+          fi
+          echo "release_tag=$RELEASE" >> $GITHUB_OUTPUT
+          echo "asset_name=KToolBox-$RELEASE-win-x64.exe" >> $GITHUB_OUTPUT
+          echo "asset_url=https://github.com/${{ github.repository }}/releases/download/$RELEASE/KToolBox-$RELEASE-win-x64.exe" >> $GITHUB_OUTPUT
+
+      - name: Determine upload URL for release
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "UPLOAD_URL=${{ steps.create_release.outputs.upload_url }}" >> $GITHUB_ENV
+          else
+            echo "UPLOAD_URL=${{ github.event.release.upload_url }}" >> $GITHUB_ENV
+          fi
+
+      - name: Find and copy EXE to dist/
+        run: |
+          mkdir -p dist
+          EXE_PATH=$(find ./artifacts -type f -iname "KToolBox*.exe" -print -quit)
+          if [ -z "$EXE_PATH" ]; then
+            EXE_PATH=$(find ./artifacts -type f -iname "*.exe" -print -quit)
+          fi
+          if [ -z "$EXE_PATH" ]; then
+            echo "No .exe artifact found" >&2
+            exit 1
+          fi
+          echo "Found exe: $EXE_PATH"
+          cp "$EXE_PATH" dist/KToolBox.exe
+
+      - name: Upload release asset (exe)
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ env.UPLOAD_URL }}
+          asset_path: dist/KToolBox.exe
+          asset_name: ${{ steps.set_release_vars.outputs.asset_name }}
+          asset_content_type: application/octet-stream
+
+  submit-winget-manifest:
+    name: Submit/Update WinGet manifest via wingetcreate
+    runs-on: windows-latest
+    needs: fetch-exe
+    if: always()
+
+    env:
+      RELEASE_TAG: ${{ needs.fetch-exe.outputs.release_tag }}
+      ASSET_NAME: ${{ needs.fetch-exe.outputs.asset_name }}
+      ASSET_URL: ${{ needs.fetch-exe.outputs.asset_url }}
+      PACKAGE_ID: ${{ secrets.WINGET_PACKAGE_ID }} # e.g. "Ljzd-PRO.KToolBox"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET runtime (required by wingetcreate)
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.x'
+
+      - name: Download wingetcreate
+        run: |
+          Invoke-WebRequest https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
+
+      - name: Show generated package info
+        run: |
+          echo "Asset URL: $ASSET_URL"
+          echo "Package id: $PACKAGE_ID"
+
+      - name: Submit update to winget-pkgs (update existing package)
+        if: env.PACKAGE_ID != ''
+        run: |
+          .\wingetcreate.exe update $PACKAGE_ID -u "$ASSET_URL" -v "$RELEASE_TAG" -t "${{ secrets.WINGET_CREATE_GITHUB_TOKEN }}" --submit
+
+      - name: Create new package on winget-pkgs (if PACKAGE_ID not set)
+        if: env.PACKAGE_ID == ''
+        run: |
+          echo "PACKAGE_ID not set; create a new package manually using wingetcreate or set WINGET_PACKAGE_ID secret to enable automatic updates."
+
+      - name: Note about PR
+        run: |
+          echo "If wingetcreate completed, it will open a PR against microsoft/winget-pkgs; ensure the PAT stored in WINGET_CREATE_GITHUB_TOKEN has the 'public_repo' scope."

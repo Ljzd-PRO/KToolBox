@@ -139,11 +139,19 @@ class JobRunner:
                 if not exception:  # raise Exception when cancelled or other exceptions
                     ret = task_done.result()
                     if ret.code == RetCodeEnum.FileExisted:
-                        logger.info(ret.message)
-                        # Treat file existed as successful download
+                        logger.debug(ret.message)
+                        # Treat file existed as successful download but mark as existed
                         if self._progress_manager:
+                            # Increment existed count atomically and update completed based on current done_size
+                            try:
+                                self._progress_manager.increment_existed(1)
+                            except AttributeError:
+                                # Fallback if older ProgressManager doesn't have increment_existed
+                                self._progress_manager.update_job_progress(
+                                    existed=self._progress_manager._existed_jobs + 1
+                                )
                             self._progress_manager.update_job_progress(
-                                completed=self.done_size + 1
+                                completed=self.done_size
                             )
                     elif ret.code != RetCodeEnum.Success:
                         logger.error(ret.message)
@@ -157,7 +165,7 @@ class JobRunner:
                         # Update progress manager with completed job
                         if self._progress_manager:
                             self._progress_manager.update_job_progress(
-                                completed=self.done_size + 1
+                                completed=self.done_size
                             )
                 elif isinstance(exception, CancelledError):
                     logger.warning(
@@ -188,12 +196,21 @@ class JobRunner:
         """
         Watch running, completed, failed jobs
         """
-        while not self._job_queue.empty():
-            await asyncio.sleep(30)
-            logger.info(f"Waiting: {self.waiting_size} / "
-                        f"Running: {self.processing_size} / "
-                        f"Completed: {self.done_size} "
-                        f"({(self.done_size / (self.waiting_size + self.processing_size + self.done_size)) * 100:.2f}%)")
+        try:
+            while not self._job_queue.empty():
+                await asyncio.sleep(30)
+                existed = self._progress_manager._existed_jobs if self._progress_manager else 0
+                total = (self.waiting_size + self.processing_size + self.done_size)
+                percent = (self.done_size / total) * 100 if total > 0 else 0
+                logger.info(
+                    f"Waiting: {self.waiting_size} / "
+                    f"Running: {self.processing_size} / "
+                    f"Completed: {self.done_size} "
+                    f"({percent:.2f}%) | Existed: {existed}"
+                )
+        except asyncio.CancelledError:
+            # Exit promptly when cancelled to allow fast shutdown
+            return
 
     async def start(self) -> int:
         """
@@ -224,10 +241,21 @@ class JobRunner:
             if self._progress_manager:
                 display_task = asyncio.create_task(self._update_display_loop())
 
-            _, (task_done_set, _) = await asyncio.gather(
-                self._watch_status(),
-                asyncio.wait(self._concurrent_tasks)
-            )
+            # Start watcher as a background task so we can cancel it promptly when downloads finish
+            watch_task = None
+            if self._progress_manager:
+                watch_task = asyncio.create_task(self._watch_status())
+
+            # Wait for all concurrent processor tasks to finish
+            task_done_set, _ = await asyncio.wait(self._concurrent_tasks)
+
+            # Cancel watcher promptly to avoid waiting for its sleep interval
+            if watch_task:
+                watch_task.cancel()
+                try:
+                    await watch_task
+                except asyncio.CancelledError:
+                    pass
 
             if display_task:
                 display_task.cancel()
