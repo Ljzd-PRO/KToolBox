@@ -6,9 +6,6 @@ on:
     tags:
       - "*"
 
-env:
-  PYINSTALLER_VERSION: 6.15.0
-
 jobs:
   # Use the existing Python package workflow (reusable) to build executables
   build-windows:
