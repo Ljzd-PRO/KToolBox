@@ -32,11 +32,25 @@ jobs:
       cancel-in-progress: true
     strategy:
       fail-fast: false
+      # macos-14 aka. macos-latest has switched to being an ARM runner, only supporting newer versions of Python.
+      # https://github.com/actions/setup-python/issues/855#issuecomment-2096792205
       matrix:
-        # macos-14 aka. macos-latest has switched to being an ARM runner, only supporting newer versions of Python.
-        # https://github.com/actions/setup-python/issues/855#issuecomment-2096792205
-        os: [ ubuntu-latest, windows-latest, macos-13 ]
-        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12", "3.13" ]
+        os: [ ubuntu-latest, windows-latest, macos-15 ]
+        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14" ]
+        exclude:
+          - os: macos-15
+            python-version: "3.8"
+          - os: macos-15
+            python-version: "3.9"
+          - os: macos-15
+            python-version: "3.10"
+        include:
+          - os: macos-15-intel
+            python-version: "3.8"
+          - os: macos-15-intel
+            python-version: "3.9"
+          - os: macos-15-intel
+            python-version: "3.10"
     env:
       PYTEST_REPORT_FILENAME: report-${{ matrix.os }}-${{ matrix.python-version }}.html
 

@@ -179,6 +179,10 @@ class ProgressState:
     unit_scale: bool = False
     rate: Optional[float] = None
     last_update: float = field(default_factory=time.time)
+    # Tracks the last state timestamp that was actually rendered.
+    # Used to avoid advancing animation frames or forcing redraws
+    # when nothing meaningful has changed.
+    _last_render_seen: float = 0.0
     finished: bool = False
     failed: bool = False
     paused: bool = False
@@ -191,7 +195,8 @@ class ProgressManager:
     """
 
     def __init__(self, max_workers: int = 5, file: Optional[TextIO] = None,
-                 use_colors: bool = True, use_emojis: bool = True):
+                 use_colors: bool = True, use_emojis: bool = True,
+                 update_interval: float = 0.1):
         """
         Initialize the progress manager.
         
@@ -212,29 +217,41 @@ class ProgressManager:
         self._total_jobs = 0
         self._completed_jobs = 0
         self._failed_jobs = 0
+        self._existed_jobs = 0
 
         # Terminal control
         self._lines_written = 0
         self._last_display_time = 0
-        self._update_interval = 0.1  # Update every 100ms
+        # Update interval (seconds). When downloads change, refresh at most
+        # once per `update_interval`. Default is 1.0s to avoid excessive redraws.
+        self._update_interval = float(update_interval)
 
         # Display deduplication
         self._last_display_content = ""
 
-    def set_job_totals(self, total: int, completed: int = 0, failed: int = 0):
+    def set_job_totals(self, total: int, completed: int = 0, failed: int = 0, existed: int = 0):
         """Set the total number of jobs for overall progress tracking"""
         with self._lock:
             self._total_jobs = total
             self._completed_jobs = completed
             self._failed_jobs = failed
+            self._existed_jobs = existed
 
-    def update_job_progress(self, completed: int = None, failed: int = None):
+    def update_job_progress(self, completed: int = None, failed: int = None, existed: int = None):
         """Update overall job progress"""
         with self._lock:
             if completed is not None:
                 self._completed_jobs = completed
             if failed is not None:
                 self._failed_jobs = failed
+            if existed is not None:
+                self._existed_jobs = existed
+
+    def increment_existed(self, n: int = 1) -> int:
+        """Atomically increment the existed count by n and return the new value"""
+        with self._lock:
+            self._existed_jobs += n
+            return self._existed_jobs
 
     def create_progress_bar(self, desc: str, total: Optional[int] = None,
                           unit: str = "B", unit_scale: bool = True) -> 'ManagedTqdm':
@@ -434,11 +451,13 @@ class ProgressManager:
                 total_colored = ColorTheme.colorize(str(self._total_jobs), ColorTheme.BRIGHT_WHITE)
                 running_colored = ColorTheme.colorize(str(running), ColorTheme.BRIGHT_CYAN)
                 waiting_colored = ColorTheme.colorize(str(waiting), ColorTheme.BRIGHT_YELLOW)
+                existed_colored = ColorTheme.colorize(str(self._existed_jobs), ColorTheme.BRIGHT_WHITE)
             else:
                 completed_colored = str(self._completed_jobs)
                 total_colored = str(self._total_jobs)
                 running_colored = str(running)
                 waiting_colored = str(waiting)
+                existed_colored = str(self._existed_jobs)
 
             # Calculate overall download speed from active progress bars
             total_rate = 0
@@ -468,7 +487,8 @@ class ProgressManager:
                 pct_colored,
                 f"| Jobs: {completed_colored}/{total_colored}",
                 f"| {running_colored} running",
-                f"| {waiting_colored} waiting"
+                f"| {waiting_colored} waiting",
+                f"| {existed_colored} existed"
             ])
             
             if speed_str:
@@ -521,10 +541,15 @@ class ProgressManager:
                 status_emoji = ColorTheme.WAITING
             else:
                 # Animated spinner for active downloads
+                # Advance spinner only when this progress state's content changed
+                # since the last render to avoid continuous terminal refreshes
+                # caused solely by animation frames.
                 current_time = time.time()
-                if current_time - _animation_state['last_update'] > 0.1:
+                last_seen = getattr(state, '_last_render_seen', 0.0)
+                if state.last_update != last_seen:
                     _animation_state['frame'] = (_animation_state['frame'] + 1) % len(ColorTheme.SPINNER_FRAMES)
                     _animation_state['last_update'] = current_time
+                    state._last_render_seen = state.last_update
                 status_emoji = ColorTheme.SPINNER_FRAMES[_animation_state['frame']]
         else:
             status_emoji = ""

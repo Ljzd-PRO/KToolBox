@@ -142,6 +142,140 @@ class TestJobRunnerIntegration:
         assert runner._total_jobs_count == 3
         assert runner._progress_manager._total_jobs == 3
 
+    @patch('ktoolbox.job.runner.config')
+    @pytest.mark.asyncio
+    async def test_file_existed_updates_existed_and_logged_debug(self, mock_config, capsys):
+        """When a downloader returns FileExisted, the runner should log DEBUG and increment existed count"""
+        mock_config.job.count = 1
+        # Minimal downloader config used to build URL
+        mock_config.downloader.scheme = 'https'
+        mock_config.api.files_netloc = 'example.com'
+        mock_config.ssl_verify = True
+
+        from ktoolbox.job.runner import JobRunner
+        from ktoolbox.downloader.base import DownloaderRet
+        from ktoolbox._enum import RetCodeEnum
+        from pathlib import Path
+
+        # Create a minimal mock job
+        job = Mock()
+        job.server_path = '/a/b/c'
+        job.alt_filename = None
+        job.path = Path('.')
+        job.post = None
+
+        runner = JobRunner(job_list=[job], centralized_progress=True)
+        runner._progress_manager.set_job_totals(1)
+
+        async def fake_run(*args, **kwargs):
+            return DownloaderRet(code=RetCodeEnum.FileExisted, message='Download file already exists, skipping')
+
+        with patch('ktoolbox.job.runner.Downloader.run', new=fake_run):
+            with patch('ktoolbox.job.runner.logger') as mock_logger:
+                failed_num = await runner.processor()
+
+                # No failures expected
+                assert failed_num == 0
+                # existed count should be incremented
+                assert runner._progress_manager._existed_jobs == 1
+                # ensure the message was logged at DEBUG level
+                assert mock_logger.debug.called
+                assert any('Download file already exists' in str(call) for call in mock_logger.debug.call_args_list)
+
+    @patch('ktoolbox.job.runner.config')
+    @pytest.mark.asyncio
+    async def test_no_overcount_when_multiple_existed(self, mock_config):
+        """Ensure completed never exceeds total when many jobs are existed/skipped"""
+        mock_config.job.count = 3
+        mock_config.downloader.scheme = 'https'
+        mock_config.api.files_netloc = 'example.com'
+        mock_config.ssl_verify = True
+
+        from ktoolbox.job.runner import JobRunner
+        from ktoolbox.downloader.base import DownloaderRet
+        from ktoolbox._enum import RetCodeEnum
+        from pathlib import Path
+
+        # Create multiple mock jobs
+        jobs = []
+        for i in range(3):
+            job = Mock()
+            job.server_path = f'/a/{i}/c'
+            job.alt_filename = None
+            job.path = Path('.')
+            job.post = None
+            jobs.append(job)
+
+        runner = JobRunner(job_list=jobs, centralized_progress=True)
+        runner._progress_manager.set_job_totals(len(jobs))
+
+        async def fake_run(*args, **kwargs):
+            return DownloaderRet(code=RetCodeEnum.FileExisted, message='Download file already exists, skipping')
+
+        with patch('ktoolbox.job.runner.Downloader.run', new=fake_run):
+            # Use start to exercise concurrency
+            failed_num = await runner.start()
+
+            assert failed_num == 0
+            # completed should equal total and not exceed it
+            assert runner._progress_manager._completed_jobs == len(jobs)
+            assert runner._progress_manager._completed_jobs <= runner._progress_manager._total_jobs
+            # existed should equal total
+            assert runner._progress_manager._existed_jobs == len(jobs)
+
+    @patch('ktoolbox.job.runner.config')
+    @pytest.mark.asyncio
+    async def test_start_cancels_watcher_and_returns_quickly(self, mock_config):
+        """The background watcher should be cancelled promptly and start() should return quickly"""
+        mock_config.job.count = 2
+        mock_config.downloader.scheme = 'https'
+        mock_config.api.files_netloc = 'example.com'
+        mock_config.ssl_verify = True
+
+        from ktoolbox.job.runner import JobRunner
+        from ktoolbox.downloader.base import DownloaderRet
+        from ktoolbox._enum import RetCodeEnum
+        from pathlib import Path
+        import time
+
+        # Create small set of jobs
+        jobs = []
+        for i in range(2):
+            job = Mock()
+            job.server_path = f'/a/{i}/c'
+            job.alt_filename = None
+            job.path = Path('.')
+            job.post = None
+            jobs.append(job)
+
+        runner = JobRunner(job_list=jobs, centralized_progress=True)
+        runner._progress_manager.set_job_totals(len(jobs))
+
+        async def fake_run(*args, **kwargs):
+            return DownloaderRet(code=RetCodeEnum.Success, data='file')
+
+        # Replace downloader.run with a quick successful result
+        with patch('ktoolbox.job.runner.Downloader.run', new=fake_run):
+            # Provide a fake long-running watch that should be cancelled
+            async def fake_watch_status():
+                try:
+                    await asyncio.sleep(5)
+                except asyncio.CancelledError:
+                    # Mark that we were cancelled and re-raise
+                    runner._watch_cancelled = True
+                    raise
+
+            runner._watch_status = fake_watch_status
+
+            start = time.monotonic()
+            failed_num = await runner.start()
+            elapsed = time.monotonic() - start
+
+            assert failed_num == 0
+            # Ensure we returned quickly (well under the watch sleep)
+            assert elapsed < 2.0, f"start() took too long: {elapsed}s"
+            assert getattr(runner, '_watch_cancelled', False) is True
+
 
 class TestColorTheme:
     """Test the ColorTheme class for enhanced visuals"""
