@@ -26,8 +26,6 @@ jobs:
   build-windows:
     name: Build executables (reuse existing workflow)
     uses: ./.github/workflows/python-package.yml
-    secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # Fetch the built executable artifact from the previous job, pick up the .exe and upload as Release asset
   fetch-exe:
@@ -55,8 +53,6 @@ jobs:
           release_name: ${{ github.event.inputs.release_name || github.event.inputs.tag }}
           body: ${{ github.event.inputs.body }}
           draft: ${{ github.event.inputs.draft }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set release variables
         id: set_release_vars
