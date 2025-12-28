@@ -70,7 +70,7 @@ jobs:
         if: matrix.qemu != true
         uses: ./.github/actions/setup-python
         with:
-          python-version: "3.13"
+          python-version: "3.14"
           architecture: ${{ matrix.python-arch }}
 
       - name: Create Executable (Native)
