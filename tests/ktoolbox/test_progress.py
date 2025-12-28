@@ -142,6 +142,45 @@ class TestJobRunnerIntegration:
         assert runner._total_jobs_count == 3
         assert runner._progress_manager._total_jobs == 3
 
+    @patch('ktoolbox.job.runner.config')
+    @pytest.mark.asyncio
+    async def test_file_existed_updates_existed_and_logged_debug(self, mock_config, capsys):
+        """When a downloader returns FileExisted, the runner should log DEBUG and increment existed count"""
+        mock_config.job.count = 1
+        # Minimal downloader config used to build URL
+        mock_config.downloader.scheme = 'https'
+        mock_config.api.files_netloc = 'example.com'
+        mock_config.ssl_verify = True
+
+        from ktoolbox.job.runner import JobRunner
+        from ktoolbox.downloader.base import DownloaderRet
+        from ktoolbox._enum import RetCodeEnum
+        from pathlib import Path
+
+        # Create a minimal mock job
+        job = Mock()
+        job.server_path = '/a/b/c'
+        job.alt_filename = None
+        job.path = Path('.')
+        job.post = None
+
+        runner = JobRunner(job_list=[job], centralized_progress=True)
+        runner._progress_manager.set_job_totals(1)
+
+        async def fake_run(*args, **kwargs):
+            return DownloaderRet(code=RetCodeEnum.FileExisted, message='Download file already exists, skipping')
+
+        with patch('ktoolbox.job.runner.Downloader.run', new=fake_run):
+            failed_num = await runner.processor()
+
+            # No failures expected
+            assert failed_num == 0
+            # existed count should be incremented
+            assert runner._progress_manager._existed_jobs == 1
+            # ensure the message was printed to stderr by loguru handler
+            out, err = capsys.readouterr()
+            assert 'Download file already exists' in err
+
 
 class TestColorTheme:
     """Test the ColorTheme class for enhanced visuals"""

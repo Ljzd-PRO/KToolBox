@@ -139,11 +139,12 @@ class JobRunner:
                 if not exception:  # raise Exception when cancelled or other exceptions
                     ret = task_done.result()
                     if ret.code == RetCodeEnum.FileExisted:
-                        logger.info(ret.message)
-                        # Treat file existed as successful download
+                        logger.debug(ret.message)
+                        # Treat file existed as successful download but mark as existed
                         if self._progress_manager:
                             self._progress_manager.update_job_progress(
-                                completed=self.done_size + 1
+                                completed=self.done_size + 1,
+                                existed=self._progress_manager._existed_jobs + 1
                             )
                     elif ret.code != RetCodeEnum.Success:
                         logger.error(ret.message)
@@ -190,10 +191,15 @@ class JobRunner:
         """
         while not self._job_queue.empty():
             await asyncio.sleep(30)
-            logger.info(f"Waiting: {self.waiting_size} / "
-                        f"Running: {self.processing_size} / "
-                        f"Completed: {self.done_size} "
-                        f"({(self.done_size / (self.waiting_size + self.processing_size + self.done_size)) * 100:.2f}%)")
+            existed = self._progress_manager._existed_jobs if self._progress_manager else 0
+            total = (self.waiting_size + self.processing_size + self.done_size)
+            percent = (self.done_size / total) * 100 if total > 0 else 0
+            logger.info(
+                f"Waiting: {self.waiting_size} / "
+                f"Running: {self.processing_size} / "
+                f"Completed: {self.done_size} "
+                f"({percent:.2f}%) | Existed: {existed}"
+            )
 
     async def start(self) -> int:
         """
