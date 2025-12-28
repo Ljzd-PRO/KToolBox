@@ -142,9 +142,16 @@ class JobRunner:
                         logger.debug(ret.message)
                         # Treat file existed as successful download but mark as existed
                         if self._progress_manager:
+                            # Increment existed count atomically and update completed based on current done_size
+                            try:
+                                self._progress_manager.increment_existed(1)
+                            except AttributeError:
+                                # Fallback if older ProgressManager doesn't have increment_existed
+                                self._progress_manager.update_job_progress(
+                                    existed=self._progress_manager._existed_jobs + 1
+                                )
                             self._progress_manager.update_job_progress(
-                                completed=self.done_size + 1,
-                                existed=self._progress_manager._existed_jobs + 1
+                                completed=self.done_size
                             )
                     elif ret.code != RetCodeEnum.Success:
                         logger.error(ret.message)
@@ -158,7 +165,7 @@ class JobRunner:
                         # Update progress manager with completed job
                         if self._progress_manager:
                             self._progress_manager.update_job_progress(
-                                completed=self.done_size + 1
+                                completed=self.done_size
                             )
                 elif isinstance(exception, CancelledError):
                     logger.warning(

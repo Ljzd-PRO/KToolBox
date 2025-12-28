@@ -247,6 +247,12 @@ class ProgressManager:
             if existed is not None:
                 self._existed_jobs = existed
 
+    def increment_existed(self, n: int = 1) -> int:
+        """Atomically increment the existed count by n and return the new value"""
+        with self._lock:
+            self._existed_jobs += n
+            return self._existed_jobs
+
     def create_progress_bar(self, desc: str, total: Optional[int] = None,
                           unit: str = "B", unit_scale: bool = True) -> 'ManagedTqdm':
         """Create a new managed progress bar"""

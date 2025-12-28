@@ -181,6 +181,47 @@ class TestJobRunnerIntegration:
             out, err = capsys.readouterr()
             assert 'Download file already exists' in err
 
+    @patch('ktoolbox.job.runner.config')
+    @pytest.mark.asyncio
+    async def test_no_overcount_when_multiple_existed(self, mock_config):
+        """Ensure completed never exceeds total when many jobs are existed/skipped"""
+        mock_config.job.count = 3
+        mock_config.downloader.scheme = 'https'
+        mock_config.api.files_netloc = 'example.com'
+        mock_config.ssl_verify = True
+
+        from ktoolbox.job.runner import JobRunner
+        from ktoolbox.downloader.base import DownloaderRet
+        from ktoolbox._enum import RetCodeEnum
+        from pathlib import Path
+
+        # Create multiple mock jobs
+        jobs = []
+        for i in range(3):
+            job = Mock()
+            job.server_path = f'/a/{i}/c'
+            job.alt_filename = None
+            job.path = Path('.')
+            job.post = None
+            jobs.append(job)
+
+        runner = JobRunner(job_list=jobs, centralized_progress=True)
+        runner._progress_manager.set_job_totals(len(jobs))
+
+        async def fake_run(*args, **kwargs):
+            return DownloaderRet(code=RetCodeEnum.FileExisted, message='Download file already exists, skipping')
+
+        with patch('ktoolbox.job.runner.Downloader.run', new=fake_run):
+            # Use start to exercise concurrency
+            failed_num = await runner.start()
+
+            assert failed_num == 0
+            # completed should equal total and not exceed it
+            assert runner._progress_manager._completed_jobs == len(jobs)
+            assert runner._progress_manager._completed_jobs <= runner._progress_manager._total_jobs
+            # existed should equal total
+            assert runner._progress_manager._existed_jobs == len(jobs)
+
 
 class TestColorTheme:
     """Test the ColorTheme class for enhanced visuals"""
