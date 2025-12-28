@@ -196,7 +196,7 @@ class ProgressManager:
 
     def __init__(self, max_workers: int = 5, file: Optional[TextIO] = None,
                  use_colors: bool = True, use_emojis: bool = True,
-                 update_interval: float = 0.2):
+                 update_interval: float = 0.1):
         """
         Initialize the progress manager.
         
