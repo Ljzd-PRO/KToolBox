@@ -39,7 +39,7 @@ aiofiles = "^23.2.1"
 pathvalidate = "^3.2.0"
 settings-doc = "^4.3.1"
 rich = "^14.1.0"
-uvloop = {version=">=0.19,<0.22", optional=true, markers = "sys_platform != 'win32'"}
+uvloop = {version=">=0.19,<0.23", optional=true, markers = "sys_platform != 'win32'"}
 winloop = {version=">=0.1.6", optional=true, markers = "sys_platform == 'win32'"}
 urwid = [
     {version="^2.6.16", optional=true, markers = "sys_platform != 'win32'"},
