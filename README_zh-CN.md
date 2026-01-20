@@ -1,6 +1,8 @@
-<p align="center" style="text-decoration:none">
-  <img align="center" src="https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/repository-open-graph-2.svg" alt="logo">
-</p>
+<div align="center">
+  
+![KToolBox](https://socialify.git.ci/Ljzd-PRO/KToolBox/image?description=1&font=Source+Code+Pro&forks=1&issues=1&language=1&name=1&owner=1&pattern=Diagonal+Stripes&pulls=1&stargazers=1&theme=Auto)
+
+</div>
 
 <h1 align="center">
   KToolBox
