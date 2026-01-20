@@ -1,4 +1,4 @@
-<div align="center" style="text-decoration:none">
+<div align="center">
   
 ![KToolBox](https://socialify.git.ci/Ljzd-PRO/KToolBox/image?description=1&font=Source+Code+Pro&forks=1&issues=1&language=1&name=1&owner=1&pattern=Diagonal+Stripes&pulls=1&stargazers=1&theme=Auto)
 
