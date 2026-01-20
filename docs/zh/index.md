@@ -1,5 +1,5 @@
 <p style="text-decoration:none">
-  <img src="https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/repository-open-graph-2.svg" alt="logo">
+  <img src="https://socialify.git.ci/Ljzd-PRO/KToolBox/image?description=1&font=Source+Code+Pro&forks=1&issues=1&language=1&name=1&owner=1&pattern=Diagonal+Stripes&pulls=1&stargazers=1&theme=Auto" alt="KToolBox"/>
 </p>
 
 <h1 style="text-align: center">
