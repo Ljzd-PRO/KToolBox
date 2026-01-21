@@ -12,7 +12,8 @@ from pathvalidate import sanitize_filename, is_valid_filename
 from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
 from ktoolbox.action import ActionRet, fetch_creator_posts, FetchInterruptError
 from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date, generate_filename, \
-    filter_posts_by_keywords, filter_posts_by_keywords_exclude, generate_grouped_post_path, extract_content_images
+    filter_posts_by_keywords, filter_posts_by_keywords_exclude, generate_grouped_post_path, extract_content_images, \
+    generate_attachments_dirname
 from ktoolbox.api.model import Post, Attachment, Revision
 from ktoolbox.api.posts import get_post_revisions as get_post_revisions_api, get_post as get_post_api
 from ktoolbox.configuration import config
@@ -42,7 +43,9 @@ async def create_job_from_post(
 
     # Load ``PostStructureConfiguration``
     if post_dir:
-        attachments_path = post_path / config.job.post_structure.attachments  # attachments
+        # Generate attachments directory name using the format if specified
+        attachments_dirname = generate_attachments_dirname(post)
+        attachments_path = post_path / attachments_dirname  # attachments
         attachments_path.mkdir(exist_ok=True)
         content_path = post_path / config.job.post_structure.content  # content
         content_path.parent.mkdir(exist_ok=True)
@@ -84,7 +87,13 @@ async def create_job_from_post(
                 should_use_sequential = (config.job.sequential_filename and
                                          file_path_obj.suffix.lower() not in config.job.sequential_filename_excludes)
                 if should_use_sequential:
-                    basic_filename = f"{sequential_counter}{file_path_obj.suffix}"
+                    if config.job.sequential_filename_indentation:
+                        # Use sequential number with original filename: 1_OriginalFileName.png
+                        basic_filename_without_ext = file_path_obj.stem
+                        basic_filename = f"{sequential_counter}_{basic_filename_without_ext}{file_path_obj.suffix}"
+                    else:
+                        # Use only sequential number: 1.png
+                        basic_filename = f"{sequential_counter}{file_path_obj.suffix}"
                     sequential_counter += 1
                 else:
                     basic_filename = file_path_obj.name

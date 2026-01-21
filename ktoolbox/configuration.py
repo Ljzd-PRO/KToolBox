@@ -126,7 +126,7 @@ class PostStructureConfiguration(BaseModel):
               └─ ...
     ```
 
-    - Available properties for ``file``
+    - Available properties for ``file`` and ``attachments_dirname_format``
 
         | Property      | Type   |
         |---------------|--------|
@@ -139,6 +139,12 @@ class PostStructureConfiguration(BaseModel):
         | ``edited``    | Date   |
 
     :ivar attachments: Sub path of attachment directory
+    :ivar attachments_dirname_format: Customize the attachments directory name format, you can use some of the \
+    [properties][ktoolbox.configuration.JobConfiguration] in ``Post``. \
+    e.g. ``{title}`` could result dirname ``Title_of_Post``, \
+    ``{user}_{title}`` could result dirname like ``234234_Title_of_Post``. \
+    Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example: \
+    ``{title:.6}`` could shorten the title length to 6 characters like ``HiEveryoneThisIsALongTitle`` to ``HiEver``
     :ivar content: Sub path of post content file
     :ivar external_links: Sub path of external links file (for cloud storage links found in content)
     :ivar file: The format of the post `file` filename (`file` is not `attachment`, each post has only one `file`, usually the cover image) \
@@ -152,6 +158,7 @@ class PostStructureConfiguration(BaseModel):
     :ivar revisions: Sub path of revisions directory
     """
     attachments: Path = Path("attachments")
+    attachments_dirname_format: str = "attachments"
     content: Path = Path("content.txt")
     external_links: Path = Path("external_links.txt")
     file: str = "{id}_{}"
@@ -197,6 +204,8 @@ class JobConfiguration(BaseModel):
     :ivar mix_posts: Save all files from different posts at same path in creator directory. \
     It would not create any post directory, and ``CreatorIndices`` would not been recorded.
     :ivar sequential_filename: Rename attachments in numerical order, e.g. ``1.png``, ``2.png``, ...
+    :ivar sequential_filename_indentation: When enabled with ``sequential_filename``, preserve the original filename \
+    while adding sequential numbers as prefix, e.g. ``1_OriginalFileName.png``, ``2_OriginalFileName.png``, ...
     :ivar sequential_filename_excludes: File extensions to exclude from sequential naming when ``sequential_filename`` is enabled. \
     Files with these extensions will keep their original names. e.g. ``[".psd", ".zip", ".mp4"]``
     :ivar filename_format: Customize the filename format by inserting an empty ``{}`` to represent the basic filename.
@@ -235,6 +244,7 @@ class JobConfiguration(BaseModel):
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
     mix_posts: bool = False
     sequential_filename: bool = False
+    sequential_filename_indentation: bool = False
     sequential_filename_excludes: Set[str] = Field(default_factory=set)
     filename_format: str = "{}"
     # noinspection PyDataclass
