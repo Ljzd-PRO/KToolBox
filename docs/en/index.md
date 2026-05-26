@@ -80,11 +80,11 @@ You can use executables from [releases](https://github.com/Ljzd-PRO/KToolBox/rel
 === "Normal"
     Recommend to use pipx
     ```bash
-    pip3 install pipx
+    sudo apt update && sudo apt install pipx
     # Windows
-    pipx install ktoolbox[urwid,winloop]
+    pipx install "ktoolbox[urwid,winloop]"
     # Linux / macOS
-    pipx install ktoolbox[urwid,uvloop]
+    pipx install "ktoolbox[urwid,uvloop]"
     ```
 
 === "Pure Python"
