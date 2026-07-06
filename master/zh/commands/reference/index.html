@@ -868,6 +868,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ktoolbox._cli_zh.KToolBoxCli.webui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        webui
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1241,6 +1252,17 @@
     <span class="md-ellipsis">
       
         version
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ktoolbox._cli_zh.KToolBoxCli.webui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        webui
       
     </span>
   </a>
@@ -2048,6 +2070,94 @@
     <div class="doc doc-contents ">
 
         <p>显示 KToolBox 版本号</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ktoolbox._cli_zh.KToolBoxCli.webui" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">webui</span></code>
+
+<a href="#ktoolbox._cli_zh.KToolBoxCli.webui" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>启动 KToolBox WebUI 面板。</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>host</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>监听地址，默认 <code>0.0.0.0</code> 以允许局域网访问</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;0.0.0.0&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>port</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>监听端口</p>
+              </div>
+            </td>
+            <td>
+                  <code>8789</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>token</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>访问令牌，留空时自动生成</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>no_auth</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>禁用令牌认证</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
     </div>
 
