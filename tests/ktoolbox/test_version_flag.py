@@ -1,4 +1,3 @@
-import pytest
 import sys
 from unittest.mock import patch
 from ktoolbox.__main__ import main
@@ -24,17 +23,11 @@ class TestVersionFlag:
 
     def test_normal_command_not_affected(self):
         """Test that normal commands are not affected by version flag logic"""
-        # Test that we don't accidentally catch normal arguments
-        with patch.object(sys, 'argv', ['ktoolbox', 'version']):
-            # This should not trigger the early return for -v flag
-            # The test passes if no exception is raised and Fire takes over
-            try:
-                # We expect this to fail because Fire will try to run the command
-                # but we're just testing that our -v logic doesn't interfere
-                main()
-            except SystemExit:
-                # Fire may call sys.exit, which is expected
-                pass
-            except Exception:
-                # Other exceptions are also expected as we're not providing full environment
-                pass
+        # Test that we don't accidentally catch normal arguments before Fire takes over.
+        with patch.object(sys, 'argv', ['ktoolbox', 'version']), \
+                patch('ktoolbox.__main__.logger_init'), \
+                patch('ktoolbox.__main__.uvloop_init'), \
+                patch('ktoolbox.__main__.fire.Fire') as mock_fire:
+            main()
+
+        mock_fire.assert_called_once()

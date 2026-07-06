@@ -6,12 +6,19 @@ import pytest
 from ktoolbox.action.job import create_job_from_post
 from ktoolbox.action.utils import extract_content_images
 from ktoolbox.api.model import Post, Attachment
-from ktoolbox.configuration import config
+from ktoolbox.configuration import config, JobConfiguration
 
-config.job.extract_content_images = True
 
 class TestContentImageParsing:
     """Test content image parsing functionality"""
+
+    @pytest.fixture(autouse=True)
+    def reset_config(self):
+        original_job = config.job
+        config.job = JobConfiguration()
+        config.job.extract_content_images = True
+        yield
+        config.job = original_job
 
     def test_extract_content_images_basic(self):
         """Test basic HTML content image extraction"""

@@ -1,14 +1,24 @@
 import tempfile
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from types import SimpleNamespace
+from unittest.mock import patch, AsyncMock
 
 import pytest
 
 from ktoolbox._enum import TextEnum
+from ktoolbox.api import APIRet
 from ktoolbox.api.model import Post, Revision
 from ktoolbox.api.posts import GetPost
 from ktoolbox.cli import KToolBoxCli
 from ktoolbox.utils import parse_webpage_url, generate_msg
+
+
+@pytest.fixture(autouse=True)
+def mock_update_check():
+    KToolBoxCli._update_checked = False
+    with patch("ktoolbox.cli.check_for_updates", new_callable=AsyncMock):
+        yield
+    KToolBoxCli._update_checked = False
 
 
 class TestRevisionSupport:
@@ -50,23 +60,23 @@ class TestRevisionSupport:
     @pytest.mark.asyncio
     async def test_download_post_revision_url_parsing(self):
         """Test that download_post correctly parses revision URLs"""
-        with patch('ktoolbox.cli.get_post_api') as mock_get_post:
+        with patch('ktoolbox.cli.get_post_api', new_callable=AsyncMock) as mock_get_post:
             # Mock the API response
-            mock_response = MagicMock()
-            mock_response.data.post = Post(
+            post = Post(
                 id="456",
                 title="Test Post",
                 service="fanbox",
                 user="123",
                 attachments=[]  # Add empty attachments list
             )
+            mock_response = APIRet(data=SimpleNamespace(post=post, props=None))
             mock_get_post.return_value = mock_response
 
-            with patch('ktoolbox.action.job.create_job_from_post') as mock_create_job:
+            with patch('ktoolbox.cli.create_job_from_post', new_callable=AsyncMock) as mock_create_job:
                 mock_create_job.return_value = []
 
-                with patch('ktoolbox.job.runner.JobRunner') as mock_job_runner:
-                    mock_job_runner.return_value.start = MagicMock()
+                with patch('ktoolbox.cli.JobRunner') as mock_job_runner:
+                    mock_job_runner.return_value.start = AsyncMock(return_value=0)
 
                     # Test revision URL
                     with tempfile.TemporaryDirectory() as td:
@@ -74,26 +84,29 @@ class TestRevisionSupport:
                             url="https://kemono.su/fanbox/user/123/post/456/revision/789",
                             path=Path(td)
                         )
+                        assert result is None
 
                     # Verify the API was called with revision_id
-                    mock_get_post.assert_called_once_with(
+                    mock_get_post.assert_awaited_once_with(
                         service="fanbox",
                         creator_id="123",
                         post_id="456",
                         revision_id="789"
                     )
+                    mock_create_job.assert_awaited_once()
+                    mock_job_runner.return_value.start.assert_awaited_once()
 
     @pytest.mark.asyncio
     async def test_get_post_with_revision(self):
         """Test that get_post API supports revision parameter"""
-        with patch('ktoolbox.cli.get_post_api') as mock_get_post:
-            mock_response = MagicMock()
-            mock_response.data.post = Post(
+        with patch('ktoolbox.cli.get_post_api', new_callable=AsyncMock) as mock_get_post:
+            post = Post(
                 id="456",
                 title="Test Post",
                 service="fanbox",
                 user="123"
             )
+            mock_response = APIRet(data=SimpleNamespace(post=post, props=None))
             mock_get_post.return_value = mock_response
 
             # Test with revision_id
@@ -105,7 +118,8 @@ class TestRevisionSupport:
             )
 
             # Verify the API was called with revision_id
-            mock_get_post.assert_called_once_with(
+            assert result == post
+            mock_get_post.assert_awaited_once_with(
                 service="fanbox",
                 creator_id="123",
                 post_id="456",

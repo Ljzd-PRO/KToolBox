@@ -17,8 +17,6 @@ from dataclasses import dataclass, field
 from tqdm import tqdm as std_tqdm
 try:
     from rich.console import Console
-    from rich.text import Text
-    from rich.style import Style as RichStyle
     RICH_AVAILABLE = True
 except ImportError:
     RICH_AVAILABLE = False
@@ -127,29 +125,34 @@ class ColorTheme:
 
     @classmethod
     def colorize(cls, text: str, color: str, bold: bool = False) -> str:
-        """Apply color to text with optional bold using Rich when available"""
+        """Apply ANSI color to text with optional bold."""
         if not cls.supports_color():
             return text
-        
-        if RICH_AVAILABLE:
-            # Use Rich for more robust color support
-            rich_color = cls.RICH_STYLES.get(color, color)
-            style = f"bold {rich_color}" if bold else rich_color
-            
-            # Create a Text object and render it to get the styled string
-            from rich.text import Text
-            from rich.console import Console
-            
-            text_obj = Text(text, style=style)
-            # Create a temporary console that forces color output for testing
-            console = Console(force_terminal=True, width=1000)
-            with console.capture() as capture:
-                console.print(text_obj, end="")
-            return capture.get()
-        else:
-            # Fallback to ANSI codes
-            prefix = cls.BOLD + color if bold else color
-            return f"{prefix}{text}{cls.RESET}"
+
+        style_to_ansi = {
+            "black": "\033[30m",
+            "red": cls.RED,
+            "green": cls.GREEN,
+            "yellow": cls.YELLOW,
+            "blue": cls.BLUE,
+            "magenta": cls.MAGENTA,
+            "cyan": cls.CYAN,
+            "white": cls.WHITE,
+            "bright_black": "\033[90m",
+            "bright_red": cls.BRIGHT_RED,
+            "bright_green": cls.BRIGHT_GREEN,
+            "bright_yellow": cls.BRIGHT_YELLOW,
+            "bright_blue": cls.BRIGHT_BLUE,
+            "bright_magenta": cls.BRIGHT_MAGENTA,
+            "bright_cyan": cls.BRIGHT_CYAN,
+            "bright_white": cls.BRIGHT_WHITE,
+        }
+        ansi_color = color if color.startswith("\033[") else style_to_ansi.get(color)
+        if not ansi_color:
+            return text
+
+        prefix = cls.BOLD + ansi_color if bold else ansi_color
+        return f"{prefix}{text}{cls.RESET}"
 
     @classmethod
     def supports_color(cls) -> bool:

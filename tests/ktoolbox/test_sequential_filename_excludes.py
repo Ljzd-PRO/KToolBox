@@ -59,6 +59,10 @@ class TestSequentialFilenameExcludes:
         # Reset config to defaults
         config.job = JobConfiguration()
 
+    def teardown_method(self):
+        """Restore default job config after each test."""
+        config.job = JobConfiguration()
+
     @pytest.mark.asyncio
     async def test_sequential_filename_disabled(self, mock_post):
         """Test that original names are preserved when sequential_filename is False."""

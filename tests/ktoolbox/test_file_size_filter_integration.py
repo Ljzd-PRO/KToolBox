@@ -6,7 +6,7 @@ import pytest
 
 from ktoolbox.action.job import create_job_from_post
 from ktoolbox.api.model import Post, Attachment, File
-from ktoolbox.configuration import config
+from ktoolbox.configuration import config, JobConfiguration
 
 
 @pytest.fixture
@@ -32,11 +32,10 @@ class TestFileSizeFilterIntegration:
     @pytest.fixture(autouse=True)
     def reset_config(self):
         """Reset config before each test."""
-        config.job.min_file_size = None
-        config.job.max_file_size = None
-        config.job.download_attachments = True
-        config.job.download_file = True
+        original_job = config.job
+        config.job = JobConfiguration()
         yield
+        config.job = original_job
 
     @pytest.mark.asyncio
     async def test_jobs_created_regardless_of_size_limits(self, mock_post):
