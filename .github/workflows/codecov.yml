@@ -7,6 +7,7 @@ on:
       - master
       - devel
       - pure-py
+      - pawchive
     paths:
       - "ktoolbox/**"
       - "tests/**"
@@ -36,19 +37,11 @@ jobs:
       # https://github.com/actions/setup-python/issues/855#issuecomment-2096792205
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-15 ]
-        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14" ]
+        python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14" ]
         exclude:
-          - os: macos-15
-            python-version: "3.8"
-          - os: macos-15
-            python-version: "3.9"
           - os: macos-15
             python-version: "3.10"
         include:
-          - os: macos-15-intel
-            python-version: "3.8"
-          - os: macos-15-intel
-            python-version: "3.9"
           - os: macos-15-intel
             python-version: "3.10"
     env:

@@ -1,50 +1,52 @@
-[tool.poetry]
+[project]
 name = "ktoolbox"
 version = "v0.24.0"
 description = "A useful CLI tool for downloading posts in Kemono.cr / .su / .party"
-authors = ["Ljzd-PRO <me@ljzd.link>"]
+authors = [{ name = "Ljzd-PRO", email = "me@ljzd.link" }]
 readme = "README.md"
-homepage = "https://ktoolbox.readthedocs.io/"
-repository = "https://github.com/Ljzd-PRO/KToolBox"
-documentation = "https://ktoolbox.readthedocs.io/"
 license = "BSD-3-Clause"
+requires-python = ">=3.10,<=3.14"
+dependencies = [
+    "pydantic>=2.4.2,<3.0.0",
+    "pydantic-settings>=2.0.3,<3.0.0",
+    "tenacity>=8.2.3,<10.0.0",
+    "httpx[socks]>=0.24.1,<0.29.0",
+    "fire>=0.5,<0.8",
+    "tqdm>=4.66.1,<5.0.0",
+    "loguru>=0.7.2,<0.8.0",
+    "aiofiles>=23.2.1,<24.0.0",
+    "pathvalidate>=3.2.0,<4.0.0",
+    "settings-doc>=4.3.1,<5.0.0",
+    "rich>=14.1.0,<15.0.0",
+]
 
 keywords = ["kemono", "kemono.cr", "kemono.su", "kemono.party", "cli-app", "downloader", "os-independent"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Development Status :: 5 - Production/Stable",
     "Topic :: Terminals",
 ]
 
-packages = [{ include = "ktoolbox" }]
-
-[tool.poetry.urls]
+[project.urls]
+Homepage = "https://ktoolbox.readthedocs.io/"
+Repository = "https://github.com/Ljzd-PRO/KToolBox"
+Documentation = "https://ktoolbox.readthedocs.io/"
 "Bug Tracker" = "https://github.com/Ljzd-PRO/KToolBox/issues"
 
-[tool.poetry.scripts]
+[project.scripts]
 ktoolbox = "ktoolbox.__main__:main"
 
-[tool.poetry.dependencies]
-python = ">=3.8.1,<=3.14"
-pydantic = "^2.4.2"
-pydantic-settings = "^2.0.3"
-tenacity = ">=8.2.3,<10.0.0"
-httpx = {version=">=0.24.1,<0.29.0", extras=["socks"]}
-fire = ">=0.5,<0.8"
-tqdm = "^4.66.1"
-loguru = "^0.7.2"
-aiofiles = "^23.2.1"
-pathvalidate = "^3.2.0"
-settings-doc = "^4.3.1"
-rich = "^14.1.0"
-uvloop = {version=">=0.19,<0.22", optional=true, markers = "sys_platform != 'win32'"}
-winloop = {version=">=0.1.6", optional=true, markers = "sys_platform == 'win32'"}
+[project.optional-dependencies]
+uvloop = ["uvloop>=0.19,<0.22; sys_platform != 'win32'"]
+winloop = ["winloop>=0.1.6; sys_platform == 'win32'"]
 urwid = [
-    {version="^2.6.16", optional=true, markers = "sys_platform != 'win32'"},
-    {version="^2.6.16", extras=["curses"], optional=true, markers = "sys_platform == 'win32'"}
+    "urwid>=2.6.16,<3.0.0; sys_platform != 'win32'",
+    "urwid[curses]>=2.6.16,<3.0.0; sys_platform == 'win32'",
 ]
+
+[tool.poetry]
+packages = [{ include = "ktoolbox" }]
 
 [tool.poetry.group.pyinstaller.dependencies]
 pyinstaller = "==6.15.0"
@@ -57,13 +59,18 @@ mkdocstrings = {version=">=0.24,<0.27", extras=["python"]}
 mike = "^2.0.0"
 
 [tool.poetry.group.test.dependencies]
-pytest = "==8.3.3"
-pytest-asyncio = "==0.23.5"
-pytest-cov = "==4.1.0"
+pytest = ">=8.4,<9.0"
+pytest-asyncio = ">=1.2,<2.0"
+pytest-cov = ">=7.0,<8.0"
+pytest-socket = ">=0.7,<0.8"
+respx = ">=0.23,<0.24"
 allpairspy = "==2.5.1"
 
 [tool.poetry.group.dev.dependencies]
-datamodel-code-generator = ">=0.22.1,<0.24.0"
+datamodel-code-generator = ">=0.57,<0.58"
+openapi-spec-validator = ">=0.9,<0.10"
+ruff = ">=0.15,<0.16"
+mypy = ">=2.3,<2.4"
 
 [tool.poetry.group.pyinstaller]
 optional = true
@@ -77,11 +84,42 @@ optional = true
 [tool.poetry.group.dev]
 optional = true
 
-[tool.poetry.extras]
-uvloop = ["uvloop"]
-winloop = ["winloop"] 
-urwid = ["urwid"]
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-config --strict-markers -W error"
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["ktoolbox"]
+omit = ["ktoolbox/api/generated/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+extend-exclude = ["ktoolbox/api/generated"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "B", "ASYNC"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.10"
+plugins = ["pydantic.mypy"]
+exclude = ["^ktoolbox/api/generated/"]
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = ["ktoolbox.api", "ktoolbox.api.*"]
+strict = true
