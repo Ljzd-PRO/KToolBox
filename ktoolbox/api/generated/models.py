@@ -3,9 +3,10 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Annotated, Any
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ErrorResponse(BaseModel):
@@ -32,10 +33,10 @@ class CreatorSummary(BaseModel):
     Number of Pawchive favorites.
     """
     id: Annotated[str, Field(min_length=1)]
-    indexed: float | AwareDatetime
+    indexed: float | datetime
     name: str
     service: Annotated[str, Field(min_length=1)]
-    updated: float | AwareDatetime
+    updated: float | datetime
 
 
 class CreatorProfile(BaseModel):
@@ -46,8 +47,8 @@ class CreatorProfile(BaseModel):
     public_id: str | None = None
     service: Annotated[str, Field(min_length=1)]
     name: str
-    indexed: AwareDatetime | None = None
-    updated: AwareDatetime | None = None
+    indexed: datetime | None = None
+    updated: datetime | None = None
     relation_id: int | None = None
     ever_imported: bool | None = None
     kemono_favorited: int | None = None
@@ -67,9 +68,9 @@ class Post(BaseModel):
     substring: str | None = None
     embed: dict[str, Any] | None = None
     shared_file: bool | None = None
-    added: AwareDatetime | None = None
-    published: AwareDatetime | None = None
-    edited: AwareDatetime | None = None
+    added: datetime | None = None
+    published: datetime | None = None
+    edited: datetime | None = None
     file: FileReference | None = None
     attachments: list[FileReference] | None = None
     poll: dict[str, Any] | None = None
@@ -103,7 +104,7 @@ class Announcement(BaseModel):
     SHA-256 digest.
     """
     content: str | None = None
-    added: AwareDatetime | None = None
+    added: datetime | None = None
 
 
 class Fancard(BaseModel):
@@ -114,11 +115,11 @@ class Fancard(BaseModel):
     user_id: str | None = None
     file_id: int | None = None
     hash: str | None = None
-    mtime: AwareDatetime | None = None
-    ctime: AwareDatetime | None = None
+    mtime: datetime | None = None
+    ctime: datetime | None = None
     mime: str | None = None
     ext: str | None = None
-    added: AwareDatetime | None = None
+    added: datetime | None = None
     size: int | None = None
     ihash: str | None = None
 
@@ -133,7 +134,7 @@ class FileSearchPost(BaseModel):
     service: str | None = None
     title: str | None = None
     substring: str | None = None
-    published: AwareDatetime | None = None
+    published: datetime | None = None
     file: FileReference | None = None
     attachments: list[FileReference] | None = None
 
@@ -147,7 +148,7 @@ class DiscordFileSearchPost(BaseModel):
     server: str | None = None
     channel: str | None = None
     substring: str | None = None
-    published: AwareDatetime | None = None
+    published: datetime | None = None
     embeds: list[Any] | None = None
     mentions: list[Any] | None = None
     attachments: list[FileReference] | None = None
@@ -159,11 +160,11 @@ class FileSearchResult(BaseModel):
     )
     id: int | None = None
     hash: str | None = None
-    mtime: AwareDatetime | None = None
-    ctime: AwareDatetime | None = None
+    mtime: datetime | None = None
+    ctime: datetime | None = None
     mime: str | None = None
     ext: str | None = None
-    added: AwareDatetime | None = None
+    added: datetime | None = None
     size: int | None = None
     ihash: str | None = None
     posts: list[FileSearchPost] | None = None
@@ -176,7 +177,7 @@ class CommentRevision(BaseModel):
     )
     id: int | None = None
     content: str | None = None
-    added: AwareDatetime | None = None
+    added: datetime | None = None
 
 
 class Comment(BaseModel):
@@ -188,7 +189,7 @@ class Comment(BaseModel):
     commenter: str | None = None
     commenter_name: str | None = None
     content: str | None = None
-    published: AwareDatetime | None = None
+    published: datetime | None = None
     revisions: list[CommentRevision] | None = None
 
 
@@ -198,8 +199,8 @@ class AccountFavorite(BaseModel):
     )
     faved_seq: int | None = None
     id: str | None = None
-    indexed: AwareDatetime | None = None
-    last_imported: AwareDatetime | None = None
+    indexed: datetime | None = None
+    last_imported: datetime | None = None
     name: str | None = None
     service: str | None = None
-    updated: AwareDatetime | None = None
+    updated: datetime | None = None

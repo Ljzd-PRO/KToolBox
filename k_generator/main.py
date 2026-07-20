@@ -48,6 +48,8 @@ def _generate_models(schema_path: Path, output_path: Path) -> None:
             str(output_path),
             "--output-model-type",
             "pydantic_v2.BaseModel",
+            "--output-datetime-class",
+            "datetime",
             "--target-python-version",
             "3.10",
             "--openapi-scopes",
