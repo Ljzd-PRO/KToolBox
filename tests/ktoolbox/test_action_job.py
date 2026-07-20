@@ -12,7 +12,7 @@ import pytest
 
 from ktoolbox._enum import PostFileTypeEnum, RetCodeEnum
 from ktoolbox.action.fetch import FetchInterruptError
-from ktoolbox.action.job import create_job_from_creator, create_job_from_post
+from ktoolbox.action.job import create_job_from_creator, create_job_from_post, produce_jobs_from_creator
 from ktoolbox.api.errors import PawchiveHTTPError, PawchiveNotFoundError
 from ktoolbox.api.generated import FileReference, Post, Revision
 from ktoolbox.blocker import BlockerEngine, BlockerSpec
@@ -373,3 +373,72 @@ async def test_create_creator_jobs_maps_revision_generation_failure(tmp_path: Pa
             client=client,
         )
     assert result.code == RetCodeEnum.GeneralFailure
+
+
+@pytest.mark.asyncio
+async def test_produce_creator_jobs_emits_before_fetching_next_page(tmp_path: Path) -> None:
+    events: list[str] = []
+    first_job = Job(path=tmp_path, server_path="/first")
+    second_job = Job(path=tmp_path, server_path="/second")
+
+    async def pages(**kwargs: object) -> AsyncIterator[list[Post]]:
+        events.append("page:first")
+        yield [post("first")]
+        events.append("page:second")
+        yield [post("second")]
+
+    async def sink(job: Job) -> None:
+        events.append(f"sink:{job.server_path}")
+
+    with (
+        patch("ktoolbox.action.job.fetch_creator_posts", pages),
+        patch(
+            "ktoolbox.action.job.create_job_from_post",
+            new_callable=AsyncMock,
+            side_effect=[[first_job], [second_job]],
+        ),
+    ):
+        result = await produce_jobs_from_creator(
+            "fanbox",
+            "creator",
+            tmp_path,
+            sink,
+            length=2,
+            start_time=None,
+            end_time=None,
+            client=SimpleNamespace(list_post_revisions=AsyncMock()),
+        )
+
+    assert result.data is not None
+    assert result.data.generated_jobs == 2
+    assert events == ["page:first", "sink:/first", "page:second", "sink:/second"]
+
+
+@pytest.mark.asyncio
+async def test_produce_creator_jobs_does_not_replace_index_after_partial_failure(tmp_path: Path) -> None:
+    index_path = tmp_path / "creator-indices.ktoolbox"
+    index_path.write_text("previous", encoding="utf-8")
+    failure = api_error()
+
+    async def pages(**kwargs: object) -> AsyncIterator[list[Post]]:
+        yield [post("first")]
+        raise FetchInterruptError(failure)
+
+    with (
+        patch("ktoolbox.action.job.fetch_creator_posts", pages),
+        patch("ktoolbox.action.job.create_job_from_post", new_callable=AsyncMock, return_value=[]),
+    ):
+        result = await produce_jobs_from_creator(
+            "fanbox",
+            "creator",
+            tmp_path,
+            AsyncMock(),
+            all_pages=True,
+            save_creator_indices=True,
+            start_time=None,
+            end_time=None,
+            client=SimpleNamespace(list_post_revisions=AsyncMock()),
+        )
+
+    assert not result
+    assert index_path.read_text(encoding="utf-8") == "previous"

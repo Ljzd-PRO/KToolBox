@@ -1,3 +1,5 @@
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass, field
 from datetime import datetime
 from fnmatch import fnmatch
 from pathlib import Path
@@ -28,7 +30,7 @@ from ktoolbox.configuration import config
 from ktoolbox.job import CreatorIndices, Job
 from ktoolbox.utils import extract_external_links, generate_msg
 
-__all__ = ["create_job_from_post", "create_job_from_creator"]
+__all__ = ["CreatorJobGeneration", "create_job_from_post", "create_job_from_creator", "produce_jobs_from_creator"]
 
 
 async def create_job_from_post(
@@ -231,6 +233,17 @@ async def create_job_from_post(
     return jobs
 
 
+@dataclass(slots=True)
+class CreatorJobGeneration:
+    fetched_posts: int = 0
+    accepted_posts: int = 0
+    generated_jobs: int = 0
+    blocked_by: dict[str, int] = field(default_factory=dict)
+
+
+JobSink = Callable[[Job], Awaitable[None]]
+
+
 async def create_job_from_creator(
     service: str,
     creator_id: str,
@@ -267,12 +280,59 @@ async def create_job_from_creator(
     :param blocker_engine: Structured blockers applied before post jobs are created
     :param client: Pawchive client to reuse across all creator requests
     """
+    job_list: list[Job] = []
+
+    async def collect(job: Job) -> None:
+        job_list.append(job)
+
+    result = await produce_jobs_from_creator(
+        service,
+        creator_id,
+        path,
+        collect,
+        all_pages=all_pages,
+        offset=offset,
+        length=length,
+        save_creator_indices=save_creator_indices,
+        mix_posts=mix_posts,
+        start_time=start_time,
+        end_time=end_time,
+        keywords=keywords,
+        keywords_exclude=keywords_exclude,
+        blocker_engine=blocker_engine,
+        client=client,
+    )
+    if not result:
+        return ActionRet(code=result.code, message=result.message, exception=result.exception)
+    return ActionRet(data=job_list)
+
+
+async def produce_jobs_from_creator(
+    service: str,
+    creator_id: str,
+    path: Path,
+    sink: JobSink,
+    *,
+    all_pages: bool = False,
+    offset: int = 0,
+    length: int | None = 50,
+    save_creator_indices: bool = False,
+    mix_posts: bool | None = None,
+    start_time: datetime | None,
+    end_time: datetime | None,
+    keywords: set[str] | None = None,
+    keywords_exclude: set[str] | None = None,
+    blocker_engine: BlockerEngine | None = None,
+    client: PawchiveClient | None = None,
+) -> ActionRet[CreatorJobGeneration]:
+    """Generate and emit creator jobs as soon as each post has been processed."""
     if client is None:
         async with pawchive_client_scope(None) as api_client:
-            return await create_job_from_creator(
+            return await produce_jobs_from_creator(
                 service,
                 creator_id,
                 path,
+                sink,
                 all_pages=all_pages,
                 offset=offset,
                 length=length,
@@ -286,75 +346,12 @@ async def create_job_from_creator(
                 client=api_client,
             )
 
-    mix_posts = config.job.mix_posts if mix_posts is None else mix_posts
-
-    # Get posts
-    logger.info(f"Start fetching posts from creator {creator_id}")
-    post_list: list[Post] = []
-    start_offset = offset - offset % 50
-    requested_length = 50 if length is None else length
-    required_posts = offset % 50 + requested_length
-
-    try:
-        async for part in fetch_creator_posts(
-            service=service,
-            creator_id=creator_id,
-            offset=start_offset,
-            client=client,
-        ):
-            post_list += part
-            if not all_pages and len(post_list) >= required_posts:
-                break
-    except FetchInterruptError as e:
-        return action_error(e.error)
-
-    if not all_pages:
-        post_list = post_list[offset % 50 :][:requested_length]
-    else:
-        post_list = post_list[offset % 50 :]
-
-    # Filter posts by publish time
-    if start_time or end_time:
-        post_list = list(filter_posts_by_date(post_list, start_time, end_time))
-
-    # Filter posts by keywords
-    if keywords:
-        post_list = list(filter_posts_by_keywords(post_list, keywords))
-
-    active_blockers = list(blocker_engine.blockers if blocker_engine is not None else ())
-    if legacy_spec := legacy_keyword_blocker(keywords_exclude or ()):
-        logger.warning(
-            "`job.keywords_exclude` is deprecated; migrate it to a global field-match blocker in ktoolbox.toml."
-        )
-        active_blockers.insert(0, blocker_registry.build(legacy_spec))
-    if active_blockers:
-        selected_posts: list[Post] = []
-        context = BlockerContext(service=service, creator_id=creator_id)
-        engine = BlockerEngine(active_blockers)
-        for post in post_list:
-            if await engine.evaluate(post, context) is None:
-                selected_posts.append(post)
-        post_list = selected_posts
-
-    logger.info(f"Get {len(post_list)} posts after filtering, start creating jobs")
-
-    # Filter posts and generate ``CreatorIndices``
-    if not mix_posts:
-        if save_creator_indices:
-            # Generate posts_path with year/month grouping if enabled
-            posts_path = {}
-            for post in post_list:
-                grouped_base_path = generate_grouped_post_path(post, path)
-                posts_path[post.id] = grouped_base_path / sanitize_filename(post.title or post.id)
-
-            indices = CreatorIndices(
-                creator_id=creator_id,
-                service=service,
-                posts={post.id: post for post in post_list},
-                posts_path=posts_path,
-            )
-            async with aiofiles.open(path / DataStorageNameEnum.CreatorIndicesData.value, "w", encoding="utf-8") as f:
-                await f.write(indices.model_dump_json(indent=config.json_dump_indent))
+    selected_mix_posts = config.job.mix_posts if mix_posts is None else mix_posts
+    active_engine = _creator_blocker_engine(blocker_engine, keywords_exclude)
+    context = BlockerContext(service=service, creator_id=creator_id)
+    summary = CreatorJobGeneration()
+    indexed_posts: dict[str, Post] = {}
+    indexed_paths: dict[str, Path] = {}
 
     if config.job.include_revisions:
         logger.warning(
@@ -362,52 +359,162 @@ async def create_job_from_creator(
             "which may take time. Disable if not needed."
         )
     if config.job.extract_content or config.job.extract_external_links or config.job.extract_content_images:
+        logger.warning("Content extraction is enabled and will inspect posts individually; disable it when not needed.")
+
+    logger.info(f"Start fetching posts from creator {creator_id}")
+    start_offset = offset - offset % 50
+    skip = offset % 50
+    requested_length = 50 if length is None else length
+    consumed = 0
+
+    try:
+        async for page in fetch_creator_posts(
+            service=service,
+            creator_id=creator_id,
+            offset=start_offset,
+            client=client,
+        ):
+            for post in page:
+                if skip:
+                    skip -= 1
+                    continue
+                if not all_pages and consumed >= requested_length:
+                    break
+                consumed += 1
+                summary.fetched_posts += 1
+                if not _post_matches_filters(post, start_time, end_time, keywords):
+                    continue
+                if decision := await active_engine.evaluate(post, context):
+                    summary.blocked_by[decision.blocker_id] = summary.blocked_by.get(decision.blocker_id, 0) + 1
+                    continue
+
+                summary.accepted_posts += 1
+                post_path = _creator_post_path(post, path, selected_mix_posts)
+                if not selected_mix_posts and save_creator_indices:
+                    indexed_posts[post.id] = post
+                    indexed_paths[post.id] = generate_grouped_post_path(post, path) / sanitize_filename(
+                        post.title or post.id
+                    )
+
+                try:
+                    jobs = await create_job_from_post(
+                        post=post,
+                        post_path=post_path,
+                        post_dir=not selected_mix_posts,
+                        dump_post_data=not selected_mix_posts,
+                        client=client,
+                    )
+                except FetchInterruptError as error:
+                    return action_error(error.error)
+                await _emit_jobs(jobs, sink, summary)
+
+                if config.job.include_revisions and not selected_mix_posts:
+                    try:
+                        await _emit_revision_jobs(
+                            post,
+                            post_path,
+                            service,
+                            creator_id,
+                            client,
+                            sink,
+                            summary,
+                        )
+                    except FetchInterruptError as error:
+                        return action_error(error.error)
+            if not all_pages and consumed >= requested_length:
+                break
+    except FetchInterruptError as error:
+        return action_error(error.error)
+
+    if not selected_mix_posts and save_creator_indices:
+        await _write_creator_indices(service, creator_id, path, indexed_posts, indexed_paths)
+    logger.info(
+        f"Creator {creator_id}: accepted {summary.accepted_posts} of {summary.fetched_posts} posts, "
+        f"generated {summary.generated_jobs} jobs"
+    )
+    return ActionRet(data=summary)
+
+
+def _creator_blocker_engine(
+    blocker_engine: BlockerEngine | None,
+    keywords_exclude: set[str] | None,
+) -> BlockerEngine:
+    active_blockers = list(blocker_engine.blockers if blocker_engine is not None else ())
+    if legacy_spec := legacy_keyword_blocker(keywords_exclude or ()):
         logger.warning(
-            "`job.extract_content` or `job.extract_external_links` or `job.extract_content_images` is enabled "
-            "and will fetch post content one by one, which may take time. Disable if not needed."
+            "`job.keywords_exclude` is deprecated; migrate it to a global field-match blocker in ktoolbox.toml."
         )
+        active_blockers.insert(0, blocker_registry.build(legacy_spec))
+    return BlockerEngine(active_blockers)
 
-    job_list: list[Job] = []
-    for post in post_list:
-        # Get post path
-        if mix_posts:
-            post_path = path
-        else:
-            # Apply year/month grouping if enabled
-            grouped_base_path = generate_grouped_post_path(post, path)
-            post_path = grouped_base_path / generate_post_path_name(post)
 
-        # Generate jobs for the main post
-        try:
-            job_list += await create_job_from_post(
-                post=post,
-                post_path=post_path,
-                post_dir=not mix_posts,
-                dump_post_data=not mix_posts,
+def _post_matches_filters(
+    post: Post,
+    start_time: datetime | None,
+    end_time: datetime | None,
+    keywords: set[str] | None,
+) -> bool:
+    if (start_time or end_time) and not list(filter_posts_by_date([post], start_time, end_time)):
+        return False
+    return not keywords or bool(list(filter_posts_by_keywords([post], keywords)))
+
+
+def _creator_post_path(post: Post, path: Path, mix_posts: bool) -> Path:
+    if mix_posts:
+        return path
+    return generate_grouped_post_path(post, path) / generate_post_path_name(post)
+
+
+async def _emit_jobs(jobs: list[Job], sink: JobSink, summary: CreatorJobGeneration) -> None:
+    for job in jobs:
+        await sink(job)
+        summary.generated_jobs += 1
+
+
+async def _emit_revision_jobs(
+    post: Post,
+    post_path: Path,
+    service: str,
+    creator_id: str,
+    client: PawchiveClient,
+    sink: JobSink,
+    summary: CreatorJobGeneration,
+) -> None:
+    try:
+        revisions = await client.list_post_revisions(service, creator_id, post.id)
+        for revision in revisions:
+            revision_path = post_path / config.job.post_structure.revisions / generate_post_path_name(revision)
+            revision_jobs = await create_job_from_post(
+                post=revision,
+                post_path=revision_path,
+                dump_post_data=True,
                 client=client,
             )
-        except FetchInterruptError as e:
-            return action_error(e.error)
+            await _emit_jobs(revision_jobs, sink, summary)
+    except PawchiveNotFoundError:
+        return
+    except PawchiveError as error:
+        logger.warning(f"Failed to fetch revisions for post {post.id}: {error}")
+    except FetchInterruptError as error:
+        raise error
 
-        # If include_revisions is enabled, fetch and download revisions for this post
-        if config.job.include_revisions and not mix_posts:
-            try:
-                revisions = await client.list_post_revisions(service, creator_id, post.id)
-                for revision in revisions:
-                    revision_path = post_path / config.job.post_structure.revisions / generate_post_path_name(revision)
-                    try:
-                        revision_jobs = await create_job_from_post(
-                            post=revision,
-                            post_path=revision_path,
-                            dump_post_data=True,
-                            client=client,
-                        )
-                    except FetchInterruptError as e:
-                        return action_error(e.error)
-                    job_list += revision_jobs
-            except PawchiveNotFoundError:
-                continue
-            except PawchiveError as error:
-                logger.warning(f"Failed to fetch revisions for post {post.id}: {error}")
 
-    return ActionRet(data=job_list)
+async def _write_creator_indices(
+    service: str,
+    creator_id: str,
+    path: Path,
+    posts: dict[str, Post],
+    posts_path: dict[str, Path],
+) -> None:
+    indices = CreatorIndices(creator_id=creator_id, service=service, posts=posts, posts_path=posts_path)
+    index_path = path / DataStorageNameEnum.CreatorIndicesData.value
+    temporary_path = index_path.with_suffix(f"{index_path.suffix}.tmp")
+    try:
+        async with aiofiles.open(temporary_path, "w", encoding="utf-8") as file:
+            await file.write(indices.model_dump_json(indent=config.json_dump_indent))
+        await aiofiles.os.replace(temporary_path, index_path)
+    finally:
+        try:
+            await aiofiles.os.remove(temporary_path)
+        except FileNotFoundError:
+            pass
