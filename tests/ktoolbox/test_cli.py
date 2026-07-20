@@ -96,6 +96,28 @@ async def test_download_post_reuses_client_for_job_generation(tmp_path) -> None:
 
 
 @pytest.mark.asyncio
+async def test_download_post_reports_worker_failures(tmp_path) -> None:
+    post = Post(id="post", user="creator", service="fanbox")
+    client = SimpleNamespace(get_post=AsyncMock(return_value=post))
+    runner = Mock(start=AsyncMock(return_value=2))
+
+    with (
+        patch("ktoolbox.cli.check_for_updates", new_callable=AsyncMock),
+        patch("ktoolbox.cli.create_pawchive_client", return_value=ClientContext(client)),
+        patch("ktoolbox.cli.create_job_from_post", new_callable=AsyncMock, return_value=[]),
+        patch("ktoolbox.cli.JobRunner", return_value=runner),
+    ):
+        result = await KToolBoxCli.download_post(
+            service="fanbox",
+            creator_id="creator",
+            post_id="post",
+            path=tmp_path,
+        )
+
+    assert result == "2 file downloads failed"
+
+
+@pytest.mark.asyncio
 async def test_sync_creator_uses_profile_and_reuses_client(tmp_path) -> None:
     profile = CreatorProfile(id="creator", name="Display Name", service="fanbox")
     client = SimpleNamespace(

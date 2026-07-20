@@ -21,7 +21,7 @@ from ktoolbox.action import search_creator as search_creator_action
 from ktoolbox.action import search_creator_post as search_creator_post_action
 from ktoolbox.api.client import PawchiveClient
 from ktoolbox.api.errors import PawchiveError, PawchiveNotFoundError
-from ktoolbox.api.generated import Post, Revision
+from ktoolbox.api.generated import CreatorSummary, Post, Revision
 from ktoolbox.api.utils import create_pawchive_client
 from ktoolbox.configuration import config
 from ktoolbox.job import JobRunner
@@ -118,7 +118,7 @@ class KToolBoxCli:
         service: str | None = None,
         *,
         dump: Path | None = None,
-    ) -> object:
+    ) -> list[CreatorSummary] | str:
         """Search creators using one or more local filter values."""
         async with create_pawchive_client() as client:
             result = await search_creator_action(id=id, name=name, service=service, client=client)
@@ -138,7 +138,7 @@ class KToolBoxCli:
         o: int | None = None,
         *,
         dump: Path | None = None,
-    ) -> object:
+    ) -> list[Post] | str:
         """Search posts for creators selected by ID, name, or service."""
         async with create_pawchive_client() as client:
             result = await search_creator_post_action(
@@ -164,7 +164,7 @@ class KToolBoxCli:
         revision_id: str | None = None,
         *,
         dump: Path | None = None,
-    ) -> object:
+    ) -> Post | Revision | str:
         """Get one post or select one revision from its revision list."""
         try:
             async with create_pawchive_client() as client:
@@ -238,8 +238,8 @@ class KToolBoxCli:
             cause = error.error if isinstance(error, FetchInterruptError) else error
             return _error_message(cause)
 
-        await JobRunner(job_list=jobs, reporter=reporter).start()
-        return None
+        failed = await JobRunner(job_list=jobs, reporter=reporter).start()
+        return f"{failed} file downloads failed" if failed else None
 
     @staticmethod
     async def sync_creator(

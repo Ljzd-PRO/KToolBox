@@ -3,7 +3,7 @@ import sys
 from cyclopts.exceptions import CycloptsError
 from loguru import logger
 
-from ktoolbox.cli_app import app, stderr
+from ktoolbox.cli_app import run_cli, stderr
 from ktoolbox.utils import logger_init, uvloop_init
 
 _LEGACY_COMMANDS = {
@@ -20,15 +20,22 @@ _LEGACY_COMMANDS = {
 def main(argv: list[str] | None = None) -> int:
     tokens = sys.argv[1:] if argv is None else argv
     try:
+        if not tokens:
+            tokens = ["--help"]
         is_help_or_version = not tokens or any(token in {"-h", "--help", "--version"} for token in tokens)
         if not is_help_or_version:
-            logger_init(cli_use=True, console=stderr)
+            logger_init(
+                cli_use=True,
+                console=stderr,
+                verbose="--verbose" in tokens,
+                quiet="--quiet" in tokens,
+            )
             uvloop_init()
-            if replacement := _LEGACY_COMMANDS.get(tokens[0]):
-                logger.warning(f"`{tokens[0]}` is deprecated; use `{replacement}` instead.")
-        return int(app(tokens, result_action="return_int_as_exit_code_else_zero"))
-    except CycloptsError as error:
-        app.error_console.print(error)
+            command = next((token for token in tokens if token in _LEGACY_COMMANDS), "")
+            if replacement := _LEGACY_COMMANDS.get(command):
+                logger.warning(f"`{command}` is deprecated; use `{replacement}` instead.")
+        return run_cli(tokens)
+    except CycloptsError:
         return 2
     except KeyboardInterrupt:
         logger.error("KToolBox was interrupted by the user")

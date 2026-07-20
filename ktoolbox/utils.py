@@ -66,6 +66,8 @@ def logger_init(
     disable_stdout: bool = False,
     *,
     console: Console | None = None,
+    verbose: bool = False,
+    quiet: bool = False,
 ) -> None:
     """
     Initialize ``loguru`` logger
@@ -86,8 +88,8 @@ def logger_init(
         logger.add(
             handler,
             format="{message}",
-            level=logging.INFO,
-            filter=lambda record: record["level"].name != "DEBUG",
+            level=logging.ERROR if quiet else logging.DEBUG if verbose else logging.INFO,
+            filter=lambda record: verbose or record["level"].name != "SUCCESS",
         )
     if path := config.logger.path:
         path.mkdir(exist_ok=True)

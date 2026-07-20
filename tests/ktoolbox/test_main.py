@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import os
+import subprocess
 import sys
+from pathlib import Path
 from unittest.mock import patch
 
 from ktoolbox import __version__
@@ -26,15 +29,15 @@ def test_main_initializes_runtime_and_handles_interrupt() -> None:
     with (
         patch("ktoolbox.__main__.logger_init") as logger_init,
         patch("ktoolbox.__main__.uvloop_init") as uvloop_init,
-        patch("ktoolbox.__main__.app", return_value=0) as app,
+        patch("ktoolbox.__main__.run_cli", return_value=0) as run_cli,
     ):
         assert main(["site-version"]) == 0
-    logger_init.assert_called_once_with(cli_use=True, console=stderr)
+    logger_init.assert_called_once_with(cli_use=True, console=stderr, verbose=False, quiet=False)
     uvloop_init.assert_called_once_with()
-    app.assert_called_once()
+    run_cli.assert_called_once_with(["site-version"])
 
     with (
-        patch("ktoolbox.__main__.app", side_effect=KeyboardInterrupt),
+        patch("ktoolbox.__main__.run_cli", side_effect=KeyboardInterrupt),
         patch("ktoolbox.__main__.logger.error") as error,
     ):
         assert main(["site-version"]) == 130
@@ -42,6 +45,54 @@ def test_main_initializes_runtime_and_handles_interrupt() -> None:
 
 
 def test_main_uses_sys_argv_when_not_provided() -> None:
-    with patch.object(sys, "argv", ["ktoolbox", "--help"]), patch("ktoolbox.__main__.app", return_value=0) as app:
+    with (
+        patch.object(sys, "argv", ["ktoolbox", "--help"]),
+        patch("ktoolbox.__main__.run_cli", return_value=0) as run_cli,
+    ):
         assert main() == 0
-    app.assert_called_once()
+    run_cli.assert_called_once_with(["--help"])
+
+
+def test_no_arguments_show_help_and_unknown_commands_suggest_fix(capsys) -> None:
+    with patch("ktoolbox.__main__.logger_init"), patch("ktoolbox.__main__.uvloop_init"):
+        assert main([]) == 0
+        assert "Usage: ktoolbox COMMAND" in capsys.readouterr().out
+
+        assert main(["synx"]) == 2
+    captured = capsys.readouterr()
+    assert 'Did you mean "sync"?' in captured.err
+    assert "Traceback" not in captured.err
+
+
+def test_legacy_warning_is_emitted_with_leading_global_options() -> None:
+    with (
+        patch("ktoolbox.__main__.logger_init"),
+        patch("ktoolbox.__main__.uvloop_init"),
+        patch("ktoolbox.__main__.run_cli", return_value=0),
+        patch("ktoolbox.__main__.logger.warning") as warning,
+    ):
+        assert main(["--plain", "download-post", "--service", "fanbox"]) == 0
+    warning.assert_called_once()
+
+
+def test_help_never_invokes_hostile_pager(tmp_path: Path) -> None:
+    marker = tmp_path / "pager-was-run"
+    pager = tmp_path / "pager"
+    pager.write_text(f"#!/bin/sh\ntouch '{marker}'\nsleep 10\n", encoding="utf-8")
+    pager.chmod(0o755)
+    environment = os.environ.copy()
+    environment["PAGER"] = str(pager)
+
+    result = subprocess.run(
+        [sys.executable, "-m", "ktoolbox", "--help"],
+        cwd=Path(__file__).parents[2],
+        env=environment,
+        capture_output=True,
+        text=True,
+        timeout=5,
+        check=False,
+    )
+
+    assert result.returncode == 0
+    assert "Usage: ktoolbox COMMAND" in result.stdout
+    assert not marker.exists()
