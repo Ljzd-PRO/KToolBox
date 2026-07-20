@@ -17,7 +17,7 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
     async def site_version():
         # noinspection SpellCheckingInspection
         """
-        显示当前 Kemono 站点应用提交哈希
+        显示当前 Pawchive 应用版本
         """
         return await super().site_version()
 

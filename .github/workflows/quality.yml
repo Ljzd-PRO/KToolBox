@@ -40,6 +40,7 @@ jobs:
           ktoolbox/action/fetch.py
           ktoolbox/action/search.py
           ktoolbox/api/utils.py
+          ktoolbox/cli.py
 
       - name: Check contract tooling formatting
         run: >-
@@ -53,6 +54,7 @@ jobs:
           ktoolbox/action/fetch.py
           ktoolbox/action/search.py
           ktoolbox/api/utils.py
+          ktoolbox/cli.py
 
       - name: Type-check Pawchive client
         run: >-
@@ -64,3 +66,4 @@ jobs:
           ktoolbox/action/fetch.py
           ktoolbox/action/search.py
           ktoolbox/api/utils.py
+          ktoolbox/cli.py

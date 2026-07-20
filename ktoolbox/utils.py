@@ -3,6 +3,7 @@ import html
 import logging
 import re
 import sys
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Generic, TypeVar, Optional, List, Tuple, Set
 
@@ -88,10 +89,10 @@ def logger_init(cli_use: bool = False, disable_stdout: bool = False):
             )
 
 
-async def dump_search(result: List[BaseModel], path: Path):
+async def dump_search(result: Sequence[BaseModel], path: Path):
     async with aiofiles.open(str(path), "w", encoding="utf-8") as f:
         await f.write(
-            SearchResult(result=result)
+            SearchResult(result=list(result))
             .model_dump_json(indent=config.json_dump_indent)
         )
 
