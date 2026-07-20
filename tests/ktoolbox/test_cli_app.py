@@ -54,21 +54,21 @@ def test_creator_roster_commands(tmp_path: Path, capsys) -> None:
     config = tmp_path / "ktoolbox.toml"
     common = ["--config", str(config)]
 
-    assert app(["creator", "add", "fanbox:123", "--alias", "artist", *common]) == 0
-    assert app(["creator", "disable", "artist", *common]) == 0
+    assert run_cli(["creator", "add", "fanbox:123", "--alias", "artist", *common]) == 0
+    assert run_cli(["creator", "disable", "artist", *common]) == 0
     capsys.readouterr()
 
-    assert app(["creator", "list", "--json", *common]) == 0
+    assert run_cli(["creator", "list", "--json", *common]) == 0
     roster = json.loads(capsys.readouterr().out)
     assert roster == [{"service": "fanbox", "creator_id": "123", "alias": "artist", "enabled": False}]
 
-    assert app(["creator", "remove", "artist", *common]) == 0
-    assert app(["config", "validate", *common]) == 0
+    assert run_cli(["creator", "remove", "artist", *common]) == 0
+    assert run_cli(["config", "validate", *common]) == 0
     assert "0 creators" in capsys.readouterr().out
 
 
 def test_creator_roster_command_reports_invalid_target(tmp_path: Path, capsys) -> None:
-    result = app(["creator", "add", "invalid", "--config", str(tmp_path / "ktoolbox.toml")])
+    result = run_cli(["creator", "add", "invalid", "--config", str(tmp_path / "ktoolbox.toml")])
     assert result == 2
     assert "Configuration error" in capsys.readouterr().err
 
@@ -98,7 +98,7 @@ def test_sync_accepts_multiple_targets_and_returns_partial_failure(tmp_path: Pat
         patch("ktoolbox.cli_app.create_pawchive_client", return_value=ClientScope()),
         patch("ktoolbox.cli_app.SyncCoordinator", return_value=coordinator) as coordinator_type,
     ):
-        result = app(
+        result = run_cli(
             [
                 "sync",
                 "fanbox:1",
@@ -242,34 +242,34 @@ def test_query_commands_handle_empty_results_and_errors(capsys) -> None:
 def test_config_helpers_and_roster_tables(tmp_path: Path, capsys) -> None:
     config = tmp_path / "ktoolbox.toml"
     common = ["--config", str(config)]
-    assert app(["creator", "add", "fanbox:123", "--alias", "artist", *common]) == 0
+    assert run_cli(["creator", "add", "fanbox:123", "--alias", "artist", *common]) == 0
     capsys.readouterr()
-    assert app(["creator", "list", *common]) == 0
+    assert run_cli(["creator", "list", *common]) == 0
     assert "Creator roster" in capsys.readouterr().out
 
-    assert app(["creator", "enable", "missing", *common]) == 2
+    assert run_cli(["creator", "enable", "missing", *common]) == 2
     assert "Configuration error" in capsys.readouterr().err
-    assert app(["creator", "remove", "missing", *common]) == 2
+    assert run_cli(["creator", "remove", "missing", *common]) == 2
     capsys.readouterr()
 
     with patch("ktoolbox.cli_app.KToolBoxCli.config_editor", new=AsyncMock()) as edit:
-        assert app(["config", "edit", *common]) == 0
+        assert run_cli(["config", "edit", *common]) == 0
     edit.assert_awaited_once_with(config)
 
     with patch("ktoolbox.cli_app.KToolBoxCli.example_env", new=AsyncMock()) as example:
         assert app(["config", "example"]) == 0
     example.assert_awaited_once_with()
 
-    assert app(["config", "path", *common]) == 0
+    assert run_cli(["config", "path", *common]) == 0
     assert str(config) in capsys.readouterr().out
 
 
 def test_sync_validation_and_site_version_status_mapping(tmp_path: Path, capsys) -> None:
-    assert app(["sync", "--service", "fanbox", "--config", str(tmp_path / "missing.toml")]) == 2
+    assert run_cli(["sync", "--service", "fanbox", "--config", str(tmp_path / "missing.toml")]) == 2
     assert "must be used together" in capsys.readouterr().err
 
     assert (
-        app(
+        run_cli(
             [
                 "sync",
                 "fanbox:1",

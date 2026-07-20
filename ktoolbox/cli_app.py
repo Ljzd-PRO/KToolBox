@@ -157,7 +157,6 @@ async def sync(
     service: str | None = None,
     creator_id: str | None = None,
     output: Annotated[Path, Parameter(name=("--output", "-o", "--path"))] = Path("."),
-    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
     save_creator_indices: bool = False,
     mix_posts: bool | None = None,
     start_time: Annotated[str | None, Parameter(name=("--start-time", "--start"))] = None,
@@ -174,7 +173,7 @@ async def sync(
             return _project_error(ProjectConfigError("--service and --creator-id must be used together"))
         targets.append(f"{service}:{creator_id}")
 
-    store = _project_store(config_path)
+    store = _project_store(None)
     try:
         project = store.load()
         selected_creators = resolve_sync_targets(targets, project)
@@ -250,11 +249,10 @@ async def creator_search(
 @creator_app.command(name="list")
 def creator_list(
     *,
-    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
     json_output: Annotated[bool, Parameter(name="--json")] = False,
 ) -> int:
     """List creators saved in the project roster."""
-    store = _project_store(config_path)
+    store = _project_store(None)
     try:
         configuration = store.load()
     except ProjectConfigError as error:
@@ -285,10 +283,9 @@ def creator_add(
     *,
     alias: str | None = None,
     disabled: bool = False,
-    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
 ) -> int:
     """Add a Pawchive creator URL or service:id to the project roster."""
-    store = _project_store(config_path)
+    store = _project_store(None)
     try:
         parsed = parse_creator_reference(target)
         creator = CreatorReference(
@@ -307,11 +304,9 @@ def creator_add(
 @creator_app.command(name="remove")
 def creator_remove(
     target: str,
-    *,
-    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
 ) -> int:
     """Remove a creator from the project roster."""
-    store = _project_store(config_path)
+    store = _project_store(None)
     try:
         creator = store.remove_creator(target)
     except ProjectConfigError as error:
@@ -320,8 +315,8 @@ def creator_remove(
     return 0
 
 
-def _set_creator_enabled(target: str, config_path: Path | None, enabled: bool) -> int:
-    store = _project_store(config_path)
+def _set_creator_enabled(target: str, enabled: bool) -> int:
+    store = _project_store(None)
     try:
         creator = store.set_creator_enabled(target, enabled)
     except ProjectConfigError as error:
@@ -334,21 +329,17 @@ def _set_creator_enabled(target: str, config_path: Path | None, enabled: bool) -
 @creator_app.command(name="enable")
 def creator_enable(
     target: str,
-    *,
-    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
 ) -> int:
     """Enable a saved creator."""
-    return _set_creator_enabled(target, config_path, True)
+    return _set_creator_enabled(target, True)
 
 
 @creator_app.command(name="disable")
 def creator_disable(
     target: str,
-    *,
-    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
 ) -> int:
     """Disable a saved creator."""
-    return _set_creator_enabled(target, config_path, False)
+    return _set_creator_enabled(target, False)
 
 
 @post_app.command(name="search")
@@ -433,12 +424,9 @@ async def post_show(
 
 
 @config_app.command(name="edit")
-async def config_edit(
-    *,
-    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
-) -> int:
+async def config_edit() -> int:
     """Open the optional terminal configuration editor."""
-    await KToolBoxCli.config_editor(_project_store(config_path).path)
+    await KToolBoxCli.config_editor(_project_store(None).path)
     return 0
 
 
@@ -450,12 +438,9 @@ async def config_example() -> int:
 
 
 @config_app.command(name="validate")
-def config_validate(
-    *,
-    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
-) -> int:
+def config_validate() -> int:
     """Validate the project configuration file."""
-    store = _project_store(config_path)
+    store = _project_store(None)
     try:
         configuration = store.load()
     except ProjectConfigError as error:
@@ -465,12 +450,9 @@ def config_validate(
 
 
 @config_app.command(name="path")
-def config_path(
-    *,
-    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
-) -> int:
+def config_path() -> int:
     """Print the resolved project configuration path."""
-    stdout.print(str(_project_store(config_path).path), markup=False, highlight=False, soft_wrap=True)
+    stdout.print(str(_project_store(None).path), markup=False, highlight=False, soft_wrap=True)
     return 0
 
 
