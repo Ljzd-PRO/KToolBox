@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Annotated
 
@@ -10,13 +11,18 @@ from rich.table import Table
 from rich.text import Text
 
 from ktoolbox import __version__
+from ktoolbox.api.errors import PawchiveError
+from ktoolbox.api.utils import create_pawchive_client
+from ktoolbox.blocker import BlockerEngine
 from ktoolbox.cli import KToolBoxCli
+from ktoolbox.configuration import config as runtime_config
 from ktoolbox.project_config import (
     CreatorReference,
     ProjectConfigError,
     ProjectConfigStore,
     parse_creator_reference,
 )
+from ktoolbox.sync import SyncCoordinator, SyncOptions, SyncSummary, resolve_sync_targets
 
 stdout = Console()
 stderr = Console(stderr=True)
@@ -56,6 +62,32 @@ def _project_error(error: ProjectConfigError) -> int:
     return 2
 
 
+def _print_sync_summary(summary: SyncSummary) -> None:
+    table = Table(title="Synchronization summary")
+    table.add_column("Creator")
+    table.add_column("Posts", justify="right")
+    table.add_column("Excluded", justify="right")
+    table.add_column("Jobs", justify="right")
+    table.add_column("Status")
+    for result in summary.creators:
+        generation = result.generation
+        table.add_row(
+            Text(result.creator.key),
+            str(generation.accepted_posts if generation else 0),
+            str(sum(generation.blocked_by.values()) if generation else 0),
+            str(generation.generated_jobs if generation else 0),
+            Text(
+                "completed" if result.successful else result.error or "failed",
+                style="green" if result.successful else "red",
+            ),
+        )
+    table.caption = (
+        f"Files: {summary.downloads.completed} downloaded, {summary.downloads.existed} existing, "
+        f"{summary.downloads.failed} failed"
+    )
+    stdout.print(table)
+
+
 @app.command
 async def download(
     post: str | None = None,
@@ -83,37 +115,58 @@ async def download(
 
 @app.command
 async def sync(
-    creator: str | None = None,
-    *,
+    *creators: str,
     service: str | None = None,
     creator_id: str | None = None,
     output: Annotated[Path, Parameter(name=("--output", "-o", "--path"))] = Path("."),
+    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
     save_creator_indices: bool = False,
     mix_posts: bool | None = None,
-    start_time: str | None = None,
-    end_time: str | None = None,
+    start_time: Annotated[str | None, Parameter(name=("--start-time", "--start"))] = None,
+    end_time: Annotated[str | None, Parameter(name=("--end-time", "--end"))] = None,
     offset: int = 0,
     length: int | None = None,
     keywords: tuple[str, ...] | None = None,
     keywords_exclude: tuple[str, ...] | None = None,
 ) -> int:
-    """Synchronize posts from one creator."""
-    return _print_result(
-        await KToolBoxCli.sync_creator(
-            url=creator,
-            service=service,
-            creator_id=creator_id,
-            path=output,
+    """Synchronize one or more creators, or every enabled roster creator."""
+    targets = list(creators)
+    if service or creator_id:
+        if not service or not creator_id:
+            return _project_error(ProjectConfigError("--service and --creator-id must be used together"))
+        targets.append(f"{service}:{creator_id}")
+
+    store = _project_store(config_path)
+    try:
+        project = store.load()
+        selected_creators = resolve_sync_targets(targets, project)
+        options = SyncOptions(
+            output=output,
             save_creator_indices=save_creator_indices,
             mix_posts=mix_posts,
-            start_time=start_time,
-            end_time=end_time,
+            start_time=datetime.strptime(start_time, "%Y-%m-%d") if start_time else None,
+            end_time=datetime.strptime(end_time, "%Y-%m-%d") if end_time else None,
             offset=offset,
             length=length,
-            keywords=keywords,
-            keywords_exclude=keywords_exclude,
+            keywords=set(keywords) if keywords else set(runtime_config.job.keywords),
+            keywords_exclude=(set(keywords_exclude) if keywords_exclude else set(runtime_config.job.keywords_exclude)),
         )
-    )
+        engine = BlockerEngine.from_specs(project.blockers)
+    except (ProjectConfigError, ValueError) as error:
+        return _project_error(ProjectConfigError(str(error)))
+
+    try:
+        async with create_pawchive_client() as client:
+            summary = await SyncCoordinator(
+                client,
+                blocker_engine=engine,
+                creator_concurrency=runtime_config.job.creator_concurrency,
+            ).run(selected_creators, options)
+    except PawchiveError as error:
+        stderr.print(f"[red]Pawchive error:[/red] {error}")
+        return 1
+    _print_sync_summary(summary)
+    return 0 if summary.successful else 1
 
 
 @creator_app.command(name="search")

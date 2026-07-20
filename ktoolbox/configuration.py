@@ -238,6 +238,7 @@ class JobConfiguration(BaseModel):
     e.g. ``{year}-{month}`` > ``2024-01``, ``{year}_{month}`` > ``2024_01``
     :ivar keywords: keywords to filter posts by title (case-insensitive)
     :ivar keywords_exclude: keywords to exclude posts by title (case-insensitive)
+    :ivar creator_concurrency: Maximum number of creators fetched and prepared concurrently
     :ivar download_file: Download post file (usually cover image). Set to False to skip file downloads.
     :ivar download_attachments: Download post attachments. Set to False to skip attachment downloads.
     :ivar min_file_size: Minimum file size in bytes to download. Files smaller than this will be skipped. \
@@ -246,7 +247,8 @@ class JobConfiguration(BaseModel):
     Set to None to disable maximum size filtering.
     """
 
-    count: int = 4
+    count: int = Field(default=4, ge=1, le=64)
+    creator_concurrency: int = Field(default=4, ge=1, le=64)
     include_revisions: bool = False
     post_dirname_format: str = "{title}"
     post_structure: PostStructureConfiguration = PostStructureConfiguration()

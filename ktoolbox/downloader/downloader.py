@@ -42,9 +42,9 @@ class Downloader:
         *,
         buffer_size: int = None,
         chunk_size: int = None,
-        designated_filename: str = None,
-        server_path: str = None,
-        post: Post = None,
+        designated_filename: str | None = None,
+        server_path: str,
+        post: Post | None = None,
     ):
         # noinspection GrazieInspection
         """
@@ -105,7 +105,7 @@ class Downloader:
         return self._chunk_size
 
     @cached_property
-    def post(self) -> Post:
+    def post(self) -> Post | None:
         """Post that the file belongs to"""
         return self._post
 

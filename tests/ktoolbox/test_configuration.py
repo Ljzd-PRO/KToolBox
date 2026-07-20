@@ -17,10 +17,12 @@ def test_pawchive_defaults_and_nested_environment(monkeypatch) -> None:
     monkeypatch.setenv("KTOOLBOX_API__NETLOC", "api.example.test")
     monkeypatch.setenv("KTOOLBOX_DOWNLOADER__SESSION_KEY", "download-only")
     monkeypatch.setenv("KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS", "false")
+    monkeypatch.setenv("KTOOLBOX_JOB__CREATOR_CONCURRENCY", "7")
     configured = Configuration(_env_file=None)
     assert configured.api.netloc == "api.example.test"
     assert configured.downloader.session_key == "download-only"
     assert configured.job.download_attachments is False
+    assert configured.job.creator_concurrency == 7
 
 
 def test_bucket_validator_accepts_hardlink_capable_directory(tmp_path: Path) -> None:
