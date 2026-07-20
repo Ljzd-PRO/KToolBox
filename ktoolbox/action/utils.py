@@ -6,7 +6,7 @@ from typing import Optional, List, Generator, Any, Tuple, Set
 from loguru import logger
 from pathvalidate import sanitize_filename
 
-from ktoolbox.api.model import Post
+from ktoolbox.api.generated import Post
 from ktoolbox.configuration import config
 from ktoolbox.job import CreatorIndices
 

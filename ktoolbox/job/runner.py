@@ -3,13 +3,12 @@ from asyncio import CancelledError
 from functools import cached_property
 from types import MappingProxyType
 from typing import List, Set, Dict
-from urllib.parse import urlunparse
-
 import httpx
 from loguru import logger
 from tqdm import tqdm as std_tqdm
 
 from ktoolbox._enum import RetCodeEnum
+from ktoolbox.api.utils import get_file_url
 from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
 from ktoolbox.job import Job
@@ -101,14 +100,13 @@ class JobRunner:
         failed_num = 0
         async with httpx.AsyncClient(
                 verify=config.ssl_verify,
-                cookies={"session": config.api.session_key} if config.api.session_key else None
+                cookies={"session": config.downloader.session_key} if config.downloader.session_key else None
         ) as client:
             while not self._job_queue.empty():
                 job = await self._job_queue.get()
 
                 # Create downloader
-                url_parts = [config.downloader.scheme, config.api.files_netloc, job.server_path, '', '', '']
-                url = str(urlunparse(url_parts))
+                url = get_file_url(job.server_path)
                 downloader = Downloader(
                     url=url,
                     path=job.path,

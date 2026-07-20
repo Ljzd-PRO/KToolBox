@@ -71,7 +71,6 @@ class BaseAPI(ABC, Generic[_T]):
     client = httpx.AsyncClient(
         verify=config.ssl_verify,
         headers={"Accept": "text/css"},
-        cookies={"session": config.api.session_key} if config.api.session_key else None
     )
 
     Response = BaseModel

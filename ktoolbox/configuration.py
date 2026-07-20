@@ -23,27 +23,23 @@ __all__ = [
 # noinspection SpellCheckingInspection,GrazieInspection
 class APIConfiguration(BaseModel):
     """
-    Kemono API Configuration
+    Pawchive API Configuration
 
-    :ivar scheme: Kemono API URL scheme
-    :ivar netloc: Kemono API URL netloc
-    :ivar statics_netloc: URL netloc of Kemono server for static files (e.g. images)
-    :ivar files_netloc: URL netloc of Kemono server for post files
-    :ivar path: Kemono API URL root path
+    :ivar scheme: Pawchive API URL scheme
+    :ivar netloc: Pawchive API URL netloc
+    :ivar statics_netloc: Pawchive host for static creator assets
+    :ivar path: Pawchive API URL root path
     :ivar timeout: API request timeout
     :ivar retry_times: API request retry times (when request failed)
     :ivar retry_interval: Seconds of API request retry interval
-    :ivar session_key: Session key that can be found in cookies after a successful login
     """
     scheme: Literal["http", "https"] = "https"
-    netloc: str = "kemono.cr"
-    statics_netloc: str = "img.kemono.cr"
-    files_netloc: str = "kemono.cr"
+    netloc: str = "pawchive.pw"
+    statics_netloc: str = "pawchive.pw"
     path: str = "/api/v1"
     timeout: float = 5.0
     retry_times: int = 3
     retry_interval: float = 2.0
-    session_key: str = ""
 
 
 class DownloaderConfiguration(BaseModel):
@@ -51,6 +47,9 @@ class DownloaderConfiguration(BaseModel):
     File Downloader Configuration
 
     :ivar scheme: Downloader URL scheme
+    :ivar files_netloc: Pawchive host for post files
+    :ivar file_path_prefix: Path prepended to file paths returned by the API
+    :ivar session_key: Optional session cookie sent only to the file host
     :ivar timeout: Downloader request timeout
     :ivar encoding: Charset for filename parsing and post ``content``, ``external_links`` saving
     :ivar buffer_size: Number of bytes of file I/O buffer for each downloading file
@@ -70,6 +69,9 @@ class DownloaderConfiguration(BaseModel):
     :ivar keep_metadata: Keep the file metadata when downloading files (e.g. last modified time, etc.)
     """
     scheme: Literal["http", "https"] = "https"
+    files_netloc: str = "file.pawchive.pw"
+    file_path_prefix: str = "/data"
+    session_key: str = ""
     timeout: float = 30.0
     encoding: str = "utf-8"
     buffer_size: int = 20480

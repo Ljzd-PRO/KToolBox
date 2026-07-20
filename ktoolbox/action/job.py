@@ -1,6 +1,5 @@
 from datetime import datetime
 from fnmatch import fnmatch
-from itertools import count
 from pathlib import Path
 from typing import List, Union, Optional, Set
 from urllib.parse import urlparse
@@ -10,11 +9,14 @@ from loguru import logger
 from pathvalidate import sanitize_filename, is_valid_filename
 
 from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
-from ktoolbox.action import ActionRet, fetch_creator_posts, FetchInterruptError
+from ktoolbox.action.base import ActionRet, action_error
+from ktoolbox.action.fetch import FetchInterruptError, fetch_creator_posts
 from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date, generate_filename, \
     filter_posts_by_keywords, filter_posts_by_keywords_exclude, generate_grouped_post_path, extract_content_images
-from ktoolbox.api.model import Post, Attachment, Revision
-from ktoolbox.api.posts import get_post_revisions as get_post_revisions_api, get_post as get_post_api
+from ktoolbox.api.client import PawchiveClient
+from ktoolbox.api.errors import PawchiveError, PawchiveNotFoundError
+from ktoolbox.api.generated import Post, Revision
+from ktoolbox.api.utils import pawchive_client_scope
 from ktoolbox.configuration import config
 from ktoolbox.job import Job, CreatorIndices
 from ktoolbox.utils import extract_external_links, generate_msg
@@ -27,7 +29,8 @@ async def create_job_from_post(
         post_path: Path,
         *,
         post_dir: bool = True,
-        dump_post_data: bool = True
+        dump_post_data: bool = True,
+        client: PawchiveClient | None = None,
 ) -> List[Job]:
     """
     Create a list of download job from a post data
@@ -39,6 +42,7 @@ async def create_job_from_post(
     :raise FetchInterruptError: If fetching post content fails
     """
     post_path.mkdir(parents=True, exist_ok=True)
+    job_post = Post.model_validate(post.model_dump(mode="python"))
 
     # Load ``PostStructureConfiguration``
     if post_dir:
@@ -63,10 +67,10 @@ async def create_job_from_post(
     jobs: List[Job] = []
     sequential_counter = 1  # Counter for sequential filenames
     if config.job.download_attachments:
-        for i, attachment in enumerate(post.attachments):  # type: int, Attachment
+        for attachment in post.attachments or []:
             if not attachment.path:
                 continue
-            file_path_obj = Path(attachment.name) if is_valid_filename(attachment.name) else Path(
+            file_path_obj = Path(attachment.name) if attachment.name and is_valid_filename(attachment.name) else Path(
                 urlparse(attachment.path).path
             )
             if (not config.job.allow_list or any(
@@ -95,13 +99,13 @@ async def create_job_from_post(
                         alt_filename=alt_filename,
                         server_path=attachment.path,
                         type=PostFileTypeEnum.Attachment,
-                        post=post
+                        post=job_post
                     )
                 )
 
     # Filter and create jobs for ``Post.file``
     if config.job.download_file and post.file and post.file.path:
-        post_file_name = Path(post.file.name) if is_valid_filename(post.file.name) else Path(
+        post_file_name = Path(post.file.name) if post.file.name and is_valid_filename(post.file.name) else Path(
             urlparse(post.file.path).path
         )
         post_file_name = Path(generate_filename(post, post_file_name.name, config.job.post_structure.file))
@@ -122,7 +126,7 @@ async def create_job_from_post(
                     alt_filename=post_file_name.name,
                     server_path=post.file.path,
                     type=PostFileTypeEnum.File,
-                    post=post
+                    post=job_post
                 )
             )
     # ``post.substring`` is used to determine if the post has content, but it's only partial
@@ -131,15 +135,20 @@ async def create_job_from_post(
     ):
         # If post has no content, fetch it from get_post API
         if not post.content:
-            get_post_ret = await get_post_api(
-                service=post.service,
-                creator_id=post.user,
-                post_id=post.id,
-                revision_id=post.revision_id if isinstance(post, Revision) else None
-            )
-            if get_post_ret:
-                post = get_post_ret.data.post
-            else:
+            try:
+                async with pawchive_client_scope(client) as api_client:
+                    if isinstance(post, Revision):
+                        revisions = await api_client.list_post_revisions(post.service, post.user, post.id)
+                        selected_revision = next(
+                            (revision for revision in revisions if revision.revision_id == post.revision_id),
+                            None,
+                        )
+                        if selected_revision is None:
+                            raise ValueError(f"Revision {post.revision_id} was not returned by Pawchive")
+                        post = selected_revision
+                    else:
+                        post = await api_client.get_post(post.service, post.user, post.id)
+            except (PawchiveError, ValueError) as error:
                 logger.error(
                     generate_msg(
                         "Failed to fetch post content",
@@ -149,7 +158,7 @@ async def create_job_from_post(
                         service=post.service
                     )
                 )
-                raise FetchInterruptError(ret=get_post_ret)
+                raise FetchInterruptError(error) from error
 
         # If post content is still empty, skip content extraction
         if post.content:
@@ -244,7 +253,8 @@ async def create_job_from_creator(
         start_time: Optional[datetime],
         end_time: Optional[datetime],
         keywords: Optional[Set[str]] = None,
-        keywords_exclude: Optional[Set[str]] = None
+        keywords_exclude: Optional[Set[str]] = None,
+        client: PawchiveClient | None = None,
 ) -> ActionRet[List[Job]]:
     """
     Create a list of download job from a creator
@@ -262,30 +272,50 @@ async def create_job_from_creator(
     :param end_time: End time of the time range
     :param keywords: Set of keywords to filter posts by title (case-insensitive)
     :param keywords_exclude: Set of keywords to exclude posts by title (case-insensitive)
+    :param client: Pawchive client to reuse across all creator requests
     """
+    if client is None:
+        async with pawchive_client_scope(None) as api_client:
+            return await create_job_from_creator(
+                service,
+                creator_id,
+                path,
+                all_pages=all_pages,
+                offset=offset,
+                length=length,
+                save_creator_indices=save_creator_indices,
+                mix_posts=mix_posts,
+                start_time=start_time,
+                end_time=end_time,
+                keywords=keywords,
+                keywords_exclude=keywords_exclude,
+                client=api_client,
+            )
+
     mix_posts = config.job.mix_posts if mix_posts is None else mix_posts
 
     # Get posts
     logger.info(f"Start fetching posts from creator {creator_id}")
     post_list: List[Post] = []
     start_offset = offset - offset % 50
-    if all_pages:
-        page_counter = count()
-    else:
-        page_num = length // 50 + 1
-        page_counter = iter(range(page_num))
+    requested_length = 50 if length is None else length
+    required_posts = offset % 50 + requested_length
 
     try:
-        async for part in fetch_creator_posts(service=service, creator_id=creator_id, o=start_offset):
-            if next(page_counter, None) is not None:
-                post_list += part
-            else:
+        async for part in fetch_creator_posts(
+                service=service,
+                creator_id=creator_id,
+                offset=start_offset,
+                client=client,
+        ):
+            post_list += part
+            if not all_pages and len(post_list) >= required_posts:
                 break
     except FetchInterruptError as e:
-        return ActionRet(**e.ret.model_dump(mode="python"))
+        return action_error(e.error)
 
     if not all_pages:
-        post_list = post_list[offset % 50:][:length]
+        post_list = post_list[offset % 50:][:requested_length]
     else:
         post_list = post_list[offset % 50:]
 
@@ -310,7 +340,7 @@ async def create_job_from_creator(
             posts_path = {}
             for post in post_list:
                 grouped_base_path = generate_grouped_post_path(post, path)
-                posts_path[post.id] = grouped_base_path / sanitize_filename(post.title)
+                posts_path[post.id] = grouped_base_path / sanitize_filename(post.title or post.id)
 
             indices = CreatorIndices(
                 creator_id=creator_id,
@@ -349,34 +379,31 @@ async def create_job_from_creator(
                 post=post,
                 post_path=post_path,
                 post_dir=not mix_posts,
-                dump_post_data=not mix_posts
+                dump_post_data=not mix_posts,
+                client=client,
             )
         except FetchInterruptError as e:
-            return ActionRet(**e.ret.model_dump(mode="python"))
+            return action_error(e.error)
 
         # If include_revisions is enabled, fetch and download revisions for this post
         if config.job.include_revisions and not mix_posts:
             try:
-                revisions_ret = await get_post_revisions_api(
-                    service=service,
-                    creator_id=creator_id,
-                    post_id=post.id
-                )
-                if revisions_ret and revisions_ret.data:
-                    for revision in revisions_ret.data:
-                        if revision.revision_id:  # Only process actual revisions
-                            revision_path = post_path / config.job.post_structure.revisions / generate_post_path_name(
-                                revision)
-                            try:
-                                revision_jobs = await create_job_from_post(
-                                    post=revision,
-                                    post_path=revision_path,
-                                    dump_post_data=True
-                                )
-                            except FetchInterruptError as e:
-                                return ActionRet(**e.ret.model_dump(mode="python"))
-                            job_list += revision_jobs
-            except Exception as e:
-                logger.warning(f"Failed to fetch revisions for post {post.id}: {e}")
+                revisions = await client.list_post_revisions(service, creator_id, post.id)
+                for revision in revisions:
+                    revision_path = post_path / config.job.post_structure.revisions / generate_post_path_name(revision)
+                    try:
+                        revision_jobs = await create_job_from_post(
+                            post=revision,
+                            post_path=revision_path,
+                            dump_post_data=True,
+                            client=client,
+                        )
+                    except FetchInterruptError as e:
+                        return action_error(e.error)
+                    job_list += revision_jobs
+            except PawchiveNotFoundError:
+                continue
+            except PawchiveError as error:
+                logger.warning(f"Failed to fetch revisions for post {post.id}: {error}")
 
     return ActionRet(data=job_list)

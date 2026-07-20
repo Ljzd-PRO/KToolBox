@@ -3,7 +3,7 @@ import os
 from asyncio import CancelledError, Lock
 from functools import cached_property
 from pathlib import Path
-from typing import Callable, Any, Coroutine, Type, Optional, Set
+from typing import Callable, Any, Coroutine, Type, Optional
 from urllib.parse import urlparse, unquote
 
 import aiofiles
@@ -17,7 +17,7 @@ from tenacity.stop import stop_after_attempt, stop_never
 from tqdm import tqdm as std_tqdm
 
 from ktoolbox._enum import RetCodeEnum
-from ktoolbox.api.model import Post
+from ktoolbox.api.generated import Post
 from ktoolbox.configuration import config
 from ktoolbox.downloader.base import DownloaderRet
 from ktoolbox.downloader.utils import filename_from_headers, duplicate_file_check, utime_from_headers
@@ -30,8 +30,6 @@ class Downloader:
     """
     :ivar _save_filename: The actual filename for saving.
     """
-    succeeded_servers: Set[int] = set()
-    failure_servers: Set[int] = set()
     wait_lock = Lock()
 
     def __init__(
@@ -76,7 +74,6 @@ class Downloader:
         self._save_filename = designated_filename  # Prioritize the manually specified filename
         self._post = post
 
-        self._next_subdomain_index = 1
         self._finished_lock = asyncio.Lock()
         self._stop: bool = False
 
@@ -209,43 +206,7 @@ class Downloader:
                     timeout=config.downloader.timeout,
                     headers={"Range": f"bytes={temp_size}-"}
             ) as res:  # type: httpx.Response
-                try:
-                    subdomain_index = int(res.url.netloc.split(b".")[0][1:])
-                except ValueError:
-                    subdomain_index = None
-                if res.status_code == 403:
-                    if subdomain_index is not None:
-                        self.succeeded_servers.discard(subdomain_index)
-                        self.failure_servers.add(subdomain_index)
-                    # try succeeded servers first
-                    subdomain_index = next(iter(self.succeeded_servers), None)
-                    if subdomain_index is None:
-                        subdomain_index = self._next_subdomain_index
-                        # Update self._next_subdomain_index
-                        ## index fallback to 1 when a server after failure_servers has been tried
-                        if self.failure_servers and self._next_subdomain_index > max(self.failure_servers):
-                            self._next_subdomain_index = 1
-                            self.failure_servers.clear()
-                        ## otherwise, increment the index and avoid failure_servers
-                        else:
-                            self._next_subdomain_index += 1
-                            while self._next_subdomain_index in self.failure_servers:
-                                self._next_subdomain_index += 1
-                        msg = "Download failed, trying next subdomain"
-                    else:
-                        msg = "Download failed, trying succeeded subdomains"
-                    new_netloc = f"n{subdomain_index}.{config.api.files_netloc}"
-                    self._url = str(res.url.copy_with(netloc=new_netloc.encode()))
-                    return DownloaderRet(
-                        code=RetCodeEnum.GeneralFailure,
-                        message=generate_msg(
-                            msg,
-                            nex_subdomain=new_netloc,
-                            status_code=res.status_code,
-                            filename=save_filepath
-                        )
-                    )
-                elif res.status_code != httpx.codes.PARTIAL_CONTENT:
+                if res.status_code != httpx.codes.PARTIAL_CONTENT:
                     self._url = self._initial_url
                     return DownloaderRet(
                         code=RetCodeEnum.GeneralFailure,
@@ -255,11 +216,6 @@ class Downloader:
                             filename=save_filepath
                         )
                     )
-                else:
-                    if subdomain_index is not None:
-                        self.failure_servers.discard(subdomain_index)
-                        self.succeeded_servers.add(subdomain_index)
-
                 # Get filename for saving and check if file exists (Second-time duplicate file check)
                 # Priority order can be referenced from the constructor's documentation
                 self._save_filename = self._designated_filename or sanitize_filename(

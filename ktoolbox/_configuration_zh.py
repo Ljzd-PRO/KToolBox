@@ -4,17 +4,15 @@ import ktoolbox.configuration
 # noinspection SpellCheckingInspection,GrazieInspection
 class APIConfiguration(ktoolbox.configuration.APIConfiguration):
     """
-    Kemono API 配置
+    Pawchive API 配置
 
-    :ivar scheme: Kemono API 的 URL 协议
-    :ivar netloc: Kemono API 的主机地址
-    :ivar statics_netloc: Kemono 服务器静态文件（如图片）的主机地址
-    :ivar files_netloc: Kemono 服务器帖子文件的主机地址
-    :ivar path: Kemono API 的根路径
+    :ivar scheme: Pawchive API 的 URL 协议
+    :ivar netloc: Pawchive API 的主机地址
+    :ivar statics_netloc: Pawchive 静态资源的主机地址
+    :ivar path: Pawchive API 的根路径
     :ivar timeout: API 请求超时时间
     :ivar retry_times: API 请求失败时重试次数
     :ivar retry_interval: API 请求重试间隔秒数
-    :ivar session_key: 登录成功后可在 Cookie 中找到的会话密钥
     """
     ...
 
@@ -24,6 +22,9 @@ class DownloaderConfiguration(ktoolbox.configuration.DownloaderConfiguration):
     文件下载器配置
 
     :ivar scheme: 下载器的 URL 协议
+    :ivar files_netloc: Pawchive 投稿文件的主机地址
+    :ivar file_path_prefix: API 文件路径前添加的路径前缀
+    :ivar session_key: 仅发送给文件主机的可选会话 Cookie
     :ivar timeout: 下载器请求超时时间
     :ivar encoding: 文件名解析和帖子 ``内容``、``external_links`` 保存的字符集
     :ivar buffer_size: 每个下载文件的文件 I/O 缓冲区字节数
@@ -36,8 +37,8 @@ class DownloaderConfiguration(ktoolbox.configuration.DownloaderConfiguration):
     :ivar use_bucket: 启用本地存储桶模式
     :ivar bucket_path: 本地存储桶路径
     :ivar reverse_proxy: 下载 URL 的反向代理格式。通过插入空的 ``{}`` 自定义文件名格式以表示原始 URL。\
-    例如：``https://example.com/{}`` 会变成 ``https://example.com/https://n1.kemono.su/data/66/83/xxxxx.jpg``；\
-    ``https://example.com/?url={}`` 会变成 ``https://example.com/?url=https://n1.kemono.su/data/66/83/xxxxx.jpg``
+    例如：``https://example.com/{}`` 会变成 ``https://example.com/https://file.pawchive.pw/data/66/83/xxxxx.jpg``；\
+    ``https://example.com/?url={}`` 会变成 ``https://example.com/?url=https://file.pawchive.pw/data/66/83/xxxxx.jpg``
     :ivar keep_metadata: 下载文件时保留文件元数据（例如最后修改时间等）
     """
     ...
@@ -168,11 +169,11 @@ class Configuration(ktoolbox.configuration.Configuration):
     """
     KToolBox 配置
 
-    :ivar api: Kemono API 配置
+    :ivar api: Pawchive API 配置
     :ivar downloader: 文件下载器配置
     :ivar job: 下载任务配置
     :ivar logger: 日志配置
-    :ivar ssl_verify: 对 Kemono API 服务器和下载服务器启用 SSL 证书验证
+    :ivar ssl_verify: 对 Pawchive API 服务器和下载服务器启用 SSL 证书验证
     :ivar json_dump_indent: JSON 文件保存时的缩进
     :ivar use_uvloop: 使用 uvloop/winloop 优化 asyncio 性能 \
     Windows 下使用 winloop，类 Unix 系统下使用 uvloop，提高并发性能。\

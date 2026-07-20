@@ -1,38 +1,41 @@
-from typing import AsyncGenerator, List, Any
+from __future__ import annotations
 
-from ktoolbox.api.model import Post
-from ktoolbox.api.posts import get_creator_post
-from ktoolbox.api.utils import SEARCH_STEP
-from ktoolbox.utils import BaseRet
+from collections.abc import AsyncGenerator
+
+from ktoolbox.api.client import PawchiveClient
+from ktoolbox.api.errors import PawchiveError, PawchiveNotFoundError
+from ktoolbox.api.generated import Post
+from ktoolbox.api.utils import SEARCH_STEP, pawchive_client_scope
 
 __all__ = ["FetchInterruptError", "fetch_creator_posts"]
 
 
 class FetchInterruptError(Exception):
-    """Exception for interrupt of data fetching"""
+    """Raised when paginated Pawchive fetching cannot continue."""
 
-    def __init__(self, *args, ret: BaseRet = None):
-        super().__init__(*args)
-        self.ret = ret
+    def __init__(self, error: Exception) -> None:
+        self.error = error
+        super().__init__(str(error))
 
 
-async def fetch_creator_posts(service: str, creator_id: str, o: int = 0) -> AsyncGenerator[List[Post], Any]:
-    """
-    Fetch posts from a creator
+async def fetch_creator_posts(
+    service: str,
+    creator_id: str,
+    offset: int = 0,
+    *,
+    client: PawchiveClient | None = None,
+) -> AsyncGenerator[list[Post], None]:
+    """Yield every page of posts for one creator."""
+    async with pawchive_client_scope(client) as api_client:
+        while True:
+            try:
+                posts = await api_client.list_creator_posts(service, creator_id, offset=offset)
+            except PawchiveNotFoundError:
+                return
+            except PawchiveError as error:
+                raise FetchInterruptError(error) from error
 
-    :param service: The service where the post is located
-    :param creator_id: The ID of the creator
-    :param o: Result offset, stepping of 50 is enforced
-    :return: Async generator of several list of posts
-    :raise FetchInterruptError: Exception for interrupt of data fetching
-    """
-    while True:
-        ret = await get_creator_post(service=service, creator_id=creator_id, o=o)
-        if ret:
-            yield ret.data
-            if len(ret.data) < SEARCH_STEP:
-                break
-            else:
-                o += SEARCH_STEP
-        else:
-            raise FetchInterruptError(ret=ret)
+            yield posts
+            if len(posts) < SEARCH_STEP:
+                return
+            offset += SEARCH_STEP
