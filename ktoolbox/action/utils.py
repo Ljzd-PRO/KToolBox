@@ -13,6 +13,7 @@ from ktoolbox.job import CreatorIndices
 __all__ = [
     "generate_post_path_name",
     "generate_filename",
+    "generate_attachments_dirname",
     "generate_year_dirname",
     "generate_month_dirname",
     "generate_grouped_post_path",
@@ -61,6 +62,25 @@ def generate_post_path_name(post: Post) -> str:
         except KeyError as e:
             logger.error(f"`JobConfiguration.post_dirname_format` contains invalid key: {e}")
             exit(1)
+
+
+def generate_attachments_dirname(post: Post) -> str:
+    """Generate directory name for attachments."""
+    try:
+        return sanitize_filename(
+            config.job.post_structure.attachments_dirname_format.format(
+                id=post.id,
+                user=post.user,
+                service=post.service,
+                title=post.title,
+                added=post.added.strftime(TIME_FORMAT) if post.added else "",
+                published=post.published.strftime(TIME_FORMAT) if post.published else "",
+                edited=post.edited.strftime(TIME_FORMAT) if post.edited else ""
+            )
+        )
+    except KeyError as e:
+        logger.error(f"`PostStructureConfiguration.attachments_dirname_format` contains invalid key: {e}")
+        exit(1)
 
 
 def generate_year_dirname(post: Post) -> str:
