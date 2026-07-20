@@ -1,4 +1,4 @@
-from enum import IntEnum, Enum
+from enum import Enum, IntEnum
 
 __all__ = ["TextEnum", "RetCodeEnum", "PostFileTypeEnum", "DataStorageNameEnum"]
 
@@ -10,6 +10,7 @@ class TextEnum(Enum):
 
 class RetCodeEnum(IntEnum):
     """Enum for ``BaseRet.code``"""
+
     Success = 0
     GeneralFailure = -1
 
@@ -27,7 +28,8 @@ class RetCodeEnum(IntEnum):
 
 class PostFileTypeEnum(Enum):
     # noinspection SpellCheckingInspection
-    """File types of Kemono post files"""
+    """File types of Pawchive post files."""
+
     Attachment = "attachment"
     File = "file"
 
@@ -35,6 +37,7 @@ class PostFileTypeEnum(Enum):
 # noinspection SpellCheckingInspection
 class DataStorageNameEnum(Enum):
     """File names for saving KToolBox data files"""
+
     PostData = "post.json"
     CreatorIndicesData = "creator-indices.ktoolbox"
     JobListData = "job-list.ktoolbox"

@@ -1,99 +1,82 @@
-# Guide
+# Command Guide
 
-Check [Reference](reference.md) for all commands and their flags / parameters.
-
-## Get general help
-
-- `--help`, `-h`
+Use hyphenated command and option names. Python Fire also accepts underscores, but hyphens are easier to read.
 
 ```bash
 ktoolbox -h
+ktoolbox sync-creator -h
 ```
-  
-## Get help of a command
 
-- `--help`, `-h`
+## Download one post
+
+Pass either a Pawchive page URL or the three identity values:
 
 ```bash
-ktoolbox download-post -h
+ktoolbox download-post https://pawchive.pw/fanbox/user/6570768/post/1836570
+
+ktoolbox download-post \
+  --service=fanbox \
+  --creator-id=6570768 \
+  --post-id=1836570 \
+  --path=downloads
 ```
 
-## Launch the graphical configuration editor
+Use `--revision-id` to select a revision. KToolBox fetches the revision list and matches the requested ID; Pawchive has no separate single-revision endpoint. Set `KTOOLBOX_JOB__INCLUDE_REVISIONS=True` to include all revisions when downloading the current post.
 
-`config-editor`
+If a transfer is interrupted, rerun the same command. Completed files are skipped and compatible temporary files are resumed.
+
+## Synchronize a creator
+
+Start with a bounded run when checking a new creator:
+
+```bash
+ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --length=1
+```
+
+Omitting `--length` follows all available pages. `--offset` is a post index at the CLI boundary and may be any non-negative integer; KToolBox converts it into Pawchive's 50-item page offsets.
+
+```bash
+# First 10 posts.
+ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --length=10
+
+# Posts 11 through 15.
+ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --offset=10 --length=5
+```
+
+Filter by inclusive publication dates or case-insensitive title text:
+
+```bash
+ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 \
+  --start-time=2025-01-01 --end-time=2025-03-01
+
+ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 \
+  --keywords=preview --keywords-exclude=archive
+```
+
+Dates use `%Y-%m-%d`. Enable `--save-creator-indices=True` to write a resumable creator index, or `--mix-posts=True` to place files directly in the creator directory without per-post directories or an index.
+
+## Inspect public data
+
+```bash
+# Search the public creator list locally.
+ktoolbox search-creator --name=example --service=fanbox
+
+# Search posts for a known creator.
+ktoolbox search-creator-post --id=6570768 --service=fanbox --q=preview --o=0
+
+# Validate and print one post model.
+ktoolbox get-post fanbox 6570768 1836570
+```
+
+Use `--dump=path.json` with search and `get-post` commands to write JSON instead of relying on terminal output.
+
+## Configuration utilities
 
 ```bash
 ktoolbox config-editor
-```
-
-## Generate an example configuration file (`.env`/`prod.env`)
-
-`example-env`
-
-```bash
 ktoolbox example-env
+ktoolbox version
+ktoolbox site-version
 ```
 
-## Download a specific post
-
-`download-post`
-
-```bash
-ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
-```
-??? info "If some files failed to download"
-    If some files failed to download, you can try to execute the command line again, 
-    the downloaded files will be **skipped**.
-  
-## Download all posts from a creator
-
-`sync-creator`
-
-```bash
-# Download all posts of the creator/artist
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016
-```
-
-??? tip "Update creator directory"
-    You can rerun the command, files with the same filename will be skipped.
-
-## Download a specified number of posts from the creator
-
-`sync-creator`
-
-- `--offset`: Posts result offset (or start offset)
-- `--length`: The number of posts to fetch, defaults to fetching all posts
-
-```bash
-# Download latest 10 posts of the creator/artist
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --length=10
-
-# Download latest No.11-No.15 posts of the creator/artist
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
-```
-
-## Download posts that published within the specified time range
-
-`sync-creator`
-
-- `--start-time`: Start time of the published time range for posts downloading.
-- `--end-time`: End time of the published time range for posts downloading.
-
-```bash
-# From 2023-8-5 to 2023-12-6
-ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --start-time=2023-8-5 --end-time=2023-12-6
-
-# From 2023-8-5 to now
-ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --start-time=2023-8-5
-
-# Before 2023-8-5
-ktoolbox sync-creator https://kemono.su/fanbox/user/641955 --end-time=2023-8-5
-```
-
-### Time Format
-
-The time value should match `%Y-%m-%d`, for example:
-
-- `2023-12-7`
-- `2023-12-07`
-- `2023-12-31`
+The editor needs the `urwid` optional dependency. `example-env` renders all configuration fields from the current model.

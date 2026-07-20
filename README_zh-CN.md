@@ -1,198 +1,153 @@
 <div align="center">
-  
-![KToolBox](https://socialify.git.ci/Ljzd-PRO/KToolBox/image?description=1&font=Source+Code+Pro&forks=1&issues=1&language=1&name=1&owner=1&pattern=Diagonal+Stripes&pulls=1&stargazers=1&theme=Auto)
+
+# KToolBox
+
+用于从 [Pawchive](https://pawchive.pw/) 下载公开投稿的异步命令行工具与 Python 客户端。
+
+[![PyPI](https://img.shields.io/pypi/v/ktoolbox?logo=python)](https://pypi.org/project/ktoolbox/)
+[![Python](https://img.shields.io/badge/Python-3.10--3.14-blue)](https://www.python.org/)
+[![License](https://img.shields.io/github/license/Ljzd-PRO/KToolBox)](LICENSE)
+[![Documentation](https://readthedocs.org/projects/ktoolbox/badge/?version=latest)](https://ktoolbox.readthedocs.io/)
+
+[English](README.md) | [中文](README_zh-CN.md)
 
 </div>
 
-<h1 align="center">
-  KToolBox
-</h1>
-
-<p align="center">
-  KToolBox 是一个用于下载
-  <a href="https://kemono.cr/">Kemono.cr / Kemono.su / Kemono.party</a>
-  中帖子内容的实用命令行工具
-</p>
-
-<p align="center">
-  <a href="https://pypi.org/project/ktoolbox" target="_blank">
-    <img src="https://img.shields.io/github/v/release/Ljzd-PRO/KToolBox?logo=python" alt="Version">
-  </a>
-
-<a href="https://pypi.org/project/ktoolbox" target="_blank">
-    <img src="https://img.shields.io/pypi/dm/ktoolbox?label=pypi-downloads" alt="PyPI Downloads">
-  </a>
-
-  <a href="https://github.com/Ljzd-PRO/KToolBox/releases" target="_blank">
-    <img src="https://img.shields.io/github/downloads/Ljzd-PRO/KToolBox/total?label=github-downloads" alt="GitHub Release Downloads">
-  </a>
-
-  <a href="./LICENSE">
-    <img src="https://img.shields.io/github/license/Ljzd-PRO/KToolBox" alt="BSD 3-Clause"/>
-  </a>
-
-  <a href="https://github.com/Ljzd-PRO/KToolBox/activity">
-    <img src="https://img.shields.io/github/last-commit/Ljzd-PRO/KToolBox/devel" alt="Last Commit"/>
-  </a>
-
-  <a href="https://codecov.io/gh/Ljzd-PRO/KToolBox" target="_blank">
-      <img src="https://codecov.io/gh/Ljzd-PRO/KToolBox/branch/master/graph/badge.svg?token=5XK9CYQHQN" alt="codecov"/>
-  </a>
-
-  <a href='https://ktoolbox.readthedocs.io/'>
-    <img src='https://readthedocs.org/projects/ktoolbox/badge/?version=latest' alt='Documentation Status' />
-  </a>
-
-  <a style="text-decoration:none">
-    <img src="https://img.shields.io/badge/Platform-Windows%20|%20Linux%20|%20macOS-blue" alt="Platform Win | Linux | macOS"/>
-  </a>
-</p>
-
-<p align="center">
-    <a href="./README.md">English</a> | <a href="./README_zh-CN.md">中文</a>
-</p>
-
-<p align="center">
-  <a href='https://ko-fi.com/N4N51J14RW'>
-    <img src='https://ko-fi.com/img/githubbutton_sm.svg' alt='ko-fi' />
-  </a>
-</p>
+KToolBox v1 仅支持 Pawchive 后端。项目对 Pawchive OpenAPI 文档中的全部公开操作提供类型化访问，并明确排除需要账号登录的收藏操作。
 
 ## 功能
 
-- 支持多文件并发下载
-- API 调用和下载失败后 **自动重试**
-- 支持下载单个帖子以及指定的画师的 **全部帖子**
-- 可 **更新已下载** 的画师目录至最新状态
-- 支持自定义下载的帖子/画师的 **文件和目录名格式**、**目录结构**
-  - 例如帖子目录可设置为 `[2025-01-02]_TheTitle` 的格式，图片文件设置为按顺序的 `1.jpg`、`2.jpg` 等
-  - 当你希望将某作者的所有帖子图片统一存放至一个目录下，以便预览，可以使用 `job.mix_posts` 配置项搭配自定义文件名格式，你将得到几百上千张图片的目录
-    - 如 `[2025-01-02]_TheTitle_1.jpg`、`[2025-01-02]_TheTitle_2.jpg`、`[2025-01-02]_TheTitle_3.jpg` 等
-- 支持排除 **指定格式** 的文件或仅下载指定格式的文件
-  - 例如当你不想下载庞大重复的 PSD 和压缩包文件时，可以在配置中排除 `.psd` 和 `.zip` 文件
-- 支持按**文件大小**过滤下载
-  - 例如，如果你想在磁盘空间不足时避免下载大型视频文件，可以在配置中设置最大文件大小限制
-  - 你也可以设置最小文件大小，以跳过下载缩略图或预览图片
-- 支持按帖子**标题关键词**过滤下载
-  - 例如你只想下载标题中包含“表情、効果音差分”的帖子，可以使用 `sync-creator` 命令的 `--keywords` 选项
-  - 如果你想排除标题中包含指定关键词的帖子，可以使用 `--keywords-exclude` 选项
-- 支持按帖子发布日期**时间范围**过滤下载
-- 能够解析帖子页面 HTML 多信息文本中包含的图片并下载
-  - 这类帖子特征为：浏览器页面刚进入时图片可能没有加载出来，且没有预览图
-- 能够收集帖子页面中列出的**网盘链接**并保存至文本文件
-- 可搜索画师和帖子，并导出结果
-  - 如果你希望自己处理画师和帖子数据，可以使用该功能导出 JSON 数据
-- 支持全平台，并提供 iOS 快捷指令
-  - 纯 Python 分支可在 iOS 的 a-Shell 或浏览器的 Pyodide 上运行
-- 对于 _Coomer.st / Coomer.su / Coomer.party_ 的支持，请查看文档 [Coomer](https://ktoolbox.readthedocs.io/latest/zh/coomer/)
+- 下载单篇投稿、指定修订，或按范围/全部同步某位创作者的投稿。
+- 在多个操作间复用同一个类型化异步 `PawchiveClient`。
+- 使用 HTTP Range 续传未完成文件，并跳过已经存在的文件。
+- 按文件大小、扩展名、标题关键词和发布日期过滤，可分别控制封面与附件。
+- 自定义目录结构、投稿目录名、文件名、顺序命名和年月分组。
+- 保存投稿元数据、创作者索引、正文、正文图片及匹配的外部链接。
+- 并发下载、集中式进度显示，以及可选的本地硬链接存储桶。
+- 默认测试完全离线，基于 MockTransport，并禁止意外联网。
 
-## 开发计划
+## 运行要求
 
-- [ ] GUI
-- [ ] Discord 下载支持
+- Python 3.10 至 3.14
+- Windows、macOS 或 Linux
 
-## 使用方法
+## 安装
 
-前往 [文档](https://ktoolbox.readthedocs.io/latest/zh/) 查看更多详情。
+推荐使用 `pipx`：
 
-### 安装
+```bash
+pipx install ktoolbox
+```
 
-你可以从 [releases](https://github.com/Ljzd-PRO/KToolBox/releases) 页面下载可执行文件使用
+可选的事件循环优化与终端配置编辑器依赖：
 
-手动安装：
+```bash
+# Windows
+pipx install "ktoolbox[urwid,winloop]" --force
 
-- 推荐
-  ```bash
-  pip3 install pipx
-  
-  # Windows
-  pipx install ktoolbox[urwid,winloop]
-  # Linux / macOS
-  pipx install ktoolbox[urwid,uvloop]
-  ```
+# Linux / macOS
+pipx install "ktoolbox[urwid,uvloop]" --force
+```
 
-- 对于 iOS [a-Shell](https://github.com/holzschu/a-shell) 或 [pyodide](https://pyodide.org/en/stable/)，
-或者如果你只能使用纯Python，无法编译 [pydantic](https://docs.pydantic.dev/latest/) v2.x.x
-  ```bash
-  pip3 install ktoolbox-pure-py
-  ```
+## 快速开始
 
-### 命令
+查看命令帮助：
 
-使用帮助命令或前往 [命令](https://ktoolbox.readthedocs.io/latest/zh/commands/guide/) 页面查看更多帮助。
-  
-#### ❓ 获取帮助总览
 ```bash
 ktoolbox -h
-```
-  
-#### ❓ 获取某个命令的帮助信息
-```bash
 ktoolbox download-post -h
 ```
 
-#### ⬇️🖼️ 下载指定的帖子
+下载一篇投稿：
+
 ```bash
-ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
+ktoolbox download-post https://pawchive.pw/fanbox/user/6570768/post/1836570
 ```
 
-如果部分文件下载失败，你可以尝试重新运行命令，已下载完成的文件会被 **跳过**。
-  
-#### ⬇️🖌️ 下载作者的所有帖子
+首次同步创作者时先限制为一篇投稿：
+
 ```bash
-# 下载作者/画师的所有帖子
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016
-
-# 下载作者/画师最新的 10 个帖子
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --length=10
-
-# 下载作者/画师最新的第 11 至 15 个帖子
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
-
-# 下载作者/画师从 2024-1-1 到 2024-3-1 的帖子
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 --end-time=2024-3-1
-
-# 下载作者/画师标题中包含“表情”的帖子
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --keywords "表情"
-
-# 下载作者/画师标题中包含“表情、効果音差分”的帖子
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --keywords "表情,効果音差分"
+ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --length=1
 ```
 
-### 配置
+使用偏移量、日期范围或标题过滤：
 
-- 同时下载10个文件
-- 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
-- 将发布日期作为帖子目录名的开头，例如 `[2024-1-1]HelloWorld`
-- 将帖子标题作为文件名的开头，例如 `HelloWorld_1.png`, `HelloWorld_2.png`, ...
-- 下载帖子修订版本
-- 排除下载 `.psd` 和 `.zip` 文件
-- 从帖子中提取云盘链接并保存到文本文件
-- ...
+```bash
+ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --offset=50 --length=10
+ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --start-time=2025-01-01 --end-time=2025-03-01
+ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --keywords=preview --keywords-exclude=archive
+```
 
-前往 [配置-向导](https://ktoolbox.readthedocs.io/latest/zh/configuration/guide/) 页面查看更多详情。
+再次运行时会跳过已经下载的文件；文件主机支持 Range 时，未完成的临时文件会继续下载。
 
-![KToolBox 配置编辑器](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-2.png)
-![KToolBox 配置编辑器](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-3.png)
+## 配置
 
-### iOS 快捷指令
+KToolBox 从当前工作目录依次读取 `.env` 和 `prod.env`。嵌套字段使用 `__`：
 
-前往 [iOS 快捷指令](https://ktoolbox.readthedocs.io/latest/zh/shortcut/) 页面查看更多详情。
+```dotenv
+# Pawchive 默认值，通常不需要覆盖。
+KTOOLBOX_API__NETLOC=pawchive.pw
+KTOOLBOX_API__STATICS_NETLOC=pawchive.pw
+KTOOLBOX_API__PATH=/api/v1
+KTOOLBOX_DOWNLOADER__FILES_NETLOC=file.pawchive.pw
+KTOOLBOX_DOWNLOADER__FILE_PATH_PREFIX=/data
 
-## 其他分支
+# 下载控制。
+KTOOLBOX_JOB__COUNT=4
+KTOOLBOX_JOB__DOWNLOAD_FILE=True
+KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
+KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
+```
 
-- 纯 Python 分支：[🔗pure-py](https://github.com/Ljzd-PRO/KToolBox/tree/pure-py)
-  - 使用 pydantic v1 因此安装时不需要 cargo
-  - 例如你可以在 iOS 的终端 App [a-Shell](https://github.com/holzschu/a-shell) 运行
-  - 🔗[PyPI](https://pypi.org/project/ktoolbox-pure-py/)
-- 开发版分支：[🔗devel](https://github.com/Ljzd-PRO/KToolBox/tree/devel)
+配置 `KTOOLBOX_DOWNLOADER__SESSION_KEY` 后，它只会发送给文件下载请求；API 客户端永远不会发送账号会话。
 
-## 代码覆盖率
+生成完整环境变量参考，或启动可选的终端配置编辑器：
 
-![codecov.io](https://codecov.io/gh/Ljzd-PRO/KToolBox/graphs/sunburst.svg?token=5XK9CYQHQN)
+```bash
+ktoolbox example-env
+ktoolbox config-editor
+```
+
+详见[配置文档](https://ktoolbox.readthedocs.io/latest/zh/configuration/guide/)与 [`example.env`](example.env)。
+
+## Python API
+
+```python
+import asyncio
+
+from ktoolbox.api import PawchiveClient
+
+
+async def main() -> None:
+    async with PawchiveClient() as client:
+        profile = await client.get_creator_profile("fanbox", "6570768")
+        posts = await client.list_creator_posts(profile.service, profile.id, offset=0)
+        print(profile.name, len(posts))
+
+
+asyncio.run(main())
+```
+
+成功调用返回 Pydantic v2 模型；传输、HTTP 状态、认证、未找到、冲突和响应校验失败分别使用不同异常。详见 [API 文档](https://ktoolbox.readthedocs.io/latest/zh/api/)。
+
+## 从 v0 迁移
+
+v1 删除 Kemono/Coomer 兼容层，以及旧 `BaseAPI`、模块级 `get_*`、`APIRet` 和包装响应接口。请将 `KTOOLBOX_API__SESSION_KEY` 移至 `KTOOLBOX_DOWNLOADER__SESSION_KEY`，并阅读 [v1 迁移指南](https://ktoolbox.readthedocs.io/latest/zh/migration-v1/)。
+
+仓库仍保留历史 `kemono_openapi.json`，但它只作为资料，不再是运行时支持的契约。
+
+## 开发
+
+```bash
+poetry install --with test,docs,dev
+poetry run pytest --cov
+poetry run ruff check k_generator ktoolbox/api tests
+poetry run mypy --strict ktoolbox/api
+poetry run mkdocs build --strict
+```
+
+默认测试必须保持离线，不得访问 Pawchive 或其他远程服务。
 
 ## 许可证
 
-KToolBox 使用 BSD 3-Clause 许可证.
-
-Copyright © 2023 by Ljzd-PRO.
+KToolBox 使用 [BSD 3-Clause License](LICENSE)。

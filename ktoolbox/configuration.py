@@ -65,8 +65,10 @@ class DownloaderConfiguration(BaseModel):
     :ivar bucket_path: Path of local storage bucket
     :ivar reverse_proxy: Reverse proxy format for download URL. \
     Customize the filename format by inserting an empty ``{}`` to represent the original URL. \
-    For example: ``https://example.com/{}`` will be ``https://example.com/https://n1.kemono.su/data/66/83/xxxxx.jpg``;  \
-    ``https://example.com/?url={}`` will be ``https://example.com/?url=https://n1.kemono.su/data/66/83/xxxxx.jpg``
+    For example: ``https://example.com/{}`` will be \
+    ``https://example.com/https://file.pawchive.pw/data/66/83/xxxxx.jpg``; \
+    ``https://example.com/?url={}`` will be \
+    ``https://example.com/?url=https://file.pawchive.pw/data/66/83/xxxxx.jpg``
     :ivar keep_metadata: Keep the file metadata when downloading files (e.g. last modified time, etc.)
     """
 
@@ -326,11 +328,11 @@ class Configuration(BaseSettings):
     """
     KToolBox Configuration
 
-    :ivar api: Kemono API Configuration
+    :ivar api: Pawchive API Configuration
     :ivar downloader: File Downloader Configuration
     :ivar job: Download jobs Configuration
     :ivar logger: Logger configuration
-    :ivar ssl_verify: Enable SSL certificate verification for Kemono API server and download server
+    :ivar ssl_verify: Enable SSL certificate verification for the Pawchive API and file servers
     :ivar json_dump_indent: Indent of JSON file dump
     :ivar use_uvloop: Use uvloop/winloop for asyncio performance optimization \
     Uses winloop on Windows and uvloop on Unix-like systems for better concurrent performance. \

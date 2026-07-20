@@ -1,198 +1,153 @@
 <div align="center">
-  
-![KToolBox](https://socialify.git.ci/Ljzd-PRO/KToolBox/image?description=1&font=Source+Code+Pro&forks=1&issues=1&language=1&name=1&owner=1&pattern=Diagonal+Stripes&pulls=1&stargazers=1&theme=Auto)
+
+# KToolBox
+
+An asynchronous CLI and Python client for downloading public posts from [Pawchive](https://pawchive.pw/).
+
+[![PyPI](https://img.shields.io/pypi/v/ktoolbox?logo=python)](https://pypi.org/project/ktoolbox/)
+[![Python](https://img.shields.io/badge/Python-3.10--3.14-blue)](https://www.python.org/)
+[![License](https://img.shields.io/github/license/Ljzd-PRO/KToolBox)](LICENSE)
+[![Documentation](https://readthedocs.org/projects/ktoolbox/badge/?version=latest)](https://ktoolbox.readthedocs.io/)
+
+[English](README.md) | [中文](README_zh-CN.md)
 
 </div>
 
-<h1 align="center">
-  KToolBox
-</h1>
-
-<p align="center">
-  KToolBox is a useful CLI tool for downloading posts content in
-  <a href="https://kemono.cr/">Kemono.cr / Kemono.su / Kemono.party</a>
-</p>
-
-<p align="center">
-  <a href="https://pypi.org/project/ktoolbox" target="_blank">
-    <img src="https://img.shields.io/github/v/release/Ljzd-PRO/KToolBox?logo=python" alt="Version">
-  </a>
-
-  <a href="https://pypi.org/project/ktoolbox" target="_blank">
-    <img src="https://img.shields.io/pypi/dm/ktoolbox?label=pypi-downloads" alt="PyPI Downloads">
-  </a>
-
-  <a href="https://github.com/Ljzd-PRO/KToolBox/releases" target="_blank">
-    <img src="https://img.shields.io/github/downloads/Ljzd-PRO/KToolBox/total?label=github-downloads" alt="GitHub Release Downloads">
-  </a>
-  
-  <a href="./LICENSE">
-    <img src="https://img.shields.io/github/license/Ljzd-PRO/KToolBox" alt="BSD 3-Clause"/>
-  </a>
-
-  <a href="https://github.com/Ljzd-PRO/KToolBox/activity">
-    <img src="https://img.shields.io/github/last-commit/Ljzd-PRO/KToolBox/devel" alt="Last Commit"/>
-  </a>
-
-  <a href="https://codecov.io/gh/Ljzd-PRO/KToolBox" target="_blank">
-      <img src="https://codecov.io/gh/Ljzd-PRO/KToolBox/branch/master/graph/badge.svg?token=5XK9CYQHQN" alt="codecov"/>
-  </a>
-
-  <a href='https://ktoolbox.readthedocs.io/'>
-    <img src='https://readthedocs.org/projects/ktoolbox/badge/?version=latest' alt='Documentation Status' />
-  </a>
-
-  <a style="text-decoration:none">
-    <img src="https://img.shields.io/badge/Platform-Windows%20|%20Linux%20|%20macOS-blue" alt="Platform Win | Linux | macOS"/>
-  </a>
-</p>
-
-<p align="center">
-    <a href="./README.md">English</a> | <a href="./README_zh-CN.md">中文</a>
-</p>
-
-<p align="center">
-  <a href='https://ko-fi.com/N4N51J14RW'>
-    <img src='https://ko-fi.com/img/githubbutton_sm.svg' alt='ko-fi' />
-  </a>
-</p>
+KToolBox v1 uses Pawchive as its only supported backend. It provides typed access to every public operation in the Pawchive OpenAPI document and keeps account-authenticated favorites operations out of scope.
 
 ## Features
 
-- Support concurrent downloading of multiple files
-- Automatically retry on API call or download failure
-- Support downloading a single post or **all posts** of a specified artist
-- Can **update downloaded** artist directories to the latest state
-- Support customizing the **file and directory name format** and **directory structure** for downloaded posts/artists
-  - For example, the post directory can be set to the format `[2025-01-02]_TheTitle`, and image files can be named sequentially as `1.jpg`, `2.jpg`, etc.
-  - If you want to store all images from an artist's posts in a single directory for preview, you can use the `job.mix_posts` config option with a custom filename format to get a directory with hundreds or thousands of images
-    - Such as `[2025-01-02]_TheTitle_1.jpg`, `[2025-01-02]_TheTitle_2.jpg`, `[2025-01-02]_TheTitle_3.jpg`, etc.
-- Support excluding **specified file formats** or downloading only specified formats
-  - For example, if you don't want to download large and duplicate PSD or archive files, you can exclude `.psd` and `.zip` files in the config
-- Support filtering downloads by **file size**
-  - For example, if you want to avoid downloading large video files when running out of disk space, you can set a maximum file size limit in the config
-  - You can also set a minimum file size to skip downloading thumbnail or preview images
-- Support filtering downloads by post **title keywords**
-  - For example, if you only want to download posts whose titles contain "表情" or "効果音差分", you can use the `sync-creator` command with the `--keywords` option
-  - You can also exclude posts with specific keywords in the title using the `--keywords-exclude` option
-- Support filtering downloads by post **publish date range**
-- Can parse and download images contained in the multi-info text of the post page HTML
-  - These posts are characterized by images not loading immediately when the browser enters the page, and no preview images
-- Can collect **cloud drive links** listed on the post page and save them to a text file
-- Can search for artists and posts, and export results
-  - If you want to process artist and post data yourself, you can use this feature to export JSON data
-- Cross-platform support, with iOS shortcuts provided
-  - The pure Python branch can run on iOS a-Shell or in the browser via Pyodide
-- For _Coomer.st / Coomer.su / Coomer.party_ support, please refer to the documentation [Coomer](https://ktoolbox.readthedocs.io/latest/zh/coomer/)
+- Download one post, a selected revision, or a bounded/all-post creator synchronization.
+- Reuse one typed asynchronous `PawchiveClient` across API operations.
+- Resume partial downloads with HTTP Range requests and skip existing files.
+- Limit file sizes, select extensions, filter titles and dates, and control cover/attachment downloads.
+- Customize directory structure, post names, file names, sequential names, and year/month grouping.
+- Save post metadata, creator indices, extracted content, content images, and matching external links.
+- Run concurrent downloads with centralized progress and optional local hard-link bucket storage.
+- Use a fully offline MockTransport-based test suite; accidental network access is blocked in tests.
 
-## Dev Plan
+## Requirements
 
-- [ ] GUI
-- [ ] Discord support
+- Python 3.10 through 3.14
+- Windows, macOS, or Linux
 
-## Tutorial
+## Installation
 
-See [documentation](https://ktoolbox.readthedocs.io/) for more details.
+Using `pipx` is recommended:
 
-### Installation
+```bash
+pipx install ktoolbox
+```
 
-You can use executables from [releases](https://github.com/Ljzd-PRO/KToolBox/releases) page
+Optional event-loop and terminal configuration-editor dependencies:
 
-Manually install:
+```bash
+# Windows
+pipx install "ktoolbox[urwid,winloop]" --force
 
-- Recommend
-  ```bash
-  pip3 install pipx
-  
-  # Windows
-  pipx install "ktoolbox[urwid,winloop]"
-  # Linux / macOS
-  pipx install "ktoolbox[urwid,uvloop]"
-  ```
+# Linux / macOS
+pipx install "ktoolbox[urwid,uvloop]" --force
+```
 
-- For [a-Shell](https://github.com/holzschu/a-shell) or [pyodide](https://pyodide.org/en/stable/), 
-  or if you can only use pure Python and you cannot compile [pydantic](https://docs.pydantic.dev/latest/) v2.x.x
-  ```bash
-  pip3 install ktoolbox-pure-py
-  ```
+## Quick Start
 
-### Command
+Show command help:
 
-For more information, use the help command or goto [Command](https://ktoolbox.readthedocs.io/latest/commands/guide) page.
-  
-#### ❓ Get general help
 ```bash
 ktoolbox -h
-```
-  
-#### ❓ Get help of a command
-```bash
 ktoolbox download-post -h
 ```
 
-#### ⬇️🖼️ Download a specific post
+Download one post:
+
 ```bash
-ktoolbox download-post https://kemono.su/fanbox/user/49494721/post/6608808
+ktoolbox download-post https://pawchive.pw/fanbox/user/6570768/post/1836570
 ```
 
-If some files failed to download, you can try to execute the command line again, 
-the downloaded files will be **skipped**.
-  
-#### ⬇️🖌️ Download posts from a creator
+Synchronize one creator while limiting the first run to one post:
+
 ```bash
-# Download all posts of the creator/artist
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016
-
-# Download latest 10 posts of the creator/artist
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --length=10
-
-# Download latest No.11-No.15 posts of the creator/artist
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --offset=10 --length=5
-
-# Download posts from the creator/artist from 2024-1-1 to 2024-3-1
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --start-time=2024-1-1 --end-time=2024-3-1
-
-# Download posts from the creator/artist whose title contains "表情"
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --keywords "表情"
-
-# Download posts from the creator/artist whose title contains "表情" or "効果音差分"
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --keywords "表情,効果音差分"
+ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --length=1
 ```
 
-### Configuration
+Use an offset, date range, or title filters:
 
-- Download 10 files at the same time
-- Rename attachments in numerical order, e.g. `1.png`, `2.png`, ...
-- Prefix the post directory name with its release/publish date, e.g. `[2024-1-1]HelloWorld`
-- Use the post title as the prefix for file names, e.g. `HelloWorld_1.png`, `HelloWorld_2.png`, ...
-- Download revisions of posts
-- Exclude `.psd` and `.zip` files
-- Extract cloud drive links from posts and save them to a text file
-- ...
+```bash
+ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --offset=50 --length=10
+ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --start-time=2025-01-01 --end-time=2025-03-01
+ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --keywords=preview --keywords-exclude=archive
+```
 
-Goto [Configuration-Guide](https://ktoolbox.readthedocs.io/latest/configuration/guide/) page for more details.
+Downloaded files are skipped on later runs. Incomplete temporary files are resumed when the file host supports ranges.
 
-![KToolBox Configuration Editor](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-2.png)
-![KToolBox Configuration Editor](https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-3.png)
+## Configuration
 
-### iOS Shortcuts
+KToolBox reads `.env`, then `prod.env`, from the current working directory. Nested fields use `__`:
 
-Goto [Shortcuts for iOS](https://ktoolbox.readthedocs.io/latest/shortcut/) page for more details.
+```dotenv
+# Pawchive defaults; normally no override is needed.
+KTOOLBOX_API__NETLOC=pawchive.pw
+KTOOLBOX_API__STATICS_NETLOC=pawchive.pw
+KTOOLBOX_API__PATH=/api/v1
+KTOOLBOX_DOWNLOADER__FILES_NETLOC=file.pawchive.pw
+KTOOLBOX_DOWNLOADER__FILE_PATH_PREFIX=/data
 
-## Other Branches
+# Download controls.
+KTOOLBOX_JOB__COUNT=4
+KTOOLBOX_JOB__DOWNLOAD_FILE=True
+KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
+KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
+```
 
-- Pure Python branch: [🔗pure-py](https://github.com/Ljzd-PRO/KToolBox/tree/pure-py)
-  - Use pydantic v1 so that cargo is not needed for installation
-  - For example, you can use it on iOS terminal App [a-Shell](https://github.com/holzschu/a-shell)
-  - 🔗[PyPI](https://pypi.org/project/ktoolbox-pure-py/)
-- Development branch: [🔗devel](https://github.com/Ljzd-PRO/KToolBox/tree/devel)
+`KTOOLBOX_DOWNLOADER__SESSION_KEY`, if set, is sent only to file downloads. The API client never sends an account session.
 
-## Code Coverage
+Generate a complete environment reference or launch the optional terminal editor:
 
-![codecov.io](https://codecov.io/gh/Ljzd-PRO/KToolBox/graphs/sunburst.svg?token=5XK9CYQHQN)
+```bash
+ktoolbox example-env
+ktoolbox config-editor
+```
+
+See [Configuration](https://ktoolbox.readthedocs.io/latest/configuration/guide/) and [`example.env`](example.env).
+
+## Python API
+
+```python
+import asyncio
+
+from ktoolbox.api import PawchiveClient
+
+
+async def main() -> None:
+    async with PawchiveClient() as client:
+        profile = await client.get_creator_profile("fanbox", "6570768")
+        posts = await client.list_creator_posts(profile.service, profile.id, offset=0)
+        print(profile.name, len(posts))
+
+
+asyncio.run(main())
+```
+
+Successful calls return Pydantic v2 models. Transport, HTTP status, authentication, not-found, conflict, and response-validation failures use distinct exception classes. See the [API documentation](https://ktoolbox.readthedocs.io/latest/api/).
+
+## Migrating From v0
+
+v1 removes the Kemono/Coomer compatibility layer and the old `BaseAPI`, module-level `get_*`, `APIRet`, and wrapper-response interfaces. Move `KTOOLBOX_API__SESSION_KEY` to `KTOOLBOX_DOWNLOADER__SESSION_KEY` and review the [v1 migration guide](https://ktoolbox.readthedocs.io/latest/migration-v1/).
+
+The historical `kemono_openapi.json` remains in the repository for reference only; it is not a supported runtime contract.
+
+## Development
+
+```bash
+poetry install --with test,docs,dev
+poetry run pytest --cov
+poetry run ruff check k_generator ktoolbox/api tests
+poetry run mypy --strict ktoolbox/api
+poetry run mkdocs build --strict
+```
+
+Default tests are hermetic and must not contact Pawchive or any other remote service.
 
 ## License
 
-KToolBox is licensed under BSD 3-Clause.
-
-Copyright © 2023 by Ljzd-PRO.
+KToolBox is licensed under the [BSD 3-Clause License](LICENSE).

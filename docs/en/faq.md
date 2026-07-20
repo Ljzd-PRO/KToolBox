@@ -1,201 +1,97 @@
 # FAQ
 
-## How to solve the failure of uvloop/winloop installation?
+## Why are account favorites unavailable?
 
-!!! info "It's optional"
-    Event loop optimization (uvloop/winloop) can improve concurrent performance, but it's **optional**. 
-    If you don't want to install these packages, you can ignore this step.
+KToolBox v1 implements the 14 Pawchive operations that do not require login. The five OpenAPI operations protected by `cookieAuth` are deliberately excluded, so the API client never accepts or sends an account session.
 
-KToolBox now supports platform-specific event loop optimization:
+Post flagging is a separate public operation and is implemented. Call it intentionally: a successful flag changes server state and an already flagged post may return `PawchiveConflictError`.
 
-- **Windows**: Uses `winloop` for improved performance
-- **Linux/macOS**: Uses `uvloop` for improved performance
+## What should I do when an API call fails?
 
-### Installing event loop optimizations
+The CLI reports typed Pawchive failures rather than returning a partially parsed response. Common classes are transport, HTTP, authentication, not-found, conflict, and response-validation errors.
 
-=== "Windows"
-    ```bash
-    pip install ktoolbox[winloop]
-    ```
+- Check that the URL or `service`, creator ID, and post ID are correct.
+- Increase `KTOOLBOX_API__TIMEOUT` for a slow connection.
+- Adjust `KTOOLBOX_API__RETRY_TIMES` and `KTOOLBOX_API__RETRY_INTERVAL` for transient transport, `429`, or `5xx` failures.
+- Do not add an account cookie to API settings; API requests do not use one.
 
-=== "Linux/macOS"
-    ```bash
-    pip install ktoolbox[uvloop]
-    ```
+Redirects, ordinary `4xx` responses, conflicts, and invalid response data are not retried.
 
-If you failed installing uvloop on Linux or macOS, you can try to install it with system package manager like **apt**, **yum** or **brew**, as package managers provide prebuilt wheels for uvloop.
+## Why do file downloads return 403?
 
-- Install with apt
-    ```bash
-    sudo apt install python3-uvloop
-    ```
+If the file host requires a session for a specific asset, set the downloader-only key:
 
-## `attachments` folder inside post directory is no need for me
+```dotenv
+KTOOLBOX_DOWNLOADER__SESSION_KEY=xxxxx
+```
 
-You can set configuration option `job.post_structure.attachments` to `./`
+The cookie is scoped to file download requests and is not sent to Pawchive API requests. Treat `.env` and `prod.env` as secret-bearing local files and do not commit them.
 
-Set the configuration by `prod.env` dotenv file or system environment variables:
+## How do I resume an interrupted download?
+
+Run the same command again. KToolBox skips complete destination files. If an incomplete file with `downloader.temp_suffix` exists and the server supports ranges, the downloader requests the remaining bytes and validates the combined size.
+
+## How do I disable covers or attachments?
+
+```dotenv
+# Attachments only.
+KTOOLBOX_JOB__DOWNLOAD_FILE=False
+KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
+
+# Covers only.
+#KTOOLBOX_JOB__DOWNLOAD_FILE=True
+#KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=False
+```
+
+`download_file` means the main post file, usually the cover. Both options default to `True`.
+
+## Can attachments be stored directly in the post directory?
+
 ```dotenv
 KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 ```
 
-`./` means attachments will be downloaded directly into the post directory.
+## How do I avoid long filenames?
 
-!!! info "Notice"
-    For more information, please visit [Configuration-Guide](configuration/guide.md) page.
+Use sequential names or a format precision limit:
 
-## How to disable cover image download?
-
-You can set configuration option `job.download_file` to `False` to disable cover image (file) download functionality.
-
-Set the configuration by `prod.env` dotenv file or system environment variables:
 ```dotenv
-# Disable cover image download
-KTOOLBOX_JOB__DOWNLOAD_FILE=False
-
-# If you also want to disable attachment downloads, you can set
-#KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=False
-```
-
-With this setting, KToolBox will only download attachments and skip file downloads. This is useful when some authors have garbled image names that require renaming functionality to sort by webpage order.
-
-!!! info "Notice"
-    - `download_file`: Controls whether to download post file (usually cover image)
-    - `download_attachments`: Controls whether to download post attachments  
-    - Both options default to `True` for backward compatibility
-
-## Commands and flags should use `-` or `_` as seperator?
-
-Both is support, `-` is suggested.
-
-## Filename too long
-
-In some cases, the filename or the post directory name can be too long and caused download failure.
-To solve this issue, you can set **sequential filename** or use **custom post directory name**
-
-Set the configuration by `prod.env` dotenv file or system environment variables:
-```dotenv
-# Rename attachments in numerical order, e.g. `1.png`, `2.png`, ...
 KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
-
-# Set the post directory name to its release/publish date and ID, e.g. `[2024-1-1]11223344`
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}
+KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}_{title:.30}
+KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
 ```
 
-## How to Configure a Proxy?
+## How do I configure a proxy?
 
-You can set the `HTTPS_PROXY`, `HTTP_PROXY`, and `ALL_PROXY` environment variables to achieve this.
+HTTPX reads standard proxy environment variables:
 
-Refer to: [HTTPX - Environment Variables](https://www.python-httpx.org/environment_variables/#http_proxy-https_proxy-all_proxy)
-
-For example, set it like this:
-
-```shell
-# Unix Shell
+```bash
 export HTTPS_PROXY=http://127.0.0.1:7897
 export HTTP_PROXY=http://127.0.0.1:7897
 export ALL_PROXY=socks5://127.0.0.1:7897
 ```
 
+On PowerShell:
+
 ```powershell
-# Windows PowerShell
-$env:HTTP_PROXY="http://127.0.0.1:7897"; $env:HTTPS_PROXY="http://127.0.0.1:7897"
+$env:HTTP_PROXY="http://127.0.0.1:7897"
+$env:HTTPS_PROXY="http://127.0.0.1:7897"
 ```
 
-## GUI Configuration Editor Cannot Be Opened
+## Why does the configuration editor not open?
 
-!!! warning "Note"
-    [`ktoolbox-pure-py`](https://pypi.org/project/ktoolbox-pure-py/) does not support the graphical configuration editor.
+Install the optional terminal UI dependency:
 
-By default, the dependencies for the graphical configuration editor are not installed. You can install them using the following command:
-
-```shell
-pip3 install ktoolbox[urwid]
+```bash
+pip install "ktoolbox[urwid]"
+# or
+pipx install "ktoolbox[urwid]" --force
 ```
 
-If you are using pipx:
+## Is uvloop or winloop required?
 
-```shell
-pipx install ktoolbox[urwid] --force
-```
+No. They are optional event-loop optimizations. Use `ktoolbox[uvloop]` on Linux/macOS or `ktoolbox[winloop]` on Windows. If neither is installed, KToolBox continues with Python's standard asyncio loop.
 
-## Kemono API Call Failed
+## Why might an antivirus flag a packaged executable?
 
-For example:
-
-```
-ktoolbox sync-creator "https://coomer.su/onlyfans/user/hollyharper11" --start-time="2020-05-01" --end-time="2025-01-01"
-
-2024-05-12 12:52:51.477 | INFO     | ktoolbox.cli:sync_creator:271 - Got creator information - {'name': 'hollyharper11', 'id': 'hollyharper11'}
-2024-05-12 12:52:51.479 | INFO     | ktoolbox.action.job:create_job_from_creator:148 - Start fetching posts from creator hollyharper11
-2024-05-12 12:52:56.477 | ERROR    | ktoolbox.api.base:_retry_error_callback:37 - Kemono API call failed - {'ret': APIRet(code=1002, message="1 validation error for Response\n  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='<!DOCTYPE html>\\n<html>\\...>\\n  </body>\\n</html>\\n', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.7/v/json_invalid", exception=1 validation error for Response
-  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='<!DOCTYPE html>\n<html>\...>\n  </body>\n</html>\n', input_type=str]
-    For further information visit https://errors.pydantic.dev/2.7/v/json_invalid, data=None)}
-1 validation error for Response
-  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='<!DOCTYPE html>\n<html>\...>\n  </body>\n</html>\n', input_type=str]
-    For further information visit https://errors.pydantic.dev/2.7/v/json_invalid
-```
-
-1. This is generally caused by frequent requests, so you can try setting a higher number of API retry attempts.
-    ```dotenv
-    # .env / prod.env
-    KTOOLBOX_API__RETRY_TIMES=10
-    ```
-
-2. You can set **session key** (can be found in cookies after a successful login) for download
-    ```dotenv
-    # .env / prod.env
-    KTOOLBOX_API__SESSION_KEY="xxxxxxx"
-    ```
-
-You can also set these through the graphical configuration editor: `API - retry_times` and `API -> session_key`.
-
-## Frequently encounter **403** errors during downloads
-
-The solution is the same as above.
-
-## Antivirus software flags the executable as a virus/threat
-
-This is a **false positive**. KToolBox is completely safe and open-source software.
-
-**Why this happens:**
-- PyInstaller executables are commonly flagged by antivirus engines due to their packing method
-- Downloaded executables from the internet are often treated with suspicion
-- Some heuristic engines flag any "download manager" type software
-
-**Solutions:**
-1. **Add an exception** in your antivirus software for the KToolBox executable
-2. **Use pipx or pip installation** instead
-3. **Build from source** if you're still concerned:
-   ```bash
-   git clone https://github.com/Ljzd-PRO/KToolBox.git
-   cd KToolBox
-   poetry install --with pyinstaller
-   poetry run pyinstaller ktoolbox.spec
-   ```
-
-**Security assurance:**
-- All releases are built automatically using GitHub Actions (publicly visible)
-- Source code is completely open and auditable
-- No malicious code exists in this project
-
-## Post title too long to create directory or download file
-
-!!! tip "Tip"
-    For more information about Python format specification mini-language, please refer to [Format Specification Mini-Language](https://docs.python.org/3.13/library/string.html#format-specification-mini-language)
-
-In some cases, overly long post titles may cause download failures. To solve this problem, you can use the Python format specification mini-language to limit the title length in the **custom post directory name format**.
-
-You can set this configuration via the graphical configuration editor, dotenv file `.env`, or system environment variables:
-```dotenv
-# Set the post directory name to the first 30 characters of its title
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT={title:.30}
-
-# If you need to include the title in a custom filename format, you can also limit its length
-KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
-```
-
-## Where can I find more information about KToolBox?
-
-- Guide: Use **AI(Copilot Spaces)** for command params and configuration help: [#304](https://github.com/Ljzd-PRO/KToolBox/issues/304)
-- A community-shared usage guide: [#141](https://github.com/Ljzd-PRO/KToolBox/issues/141)
+Some heuristic scanners flag PyInstaller bundles or download managers. Releases are built through the repository's public automation; you can also install with `pipx` or audit and build the source locally.

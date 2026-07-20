@@ -1,202 +1,97 @@
 # 常见问题
 
-## 如何解决 uvloop/winloop 安装失败的问题？
+## 为什么没有账号收藏功能？
 
-!!! info "这是可选的"
-    事件循环优化（uvloop/winloop）可以提高并发性能，但它是 **可选的**。如果你不想安装这些包，你可以跳过这个步骤。
+KToolBox v1 实现 Pawchive 中无需登录的 14 个操作。OpenAPI 中受 `cookieAuth` 保护的 5 个操作明确排除，因此 API 客户端不会接受或发送账号会话。
 
-KToolBox 现在支持平台特定的事件循环优化：
+投稿标记是独立的公开操作，已经实现。请有意识地调用：成功标记会改变服务端状态，重复标记可能抛出 `PawchiveConflictError`。
 
-- **Windows**: 使用 `winloop` 来提升性能
-- **Linux/macOS**: 使用 `uvloop` 来提升性能
+## API 调用失败时怎么办？
 
-### 安装事件循环优化
+CLI 会报告类型化的 Pawchive 错误，不会返回只解析了一部分的响应。常见类型包括传输、HTTP、认证、未找到、冲突和响应校验错误。
 
-=== "Windows"
-    ```bash
-    pip install ktoolbox[winloop]
-    ```
+- 检查 URL 或 `service`、作者 ID、投稿 ID 是否正确。
+- 网络较慢时增大 `KTOOLBOX_API__TIMEOUT`。
+- 对临时传输错误、`429` 或 `5xx`，调整 `KTOOLBOX_API__RETRY_TIMES` 与 `KTOOLBOX_API__RETRY_INTERVAL`。
+- 不要向 API 配置添加账号 Cookie；API 请求不会使用它。
 
-=== "Linux/macOS"
-    ```bash
-    pip install ktoolbox[uvloop]
-    ```
+重定向、普通 `4xx`、冲突和非法响应数据不会重试。
 
-如果你在 Linux 或 macOS 安装 uvloop 失败， 
-你可以尝试用例如 **apt**、**yum**、**brew** 的系统包管理器安装，包管理器提供构建好的 uvloop 包。
+## 文件下载为什么返回 403？
 
-- 使用 apt 安装
-    ```bash
-    sudo apt install python3-uvloop
-    ```
+若文件主机要求特定资源携带会话，可设置只属于下载器的密钥：
 
-## 我不需要帖子目录下的 `attachments` 文件夹
+```dotenv
+KTOOLBOX_DOWNLOADER__SESSION_KEY=xxxxx
+```
 
-你可以设置配置选项 `job.post_structure.attachments` 为 `./`
+该 Cookie 仅用于文件下载请求，不会发送到 Pawchive API。请将 `.env` 和 `prod.env` 视作可能包含密钥的本地文件，不要提交。
 
-通过 dotenv 文件 `prod.env` 或系统环境变量来设置配置：
+## 如何继续中断的下载？
+
+重新运行相同命令即可。KToolBox 会跳过完整的目标文件。如果存在带 `downloader.temp_suffix` 的未完成文件，且服务器支持范围请求，下载器会请求剩余字节并校验合并后的大小。
+
+## 如何禁用封面或附件？
+
+```dotenv
+# 只下载附件。
+KTOOLBOX_JOB__DOWNLOAD_FILE=False
+KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
+
+# 只下载封面。
+#KTOOLBOX_JOB__DOWNLOAD_FILE=True
+#KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=False
+```
+
+`download_file` 指投稿主文件，通常为封面。两个选项默认均为 `True`。
+
+## 能否把附件直接放进投稿目录？
+
 ```dotenv
 KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 ```
 
-`./` 表示附件文件将会直接下载到帖子目录下。
+## 如何避免文件名过长？
 
-!!! info "提示"
-    更多详情，请参考 [配置-向导](configuration/guide.md) 页面。
+使用顺序命名或格式精度限制：
 
-## 如何关闭封面图功能？
-
-你可以设置配置选项 `job.download_file` 为 `False` 来关闭封面图（文件）下载功能。
-
-通过 dotenv 文件 `prod.env` 或系统环境变量来设置配置：
 ```dotenv
-# 关闭封面图下载
-KTOOLBOX_JOB__DOWNLOAD_FILE=False
-
-# 如果你也想关闭附件下载，可以设置
-#KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=False
-```
-
-这样设置后，KToolBox 将只下载附件（attachments），跳过封面图（file）下载。这对于有些作者的图片名称是乱码、需要依赖重命名功能按网页顺序排序的情况很有用。
-
-!!! info "提示"
-    - `download_file`: 控制是否下载帖子文件（通常为封面图片）
-    - `download_attachments`: 控制是否下载帖子附件
-    - 两个选项都默认为 `True`，确保向后兼容性
-
-## 命令和标志（选项）应当使用 `-` 还是 `_` 作为分隔符？
-
-两者都支持，推荐使用 `-`。
-
-## 文件名过长
-
-在一些情况下，文件名或帖子目录名过长而导致下载失败。为了解决这个问题，你可以设置 **序列化文件名** 或使用 **自定义帖子目录名**
-
-通过 dotenv 文件 `prod.env` 或系统环境变量来设置配置：
-```dotenv
-# 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
 KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
-
-# 设置帖子目录名为其发布日期和ID，例如 `[2024-1-1]11223344`
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}
+KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}_{title:.30}
+KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
 ```
 
 ## 如何配置代理？
 
-可以通过设置 `HTTPS_PROXY`, `HTTP_PROXY`, `ALL_PROXY` 环境变量实现
+HTTPX 会读取标准代理环境变量：
 
-参考：[HTTPX - Environment Variables](https://www.python-httpx.org/environment_variables/#http_proxy-https_proxy-all_proxy)
-
-例如这样设置：
-
-```shell
-# Unix Shell
+```bash
 export HTTPS_PROXY=http://127.0.0.1:7897
 export HTTP_PROXY=http://127.0.0.1:7897
 export ALL_PROXY=socks5://127.0.0.1:7897
 ```
 
+PowerShell：
+
 ```powershell
-# Windows PowerShell
-$env:HTTP_PROXY="http://127.0.0.1:7897"; $env:HTTPS_PROXY="http://127.0.0.1:7897"
+$env:HTTP_PROXY="http://127.0.0.1:7897"
+$env:HTTPS_PROXY="http://127.0.0.1:7897"
 ```
 
-## 图形化配置编辑器无法打开
+## 为什么配置编辑器无法打开？
 
-!!! warning "注意"
-    [`ktoolbox-pure-py`](https://pypi.org/project/ktoolbox-pure-py/) 不支持图形化配置编辑器
+安装可选的终端 UI 依赖：
 
-默认情况下，图形化配置编辑器的相关依赖不会被安装，可使用以下命令附带安装：
-
-```shell
-pip3 install ktoolbox[urwid]
+```bash
+pip install "ktoolbox[urwid]"
+# 或
+pipx install "ktoolbox[urwid]" --force
 ```
 
-如果你用的是 pipx：
+## uvloop 或 winloop 是必需的吗？
 
-```shell
-pipx install ktoolbox[urwid] --force
-```
+不是。它们只是可选的事件循环优化。Linux/macOS 使用 `ktoolbox[uvloop]`，Windows 使用 `ktoolbox[winloop]`。两者都未安装时，KToolBox 会继续使用 Python 标准 asyncio 循环。
 
-## Kemono API 调用失败
+## 为什么杀毒软件可能标记打包后的可执行文件？
 
-例如：
-
-```
-ktoolbox sync-creator "https://coomer.su/onlyfans/user/hollyharper11" --start-time="2020-05-01" --end-time="2025-01-01"
-
-2024-05-12 12:52:51.477 | INFO     | ktoolbox.cli:sync_creator:271 - Got creator information - {'name': 'hollyharper11', 'id': 'hollyharper11'}
-2024-05-12 12:52:51.479 | INFO     | ktoolbox.action.job:create_job_from_creator:148 - Start fetching posts from creator hollyharper11
-2024-05-12 12:52:56.477 | ERROR    | ktoolbox.api.base:_retry_error_callback:37 - Kemono API call failed - {'ret': APIRet(code=1002, message="1 validation error for Response\n  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='<!DOCTYPE html>\\n<html>\\...>\\n  </body>\\n</html>\\n', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.7/v/json_invalid", exception=1 validation error for Response
-  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='<!DOCTYPE html>\n<html>\...>\n  </body>\n</html>\n', input_type=str]
-    For further information visit https://errors.pydantic.dev/2.7/v/json_invalid, data=None)}
-1 validation error for Response
-  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='<!DOCTYPE html>\n<html>\...>\n  </body>\n</html>\n', input_type=str]
-    For further information visit https://errors.pydantic.dev/2.7/v/json_invalid
-```
-
-1. 确保更新到了 [v0.14.0](https://github.com/Ljzd-PRO/KToolBox/releases/tag/v0.14.0) 或以上版本
-
-2. 一般可能是因为请求频繁导致，你可以尝试设置更多的 API 重试次数
-    ```dotenv
-    # .env / prod.env
-    KTOOLBOX_API__RETRY_TIMES=10
-    ```
-
-3. 你可以尝试设置下载所用的 **session key** （登录成功后可在 Cookies 中查看）
-    ```dotenv
-    # .env / prod.env
-    KTOOLBOX_API__SESSION_KEY="xxxxxxx"
-    ```
-
-你也可以通过图形化配置编辑器设置：`API - retry_times` 和 `API -> session_key`.
-
-## 下载时频繁出现 403 错误
-
-解决方法同上
-
-## 杀毒软件将可执行文件标记为病毒/威胁
-
-这是**误报**。KToolBox 是完全安全的开源软件。
-
-**为什么会发生这种情况：**
-- PyInstaller 可执行文件由于其打包方法经常被杀毒引擎标记
-- 从网络下载的可执行文件通常被怀疑对待
-- 一些启发式引擎会标记任何"下载管理器"类型的软件
-
-**解决方案：**
-1. **在杀毒软件中添加例外** 对 KToolBox 可执行文件
-2. **使用 pipx 或 pip 安装**
-3. **从源码构建** 如果你仍有顾虑：
-   ```bash
-   git clone https://github.com/Ljzd-PRO/KToolBox.git
-   cd KToolBox
-   poetry install --with pyinstaller
-   poetry run pyinstaller ktoolbox.spec
-   ```
-
-**安全保证：**
-- 所有发布版本都使用 GitHub Actions 自动构建（公开可见）
-- 源代码完全开放且可审计
-- 此项目中不存在恶意代码
-
-## 帖子标题太长导致无法创建目录或下载文件
-
-!!! tip "提示"
-    Python 格式规格迷你语言的更多信息，请参考 [格式规格迷你语言](https://docs.python.org/zh-cn/3.13/library/string.html#format-specification-mini-language)
-
-在某些情况下，帖子标题过长会导致下载失败。为了解决这个问题，你可以在 **自定义帖子目录名格式** 中使用 Python 格式规格迷你语言对标题进行长度限制。
-
-通过图形化配置编辑器或 dotenv 文件 `.env` 和系统环境变量来设置配置：
-```dotenv
-# 设置帖子目录名为其标题的前 30 个字符
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT={title:.30}
-
-# 如果你需要在自定义的文件名格式中添加标题，也可以进行长度限制
-KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
-```
-
-## 我在哪里可以找到更多帮助？
-
-- 向导：用 **AI（Copilot Spaces）** 获取命令参数和配置帮助：[#304](https://github.com/Ljzd-PRO/KToolBox/issues/304)
-- 一个社区分享的使用向导：[#141](https://github.com/Ljzd-PRO/KToolBox/issues/141)
+部分启发式扫描会标记 PyInstaller 包或下载管理器。发布包通过仓库中公开的自动化流程构建；也可以改用 `pipx` 安装，或审查源码后自行构建。

@@ -5,14 +5,14 @@ import re
 import sys
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Generic, TypeVar, Optional, List, Tuple, Set
+from typing import Generic, TypeVar
 
 import aiofiles
 from loguru import logger
 from pydantic import BaseModel, ConfigDict
 from tqdm import tqdm
 
-from ktoolbox._enum import RetCodeEnum, DataStorageNameEnum
+from ktoolbox._enum import DataStorageNameEnum, RetCodeEnum
 from ktoolbox.configuration import config
 from ktoolbox.model import SearchResult
 
@@ -24,18 +24,19 @@ __all__ = [
     "parse_webpage_url",
     "uvloop_init",
     "extract_external_links",
-    "check_for_updates"
+    "check_for_updates",
 ]
 
-_T = TypeVar('_T')
+_T = TypeVar("_T")
 
 
 class BaseRet(BaseModel, Generic[_T]):
     """Base data model of function return value"""
+
     code: int = RetCodeEnum.Success.value
-    message: str = ''
-    exception: Optional[Exception] = None
-    data: Optional[_T] = None
+    message: str = ""
+    exception: Exception | None = None
+    data: _T | None = None
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -73,10 +74,10 @@ def logger_init(cli_use: bool = False, disable_stdout: bool = False):
             tqdm.write,
             colorize=True,
             format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
-                   "<level>{level: <8}</level> | "
-                   "<cyan>{name}</cyan> - <level>{message}</level>",
+            "<level>{level: <8}</level> | "
+            "<cyan>{name}</cyan> - <level>{message}</level>",
             level=logging.INFO,
-            filter=lambda record: record["level"].name != "DEBUG"
+            filter=lambda record: record["level"].name != "DEBUG",
         )
     if path := config.logger.path:
         path.mkdir(exist_ok=True)
@@ -85,26 +86,23 @@ def logger_init(cli_use: bool = False, disable_stdout: bool = False):
                 path / DataStorageNameEnum.LogData.value,
                 level=config.logger.level,
                 rotation=config.logger.rotation,
-                diagnose=True
+                diagnose=True,
             )
 
 
 async def dump_search(result: Sequence[BaseModel], path: Path):
     async with aiofiles.open(str(path), "w", encoding="utf-8") as f:
-        await f.write(
-            SearchResult(result=list(result))
-            .model_dump_json(indent=config.json_dump_indent)
-        )
+        await f.write(SearchResult(result=list(result)).model_dump_json(indent=config.json_dump_indent))
 
 
-def parse_webpage_url(url: str) -> Tuple[Optional[str], Optional[str], Optional[str], Optional[str]]:
+def parse_webpage_url(url: str) -> tuple[str | None, str | None, str | None, str | None]:
     # noinspection SpellCheckingInspection
     """
     Fetch **service**, **user_id**, **post_id**, **revision_id** from webpage url
 
     Each part can be ``None`` if not found in url.
 
-    :param url: Kemono Webpage url
+    :param url: Pawchive post or creator URL
     :return: Tuple of **service**, **user_id**, **post_id**, **revision_id**
     """
     path_url = Path(url)
@@ -151,8 +149,7 @@ def uvloop_init() -> bool:
                 import uvloop
             except ModuleNotFoundError:
                 logger.debug(
-                    "uvloop is not installed, but it's optional. "
-                    "You can install it with `pip install ktoolbox[uvloop]`"
+                    "uvloop is not installed, but it's optional. You can install it with `pip install ktoolbox[uvloop]`"
                 )
             else:
                 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -161,7 +158,7 @@ def uvloop_init() -> bool:
     return False
 
 
-def extract_external_links(content: str, custom_patterns: Optional[List[str]] = None) -> Set[str]:
+def extract_external_links(content: str, custom_patterns: list[str] | None = None) -> set[str]:
     """
     Extract external file sharing links from text content.
 
@@ -185,7 +182,7 @@ def extract_external_links(content: str, custom_patterns: Optional[List[str]] = 
     links = set()
 
     # Combine all patterns
-    combined_pattern = '|'.join(f'({pattern})' for pattern in external_link_patterns)
+    combined_pattern = "|".join(f"({pattern})" for pattern in external_link_patterns)
 
     # Find all matches
     matches = re.finditer(combined_pattern, content, re.IGNORECASE)
@@ -196,21 +193,21 @@ def extract_external_links(content: str, custom_patterns: Optional[List[str]] = 
 
         # Clean up HTML markup and common trailing punctuation that might be part of text
         # Stop at common HTML boundary characters and quotes
-        url = re.sub(r'["\'>][^<]*$', '', url)  # Remove quote + content to end
+        url = re.sub(r'["\'>][^<]*$', "", url)  # Remove quote + content to end
 
         # Additional cleanup: Remove HTML tags that might have been captured
-        url = re.sub(r'<[^>]*>.*$', '', url)  # Remove any HTML tags and everything after
-        url = re.sub(r'"[^"]*$', '', url)  # Remove quote and everything after it
+        url = re.sub(r"<[^>]*>.*$", "", url)  # Remove any HTML tags and everything after
+        url = re.sub(r'"[^"]*$', "", url)  # Remove quote and everything after it
 
         # Remove trailing HTML tag fragments and punctuation
-        url = re.sub(r'</[^>]*>?$', '', url)  # Remove closing tags or partial tags at end
-        url = re.sub(r'[.,;!?)\]}>"\'\s]+$', '', url)  # Remove trailing punctuation
+        url = re.sub(r"</[^>]*>?$", "", url)  # Remove closing tags or partial tags at end
+        url = re.sub(r'[.,;!?)\]}>"\'\s]+$', "", url)  # Remove trailing punctuation
 
         # Decode HTML entities (like &amp; -> &, &lt; -> <, etc.)
         url = html.unescape(url)
 
         # Validate that it looks like a proper URL
-        if len(url) > 10 and '.' in url:
+        if len(url) > 10 and "." in url:
             links.add(url)
 
     return links
@@ -223,9 +220,10 @@ async def check_for_updates() -> None:
     """
     try:
         import httpx
+
         from ktoolbox import __version__
 
-        current_version = __version__.lstrip('v')  # Remove 'v' prefix if present
+        current_version = __version__.lstrip("v")  # Remove 'v' prefix if present
 
         # First try GitHub API
         try:
@@ -233,7 +231,7 @@ async def check_for_updates() -> None:
                 response = await client.get("https://api.github.com/repos/Ljzd-PRO/KToolBox/releases/latest")
                 if response.status_code == 200:
                     data = response.json()
-                    latest_version = data["tag_name"].lstrip('v')
+                    latest_version = data["tag_name"].lstrip("v")
                     if latest_version != current_version:
                         logger.info(f"Update available: {latest_version} (current: {current_version})")
                         logger.info(f"Release URL: {data['html_url']}")
@@ -250,7 +248,7 @@ async def check_for_updates() -> None:
                 response = await client.get("https://pypi.org/pypi/ktoolbox/json")
                 if response.status_code == 200:
                     data = response.json()
-                    latest_version = data["info"]["version"].lstrip('v')
+                    latest_version = data["info"]["version"].lstrip("v")
                     if latest_version != current_version:
                         logger.info(f"Update available: {latest_version} (current: {current_version})")
                         logger.info("Run 'pip install --upgrade ktoolbox' or 'pipx upgrade ktoolbox' to update")

@@ -12,7 +12,8 @@ watch:
 nav:
   - Get Started:
     - Welcome to KToolBox: index.md
-    - About Kemono: about-kemono.md
+    - About Pawchive: about-pawchive.md
+    - Migrating to v1: migration-v1.md
     - More: more.md
   - Commands:
     - Guide: commands/guide.md
@@ -20,23 +21,12 @@ nav:
   - Configuration:
     - Guide: configuration/guide.md
     - Reference: configuration/reference.md
-  - iOS Shortcuts: shortcut.md
-  - Coomer: coomer.md
   - FAQ: faq.md
   - API Documentation: api.md
 
 plugins:
   - tags
   - search
-  - mkdocstrings:
-      custom_templates: custom_templates
-      handlers:
-        python:
-          import:
-            - https://docs.python.org/3/objects.inv
-          options:
-            docstring_style: sphinx
-            docstring_section_style: table
   - i18n:
       docs_structure: folder
       languages:
@@ -50,13 +40,13 @@ plugins:
           nav_translations:
             Get Started: 开始
             Welcome to KToolBox: 欢迎使用 KToolBox
-            About Kemono: 关于 Kemono
+            About Pawchive: 关于 Pawchive
+            Migrating to v1: 迁移至 v1
             More: 更多
             Commands: 命令
             Configuration: 配置
             Guide: 向导
             Reference: 参考
-            iOS Shortcuts: iOS 快捷指令
             FAQ: 常见问题
             API Documentation: API 文档
 
