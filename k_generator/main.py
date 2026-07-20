@@ -3,7 +3,7 @@ import random
 from pathlib import Path
 from typing import Dict, Any, List
 
-openapi_schema_path = "openapi.json"
+openapi_schema_path = "pawchive_openapi.json"
 openapi_schema_path = Path(openapi_schema_path)
 
 output_path = "."
