@@ -70,6 +70,25 @@ def test_rich_reporter_tracks_dynamic_tasks_and_log_output() -> None:
     assert reporter.overall.tasks[0].completed == 1
 
 
+def test_rich_reporter_keeps_long_download_descriptions_on_one_line() -> None:
+    output = StringIO()
+    console = Console(file=output, force_terminal=True, color_system=None, width=72)
+    reporter = RichProgressReporter(console)
+    reporter.download_started(
+        "download-1",
+        "fanbox:1",
+        "a-very-long-filename-that-must-be-truncated-cleanly.bin",
+        10,
+        2,
+    )
+
+    console.print(reporter.downloads)
+
+    rendered_lines = [line for line in output.getvalue().splitlines() if line]
+    assert len(rendered_lines) == 1
+    assert "…" in rendered_lines[0]
+
+
 def test_rich_reporter_handles_idempotence_failures_and_missing_tasks() -> None:
     output = StringIO()
     reporter = RichProgressReporter(Console(file=output, force_terminal=True, color_system=None))
