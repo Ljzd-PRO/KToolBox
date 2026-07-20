@@ -1,18 +1,19 @@
 import asyncio
-import os
 from asyncio import CancelledError, Lock
+from collections.abc import Callable, Coroutine
 from functools import cached_property
 from pathlib import Path
-from typing import Callable, Any, Coroutine, Type, Optional
-from urllib.parse import urlparse, unquote
+from typing import Any
+from urllib.parse import unquote, urlparse
 
 import aiofiles
+import aiofiles.os
 import httpx
 import tenacity
 import tqdm.asyncio
 from loguru import logger
 from pathvalidate import sanitize_filename
-from tenacity import wait_fixed, retry_if_result, retry_if_exception
+from tenacity import retry_if_exception, retry_if_result, wait_fixed
 from tenacity.stop import stop_after_attempt, stop_never
 from tqdm import tqdm as std_tqdm
 
@@ -20,7 +21,7 @@ from ktoolbox._enum import RetCodeEnum
 from ktoolbox.api.generated import Post
 from ktoolbox.configuration import config
 from ktoolbox.downloader.base import DownloaderRet
-from ktoolbox.downloader.utils import filename_from_headers, duplicate_file_check, utime_from_headers
+from ktoolbox.downloader.utils import duplicate_file_check, filename_from_headers, utime_from_headers
 from ktoolbox.utils import generate_msg
 
 __all__ = ["Downloader"]
@@ -30,19 +31,20 @@ class Downloader:
     """
     :ivar _save_filename: The actual filename for saving.
     """
+
     wait_lock = Lock()
 
     def __init__(
-            self,
-            url: str,
-            path: Path,
-            client: httpx.AsyncClient,
-            *,
-            buffer_size: int = None,
-            chunk_size: int = None,
-            designated_filename: str = None,
-            server_path: str = None,
-            post: Post = None
+        self,
+        url: str,
+        path: Path,
+        client: httpx.AsyncClient,
+        *,
+        buffer_size: int = None,
+        chunk_size: int = None,
+        designated_filename: str = None,
+        server_path: str = None,
+        post: Post = None,
     ):
         # noinspection GrazieInspection
         """
@@ -108,7 +110,7 @@ class Downloader:
         return self._post
 
     @property
-    def filename(self) -> Optional[str]:
+    def filename(self) -> str | None:
         """Actual filename of the download file"""
         return self._save_filename
 
@@ -129,14 +131,28 @@ class Downloader:
         """
         self._stop = True
 
+    @staticmethod
+    def _size_filter_result(total_size: int, save_filepath: Path) -> DownloaderRet[str] | None:
+        minimum = config.job.min_file_size
+        maximum = config.job.max_file_size
+        if minimum is not None and total_size < minimum:
+            reason = f"size: {total_size} bytes, below minimum: {minimum}"
+        elif maximum is not None and total_size > maximum:
+            reason = f"size: {total_size} bytes, above maximum: {maximum}"
+        else:
+            return None
+
+        logger.debug(f"Skipping file {save_filepath.name} ({reason})")
+        return DownloaderRet(
+            code=RetCodeEnum.FileExisted,
+            message=generate_msg(f"File skipped due to size filtering ({reason})", path=save_filepath),
+        )
+
     @tenacity.retry(
         stop=stop_never if config.downloader.retry_stop_never else stop_after_attempt(config.downloader.retry_times),
         wait=wait_fixed(config.downloader.retry_interval),
-        retry=retry_if_result(
-            lambda x: not x and x.code != RetCodeEnum.FileExisted
-        ) | retry_if_exception(
-            lambda x: isinstance(x, httpx.HTTPError)
-        ),
+        retry=retry_if_result(lambda x: not x and x.code != RetCodeEnum.FileExisted)
+        | retry_if_exception(lambda x: isinstance(x, httpx.HTTPError)),
         before_sleep=lambda x: logger.warning(
             generate_msg(
                 f"Retrying ({x.attempt_number})",
@@ -145,18 +161,18 @@ class Downloader:
                 post_id=x.args[0].post.id if x.args[0].post else None,
                 message=x.outcome.result().message if not x.outcome.failed else None,
                 exception=x.outcome.exception(),
-                url=x.args[0].url
+                url=x.args[0].url,
             )
         ),
-        reraise=True
+        reraise=True,
     )
     async def run(
-            self,
-            *,
-            sync_callable: Callable[["Downloader"], Any] = None,
-            async_callable: Callable[["Downloader"], Coroutine] = None,
-            tqdm_class: Type[std_tqdm] = None,
-            progress: bool = False
+        self,
+        *,
+        sync_callable: Callable[["Downloader"], Any] = None,
+        async_callable: Callable[["Downloader"], Coroutine] = None,
+        tqdm_class: type[std_tqdm] = None,
+        progress: bool = False,
     ) -> DownloaderRet[str]:
         """
         Start to download
@@ -177,120 +193,68 @@ class Downloader:
         save_filepath = self._path / (self._save_filename or server_path_filename)
 
         # Get bucket file path
-        bucket_file_path: Optional[Path] = None
+        bucket_file_path: Path | None = None
         if config.downloader.use_bucket:
-            bucket_file_path = config.downloader.bucket_path / server_relpath
+            bucket_file_path = config.downloader.bucket_path / server_relpath_without_params
 
         # Check if the file exists
         file_existed, ret_msg = duplicate_file_check(save_filepath, bucket_file_path)
         if file_existed:
-            return DownloaderRet(
-                code=RetCodeEnum.FileExisted,
-                message=generate_msg(
-                    ret_msg,
-                    path=save_filepath
-                )
-            )
+            return DownloaderRet(code=RetCodeEnum.FileExisted, message=generate_msg(ret_msg, path=save_filepath))
 
-        tqdm_class: Type[std_tqdm] = tqdm_class or tqdm.asyncio.tqdm
+        tqdm_class: type[std_tqdm] = tqdm_class or tqdm.asyncio.tqdm
         async with self.wait_lock:
             await asyncio.sleep(1 / config.downloader.tps_limit)
         async with self._finished_lock:
             temp_filepath = Path(f"{save_filepath}.{config.downloader.temp_suffix}")
-            temp_size = temp_filepath.stat().st_size if temp_filepath.exists() else 0
+            try:
+                temp_size = (await aiofiles.os.stat(temp_filepath)).st_size
+            except FileNotFoundError:
+                temp_size = 0
 
             async with self._client.stream(
-                    method="GET",
-                    url=config.downloader.reverse_proxy.format(self._url),
-                    follow_redirects=True,
-                    timeout=config.downloader.timeout,
-                    headers={"Range": f"bytes={temp_size}-"}
+                method="GET",
+                url=config.downloader.reverse_proxy.format(self._url),
+                follow_redirects=True,
+                timeout=config.downloader.timeout,
+                headers={"Range": f"bytes={temp_size}-"},
             ) as res:  # type: httpx.Response
                 if res.status_code != httpx.codes.PARTIAL_CONTENT:
                     self._url = self._initial_url
                     return DownloaderRet(
                         code=RetCodeEnum.GeneralFailure,
-                        message=generate_msg(
-                            "Download failed",
-                            status_code=res.status_code,
-                            filename=save_filepath
-                        )
+                        message=generate_msg("Download failed", status_code=res.status_code, filename=save_filepath),
                     )
                 # Get filename for saving and check if file exists (Second-time duplicate file check)
                 # Priority order can be referenced from the constructor's documentation
-                self._save_filename = self._designated_filename or sanitize_filename(
-                    filename_from_headers(res.headers)
-                ) or server_path_filename
+                self._save_filename = (
+                    self._designated_filename
+                    or sanitize_filename(filename_from_headers(res.headers))
+                    or server_path_filename
+                )
                 save_filepath = self._path / self._save_filename
                 file_existed, ret_msg = duplicate_file_check(save_filepath, bucket_file_path)
                 if file_existed:
                     return DownloaderRet(
-                        code=RetCodeEnum.FileExisted,
-                        message=generate_msg(
-                            ret_msg,
-                            path=save_filepath
-                        )
+                        code=RetCodeEnum.FileExisted, message=generate_msg(ret_msg, path=save_filepath)
                     )
 
                 # Download
-                total_size = int(range_str.split("/")[-1]) if (range_str := res.headers.get("Content-Range")) else None
-                
-                # Check file size filtering if enabled and we have the total size
-                if total_size is not None and (config.job.min_file_size is not None or config.job.max_file_size is not None):
-                    # Check minimum size
-                    if config.job.min_file_size is not None and total_size < config.job.min_file_size:
-                        logger.debug(f"Skipping file {self._save_filename} (size: {total_size} bytes) - below minimum size {config.job.min_file_size}")
-                        return DownloaderRet(
-                            code=RetCodeEnum.FileExisted,  # Use FileExisted to indicate it was skipped intentionally
-                            message=generate_msg(
-                                f"File skipped due to size filtering (size: {total_size} bytes, below minimum: {config.job.min_file_size})",
-                                path=save_filepath
-                            )
-                        )
-                    
-                    # Check maximum size  
-                    if config.job.max_file_size is not None and total_size > config.job.max_file_size:
-                        logger.debug(f"Skipping file {self._save_filename} (size: {total_size} bytes) - above maximum size {config.job.max_file_size}")
-                        return DownloaderRet(
-                            code=RetCodeEnum.FileExisted,  # Use FileExisted to indicate it was skipped intentionally
-                            message=generate_msg(
-                                f"File skipped due to size filtering (size: {total_size} bytes, above maximum: {config.job.max_file_size})",
-                                path=save_filepath
-                            )
-                        )
-                        
-                # If no Content-Range header, try to get size from Content-Length
+                range_header = res.headers.get("Content-Range")
+                total_size = int(range_header.split("/")[-1]) if range_header else None
+
+                # A partial response's Content-Length is only the remaining size.
                 if total_size is None:
                     content_length = res.headers.get("Content-Length")
                     if content_length:
                         try:
-                            total_size = int(content_length)
-                            # Apply size filtering with Content-Length
-                            if config.job.min_file_size is not None or config.job.max_file_size is not None:
-                                # Check minimum size
-                                if config.job.min_file_size is not None and total_size < config.job.min_file_size:
-                                    logger.debug(f"Skipping file {self._save_filename} (size: {total_size} bytes) - below minimum size {config.job.min_file_size}")
-                                    return DownloaderRet(
-                                        code=RetCodeEnum.FileExisted,  # Use FileExisted to indicate it was skipped intentionally
-                                        message=generate_msg(
-                                            f"File skipped due to size filtering (size: {total_size} bytes, below minimum: {config.job.min_file_size})",
-                                            path=save_filepath
-                                        )
-                                    )
-                                
-                                # Check maximum size  
-                                if config.job.max_file_size is not None and total_size > config.job.max_file_size:
-                                    logger.debug(f"Skipping file {self._save_filename} (size: {total_size} bytes) - above maximum size {config.job.max_file_size}")
-                                    return DownloaderRet(
-                                        code=RetCodeEnum.FileExisted,  # Use FileExisted to indicate it was skipped intentionally
-                                        message=generate_msg(
-                                            f"File skipped due to size filtering (size: {total_size} bytes, above maximum: {config.job.max_file_size})",
-                                            path=save_filepath
-                                        )
-                                    )
+                            total_size = temp_size + int(content_length)
                         except ValueError:
-                            # Invalid Content-Length, continue with download
                             pass
+                if total_size is not None:
+                    filtered = self._size_filter_result(total_size, save_filepath)
+                    if filtered is not None:
+                        return filtered
                 async with aiofiles.open(str(temp_filepath), "ab", self._buffer_size) as f:
                     chunk_iterator = res.aiter_bytes(self._chunk_size)
                     t = tqdm_class(
@@ -299,7 +263,7 @@ class Downloader:
                         initial=temp_size,
                         disable=not progress,
                         unit="B",
-                        unit_scale=True
+                        unit_scale=True,
                     )
                     async for chunk in chunk_iterator:
                         if self._stop:
@@ -310,9 +274,9 @@ class Downloader:
             # Download finished
             if config.downloader.use_bucket:
                 bucket_file_path.parent.mkdir(parents=True, exist_ok=True)
-                os.link(temp_filepath, bucket_file_path)
+                await aiofiles.os.link(temp_filepath, bucket_file_path)
             final_filepath = self._path / self._save_filename
-            temp_filepath.rename(final_filepath)
+            await aiofiles.os.rename(temp_filepath, final_filepath)
 
             # Set file time from headers
             if config.downloader.keep_metadata:
@@ -320,11 +284,7 @@ class Downloader:
                     utime_from_headers(res.headers, final_filepath)
                 except (OSError, ValueError, TypeError) as e:
                     logger.warning(
-                        generate_msg(
-                            "Failed to set file time from headers",
-                            file=self._save_filename,
-                            exception=e
-                        )
+                        generate_msg("Failed to set file time from headers", file=self._save_filename, exception=e)
                     )
 
             # Callbacks
@@ -333,13 +293,12 @@ class Downloader:
             if async_callable:
                 await async_callable(self)
 
-            return DownloaderRet(
-                data=self._save_filename
-            ) if self._save_filename else DownloaderRet(
-                code=RetCodeEnum.GeneralFailure,
-                message=generate_msg(
-                    "Download failed",
-                    filename=self._designated_filename
+            return (
+                DownloaderRet(data=self._save_filename)
+                if self._save_filename
+                else DownloaderRet(
+                    code=RetCodeEnum.GeneralFailure,
+                    message=generate_msg("Download failed", filename=self._designated_filename),
                 )
             )
 

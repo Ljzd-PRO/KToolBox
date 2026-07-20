@@ -3,10 +3,10 @@ import logging
 import os
 import tempfile
 from pathlib import Path
-from typing import Literal, Union, Optional, Set, ClassVar, List
+from typing import ClassVar, Literal
 
 from loguru import logger
-from pydantic import BaseModel, model_validator, Field
+from pydantic import BaseModel, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 __all__ = [
@@ -16,7 +16,7 @@ __all__ = [
     "PostStructureConfiguration",
     "JobConfiguration",
     "LoggerConfiguration",
-    "Configuration"
+    "Configuration",
 ]
 
 
@@ -33,6 +33,7 @@ class APIConfiguration(BaseModel):
     :ivar retry_times: API request retry times (when request failed)
     :ivar retry_interval: Seconds of API request retry interval
     """
+
     scheme: Literal["http", "https"] = "https"
     netloc: str = "pawchive.pw"
     statics_netloc: str = "pawchive.pw"
@@ -68,6 +69,7 @@ class DownloaderConfiguration(BaseModel):
     ``https://example.com/?url={}`` will be ``https://example.com/?url=https://n1.kemono.su/data/66/83/xxxxx.jpg``
     :ivar keep_metadata: Keep the file metadata when downloading files (e.g. last modified time, etc.)
     """
+
     scheme: Literal["http", "https"] = "https"
     files_netloc: str = "file.pawchive.pw"
     file_path_prefix: str = "/data"
@@ -89,18 +91,27 @@ class DownloaderConfiguration(BaseModel):
     @model_validator(mode="after")
     def check_bucket_path(self) -> "DownloaderConfiguration":
         if self.use_bucket:
-            # noinspection PyBroadException
+            temp_path: Path | None = None
+            temp_link_path: Path | None = None
             try:
                 bucket_path = Path(self.bucket_path)
                 bucket_path.mkdir(parents=True, exist_ok=True)
-                with tempfile.TemporaryFile(dir=bucket_path) as temp_file:
-                    temp_link_file_path = f"{bucket_path / temp_file.name}.hlink"
-                    os.link(temp_file.name, temp_link_file_path)
-                    os.remove(temp_link_file_path)
+                file_descriptor, temp_name = tempfile.mkstemp(dir=bucket_path)
+                os.close(file_descriptor)
+                temp_path = Path(temp_name)
+                temp_link_path = Path(f"{temp_name}.hlink")
+                os.link(temp_path, temp_link_path)
             except Exception:
                 self.use_bucket = False
-                logger.exception(f"`DownloaderConfiguration.bucket_path` is not available, "
-                                 f"`DownloaderConfiguration.use_bucket` has been disabled.")
+                logger.exception(
+                    "`DownloaderConfiguration.bucket_path` is not available, "
+                    "`DownloaderConfiguration.use_bucket` has been disabled."
+                )
+            finally:
+                if temp_link_path is not None:
+                    temp_link_path.unlink(missing_ok=True)
+                if temp_path is not None:
+                    temp_path.unlink(missing_ok=True)
         return self
 
 
@@ -153,6 +164,7 @@ class PostStructureConfiguration(BaseModel):
     ``HiEveryoneThisIsALongTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg`` to ``HiEver_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``
     :ivar revisions: Sub path of revisions directory
     """
+
     attachments: Path = Path("attachments")
     content: Path = Path("content.txt")
     external_links: Path = Path("external_links.txt")
@@ -231,80 +243,68 @@ class JobConfiguration(BaseModel):
     :ivar max_file_size: Maximum file size in bytes to download. Files larger than this will be skipped. \
     Set to None to disable maximum size filtering.
     """
+
     count: int = 4
     include_revisions: bool = False
     post_dirname_format: str = "{title}"
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
     mix_posts: bool = False
     sequential_filename: bool = False
-    sequential_filename_excludes: Set[str] = Field(default_factory=set)
+    sequential_filename_excludes: set[str] = Field(default_factory=set)
     filename_format: str = "{}"
     # noinspection PyDataclass
-    allow_list: Set[str] = Field(default_factory=set)
+    allow_list: set[str] = Field(default_factory=set)
     # noinspection PyDataclass
-    block_list: Set[str] = Field(default_factory=set)
+    block_list: set[str] = Field(default_factory=set)
     extract_content: bool = False
     extract_content_images: bool = False
     extract_external_links: bool = False
     # noinspection SpellCheckingInspection
-    external_link_patterns: List[str] = [
+    external_link_patterns: list[str] = [
         # Google Drive
-        r'https?://drive\.google\.com/[^\s]+',
-        r'https?://docs\.google\.com/[^\s]+',
-
+        r"https?://drive\.google\.com/[^\s]+",
+        r"https?://docs\.google\.com/[^\s]+",
         # MEGA
-        r'https?://mega\.nz/[^\s]+',
-        r'https?://mega\.co\.nz/[^\s]+',
-
+        r"https?://mega\.nz/[^\s]+",
+        r"https?://mega\.co\.nz/[^\s]+",
         # Dropbox
-        r'https?://(?:www\.)?dropbox\.com/[^\s]+',
-        r'https?://db\.tt/[^\s]+',
-
+        r"https?://(?:www\.)?dropbox\.com/[^\s]+",
+        r"https?://db\.tt/[^\s]+",
         # OneDrive
-        r'https?://onedrive\.live\.com/[^\s]+',
-        r'https?://1drv\.ms/[^\s]+',
-
+        r"https?://onedrive\.live\.com/[^\s]+",
+        r"https?://1drv\.ms/[^\s]+",
         # MediaFire
-        r'https?://(?:www\.)?mediafire\.com/[^\s]+',
-
+        r"https?://(?:www\.)?mediafire\.com/[^\s]+",
         # WeTransfer
-        r'https?://(?:www\.)?wetransfer\.com/[^\s]+',
-        r'https?://we\.tl/[^\s]+',
-
+        r"https?://(?:www\.)?wetransfer\.com/[^\s]+",
+        r"https?://we\.tl/[^\s]+",
         # SendSpace
-        r'https?://(?:www\.)?sendspace\.com/[^\s]+',
-
+        r"https?://(?:www\.)?sendspace\.com/[^\s]+",
         # 4shared
-        r'https?://(?:www\.)?4shared\.com/[^\s]+',
-
+        r"https?://(?:www\.)?4shared\.com/[^\s]+",
         # Zippyshare
-        r'https?://(?:www\.)?zippyshare\.com/[^\s]+',
-
+        r"https?://(?:www\.)?zippyshare\.com/[^\s]+",
         # Uploadfiles.io
-        r'https?://(?:www\.)?uploadfiles\.io/[^\s]+',
-
+        r"https?://(?:www\.)?uploadfiles\.io/[^\s]+",
         # Box
-        r'https?://(?:www\.)?box\.com/[^\s]+',
-
+        r"https?://(?:www\.)?box\.com/[^\s]+",
         # pCloud
-        r'https?://(?:www\.)?pcloud\.com/[^\s]+',
-
+        r"https?://(?:www\.)?pcloud\.com/[^\s]+",
         # Yandex Disk
-        r'https?://disk\.yandex\.[a-z]+/[^\s]+',
-
+        r"https?://disk\.yandex\.[a-z]+/[^\s]+",
         # Generic patterns for other file hosting services
-        r'https?://[^\s]*(?:file|upload|share|download|drive|storage)[^\s]*\.[a-z]{2,4}/[^\s]+',
+        r"https?://[^\s]*(?:file|upload|share|download|drive|storage)[^\s]*\.[a-z]{2,4}/[^\s]+",
     ]
     group_by_year: bool = False
     group_by_month: bool = False
     year_dirname_format: str = "{year}"
     month_dirname_format: str = "{year}-{month:02d}"
-    keywords: Set[str] = Field(default_factory=set)
-    keywords_exclude: Set[str] = Field(default_factory=set)
+    keywords: set[str] = Field(default_factory=set)
+    keywords_exclude: set[str] = Field(default_factory=set)
     download_file: bool = True
     download_attachments: bool = True
-    min_file_size: Optional[int] = None
-    max_file_size: Optional[int] = None
+    min_file_size: int | None = None
+    max_file_size: int | None = None
 
 
 class LoggerConfiguration(BaseModel):
@@ -315,9 +315,10 @@ class LoggerConfiguration(BaseModel):
     :ivar level: Log filter level
     :ivar rotation: Log rotation
     """
-    path: Optional[Path] = None
-    level: Union[str, int] = logging.getLevelName(logging.DEBUG)
-    rotation: Union[str, int, datetime.time, datetime.timedelta] = "1 week"
+
+    path: Path | None = None
+    level: str | int = logging.getLevelName(logging.DEBUG)
+    rotation: str | int | datetime.time | datetime.timedelta = "1 week"
 
 
 class Configuration(BaseSettings):
@@ -336,6 +337,7 @@ class Configuration(BaseSettings):
     Install winloop on Windows with `pip install ktoolbox[winloop]` \
     or uvloop on Unix with `pip install ktoolbox[uvloop]`.
     """
+
     api: APIConfiguration = APIConfiguration()
     downloader: DownloaderConfiguration = DownloaderConfiguration()
     job: JobConfiguration = JobConfiguration()
@@ -347,11 +349,11 @@ class Configuration(BaseSettings):
 
     # noinspection SpellCheckingInspection
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
-        env_prefix='ktoolbox_',
-        env_nested_delimiter='__',
-        env_file=['.env', 'prod.env'],
-        env_file_encoding='utf-8',
-        extra='ignore'
+        env_prefix="ktoolbox_",
+        env_nested_delimiter="__",
+        env_file=[".env", "prod.env"],
+        env_file_encoding="utf-8",
+        extra="ignore",
     )
 
 

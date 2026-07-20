@@ -13,7 +13,7 @@ class RetCodeEnum(IntEnum):
     Success = 0
     GeneralFailure = -1
 
-    # APIRet
+    # API and action boundaries
     NetWorkError = 1001
     JsonDecodeError = 1002
     ValidationError = 1003

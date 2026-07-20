@@ -32,29 +32,29 @@ jobs:
         run: >-
           poetry run ruff check
           k_generator
-          ktoolbox/api/client.py
-          ktoolbox/api/errors.py
-          ktoolbox/api/parameters.py
-          ktoolbox/api/generated
+          ktoolbox/api
           ktoolbox/action/base.py
           ktoolbox/action/fetch.py
           ktoolbox/action/search.py
-          ktoolbox/api/utils.py
           ktoolbox/cli.py
+          ktoolbox/configuration.py
+          ktoolbox/downloader/downloader.py
+          ktoolbox/job/runner.py
+          tests
 
       - name: Check contract tooling formatting
         run: >-
           poetry run ruff format --check
           k_generator
-          ktoolbox/api/client.py
-          ktoolbox/api/errors.py
-          ktoolbox/api/parameters.py
-          ktoolbox/api/generated
+          ktoolbox/api
           ktoolbox/action/base.py
           ktoolbox/action/fetch.py
           ktoolbox/action/search.py
-          ktoolbox/api/utils.py
           ktoolbox/cli.py
+          ktoolbox/configuration.py
+          ktoolbox/downloader/downloader.py
+          ktoolbox/job/runner.py
+          tests
 
       - name: Type-check Pawchive client
         run: >-
@@ -67,3 +67,19 @@ jobs:
           ktoolbox/action/search.py
           ktoolbox/api/utils.py
           ktoolbox/cli.py
+
+      - name: Test Pawchive API layer at 100% coverage
+        run: >-
+          poetry run pytest
+          tests/ktoolbox/test_api_client.py
+          tests/ktoolbox/test_api_contract.py
+          tests/ktoolbox/test_api_utils.py
+          --cov=ktoolbox.api.client
+          --cov=ktoolbox.api.errors
+          --cov=ktoolbox.api.parameters
+          --cov=ktoolbox.api.utils
+          --cov-branch
+          --cov-fail-under=100
+
+      - name: Run hermetic test suite at 85% coverage
+        run: poetry run pytest --cov --cov-fail-under=85

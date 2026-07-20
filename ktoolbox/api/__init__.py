@@ -1,12 +1,5 @@
-# noinspection SpellCheckingInspection
-"""
-* Kemono API version:
-``1.0.0``
+"""Public Pawchive API client surface."""
 
-* current App commit hash:
-``7ee4a7b18ee92a442c13950c05dc8236cfb14a60``
-"""
-from .base import *
 from .client import PawchiveClient, ResponseDrift
 from .errors import (
     PawchiveAuthenticationError,
@@ -17,3 +10,35 @@ from .errors import (
     PawchiveResponseValidationError,
     PawchiveTransportError,
 )
+from .generated import (
+    Announcement,
+    Comment,
+    CreatorProfile,
+    CreatorSummary,
+    Fancard,
+    FileReference,
+    FileSearchResult,
+    Post,
+    Revision,
+)
+
+__all__ = [
+    "Announcement",
+    "Comment",
+    "CreatorProfile",
+    "CreatorSummary",
+    "Fancard",
+    "FileReference",
+    "FileSearchResult",
+    "PawchiveAuthenticationError",
+    "PawchiveClient",
+    "PawchiveConflictError",
+    "PawchiveError",
+    "PawchiveHTTPError",
+    "PawchiveNotFoundError",
+    "PawchiveResponseValidationError",
+    "PawchiveTransportError",
+    "Post",
+    "ResponseDrift",
+    "Revision",
+]

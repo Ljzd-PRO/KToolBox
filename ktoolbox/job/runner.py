@@ -2,7 +2,7 @@ import asyncio
 from asyncio import CancelledError
 from functools import cached_property
 from types import MappingProxyType
-from typing import List, Set, Dict
+
 import httpx
 from loguru import logger
 from tqdm import tqdm as std_tqdm
@@ -19,8 +19,16 @@ __all__ = ["JobRunner"]
 
 
 class JobRunner:
-    def __init__(self, *, job_list: List[Job] = None, tqdm_class: std_tqdm = None, progress: bool = True,
-                 centralized_progress: bool = True, use_colors: bool = True, use_emojis: bool = True):
+    def __init__(
+        self,
+        *,
+        job_list: list[Job] = None,
+        tqdm_class: std_tqdm = None,
+        progress: bool = True,
+        centralized_progress: bool = True,
+        use_colors: bool = True,
+        use_emojis: bool = True,
+    ):
         """
         Create a job runner
 
@@ -43,9 +51,7 @@ class JobRunner:
         if self._centralized_progress:
             # Use centralized progress manager with enhanced visuals
             self._progress_manager = ProgressManager(
-                max_workers=config.job.count,
-                use_colors=use_colors,
-                use_emojis=use_emojis
+                max_workers=config.job.count, use_colors=use_colors, use_emojis=use_emojis
             )
             self._tqdm_class = tqdm_class or create_managed_tqdm_class(self._progress_manager)
         else:
@@ -53,8 +59,8 @@ class JobRunner:
             self._progress_manager = None
             self._tqdm_class = tqdm_class
 
-        self._downloaders_with_task: Dict[Downloader, asyncio.Task] = {}
-        self._concurrent_tasks: Set[asyncio.Task] = set()
+        self._downloaders_with_task: dict[Downloader, asyncio.Task] = {}
+        self._concurrent_tasks: set[asyncio.Task] = set()
         self._lock = asyncio.Lock()
         self._total_jobs_count = len(job_list)
 
@@ -99,8 +105,8 @@ class JobRunner:
         """
         failed_num = 0
         async with httpx.AsyncClient(
-                verify=config.ssl_verify,
-                cookies={"session": config.downloader.session_key} if config.downloader.session_key else None
+            verify=config.ssl_verify,
+            cookies={"session": config.downloader.session_key} if config.downloader.session_key else None,
         ) as client:
             while not self._job_queue.empty():
                 job = await self._job_queue.get()
@@ -113,16 +119,11 @@ class JobRunner:
                     client=client,
                     designated_filename=job.alt_filename,
                     server_path=job.server_path,
-                    post=job.post
+                    post=job.post,
                 )
 
                 # Create task
-                task = asyncio.create_task(
-                    downloader.run(
-                        tqdm_class=self._tqdm_class,
-                        progress=self._progress
-                    )
-                )
+                task = asyncio.create_task(downloader.run(tqdm_class=self._tqdm_class, progress=self._progress))
                 self._downloaders_with_task[downloader] = task
                 # task.add_done_callback(lambda _: self._downloaders_with_task.pop(downloader))
                 #   Delete this for counting finished job tasks
@@ -148,44 +149,25 @@ class JobRunner:
                                 self._progress_manager.update_job_progress(
                                     existed=self._progress_manager._existed_jobs + 1
                                 )
-                            self._progress_manager.update_job_progress(
-                                completed=self.done_size
-                            )
+                            self._progress_manager.update_job_progress(completed=self.done_size)
                     elif ret.code != RetCodeEnum.Success:
                         logger.error(ret.message)
                         failed_num += 1
                         # Update progress manager with failed job
                         if self._progress_manager:
-                            self._progress_manager.update_job_progress(
-                                failed=failed_num
-                            )
+                            self._progress_manager.update_job_progress(failed=failed_num)
                     else:
                         # Update progress manager with completed job
                         if self._progress_manager:
-                            self._progress_manager.update_job_progress(
-                                completed=self.done_size
-                            )
+                            self._progress_manager.update_job_progress(completed=self.done_size)
                 elif isinstance(exception, CancelledError):
-                    logger.warning(
-                        generate_msg(
-                            "Download cancelled",
-                            filename=job.alt_filename
-                        )
-                    )
+                    logger.warning(generate_msg("Download cancelled", filename=job.alt_filename))
                 else:
-                    logger.error(
-                        generate_msg(
-                            "Download failed",
-                            filename=job.alt_filename,
-                            exception=exception
-                        )
-                    )
+                    logger.error(generate_msg("Download failed", filename=job.alt_filename, exception=exception))
                     failed_num += 1
                     # Update progress manager with failed job
                     if self._progress_manager:
-                        self._progress_manager.update_job_progress(
-                            failed=failed_num
-                        )
+                        self._progress_manager.update_job_progress(failed=failed_num)
                 self._job_queue.task_done()
         await self._job_queue.join()
         return failed_num
@@ -198,7 +180,7 @@ class JobRunner:
             while not self._job_queue.empty():
                 await asyncio.sleep(30)
                 existed = self._progress_manager._existed_jobs if self._progress_manager else 0
-                total = (self.waiting_size + self.processing_size + self.done_size)
+                total = self.waiting_size + self.processing_size + self.done_size
                 percent = (self.done_size / total) * 100 if total > 0 else 0
                 logger.info(
                     f"Waiting: {self.waiting_size} / "

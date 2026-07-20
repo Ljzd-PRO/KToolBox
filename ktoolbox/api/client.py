@@ -172,7 +172,7 @@ class PawchiveClient:
                 self._raise_http_error(response)
             return response
 
-        raise AssertionError("request retry loop terminated unexpectedly")
+        raise AssertionError("request retry loop terminated unexpectedly")  # pragma: no cover
 
     @staticmethod
     def _raise_http_error(response: httpx.Response) -> None:

@@ -13,21 +13,6 @@ files = [
 ]
 
 [[package]]
-name = "allpairspy"
-version = "2.5.1"
-description = "Pairwise test combinations generator"
-optional = false
-python-versions = ">=3.7"
-groups = ["test"]
-files = [
-    {file = "allpairspy-2.5.1-py3-none-any.whl", hash = "sha256:3f97cbac2bbee86f4bfceffd0fd91dca740a120c78e9368af2bad81a2b3426e2"},
-    {file = "allpairspy-2.5.1.tar.gz", hash = "sha256:f69d31a3b56eee119d1ec6063e9c732dd44fbba352ef738cb22d9699fc4009fe"},
-]
-
-[package.extras]
-test = ["pytest (>=6.0.1)", "pytest-md-report (>=0.3)"]
-
-[[package]]
 name = "altgraph"
 version = "0.17.5"
 description = "Python graph (network) package"
@@ -2996,4 +2981,4 @@ winloop = ["winloop"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<=3.14"
-content-hash = "ebd482ce5c97dd92efa402f1bbfa86523b8f5b711c7adeee4013e5cc66adaa57"
+content-hash = "9af8015b8146085cdf31c0f1e991c9c4b93a61b43be8e9e6ab124c0ec96bdb0f"

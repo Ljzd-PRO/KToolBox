@@ -64,7 +64,6 @@ pytest-asyncio = ">=1.2,<2.0"
 pytest-cov = ">=7.0,<8.0"
 pytest-socket = ">=0.7,<0.8"
 respx = ">=0.23,<0.24"
-allpairspy = "==2.5.1"
 
 [tool.poetry.group.dev.dependencies]
 datamodel-code-generator = ">=0.57,<0.58"
@@ -89,7 +88,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
-addopts = "-ra --strict-config --strict-markers -W error"
+addopts = "-ra --strict-config --strict-markers -W error --disable-socket --allow-unix-socket"
 asyncio_mode = "auto"
 testpaths = ["tests"]
 
@@ -99,6 +98,7 @@ source = ["ktoolbox"]
 omit = ["ktoolbox/api/generated/*"]
 
 [tool.coverage.report]
+fail_under = 85
 show_missing = true
 skip_covered = true
 
