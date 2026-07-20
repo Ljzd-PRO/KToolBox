@@ -88,6 +88,32 @@ pip install "ktoolbox[urwid]"
 pipx install "ktoolbox[urwid]" --force
 ```
 
+## 如何定期同步很多作者？
+
+将每位作者加入项目清单，可选设置短别名，然后执行无目标 `sync`：
+
+```bash
+ktoolbox creator add fanbox:123 --alias studio-a
+ktoolbox creator add patreon:456 --alias studio-b
+ktoolbox sync
+```
+
+使用 `creator disable` 可保留作者但不加入无目标同步；仍可显式同步已禁用别名。作者准备与文件传输使用不同并发限制，因此大型作者不会长期占据全部已就绪下载。
+
+## 如何为不同作者排除不同主题？
+
+在 `ktoolbox.toml` 中添加不同 `[[blockers]]`。所有作者共享的规则使用 `scope.mode = "global"`；特定作者规则使用 `scope.mode = "creators"` 并填写精确 `service:id`。屏蔽器按文件顺序求值，第一个命中后停止。
+
+长时间同步前先校验正则与作用域：
+
+```bash
+ktoolbox config validate
+```
+
+## 为什么重定向日志中的进度显示不同？
+
+Rich 实时进度仅用于交互终端。管道、CI、`NO_COLOR` 与 `--plain` 使用稳定逐行输出，日志不会破坏 ANSI 实时区域。需要无颜色交互布局时使用 `--no-color`，完全隐藏进度与普通日志时使用 `--quiet`。
+
 ## uvloop 或 winloop 是必需的吗？
 
 不是。它们只是可选的事件循环优化。Linux/macOS 使用 `ktoolbox[uvloop]`，Windows 使用 `ktoolbox[winloop]`。两者都未安装时，KToolBox 会继续使用 Python 标准 asyncio 循环。

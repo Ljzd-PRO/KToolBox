@@ -18,6 +18,9 @@ KToolBox v1 is a breaking backend and library-API release.
 | API and file hosts mixed in API config | API/static hosts in `api`; file host in `downloader` |
 | Revision detail request | Fetch revision list, then select by `revision_id` |
 | Wrapper responses such as `.data.post` | Typed `Post`, `Revision`, and other Pydantic models directly |
+| Python Fire command surface | Cyclopts command tree with hyphenated options and explicit exit codes |
+| One creator per synchronization | Any number of targets or an enabled project roster |
+| Global `keywords_exclude` only | Ordered global and creator-scoped `field-match` blockers |
 
 The new defaults are:
 
@@ -28,6 +31,42 @@ KTOOLBOX_API__PATH=/api/v1
 KTOOLBOX_DOWNLOADER__FILES_NETLOC=file.pawchive.pw
 KTOOLBOX_DOWNLOADER__FILE_PATH_PREFIX=/data
 ```
+
+## CLI commands
+
+Hidden aliases keep existing automation running temporarily, but each invocation prints a deprecation warning:
+
+| v0 command | v1 command |
+| --- | --- |
+| `download-post` | `download` |
+| `sync-creator` | `sync` |
+| `search-creator` | `creator search` |
+| `search-creator-post` | `post search` |
+| `get-post` | `post show` |
+| `config-editor` | `config edit` |
+| `example-env` | `config example` |
+
+Options are displayed as `--creator-id`, not Python-style underscores. Old underscore spellings remain accepted by compatibility aliases. Help prints directly and no longer requires quitting a pager.
+
+CLI failures now use process status: `0` success, `1` remote/creator/download failure, `2` argument/configuration failure, and `130` interruption. JSON and tables use stdout; progress and logs use stderr.
+
+## Project roster and blockers
+
+Create `ktoolbox.toml` only when you need a reusable roster or structured blockers. A missing file is a valid empty project.
+
+```toml
+schema_version = 1
+
+[[creators]]
+service = "fanbox"
+creator_id = "123"
+alias = "studio-a"
+enabled = true
+```
+
+Move non-empty `KTOOLBOX_JOB__KEYWORDS_EXCLUDE` values to a global `field-match` title condition. The old setting remains active as an implicit blocker and warns, but KToolBox will not rewrite local files. See the [configuration guide](configuration/guide.md#post-blockers).
+
+`KTOOLBOX_JOB__CREATOR_CONCURRENCY` defaults to `4` and limits creator producers. Existing `KTOOLBOX_JOB__COUNT` continues to limit file workers.
 
 ## Library API
 
@@ -50,4 +89,3 @@ asyncio.run(main())
 ```
 
 Successful calls return Pydantic v2 models. Failures raise typed `PawchiveError` subclasses; see [API Documentation](api.md).
-

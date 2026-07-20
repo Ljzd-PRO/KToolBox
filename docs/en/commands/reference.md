@@ -1,81 +1,119 @@
 # Command Reference
 
-Run `ktoolbox COMMAND -h` for Fire's generated help. The table below records the stable v1 command surface; hyphenated names map to the Python parameter names shown in parentheses.
+Run `ktoolbox COMMAND --help` for the authoritative Cyclopts help. Command and option names use hyphens; legacy underscore spellings are still parsed for hidden compatibility commands.
 
-## General commands
+## Global options
+
+| Option | Meaning |
+| --- | --- |
+| `-h`, `--help` | Print help directly without a pager. |
+| `--version` | Print the installed KToolBox version. |
+| `--install-completion` | Install completion for the detected shell. |
+| `--config PATH` | Select a project file. Resolution order is this option, `KTOOLBOX_PROJECT_CONFIG`, then `./ktoolbox.toml`. |
+| `--verbose` | Include diagnostic logs. |
+| `--quiet` | Suppress progress and ordinary logs. |
+| `--plain` | Force stable line-oriented progress. Non-TTY output and `NO_COLOR` use this automatically. |
+| `--no-color` | Disable ANSI colors. |
+
+Running `ktoolbox` without arguments prints root help and exits successfully.
+
+## Command tree
 
 | Command | Purpose |
 | --- | --- |
-| `version` | Show the installed KToolBox version and perform the optional release check. |
-| `site-version` | Show the Pawchive application version. |
-| `config-editor` | Open the optional terminal configuration editor. |
-| `example-env` | Render a complete dotenv configuration reference. |
+| `download` | Download one post or selected revision. |
+| `sync [TARGET ...]` | Synchronize explicit creators, or all enabled roster creators when no target is given. |
+| `creator list/add/remove/enable/disable/search` | Manage the roster or search Pawchive creators. |
+| `post show/search` | Inspect a post or search creator posts. |
+| `config edit/example/validate/path` | Edit or inspect environment and project configuration. |
+| `site-version` | Print the Pawchive application version. |
 
-## `search-creator`
+## `download`
 
-Filters the public creator list locally. At least one filter is recommended.
-
-| Option | Type | Default | Meaning |
-| --- | --- | --- | --- |
-| `--name` | string | `None` | Case-insensitive creator-name filter. |
-| `--id` | string | `None` | Exact creator ID filter. |
-| `--service` | string | `None` | Exact service filter. |
-| `--dump` | path | `None` | Write matching models as JSON. |
-
-## `search-creator-post`
-
-Lists posts for creators selected by ID, name, or service.
-
-| Option | Type | Default | Meaning |
-| --- | --- | --- | --- |
-| `--id` | string | `None` | Creator ID. Use with `--service` for a direct lookup. |
-| `--name` | string | `None` | Select matching creators from the public list. |
-| `--service` | string | `None` | Creator service. |
-| `--q` | string | `None` | Pawchive search query, at least 3 characters. |
-| `--o` | integer | `None` | API offset; non-negative and divisible by 50. |
-| `--dump` | path | `None` | Write matching post models as JSON. |
-
-## `get-post`
+Provide a Pawchive post URL, or all of `--service`, `--creator-id`, and `--post-id`.
 
 | Argument or option | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `service` | string | required | Creator service. |
-| `creator-id` (`creator_id`) | string | required | Creator ID. |
-| `post-id` (`post_id`) | string | required | Post ID. |
-| `--revision-id` | string | `None` | Select this ID from the post revision list. |
-| `--dump` | path | `None` | Write the validated model as JSON. |
+| `POST` | string | omitted | Pawchive post or revision URL. |
+| `--service` | string | omitted | Creator service. |
+| `--creator-id` | string | omitted | Creator ID. |
+| `--post-id` | string | omitted | Post ID. |
+| `--revision-id` | string | omitted | Select this revision from the revision list. |
+| `-o`, `--output`, `--path` | path | `.` | Output root. |
+| `--dump-post-data` / `--no-dump-post-data` | boolean | enabled | Save validated metadata to `post.json`. |
 
-## `download-post`
+`download` intentionally does not apply roster blockers.
 
-Provide either `url` or all of `service`, `creator-id`, and `post-id`.
+## `sync`
 
-| Argument or option | Type | Default | Meaning |
-| --- | --- | --- | --- |
-| `url` | string | `None` | Pawchive post or revision URL. |
-| `--service` | string | `None` | Creator service. |
-| `--creator-id` | string | `None` | Creator ID. |
-| `--post-id` | string | `None` | Post ID. |
-| `--revision-id` | string | `None` | Download one selected revision. |
-| `--path` | path | `.` | Output root. |
-| `--dump-post-data` | boolean | `True` | Save validated metadata to `post.json`. |
-
-## `sync-creator`
-
-Provide either `url` or both `service` and `creator-id`.
+Each `TARGET` may be a Pawchive creator URL, `service:id`, or roster alias. Explicit targets run even when disabled in the roster. With no targets, every enabled roster creator runs.
 
 | Argument or option | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `url` | string | `None` | Pawchive creator URL. |
-| `--service` | string | `None` | Creator service. |
-| `--creator-id` | string | `None` | Creator ID. |
-| `--path` | path | `.` | Output root. |
-| `--save-creator-indices` | boolean | `False` | Save `creator-indices.ktoolbox`. |
-| `--mix-posts` | boolean | configuration | Override `job.mix_posts`. |
-| `--start-time` | date | `None` | Inclusive lower publication date, `%Y-%m-%d`. |
-| `--end-time` | date | `None` | Inclusive upper publication date, `%Y-%m-%d`. |
-| `--offset` | integer | `0` | First post index at the CLI boundary. |
-| `--length` | integer | `None` | Number of posts; `None` fetches all pages. |
-| `--keywords` | string/tuple | configuration | Include titles containing any value. |
-| `--keywords-exclude` | string/tuple | configuration | Exclude titles containing any value. |
+| `TARGET ...` | strings | enabled roster | Zero or more creators. |
+| `--service` + `--creator-id` | strings | omitted | Add one explicit creator; both are required together. |
+| `-o`, `--output`, `--path` | path | `.` | Output root. |
+| `--save-creator-indices` | boolean | disabled | Atomically save the creator index after successful production. |
+| `--mix-posts` / `--no-mix-posts` | boolean | environment config | Override `job.mix_posts`. |
+| `--start-time`, `--start` | date | omitted | Inclusive publication lower bound, `YYYY-MM-DD`. |
+| `--end-time`, `--end` | date | omitted | Inclusive publication upper bound, `YYYY-MM-DD`. |
+| `--offset` | integer | `0` | First post index. |
+| `--length` | integer | all | Maximum accepted posts per creator. |
+| `--keywords` | repeated string | environment config | Include titles containing any value. |
+| `--keywords-exclude` | repeated string | environment config | Deprecated title exclusion compatibility input. |
 
-Exit-facing API, validation, and task-generation failures are returned as readable messages. Download workers retain their retry and progress behavior from the active configuration.
+`job.creator_concurrency` limits creator production, while `job.count` limits shared file workers.
+
+## `creator`
+
+| Command | Arguments and options | Meaning |
+| --- | --- | --- |
+| `creator list` | `--json` | List roster entries as a Rich table or JSON. |
+| `creator add TARGET` | `--alias NAME`, `--disabled` | Add a URL or `service:id`. |
+| `creator remove TARGET` | | Remove by alias, URL, or identity. |
+| `creator enable TARGET` | | Enable a saved creator. |
+| `creator disable TARGET` | | Disable a saved creator. |
+| `creator search` | `--name`, `--creator-id`/`--id`, `--service`, `--dump`, `--json` | Filter the public creator list. |
+
+## `post`
+
+| Command | Arguments and options | Meaning |
+| --- | --- | --- |
+| `post search` | `--creator-id`/`--id`, `--name`, `--service`, `-q`/`--query`, `-o`/`--offset`, `--dump`, `--json` | Search posts for selected creators. A direct API query is at least 3 characters and an API offset is divisible by 50. |
+| `post show SERVICE CREATOR_ID POST_ID [REVISION_ID]` | `--dump`, `--json` | Show current post metadata or one selected revision. |
+
+Without `--json`, query commands deliberately omit post body text from terminal tables.
+
+## `config`
+
+| Command | Meaning |
+| --- | --- |
+| `config path` | Print the resolved project path without line wrapping. |
+| `config validate` | Validate schema version, creator uniqueness, blocker types, scopes, conditions, and regular expressions. |
+| `config example` | Render all dotenv settings from configuration model docstrings. |
+| `config edit` | Open the optional Urwid editor and validate before saving. |
+
+## Compatibility aliases
+
+These aliases are hidden from help and emit one deprecation warning per invocation:
+
+| Legacy | Replacement |
+| --- | --- |
+| `download-post` | `download` |
+| `sync-creator` | `sync` |
+| `search-creator` | `creator search` |
+| `search-creator-post` | `post search` |
+| `get-post` | `post show` |
+| `config-editor` | `config edit` |
+| `example-env` | `config example` |
+
+## Exit codes and streams
+
+| Code | Meaning |
+| --- | --- |
+| `0` | Success. |
+| `1` | Remote, creator, or download failure, including partial multi-creator success. |
+| `2` | Invalid arguments or configuration. |
+| `130` | User interruption. |
+
+Tables and JSON use stdout. Logs, progress, warnings, and errors use stderr.

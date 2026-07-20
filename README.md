@@ -17,13 +17,15 @@ KToolBox v1 uses Pawchive as its only supported backend. It provides typed acces
 
 ## Features
 
-- Download one post, a selected revision, or a bounded/all-post creator synchronization.
+- Download one post or synchronize any number of creators in one command.
+- Keep a reusable, enabled/disabled creator roster in project-local `ktoolbox.toml`.
+- Exclude non-work posts with ordered global or creator-scoped field blockers.
 - Reuse one typed asynchronous `PawchiveClient` across API operations.
 - Resume partial downloads with HTTP Range requests and skip existing files.
 - Limit file sizes, select extensions, filter titles and dates, and control cover/attachment downloads.
 - Customize directory structure, post names, file names, sequential names, and year/month grouping.
 - Save post metadata, creator indices, extracted content, content images, and matching external links.
-- Run concurrent downloads with centralized progress and optional local hard-link bucket storage.
+- Stream jobs from concurrent creator producers into one fair download pool with stable Rich progress.
 - Use a fully offline MockTransport-based test suite; accidental network access is blocked in tests.
 
 ## Requirements
@@ -55,27 +57,36 @@ Show command help:
 
 ```bash
 ktoolbox -h
-ktoolbox download-post -h
+ktoolbox download -h
 ```
+
+![KToolBox command overview](docs/assets/cli-overview.png)
 
 Download one post:
 
 ```bash
-ktoolbox download-post https://pawchive.pw/fanbox/user/6570768/post/1836570
+ktoolbox download https://pawchive.pw/fanbox/user/6570768/post/1836570
 ```
 
 Synchronize one creator while limiting the first run to one post:
 
 ```bash
-ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --length=1
+ktoolbox sync https://pawchive.pw/fanbox/user/6570768 --length 1
 ```
 
 Use an offset, date range, or title filters:
 
 ```bash
-ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --offset=50 --length=10
-ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --start-time=2025-01-01 --end-time=2025-03-01
-ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --keywords=preview --keywords-exclude=archive
+ktoolbox sync fanbox:123 patreon:456 --length 10
+ktoolbox sync fanbox:123 --start-time 2025-01-01 --end-time 2025-03-01
+```
+
+Save frequently synchronized creators, then run `sync` without targets:
+
+```bash
+ktoolbox creator add fanbox:123 --alias studio-a
+ktoolbox creator add patreon:456 --alias studio-b
+ktoolbox sync
 ```
 
 Downloaded files are skipped on later runs. Incomplete temporary files are resumed when the file host supports ranges.
@@ -94,6 +105,7 @@ KTOOLBOX_DOWNLOADER__FILE_PATH_PREFIX=/data
 
 # Download controls.
 KTOOLBOX_JOB__COUNT=4
+KTOOLBOX_JOB__CREATOR_CONCURRENCY=4
 KTOOLBOX_JOB__DOWNLOAD_FILE=True
 KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
@@ -101,11 +113,31 @@ KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
 
 `KTOOLBOX_DOWNLOADER__SESSION_KEY`, if set, is sent only to file downloads. The API client never sends an account session.
 
-Generate a complete environment reference or launch the optional terminal editor:
+`.env` controls runtime and transfer behavior. A project-level `ktoolbox.toml` stores the creator roster and blockers:
+
+```toml
+schema_version = 1
+
+[[creators]]
+service = "fanbox"
+creator_id = "123"
+alias = "studio-a"
+enabled = true
+
+[[blockers]]
+id = "skip-progress-updates"
+type = "field-match"
+enabled = true
+scope = { mode = "creators", creators = ["fanbox:123"] }
+options = { rule = { kind = "group", mode = "any", conditions = [{ kind = "field", field = "title", operator = "contains", values = ["progress update"] }] } }
+```
+
+Generate references, validate the project file, or launch the optional terminal editor:
 
 ```bash
-ktoolbox example-env
-ktoolbox config-editor
+ktoolbox config example
+ktoolbox config validate
+ktoolbox config edit
 ```
 
 See [Configuration](https://ktoolbox.readthedocs.io/latest/configuration/guide/) and [`example.env`](example.env).
@@ -132,7 +164,7 @@ Successful calls return Pydantic v2 models. Transport, HTTP status, authenticati
 
 ## Migrating From v0
 
-v1 removes the Kemono/Coomer compatibility layer and the old `BaseAPI`, module-level `get_*`, `APIRet`, and wrapper-response interfaces. Move `KTOOLBOX_API__SESSION_KEY` to `KTOOLBOX_DOWNLOADER__SESSION_KEY` and review the [v1 migration guide](https://ktoolbox.readthedocs.io/latest/migration-v1/).
+v1 removes the Kemono/Coomer compatibility layer and the old `BaseAPI`, module-level `get_*`, `APIRet`, and wrapper-response interfaces. Fire commands were replaced by Cyclopts: use `download`, `sync`, `creator`, `post`, and `config`. Hidden aliases remain temporarily available with a deprecation warning. Move `KTOOLBOX_API__SESSION_KEY` to `KTOOLBOX_DOWNLOADER__SESSION_KEY` and review the [v1 migration guide](https://ktoolbox.readthedocs.io/latest/migration-v1/).
 
 The historical `kemono_openapi.json` remains in the repository for reference only; it is not a supported runtime contract.
 
@@ -141,8 +173,8 @@ The historical `kemono_openapi.json` remains in the repository for reference onl
 ```bash
 poetry install --with test,docs,dev
 poetry run pytest --cov
-poetry run ruff check k_generator ktoolbox/api tests
-poetry run mypy --strict ktoolbox/api
+poetry run ruff check .
+poetry run mypy ktoolbox
 poetry run mkdocs build --strict
 ```
 

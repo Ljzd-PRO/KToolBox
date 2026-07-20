@@ -63,6 +63,7 @@ API 配置组有意不包含会话密钥。
 | 字段 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | `count` | 整数 | `4` | 并发下载工作器数量。 |
+| `creator_concurrency` | 整数 | `4` | 向共享文件工作器提供任务的并发作者生产者数量。 |
 | `include_revisions` | 布尔值 | `False` | 为当前投稿包含所有已知修订。 |
 | `post_dirname_format` | 字符串 | `{title}` | 每篇投稿的目录模板。 |
 | `mix_posts` | 布尔值 | `False` | 不建投稿目录，将作者文件存放在一起。 |
@@ -80,13 +81,47 @@ API 配置组有意不包含会话密钥。
 | `year_dirname_format` | 字符串 | `{year}` | 年份目录模板。 |
 | `month_dirname_format` | 字符串 | `{year}-{month:02d}` | 月份目录模板。 |
 | `keywords` | 集合 | 空 | 标题需包含的不区分大小写词语。 |
-| `keywords_exclude` | 集合 | 空 | 标题需排除的不区分大小写词语。 |
+| `keywords_exclude` | 集合 | 空 | 弃用的标题排除项，会转换为隐式全局屏蔽器。 |
 | `download_file` | 布尔值 | `True` | 下载投稿主文件，通常为封面。 |
 | `download_attachments` | 布尔值 | `True` | 下载附件。 |
 | `min_file_size` | 整数 / 省略 | 省略 | 跳过小于该字节数的文件。 |
 | `max_file_size` | 整数 / 省略 | 省略 | 跳过大于该字节数的文件。 |
 
 命名模板接受 `id`、`user`、`service`、`title`、`added`、`published` 和 `edited`。年份与月份模板接受 `year` 和 `month`。
+
+## 项目 `ktoolbox.toml`
+
+项目文档独立于环境配置。路径依次从全局 `--config`、`KTOOLBOX_PROJECT_CONFIG`、`./ktoolbox.toml` 解析。
+
+### 根字段
+
+| 字段 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `schema_version` | 字面量 `1` | `1` | 项目 Schema 版本，其他值会被拒绝。 |
+| `creators` | 表数组 | 空 | 已保存作者清单。 |
+| `blockers` | 表数组 | 空 | 有序屏蔽器定义。 |
+
+### 作者项
+
+| 字段 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `service` | 非空字符串 | 必填 | Pawchive 服务。 |
+| `creator_id` | 非空字符串 | 必填 | Pawchive 作者 ID。 |
+| `alias` | 字符串 / 省略 | 省略 | 唯一 CLI 目标，禁止 `:`。 |
+| `enabled` | 布尔值 | `True` | 是否包含在无目标 `sync` 中。 |
+
+### 屏蔽器项
+
+| 字段 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `id` | 标识符 | 必填 | 唯一 ID，只允许字母、数字、`.`、`_`、`-`。 |
+| `type` | 字符串 | `field-match` | 已注册屏蔽器实现，未知类型会被拒绝。 |
+| `enabled` | 布尔值 | `True` | 是否参与求值。 |
+| `scope.mode` | `global` / `creators` | `global` | 全局应用或仅作用于所选身份。 |
+| `scope.creators` | `service:id` 列表 | 空 | 作者作用域必须非空；全局作用域禁止填写。 |
+| `options.rule` | 条件组 | `field-match` 必填 | 根递归规则。 |
+
+条件组使用 `kind = "group"`、`mode = "any"` 或 `"all"`、非空 `conditions` 列表及可选 `negate`。字段条件使用 `kind = "field"`、安全点路径 `field`、`contains`、`equals`、`regex`、`exists` 之一，以及可选 `case_sensitive`、`negate` 或 `expected`。非 `exists` 操作符要求非空 `values`；`exists` 禁止 `values`。
 
 ## `logger`
 

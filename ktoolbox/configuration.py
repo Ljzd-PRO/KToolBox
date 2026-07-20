@@ -237,7 +237,8 @@ class JobConfiguration(BaseModel):
     :ivar month_dirname_format: Customize the month directory name format. Available properties: ``year``, ``month``. \
     e.g. ``{year}-{month}`` > ``2024-01``, ``{year}_{month}`` > ``2024_01``
     :ivar keywords: keywords to filter posts by title (case-insensitive)
-    :ivar keywords_exclude: keywords to exclude posts by title (case-insensitive)
+    :ivar keywords_exclude: Deprecated title exclusions converted to an implicit global field-match blocker. \
+    Define structured blockers in ``ktoolbox.toml`` instead.
     :ivar creator_concurrency: Maximum number of creators fetched and prepared concurrently
     :ivar download_file: Download post file (usually cover image). Set to False to skip file downloads.
     :ivar download_attachments: Download post attachments. Set to False to skip attachment downloads.

@@ -1,6 +1,11 @@
 # 配置向导
 
-KToolBox 会读取进程环境变量，以及当前工作目录中的两个可选文件：先读取 `.env`，再读取 `prod.env`。`prod.env` 中的同名值会覆盖 `.env`，进程环境变量优先级最高。
+KToolBox 使用两层配置：
+
+- `.env`、`prod.env` 与进程变量控制 API、传输、命名及全局下载行为。
+- `ktoolbox.toml` 保存项目作者清单与有序投稿屏蔽器。
+
+KToolBox 会从当前工作目录先读取 `.env`，再读取 `prod.env`。`prod.env` 中的同名值会覆盖 `.env`，进程环境变量优先级最高。
 
 嵌套字段使用双下划线。例如，`KTOOLBOX_API__TIMEOUT` 对应 `config.api.timeout`。
 
@@ -16,6 +21,7 @@ KTOOLBOX_DOWNLOADER__TPS_LIMIT=5
 
 # 下载任务。
 KTOOLBOX_JOB__COUNT=4
+KTOOLBOX_JOB__CREATOR_CONCURRENCY=4
 KTOOLBOX_JOB__DOWNLOAD_FILE=True
 KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 ```
@@ -27,15 +33,81 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 根据当前模型生成全部 dotenv 配置键：
 
 ```bash
-ktoolbox example-env
+ktoolbox config example
 ```
 
 可选的终端编辑器能够展示从配置模型 docstring 正确解析的字段说明：
 
 ```bash
 pipx install "ktoolbox[urwid]" --force
-ktoolbox config-editor
+ktoolbox config edit
 ```
+
+无需打开编辑器即可查看或校验项目文件：
+
+```bash
+ktoolbox config path
+ktoolbox config validate
+```
+
+项目路径优先级为全局 `--config`、`KTOOLBOX_PROJECT_CONFIG`、`./ktoolbox.toml`。写入时使用同目录临时文件和原子替换，TomlKit 会保留注释。
+
+## 作者清单
+
+每份项目文档都以 `schema_version = 1` 开始。作者按不区分大小写的 `service:id` 唯一，可选别名也必须唯一。
+
+```toml
+schema_version = 1
+
+[[creators]]
+service = "fanbox"
+creator_id = "123"
+alias = "studio-a"
+enabled = true
+
+[[creators]]
+service = "patreon"
+creator_id = "456"
+alias = "studio-b"
+enabled = false
+```
+
+简单清单项建议通过 `creator add`、`remove`、`enable`、`disable` 管理。无目标 `sync` 使用全部已启用项；显式别名或身份无论 `enabled` 状态都会运行。
+
+## 投稿屏蔽器 {#post-blockers}
+
+屏蔽器按 TOML 顺序执行，第一个命中项会排除投稿。全局作用域应用于每位同步作者；作者作用域列出精确 `service:id`。禁用屏蔽器会保留配置但不运行。
+
+```toml
+[[blockers]]
+id = "skip-life-updates"
+type = "field-match"
+enabled = true
+scope = { mode = "global", creators = [] }
+options = { rule = { kind = "group", mode = "any", conditions = [{ kind = "field", field = "title", operator = "contains", values = ["生活分享", "日常记录"] }, { kind = "field", field = "tags[*]", operator = "equals", values = ["personal"] }] } }
+
+[[blockers]]
+id = "studio-a-progress"
+type = "field-match"
+enabled = true
+scope = { mode = "creators", creators = ["fanbox:123"] }
+options = { rule = { kind = "group", mode = "all", conditions = [{ kind = "field", field = "title", operator = "regex", values = ["进度|练习"] }, { kind = "field", field = "attachments[*].name", operator = "exists", expected = false }] } }
+```
+
+`field-match` 支持递归 `any`/`all` 条件组，组与条件都可设置 `negate`。条件操作符如下：
+
+| 操作符 | 行为 |
+| --- | --- |
+| `contains` | 任一所选标量包含任一配置值。 |
+| `equals` | 任一所选标量等于任一配置值。 |
+| `regex` | 任一所选标量匹配任一正则；配置校验时预编译。 |
+| `exists` | 所选路径存在且非空；设置 `expected = false` 可反转预期。 |
+
+比较默认不区分大小写，设置 `case_sensitive = true` 后区分。安全点路径可带 `[*]` 列表选择器，例如 `tags[*]`、`file.name`、`attachments[*].name`。缺失路径不匹配，永远不会执行 Python 表达式或任意代码。
+
+屏蔽器在列表响应阶段执行，早于详情、修订、目录、元数据和下载任务。被排除投稿及其修订不会进入作者索引，也不会打印匹配文本。异步 `PostBlocker` 接口与注册表允许未来新增屏蔽器类型而无需修改同步协调器。
+
+`KTOOLBOX_JOB__KEYWORDS_EXCLUDE` 仍作为弃用的隐式全局标题包含屏蔽器接受。KToolBox 不会自动改写，请手动迁移到 `ktoolbox.toml`。
 
 ## Pawchive 端点
 
@@ -94,3 +166,5 @@ KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
 KTOOLBOX_JOB__DOWNLOAD_FILE=True
 KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=False
 ```
+
+`KTOOLBOX_JOB__CREATOR_CONCURRENCY` 控制并发作者生产者；`KTOOLBOX_JOB__COUNT` 独立控制全部作者共享的文件工作器。

@@ -4,7 +4,8 @@ KToolBox is an asynchronous command-line downloader and typed Python client for 
 
 ## What it does
 
-- Downloads one post, a selected revision, or a creator's posts.
+- Downloads one post or concurrently synchronizes a roster of creators.
+- Applies ordered global or creator-scoped blockers before creating download work.
 - Resumes partial files and skips files that already exist.
 - Filters by date, title, filename pattern, and file size.
 - Controls cover, attachment, content image, metadata, and external-link output separately.
@@ -35,13 +36,23 @@ pipx install "ktoolbox[urwid,winloop]" --force
 ```bash
 # Inspect commands and options.
 ktoolbox -h
-ktoolbox download-post -h
+ktoolbox download -h
 
 # Download one post.
-ktoolbox download-post https://pawchive.pw/fanbox/user/6570768/post/1836570
+ktoolbox download https://pawchive.pw/fanbox/user/6570768/post/1836570
 
 # Start with one post before synchronizing a larger range.
-ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --length=1
+ktoolbox sync https://pawchive.pw/fanbox/user/6570768 --length 1
+```
+
+![KToolBox command overview](../assets/cli-overview.png)
+
+Save multiple creators and synchronize all enabled entries:
+
+```bash
+ktoolbox creator add fanbox:123 --alias studio-a
+ktoolbox creator add patreon:456 --alias studio-b
+ktoolbox sync
 ```
 
 Existing files are skipped on repeat runs. An incomplete file with the configured temporary suffix is resumed when the file server supports byte ranges.

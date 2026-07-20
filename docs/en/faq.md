@@ -88,6 +88,32 @@ pip install "ktoolbox[urwid]"
 pipx install "ktoolbox[urwid]" --force
 ```
 
+## How do I synchronize many creators regularly?
+
+Add each creator to the project roster, optionally assign a short alias, then run targetless `sync`:
+
+```bash
+ktoolbox creator add fanbox:123 --alias studio-a
+ktoolbox creator add patreon:456 --alias studio-b
+ktoolbox sync
+```
+
+Use `creator disable` to keep an entry without including it in targetless runs. You can still explicitly sync a disabled alias. Creator preparation and file transfer have separate concurrency limits, so a large creator does not monopolize every ready download.
+
+## How do I exclude different topics for different creators?
+
+Add separate `[[blockers]]` entries to `ktoolbox.toml`. Set `scope.mode = "global"` for rules shared by everyone, or `scope.mode = "creators"` with exact `service:id` values. Blocks are evaluated in file order and stop at the first match.
+
+Validate regular expressions and scopes before a long run:
+
+```bash
+ktoolbox config validate
+```
+
+## Why does progress look different in a redirected log?
+
+Rich live progress is used only on an interactive terminal. Pipes, CI, `NO_COLOR`, and `--plain` use stable line output so log messages cannot corrupt an ANSI live region. Use `--no-color` when you want the interactive layout without color, or `--quiet` to suppress progress and ordinary logs.
+
 ## Is uvloop or winloop required?
 
 No. They are optional event-loop optimizations. Use `ktoolbox[uvloop]` on Linux/macOS or `ktoolbox[winloop]` on Windows. If neither is installed, KToolBox continues with Python's standard asyncio loop.

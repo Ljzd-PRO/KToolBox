@@ -63,6 +63,7 @@ Bucket mode disables itself when the target filesystem cannot create hard links.
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
 | `count` | integer | `4` | Concurrent download workers. |
+| `creator_concurrency` | integer | `4` | Concurrent creator producers feeding the shared file workers. |
 | `include_revisions` | boolean | `False` | Include all known revisions for a current post. |
 | `post_dirname_format` | string | `{title}` | Per-post directory template. |
 | `mix_posts` | boolean | `False` | Store all creator files together without post directories. |
@@ -80,13 +81,47 @@ Bucket mode disables itself when the target filesystem cannot create hard links.
 | `year_dirname_format` | string | `{year}` | Year-directory template. |
 | `month_dirname_format` | string | `{year}-{month:02d}` | Month-directory template. |
 | `keywords` | set | empty | Case-insensitive title terms to include. |
-| `keywords_exclude` | set | empty | Case-insensitive title terms to exclude. |
+| `keywords_exclude` | set | empty | Deprecated title exclusions, converted to an implicit global blocker. |
 | `download_file` | boolean | `True` | Download the main post file, usually the cover. |
 | `download_attachments` | boolean | `True` | Download attachments. |
 | `min_file_size` | integer / omitted | omitted | Skip files smaller than this byte count. |
 | `max_file_size` | integer / omitted | omitted | Skip files larger than this byte count. |
 
 Naming templates accept `id`, `user`, `service`, `title`, `added`, `published`, and `edited`. Year and month templates accept `year` and `month`.
+
+## Project `ktoolbox.toml`
+
+The project document is separate from environment configuration. Its path resolves from global `--config`, then `KTOOLBOX_PROJECT_CONFIG`, then `./ktoolbox.toml`.
+
+### Root
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `schema_version` | literal `1` | `1` | Project schema version; other values are rejected. |
+| `creators` | table array | empty | Saved creator roster. |
+| `blockers` | table array | empty | Ordered blocker specifications. |
+
+### Creator entry
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `service` | non-empty string | required | Pawchive service. |
+| `creator_id` | non-empty string | required | Pawchive creator ID. |
+| `alias` | string / omitted | omitted | Unique CLI target; `:` is forbidden. |
+| `enabled` | boolean | `True` | Included by targetless `sync`. |
+
+### Blocker entry
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `id` | identifier | required | Unique ID matching letters, numbers, `.`, `_`, or `-`. |
+| `type` | string | `field-match` | Registered blocker implementation. Unknown types are rejected. |
+| `enabled` | boolean | `True` | Whether this blocker participates. |
+| `scope.mode` | `global` / `creators` | `global` | Apply globally or to selected identities. |
+| `scope.creators` | list of `service:id` | empty | Required and non-empty for creator scope; forbidden for global scope. |
+| `options.rule` | condition group | required for `field-match` | Root recursive rule. |
+
+Condition groups use `kind = "group"`, `mode = "any"` or `"all"`, a non-empty `conditions` list, and optional `negate`. Field conditions use `kind = "field"`, a safe dotted `field`, one of `contains`, `equals`, `regex`, or `exists`, and optional `case_sensitive`, `negate`, or `expected`. Non-`exists` operators require a non-empty `values` list; `exists` forbids `values`.
 
 ## `logger`
 

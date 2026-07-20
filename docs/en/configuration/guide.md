@@ -1,6 +1,11 @@
 # Configuration Guide
 
-KToolBox reads environment variables and two optional files in the current working directory: `.env`, then `prod.env`. Values from `prod.env` override matching values from `.env`, while process environment variables have the highest priority.
+KToolBox has two configuration layers:
+
+- `.env`, `prod.env`, and process variables control API, transfer, naming, and global download behavior.
+- `ktoolbox.toml` stores a project creator roster and ordered post blockers.
+
+KToolBox reads `.env`, then `prod.env`, from the current working directory. Values from `prod.env` override matching values from `.env`, while process environment variables have the highest priority.
 
 Nested fields use a double underscore. For example, `KTOOLBOX_API__TIMEOUT` maps to `config.api.timeout`.
 
@@ -16,6 +21,7 @@ KTOOLBOX_DOWNLOADER__TPS_LIMIT=5
 
 # Download jobs.
 KTOOLBOX_JOB__COUNT=4
+KTOOLBOX_JOB__CREATOR_CONCURRENCY=4
 KTOOLBOX_JOB__DOWNLOAD_FILE=True
 KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 ```
@@ -27,15 +33,81 @@ All settings are optional. See the [configuration reference](reference.md) for d
 Generate every available dotenv key from the current model:
 
 ```bash
-ktoolbox example-env
+ktoolbox config example
 ```
 
 The optional terminal editor can inspect field descriptions parsed from the configuration model docstrings:
 
 ```bash
 pipx install "ktoolbox[urwid]" --force
-ktoolbox config-editor
+ktoolbox config edit
 ```
+
+Inspect or validate the project file without opening the editor:
+
+```bash
+ktoolbox config path
+ktoolbox config validate
+```
+
+The project path resolves in this order: global `--config`, `KTOOLBOX_PROJECT_CONFIG`, then `./ktoolbox.toml`. Writes use a same-directory temporary file and atomic replacement; TomlKit preserves comments.
+
+## Creator roster
+
+Every project document starts with `schema_version = 1`. Creators are unique by case-insensitive `service:id`; optional aliases are also unique.
+
+```toml
+schema_version = 1
+
+[[creators]]
+service = "fanbox"
+creator_id = "123"
+alias = "studio-a"
+enabled = true
+
+[[creators]]
+service = "patreon"
+creator_id = "456"
+alias = "studio-b"
+enabled = false
+```
+
+Use `creator add`, `remove`, `enable`, and `disable` instead of editing simple roster entries by hand. `sync` without targets uses all enabled entries; explicit aliases or identities run regardless of `enabled`.
+
+## Post blockers {#post-blockers}
+
+Blockers run in TOML order, and the first match excludes the post. A global blocker applies to every synchronized creator; a creator scope lists exact `service:id` values. Disabled blockers remain configured but do not run.
+
+```toml
+[[blockers]]
+id = "skip-life-updates"
+type = "field-match"
+enabled = true
+scope = { mode = "global", creators = [] }
+options = { rule = { kind = "group", mode = "any", conditions = [{ kind = "field", field = "title", operator = "contains", values = ["life update", "daily note"] }, { kind = "field", field = "tags[*]", operator = "equals", values = ["personal"] }] } }
+
+[[blockers]]
+id = "studio-a-progress"
+type = "field-match"
+enabled = true
+scope = { mode = "creators", creators = ["fanbox:123"] }
+options = { rule = { kind = "group", mode = "all", conditions = [{ kind = "field", field = "title", operator = "regex", values = ["progress|practice"] }, { kind = "field", field = "attachments[*].name", operator = "exists", expected = false }] } }
+```
+
+`field-match` supports recursive `any`/`all` groups and `negate` on either a group or condition. Conditions support:
+
+| Operator | Behavior |
+| --- | --- |
+| `contains` | Any selected scalar contains one configured value. |
+| `equals` | Any selected scalar equals one configured value. |
+| `regex` | Any selected scalar matches one regular expression. Patterns compile during configuration validation. |
+| `exists` | The selected path exists and is not null; set `expected = false` to invert that expectation. |
+
+Comparisons are case-insensitive unless `case_sensitive = true`. Safe dotted paths may include `[*]` list selectors, for example `tags[*]`, `file.name`, and `attachments[*].name`. Missing paths do not match. Python expressions and arbitrary code are never evaluated.
+
+Blockers evaluate the list response before detail, revision, directory, metadata, or download work. Excluded posts and revisions do not enter the creator index, and matching text is not printed. The asynchronous `PostBlocker` interface and registry allow future blocker types without changing the synchronization coordinator.
+
+`KTOOLBOX_JOB__KEYWORDS_EXCLUDE` remains accepted as a deprecated implicit global title-contains blocker. KToolBox does not rewrite it automatically; migrate it into `ktoolbox.toml`.
 
 ## Pawchive endpoints
 
@@ -94,3 +166,5 @@ KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
 KTOOLBOX_JOB__DOWNLOAD_FILE=True
 KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=False
 ```
+
+`KTOOLBOX_JOB__CREATOR_CONCURRENCY` controls concurrent creator producers. `KTOOLBOX_JOB__COUNT` separately controls file workers shared by all creators.
