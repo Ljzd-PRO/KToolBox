@@ -1,0 +1,1691 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Pawchive API",
+    "version": "1.0.0",
+    "contact": {
+      "email": "contact@pawchive.st"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://pawchive.pw/api/v1"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Posts",
+      "description": "Version one"
+    },
+    {
+      "name": "Creators"
+    },
+    {
+      "name": "Comments"
+    },
+    {
+      "name": "Post Flagging",
+      "description": "Flag post for re-import"
+    },
+    {
+      "name": "Favorites"
+    },
+    {
+      "name": "File Search"
+    },
+    {
+      "name": "Misc"
+    }
+  ],
+  "paths": {
+    "/creators": {
+      "get": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "List All Creators",
+        "description": "List all creators with details. (don't use the try it out button or your page will crash)",
+        "responses": {
+          "200": {
+            "description": "List of all creators",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreatorSummary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "listCreators"
+      }
+    },
+    "/posts": {
+      "get": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "List recent posts",
+        "description": "List of recently created posts",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search query",
+            "schema": {
+              "type": "string",
+              "minLength": 3
+            }
+          },
+          {
+            "name": "o",
+            "in": "query",
+            "description": "Result offset, stepping of 50 is enforced",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "multipleOf": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of recently added posts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Post"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "listRecentPosts"
+      }
+    },
+    "/{service}/user/{creator_id}/profile": {
+      "get": {
+        "summary": "Get a creator",
+        "tags": [
+          "Creators"
+        ],
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "The service where the creator is located",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The ID of the creator",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Creator details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatorProfile"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The creator could not be found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "The error message",
+                      "enum": [
+                        "Creator not found."
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getCreatorProfile"
+      }
+    },
+    "/{service}/user/{creator_id}": {
+      "get": {
+        "summary": "Get a list of creator posts",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "The service where the post is located",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The ID of the creator",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search query",
+            "schema": {
+              "type": "string",
+              "minLength": 3
+            }
+          },
+          {
+            "name": "o",
+            "in": "query",
+            "description": "Result offset, stepping of 50 is enforced",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "multipleOf": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Post"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Offset provided which is not a multiple of 50"
+          },
+          "404": {
+            "description": "The creator could not be found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "The error message",
+                      "enum": [
+                        "Creator not found."
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "listCreatorPosts"
+      }
+    },
+    "/{service}/user/{creator_id}/announcements": {
+      "get": {
+        "summary": "Get creator announcements",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "description": "The service name",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "required": true,
+            "description": "The creator's ID",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Announcement"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Artist not found"
+          }
+        },
+        "operationId": "listCreatorAnnouncements"
+      }
+    },
+    "/{service}/user/{creator_id}/fancards": {
+      "get": {
+        "summary": "Get fancards by creator, fanbox only",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "description": "The service name, has to be \"fanbox\"",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "required": true,
+            "description": "The creator's ID",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Fancard"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Artist not found"
+          }
+        },
+        "operationId": "listCreatorFancards"
+      }
+    },
+    "/{service}/user/{creator_id}/links": {
+      "get": {
+        "summary": "Get a creator's linked accounts",
+        "tags": [
+          "Creators"
+        ],
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "The service where the creator is located",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The ID of the creator",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Linked accounts retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreatorProfile"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The creator could not be found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "The error message",
+                      "enum": [
+                        "Creator not found."
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "listCreatorLinks"
+      }
+    },
+    "/{service}/user/{creator_id}/post/{post_id}": {
+      "get": {
+        "summary": "Get a specific post",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "description": "The service name",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "required": true,
+            "description": "The creator's ID",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "description": "The post ID",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Post not found"
+          }
+        },
+        "operationId": "getPost"
+      }
+    },
+    "/account/favorites": {
+      "get": {
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "List Account Favorites",
+        "description": "List account favorites (posts or creators) for the authenticated user (cookie session)",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Type of favorites to list (post or creator (artist) )",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "post",
+                "artist"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of account favorites",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountFavorite"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "listAccountFavorites"
+      }
+    },
+    "/favorites/post/{service}/{creator_id}/{post_id}": {
+      "post": {
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Add Favorite Post",
+        "description": "Add a post to the user's favorite posts",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "Service of the post",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The ID of the creator",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "description": "The ID of the post",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Favorite post added successfully",
+            "content": {}
+          },
+          "302": {
+            "description": "Redirect to login if not authenticated",
+            "content": {}
+          },
+          "401": {
+            "description": "Authentication required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "addFavoritePost"
+      },
+      "delete": {
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Remove Favorite Post",
+        "description": "Remove a post from the user's favorite posts",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "The service where the post is located",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The ID of the creator",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "description": "The ID of the post",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unfavorite post removed successfully",
+            "content": {}
+          },
+          "302": {
+            "description": "Redirect to login if not authenticated",
+            "content": {}
+          },
+          "401": {
+            "description": "Authentication required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "removeFavoritePost"
+      }
+    },
+    "/favorites/creator/{service}/{creator_id}": {
+      "post": {
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Add Favorite creator",
+        "description": "Add an creator to the user's favorite creators",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "The service where the creator is located",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The ID of the creator",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Favorite creator added successfully",
+            "content": {}
+          },
+          "302": {
+            "description": "Redirect to login if not authenticated",
+            "content": {}
+          },
+          "401": {
+            "description": "Authentication required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "addFavoriteCreator"
+      },
+      "delete": {
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "summary": "Remove Favorite Creator",
+        "description": "Remove an creator from the user's favorite creators",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "The service where the creator is located",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The ID of the creator",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Favorite creator removed successfully",
+            "content": {}
+          },
+          "302": {
+            "description": "Redirect to login if not authenticated",
+            "content": {}
+          },
+          "401": {
+            "description": "Authentication required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "removeFavoriteCreator"
+      }
+    },
+    "/search_hash/{file_hash}": {
+      "get": {
+        "tags": [
+          "File Search"
+        ],
+        "summary": "Lookup file by hash",
+        "parameters": [
+          {
+            "name": "file_hash",
+            "in": "path",
+            "required": true,
+            "description": "SHA-2 / SHA-256",
+            "schema": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-fA-F]{64}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileSearchResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found"
+          }
+        },
+        "operationId": "searchFileByHash"
+      }
+    },
+    "/{service}/user/{creator_id}/post/{post}/flag": {
+      "post": {
+        "tags": [
+          "Post Flagging"
+        ],
+        "summary": "Flag a post",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "post",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Flagged successfully",
+            "content": {}
+          },
+          "409": {
+            "description": "Already flagged",
+            "content": {}
+          }
+        },
+        "operationId": "flagPost"
+      },
+      "get": {
+        "tags": [
+          "Post Flagging"
+        ],
+        "summary": "Check if a Post is flagged",
+        "description": "Check if a Post is flagged",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "The service where the post is located",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The creator of the post",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "post",
+            "in": "path",
+            "description": "The ID of the post to flag",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The post is flagged",
+            "content": {}
+          },
+          "404": {
+            "description": "The post has no flag",
+            "content": {}
+          }
+        },
+        "operationId": "isPostFlagged"
+      }
+    },
+    "/{service}/user/{creator_id}/post/{post_id}/revisions": {
+      "get": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "List a Post's Revisions",
+        "description": "List revisions of a specific post by service, creator_id, and post_id",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "The service where the post is located",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The ID of the creator",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "description": "The ID of the post",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of post revisions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Revision"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Post not found"
+          }
+        },
+        "operationId": "listPostRevisions"
+      }
+    },
+    "/{service}/user/{creator_id}/post/{post_id}/comments": {
+      "get": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "List a post's comments",
+        "description": "List comments for a specific post by service, creator_id, and post_id.",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "description": "The post's service.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "creator_id",
+            "in": "path",
+            "description": "The service ID of the post's creator.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "description": "The service ID of the post.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of post comments.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Comment"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No comments found."
+          }
+        },
+        "operationId": "listPostComments"
+      }
+    },
+    "/app_version": {
+      "get": {
+        "tags": [
+          "Misc"
+        ],
+        "summary": "Git Commit Hash",
+        "description": "Show current App commit hash",
+        "responses": {
+          "200": {
+            "description": "Commit Hash",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getAppVersion"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "description": "Session key that can be found in cookies after a successful login",
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session"
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "FileReference": {
+        "type": "object",
+        "description": "A file name and Pawchive data path.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "path": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CreatorSummary": {
+        "type": "object",
+        "required": [
+          "favorited",
+          "id",
+          "indexed",
+          "name",
+          "service",
+          "updated"
+        ],
+        "properties": {
+          "favorited": {
+            "type": "integer",
+            "description": "Number of Pawchive favorites."
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "indexed": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              }
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "service": {
+            "type": "string",
+            "minLength": 1
+          },
+          "updated": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              }
+            ]
+          }
+        }
+      },
+      "CreatorProfile": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "service"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "public_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "service": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string"
+          },
+          "indexed": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "updated": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "relation_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "ever_imported": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "kemono_favorited": {
+            "type": "integer",
+            "nullable": true
+          },
+          "last_import_favs": {
+            "type": "integer",
+            "nullable": true
+          },
+          "import_size_cap_gb": {
+            "type": "number",
+            "nullable": true
+          }
+        }
+      },
+      "Post": {
+        "type": "object",
+        "required": [
+          "id",
+          "user",
+          "service"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "user": {
+            "type": "string",
+            "minLength": 1
+          },
+          "service": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          },
+          "substring": {
+            "type": "string",
+            "nullable": true
+          },
+          "embed": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "shared_file": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "added": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "published": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "edited": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "file": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FileReference"
+              }
+            ],
+            "nullable": true
+          },
+          "attachments": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/FileReference"
+            }
+          },
+          "poll": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "captions": {
+            "type": "array",
+            "nullable": true,
+            "items": {}
+          },
+          "tags": {
+            "type": "array",
+            "nullable": true,
+            "items": {}
+          },
+          "origin": {
+            "type": "string",
+            "nullable": true
+          },
+          "preview_state": {
+            "type": "string",
+            "nullable": true
+          },
+          "has_full": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "preview_attempts": {
+            "type": "integer",
+            "nullable": true
+          },
+          "detail_fetched": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "import_size_cap_gb": {
+            "type": "number",
+            "nullable": true
+          },
+          "next": {
+            "type": "string",
+            "nullable": true
+          },
+          "prev": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "Revision": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Post"
+          },
+          {
+            "type": "object",
+            "required": [
+              "revision_id"
+            ],
+            "properties": {
+              "revision_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ]
+      },
+      "Announcement": {
+        "type": "object",
+        "properties": {
+          "service": {
+            "type": "string",
+            "nullable": true
+          },
+          "user_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "hash": {
+            "type": "string",
+            "nullable": true,
+            "description": "SHA-256 digest."
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          },
+          "added": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "Fancard": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "user_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "file_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "hash": {
+            "type": "string",
+            "nullable": true
+          },
+          "mtime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "ctime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "mime": {
+            "type": "string",
+            "nullable": true
+          },
+          "ext": {
+            "type": "string",
+            "nullable": true
+          },
+          "added": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "size": {
+            "type": "integer",
+            "nullable": true
+          },
+          "ihash": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "FileSearchPost": {
+        "type": "object",
+        "properties": {
+          "file_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "user": {
+            "type": "string",
+            "nullable": true
+          },
+          "service": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "substring": {
+            "type": "string",
+            "nullable": true
+          },
+          "published": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "file": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FileReference"
+              }
+            ],
+            "nullable": true
+          },
+          "attachments": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/FileReference"
+            }
+          }
+        }
+      },
+      "DiscordFileSearchPost": {
+        "type": "object",
+        "properties": {
+          "file_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "server": {
+            "type": "string",
+            "nullable": true
+          },
+          "channel": {
+            "type": "string",
+            "nullable": true
+          },
+          "substring": {
+            "type": "string",
+            "nullable": true
+          },
+          "published": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "embeds": {
+            "type": "array",
+            "nullable": true,
+            "items": {}
+          },
+          "mentions": {
+            "type": "array",
+            "nullable": true,
+            "items": {}
+          },
+          "attachments": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/FileReference"
+            }
+          }
+        }
+      },
+      "FileSearchResult": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "hash": {
+            "type": "string",
+            "nullable": true
+          },
+          "mtime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "ctime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "mime": {
+            "type": "string",
+            "nullable": true
+          },
+          "ext": {
+            "type": "string",
+            "nullable": true
+          },
+          "added": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "size": {
+            "type": "integer",
+            "nullable": true
+          },
+          "ihash": {
+            "type": "string",
+            "nullable": true
+          },
+          "posts": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/FileSearchPost"
+            }
+          },
+          "discord_posts": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/DiscordFileSearchPost"
+            }
+          }
+        }
+      },
+      "CommentRevision": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          },
+          "added": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "commenter": {
+            "type": "string",
+            "nullable": true
+          },
+          "commenter_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          },
+          "published": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "revisions": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/CommentRevision"
+            }
+          }
+        }
+      },
+      "AccountFavorite": {
+        "type": "object",
+        "properties": {
+          "faved_seq": {
+            "type": "integer",
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "indexed": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "last_imported": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "service": {
+            "type": "string",
+            "nullable": true
+          },
+          "updated": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      }
+    }
+  },
+  "x-ktoolbox-source-schema": "pawchive_openapi.json",
+  "x-ktoolbox-public-operations": [
+    "GET /app_version",
+    "GET /creators",
+    "GET /posts",
+    "GET /search_hash/{file_hash}",
+    "GET /{service}/user/{creator_id}",
+    "GET /{service}/user/{creator_id}/announcements",
+    "GET /{service}/user/{creator_id}/fancards",
+    "GET /{service}/user/{creator_id}/links",
+    "GET /{service}/user/{creator_id}/post/{post_id}",
+    "GET /{service}/user/{creator_id}/post/{post_id}/comments",
+    "GET /{service}/user/{creator_id}/post/{post_id}/revisions",
+    "GET /{service}/user/{creator_id}/post/{post}/flag",
+    "GET /{service}/user/{creator_id}/profile",
+    "POST /{service}/user/{creator_id}/post/{post}/flag"
+  ],
+  "x-ktoolbox-authenticated-operations": [
+    "DELETE /favorites/creator/{service}/{creator_id}",
+    "DELETE /favorites/post/{service}/{creator_id}/{post_id}",
+    "GET /account/favorites",
+    "POST /favorites/creator/{service}/{creator_id}",
+    "POST /favorites/post/{service}/{creator_id}/{post_id}"
+  ],
+  "x-ktoolbox-observations": [
+    "The top-level contact object belongs under info.contact.",
+    "Post detail returns a Post directly rather than a post/props wrapper.",
+    "Post, creator profile, and comment responses contain named fields absent from the raw schema.",
+    "The app_version response is arbitrary text and is not guaranteed to be a 40-character hash.",
+    "Unknown response fields are retained by generated models for drift reporting."
+  ]
+}

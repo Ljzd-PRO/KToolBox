@@ -1,0 +1,285 @@
+{
+  "schema_version": 1,
+  "source": "pawchive_openapi.json",
+  "normalized": "pawchive_openapi.normalized.json",
+  "observations": [
+    "The top-level contact object belongs under info.contact.",
+    "Post detail returns a Post directly rather than a post/props wrapper.",
+    "Post, creator profile, and comment responses contain named fields absent from the raw schema.",
+    "The app_version response is arbitrary text and is not guaranteed to be a 40-character hash.",
+    "Unknown response fields are retained by generated models for drift reporting."
+  ],
+  "public_operations": [
+    "GET /creators",
+    "GET /posts",
+    "GET /{service}/user/{creator_id}/profile",
+    "GET /{service}/user/{creator_id}",
+    "GET /{service}/user/{creator_id}/announcements",
+    "GET /{service}/user/{creator_id}/fancards",
+    "GET /{service}/user/{creator_id}/links",
+    "GET /{service}/user/{creator_id}/post/{post_id}",
+    "GET /search_hash/{file_hash}",
+    "POST /{service}/user/{creator_id}/post/{post}/flag",
+    "GET /{service}/user/{creator_id}/post/{post}/flag",
+    "GET /{service}/user/{creator_id}/post/{post_id}/revisions",
+    "GET /{service}/user/{creator_id}/post/{post_id}/comments",
+    "GET /app_version"
+  ],
+  "authenticated_operations": [
+    "GET /account/favorites",
+    "POST /favorites/post/{service}/{creator_id}/{post_id}",
+    "DELETE /favorites/post/{service}/{creator_id}/{post_id}",
+    "POST /favorites/creator/{service}/{creator_id}",
+    "DELETE /favorites/creator/{service}/{creator_id}"
+  ],
+  "operations": {
+    "GET /creators": {
+      "operationId": "listCreators",
+      "response": {"status": "200", "media_type": "application/json", "model": "CreatorSummary", "many": true}
+    },
+    "GET /posts": {
+      "operationId": "listRecentPosts",
+      "response": {"status": "200", "media_type": "application/json", "model": "Post", "many": true}
+    },
+    "GET /{service}/user/{creator_id}/profile": {
+      "operationId": "getCreatorProfile",
+      "response": {"status": "200", "media_type": "application/json", "model": "CreatorProfile"}
+    },
+    "GET /{service}/user/{creator_id}": {
+      "operationId": "listCreatorPosts",
+      "response": {"status": "200", "media_type": "application/json", "model": "Post", "many": true}
+    },
+    "GET /{service}/user/{creator_id}/announcements": {
+      "operationId": "listCreatorAnnouncements",
+      "response": {"status": "200", "media_type": "application/json", "model": "Announcement", "many": true}
+    },
+    "GET /{service}/user/{creator_id}/fancards": {
+      "operationId": "listCreatorFancards",
+      "response": {"status": "200", "media_type": "application/json", "model": "Fancard", "many": true}
+    },
+    "GET /{service}/user/{creator_id}/links": {
+      "operationId": "listCreatorLinks",
+      "response": {"status": "200", "media_type": "application/json", "model": "CreatorProfile", "many": true}
+    },
+    "GET /{service}/user/{creator_id}/post/{post_id}": {
+      "operationId": "getPost",
+      "response": {"status": "200", "media_type": "application/json", "model": "Post"}
+    },
+    "GET /account/favorites": {
+      "operationId": "listAccountFavorites",
+      "response": {"status": "200", "media_type": "application/json", "model": "AccountFavorite", "many": true}
+    },
+    "POST /favorites/post/{service}/{creator_id}/{post_id}": {"operationId": "addFavoritePost"},
+    "DELETE /favorites/post/{service}/{creator_id}/{post_id}": {"operationId": "removeFavoritePost"},
+    "POST /favorites/creator/{service}/{creator_id}": {"operationId": "addFavoriteCreator"},
+    "DELETE /favorites/creator/{service}/{creator_id}": {"operationId": "removeFavoriteCreator"},
+    "GET /search_hash/{file_hash}": {
+      "operationId": "searchFileByHash",
+      "response": {"status": "200", "media_type": "application/json", "model": "FileSearchResult"}
+    },
+    "POST /{service}/user/{creator_id}/post/{post}/flag": {"operationId": "flagPost"},
+    "GET /{service}/user/{creator_id}/post/{post}/flag": {"operationId": "isPostFlagged"},
+    "GET /{service}/user/{creator_id}/post/{post_id}/revisions": {
+      "operationId": "listPostRevisions",
+      "response": {"status": "200", "media_type": "application/json", "model": "Revision", "many": true}
+    },
+    "GET /{service}/user/{creator_id}/post/{post_id}/comments": {
+      "operationId": "listPostComments",
+      "response": {"status": "200", "media_type": "application/json", "model": "Comment", "many": true}
+    },
+    "GET /app_version": {
+      "operationId": "getAppVersion",
+      "response": {"status": "200", "media_type": "text/plain", "type": "string"}
+    }
+  },
+  "component_schemas": {
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {"error": {"type": "string"}}
+    },
+    "FileReference": {
+      "type": "object",
+      "description": "A file name and Pawchive data path.",
+      "properties": {
+        "name": {"type": "string", "nullable": true},
+        "path": {"type": "string", "nullable": true}
+      }
+    },
+    "CreatorSummary": {
+      "type": "object",
+      "required": ["favorited", "id", "indexed", "name", "service", "updated"],
+      "properties": {
+        "favorited": {"type": "integer", "description": "Number of Pawchive favorites."},
+        "id": {"type": "string", "minLength": 1},
+        "indexed": {"oneOf": [{"type": "number"}, {"type": "string", "format": "date-time"}]},
+        "name": {"type": "string"},
+        "service": {"type": "string", "minLength": 1},
+        "updated": {"oneOf": [{"type": "number"}, {"type": "string", "format": "date-time"}]}
+      }
+    },
+    "CreatorProfile": {
+      "type": "object",
+      "required": ["id", "name", "service"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "public_id": {"type": "string", "nullable": true},
+        "service": {"type": "string", "minLength": 1},
+        "name": {"type": "string"},
+        "indexed": {"type": "string", "format": "date-time", "nullable": true},
+        "updated": {"type": "string", "format": "date-time", "nullable": true},
+        "relation_id": {"type": "integer", "nullable": true},
+        "ever_imported": {"type": "boolean", "nullable": true},
+        "kemono_favorited": {"type": "integer", "nullable": true},
+        "last_import_favs": {"type": "integer", "nullable": true},
+        "import_size_cap_gb": {"type": "number", "nullable": true}
+      }
+    },
+    "Post": {
+      "type": "object",
+      "required": ["id", "user", "service"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "user": {"type": "string", "minLength": 1},
+        "service": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "nullable": true},
+        "content": {"type": "string", "nullable": true},
+        "substring": {"type": "string", "nullable": true},
+        "embed": {"type": "object", "nullable": true, "additionalProperties": true},
+        "shared_file": {"type": "boolean", "nullable": true},
+        "added": {"type": "string", "format": "date-time", "nullable": true},
+        "published": {"type": "string", "format": "date-time", "nullable": true},
+        "edited": {"type": "string", "format": "date-time", "nullable": true},
+        "file": {"allOf": [{"$ref": "#/components/schemas/FileReference"}], "nullable": true},
+        "attachments": {
+          "type": "array",
+          "nullable": true,
+          "items": {"$ref": "#/components/schemas/FileReference"}
+        },
+        "poll": {"type": "object", "nullable": true, "additionalProperties": true},
+        "captions": {"type": "array", "nullable": true, "items": {}},
+        "tags": {"type": "array", "nullable": true, "items": {}},
+        "origin": {"type": "string", "nullable": true},
+        "preview_state": {"type": "string", "nullable": true},
+        "has_full": {"type": "boolean", "nullable": true},
+        "preview_attempts": {"type": "integer", "nullable": true},
+        "detail_fetched": {"type": "boolean", "nullable": true},
+        "import_size_cap_gb": {"type": "number", "nullable": true},
+        "next": {"type": "string", "nullable": true},
+        "prev": {"type": "string", "nullable": true}
+      }
+    },
+    "Revision": {
+      "allOf": [
+        {"$ref": "#/components/schemas/Post"},
+        {
+          "type": "object",
+          "required": ["revision_id"],
+          "properties": {"revision_id": {"type": "integer"}}
+        }
+      ]
+    },
+    "Announcement": {
+      "type": "object",
+      "properties": {
+        "service": {"type": "string", "nullable": true},
+        "user_id": {"type": "string", "nullable": true},
+        "hash": {"type": "string", "nullable": true, "description": "SHA-256 digest."},
+        "content": {"type": "string", "nullable": true},
+        "added": {"type": "string", "format": "date-time", "nullable": true}
+      }
+    },
+    "Fancard": {
+      "type": "object",
+      "properties": {
+        "id": {"type": "integer", "nullable": true},
+        "user_id": {"type": "string", "nullable": true},
+        "file_id": {"type": "integer", "nullable": true},
+        "hash": {"type": "string", "nullable": true},
+        "mtime": {"type": "string", "format": "date-time", "nullable": true},
+        "ctime": {"type": "string", "format": "date-time", "nullable": true},
+        "mime": {"type": "string", "nullable": true},
+        "ext": {"type": "string", "nullable": true},
+        "added": {"type": "string", "format": "date-time", "nullable": true},
+        "size": {"type": "integer", "nullable": true},
+        "ihash": {"type": "string", "nullable": true}
+      }
+    },
+    "FileSearchPost": {
+      "type": "object",
+      "properties": {
+        "file_id": {"type": "integer", "nullable": true},
+        "id": {"type": "string", "nullable": true},
+        "user": {"type": "string", "nullable": true},
+        "service": {"type": "string", "nullable": true},
+        "title": {"type": "string", "nullable": true},
+        "substring": {"type": "string", "nullable": true},
+        "published": {"type": "string", "format": "date-time", "nullable": true},
+        "file": {"allOf": [{"$ref": "#/components/schemas/FileReference"}], "nullable": true},
+        "attachments": {"type": "array", "nullable": true, "items": {"$ref": "#/components/schemas/FileReference"}}
+      }
+    },
+    "DiscordFileSearchPost": {
+      "type": "object",
+      "properties": {
+        "file_id": {"type": "integer", "nullable": true},
+        "id": {"type": "string", "nullable": true},
+        "server": {"type": "string", "nullable": true},
+        "channel": {"type": "string", "nullable": true},
+        "substring": {"type": "string", "nullable": true},
+        "published": {"type": "string", "format": "date-time", "nullable": true},
+        "embeds": {"type": "array", "nullable": true, "items": {}},
+        "mentions": {"type": "array", "nullable": true, "items": {}},
+        "attachments": {"type": "array", "nullable": true, "items": {"$ref": "#/components/schemas/FileReference"}}
+      }
+    },
+    "FileSearchResult": {
+      "type": "object",
+      "properties": {
+        "id": {"type": "integer", "nullable": true},
+        "hash": {"type": "string", "nullable": true},
+        "mtime": {"type": "string", "format": "date-time", "nullable": true},
+        "ctime": {"type": "string", "format": "date-time", "nullable": true},
+        "mime": {"type": "string", "nullable": true},
+        "ext": {"type": "string", "nullable": true},
+        "added": {"type": "string", "format": "date-time", "nullable": true},
+        "size": {"type": "integer", "nullable": true},
+        "ihash": {"type": "string", "nullable": true},
+        "posts": {"type": "array", "nullable": true, "items": {"$ref": "#/components/schemas/FileSearchPost"}},
+        "discord_posts": {"type": "array", "nullable": true, "items": {"$ref": "#/components/schemas/DiscordFileSearchPost"}}
+      }
+    },
+    "CommentRevision": {
+      "type": "object",
+      "properties": {
+        "id": {"type": "integer", "nullable": true},
+        "content": {"type": "string", "nullable": true},
+        "added": {"type": "string", "format": "date-time", "nullable": true}
+      }
+    },
+    "Comment": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {"type": "string"},
+        "parent_id": {"type": "string", "nullable": true},
+        "commenter": {"type": "string", "nullable": true},
+        "commenter_name": {"type": "string", "nullable": true},
+        "content": {"type": "string", "nullable": true},
+        "published": {"type": "string", "format": "date-time", "nullable": true},
+        "revisions": {"type": "array", "nullable": true, "items": {"$ref": "#/components/schemas/CommentRevision"}}
+      }
+    },
+    "AccountFavorite": {
+      "type": "object",
+      "properties": {
+        "faved_seq": {"type": "integer", "nullable": true},
+        "id": {"type": "string", "nullable": true},
+        "indexed": {"type": "string", "format": "date-time", "nullable": true},
+        "last_imported": {"type": "string", "format": "date-time", "nullable": true},
+        "name": {"type": "string", "nullable": true},
+        "service": {"type": "string", "nullable": true},
+        "updated": {"type": "string", "format": "date-time", "nullable": true}
+      }
+    }
+  }
+}
