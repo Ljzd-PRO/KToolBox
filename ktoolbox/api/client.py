@@ -266,6 +266,23 @@ class PawchiveClient:
         response = await self._request("GET", f"/search_hash/{parameters.file_hash}")
         return self._parse_json("search_file_by_hash", response, FILE_SEARCH_ADAPTER)
 
+    async def flag_post(self, service: str, creator_id: str, post_id: str) -> None:
+        parameters = PostParameters(service=service, creator_id=creator_id, post_id=post_id)
+        path = (
+            f"/{self._segment(parameters.service)}/user/{self._segment(parameters.creator_id)}"
+            f"/post/{self._segment(parameters.post_id)}/flag"
+        )
+        await self._request("POST", path, expected_statuses=frozenset({201}))
+
+    async def is_post_flagged(self, service: str, creator_id: str, post_id: str) -> bool:
+        parameters = PostParameters(service=service, creator_id=creator_id, post_id=post_id)
+        path = (
+            f"/{self._segment(parameters.service)}/user/{self._segment(parameters.creator_id)}"
+            f"/post/{self._segment(parameters.post_id)}/flag"
+        )
+        response = await self._request("GET", path, expected_statuses=frozenset({200, 404}))
+        return response.status_code == 200
+
     async def list_post_revisions(self, service: str, creator_id: str, post_id: str) -> list[Revision]:
         parameters = PostParameters(service=service, creator_id=creator_id, post_id=post_id)
         path = (
