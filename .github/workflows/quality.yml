@@ -36,10 +36,12 @@ jobs:
           ktoolbox/action/base.py
           ktoolbox/action/fetch.py
           ktoolbox/action/search.py
+          ktoolbox/_enum.py
           ktoolbox/cli.py
           ktoolbox/configuration.py
           ktoolbox/downloader/downloader.py
           ktoolbox/job/runner.py
+          ktoolbox/utils.py
           tests
 
       - name: Check contract tooling formatting
@@ -50,10 +52,12 @@ jobs:
           ktoolbox/action/base.py
           ktoolbox/action/fetch.py
           ktoolbox/action/search.py
+          ktoolbox/_enum.py
           ktoolbox/cli.py
           ktoolbox/configuration.py
           ktoolbox/downloader/downloader.py
           ktoolbox/job/runner.py
+          ktoolbox/utils.py
           tests
 
       - name: Type-check Pawchive client
@@ -67,6 +71,9 @@ jobs:
           ktoolbox/action/search.py
           ktoolbox/api/utils.py
           ktoolbox/cli.py
+
+      - name: Compile Python sources
+        run: poetry run python -m compileall -q ktoolbox k_generator
 
       - name: Test Pawchive API layer at 100% coverage
         run: >-
@@ -83,3 +90,9 @@ jobs:
 
       - name: Run hermetic test suite at 85% coverage
         run: poetry run pytest --cov --cov-fail-under=85
+
+      - name: Build documentation without warnings
+        run: poetry run mkdocs build --strict
+
+      - name: Build source and wheel distributions
+        run: poetry build

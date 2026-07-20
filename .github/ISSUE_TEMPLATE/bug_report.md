@@ -20,14 +20,15 @@ For example:
 ### Command
 
 ```shell
-ktoolbox sync-creator https://kemono.su/fanbox/user/9016 --length=10
+ktoolbox sync-creator https://pawchive.pw/fanbox/user/6570768 --length=1
 ```
 
 ### Configuration
 
 ```dotenv
-KTOOLBOX_API__NETLOC=coomer.su
-KTOOLBOX_API__FILES_NETLOC=coomer.su
+KTOOLBOX_API__NETLOC=pawchive.pw
+KTOOLBOX_API__PATH=/api/v1
+KTOOLBOX_DOWNLOADER__FILES_NETLOC=file.pawchive.pw
 ```
 
 ## Screenshots
@@ -40,7 +41,7 @@ Please complete the following information
 
  - OS: [e.g. Windows]
  - Python Version [e.g. 3.11]
- - KToolBox Version [e.g. 0.10.0]
+ - KToolBox Version [e.g. 1.0.0]
 
 **Additional context**
 Add any other context about the problem here.

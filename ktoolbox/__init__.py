@@ -1,4 +1,4 @@
 __title__ = "KToolBox"
 # noinspection SpellCheckingInspection
-__description__ = "A useful CLI tool for downloading posts in Kemono.cr / .su / .party"
-__version__ = "v0.24.0"
+__description__ = "An asynchronous CLI and typed Python client for downloading public Pawchive posts"
+__version__ = "v1.0.0"

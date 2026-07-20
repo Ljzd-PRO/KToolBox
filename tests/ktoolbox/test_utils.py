@@ -126,7 +126,7 @@ async def test_update_check_github_and_pypi_fallbacks() -> None:
         FakeAsyncClient.responses = [json_response({"tag_name": "v99.0.0", "html_url": "https://release.test"})]
         await check_for_updates()
 
-        FakeAsyncClient.responses = [json_response({"tag_name": "v0.24.0", "html_url": "https://release.test"})]
+        FakeAsyncClient.responses = [json_response({"tag_name": "v1.0.0", "html_url": "https://release.test"})]
         await check_for_updates()
 
         FakeAsyncClient.responses = [
@@ -135,7 +135,7 @@ async def test_update_check_github_and_pypi_fallbacks() -> None:
         ]
         await check_for_updates()
 
-        FakeAsyncClient.responses = [json_response({}, 500), json_response({"info": {"version": "0.24.0"}})]
+        FakeAsyncClient.responses = [json_response({}, 500), json_response({"info": {"version": "1.0.0"}})]
         await check_for_updates()
 
         FakeAsyncClient.responses = [httpx.ConnectError("offline"), httpx.ConnectError("offline")]
