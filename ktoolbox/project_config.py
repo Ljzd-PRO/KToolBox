@@ -12,6 +12,8 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from tomlkit.items import AoT
 from tomlkit.toml_document import TOMLDocument
 
+from ktoolbox.blocker.model import BlockerSpec
+
 PROJECT_CONFIG_ENV = "KTOOLBOX_PROJECT_CONFIG"
 DEFAULT_PROJECT_CONFIG_PATH = Path("ktoolbox.toml")
 
@@ -54,6 +56,7 @@ class ProjectConfiguration(BaseModel):
 
     schema_version: Literal[1] = 1
     creators: list[CreatorReference] = Field(default_factory=list)
+    blockers: list[BlockerSpec] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def validate_unique_creators(self) -> ProjectConfiguration:
@@ -69,6 +72,15 @@ class ProjectConfiguration(BaseModel):
                 if normalized_alias in aliases:
                     raise ValueError(f"duplicate creator alias: {creator.alias}")
                 aliases.add(normalized_alias)
+        blocker_ids: set[str] = set()
+        from ktoolbox.blocker.engine import blocker_registry
+
+        for blocker in self.blockers:
+            normalized_id = blocker.id.casefold()
+            if normalized_id in blocker_ids:
+                raise ValueError(f"duplicate blocker ID: {blocker.id}")
+            blocker_ids.add(normalized_id)
+            blocker_registry.validate(blocker)
         return self
 
     def find_creator(self, target: str) -> CreatorReference | None:
@@ -130,11 +142,34 @@ class ProjectConfigStore:
         except (OSError, ValueError, TypeError) as error:
             raise ProjectConfigError(f"invalid project configuration {self.path}: {error}") from error
 
+    def load_text(self) -> str:
+        if self.path.exists():
+            try:
+                return self.path.read_text(encoding="utf-8")
+            except OSError as error:
+                raise ProjectConfigError(f"unable to read project configuration {self.path}: {error}") from error
+        document = tomlkit.document()
+        document.add("schema_version", 1)
+        document.add("creators", tomlkit.aot())
+        document.add("blockers", tomlkit.aot())
+        return tomlkit.dumps(document)
+
+    def replace_text(self, content: str) -> ProjectConfiguration:
+        try:
+            document = tomlkit.parse(content)
+            configuration = ProjectConfiguration.model_validate(document.unwrap())
+        except (ValueError, TypeError) as error:
+            raise ProjectConfigError(f"invalid project configuration {self.path}: {error}") from error
+        self._document = document
+        self.save(configuration)
+        return configuration
+
     def save(self, configuration: ProjectConfiguration) -> None:
         configuration = ProjectConfiguration.model_validate(configuration)
         document = self._document.copy()
         document["schema_version"] = configuration.schema_version
         document["creators"] = _creator_tables(configuration.creators)
+        document["blockers"] = _blocker_tables(configuration.blockers)
         self.path.parent.mkdir(parents=True, exist_ok=True)
 
         temporary_path: Path | None = None
@@ -197,5 +232,18 @@ def _creator_tables(creators: list[CreatorReference]) -> AoT:
         if creator.alias is not None:
             table.add("alias", creator.alias)
         table.add("enabled", creator.enabled)
+        tables.append(table)
+    return tables
+
+
+def _blocker_tables(blockers: list[BlockerSpec]) -> AoT:
+    tables = tomlkit.aot()
+    for blocker in blockers:
+        table = tomlkit.table()
+        table.add("id", blocker.id)
+        table.add("type", blocker.type)
+        table.add("enabled", blocker.enabled)
+        table.add("scope", tomlkit.item(blocker.scope.model_dump(mode="python")))
+        table.add("options", tomlkit.item(blocker.options))
         tables.append(table)
     return tables

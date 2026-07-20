@@ -15,6 +15,7 @@ from ktoolbox.action.fetch import FetchInterruptError
 from ktoolbox.action.job import create_job_from_creator, create_job_from_post
 from ktoolbox.api.errors import PawchiveHTTPError, PawchiveNotFoundError
 from ktoolbox.api.generated import FileReference, Post, Revision
+from ktoolbox.blocker import BlockerEngine, BlockerSpec
 from ktoolbox.configuration import config
 from ktoolbox.job import Job
 
@@ -253,6 +254,48 @@ async def test_create_creator_jobs_offset_all_pages_mix_and_owned_scope(tmp_path
     assert create.await_args.kwargs["post_path"] == tmp_path
     assert create.await_args.kwargs["post_dir"] is False
     assert not (tmp_path / "creator-indices.ktoolbox").exists()
+
+
+@pytest.mark.asyncio
+async def test_create_creator_jobs_blocks_before_generation_and_indices(tmp_path: Path) -> None:
+    client = SimpleNamespace(list_post_revisions=AsyncMock())
+    blocker = BlockerSpec(
+        id="daily-life",
+        options={
+            "rule": {
+                "kind": "group",
+                "mode": "any",
+                "conditions": [
+                    {
+                        "kind": "field",
+                        "field": "content",
+                        "operator": "contains",
+                        "values": ["daily"],
+                    }
+                ],
+            }
+        },
+    )
+    with (
+        patch("ktoolbox.action.job.fetch_creator_posts", page_source([post(content="Daily notes")])),
+        patch("ktoolbox.action.job.create_job_from_post", new_callable=AsyncMock) as create,
+    ):
+        result = await create_job_from_creator(
+            "fanbox",
+            "creator",
+            tmp_path,
+            length=1,
+            save_creator_indices=True,
+            start_time=None,
+            end_time=None,
+            blocker_engine=BlockerEngine.from_specs([blocker]),
+            client=client,
+        )
+
+    assert result.data == []
+    create.assert_not_awaited()
+    indices = json.loads((tmp_path / "creator-indices.ktoolbox").read_text())
+    assert indices["posts"] == {}
 
 
 @pytest.mark.asyncio

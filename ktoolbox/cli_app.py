@@ -269,9 +269,12 @@ async def post_show(
 
 
 @config_app.command(name="edit")
-async def config_edit() -> int:
+async def config_edit(
+    *,
+    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
+) -> int:
     """Open the optional terminal configuration editor."""
-    await KToolBoxCli.config_editor()
+    await KToolBoxCli.config_editor(config_path)
     return 0
 
 

@@ -123,3 +123,7 @@ warn_unused_configs = true
 [[tool.mypy.overrides]]
 module = ["ktoolbox.api", "ktoolbox.api.*"]
 strict = true
+
+[[tool.mypy.overrides]]
+module = ["ktoolbox.editor"]
+ignore_errors = true

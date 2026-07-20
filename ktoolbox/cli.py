@@ -89,12 +89,15 @@ class KToolBoxCli:
             return _error_message(error)
 
     @staticmethod
-    async def config_editor() -> None:
+    async def config_editor(project_config_path: Path | None = None) -> None:
         """Launch the graphical KToolBox configuration editor."""
         try:
             from ktoolbox.editor import run_config_editor
 
-            run_config_editor()  # type: ignore[no-untyped-call]
+            if project_config_path is None:
+                run_config_editor()
+            else:
+                run_config_editor(project_config_path)
         except ModuleNotFoundError:
             logger.error(
                 "You need to install extra dependencies to use the editor, "

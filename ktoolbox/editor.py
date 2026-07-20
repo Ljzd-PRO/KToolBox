@@ -4,17 +4,26 @@ import json
 import pprint
 import warnings
 import webbrowser
+from collections.abc import Callable, Generator, Hashable, Iterable, Sequence
 from pathlib import Path
-from typing import get_args, Literal, Union, TypeVar, Optional, Tuple, Any, Callable, Hashable, Iterable, NoReturn, \
-    List, Generator, Sequence
+from typing import (
+    Any,
+    Literal,
+    NoReturn,
+    TypeVar,
+    Union,
+    get_args,
+)
 
 import urwid
 from pydantic import BaseModel
+
 # noinspection PyProtectedMember
 from pydantic._internal._model_construction import ModelMetaclass
 
 from ktoolbox import __version__
-from ktoolbox.configuration import config, Configuration
+from ktoolbox.configuration import Configuration, config
+from ktoolbox.project_config import ProjectConfigError, ProjectConfigStore
 
 warnings.filterwarnings("ignore")
 
@@ -28,17 +37,13 @@ class EditWithSignalWidget(urwid.Edit):
     """
 
     def __init__(
-            self,
-            *args,
-            on_state_change: Optional[Callable[[EditWithSignalWidget, _T], Any]],
-            user_data: Optional[_T],
-            **kwargs
+        self, *args, on_state_change: Callable[[EditWithSignalWidget, _T], Any] | None, user_data: _T | None, **kwargs
     ) -> None:
         self.__on_state_change = on_state_change
         self.__user_data = user_data
         super().__init__(*args, **kwargs)
 
-    def keypress(self, size: Tuple[int], key: str) -> Union[str, None]:
+    def keypress(self, size: tuple[int], key: str) -> str | None:
         ret = super().keypress(size, key)
         self.__on_state_change(self, self.__user_data)
         return ret
@@ -54,9 +59,7 @@ class CascadingBoxes(urwid.WidgetPlaceholder):
 
     def open_box(self, box: urwid.Widget):
         self.original_widget = urwid.Overlay(
-            urwid.LineBox(
-                urwid.Padding(box, align=urwid.CENTER, left=2, right=2)
-            ),
+            urwid.LineBox(urwid.Padding(box, align=urwid.CENTER, left=2, right=2)),
             self.original_widget,
             align=urwid.CENTER,
             width=(urwid.RELATIVE, 80),
@@ -71,7 +74,7 @@ class CascadingBoxes(urwid.WidgetPlaceholder):
         )
         self.box_level += 1
 
-    def back(self) -> Optional[NoReturn]:
+    def back(self) -> NoReturn | None:
         self.original_widget = self.original_widget[0]
         self.box_level -= 1
         return None
@@ -79,7 +82,7 @@ class CascadingBoxes(urwid.WidgetPlaceholder):
     def exit(self):
         raise urwid.ExitMainLoop()
 
-    def keypress(self, size, key: str) -> Union[str, NoReturn, None]:
+    def keypress(self, size, key: str) -> str | NoReturn | None:
         if key == "esc":
             if self.box_level > 1:
                 self.back()
@@ -88,7 +91,7 @@ class CascadingBoxes(urwid.WidgetPlaceholder):
         return super().keypress(size, key)
 
 
-def dump_envs(model: BaseModel) -> List[str]:
+def dump_envs(model: BaseModel) -> list[str]:
     """Dump environment variables, with no Env prefix"""
     envs = []
     for field in model.model_fields:
@@ -104,15 +107,13 @@ def dump_envs(model: BaseModel) -> List[str]:
     return envs
 
 
-def dump_modified_envs(envs: List[str]) -> List[str]:
+def dump_modified_envs(envs: list[str]) -> list[str]:
     """
     Dump modified environment variables, with Env prefix
 
     :param envs: Current Envs
     """
-    return sorted([
-        f"KTOOLBOX_{env}" for env in set(envs) - default_config_envs
-    ])
+    return sorted([f"KTOOLBOX_{env}" for env in set(envs) - default_config_envs])
 
 
 def save_dotenv():
@@ -130,8 +131,12 @@ def save_dotenv():
     initial_envs.update(current_envs)
 
 
-def has_changed() -> bool:
+def has_env_changed() -> bool:
     return bool(set(dump_envs(config)) - initial_envs)
+
+
+def has_changed() -> bool:
+    return has_env_changed() or project_toml_editor.edit_text != initial_project_text
 
 
 def menu_option(widget: urwid.Widget) -> urwid.AttrMap:
@@ -140,62 +145,53 @@ def menu_option(widget: urwid.Widget) -> urwid.AttrMap:
 
 
 def sub_menu_with_menu_widget(
-        caption: Union[str, Tuple[Hashable, str], List[Union[str, Tuple[Hashable, str]]]],
-        choices: Iterable[urwid.Widget],
-) -> Tuple[urwid.AttrMap[urwid.Button], urwid.ListBox]:
+    caption: str | tuple[Hashable, str] | list[str | tuple[Hashable, str]],
+    choices: Iterable[urwid.Widget],
+) -> tuple[urwid.AttrMap[urwid.Button], urwid.ListBox]:
     contents = menu(
-        caption,
-        list(choices) + [
-            urwid.Divider(bottom=2),
-            menu_option(urwid.Button(
-                "Back", lambda x: top.back()
-            ))
-        ]
+        caption, list(choices) + [urwid.Divider(bottom=2), menu_option(urwid.Button("Back", lambda x: top.back()))]
     )
 
-    return menu_option(urwid.Button(
-        [caption, "..."],
-        lambda x: top.open_box(contents)
-    )), contents
+    return menu_option(urwid.Button([caption, "..."], lambda x: top.open_box(contents))), contents
 
 
 def sub_menu(
-        caption: Union[str, Tuple[Hashable, str], List[Union[str, Tuple[Hashable, str]]]],
-        choices: Iterable[urwid.Widget],
+    caption: str | tuple[Hashable, str] | list[str | tuple[Hashable, str]],
+    choices: Iterable[urwid.Widget],
 ) -> urwid.AttrMap[urwid.Button]:
     button, _ = sub_menu_with_menu_widget(caption, choices)
     return button
 
 
 def menu(
-        title: Union[str, Tuple[Hashable, str], List[Union[str, Tuple[Hashable, str]]]],
-        choices: Iterable[urwid.Widget],
+    title: str | tuple[Hashable, str] | list[str | tuple[Hashable, str]],
+    choices: Iterable[urwid.Widget],
 ) -> urwid.ListBox:
     body = [urwid.Text(title, align=urwid.CENTER), urwid.Divider(), *choices]
     return urwid.ListBox(urwid.SimpleFocusListWalker(body))
 
 
-def on_radio_button_change(_: urwid.RadioButton, state: bool, user_data: Tuple[BaseModel, str, Any]):
+def on_radio_button_change(_: urwid.RadioButton, state: bool, user_data: tuple[BaseModel, str, Any]):
     if state:
         model, field, value = user_data
         model.__setattr__(field, value)
 
 
-def on_checkbox_change(_: urwid.CheckBox, state: bool, user_data: Tuple[BaseModel, str]):
+def on_checkbox_change(_: urwid.CheckBox, state: bool, user_data: tuple[BaseModel, str]):
     model, field = user_data
     model.__setattr__(field, state)
 
 
 def on_add_item(
-        _: urwid.Button,
-        user_data: Tuple[
-            BaseModel,
-            str,
-            Callable[[], Optional[Any]],
-            Union[List[_T], List[None]],
-            Callable[[], _T],
-            Union[urwid.MonitoredFocusList[_T], urwid.ListWalker]
-        ]
+    _: urwid.Button,
+    user_data: tuple[
+        BaseModel,
+        str,
+        Callable[[], Any | None],
+        list[_T] | list[None],
+        Callable[[], _T],
+        urwid.MonitoredFocusList[_T] | urwid.ListWalker,
+    ],
 ):
     """
     Call when add item to List/Set/Tuple field
@@ -213,14 +209,8 @@ def on_add_item(
 
 
 def on_remove_item(
-        _: urwid.Button,
-        user_data: Tuple[
-            BaseModel,
-            str,
-            Union[List[_T], List[None]],
-            _T,
-            Union[urwid.MonitoredFocusList[_T], urwid.ListWalker]
-        ]
+    _: urwid.Button,
+    user_data: tuple[BaseModel, str, list[_T] | list[None], _T, urwid.MonitoredFocusList[_T] | urwid.ListWalker],
 ):
     """
     Call when remove item to List/Set/Tuple field
@@ -238,14 +228,8 @@ def on_remove_item(
 
 
 def on_item_changed(
-        widget: EditWithSignalWidget,
-        user_data: Tuple[
-            BaseModel,
-            str,
-            Callable[[EditWithSignalWidget], Any],
-            Union[List[_T], List[None]],
-            _T
-        ]
+    widget: EditWithSignalWidget,
+    user_data: tuple[BaseModel, str, Callable[[EditWithSignalWidget], Any], list[_T] | list[None], _T],
 ):
     """
     Call when List/Set/Tuple field item changed
@@ -260,7 +244,7 @@ def on_item_changed(
     model.__setattr__(field, values)
 
 
-def on_edit_change(widget: urwid.EditWithSignalWidget, user_data: Tuple[BaseModel, str, Iterable[type]]):
+def on_edit_change(widget: urwid.EditWithSignalWidget, user_data: tuple[BaseModel, str, Iterable[type]]):
     model, field, annotation = user_data
     for field_type in annotation:
         try:
@@ -272,58 +256,79 @@ def on_edit_change(widget: urwid.EditWithSignalWidget, user_data: Tuple[BaseMode
 
 
 def on_save_dotenv(_: urwid.Button):
-    if has_changed():
-        pile = urwid.Pile([
-            urwid.Text("Your changes have been saved."),
-            urwid.Divider(),
-            menu_option(urwid.Button(
-                "OK", lambda x: top.back()
-            )),
-        ])
+    if has_env_changed():
+        pile = urwid.Pile(
+            [
+                urwid.Text("Your changes have been saved."),
+                urwid.Divider(),
+                menu_option(urwid.Button("OK", lambda x: top.back())),
+            ]
+        )
         try:
             save_dotenv()
         except Exception as e:
-            pile = urwid.Pile([
-                urwid.Text("Unable to save changes!"),
-                urwid.Divider(),
-                urwid.Text(f"{type(e).__name__}: {e}"),
-                urwid.Divider(),
-                menu_option(urwid.Button(
-                    "OK", lambda x: top.back()
-                )),
-            ])
+            pile = urwid.Pile(
+                [
+                    urwid.Text("Unable to save changes!"),
+                    urwid.Divider(),
+                    urwid.Text(f"{type(e).__name__}: {e}"),
+                    urwid.Divider(),
+                    menu_option(urwid.Button("OK", lambda x: top.back())),
+                ]
+            )
     else:
-        pile = urwid.Pile([
-            urwid.Text("Nothing has changed, no need to save."),
-            urwid.Divider(),
-            menu_option(urwid.Button(
-                "OK", lambda x: top.back()
-            )),
-        ])
+        pile = urwid.Pile(
+            [
+                urwid.Text("Nothing has changed, no need to save."),
+                urwid.Divider(),
+                menu_option(urwid.Button("OK", lambda x: top.back())),
+            ]
+        )
     top.open_box(urwid.Filler(pile))
 
 
-def exit_program(_: urwid.Button = None) -> Optional[NoReturn]:
+def on_save_project(_: urwid.Button):
+    global initial_project_text
+    try:
+        project_store.replace_text(project_toml_editor.edit_text)
+        normalized = project_store.load_text()
+        project_toml_editor.set_edit_text(normalized)
+        initial_project_text = normalized
+        message = urwid.Text(f"Project configuration saved to {project_store.path}.")
+    except ProjectConfigError as error:
+        message = urwid.Text(f"Unable to save project configuration:\n{error}")
+    top.open_box(
+        urwid.Filler(
+            urwid.Pile(
+                [
+                    message,
+                    urwid.Divider(),
+                    menu_option(urwid.Button("OK", lambda button: top.back())),
+                ]
+            )
+        )
+    )
+
+
+def exit_program(_: urwid.Button = None) -> NoReturn | None:
     if has_changed():
         top.open_box(
             urwid.Filler(
-                urwid.Pile([
-                    urwid.Text("Any unsaved changes will be lost. Are you sure you want to EXIT?"),
-                    urwid.Divider(),
-                    menu_option(urwid.Button(
-                        "NO", lambda x: top.back()
-                    )),
-                    menu_option(urwid.Button(
-                        "YES", lambda x: top.exit()
-                    )),
-                ])
+                urwid.Pile(
+                    [
+                        urwid.Text("Any unsaved changes will be lost. Are you sure you want to EXIT?"),
+                        urwid.Divider(),
+                        menu_option(urwid.Button("NO", lambda x: top.back())),
+                        menu_option(urwid.Button("YES", lambda x: top.exit())),
+                    ]
+                )
             )
         )
     else:
         top.exit()
 
 
-def get_value(item_types: Sequence[type]) -> Callable[[EditWithSignalWidget], Optional[Any]]:
+def get_value(item_types: Sequence[type]) -> Callable[[EditWithSignalWidget], Any | None]:
     def inner(w: EditWithSignalWidget = None):
         for t in item_types:
             try:
@@ -336,11 +341,11 @@ def get_value(item_types: Sequence[type]) -> Callable[[EditWithSignalWidget], Op
 
 
 def get_item(
-        model: BaseModel,
-        field: str,
-        get_value_callback: Callable[[EditWithSignalWidget], Optional[Any]],
-        widget_list: List[urwid.WidgetPlaceholder],
-        list_walker: urwid.ListWalker
+    model: BaseModel,
+    field: str,
+    get_value_callback: Callable[[EditWithSignalWidget], Any | None],
+    widget_list: list[urwid.WidgetPlaceholder],
+    list_walker: urwid.ListWalker,
 ) -> Callable[[str], urwid.WidgetPlaceholder]:
     def inner(edit_text: str = ""):
         item = urwid.WidgetPlaceholder(urwid.Widget())
@@ -348,18 +353,16 @@ def get_item(
             edit_text=edit_text,
             align=urwid.LEFT,
             on_state_change=on_item_changed,
-            user_data=(model, field, get_value_callback, widget_list, item)
+            user_data=(model, field, get_value_callback, widget_list, item),
         )
-        columns_widget = urwid.Columns([
-            edit_widget,
-            urwid.Divider(),
-            urwid.Divider(),
-            urwid.Button(
-                "Remove -",
-                on_remove_item,
-                (model, field, widget_list, item, list_walker)
-            )
-        ])
+        columns_widget = urwid.Columns(
+            [
+                edit_widget,
+                urwid.Divider(),
+                urwid.Divider(),
+                urwid.Button("Remove -", on_remove_item, (model, field, widget_list, item, list_walker)),
+            ]
+        )
         item.original_widget = columns_widget
         return item
 
@@ -376,46 +379,53 @@ def model_to_widgets(model: BaseModel, fields: Iterable[str] = None) -> Generato
     for field, field_info in model.model_fields.items():
         if fields is not None and field not in fields:
             continue
-        origin_annotation = getattr(field_info.annotation, '__origin__', None)
+        origin_annotation = getattr(field_info.annotation, "__origin__", None)
         annotation = get_args(field_info.annotation) if origin_annotation is Union else [field_info.annotation]
 
         if origin_annotation is Literal:
             radio_buttons = []
             for value in get_args(field_info.annotation):
-                menu_option(urwid.RadioButton(
-                    radio_buttons,
-                    str(value),
-                    model.__getattribute__(field) == value,
-                    on_radio_button_change,
-                    (model, field, value)
-                ))
+                menu_option(
+                    urwid.RadioButton(
+                        radio_buttons,
+                        str(value),
+                        model.__getattribute__(field) == value,
+                        on_radio_button_change,
+                        (model, field, value),
+                    )
+                )
             yield sub_menu(field, radio_buttons)
         elif bool in annotation:
-            yield menu_option(urwid.CheckBox(
-                field,
-                model.__getattribute__(field),
-                on_state_change=on_checkbox_change,
-                user_data=(model, field)
-            ))
-        elif any(map(lambda x: x in annotation, [str, int, float, Path])):
-            yield menu_option(urwid.Columns([
-                urwid.Text(f"{' ' * 4}{field}", align=urwid.LEFT),
-                EditWithSignalWidget(
-                    edit_text=str(model.__getattribute__(field)),
-                    align=urwid.RIGHT,
-                    on_state_change=on_edit_change,
-                    user_data=(model, field, annotation)
+            yield menu_option(
+                urwid.CheckBox(
+                    field, model.__getattribute__(field), on_state_change=on_checkbox_change, user_data=(model, field)
                 )
-            ]))
+            )
+        elif any(map(lambda x: x in annotation, [str, int, float, Path])):
+            yield menu_option(
+                urwid.Columns(
+                    [
+                        urwid.Text(f"{' ' * 4}{field}", align=urwid.LEFT),
+                        EditWithSignalWidget(
+                            edit_text=str(model.__getattribute__(field)),
+                            align=urwid.RIGHT,
+                            on_state_change=on_edit_change,
+                            user_data=(model, field, annotation),
+                        ),
+                    ]
+                )
+            )
         elif origin_annotation in [list, set, tuple]:
             item_types = get_args(field_info.annotation)
             widget_list = []
             widget, menu_widget = sub_menu_with_menu_widget(field, [])
             list_walker: urwid.SimpleFocusListWalker = menu_widget.body  # type: ignore
-            widget_list.extend([
-                get_item(model, field, get_value(item_types), widget_list, list_walker)
-                (str(existed)) for existed in model.__getattribute__(field)
-            ])
+            widget_list.extend(
+                [
+                    get_item(model, field, get_value(item_types), widget_list, list_walker)(str(existed))
+                    for existed in model.__getattribute__(field)
+                ]
+            )
             # noinspection PyTypeChecker
             option_widget = menu_option(
                 urwid.Button(
@@ -427,8 +437,8 @@ def model_to_widgets(model: BaseModel, fields: Iterable[str] = None) -> Generato
                         get_value(item_types),
                         widget_list,
                         get_item(model, field, get_value(item_types), widget_list, list_walker),
-                        list_walker
-                    )
+                        list_walker,
+                    ),
                 )
             )
             list_walker.extend([urwid.Divider(), option_widget, urwid.Divider()])
@@ -439,26 +449,45 @@ def model_to_widgets(model: BaseModel, fields: Iterable[str] = None) -> Generato
         else:
             yield sub_menu(
                 field,
-                [urwid.Text(
-                    f"This option ({repr(field_info.annotation)}) is currently not supported for editing in "
-                    "the graphical interface; please edit it in the '.env' or 'prod.env' file in the working directory."
-                )]
+                [
+                    urwid.Text(
+                        f"This option ({repr(field_info.annotation)}) is currently not supported for editing in "
+                        "the graphical interface; please edit it in the '.env' or 'prod.env' file in the working directory."
+                    )
+                ],
             )
     yield urwid.Divider()
-    yield menu_option(urwid.Button(
-        f"View Document: {type(model).__name__}", lambda x: webbrowser.open(
-            f"https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.{type(model).__name__}"
+    yield menu_option(
+        urwid.Button(
+            f"View Document: {type(model).__name__}",
+            lambda x: webbrowser.open(
+                f"https://ktoolbox.readthedocs.io/latest/configuration/reference/#ktoolbox.configuration.{type(model).__name__}"
+            ),
         )
-    ))
+    )
 
 
-def run_config_editor():
+def run_config_editor(project_config_path: Path | None = None):
+    global project_store, initial_project_text
+    project_store = ProjectConfigStore(project_config_path)
+    initial_project_text = load_project_editor_text(project_store)
+    project_toml_editor.set_edit_text(initial_project_text)
     urwid.MainLoop(top, palette=[("reversed", "standout", "")]).run()
+
+
+def load_project_editor_text(store: ProjectConfigStore) -> str:
+    try:
+        return store.load_text()
+    except ProjectConfigError as error:
+        return f"# {error}\n"
 
 
 default_config = Configuration(_env_file="")
 default_config_envs = set(dump_envs(default_config))
 initial_envs = set(dump_envs(config))
+project_store = ProjectConfigStore()
+initial_project_text = load_project_editor_text(project_store)
+project_toml_editor = urwid.Edit(edit_text=initial_project_text, multiline=True)
 menu_top = menu(
     "KToolBox Configuration Editor",
     [
@@ -481,75 +510,69 @@ menu_top = menu(
                     "Logger",
                     model_to_widgets(config.logger),
                 ),
-                urwid.Divider()
-            ] + list(model_to_widgets(config, ["ssl_verify", "json_dump_indent", "use_uvloop"])),
+                sub_menu(
+                    "Project roster and blockers (TOML)",
+                    [project_toml_editor],
+                ),
+                urwid.Divider(),
+            ]
+            + list(model_to_widgets(config, ["ssl_verify", "json_dump_indent", "use_uvloop"])),
         ),
         urwid.Divider(),
-        menu_option(urwid.Button(
-            "JSON Preview",
-            lambda x: top.open_box(
-                sub_menu_with_menu_widget(
-                    "JSON Preview",
-                    [
-                        urwid.Text(
-                            config.model_dump_json(indent=4)
-                        )
-                    ]
-                )[1]
+        menu_option(
+            urwid.Button(
+                "JSON Preview",
+                lambda x: top.open_box(
+                    sub_menu_with_menu_widget("JSON Preview", [urwid.Text(config.model_dump_json(indent=4))])[1]
+                ),
             )
-        )),
-        menu_option(urwid.Button(
-            "JSON Preview (Python Mode)",
-            lambda x: top.open_box(
-                sub_menu_with_menu_widget(
-                    "JSON Preview (Python Serialize Mode)",
-                    [
-                        urwid.Text(
-                            pprint.pformat(
-                                config.model_dump(mode="python"),
-                                sort_dicts=False
+        ),
+        menu_option(
+            urwid.Button(
+                "JSON Preview (Python Mode)",
+                lambda x: top.open_box(
+                    sub_menu_with_menu_widget(
+                        "JSON Preview (Python Serialize Mode)",
+                        [urwid.Text(pprint.pformat(config.model_dump(mode="python"), sort_dicts=False))],
+                    )[1]
+                ),
+            )
+        ),
+        menu_option(
+            urwid.Button(
+                "DotEnv Preview (.env / prod.env)",
+                lambda x: top.open_box(
+                    sub_menu_with_menu_widget(
+                        "DotEnv Preview (.env / prod.env)",
+                        [
+                            urwid.Text(
+                                "\n".join(dump_modified_envs(dump_envs(config)))
+                                or "Same as the default configuration, DotEnv will be left empty."
                             )
-                        )
-                    ]
-                )[1]
+                        ],
+                    )[1]
+                ),
             )
-        )),
-        menu_option(urwid.Button(
-            "DotEnv Preview (.env / prod.env)",
-            lambda x: top.open_box(
-                sub_menu_with_menu_widget(
-                    "DotEnv Preview (.env / prod.env)",
-                    [
-                        urwid.Text(
-                            "\n".join(dump_modified_envs(dump_envs(config))) or "Same as the default configuration, "
-                                                                                "DotEnv will be left empty."
-                        )
-                    ]
-                )[1]
-            )
-        )),
+        ),
         urwid.Divider(),
         sub_menu(
             "Save",
             [
-                menu_option(urwid.Button(
-                    "Save to '.env' / 'prod.env' file",
-                    on_save_dotenv
-                ))
+                menu_option(urwid.Button("Save to '.env' / 'prod.env' file", on_save_dotenv)),
+                menu_option(urwid.Button("Save project roster and blockers", on_save_project)),
             ],
         ),
         urwid.Divider(bottom=2),
-        menu_option(urwid.Button(
-            "Help", lambda x: webbrowser.open("https://ktoolbox.readthedocs.io/latest/configuration/guide/")
-        )),
+        menu_option(
+            urwid.Button(
+                "Help", lambda x: webbrowser.open("https://ktoolbox.readthedocs.io/latest/configuration/guide/")
+            )
+        ),
         menu_option(urwid.Button("Exit", exit_program)),
         urwid.Divider(bottom=2),
-        urwid.Text(
-            "For detailed information, please refer to https://ktoolbox.readthedocs.io",
-            align=urwid.CENTER
-        ),
+        urwid.Text("For detailed information, please refer to https://ktoolbox.readthedocs.io", align=urwid.CENTER),
         urwid.Divider(),
-        urwid.Text(__version__, align=urwid.CENTER)
+        urwid.Text(__version__, align=urwid.CENTER),
     ],
 )
 top = CascadingBoxes(menu_top)

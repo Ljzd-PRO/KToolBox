@@ -174,6 +174,12 @@ async def test_config_editor_and_example_env(capsys) -> None:
         await KToolBoxCli.config_editor()
     editor.run_config_editor.assert_called_once_with()
 
+    editor.run_config_editor.reset_mock()
+    project_path = Path("custom.toml")
+    with patch.dict(sys.modules, {"ktoolbox.editor": editor}):
+        await KToolBoxCli.config_editor(project_path)
+    editor.run_config_editor.assert_called_once_with(project_path)
+
     real_import = builtins.__import__
 
     def missing_editor(name: str, *args: object, **kwargs: object):

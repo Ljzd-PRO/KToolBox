@@ -1,37 +1,44 @@
 from datetime import datetime
 from fnmatch import fnmatch
 from pathlib import Path
-from typing import List, Union, Optional, Set
 from urllib.parse import urlparse
 
-import aiofiles
+import aiofiles  # type: ignore[import-untyped]
 from loguru import logger
-from pathvalidate import sanitize_filename, is_valid_filename
+from pathvalidate import is_valid_filename, sanitize_filename
 
-from ktoolbox._enum import PostFileTypeEnum, DataStorageNameEnum
+from ktoolbox._enum import DataStorageNameEnum, PostFileTypeEnum
 from ktoolbox.action.base import ActionRet, action_error
 from ktoolbox.action.fetch import FetchInterruptError, fetch_creator_posts
-from ktoolbox.action.utils import generate_post_path_name, filter_posts_by_date, generate_filename, \
-    filter_posts_by_keywords, filter_posts_by_keywords_exclude, generate_grouped_post_path, extract_content_images
+from ktoolbox.action.utils import (
+    extract_content_images,
+    filter_posts_by_date,
+    filter_posts_by_keywords,
+    generate_filename,
+    generate_grouped_post_path,
+    generate_post_path_name,
+)
 from ktoolbox.api.client import PawchiveClient
 from ktoolbox.api.errors import PawchiveError, PawchiveNotFoundError
 from ktoolbox.api.generated import Post, Revision
 from ktoolbox.api.utils import pawchive_client_scope
+from ktoolbox.blocker import BlockerContext, BlockerEngine
+from ktoolbox.blocker.engine import blocker_registry, legacy_keyword_blocker
 from ktoolbox.configuration import config
-from ktoolbox.job import Job, CreatorIndices
+from ktoolbox.job import CreatorIndices, Job
 from ktoolbox.utils import extract_external_links, generate_msg
 
 __all__ = ["create_job_from_post", "create_job_from_creator"]
 
 
 async def create_job_from_post(
-        post: Union[Post, Revision],
-        post_path: Path,
-        *,
-        post_dir: bool = True,
-        dump_post_data: bool = True,
-        client: PawchiveClient | None = None,
-) -> List[Job]:
+    post: Post | Revision,
+    post_path: Path,
+    *,
+    post_dir: bool = True,
+    dump_post_data: bool = True,
+    client: PawchiveClient | None = None,
+) -> list[Job]:
     """
     Create a list of download job from a post data
 
@@ -41,17 +48,17 @@ async def create_job_from_post(
     :param dump_post_data: Whether to dump post data (post.json) in post directory
     :raise FetchInterruptError: If fetching post content fails
     """
-    post_path.mkdir(parents=True, exist_ok=True)
+    await aiofiles.os.makedirs(post_path, exist_ok=True)
     job_post = Post.model_validate(post.model_dump(mode="python"))
 
     # Load ``PostStructureConfiguration``
     if post_dir:
         attachments_path = post_path / config.job.post_structure.attachments  # attachments
-        attachments_path.mkdir(exist_ok=True)
+        await aiofiles.os.makedirs(attachments_path, exist_ok=True)
         content_path = post_path / config.job.post_structure.content  # content
-        content_path.parent.mkdir(exist_ok=True)
+        await aiofiles.os.makedirs(content_path.parent, exist_ok=True)
         external_links_path = post_path / config.job.post_structure.external_links  # external_links
-        external_links_path.parent.mkdir(exist_ok=True)
+        await aiofiles.os.makedirs(external_links_path.parent, exist_ok=True)
     else:
         attachments_path = post_path
         content_path = None
@@ -59,34 +66,28 @@ async def create_job_from_post(
 
     if dump_post_data:
         async with aiofiles.open(str(post_path / DataStorageNameEnum.PostData.value), "w", encoding="utf-8") as f:
-            await f.write(
-                post.model_dump_json(indent=config.json_dump_indent)
-            )
+            await f.write(post.model_dump_json(indent=config.json_dump_indent))
 
     # Filter and create jobs for ``Post.attachment``
-    jobs: List[Job] = []
+    jobs: list[Job] = []
     sequential_counter = 1  # Counter for sequential filenames
     if config.job.download_attachments:
         for attachment in post.attachments or []:
             if not attachment.path:
                 continue
-            file_path_obj = Path(attachment.name) if attachment.name and is_valid_filename(attachment.name) else Path(
-                urlparse(attachment.path).path
+            file_path_obj = (
+                Path(attachment.name)
+                if attachment.name and is_valid_filename(attachment.name)
+                else Path(urlparse(attachment.path).path)
             )
-            if (not config.job.allow_list or any(
-                    map(
-                        lambda x: fnmatch(file_path_obj.name, x),
-                        config.job.allow_list
-                    )
-            )) and not any(
-                map(
-                    lambda x: fnmatch(file_path_obj.name, x),
-                    config.job.block_list
-                )
-            ):
+            if (
+                not config.job.allow_list or any(map(lambda x: fnmatch(file_path_obj.name, x), config.job.allow_list))
+            ) and not any(map(lambda x: fnmatch(file_path_obj.name, x), config.job.block_list)):
                 # Check if file extension should be excluded from sequential naming
-                should_use_sequential = (config.job.sequential_filename and
-                                         file_path_obj.suffix.lower() not in config.job.sequential_filename_excludes)
+                should_use_sequential = (
+                    config.job.sequential_filename
+                    and file_path_obj.suffix.lower() not in config.job.sequential_filename_excludes
+                )
                 if should_use_sequential:
                     basic_filename = f"{sequential_counter}{file_path_obj.suffix}"
                     sequential_counter += 1
@@ -99,39 +100,35 @@ async def create_job_from_post(
                         alt_filename=alt_filename,
                         server_path=attachment.path,
                         type=PostFileTypeEnum.Attachment,
-                        post=job_post
+                        post=job_post,
                     )
                 )
 
     # Filter and create jobs for ``Post.file``
     if config.job.download_file and post.file and post.file.path:
-        post_file_name = Path(post.file.name) if post.file.name and is_valid_filename(post.file.name) else Path(
-            urlparse(post.file.path).path
+        post_file_name = (
+            Path(post.file.name)
+            if post.file.name and is_valid_filename(post.file.name)
+            else Path(urlparse(post.file.path).path)
         )
         post_file_name = Path(generate_filename(post, post_file_name.name, config.job.post_structure.file))
-        if (not config.job.allow_list or any(
-                map(
-                    lambda x: fnmatch(post_file_name.name, x),
-                    config.job.allow_list
-                )
-        )) and not any(
-            map(
-                lambda x: fnmatch(post_file_name.name, x),
-                config.job.block_list
-            )
-        ):
+        if (
+            not config.job.allow_list or any(map(lambda x: fnmatch(post_file_name.name, x), config.job.allow_list))
+        ) and not any(map(lambda x: fnmatch(post_file_name.name, x), config.job.block_list)):
             jobs.append(
                 Job(
                     path=post_path,
                     alt_filename=post_file_name.name,
                     server_path=post.file.path,
                     type=PostFileTypeEnum.File,
-                    post=job_post
+                    post=job_post,
                 )
             )
     # ``post.substring`` is used to determine if the post has content, but it's only partial
-    if (post.content or post.substring) and post_dir and (
-            config.job.extract_content or config.job.extract_external_links or config.job.extract_content_images
+    if (
+        (post.content or post.substring)
+        and post_dir
+        and (config.job.extract_content or config.job.extract_external_links or config.job.extract_content_images)
     ):
         # If post has no content, fetch it from get_post API
         if not post.content:
@@ -155,7 +152,7 @@ async def create_job_from_post(
                         post_name=post.title or "Unknown",
                         post_id=post.id,
                         creator_id=post.user,
-                        service=post.service
+                        service=post.service,
                     )
                 )
                 raise FetchInterruptError(error) from error
@@ -185,10 +182,10 @@ async def create_job_from_post(
 
                     # Handle relative paths by making them absolute
                     # noinspection HttpUrlsUsage
-                    if image_src.startswith('/') and not image_src.startswith('//'):
+                    if image_src.startswith("/") and not image_src.startswith("//"):
                         # Relative path - construct full URL
                         image_path = image_src
-                    elif image_src.startswith('http://') or image_src.startswith('https://'):
+                    elif image_src.startswith("http://") or image_src.startswith("https://"):
                         # Absolute URL - extract path
                         image_path = urlparse(image_src).path
                     else:
@@ -209,20 +206,14 @@ async def create_job_from_post(
 
                     alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
 
-                    if (not config.job.allow_list or any(
-                            map(
-                                lambda x: fnmatch(alt_filename, x),
-                                config.job.allow_list
-                            )
-                    )) and not any(
-                        map(
-                            lambda x: fnmatch(alt_filename, x),
-                            config.job.block_list
-                        )
-                    ):
+                    if (
+                        not config.job.allow_list or any(map(lambda x: fnmatch(alt_filename, x), config.job.allow_list))
+                    ) and not any(map(lambda x: fnmatch(alt_filename, x), config.job.block_list)):
                         # Regenerate filename with correct counter
-                        should_use_sequential = (config.job.sequential_filename and
-                                                 image_file_path.suffix.lower() not in config.job.sequential_filename_excludes)
+                        should_use_sequential = (
+                            config.job.sequential_filename
+                            and image_file_path.suffix.lower() not in config.job.sequential_filename_excludes
+                        )
                         if should_use_sequential:
                             basic_filename = f"{sequential_counter}{image_file_path.suffix}"
                             alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
@@ -233,7 +224,7 @@ async def create_job_from_post(
                                 path=attachments_path,
                                 alt_filename=alt_filename,
                                 server_path=image_path,
-                                type=PostFileTypeEnum.Attachment
+                                type=PostFileTypeEnum.Attachment,
                             )
                         )
 
@@ -241,21 +232,22 @@ async def create_job_from_post(
 
 
 async def create_job_from_creator(
-        service: str,
-        creator_id: str,
-        path: Path,
-        *,
-        all_pages: bool = False,
-        offset: int = 0,
-        length: Optional[int] = 50,
-        save_creator_indices: bool = False,
-        mix_posts: bool | None = None,
-        start_time: Optional[datetime],
-        end_time: Optional[datetime],
-        keywords: Optional[Set[str]] = None,
-        keywords_exclude: Optional[Set[str]] = None,
-        client: PawchiveClient | None = None,
-) -> ActionRet[List[Job]]:
+    service: str,
+    creator_id: str,
+    path: Path,
+    *,
+    all_pages: bool = False,
+    offset: int = 0,
+    length: int | None = 50,
+    save_creator_indices: bool = False,
+    mix_posts: bool | None = None,
+    start_time: datetime | None,
+    end_time: datetime | None,
+    keywords: set[str] | None = None,
+    keywords_exclude: set[str] | None = None,
+    blocker_engine: BlockerEngine | None = None,
+    client: PawchiveClient | None = None,
+) -> ActionRet[list[Job]]:
     """
     Create a list of download job from a creator
 
@@ -272,6 +264,7 @@ async def create_job_from_creator(
     :param end_time: End time of the time range
     :param keywords: Set of keywords to filter posts by title (case-insensitive)
     :param keywords_exclude: Set of keywords to exclude posts by title (case-insensitive)
+    :param blocker_engine: Structured blockers applied before post jobs are created
     :param client: Pawchive client to reuse across all creator requests
     """
     if client is None:
@@ -289,6 +282,7 @@ async def create_job_from_creator(
                 end_time=end_time,
                 keywords=keywords,
                 keywords_exclude=keywords_exclude,
+                blocker_engine=blocker_engine,
                 client=api_client,
             )
 
@@ -296,17 +290,17 @@ async def create_job_from_creator(
 
     # Get posts
     logger.info(f"Start fetching posts from creator {creator_id}")
-    post_list: List[Post] = []
+    post_list: list[Post] = []
     start_offset = offset - offset % 50
     requested_length = 50 if length is None else length
     required_posts = offset % 50 + requested_length
 
     try:
         async for part in fetch_creator_posts(
-                service=service,
-                creator_id=creator_id,
-                offset=start_offset,
-                client=client,
+            service=service,
+            creator_id=creator_id,
+            offset=start_offset,
+            client=client,
         ):
             post_list += part
             if not all_pages and len(post_list) >= required_posts:
@@ -315,9 +309,9 @@ async def create_job_from_creator(
         return action_error(e.error)
 
     if not all_pages:
-        post_list = post_list[offset % 50:][:requested_length]
+        post_list = post_list[offset % 50 :][:requested_length]
     else:
-        post_list = post_list[offset % 50:]
+        post_list = post_list[offset % 50 :]
 
     # Filter posts by publish time
     if start_time or end_time:
@@ -327,9 +321,20 @@ async def create_job_from_creator(
     if keywords:
         post_list = list(filter_posts_by_keywords(post_list, keywords))
 
-    # Filter out posts by exclude keywords
-    if keywords_exclude:
-        post_list = list(filter_posts_by_keywords_exclude(post_list, keywords_exclude))
+    active_blockers = list(blocker_engine.blockers if blocker_engine is not None else ())
+    if legacy_spec := legacy_keyword_blocker(keywords_exclude or ()):
+        logger.warning(
+            "`job.keywords_exclude` is deprecated; migrate it to a global field-match blocker in ktoolbox.toml."
+        )
+        active_blockers.insert(0, blocker_registry.build(legacy_spec))
+    if active_blockers:
+        selected_posts: list[Post] = []
+        context = BlockerContext(service=service, creator_id=creator_id)
+        engine = BlockerEngine(active_blockers)
+        for post in post_list:
+            if await engine.evaluate(post, context) is None:
+                selected_posts.append(post)
+        post_list = selected_posts
 
     logger.info(f"Get {len(post_list)} posts after filtering, start creating jobs")
 
@@ -346,24 +351,23 @@ async def create_job_from_creator(
                 creator_id=creator_id,
                 service=service,
                 posts={post.id: post for post in post_list},
-                posts_path=posts_path
+                posts_path=posts_path,
             )
-            async with aiofiles.open(
-                    path / DataStorageNameEnum.CreatorIndicesData.value,
-                    "w",
-                    encoding="utf-8"
-            ) as f:
+            async with aiofiles.open(path / DataStorageNameEnum.CreatorIndicesData.value, "w", encoding="utf-8") as f:
                 await f.write(indices.model_dump_json(indent=config.json_dump_indent))
 
     if config.job.include_revisions:
-        logger.warning("`job.include_revisions` is enabled and will fetch post revisions, "
-                       "which may take time. Disable if not needed.")
+        logger.warning(
+            "`job.include_revisions` is enabled and will fetch post revisions, "
+            "which may take time. Disable if not needed."
+        )
     if config.job.extract_content or config.job.extract_external_links or config.job.extract_content_images:
         logger.warning(
             "`job.extract_content` or `job.extract_external_links` or `job.extract_content_images` is enabled "
-            "and will fetch post content one by one, which may take time. Disable if not needed.")
+            "and will fetch post content one by one, which may take time. Disable if not needed."
+        )
 
-    job_list: List[Job] = []
+    job_list: list[Job] = []
     for post in post_list:
         # Get post path
         if mix_posts:

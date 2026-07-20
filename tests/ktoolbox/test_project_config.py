@@ -55,6 +55,15 @@ def test_store_round_trip_is_atomic_and_preserves_top_comment(tmp_path: Path) ->
     assert configuration.find_creator("https://pawchive.pw/fanbox/user/123") == configuration.creators[0]
 
 
+def test_store_replaces_validated_editor_text(tmp_path: Path) -> None:
+    path = tmp_path / "ktoolbox.toml"
+    store = ProjectConfigStore(path)
+    configuration = store.replace_text('schema_version = 1\n[[creators]]\nservice = "fanbox"\ncreator_id = "123"\n')
+    assert configuration.creators[0].key == "fanbox:123"
+    with pytest.raises(ProjectConfigError, match="invalid project configuration"):
+        store.replace_text('schema_version = 1\n[[creators]]\nservice = "fanbox"\n')
+
+
 def test_store_manages_creator_lifecycle(tmp_path: Path) -> None:
     store = ProjectConfigStore(tmp_path / "nested" / "ktoolbox.toml")
     assert store.load() == ProjectConfiguration()
