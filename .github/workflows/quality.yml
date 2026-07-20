@@ -29,7 +29,26 @@ jobs:
         run: poetry run python -m k_generator.main --check
 
       - name: Lint contract tooling
-        run: poetry run ruff check k_generator ktoolbox/api/generated
+        run: >-
+          poetry run ruff check
+          k_generator
+          ktoolbox/api/client.py
+          ktoolbox/api/errors.py
+          ktoolbox/api/parameters.py
+          ktoolbox/api/generated
 
       - name: Check contract tooling formatting
-        run: poetry run ruff format --check k_generator ktoolbox/api/generated
+        run: >-
+          poetry run ruff format --check
+          k_generator
+          ktoolbox/api/client.py
+          ktoolbox/api/errors.py
+          ktoolbox/api/parameters.py
+          ktoolbox/api/generated
+
+      - name: Type-check Pawchive client
+        run: >-
+          poetry run mypy --strict
+          ktoolbox/api/client.py
+          ktoolbox/api/errors.py
+          ktoolbox/api/parameters.py

@@ -7,3 +7,13 @@
 ``7ee4a7b18ee92a442c13950c05dc8236cfb14a60``
 """
 from .base import *
+from .client import PawchiveClient, ResponseDrift
+from .errors import (
+    PawchiveAuthenticationError,
+    PawchiveConflictError,
+    PawchiveError,
+    PawchiveHTTPError,
+    PawchiveNotFoundError,
+    PawchiveResponseValidationError,
+    PawchiveTransportError,
+)
