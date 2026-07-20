@@ -3,7 +3,7 @@ import sys
 from cyclopts.exceptions import CycloptsError
 from loguru import logger
 
-from ktoolbox.cli_app import app
+from ktoolbox.cli_app import app, stderr
 from ktoolbox.utils import logger_init, uvloop_init
 
 _LEGACY_COMMANDS = {
@@ -22,7 +22,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         is_help_or_version = not tokens or any(token in {"-h", "--help", "--version"} for token in tokens)
         if not is_help_or_version:
-            logger_init(cli_use=True)
+            logger_init(cli_use=True, console=stderr)
             uvloop_init()
             if replacement := _LEGACY_COMMANDS.get(tokens[0]):
                 logger.warning(f"`{tokens[0]}` is deprecated; use `{replacement}` instead.")

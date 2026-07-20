@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 from ktoolbox import __version__
 from ktoolbox.__main__ import main
+from ktoolbox.cli_app import stderr
 
 
 def test_version_and_help_skip_runtime_initialization(capsys) -> None:
@@ -28,7 +29,7 @@ def test_main_initializes_runtime_and_handles_interrupt() -> None:
         patch("ktoolbox.__main__.app", return_value=0) as app,
     ):
         assert main(["site-version"]) == 0
-    logger_init.assert_called_once_with(cli_use=True)
+    logger_init.assert_called_once_with(cli_use=True, console=stderr)
     uvloop_init.assert_called_once_with()
     app.assert_called_once()
 

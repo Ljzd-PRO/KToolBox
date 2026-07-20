@@ -14,15 +14,18 @@ from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
 
 
-class RecordingTqdm:
-    instances: list[RecordingTqdm] = []
+class RecordingProgress:
+    instances: list[RecordingProgress] = []
 
-    def __init__(self, **kwargs: object) -> None:
-        self.kwargs = kwargs
+    def __init__(self) -> None:
+        self.started: tuple[str, int | None, int] | None = None
         self.updates: list[int] = []
         self.instances.append(self)
 
-    def update(self, size: int) -> None:
+    def start(self, filename: str, total: int | None, completed: int) -> None:
+        self.started = (filename, total, completed)
+
+    def advance(self, size: int) -> None:
         self.updates.append(size)
 
 
@@ -79,8 +82,7 @@ async def test_stream_download_uses_headers_callbacks_and_progress(tmp_path: Pat
             downloader,
             sync_callable=sync_callback,
             async_callable=async_callback,
-            tqdm_class=RecordingTqdm,
-            progress=True,
+            progress=RecordingProgress(),
         )
 
     assert result.code == RetCodeEnum.Success
@@ -88,8 +90,8 @@ async def test_stream_download_uses_headers_callbacks_and_progress(tmp_path: Pat
     assert downloader.filename == "server name.bin"
     assert (tmp_path / "server name.bin").read_bytes() == b"abcdef"
     assert seen[0].headers["range"] == "bytes=0-"
-    assert RecordingTqdm.instances[-1].kwargs["total"] == 6
-    assert sum(RecordingTqdm.instances[-1].updates) == 6
+    assert RecordingProgress.instances[-1].started == ("server name.bin", 6, 0)
+    assert sum(RecordingProgress.instances[-1].updates) == 6
     sync_callback.assert_called_once_with(downloader)
     async_callback.assert_awaited_once_with(downloader)
     assert bool(downloader)
@@ -114,7 +116,7 @@ async def test_resume_counts_existing_bytes_for_content_length_filter(tmp_path: 
             designated_filename="resume.bin",
             server_path="/resume.bin",
         )
-        result = await run_once(downloader, tqdm_class=RecordingTqdm)
+        result = await run_once(downloader)
 
     assert result.code == RetCodeEnum.FileExisted
     assert "size: 6 bytes" in result.message
@@ -137,10 +139,10 @@ async def test_resume_download_appends_and_renames(tmp_path: Path) -> None:
             designated_filename="resume.bin",
             server_path="/resume.bin",
         )
-        result = await run_once(downloader, tqdm_class=RecordingTqdm)
+        result = await run_once(downloader, progress=RecordingProgress())
     assert result.data == "resume.bin"
     assert (tmp_path / "resume.bin").read_bytes() == b"abcdef"
-    assert RecordingTqdm.instances[-1].kwargs["initial"] == 3
+    assert RecordingProgress.instances[-1].started == ("resume.bin", 6, 3)
 
 
 @pytest.mark.asyncio
@@ -212,9 +214,9 @@ async def test_invalid_content_length_does_not_abort_download(tmp_path: Path) ->
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
         downloader = Downloader("https://files.example.test/file.bin", tmp_path, client, server_path="/file.bin")
-        result = await run_once(downloader, tqdm_class=RecordingTqdm)
+        result = await run_once(downloader, progress=RecordingProgress())
     assert result.data == "file.bin"
-    assert RecordingTqdm.instances[-1].kwargs["total"] is None
+    assert RecordingProgress.instances[-1].started == ("file.bin", None, 0)
 
 
 @pytest.mark.asyncio
@@ -245,7 +247,7 @@ async def test_bucket_download_uses_queryless_path_and_hardlink(tmp_path: Path) 
             client,
             server_path="/aa/file.bin?download=1",
         )
-        result = await run_once(downloader, tqdm_class=RecordingTqdm)
+        result = await run_once(downloader)
 
     local = output / "file.bin"
     bucket = config.downloader.bucket_path / "aa/file.bin"
@@ -265,7 +267,7 @@ async def test_metadata_failure_is_nonfatal_and_cancel_stops_stream(tmp_path: Pa
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
         downloader = Downloader("https://files.example.test/file.bin", tmp_path, client, server_path="/file.bin")
         with patch("ktoolbox.downloader.downloader.utime_from_headers", side_effect=OSError("denied")):
-            result = await run_once(downloader, tqdm_class=RecordingTqdm)
+            result = await run_once(downloader)
     assert result.data == "file.bin"
 
     (tmp_path / "file.bin").unlink()
@@ -273,5 +275,5 @@ async def test_metadata_failure_is_nonfatal_and_cancel_stops_stream(tmp_path: Pa
         downloader = Downloader("https://files.example.test/file.bin", tmp_path, client, server_path="/file.bin")
         downloader.cancel()
         with pytest.raises(asyncio.CancelledError):
-            await run_once(downloader, tqdm_class=RecordingTqdm)
+            await run_once(downloader)
     assert (tmp_path / "file.bin.tmp").exists()

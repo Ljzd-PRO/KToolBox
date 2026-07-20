@@ -1,27 +1,26 @@
 import asyncio
 from asyncio import CancelledError, Lock
-from collections.abc import Callable, Coroutine
+from collections.abc import Awaitable, Callable
 from functools import cached_property
 from pathlib import Path
 from typing import Any
 from urllib.parse import unquote, urlparse
 
-import aiofiles
-import aiofiles.os
+import aiofiles  # type: ignore[import-untyped]
+import aiofiles.os  # type: ignore[import-untyped]
 import httpx
 import tenacity
-import tqdm.asyncio
 from loguru import logger
 from pathvalidate import sanitize_filename
 from tenacity import retry_if_exception, retry_if_result, wait_fixed
 from tenacity.stop import stop_after_attempt, stop_never
-from tqdm import tqdm as std_tqdm
 
 from ktoolbox._enum import RetCodeEnum
 from ktoolbox.api.generated import Post
 from ktoolbox.configuration import config
 from ktoolbox.downloader.base import DownloaderRet
 from ktoolbox.downloader.utils import duplicate_file_check, filename_from_headers, utime_from_headers
+from ktoolbox.reporting import DownloadProgressObserver
 from ktoolbox.utils import generate_msg
 
 __all__ = ["Downloader"]
@@ -40,12 +39,12 @@ class Downloader:
         path: Path,
         client: httpx.AsyncClient,
         *,
-        buffer_size: int = None,
-        chunk_size: int = None,
+        buffer_size: int | None = None,
+        chunk_size: int | None = None,
         designated_filename: str | None = None,
         server_path: str,
         post: Post | None = None,
-    ):
+    ) -> None:
         # noinspection GrazieInspection
         """
         Initialize a file downloader
@@ -123,7 +122,7 @@ class Downloader:
         """
         return not self._finished_lock.locked()
 
-    def cancel(self):
+    def cancel(self) -> None:
         """
         Cancel the download
 
@@ -169,18 +168,16 @@ class Downloader:
     async def run(
         self,
         *,
-        sync_callable: Callable[["Downloader"], Any] = None,
-        async_callable: Callable[["Downloader"], Coroutine] = None,
-        tqdm_class: type[std_tqdm] = None,
-        progress: bool = False,
+        sync_callable: Callable[["Downloader"], Any] | None = None,
+        async_callable: Callable[["Downloader"], Awaitable[Any]] | None = None,
+        progress: DownloadProgressObserver | None = None,
     ) -> DownloaderRet[str]:
         """
         Start to download
 
         :param sync_callable: Sync callable for download finished
         :param async_callable: Async callable for download finished
-        :param tqdm_class: ``tqdm`` class to replace default ``tqdm.asyncio.tqdm``
-        :param progress: Show progress bar
+        :param progress: Optional byte-level progress observer
         :return: ``DownloaderRet`` which contain the actual output filename
         :raise CancelledError: Job cancelled
         """
@@ -200,9 +197,11 @@ class Downloader:
         # Check if the file exists
         file_existed, ret_msg = duplicate_file_check(save_filepath, bucket_file_path)
         if file_existed:
-            return DownloaderRet(code=RetCodeEnum.FileExisted, message=generate_msg(ret_msg, path=save_filepath))
+            return DownloaderRet(
+                code=RetCodeEnum.FileExisted,
+                message=generate_msg(ret_msg or "Download file already exists", path=save_filepath),
+            )
 
-        tqdm_class: type[std_tqdm] = tqdm_class or tqdm.asyncio.tqdm
         async with self.wait_lock:
             await asyncio.sleep(1 / config.downloader.tps_limit)
         async with self._finished_lock:
@@ -227,16 +226,16 @@ class Downloader:
                     )
                 # Get filename for saving and check if file exists (Second-time duplicate file check)
                 # Priority order can be referenced from the constructor's documentation
-                self._save_filename = (
-                    self._designated_filename
-                    or sanitize_filename(filename_from_headers(res.headers))
-                    or server_path_filename
+                header_filename = filename_from_headers(res.headers)
+                self._save_filename = self._designated_filename or (
+                    sanitize_filename(header_filename) if header_filename else server_path_filename
                 )
                 save_filepath = self._path / self._save_filename
                 file_existed, ret_msg = duplicate_file_check(save_filepath, bucket_file_path)
                 if file_existed:
                     return DownloaderRet(
-                        code=RetCodeEnum.FileExisted, message=generate_msg(ret_msg, path=save_filepath)
+                        code=RetCodeEnum.FileExisted,
+                        message=generate_msg(ret_msg or "Download file already exists", path=save_filepath),
                     )
 
                 # Download
@@ -257,22 +256,17 @@ class Downloader:
                         return filtered
                 async with aiofiles.open(str(temp_filepath), "ab", self._buffer_size) as f:
                     chunk_iterator = res.aiter_bytes(self._chunk_size)
-                    t = tqdm_class(
-                        desc=self._save_filename,
-                        total=total_size,
-                        initial=temp_size,
-                        disable=not progress,
-                        unit="B",
-                        unit_scale=True,
-                    )
+                    if progress is not None:
+                        progress.start(self._save_filename, total_size, temp_size)
                     async for chunk in chunk_iterator:
                         if self._stop:
                             raise CancelledError
                         await f.write(chunk)
-                        t.update(len(chunk))  # Update progress bar
+                        if progress is not None:
+                            progress.advance(len(chunk))
 
             # Download finished
-            if config.downloader.use_bucket:
+            if config.downloader.use_bucket and bucket_file_path is not None:
                 bucket_file_path.parent.mkdir(parents=True, exist_ok=True)
                 await aiofiles.os.link(temp_filepath, bucket_file_path)
             final_filepath = self._path / self._save_filename

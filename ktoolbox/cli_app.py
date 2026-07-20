@@ -22,6 +22,7 @@ from ktoolbox.project_config import (
     ProjectConfigStore,
     parse_creator_reference,
 )
+from ktoolbox.reporting import create_progress_reporter
 from ktoolbox.sync import SyncCoordinator, SyncOptions, SyncSummary, resolve_sync_targets
 
 stdout = Console()
@@ -109,6 +110,7 @@ async def download(
             revision_id=revision_id,
             path=output,
             dump_post_data=dump_post_data,
+            reporter=create_progress_reporter(stderr),
         )
     )
 
@@ -161,6 +163,7 @@ async def sync(
                 client,
                 blocker_engine=engine,
                 creator_concurrency=runtime_config.job.creator_concurrency,
+                reporter=create_progress_reporter(stderr),
             ).run(selected_creators, options)
     except PawchiveError as error:
         stderr.print(f"[red]Pawchive error:[/red] {error}")

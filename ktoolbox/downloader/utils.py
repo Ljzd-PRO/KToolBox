@@ -1,15 +1,15 @@
 import email.utils
 import os
 import urllib.parse
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Optional, Dict, Tuple, Union
 
 from ktoolbox.configuration import config
 
 __all__ = ["filename_from_headers", "duplicate_file_check", "utime_from_headers"]
 
 
-def parse_header(line: str) -> Dict[str, Optional[str]]:
+def parse_header(line: str) -> dict[str, str | None]:
     """
     Alternative resolution for parsing header line.
 
@@ -30,7 +30,7 @@ def parse_header(line: str) -> Dict[str, Optional[str]]:
     :param line: Header line
     :return: Dict of header line
     """
-    dict_value: Dict[str, Optional[str]] = {}
+    dict_value: dict[str, str | None] = {}
     for item in line.split(";"):
         if len(pair := item.split("=")) == 1:
             dict_value[pair[0]] = None
@@ -40,7 +40,7 @@ def parse_header(line: str) -> Dict[str, Optional[str]]:
     return dict_value
 
 
-def filename_from_headers(headers: Dict[str, str]) -> Optional[str]:
+def filename_from_headers(headers: Mapping[str, str]) -> str | None:
     """
     Get file name from headers.
 
@@ -72,7 +72,7 @@ def filename_from_headers(headers: Dict[str, str]) -> Optional[str]:
     return None
 
 
-def duplicate_file_check(local_file_path: Path, bucket_file_path: Path = None) -> Tuple[bool, Optional[str]]:
+def duplicate_file_check(local_file_path: Path, bucket_file_path: Path | None = None) -> tuple[bool, str | None]:
     """
     Check if the file existed, and link the bucket filepath to local filepath \
     if ``DownloaderConfiguration.use_bucket`` enabled.
@@ -87,6 +87,7 @@ def duplicate_file_check(local_file_path: Path, bucket_file_path: Path = None) -
             ret_msg = "Download file already exists in both bucket and local, skipping"
             if not local_file_path.is_file():
                 ret_msg = "Download file already exists in bucket, linking to local path"
+                assert bucket_file_path is not None
                 os.link(bucket_file_path, local_file_path)
         else:
             ret_msg = "Download file already exists, skipping"
@@ -95,7 +96,7 @@ def duplicate_file_check(local_file_path: Path, bucket_file_path: Path = None) -
         return False, None
 
 
-def utime_from_headers(headers: Dict[str, str], path: Union[Path, str]) -> Optional[Exception]:
+def utime_from_headers(headers: Mapping[str, str], path: Path | str) -> None:
     """
     Run ``os.utime`` on specific file using ``Last-Modified`` or ``Date`` in HTTP headers.
 
@@ -111,6 +112,6 @@ def utime_from_headers(headers: Dict[str, str], path: Union[Path, str]) -> Optio
     # Use Date for creation time
     ctime = email.utils.parsedate_to_datetime(date_header).timestamp() if date_header else None
     # Set times if available
-    if mtime or ctime:
-        atime = mtime or ctime  # Access time can be the same as modification time
-        os.utime(path, (atime, mtime or ctime))
+    timestamp = mtime if mtime is not None else ctime
+    if timestamp is not None:
+        os.utime(path, (timestamp, timestamp))

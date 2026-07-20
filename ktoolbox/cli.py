@@ -25,6 +25,7 @@ from ktoolbox.api.generated import Post, Revision
 from ktoolbox.api.utils import create_pawchive_client
 from ktoolbox.configuration import config
 from ktoolbox.job import JobRunner
+from ktoolbox.reporting import ProgressReporter
 from ktoolbox.utils import check_for_updates, dump_search, generate_msg, parse_webpage_url
 
 __all__ = ["KToolBoxCli"]
@@ -184,6 +185,7 @@ class KToolBoxCli:
         path: Path | str = Path("."),
         *,
         dump_post_data: bool = True,
+        reporter: ProgressReporter | None = None,
     ) -> str | None:
         """Download one post, one selected revision, or a post with all revisions."""
         await KToolBoxCli._ensure_update_check()
@@ -236,7 +238,7 @@ class KToolBoxCli:
             cause = error.error if isinstance(error, FetchInterruptError) else error
             return _error_message(cause)
 
-        await JobRunner(job_list=jobs).start()
+        await JobRunner(job_list=jobs, reporter=reporter).start()
         return None
 
     @staticmethod
@@ -254,6 +256,7 @@ class KToolBoxCli:
         length: int | None = None,
         keywords: tuple[str, ...] | str | None = None,
         keywords_exclude: tuple[str, ...] | str | None = None,
+        reporter: ProgressReporter | None = None,
     ) -> str | None:
         """Synchronize a bounded range or every available post for one creator."""
         await KToolBoxCli._ensure_update_check()
@@ -300,5 +303,5 @@ class KToolBoxCli:
 
         if not result:
             return result.message
-        await JobRunner(job_list=result.data or []).start()
+        await JobRunner(job_list=result.data or [], reporter=reporter).start()
         return None

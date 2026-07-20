@@ -6,11 +6,13 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Generic, TypeVar
+from urllib.parse import urlparse
 
-import aiofiles
+import aiofiles  # type: ignore[import-untyped]
 from loguru import logger
 from pydantic import BaseModel, ConfigDict
-from tqdm import tqdm
+from rich.console import Console
+from rich.logging import RichHandler
 
 from ktoolbox._enum import DataStorageNameEnum, RetCodeEnum
 from ktoolbox.configuration import config
@@ -40,18 +42,18 @@ class BaseRet(BaseModel, Generic[_T]):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return self.code == RetCodeEnum.Success
 
 
-def generate_msg(title: str = None, **kwargs):
+def generate_msg(title: str | None = None, **kwargs: object) -> str:
     """
     Generate message for ``BaseRet`` and logger
 
     :param title: Message title
     :param kwargs: Extra data
     """
-    title: str = title or ""
+    title = title or ""
     extra_data = ", ".join(f"{k}: {v}" for k, v in kwargs.items())
     if title:
         return f"{title} - {extra_data}" if kwargs else title
@@ -59,7 +61,12 @@ def generate_msg(title: str = None, **kwargs):
         return extra_data if kwargs else ""
 
 
-def logger_init(cli_use: bool = False, disable_stdout: bool = False):
+def logger_init(
+    cli_use: bool = False,
+    disable_stdout: bool = False,
+    *,
+    console: Console | None = None,
+) -> None:
     """
     Initialize ``loguru`` logger
 
@@ -70,12 +77,15 @@ def logger_init(cli_use: bool = False, disable_stdout: bool = False):
         logger.remove()
     elif cli_use:
         logger.remove()
+        handler = RichHandler(
+            console=console or Console(stderr=True),
+            show_path=False,
+            rich_tracebacks=False,
+            markup=False,
+        )
         logger.add(
-            tqdm.write,
-            colorize=True,
-            format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
-            "<level>{level: <8}</level> | "
-            "<cyan>{name}</cyan> - <level>{message}</level>",
+            handler,
+            format="{message}",
             level=logging.INFO,
             filter=lambda record: record["level"].name != "DEBUG",
         )
@@ -90,7 +100,7 @@ def logger_init(cli_use: bool = False, disable_stdout: bool = False):
             )
 
 
-async def dump_search(result: Sequence[BaseModel], path: Path):
+async def dump_search(result: Sequence[BaseModel], path: Path) -> None:
     async with aiofiles.open(str(path), "w", encoding="utf-8") as f:
         await f.write(SearchResult(result=list(result)).model_dump_json(indent=config.json_dump_indent))
 
@@ -105,15 +115,14 @@ def parse_webpage_url(url: str) -> tuple[str | None, str | None, str | None, str
     :param url: Pawchive post or creator URL
     :return: Tuple of **service**, **user_id**, **post_id**, **revision_id**
     """
-    path_url = Path(url)
-    parts = path_url.parts
-    if (url_parts_len := len(parts)) < 9:
-        # Pad to full size (now supporting revision URLs)
-        parts += tuple(None for _ in range(9 - url_parts_len))
-    _scheme, _netloc, service, _user_key, user_id, _post_key, post_id, _revision_key, revision_id = parts
+    parts = [part for part in urlparse(url).path.split("/") if part]
+    service = parts[0] if parts else None
+    user_id = parts[2] if len(parts) > 2 and parts[1] == "user" else None
+    post_id = parts[4] if len(parts) > 4 and parts[3] == "post" else None
+    revision_id = parts[6] if len(parts) > 6 and parts[5] == "revision" else None
 
     # Only return revision_id if we have the revision keyword
-    if _revision_key != "revision":
+    if len(parts) <= 5 or parts[5] != "revision":
         revision_id = None
 
     return service, user_id, post_id, revision_id

@@ -54,7 +54,7 @@ async def test_sync_coordinator_bounds_creators_and_downloads_all_jobs(tmp_path:
         active -= 1
         return ActionRet(data=CreatorJobGeneration(fetched_posts=1, accepted_posts=1, generated_jobs=1))
 
-    async def download(queued: QueuedJob, client) -> DownloaderRet[str]:
+    async def download(queued: QueuedJob, client, observer) -> DownloaderRet[str]:
         downloaded.append(queued.creator_key)
         return DownloaderRet(data=queued.job.alt_filename)
 
@@ -99,7 +99,7 @@ async def test_sync_coordinator_isolates_creator_failure(tmp_path: Path) -> None
         await sink(Job(path=path, server_path="/ok", alt_filename="ok"))
         return ActionRet(data=CreatorJobGeneration(generated_jobs=1))
 
-    async def download(queued: QueuedJob, client) -> DownloaderRet[str]:
+    async def download(queued: QueuedJob, client, observer) -> DownloaderRet[str]:
         return DownloaderRet(data="ok")
 
     coordinator = SyncCoordinator(

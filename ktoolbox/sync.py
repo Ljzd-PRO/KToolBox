@@ -12,8 +12,10 @@ from ktoolbox.action.job import CreatorJobGeneration, produce_jobs_from_creator
 from ktoolbox.api.client import PawchiveClient
 from ktoolbox.blocker import BlockerEngine
 from ktoolbox.configuration import config
+from ktoolbox.job.model import Job
 from ktoolbox.job.stream import DownloadSummary, DownloadWorkerPool, FairJobQueue
 from ktoolbox.project_config import CreatorReference, ProjectConfigError, ProjectConfiguration, parse_creator_reference
+from ktoolbox.reporting import NullProgressReporter, ProgressReporter
 
 
 @dataclass(frozen=True, slots=True)
@@ -79,13 +81,16 @@ class SyncCoordinator:
         creator_concurrency: int = 4,
         download_pool: DownloadWorkerPool | None = None,
         lane_size: int | None = None,
+        reporter: ProgressReporter | None = None,
     ) -> None:
         if creator_concurrency < 1:
             raise ValueError("creator concurrency must be positive")
         self.client = client
         self.blocker_engine = blocker_engine or BlockerEngine()
         self.creator_concurrency = creator_concurrency
-        self.download_pool = download_pool or DownloadWorkerPool(config.job.count)
+        self.reporter = reporter or NullProgressReporter()
+        self.download_pool = download_pool or DownloadWorkerPool(config.job.count, reporter=self.reporter)
+        self.download_pool.reporter = self.reporter
         self.lane_size = lane_size or max(2, self.download_pool.concurrency)
 
     async def run(self, creators: list[CreatorReference], options: SyncOptions) -> SyncSummary:
@@ -98,6 +103,7 @@ class SyncCoordinator:
             queue.register(creator.key)
 
         semaphore = asyncio.Semaphore(self.creator_concurrency)
+        self.reporter.start()
         download_task = asyncio.create_task(self.download_pool.run(queue))
         producer_tasks = [
             asyncio.create_task(self._produce_creator(creator, options, queue, semaphore))
@@ -114,6 +120,8 @@ class SyncCoordinator:
             download_task.cancel()
             await asyncio.gather(*producer_tasks, download_task, return_exceptions=True)
             raise
+        finally:
+            self.reporter.stop()
         return SyncSummary(creators=creator_results, downloads=downloads)
 
     async def _produce_creator(
@@ -124,6 +132,7 @@ class SyncCoordinator:
         semaphore: asyncio.Semaphore,
     ) -> CreatorSyncResult:
         result = CreatorSyncResult(creator=creator)
+        self.reporter.creator_started(creator.key)
         try:
             async with semaphore:
                 profile = await self.client.get_creator_profile(creator.service, creator.creator_id)
@@ -133,11 +142,16 @@ class SyncCoordinator:
                 creator_path = options.output / dirname
                 await aiofiles.os.makedirs(creator_path, exist_ok=True)
                 result.output = creator_path
+
+                async def enqueue(job: Job) -> None:
+                    await queue.put(creator.key, job)
+                    self.reporter.job_queued(creator.key)
+
                 generation = await produce_jobs_from_creator(
                     creator.service,
                     creator.creator_id,
                     creator_path,
-                    lambda job: queue.put(creator.key, job),
+                    enqueue,
                     all_pages=options.length is None,
                     offset=options.offset,
                     length=options.length,
@@ -160,4 +174,5 @@ class SyncCoordinator:
             result.error = str(error)
         finally:
             await queue.close(creator.key)
+            self.reporter.creator_finished(creator.key, result.error)
         return result

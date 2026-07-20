@@ -4,6 +4,7 @@ import asyncio
 from collections import deque
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
+from itertools import count
 
 import httpx
 from loguru import logger
@@ -14,6 +15,7 @@ from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
 from ktoolbox.downloader.base import DownloaderRet
 from ktoolbox.job.model import Job
+from ktoolbox.reporting import NullProgressReporter, ProgressReporter, ReporterDownloadObserver
 
 
 @dataclass(frozen=True, slots=True)
@@ -94,17 +96,28 @@ class DownloadSummary:
         return self.failed == 0
 
 
-DownloadCallable = Callable[[QueuedJob, httpx.AsyncClient], Awaitable[DownloaderRet[str]]]
+DownloadCallable = Callable[
+    [QueuedJob, httpx.AsyncClient, ReporterDownloadObserver],
+    Awaitable[DownloaderRet[str]],
+]
 
 
 class DownloadWorkerPool:
     """Consume a fair job queue with one shared HTTPX connection pool."""
 
-    def __init__(self, concurrency: int, *, download: DownloadCallable | None = None) -> None:
+    def __init__(
+        self,
+        concurrency: int,
+        *,
+        download: DownloadCallable | None = None,
+        reporter: ProgressReporter | None = None,
+    ) -> None:
         if concurrency < 1:
             raise ValueError("download concurrency must be positive")
         self.concurrency = concurrency
         self._download = _download_job if download is None else download
+        self.reporter = reporter or NullProgressReporter()
+        self._task_ids = count(1)
 
     async def run(self, queue: FairJobQueue) -> DownloadSummary:
         summary = DownloadSummary()
@@ -132,25 +145,36 @@ class DownloadWorkerPool:
     ) -> None:
         while queued := await queue.get():
             summary.total += 1
+            task_key = f"download-{next(self._task_ids)}"
+            observer = ReporterDownloadObserver(self.reporter, task_key, queued.creator_key)
+            status = "failed"
             try:
-                result = await self._download(queued, client)
+                result = await self._download(queued, client, observer)
                 if result.code == RetCodeEnum.FileExisted:
                     summary.existed += 1
+                    status = "existed"
                 elif result.code == RetCodeEnum.Success:
                     summary.completed += 1
+                    status = "completed"
                 else:
                     summary.failed += 1
                     logger.error(result.message)
             except asyncio.CancelledError:
+                status = "cancelled"
                 raise
             except Exception as error:
                 summary.failed += 1
                 logger.error(f"Download failed for {queued.job.alt_filename or queued.job.server_path}: {error}")
             finally:
+                self.reporter.download_finished(task_key, status)
                 queue.task_done(queued.creator_key)
 
 
-async def _download_job(queued: QueuedJob, client: httpx.AsyncClient) -> DownloaderRet[str]:
+async def _download_job(
+    queued: QueuedJob,
+    client: httpx.AsyncClient,
+    observer: ReporterDownloadObserver,
+) -> DownloaderRet[str]:
     job = queued.job
     downloader = Downloader(
         url=get_file_url(job.server_path),
@@ -160,4 +184,4 @@ async def _download_job(queued: QueuedJob, client: httpx.AsyncClient) -> Downloa
         server_path=job.server_path,
         post=job.post,
     )
-    return await downloader.run(progress=False)
+    return await downloader.run(progress=observer)

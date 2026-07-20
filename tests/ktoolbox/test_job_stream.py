@@ -74,7 +74,7 @@ async def test_download_pool_bounds_concurrency_and_reuses_client(tmp_path: Path
     release = asyncio.Event()
     clients: set[int] = set()
 
-    async def download(queued: QueuedJob, client) -> DownloaderRet[str]:
+    async def download(queued: QueuedJob, client, observer) -> DownloaderRet[str]:
         nonlocal active, maximum
         clients.add(id(client))
         active += 1
@@ -103,7 +103,7 @@ async def test_download_pool_classifies_results_and_exceptions(tmp_path: Path) -
         await queue.put("fanbox:a", job(tmp_path, name))
     await queue.close("fanbox:a")
 
-    async def download(queued: QueuedJob, client) -> DownloaderRet[str]:
+    async def download(queued: QueuedJob, client, observer) -> DownloaderRet[str]:
         if queued.job.alt_filename == "exists":
             return DownloaderRet(code=RetCodeEnum.FileExisted)
         if queued.job.alt_filename == "failure":
@@ -128,7 +128,7 @@ async def test_download_pool_overlaps_ready_creators(tmp_path: Path) -> None:
     both_started = asyncio.Event()
     release = asyncio.Event()
 
-    async def download(queued: QueuedJob, client) -> DownloaderRet[str]:
+    async def download(queued: QueuedJob, client, observer) -> DownloaderRet[str]:
         active_creators.add(queued.creator_key)
         if len(active_creators) == 2:
             both_started.set()
