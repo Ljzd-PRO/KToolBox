@@ -1,13 +1,22 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Annotated
 
 from cyclopts import App, Parameter
 from rich.console import Console
+from rich.table import Table
+from rich.text import Text
 
 from ktoolbox import __version__
 from ktoolbox.cli import KToolBoxCli
+from ktoolbox.project_config import (
+    CreatorReference,
+    ProjectConfigError,
+    ProjectConfigStore,
+    parse_creator_reference,
+)
 
 stdout = Console()
 stderr = Console(stderr=True)
@@ -36,6 +45,15 @@ def _print_result(result: object) -> int:
     if result is not None:
         stdout.print(result)
     return 0
+
+
+def _project_store(path: Path | None) -> ProjectConfigStore:
+    return ProjectConfigStore(path)
+
+
+def _project_error(error: ProjectConfigError) -> int:
+    stderr.print(f"[red]Configuration error:[/red] {error}")
+    return 2
 
 
 @app.command
@@ -110,6 +128,110 @@ async def creator_search(
     return _print_result(await KToolBoxCli.search_creator(name=name, id=creator_id, service=service, dump=dump))
 
 
+@creator_app.command(name="list")
+def creator_list(
+    *,
+    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
+    json_output: Annotated[bool, Parameter(name="--json")] = False,
+) -> int:
+    """List creators saved in the project roster."""
+    store = _project_store(config_path)
+    try:
+        configuration = store.load()
+    except ProjectConfigError as error:
+        return _project_error(error)
+    if json_output:
+        stdout.print(json.dumps([item.model_dump() for item in configuration.creators], ensure_ascii=False))
+        return 0
+    if not configuration.creators:
+        stdout.print(f"No creators are configured in {store.path}.")
+        return 0
+    table = Table(title=f"Creator roster: {store.path}")
+    table.add_column("Creator")
+    table.add_column("Alias")
+    table.add_column("Status")
+    for creator in configuration.creators:
+        table.add_row(
+            Text(creator.key),
+            Text(creator.alias or ""),
+            Text("enabled" if creator.enabled else "disabled", style="green" if creator.enabled else "dim"),
+        )
+    stdout.print(table)
+    return 0
+
+
+@creator_app.command(name="add")
+def creator_add(
+    target: str,
+    *,
+    alias: str | None = None,
+    disabled: bool = False,
+    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
+) -> int:
+    """Add a Pawchive creator URL or service:id to the project roster."""
+    store = _project_store(config_path)
+    try:
+        parsed = parse_creator_reference(target)
+        creator = CreatorReference(
+            service=parsed.service,
+            creator_id=parsed.creator_id,
+            alias=alias,
+            enabled=not disabled,
+        )
+        store.add_creator(creator)
+    except (ProjectConfigError, ValueError) as error:
+        return _project_error(ProjectConfigError(str(error)))
+    stdout.print(f"Added [bold]{creator.key}[/bold] to {store.path}.")
+    return 0
+
+
+@creator_app.command(name="remove")
+def creator_remove(
+    target: str,
+    *,
+    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
+) -> int:
+    """Remove a creator from the project roster."""
+    store = _project_store(config_path)
+    try:
+        creator = store.remove_creator(target)
+    except ProjectConfigError as error:
+        return _project_error(error)
+    stdout.print(f"Removed [bold]{creator.key}[/bold] from {store.path}.")
+    return 0
+
+
+def _set_creator_enabled(target: str, config_path: Path | None, enabled: bool) -> int:
+    store = _project_store(config_path)
+    try:
+        creator = store.set_creator_enabled(target, enabled)
+    except ProjectConfigError as error:
+        return _project_error(error)
+    state = "Enabled" if enabled else "Disabled"
+    stdout.print(f"{state} [bold]{creator.key}[/bold].")
+    return 0
+
+
+@creator_app.command(name="enable")
+def creator_enable(
+    target: str,
+    *,
+    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
+) -> int:
+    """Enable a saved creator."""
+    return _set_creator_enabled(target, config_path, True)
+
+
+@creator_app.command(name="disable")
+def creator_disable(
+    target: str,
+    *,
+    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
+) -> int:
+    """Disable a saved creator."""
+    return _set_creator_enabled(target, config_path, False)
+
+
 @post_app.command(name="search")
 async def post_search(
     creator_id: Annotated[str | None, Parameter(name=("--creator-id", "--id"))] = None,
@@ -157,6 +279,31 @@ async def config_edit() -> int:
 async def config_example() -> int:
     """Print an example dotenv configuration."""
     await KToolBoxCli.example_env()
+    return 0
+
+
+@config_app.command(name="validate")
+def config_validate(
+    *,
+    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
+) -> int:
+    """Validate the project configuration file."""
+    store = _project_store(config_path)
+    try:
+        configuration = store.load()
+    except ProjectConfigError as error:
+        return _project_error(error)
+    stdout.print(f"[green]Valid configuration:[/green] {store.path} ({len(configuration.creators)} creators)")
+    return 0
+
+
+@config_app.command(name="path")
+def config_path(
+    *,
+    config_path: Annotated[Path | None, Parameter(name="--config")] = None,
+) -> int:
+    """Print the resolved project configuration path."""
+    stdout.print(_project_store(config_path).path)
     return 0
 
 

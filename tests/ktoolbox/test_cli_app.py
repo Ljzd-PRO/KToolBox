@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 from ktoolbox.cli_app import app
@@ -37,3 +39,26 @@ def test_legacy_download_alias_keeps_signature() -> None:
             == 0
         )
     download.assert_awaited_once()
+
+
+def test_creator_roster_commands(tmp_path: Path, capsys) -> None:
+    config = tmp_path / "ktoolbox.toml"
+    common = ["--config", str(config)]
+
+    assert app(["creator", "add", "fanbox:123", "--alias", "artist", *common]) == 0
+    assert app(["creator", "disable", "artist", *common]) == 0
+    capsys.readouterr()
+
+    assert app(["creator", "list", "--json", *common]) == 0
+    roster = json.loads(capsys.readouterr().out)
+    assert roster == [{"service": "fanbox", "creator_id": "123", "alias": "artist", "enabled": False}]
+
+    assert app(["creator", "remove", "artist", *common]) == 0
+    assert app(["config", "validate", *common]) == 0
+    assert "0 creators" in capsys.readouterr().out
+
+
+def test_creator_roster_command_reports_invalid_target(tmp_path: Path, capsys) -> None:
+    result = app(["creator", "add", "invalid", "--config", str(tmp_path / "ktoolbox.toml")])
+    assert result == 2
+    assert "Configuration error" in capsys.readouterr().err
