@@ -15,7 +15,8 @@ from ktoolbox.blocker import (
     BlockerScope,
     BlockerSpec,
 )
-from ktoolbox.blocker.engine import legacy_keyword_blocker
+from ktoolbox.blocker.engine import _build_field_match, legacy_keyword_blocker
+from ktoolbox.blocker.field_match import FieldMatchOptions, _flatten, _select_values
 from ktoolbox.project_config import ProjectConfigError, ProjectConfigStore
 
 
@@ -88,6 +89,11 @@ async def test_creator_scope_and_disabled_specs() -> None:
     assert await engine.evaluate(post(), BlockerContext("fanbox", "creator-1")) is not None
 
 
+async def test_field_match_returns_none_when_in_scope_rule_does_not_match() -> None:
+    engine = BlockerEngine.from_specs([spec(group(field("title", "equals", ["finished work"])))])
+    assert await engine.evaluate(post(), BlockerContext("fanbox", "creator-1")) is None
+
+
 def test_rule_validation_rejects_unsafe_paths_and_invalid_regex() -> None:
     with pytest.raises(ValueError, match="field paths"):
         BlockerEngine.from_specs([spec(group(field("__class__[0]", "exists")))])
@@ -106,6 +112,37 @@ def test_scope_and_registry_validation() -> None:
         BlockerScope(mode="creators", creators=["invalid"])
     with pytest.raises(ValueError, match="unknown blocker type"):
         BlockerRegistry().validate(BlockerSpec(id="custom", type="custom"))
+
+    scope = BlockerScope(mode="creators", creators=["fanbox:1", "FANBOX:1"])
+    assert scope.creators == ["fanbox:1"]
+    context = BlockerContext("fanbox", "1")
+    assert context.creator_key == "fanbox:1"
+
+
+def test_condition_value_validation_and_nested_value_helpers() -> None:
+    with pytest.raises(ValueError, match="do not accept values"):
+        BlockerEngine.from_specs([spec(group(field("title", "exists", ["unexpected"])))])
+    with pytest.raises(ValueError, match="require at least one value"):
+        BlockerEngine.from_specs([spec(group(field("title", "contains")))])
+
+    class Nested(BaseModel):
+        name: str
+
+    assert _select_values({"nested": Nested(name="value")}, "nested.name") == ["value"]
+    assert _flatten(_select_values({}, "missing")[0]) == []
+    assert _flatten(None) == []
+    assert _flatten({"items": ["one", None]}) == ["one"]
+    assert _flatten(["one", ["two"]]) == ["one", "two"]
+
+
+def test_field_match_builder_rejects_the_wrong_options_model() -> None:
+    class OtherOptions(BaseModel):
+        pass
+
+    configured = spec(group(field("title", "contains", ["progress"])))
+    with pytest.raises(TypeError, match="requires FieldMatchOptions"):
+        _build_field_match(configured, OtherOptions())
+    assert _build_field_match(configured, FieldMatchOptions.model_validate(configured.options)).id == "rule"
 
 
 async def test_engine_short_circuits_after_first_decision() -> None:

@@ -33,14 +33,20 @@ jobs:
           poetry run ruff check
           k_generator
           ktoolbox/api
+          ktoolbox/blocker
           ktoolbox/action/base.py
           ktoolbox/action/fetch.py
           ktoolbox/action/search.py
           ktoolbox/_enum.py
           ktoolbox/cli.py
+          ktoolbox/cli_app.py
           ktoolbox/configuration.py
           ktoolbox/downloader/downloader.py
           ktoolbox/job/runner.py
+          ktoolbox/job/stream.py
+          ktoolbox/project_config.py
+          ktoolbox/reporting.py
+          ktoolbox/sync.py
           ktoolbox/utils.py
           tests
 
@@ -49,14 +55,20 @@ jobs:
           poetry run ruff format --check
           k_generator
           ktoolbox/api
+          ktoolbox/blocker
           ktoolbox/action/base.py
           ktoolbox/action/fetch.py
           ktoolbox/action/search.py
           ktoolbox/_enum.py
           ktoolbox/cli.py
+          ktoolbox/cli_app.py
           ktoolbox/configuration.py
           ktoolbox/downloader/downloader.py
           ktoolbox/job/runner.py
+          ktoolbox/job/stream.py
+          ktoolbox/project_config.py
+          ktoolbox/reporting.py
+          ktoolbox/sync.py
           ktoolbox/utils.py
           tests
 
@@ -71,6 +83,12 @@ jobs:
           ktoolbox/action/search.py
           ktoolbox/api/utils.py
           ktoolbox/cli.py
+          ktoolbox/cli_app.py
+          ktoolbox/blocker
+          ktoolbox/job/stream.py
+          ktoolbox/project_config.py
+          ktoolbox/reporting.py
+          ktoolbox/sync.py
 
       - name: Compile Python sources
         run: poetry run python -m compileall -q ktoolbox k_generator
@@ -85,6 +103,22 @@ jobs:
           --cov=ktoolbox.api.errors
           --cov=ktoolbox.api.parameters
           --cov=ktoolbox.api.utils
+          --cov-branch
+          --cov-fail-under=100
+
+      - name: Test synchronization core at 100% coverage
+        run: >-
+          poetry run pytest
+          tests/ktoolbox/test_blocker.py
+          tests/ktoolbox/test_job_stream.py
+          tests/ktoolbox/test_reporting.py
+          tests/ktoolbox/test_sync.py
+          --cov=ktoolbox.blocker.engine
+          --cov=ktoolbox.blocker.field_match
+          --cov=ktoolbox.blocker.model
+          --cov=ktoolbox.job.stream
+          --cov=ktoolbox.reporting
+          --cov=ktoolbox.sync
           --cov-branch
           --cov-fail-under=100
 

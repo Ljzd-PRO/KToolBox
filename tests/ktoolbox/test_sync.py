@@ -11,10 +11,12 @@ from ktoolbox._enum import RetCodeEnum
 from ktoolbox.action.base import ActionRet
 from ktoolbox.action.job import CreatorJobGeneration
 from ktoolbox.api.generated import CreatorProfile
+from ktoolbox.blocker import BlockerEngine
 from ktoolbox.downloader.base import DownloaderRet
 from ktoolbox.job.model import Job
 from ktoolbox.job.stream import DownloadWorkerPool, QueuedJob
 from ktoolbox.project_config import CreatorReference, ProjectConfigError, ProjectConfiguration
+from ktoolbox.reporting import NullProgressReporter
 from ktoolbox.sync import SyncCoordinator, SyncOptions, resolve_sync_targets
 
 
@@ -115,6 +117,64 @@ async def test_sync_coordinator_isolates_creator_failure(tmp_path: Path) -> None
 
 
 async def test_sync_coordinator_rejects_empty_target_list() -> None:
+    with pytest.raises(ValueError, match="creator concurrency must be positive"):
+        SyncCoordinator(SimpleNamespace(), creator_concurrency=0)  # type: ignore[arg-type]
+
     coordinator = SyncCoordinator(SimpleNamespace())  # type: ignore[arg-type]
     with pytest.raises(ProjectConfigError, match="no creators selected"):
         await coordinator.run([], SyncOptions())
+
+
+async def test_sync_coordinator_captures_unexpected_creator_failure(tmp_path: Path) -> None:
+    client = SimpleNamespace(get_creator_profile=AsyncMock(side_effect=RuntimeError("profile failed")))
+
+    async def download(queued: QueuedJob, client, observer) -> DownloaderRet[str]:
+        return DownloaderRet(data="unused")
+
+    coordinator = SyncCoordinator(
+        client,
+        blocker_engine=BlockerEngine(),
+        download_pool=DownloadWorkerPool(1, download=download),
+        lane_size=1,
+    )
+    summary = await coordinator.run([creator("broken")], SyncOptions(output=tmp_path))
+
+    assert not summary.successful
+    assert summary.creators[0].error == "profile failed"
+    assert summary.downloads.total == 0
+
+
+async def test_sync_coordinator_cancellation_closes_producers_and_download_pool(tmp_path: Path) -> None:
+    profile_started = asyncio.Event()
+
+    class Client:
+        async def get_creator_profile(self, service: str, creator_id: str) -> CreatorProfile:
+            profile_started.set()
+            await asyncio.Event().wait()
+            raise AssertionError("unreachable")
+
+    class Reporter(NullProgressReporter):
+        def __init__(self) -> None:
+            self.started = 0
+            self.stopped = 0
+            self.finished: list[tuple[str, str | None]] = []
+
+        def start(self) -> None:
+            self.started += 1
+
+        def stop(self) -> None:
+            self.stopped += 1
+
+        def creator_finished(self, creator_key: str, error: str | None = None) -> None:
+            self.finished.append((creator_key, error))
+
+    reporter = Reporter()
+    coordinator = SyncCoordinator(Client(), reporter=reporter)  # type: ignore[arg-type]
+    task = asyncio.create_task(coordinator.run([creator("cancelled")], SyncOptions(output=tmp_path)))
+    await asyncio.wait_for(profile_started.wait(), timeout=1)
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    assert reporter.started == reporter.stopped == 1
+    assert reporter.finished == [("fanbox:cancelled", None)]

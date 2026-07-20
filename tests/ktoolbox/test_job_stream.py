@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import asyncio
 from pathlib import Path
+from unittest.mock import AsyncMock, patch
+
+import pytest
 
 from ktoolbox._enum import RetCodeEnum
 from ktoolbox.downloader.base import DownloaderRet
 from ktoolbox.job.model import Job
 from ktoolbox.job.stream import DownloadWorkerPool, FairJobQueue, QueuedJob
+from ktoolbox.reporting import NullProgressReporter, ReporterDownloadObserver
 
 
 def job(path: Path, name: str) -> Job:
@@ -59,6 +63,21 @@ async def test_fair_queue_applies_per_creator_backpressure(tmp_path: Path) -> No
     queue.task_done(first.creator_key)
     await asyncio.wait_for(blocked_put, timeout=1)
     await queue.close("fanbox:a")
+
+
+async def test_queue_and_pool_reject_invalid_lifecycle_operations(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="lane_size must be positive"):
+        FairJobQueue(0)
+    with pytest.raises(ValueError, match="concurrency must be positive"):
+        DownloadWorkerPool(0)
+
+    queue = FairJobQueue(1)
+    queue.register("fanbox:a")
+    with pytest.raises(ValueError, match="already registered"):
+        queue.register("fanbox:a")
+    await queue.close("fanbox:a")
+    with pytest.raises(RuntimeError, match="queue is closed"):
+        await queue.put("fanbox:a", job(tmp_path, "late"))
 
 
 async def test_download_pool_bounds_concurrency_and_reuses_client(tmp_path: Path) -> None:
@@ -140,3 +159,51 @@ async def test_download_pool_overlaps_ready_creators(tmp_path: Path) -> None:
     assert active_creators == {"fanbox:a", "fanbox:b"}
     release.set()
     assert (await task).completed == 2
+
+
+async def test_download_pool_cancels_workers_and_reports_cancelled_status(tmp_path: Path) -> None:
+    queue = FairJobQueue(1)
+    queue.register("fanbox:a")
+    await queue.put("fanbox:a", job(tmp_path, "cancel"))
+    await queue.close("fanbox:a")
+    started = asyncio.Event()
+
+    class Reporter(NullProgressReporter):
+        def __init__(self) -> None:
+            self.finished: list[tuple[str, str]] = []
+
+        def download_finished(self, task_key: str, status: str) -> None:
+            self.finished.append((task_key, status))
+
+    reporter = Reporter()
+
+    async def download(queued: QueuedJob, client, observer) -> DownloaderRet[str]:
+        started.set()
+        await asyncio.Event().wait()
+        return DownloaderRet(data="unreachable")
+
+    task = asyncio.create_task(DownloadWorkerPool(2, download=download, reporter=reporter).run(queue))
+    await asyncio.wait_for(started.wait(), timeout=1)
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+    assert reporter.finished == [("download-1", "cancelled")]
+
+
+async def test_default_download_callable_builds_downloader_and_observer(tmp_path: Path) -> None:
+    queue = FairJobQueue(1)
+    queue.register("fanbox:a")
+    queued_job = job(tmp_path, "default.bin")
+    await queue.put("fanbox:a", queued_job)
+    await queue.close("fanbox:a")
+
+    with patch("ktoolbox.job.stream.Downloader") as downloader_type:
+        downloader = downloader_type.return_value
+        downloader.run = AsyncMock(return_value=DownloaderRet(data="default.bin"))
+        summary = await DownloadWorkerPool(1).run(queue)
+
+    assert summary.completed == 1
+    assert downloader_type.call_args.kwargs["path"] == tmp_path
+    assert downloader_type.call_args.kwargs["designated_filename"] == "default.bin"
+    observer = downloader.run.await_args.kwargs["progress"]
+    assert isinstance(observer, ReporterDownloadObserver)

@@ -173,8 +173,8 @@ v1 删除 Kemono/Coomer 兼容层，以及旧 `BaseAPI`、模块级 `get_*`、`A
 ```bash
 poetry install --with test,docs,dev
 poetry run pytest --cov
-poetry run ruff check .
-poetry run mypy ktoolbox
+poetry run ruff check k_generator ktoolbox/api ktoolbox/blocker ktoolbox/cli.py ktoolbox/cli_app.py ktoolbox/job/stream.py ktoolbox/project_config.py ktoolbox/reporting.py ktoolbox/sync.py tests
+poetry run mypy --strict ktoolbox/api/client.py ktoolbox/api/errors.py ktoolbox/api/parameters.py ktoolbox/api/utils.py ktoolbox/blocker ktoolbox/cli.py ktoolbox/cli_app.py ktoolbox/job/stream.py ktoolbox/project_config.py ktoolbox/reporting.py ktoolbox/sync.py
 poetry run mkdocs build --strict
 ```
 

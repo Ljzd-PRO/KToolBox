@@ -34,7 +34,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 
 ## Testing and quality
 
-- Replace the test suite with 154 fully offline tests using RESPX, HTTPX transports, dependency injection, and temporary filesystems; accidental sockets are blocked.
+- Replace the test suite with 162 fully offline tests using RESPX, HTTPX transports, dependency injection, and temporary filesystems; accidental sockets are blocked.
 - Cover every public operation, parameter and response contract, status mapping, retry path, malformed response, schema drift report, and client lifecycle.
 - Enforce 100% line and branch coverage for the handwritten API layer and at least 85% for the full project.
 - Add Ruff, strict API-layer Mypy, warnings-as-errors, OpenAPI validation, generation checks, `compileall`, package builds, and strict bilingual documentation builds.
@@ -81,7 +81,7 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 
 ## 测试与质量
 
-- 使用 RESPX、HTTPX Transport、依赖注入和临时文件系统重建 154 项完全离线测试，并阻止意外 Socket。
+- 使用 RESPX、HTTPX Transport、依赖注入和临时文件系统重建 162 项完全离线测试，并阻止意外 Socket。
 - 覆盖全部公开操作、参数与响应契约、状态映射、重试路径、非法响应、Schema 漂移报告和客户端生命周期。
 - 手写 API 层强制 100% 行与分支覆盖率，全项目覆盖率不低于 85%。
 - 加入 Ruff、API 层严格 Mypy、警告即错误、OpenAPI 校验、生成一致性检查、`compileall`、包构建和双语文档严格构建。
