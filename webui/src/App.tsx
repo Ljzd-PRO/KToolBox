@@ -10,8 +10,9 @@ import { BlockersPage } from "./pages/BlockersPage";
 import { CreatorsPage } from "./pages/CreatorsPage";
 import { ConfigurationPage } from "./pages/ConfigurationPage";
 import { LoginPage } from "./pages/LoginPage";
-import { PlaceholderPage } from "./pages/PlaceholderPage";
+import { PostsPage } from "./pages/PostsPage";
 import { SystemPage } from "./pages/SystemPage";
+import { TasksPage } from "./pages/TasksPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,9 +41,9 @@ function AuthenticatedApplication() {
     <Routes>
       <Route element={<AppShell />}>
         <Route index element={<DashboardPage />} />
-        <Route element={<PlaceholderPage page="tasks" />} path="tasks/*" />
+        <Route element={<TasksPage />} path="tasks/:taskId?" />
         <Route element={<CreatorsPage />} path="creators" />
-        <Route element={<PlaceholderPage page="posts" />} path="posts" />
+        <Route element={<PostsPage />} path="posts" />
         <Route element={<BlockersPage />} path="blockers" />
         <Route element={<ConfigurationPage />} path="configuration" />
         <Route element={<SystemPage />} path="system" />

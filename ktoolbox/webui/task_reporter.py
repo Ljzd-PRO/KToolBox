@@ -111,6 +111,9 @@ class WebTaskReporter(NullProgressReporter):
             self.progress.failed_files += 1
         self._record_speed(monotonic())
         self._refresh_eta()
+        if not self.progress.active_downloads:
+            self.progress.speed_bps = 0
+            self.progress.eta_seconds = 0 if self.progress.total_bytes is not None else None
         self._emit("download.finished", {"key": task_key, "status": status}, immediate=True)
 
     def artifact_created(self, path: Path) -> None:

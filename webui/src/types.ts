@@ -169,6 +169,33 @@ export type TaskEvent = {
   created_at: string;
 };
 
+export type TaskAttempt = {
+  id: number;
+  task_id: string;
+  sequence: number;
+  status: TaskStatus;
+  spec: TaskSpec;
+  configuration: Record<string, unknown>;
+  started_at: string;
+  finished_at: string | null;
+  error: string | null;
+};
+
+export type TaskArtifact = {
+  path: string;
+  size: number;
+  mtime_ns: number;
+  removable: boolean;
+  reason: string | null;
+};
+
+export type TaskCleanupPreview = {
+  task_id: string;
+  artifacts: TaskArtifact[];
+  removable_files: number;
+  removable_bytes: number;
+};
+
 export type CreatorSummary = {
   id: string;
   service: string;
@@ -186,4 +213,8 @@ export type PawchivePost = {
   edited?: string | null;
   attachments?: unknown[] | null;
   [key: string]: unknown;
+};
+
+export type PawchiveRevision = PawchivePost & {
+  revision_id: string | number;
 };

@@ -199,7 +199,7 @@ export function CreatorsPage() {
                 <Table.ScrollContainer>
                   <Table.Content aria-label={t("creators.roster")}>
                     <Table.Header>
-                      <Table.Column>{t("creators.alias")}</Table.Column>
+                      <Table.Column isRowHeader>{t("creators.alias")}</Table.Column>
                       <Table.Column>{t("creators.service")}</Table.Column>
                       <Table.Column>{t("creators.creatorId")}</Table.Column>
                       <Table.Column>{t("common.status")}</Table.Column>

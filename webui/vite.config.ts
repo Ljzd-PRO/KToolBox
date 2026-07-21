@@ -13,6 +13,10 @@ export default defineConfig({
         codeSplitting: {
           groups: [
             {
+              name: "date-runtime",
+              test: /node_modules\/(?:@internationalized\/date|@heroui\/react\/dist\/components\/(?:calendar|calendar-year-picker|date-field|date-input-group|date-range-picker|range-calendar)|@react-aria\/(?:calendar|datepicker)|@react-stately\/(?:calendar|datepicker))\//,
+            },
+            {
               name: "react-runtime",
               test: /node_modules\/(react|react-dom|react-router|scheduler)\//,
             },

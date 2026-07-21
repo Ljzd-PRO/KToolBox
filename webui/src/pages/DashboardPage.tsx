@@ -97,7 +97,7 @@ export function DashboardPage() {
               <Table.ScrollContainer>
                 <Table.Content aria-label={t("overview.recent")}>
                   <Table.Header>
-                    <Table.Column>{t("common.type")}</Table.Column>
+                    <Table.Column isRowHeader>{t("common.type")}</Table.Column>
                     <Table.Column>{t("common.status")}</Table.Column>
                     <Table.Column>{t("common.created")}</Table.Column>
                     <Table.Column className="text-right">{t("common.actions")}</Table.Column>

@@ -96,6 +96,24 @@ def create_pawchive_router() -> APIRouter:
         except (PawchiveError, ValidationError) as error:
             raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(error)) from error
 
+    @router.get("/posts/{service}/{creator_id}/{post_id}/revisions", response_model=list[Revision])
+    async def post_revisions(
+        service: str,
+        creator_id: str,
+        post_id: str,
+        request: Request,
+        _: SessionDependency,
+    ) -> list[Revision]:
+        context = runtime(request)
+        try:
+            with context.activate():
+                async with create_pawchive_client() as client:
+                    return await client.list_post_revisions(service, creator_id, post_id)
+        except PawchiveNotFoundError as error:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+        except (PawchiveError, ValidationError) as error:
+            raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(error)) from error
+
     @router.get("/site-version", response_model=SiteVersionResponse)
     async def site_version(request: Request, _: SessionDependency) -> SiteVersionResponse:
         context = runtime(request)

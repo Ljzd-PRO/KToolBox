@@ -69,6 +69,8 @@ async def test_pawchive_query_routes_use_typed_client(tmp_path: Path) -> None:
                 assert details.json()["title"] == "Fixture post"
                 selected = await client.get("/api/v1/pawchive/posts/fanbox/42/99?revision_id=7")
                 assert selected.json()["revision_id"] == 7
+                revisions = await client.get("/api/v1/pawchive/posts/fanbox/42/99/revisions")
+                assert revisions.json()[0]["revision_id"] == 7
                 missing = await client.get("/api/v1/pawchive/posts/fanbox/42/99?revision_id=8")
                 assert missing.status_code == 404
                 version = await client.get("/api/v1/pawchive/site-version")

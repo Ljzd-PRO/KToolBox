@@ -3,6 +3,8 @@ import {
   Button,
   Chip,
   Description,
+  DateField,
+  DateRangePicker,
   EmptyState,
   FieldError,
   Input,
@@ -11,6 +13,8 @@ import {
   ListBox,
   Modal,
   NumberField,
+  ProgressBar,
+  RangeCalendar,
   SearchField,
   Select,
   Skeleton,
@@ -20,8 +24,10 @@ import {
   Tooltip,
   useOverlayState,
 } from "@heroui/react";
+import type { DateValue } from "@internationalized/date";
 import { Check, ChevronDown, Eye, EyeOff, Inbox, Minus, Plus, Search, X, type LucideIcon } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 import type { TaskStatus } from "../types";
 
@@ -198,6 +204,88 @@ export function NumberInput({
   );
 }
 
+export type DateRangeValue = { start: DateValue; end: DateValue };
+
+export function DateRangeInput({
+  label,
+  description,
+  value,
+  onChange,
+}: {
+  label: string;
+  description?: string;
+  value: DateRangeValue | null;
+  onChange: (value: DateRangeValue | null) => void;
+}) {
+  return (
+    <DateRangePicker className="grid gap-1.5" value={value} onChange={onChange}>
+      <Label className="text-sm font-medium text-foreground">{label}</Label>
+      <DateField.Group fullWidth variant="secondary">
+        <DateField.InputContainer>
+          <DateField.Input slot="start">
+            {(segment) => <DateField.Segment segment={segment} />}
+          </DateField.Input>
+          <DateRangePicker.RangeSeparator />
+          <DateField.Input slot="end">
+            {(segment) => <DateField.Segment segment={segment} />}
+          </DateField.Input>
+        </DateField.InputContainer>
+        <DateField.Suffix>
+          <DateRangePicker.Trigger aria-label={label}>
+            <DateRangePicker.TriggerIndicator />
+          </DateRangePicker.Trigger>
+        </DateField.Suffix>
+      </DateField.Group>
+      {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
+      <DateRangePicker.Popover>
+        <RangeCalendar aria-label={label}>
+          <RangeCalendar.Header>
+            <RangeCalendar.NavButton slot="previous" />
+            <RangeCalendar.Heading />
+            <RangeCalendar.NavButton slot="next" />
+          </RangeCalendar.Header>
+          <RangeCalendar.Grid>
+            <RangeCalendar.GridHeader>
+              {(day) => <RangeCalendar.HeaderCell>{day}</RangeCalendar.HeaderCell>}
+            </RangeCalendar.GridHeader>
+            <RangeCalendar.GridBody>
+              {(date) => <RangeCalendar.Cell date={date} />}
+            </RangeCalendar.GridBody>
+          </RangeCalendar.Grid>
+        </RangeCalendar>
+      </DateRangePicker.Popover>
+    </DateRangePicker>
+  );
+}
+
+export function ProgressMeter({
+  label,
+  value,
+  isIndeterminate = false,
+}: {
+  label: string;
+  value: number;
+  isIndeterminate?: boolean;
+}) {
+  return (
+    <ProgressBar
+      aria-label={label}
+      className="grid gap-2"
+      color="accent"
+      isIndeterminate={isIndeterminate}
+      value={Math.min(100, Math.max(0, value))}
+    >
+      <div className="flex items-center justify-between gap-3 text-sm">
+        <Label className="font-medium text-foreground">{label}</Label>
+        {!isIndeterminate ? <ProgressBar.Output className="tabular-nums text-muted" /> : null}
+      </div>
+      <ProgressBar.Track>
+        <ProgressBar.Fill />
+      </ProgressBar.Track>
+    </ProgressBar>
+  );
+}
+
 export function CodeEditor({
   label,
   value,
@@ -283,9 +371,10 @@ const taskTone: Record<TaskStatus, React.ComponentProps<typeof Chip>["color"]> =
 };
 
 export function TaskStatusChip({ status }: { status: TaskStatus }) {
+  const { t } = useTranslation();
   return (
     <Chip color={taskTone[status]} size="sm" variant="soft">
-      {status.replaceAll("_", " ")}
+      {t(`tasks.statuses.${status}`)}
     </Chip>
   );
 }

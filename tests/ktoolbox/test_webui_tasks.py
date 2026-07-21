@@ -209,7 +209,6 @@ async def test_web_reporter_persists_throttled_speed_progress(tmp_path: Path) ->
     reporter.download_started("one", "fanbox:one", "sample.bin", 100, 0)
     reporter.download_advanced("one", 25)
     await asyncio.sleep(0.03)
-    await reporter.close()
 
     events = await store.events(task_id=task.id)
     assert any(event.event_type == "download.progress" for event in events)
@@ -217,6 +216,12 @@ async def test_web_reporter_persists_throttled_speed_progress(tmp_path: Path) ->
     assert progress.transferred_bytes == 25
     assert progress.speed_bps > 0
     assert progress.eta_seconds is not None
+
+    reporter.download_finished("one", "completed")
+    await reporter.close()
+    settled = (await store.get(task.id)).progress
+    assert settled.speed_bps == 0
+    assert settled.eta_seconds == 0
 
 
 @pytest.mark.asyncio
