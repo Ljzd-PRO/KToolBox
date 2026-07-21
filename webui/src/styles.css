@@ -189,6 +189,14 @@ code {
   box-shadow: 0 1px 2px color-mix(in oklab, black 7%, transparent);
 }
 
+.task-mobile-card .task-target-title {
+  display: -webkit-box;
+  overflow: hidden;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 .task-kind-icon {
   display: grid;
   width: 2.5rem;
@@ -220,6 +228,22 @@ code {
 .config-save-bar {
   background: color-mix(in oklab, var(--surface-secondary) 92%, var(--surface) 8%);
   box-shadow: 0 -1px 0 var(--border), 0 -8px 18px color-mix(in oklab, var(--background) 72%, transparent);
+}
+
+@media (max-width: 639px) {
+  .configuration-tabs [data-slot="tabs-list"] {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .configuration-tabs [data-slot="tabs-tab"] {
+    min-width: 0;
+    height: 2.75rem;
+    padding-inline: 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    white-space: normal;
+  }
 }
 
 .field-label-icon {

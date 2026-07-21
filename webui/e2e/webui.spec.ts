@@ -125,6 +125,14 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
     (creatorCellBox?.x ?? 0) + (creatorCellBox?.width ?? 0) / 2
       - (creatorControlBox?.x ?? 0) - (creatorControlBox?.width ?? 0) / 2,
   )).toBeLessThan(1);
+  await creatorRow.getByRole("switch", { name: "Enabled" }).press("Space");
+  const disabledCreatorSwitch = creatorRow.getByRole("switch", { name: "Disabled" });
+  await expect(disabledCreatorSwitch).toBeVisible();
+  const offTrack = await creatorSwitchControl.evaluate((element) => getComputedStyle(element).backgroundColor);
+  const fieldSurface = await page.locator("main input").first().evaluate((element) => getComputedStyle(element).backgroundColor);
+  expect(offTrack).not.toBe(fieldSurface);
+  await disabledCreatorSwitch.press("Space");
+  await expect(creatorRow.getByRole("switch", { name: "Enabled" })).toBeVisible();
 
   await page.getByRole("link", { name: "Blockers" }).click();
   await page.getByRole("button", { name: "Add blocker" }).click();
@@ -156,6 +164,10 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
   const saveBar = page.locator(".config-save-bar");
   await expect(saveBar).toBeVisible();
   expect(await saveBar.evaluate((element) => Boolean(element.closest(".form-surface")))).toBe(true);
+  await page.setViewportSize({ width: 390, height: 844 });
+  const tabsScroller = page.locator('[data-slot="scroll-shadow"]');
+  expect(await tabsScroller.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
+  await expect(page.getByRole("button", { name: "Scroll tabs right" })).not.toBeVisible();
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
 });
 

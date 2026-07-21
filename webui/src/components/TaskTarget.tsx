@@ -17,11 +17,11 @@ export function TaskTarget({ task }: { task: TaskRecord }) {
       .map((creator) => `${creator.alias?.trim() || creator.creator_id} (${creator.service}:${creator.creator_id})`)
       .join("\n");
     return (
-      <div className="flex min-w-0 items-start gap-3">
+      <div className="task-target flex min-w-0 flex-1 items-start gap-3">
         <span className="task-kind-icon" data-kind="sync"><RefreshCw aria-hidden="true" size={18} /></span>
         <div className="min-w-0">
           <div className="flex min-w-0 items-center gap-2">
-            <p className="truncate text-sm font-semibold" title={t("tasks.creatorCount", { count: names.length })}>{t("tasks.creatorCount", { count: names.length })}</p>
+            <p className="task-target-title truncate text-sm font-semibold" title={t("tasks.creatorCount", { count: names.length })}>{t("tasks.creatorCount", { count: names.length })}</p>
             <Chip className="shrink-0" size="sm" variant="soft">{t("common.sync")}</Chip>
           </div>
           {roster ? (
@@ -45,11 +45,11 @@ export function TaskTarget({ task }: { task: TaskRecord }) {
     identity.revisionId ? t("tasks.revisionShort", { id: identity.revisionId }) : null,
   ].filter(Boolean).join(" · ") || task.spec.post || t("common.unknown");
   return (
-    <div className="flex min-w-0 items-start gap-3">
+    <div className="task-target flex min-w-0 flex-1 items-start gap-3">
       <span className="task-kind-icon" data-kind="download"><Download aria-hidden="true" size={18} /></span>
       <div className="min-w-0">
         <div className="flex min-w-0 items-center gap-2">
-          <p className="truncate text-sm font-semibold" title={title}>{title}</p>
+          <p className="task-target-title truncate text-sm font-semibold" title={title}>{title}</p>
           <Chip className="shrink-0" color="accent" size="sm" variant="soft">{t("common.download")}</Chip>
         </div>
         <p className="mt-1 truncate text-xs text-muted" title={metadata}>{metadata}</p>

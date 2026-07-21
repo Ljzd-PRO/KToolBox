@@ -213,8 +213,8 @@ export function ConfigurationPage() {
         }
       />
 
-      <Tabs className="min-w-0 w-full" aria-label={t("configuration.title")} defaultSelectedKey="structured" variant="secondary">
-        <Tabs.ListContainer className="max-w-full overflow-x-auto">
+      <Tabs className="configuration-tabs min-w-0 w-full" aria-label={t("configuration.title")} defaultSelectedKey="structured" variant="secondary">
+        <Tabs.ListContainer className="max-w-full overflow-hidden">
           <Tabs.List>
             <Tabs.Tab id="structured">{t("configuration.structured")}<Tabs.Indicator /></Tabs.Tab>
             <Tabs.Tab id="effective">{t("configuration.effective")}<Tabs.Indicator /></Tabs.Tab>

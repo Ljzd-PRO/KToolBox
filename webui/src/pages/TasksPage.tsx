@@ -282,9 +282,9 @@ function TaskList({ tasks, handlers, onCreate }: { tasks: TaskRecord[]; handlers
           <div className="grid gap-3 min-[1360px]:hidden">
             {tasks.map((task, index) => (
               <Surface className="task-mobile-card grid gap-4 rounded-lg border border-border p-4" key={task.id}>
-                <div className="flex min-w-0 items-start justify-between gap-3">
-                  <TaskTarget task={task} />
-                  <TaskStatusChip status={task.status} />
+                <div className="flex min-w-0 flex-wrap items-start gap-3">
+                  <div className="min-w-64 flex-1"><TaskTarget task={task} /></div>
+                  <div className="ml-auto shrink-0"><TaskStatusChip status={task.status} /></div>
                 </div>
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
                   <TaskProgressSummary task={task} />
