@@ -19,6 +19,7 @@ import {
   Select,
   Skeleton,
   Switch,
+  Table,
   TextArea,
   TextField,
   Tooltip,
@@ -30,6 +31,14 @@ import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { TaskStatus } from "../types";
+
+export function DataTableFrame({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <Table className={className} variant="secondary">
+      <Table.ScrollContainer className="app-table-frame">{children}</Table.ScrollContainer>
+    </Table>
+  );
+}
 
 export function IconButton({
   label,

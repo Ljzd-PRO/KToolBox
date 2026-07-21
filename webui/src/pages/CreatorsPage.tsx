@@ -12,7 +12,7 @@ import { MoreHorizontal, Pencil, Plus, Search, Trash2, UserPlus } from "lucide-r
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 
-import { AppModal, EmptyPanel, FormField, PageHeader, PageLoading, Toggle } from "../components/ui";
+import { AppModal, DataTableFrame, EmptyPanel, FormField, PageHeader, PageLoading, Toggle } from "../components/ui";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { CreatorReference, CreatorSummary } from "../types";
@@ -194,10 +194,8 @@ export function CreatorsPage() {
           <EmptyPanel title={t("creators.empty")} />
         ) : (
           <>
-            <Surface className="hidden rounded-lg border border-border md:block">
-              <Table>
-                <Table.ScrollContainer>
-                  <Table.Content aria-label={t("creators.roster")}>
+            <DataTableFrame className="hidden md:block">
+              <Table.Content aria-label={t("creators.roster")}>
                     <Table.Header>
                       <Table.Column isRowHeader>{t("creators.alias")}</Table.Column>
                       <Table.Column>{t("creators.service")}</Table.Column>
@@ -228,10 +226,8 @@ export function CreatorsPage() {
                         </Table.Row>
                       ))}
                     </Table.Body>
-                  </Table.Content>
-                </Table.ScrollContainer>
-              </Table>
-            </Surface>
+              </Table.Content>
+            </DataTableFrame>
             <div className="grid gap-3 md:hidden">
               {creators.map((creator) => (
                 <Surface className="rounded-lg border border-border p-4" key={`${creator.service}:${creator.creator_id}`}>

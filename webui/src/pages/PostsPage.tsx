@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 import {
   AppModal,
+  DataTableFrame,
   EmptyPanel,
   FormField,
   NumberInput,
@@ -145,10 +146,8 @@ export function PostsPage() {
         {!searched ? <EmptyPanel description={t("posts.searchHint")} title={t("posts.searchReady")} /> : null}
         {results.length ? (
           <>
-            <Surface className="hidden rounded-lg border border-border md:block">
-              <Table>
-                <Table.ScrollContainer>
-                  <Table.Content aria-label={t("posts.results")}>
+            <DataTableFrame className="hidden md:block">
+              <Table.Content aria-label={t("posts.results")}>
                     <Table.Header>
                       <Table.Column isRowHeader>{t("posts.post")}</Table.Column>
                       <Table.Column>{t("posts.creatorId")}</Table.Column>
@@ -167,10 +166,8 @@ export function PostsPage() {
                         </Table.Row>
                       ))}
                     </Table.Body>
-                  </Table.Content>
-                </Table.ScrollContainer>
-              </Table>
-            </Surface>
+              </Table.Content>
+            </DataTableFrame>
             <div className="grid gap-3 md:hidden">
               {results.map((post) => (
                 <Surface className="grid gap-3 rounded-lg border border-border p-4" key={`${post.service}:${post.user}:${post.id}`}>

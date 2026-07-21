@@ -29,6 +29,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { TaskEditor } from "../components/TaskEditor";
 import {
   AppModal,
+  DataTableFrame,
   EmptyPanel,
   IconButton,
   PageHeader,
@@ -256,10 +257,8 @@ function TaskList({ tasks, handlers, onCreate }: { tasks: TaskRecord[]; handlers
       />
       {!tasks.length ? <EmptyPanel title={t("tasks.empty")} /> : (
         <>
-          <Surface className="hidden rounded-lg border border-border md:block">
-            <Table>
-              <Table.ScrollContainer>
-                <Table.Content aria-label={t("tasks.title")}>
+          <DataTableFrame className="hidden md:block">
+            <Table.Content aria-label={t("tasks.title")}>
                   <Table.Header>
                     <Table.Column isRowHeader>{t("common.type")}</Table.Column>
                     <Table.Column>{t("common.status")}</Table.Column>
@@ -282,10 +281,8 @@ function TaskList({ tasks, handlers, onCreate }: { tasks: TaskRecord[]; handlers
                       </Table.Row>
                     ))}
                   </Table.Body>
-                </Table.Content>
-              </Table.ScrollContainer>
-            </Table>
-          </Surface>
+            </Table.Content>
+          </DataTableFrame>
           <div className="grid gap-3 md:hidden">
             {tasks.map((task) => (
               <Surface className="grid gap-4 rounded-lg border border-border p-4" key={task.id}>

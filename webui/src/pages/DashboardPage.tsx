@@ -4,7 +4,7 @@ import { ArrowRight, BookUser, Boxes, CheckCircle2, Clock3, Play } from "lucide-
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { EmptyPanel, PageLoading, TaskStatusChip } from "../components/ui";
+import { DataTableFrame, EmptyPanel, PageLoading, TaskStatusChip } from "../components/ui";
 import { api } from "../lib/api";
 import type { CreatorReference, ProjectSummary, TaskRecord } from "../types";
 
@@ -92,10 +92,8 @@ export function DashboardPage() {
           </Button>
         </div>
         {records.length ? (
-          <Surface className="rounded-lg border border-border">
-            <Table>
-              <Table.ScrollContainer>
-                <Table.Content aria-label={t("overview.recent")}>
+          <DataTableFrame>
+            <Table.Content aria-label={t("overview.recent")}>
                   <Table.Header>
                     <Table.Column isRowHeader>{t("common.type")}</Table.Column>
                     <Table.Column>{t("common.status")}</Table.Column>
@@ -129,10 +127,8 @@ export function DashboardPage() {
                       </Table.Row>
                     ))}
                   </Table.Body>
-                </Table.Content>
-              </Table.ScrollContainer>
-            </Table>
-          </Surface>
+            </Table.Content>
+          </DataTableFrame>
         ) : (
           <EmptyPanel title={t("overview.empty")} />
         )}
