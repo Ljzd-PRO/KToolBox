@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { App } from "./App";
+import { queryClient } from "./lib/query";
 
 const session = {
   authenticated: true,
@@ -20,6 +21,7 @@ function json(body: unknown, status = 200) {
 }
 
 afterEach(() => {
+  queryClient.clear();
   vi.unstubAllGlobals();
   window.history.replaceState({}, "", "/");
   localStorage.clear();
@@ -41,6 +43,11 @@ describe("task and post workflows", () => {
         post_id: "99",
         output: "/project/downloads",
         dump_post_data: true,
+      },
+      presentation: {
+        target_key: "download/fanbox/42/99/",
+        title: "Fictional fixture",
+        creator_name: "Demo Studio",
       },
       progress: {
         queued_files: 2,
@@ -83,9 +90,109 @@ describe("task and post workflows", () => {
     render(<BrowserRouter><App /></BrowserRouter>);
 
     expect(await screen.findByRole("heading", { name: "Task details" })).toBeInTheDocument();
+    expect(screen.getByText("Fictional fixture")).toBeInTheDocument();
     expect(screen.getByText("2.00 KiB/s")).toBeInTheDocument();
     expect(screen.getByText("a-very-long-but-safe-fixture-name.zip")).toBeInTheDocument();
     expect(await screen.findByText(/fixture ready/)).toBeInTheDocument();
+  });
+
+  it("shows recognizable task targets with every queue action directly available", async () => {
+    window.history.replaceState({}, "", "/tasks");
+    const progress = {
+      queued_files: 4,
+      processed_files: 2,
+      completed_files: 2,
+      existing_files: 0,
+      failed_files: 0,
+      transferred_bytes: 2048,
+      total_bytes: 4096,
+      speed_bps: 2048,
+      eta_seconds: 1,
+      active_creators: [],
+      active_downloads: {},
+    };
+    const tasks = [
+      {
+        id: "download-task",
+        kind: "download",
+        status: "running",
+        position: 1,
+        revision: 1,
+        spec: {
+          kind: "download",
+          service: "fanbox",
+          creator_id: "42",
+          post_id: "99",
+          revision_id: "3",
+          output: "/project/downloads/a-very-long-output-folder",
+          dump_post_data: true,
+        },
+        presentation: {
+          target_key: "download/fanbox/42/99/3",
+          title: "Fictional cover study",
+          creator_name: "Demo Studio",
+        },
+        progress,
+        error: null,
+        blocked_by: null,
+        created_at: "2026-07-21T00:00:00Z",
+        updated_at: "2026-07-21T00:01:00Z",
+      },
+      {
+        id: "sync-task",
+        kind: "sync",
+        status: "completed",
+        position: 2,
+        revision: 1,
+        spec: {
+          kind: "sync",
+          creators: [
+            { service: "fanbox", creator_id: "demo-studio", alias: "Demo Studio", enabled: true },
+            { service: "patreon", creator_id: "type-lab", alias: "Type Lab", enabled: true },
+          ],
+          output: "/project/downloads",
+          save_creator_indices: true,
+          mix_posts: null,
+          start_time: null,
+          end_time: null,
+          offset: 0,
+          length: null,
+          keywords: [],
+          keywords_exclude: [],
+        },
+        presentation: null,
+        progress: { ...progress, speed_bps: 0 },
+        error: null,
+        blocked_by: null,
+        created_at: "2026-07-21T00:02:00Z",
+        updated_at: "2026-07-21T00:03:00Z",
+      },
+    ];
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      const path = String(input);
+      if (path.endsWith("/session")) return json(session);
+      if (path.endsWith("/tasks")) return json(tasks);
+      if (path.endsWith("/creators")) return json([]);
+      throw new Error(`Unexpected request: ${path}`);
+    }));
+
+    render(<BrowserRouter><App /></BrowserRouter>);
+
+    expect(await screen.findAllByText("Fictional cover study")).toHaveLength(2);
+    expect(screen.getAllByText("Demo Studio · fanbox:42 · #99 · rev. 3")).toHaveLength(2);
+    expect(screen.getAllByText("2 creators")).toHaveLength(2);
+    expect(screen.getAllByText("Demo Studio · Type Lab")).toHaveLength(2);
+    expect(screen.getAllByRole("button", { name: "Task details" }).length).toBeGreaterThanOrEqual(4);
+    expect(screen.getAllByRole("button", { name: "Pause" }).length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByRole("button", { name: "Resume" }).length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByRole("button", { name: "Stop" }).length).toBeGreaterThanOrEqual(4);
+    expect(screen.getAllByRole("button", { name: "Edit" }).length).toBeGreaterThanOrEqual(4);
+    expect(screen.getAllByRole("button", { name: "Move up" }).length).toBeGreaterThanOrEqual(4);
+    expect(screen.getAllByRole("button", { name: "Move down" }).length).toBeGreaterThanOrEqual(4);
+    expect(screen.getAllByRole("button", { name: "Delete" }).length).toBeGreaterThanOrEqual(4);
+    expect(screen.getAllByRole("button", { name: "Move up" }).some((button) => button.getAttribute("aria-disabled") === "true")).toBe(true);
+    expect(screen.getAllByRole("button", { name: "Delete" }).some((button) => button.getAttribute("aria-disabled") === "true")).toBe(true);
+    expect(screen.queryByRole("button", { name: "Actions" })).not.toBeInTheDocument();
   });
 
   it("creates a download with a presentation snapshot without requesting remote media", async () => {

@@ -1,9 +1,9 @@
 import {
   Button,
   Chip,
-  Dropdown,
   Surface,
   Table,
+  Tooltip,
   toast,
 } from "@heroui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -11,12 +11,13 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowUp,
+  Download,
   Eye,
-  MoreHorizontal,
   Pause,
   Pencil,
   Play,
   Plus,
+  RefreshCw,
   Square,
   Trash2,
   X,
@@ -254,45 +255,51 @@ function TaskList({ tasks, handlers, onCreate }: { tasks: TaskRecord[]; handlers
       />
       {!tasks.length ? <EmptyPanel title={t("tasks.empty")} /> : (
         <>
-          <DataTableFrame className="hidden md:block">
-            <Table.Content aria-label={t("tasks.title")}>
-                  <Table.Header>
-                    <Table.Column isRowHeader>{t("common.type")}</Table.Column>
-                    <Table.Column>{t("common.status")}</Table.Column>
-                    <Table.Column>{t("tasks.output")}</Table.Column>
-                    <Table.Column>{t("tasks.progress")}</Table.Column>
-                    <Table.Column>{t("tasks.totalSpeed")}</Table.Column>
-                    <Table.Column>{t("common.created")}</Table.Column>
-                    <Table.Column>{t("common.actions")}</Table.Column>
-                  </Table.Header>
-                  <Table.Body>
-                    {tasks.map((task) => (
-                      <Table.Row id={task.id} key={task.id}>
-                        <Table.Cell><Chip color="accent" size="sm" variant="soft">{t(`common.${task.kind}`)}</Chip></Table.Cell>
-                        <Table.Cell><TaskStatusChip status={task.status} /></Table.Cell>
-                        <Table.Cell><code className="block max-w-48 truncate text-xs">{task.spec.output}</code></Table.Cell>
-                        <Table.Cell className="min-w-40"><TaskProgressSummary task={task} /></Table.Cell>
-                        <Table.Cell className="tabular-nums">{formatBytes(task.progress.speed_bps, "/s")}</Table.Cell>
-                        <Table.Cell className="text-xs text-muted">{formatDateTime(task.created_at, i18n.language)}</Table.Cell>
-                        <Table.Cell><TaskActions task={task} handlers={handlers} /></Table.Cell>
-                      </Table.Row>
-                    ))}
-                  </Table.Body>
+          <DataTableFrame className="hidden min-[1360px]:block">
+            <Table.Content aria-label={t("tasks.title")} className="task-table-content min-w-[1100px]">
+              <Table.Header>
+                <Table.Column isRowHeader>{t("tasks.target")}</Table.Column>
+                <Table.Column>{t("common.status")}</Table.Column>
+                <Table.Column>{t("tasks.progress")}</Table.Column>
+                <Table.Column>{t("tasks.totalSpeed")}</Table.Column>
+                <Table.Column>{t("tasks.output")}</Table.Column>
+                <Table.Column>{t("common.created")}</Table.Column>
+                <Table.Column>{t("common.actions")}</Table.Column>
+              </Table.Header>
+              <Table.Body>
+                {tasks.map((task, index) => (
+                  <Table.Row className="task-table-row" id={task.id} key={task.id}>
+                    <Table.Cell className="w-60 min-w-60 max-w-60"><TaskTarget task={task} /></Table.Cell>
+                    <Table.Cell className="min-w-24"><TaskStatusChip status={task.status} /></Table.Cell>
+                    <Table.Cell className="min-w-28"><TaskProgressSummary task={task} /></Table.Cell>
+                    <Table.Cell className="min-w-20 whitespace-nowrap text-sm font-medium tabular-nums">{formatBytes(task.progress.speed_bps, "/s")}</Table.Cell>
+                    <Table.Cell><code className="block max-w-32 truncate text-xs text-muted" title={task.spec.output}>{task.spec.output}</code></Table.Cell>
+                    <Table.Cell className="w-24 max-w-24 text-xs leading-relaxed text-muted"><TaskCreatedTime locale={i18n.language} value={task.created_at} /></Table.Cell>
+                    <Table.Cell className="min-w-[332px]"><TaskActions canMoveDown={index < tasks.length - 1} canMoveUp={index > 0} task={task} handlers={handlers} /></Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
             </Table.Content>
           </DataTableFrame>
-          <div className="grid gap-3 md:hidden">
-            {tasks.map((task) => (
-              <Surface className="grid gap-4 rounded-lg border border-border p-4" key={task.id}>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex flex-wrap gap-2"><Chip color="accent" size="sm" variant="soft">{t(`common.${task.kind}`)}</Chip><TaskStatusChip status={task.status} /></div>
-                  <TaskActions task={task} handlers={handlers} />
+          <div className="grid gap-3 min-[1360px]:hidden">
+            {tasks.map((task, index) => (
+              <Surface className="task-mobile-card grid gap-4 rounded-lg border border-border p-4" key={task.id}>
+                <div className="flex min-w-0 items-start justify-between gap-3">
+                  <TaskTarget task={task} />
+                  <TaskStatusChip status={task.status} />
                 </div>
-                <code className="truncate text-xs text-muted">{task.spec.output}</code>
-                <TaskProgressSummary task={task} />
-                <div className="flex items-center justify-between text-xs text-muted">
+                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
+                  <TaskProgressSummary task={task} />
+                  <div className="text-right">
+                    <p className="text-xs text-muted">{t("tasks.totalSpeed")}</p>
+                    <strong className="text-sm tabular-nums text-foreground">{formatBytes(task.progress.speed_bps, "/s")}</strong>
+                  </div>
+                </div>
+                <div className="grid gap-1 border-t border-border pt-3 text-xs text-muted">
+                  <code className="truncate" title={task.spec.output}>{task.spec.output}</code>
                   <span>{formatDateTime(task.created_at, i18n.language)}</span>
-                  <strong className="text-foreground">{formatBytes(task.progress.speed_bps, "/s")}</strong>
                 </div>
+                <TaskActions mobile canMoveDown={index < tasks.length - 1} canMoveUp={index > 0} task={task} handlers={handlers} />
               </Surface>
             ))}
           </div>
@@ -319,34 +326,129 @@ function TaskProgressSummary({ task }: { task: TaskRecord }) {
   );
 }
 
-function TaskActions({ task, handlers }: { task: TaskRecord; handlers: TaskHandlers }) {
-  const { t } = useTranslation();
+function TaskCreatedTime({ value, locale }: { value: string; locale: string }) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return <time>{value}</time>;
+  const day = new Intl.DateTimeFormat(locale, { year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
+  const time = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(date);
   return (
-    <div className="flex items-center justify-end gap-1">
+    <time className="grid whitespace-nowrap" dateTime={value} title={formatDateTime(value, locale)}>
+      <span>{day}</span>
+      <span>{time}</span>
+    </time>
+  );
+}
+
+function TaskActions({
+  task,
+  handlers,
+  canMoveUp,
+  canMoveDown,
+  mobile = false,
+}: {
+  task: TaskRecord;
+  handlers: TaskHandlers;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+  mobile?: boolean;
+}) {
+  const { t } = useTranslation();
+  const canPause = pausable.has(task.status);
+  const canResume = resumable.has(task.status);
+  const canStop = stoppable.has(task.status);
+  const canEdit = editable.has(task.status);
+  const canDelete = deletable.has(task.status);
+  const status = t(`tasks.statuses.${task.status}`);
+  const unavailable = (action: string) => t("tasks.actionUnavailable", { action, status });
+  const lifecycleAction = canResume ? t("tasks.resume") : t("tasks.pause");
+  return (
+    <div className={mobile ? "task-action-grid grid grid-cols-4 justify-items-center gap-1 border-t border-border pt-3" : "task-action-grid flex items-center justify-end gap-1"}>
       <IconButton icon={Eye} label={t("tasks.details")} onPress={() => handlers.details(task)} />
-      {pausable.has(task.status) ? <IconButton icon={Pause} label={t("tasks.pause")} onPress={() => handlers.pause(task)} /> : null}
-      {resumable.has(task.status) ? <IconButton icon={Play} label={t("tasks.resume")} onPress={() => handlers.resume(task)} /> : null}
-      {stoppable.has(task.status) ? <IconButton icon={Square} label={t("tasks.stop")} onPress={() => handlers.stop(task)} /> : null}
-      <Dropdown>
-        <Dropdown.Trigger>
-          <Button isIconOnly aria-label={t("common.actions")} size="sm" variant="ghost"><MoreHorizontal aria-hidden="true" size={18} /></Button>
-        </Dropdown.Trigger>
-        <Dropdown.Popover>
-          <Dropdown.Menu aria-label={t("common.actions")} onAction={(key) => {
-            if (key === "edit") handlers.edit(task);
-            if (key === "up") handlers.reorder(task, Math.max(1, task.position - 1));
-            if (key === "down") handlers.reorder(task, task.position + 1);
-            if (key === "delete") handlers.remove(task);
-          }}>
-            <Dropdown.Item id="edit" isDisabled={!editable.has(task.status)} textValue={t("common.edit")}><Pencil aria-hidden="true" size={16} />{t("common.edit")}</Dropdown.Item>
-            <Dropdown.Item id="up" textValue={t("tasks.moveUp")}><ArrowUp aria-hidden="true" size={16} />{t("tasks.moveUp")}</Dropdown.Item>
-            <Dropdown.Item id="down" textValue={t("tasks.moveDown")}><ArrowDown aria-hidden="true" size={16} />{t("tasks.moveDown")}</Dropdown.Item>
-            <Dropdown.Item id="delete" isDisabled={!deletable.has(task.status)} textValue={t("common.delete")}><Trash2 aria-hidden="true" size={16} />{t("common.delete")}</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown.Popover>
-      </Dropdown>
+      <IconButton
+        icon={canResume ? Play : Pause}
+        isDisabled={!canPause && !canResume}
+        label={lifecycleAction}
+        tooltip={canPause || canResume ? lifecycleAction : unavailable(lifecycleAction)}
+        onPress={() => canResume ? handlers.resume(task) : handlers.pause(task)}
+      />
+      <IconButton icon={Square} isDisabled={!canStop} label={t("tasks.stop")} tooltip={canStop ? t("tasks.stop") : unavailable(t("tasks.stop"))} onPress={() => handlers.stop(task)} />
+      <IconButton icon={Pencil} isDisabled={!canEdit} label={t("common.edit")} tooltip={canEdit ? t("common.edit") : unavailable(t("common.edit"))} onPress={() => handlers.edit(task)} />
+      <IconButton icon={ArrowUp} isDisabled={!canMoveUp} label={t("tasks.moveUp")} tooltip={canMoveUp ? t("tasks.moveUp") : t("tasks.firstInQueue")} onPress={() => handlers.reorder(task, Math.max(1, task.position - 1))} />
+      <IconButton icon={ArrowDown} isDisabled={!canMoveDown} label={t("tasks.moveDown")} tooltip={canMoveDown ? t("tasks.moveDown") : t("tasks.lastInQueue")} onPress={() => handlers.reorder(task, task.position + 1)} />
+      <IconButton className="text-danger" icon={Trash2} isDisabled={!canDelete} label={t("common.delete")} tooltip={canDelete ? t("common.delete") : unavailable(t("common.delete"))} onPress={() => handlers.remove(task)} />
     </div>
   );
+}
+
+function TaskTarget({ task }: { task: TaskRecord }) {
+  const { t } = useTranslation();
+  if (task.spec.kind === "sync") {
+    const names = task.spec.creators.map((creator) => creator.alias?.trim() || creator.creator_id);
+    const visibleNames = names.slice(0, 2);
+    const hiddenCount = names.length - visibleNames.length;
+    const summary = names.length
+      ? `${visibleNames.join(" · ")}${hiddenCount ? ` · ${t("tasks.moreCreators", { count: hiddenCount })}` : ""}`
+      : t("tasks.noFrozenCreators");
+    const roster = task.spec.creators
+      .map((creator) => `${creator.alias?.trim() || creator.creator_id} (${creator.service}:${creator.creator_id})`)
+      .join("\n");
+    return (
+      <div className="flex min-w-0 items-start gap-3">
+        <span className="task-kind-icon" data-kind="sync"><RefreshCw aria-hidden="true" size={18} /></span>
+        <div className="min-w-0">
+          <div className="flex min-w-0 items-center gap-2">
+            <p className="truncate text-sm font-semibold" title={t("tasks.creatorCount", { count: names.length })}>{t("tasks.creatorCount", { count: names.length })}</p>
+            <Chip className="shrink-0" size="sm" variant="soft">{t("common.sync")}</Chip>
+          </div>
+          {roster ? (
+            <Tooltip>
+              <Button className="mt-1 h-auto min-h-0 max-w-full justify-start truncate p-0 text-left text-xs font-normal text-muted" size="sm" variant="ghost">{summary}</Button>
+              <Tooltip.Content className="max-w-sm whitespace-pre-line">{roster}</Tooltip.Content>
+            </Tooltip>
+          ) : <p className="mt-1 truncate text-xs text-muted">{summary}</p>}
+        </div>
+      </div>
+    );
+  }
+
+  const identity = downloadIdentity(task.spec);
+  const title = task.presentation?.title?.trim() || (identity.postId ? t("tasks.postNumber", { id: identity.postId }) : t("tasks.unknownPost"));
+  const creatorName = task.presentation?.creator_name?.trim();
+  const metadata = [
+    creatorName,
+    identity.service && identity.creatorId ? `${identity.service}:${identity.creatorId}` : identity.creatorId,
+    identity.postId ? `#${identity.postId}` : null,
+    identity.revisionId ? t("tasks.revisionShort", { id: identity.revisionId }) : null,
+  ].filter(Boolean).join(" · ") || task.spec.post || t("common.unknown");
+  return (
+    <div className="flex min-w-0 items-start gap-3">
+      <span className="task-kind-icon" data-kind="download"><Download aria-hidden="true" size={18} /></span>
+      <div className="min-w-0">
+        <div className="flex min-w-0 items-center gap-2">
+          <p className="truncate text-sm font-semibold" title={title}>{title}</p>
+          <Chip className="shrink-0" color="accent" size="sm" variant="soft">{t("common.download")}</Chip>
+        </div>
+        <p className="mt-1 truncate text-xs text-muted" title={metadata}>{metadata}</p>
+      </div>
+    </div>
+  );
+}
+
+function downloadIdentity(spec: Extract<TaskSpec, { kind: "download" }>) {
+  if (spec.service && spec.creator_id && spec.post_id) {
+    return { service: spec.service, creatorId: spec.creator_id, postId: spec.post_id, revisionId: spec.revision_id };
+  }
+  try {
+    const parts = new URL(spec.post ?? "", "https://pawchive.invalid").pathname.split("/").filter(Boolean).map(decodeURIComponent);
+    return {
+      service: parts[0] ?? null,
+      creatorId: parts[1] === "user" ? parts[2] ?? null : null,
+      postId: parts[3] === "post" ? parts[4] ?? null : null,
+      revisionId: parts[5] === "revision" ? parts[6] ?? spec.revision_id : spec.revision_id,
+    };
+  } catch {
+    return { service: null, creatorId: null, postId: null, revisionId: spec.revision_id };
+  }
 }
 
 function TaskDetails({
@@ -379,7 +481,10 @@ function TaskDetails({
           </div>
         }
       />
-      <div className="flex flex-wrap items-center gap-2"><TaskStatusChip status={task.status} /><Chip size="sm" variant="soft">{t("tasks.attempts", { count: attempts.length })}</Chip></div>
+      <Surface className="flex flex-col justify-between gap-4 rounded-lg border border-border p-4 sm:flex-row sm:items-center">
+        <TaskTarget task={task} />
+        <div className="flex shrink-0 flex-wrap items-center gap-2"><TaskStatusChip status={task.status} /><Chip size="sm" variant="soft">{t("tasks.attempts", { count: attempts.length })}</Chip></div>
+      </Surface>
       {task.error ? <Surface className="rounded-lg border border-danger/40 p-4 text-sm text-danger">{task.error}</Surface> : null}
       <Surface className="grid gap-5 rounded-lg border border-border p-5">
         <ProgressMeter isIndeterminate={task.status === "running" && !progress.total_bytes && !progress.queued_files} label={t("tasks.progress")} value={percent} />

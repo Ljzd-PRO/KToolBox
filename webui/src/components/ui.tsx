@@ -67,6 +67,7 @@ export function IconButton({
   variant = "ghost",
   isDisabled,
   className,
+  tooltip,
 }: {
   label: string;
   icon: LucideIcon;
@@ -74,20 +75,24 @@ export function IconButton({
   variant?: React.ComponentProps<typeof Button>["variant"];
   isDisabled?: boolean;
   className?: string;
+  tooltip?: string;
 }) {
   return (
     <Tooltip>
       <Button
         isIconOnly
+        aria-disabled={isDisabled || undefined}
         aria-label={label}
-        className={cn("size-11 min-w-11 shrink-0", className)}
-        isDisabled={isDisabled}
+        className={cn("size-11 min-w-11 shrink-0 aria-disabled:cursor-not-allowed aria-disabled:opacity-50", className)}
+        data-disabled={isDisabled || undefined}
         variant={variant}
-        onPress={onPress}
+        onPress={() => {
+          if (!isDisabled) onPress();
+        }}
       >
         <Icon aria-hidden="true" size={18} strokeWidth={1.8} />
       </Button>
-      <Tooltip.Content>{label}</Tooltip.Content>
+      <Tooltip.Content>{tooltip ?? label}</Tooltip.Content>
     </Tooltip>
   );
 }

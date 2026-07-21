@@ -63,7 +63,7 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   const modalScan = await new AxeBuilder({ page }).analyze();
   expect(modalScan.violations).toEqual([]);
 
-  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.getByLabel("Output directory").fill("visual-hierarchy-downloads");
   await page.getByRole("dialog", { name: "Create task" }).getByRole("button", { name: "Create task" }).click();
   await expect(page.getByRole("heading", { name: "Task details" })).toBeVisible();
@@ -83,6 +83,25 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   expect(tableStyles.background).toBe("rgba(0, 0, 0, 0)");
   expect(tableStyles.padding).toEqual(["0px", "0px", "0px", "0px"]);
   await expect(tableFrame).toHaveCSS("border-top-width", "1px");
+  expect(await tableFrame.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
+
+  await expect(tableFrame.getByText("1 creator", { exact: true })).toBeVisible();
+  await expect(tableFrame.getByText("Demo Studio", { exact: true })).toBeVisible();
+  const desktopActions = page.locator(".task-action-grid:visible button");
+  await expect(desktopActions).toHaveCount(7);
+  for (const label of ["Task details", "Stop", "Edit", "Move up", "Move down", "Delete"]) {
+    await expect(page.getByRole("button", { name: label })).toBeVisible();
+  }
+  await expect(page.getByRole("button", { name: "Actions" })).toHaveCount(0);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobileCard = page.locator(".task-mobile-card:visible");
+  await expect(mobileCard).toBeVisible();
+  const mobileActions = mobileCard.locator(".task-action-grid button");
+  await expect(mobileActions).toHaveCount(7);
+  const mobileActionBox = await mobileCard.locator(".task-action-grid").boundingBox();
+  expect(mobileActionBox?.height ?? 0).toBeGreaterThan(80);
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
 });
 
 

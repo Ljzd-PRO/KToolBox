@@ -1,10 +1,11 @@
 import { Spinner, ToastProvider } from "@heroui/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { AppShell } from "./components/AppShell";
 import { AuthProvider, useAuth } from "./lib/auth";
+import { queryClient } from "./lib/query";
 import { ThemeProvider } from "./lib/theme";
 import { DashboardPage } from "./pages/DashboardPage";
 import { BlockersPage } from "./pages/BlockersPage";
@@ -14,12 +15,6 @@ import { LoginPage } from "./pages/LoginPage";
 import { PostsPage } from "./pages/PostsPage";
 import { SystemPage } from "./pages/SystemPage";
 import { TasksPage } from "./pages/TasksPage";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { retry: 1, staleTime: 10_000 },
-  },
-});
 
 function AuthenticatedApplication() {
   const { t } = useTranslation();

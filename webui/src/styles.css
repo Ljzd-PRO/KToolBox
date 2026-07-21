@@ -167,6 +167,47 @@ code {
   background: var(--surface);
 }
 
+.task-table-row {
+  border-bottom: 1px solid var(--separator);
+  transition: background-color 140ms ease;
+}
+
+.task-table-content [data-slot="table-column"],
+.task-table-content [data-slot="table-cell"] {
+  padding-inline: 0.625rem;
+}
+
+.task-table-row:last-child {
+  border-bottom: 0;
+}
+
+.task-table-row:hover {
+  background: color-mix(in oklab, var(--surface) 92%, var(--accent) 8%);
+}
+
+.task-mobile-card {
+  box-shadow: 0 1px 2px color-mix(in oklab, black 7%, transparent);
+}
+
+.task-kind-icon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 2.5rem;
+  place-items: center;
+  border-radius: var(--radius);
+}
+
+.task-kind-icon[data-kind="download"] {
+  background: var(--accent-soft);
+  color: var(--accent-soft-foreground);
+}
+
+.task-kind-icon[data-kind="sync"] {
+  background: color-mix(in oklab, var(--ktoolbox-teal) 17%, transparent);
+  color: var(--ktoolbox-teal);
+}
+
 .form-surface {
   --default: var(--surface);
   --default-hover: color-mix(in oklab, var(--surface) 92%, var(--foreground) 8%);
