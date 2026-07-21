@@ -30,7 +30,7 @@ class RecordingProgress:
 
 
 async def run_once(downloader: Downloader, **kwargs: object):
-    return await Downloader.run.__wrapped__(downloader, **kwargs)
+    return await downloader._run_once(**kwargs)
 
 
 def partial_response(

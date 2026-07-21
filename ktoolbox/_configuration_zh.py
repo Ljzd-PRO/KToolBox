@@ -14,6 +14,7 @@ class APIConfiguration(ktoolbox.configuration.APIConfiguration):
     :ivar retry_times: API 请求失败时重试次数
     :ivar retry_interval: API 请求重试间隔秒数
     """
+
     ...
 
 
@@ -41,6 +42,7 @@ class DownloaderConfiguration(ktoolbox.configuration.DownloaderConfiguration):
     ``https://example.com/?url={}`` 会变成 ``https://example.com/?url=https://file.pawchive.pw/data/66/83/xxxxx.jpg``
     :ivar keep_metadata: 下载文件时保留文件元数据（例如最后修改时间等）
     """
+
     ...
 
 
@@ -90,6 +92,7 @@ class PostStructureConfiguration(ktoolbox.configuration.PostStructureConfigurati
     像 ``HiEveryoneThisIsALongTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg`` 会变成 ``HiEver_ScxHjZIdxt5cnjaAwf3ql2p7.jpg``
     :ivar revisions: 修订目录的子路径
     """
+
     ...
 
 
@@ -121,6 +124,7 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
         https://docs.python.org/zh-cn/3.13/library/string.html#format-specification-mini-language
 
     :ivar count: 并发下载的协程数量
+    :ivar creator_concurrency: 同时获取并准备的作者数量上限
     :ivar include_revisions: 下载时包含修订帖子
     :ivar post_dirname_format: 自定义帖子目录名格式，可使用 [属性][ktoolbox._configuration_zh.JobConfiguration]。\
     例如：``[{published}]{id}`` 可以生成类似 ``[2024-1-1]123123`` 的目录名，\
@@ -137,6 +141,7 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
     :ivar allow_list: 下载匹配这些模式（Unix shell 风格）的文件，如 ``["*.png"]``
     :ivar block_list: 不下载匹配这些模式（Unix shell 风格）的文件，如 ``["*.psd","*.zip"]``
     :ivar extract_content: 提取帖子内容并保存到单独文件（文件名由 ``config.job.post_structure.content`` 定义）
+    :ivar extract_content_images: 提取并下载帖子正文中的图片
     :ivar extract_external_links: 从帖子内容中提取外部文件分享链接并保存到单独文件（文件名由 ``config.job.post_structure.external_links`` 定义）
     :ivar external_link_patterns: 用于提取外部链接的正则表达式模式
     :ivar group_by_year: 根据发布日期按年分组到不同目录
@@ -144,12 +149,13 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
     :ivar year_dirname_format: 自定义年份目录名格式。可用属性：``year``。例如：``{year}`` > ``2024``，``Year_{year}`` > ``Year_2024``
     :ivar month_dirname_format: 自定义月份目录名格式。可用属性：``year``、``month``。例如：``{year}-{month}`` > ``2024-01``，``{year}_{month}`` > ``2024_01``
     :ivar keywords: 按帖子标题关键词过滤（不区分大小写）
-    :ivar keywords_exclude: 按帖子标题关键词排除（不区分大小写）
+    :ivar keywords_exclude: 已弃用的标题排除关键词，会转换成隐式全局字段匹配屏蔽器；新配置应在 ``ktoolbox.toml`` 中定义结构化屏蔽器
     :ivar download_file: 是否下载帖子文件（通常为封面图片）。设置为 False 可跳过文件下载。
     :ivar download_attachments: 是否下载帖子附件。设置为 False 可跳过附件下载。
     :ivar min_file_size: 最小文件大小（字节）。小于此大小的文件将被跳过。设置为 None 禁用最小文件大小过滤。
     :ivar max_file_size: 最大文件大小（字节）。大于此大小的文件将被跳过。设置为 None 禁用最大文件大小过滤。
     """
+
     post_structure: PostStructureConfiguration = PostStructureConfiguration()
 
 
@@ -161,6 +167,25 @@ class LoggerConfiguration(ktoolbox.configuration.LoggerConfiguration):
     :ivar level: 日志过滤级别
     :ivar rotation: 日志轮换周期
     """
+
+    ...
+
+
+class WebUIConfiguration(ktoolbox.configuration.WebUIConfiguration):
+    """
+    WebUI 配置
+
+    :ivar host: WebUI HTTP 服务监听的网络接口
+    :ivar port: WebUI HTTP 服务监听的 TCP 端口
+    :ivar open_browser: 启动后在默认浏览器中打开 WebUI
+    :ivar username: WebUI 单账户的用户名
+    :ivar password_hash: WebUI 账户首选的 Argon2id 密码哈希
+    :ivar password: 仅在未配置密码哈希时使用的明文兼容密码
+    :ivar max_active_tasks: 可同时运行的顶层同步或下载任务数量上限
+    :ivar session_idle_hours: 会话自最近一次使用后的有效小时数
+    :ivar session_absolute_hours: 会话自登录后的最长有效小时数
+    """
+
     ...
 
 
@@ -173,6 +198,7 @@ class Configuration(ktoolbox.configuration.Configuration):
     :ivar downloader: 文件下载器配置
     :ivar job: 下载任务配置
     :ivar logger: 日志配置
+    :ivar webui: 本地 WebUI 服务与账户配置
     :ivar ssl_verify: 对 Pawchive API 服务器和下载服务器启用 SSL 证书验证
     :ivar json_dump_indent: JSON 文件保存时的缩进
     :ivar use_uvloop: 使用 uvloop/winloop 优化 asyncio 性能 \
@@ -180,7 +206,9 @@ class Configuration(ktoolbox.configuration.Configuration):
     Windows 下安装 winloop：`pip install ktoolbox[winloop]` \
     Unix 下安装 uvloop：`pip install ktoolbox[uvloop]`
     """
+
     api: APIConfiguration = APIConfiguration()
     downloader: DownloaderConfiguration = DownloaderConfiguration()
     job: JobConfiguration = JobConfiguration()
     logger: LoggerConfiguration = LoggerConfiguration()
+    webui: WebUIConfiguration = WebUIConfiguration()

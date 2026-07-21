@@ -9,10 +9,9 @@ from urllib.parse import unquote, urlparse
 import aiofiles  # type: ignore[import-untyped]
 import aiofiles.os  # type: ignore[import-untyped]
 import httpx
-import tenacity
 from loguru import logger
 from pathvalidate import sanitize_filename
-from tenacity import retry_if_exception, retry_if_result, wait_fixed
+from tenacity import AsyncRetrying, RetryCallState, retry_if_exception, retry_if_result, wait_fixed
 from tenacity.stop import stop_after_attempt, stop_never
 
 from ktoolbox._enum import RetCodeEnum
@@ -147,24 +146,6 @@ class Downloader:
             message=generate_msg(f"File skipped due to size filtering ({reason})", path=save_filepath),
         )
 
-    @tenacity.retry(
-        stop=stop_never if config.downloader.retry_stop_never else stop_after_attempt(config.downloader.retry_times),
-        wait=wait_fixed(config.downloader.retry_interval),
-        retry=retry_if_result(lambda x: not x and x.code != RetCodeEnum.FileExisted)
-        | retry_if_exception(lambda x: isinstance(x, httpx.HTTPError)),
-        before_sleep=lambda x: logger.warning(
-            generate_msg(
-                f"Retrying ({x.attempt_number})",
-                file=x.args[0].filename,
-                post_name=x.args[0].post.title if x.args[0].post else None,
-                post_id=x.args[0].post.id if x.args[0].post else None,
-                message=x.outcome.result().message if not x.outcome.failed else None,
-                exception=x.outcome.exception(),
-                url=x.args[0].url,
-            )
-        ),
-        reraise=True,
-    )
     async def run(
         self,
         *,
@@ -181,6 +162,44 @@ class Downloader:
         :return: ``DownloaderRet`` which contain the actual output filename
         :raise CancelledError: Job cancelled
         """
+        retrying = AsyncRetrying(
+            stop=(
+                stop_never if config.downloader.retry_stop_never else stop_after_attempt(config.downloader.retry_times)
+            ),
+            wait=wait_fixed(config.downloader.retry_interval),
+            retry=retry_if_result(lambda result: not result and result.code != RetCodeEnum.FileExisted)
+            | retry_if_exception(lambda error: isinstance(error, httpx.HTTPError)),
+            before_sleep=self._before_retry,
+            reraise=True,
+        )
+        return await retrying(
+            self._run_once,
+            sync_callable=sync_callable,
+            async_callable=async_callable,
+            progress=progress,
+        )
+
+    def _before_retry(self, state: RetryCallState) -> None:
+        outcome = state.outcome
+        logger.warning(
+            generate_msg(
+                f"Retrying ({state.attempt_number})",
+                file=self.filename,
+                post_name=self.post.title if self.post else None,
+                post_id=self.post.id if self.post else None,
+                message=(outcome.result().message if outcome is not None and not outcome.failed else None),
+                exception=(outcome.exception() if outcome is not None else None),
+                url=self.url,
+            )
+        )
+
+    async def _run_once(
+        self,
+        *,
+        sync_callable: Callable[["Downloader"], Any] | None = None,
+        async_callable: Callable[["Downloader"], Awaitable[Any]] | None = None,
+        progress: DownloadProgressObserver | None = None,
+    ) -> DownloaderRet[str]:
         # Get filename to check if file exists (First-time duplicate file check)
         # Check it before request to make progress more efficiency
         server_relpath = self._server_path[1:]

@@ -2,11 +2,15 @@ import datetime
 import logging
 import os
 import tempfile
+from collections.abc import Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar, Token
+from dataclasses import dataclass
 from pathlib import Path
-from typing import ClassVar, Literal
+from typing import Any, ClassVar, Literal, cast
 
 from loguru import logger
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 __all__ = [
@@ -16,7 +20,12 @@ __all__ = [
     "PostStructureConfiguration",
     "JobConfiguration",
     "LoggerConfiguration",
+    "WebUIConfiguration",
     "Configuration",
+    "RuntimeContext",
+    "active_configuration",
+    "configuration_scope",
+    "load_configuration",
 ]
 
 
@@ -326,6 +335,32 @@ class LoggerConfiguration(BaseModel):
     rotation: str | int | datetime.time | datetime.timedelta = "1 week"
 
 
+class WebUIConfiguration(BaseModel):
+    """
+    WebUI configuration
+
+    :ivar host: Interface used by the WebUI HTTP server
+    :ivar port: TCP port used by the WebUI HTTP server
+    :ivar open_browser: Open the WebUI in the default browser after startup
+    :ivar username: Username of the single WebUI account
+    :ivar password_hash: Preferred Argon2id password hash for the WebUI account
+    :ivar password: Plaintext compatibility password used only when no password hash is configured
+    :ivar max_active_tasks: Maximum number of top-level sync or download tasks running concurrently
+    :ivar session_idle_hours: Session lifetime in hours since its most recent use
+    :ivar session_absolute_hours: Maximum session lifetime in hours since login
+    """
+
+    host: str = "0.0.0.0"
+    port: int = Field(default=8789, ge=1, le=65535)
+    open_browser: bool = True
+    username: str = ""
+    password_hash: SecretStr = SecretStr("")
+    password: SecretStr = SecretStr("")
+    max_active_tasks: int = Field(default=2, ge=1, le=16)
+    session_idle_hours: int = Field(default=24, ge=1, le=24 * 30)
+    session_absolute_hours: int = Field(default=24 * 7, ge=1, le=24 * 90)
+
+
 class Configuration(BaseSettings):
     # noinspection SpellCheckingInspection,GrazieInspection
     """
@@ -335,6 +370,7 @@ class Configuration(BaseSettings):
     :ivar downloader: File Downloader Configuration
     :ivar job: Download jobs Configuration
     :ivar logger: Logger configuration
+    :ivar webui: Local WebUI server and account configuration
     :ivar ssl_verify: Enable SSL certificate verification for the Pawchive API and file servers
     :ivar json_dump_indent: Indent of JSON file dump
     :ivar use_uvloop: Use uvloop/winloop for asyncio performance optimization \
@@ -347,6 +383,7 @@ class Configuration(BaseSettings):
     downloader: DownloaderConfiguration = DownloaderConfiguration()
     job: JobConfiguration = JobConfiguration()
     logger: LoggerConfiguration = LoggerConfiguration()
+    webui: WebUIConfiguration = WebUIConfiguration()
 
     ssl_verify: bool = True
     json_dump_indent: int = 4
@@ -362,4 +399,78 @@ class Configuration(BaseSettings):
     )
 
 
-config = Configuration()
+def load_configuration(project_root: Path | str) -> Configuration:
+    """Load an isolated configuration using dotenv files from one project root."""
+    root = Path(project_root).expanduser().resolve()
+    env_files = [root / ".env", root / "prod.env"]
+    return Configuration(_env_file=env_files)
+
+
+_default_configuration = Configuration()
+_active_configuration: ContextVar[Configuration] = ContextVar(
+    "ktoolbox_active_configuration",
+    default=_default_configuration,
+)
+
+
+def active_configuration() -> Configuration:
+    """Return the configuration active in the current async context."""
+    return _active_configuration.get()
+
+
+@contextmanager
+def configuration_scope(configuration: Configuration) -> Iterator[Configuration]:
+    """Activate an isolated configuration for this context and its child tasks."""
+    token: Token[Configuration] = _active_configuration.set(configuration)
+    try:
+        yield configuration
+    finally:
+        _active_configuration.reset(token)
+
+
+class _ActiveConfigurationProxy:
+    """Compatibility proxy that resolves legacy ``config`` access per context."""
+
+    model_fields = Configuration.model_fields
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(active_configuration(), name)
+
+    def __setattr__(self, name: str, value: object) -> None:
+        setattr(active_configuration(), name, value)
+
+    def __repr__(self) -> str:
+        return repr(active_configuration())
+
+
+config = cast(Configuration, _ActiveConfigurationProxy())
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeContext:
+    """Project root and immutable-at-dispatch configuration for one operation."""
+
+    project_root: Path
+    configuration: Configuration
+
+    @classmethod
+    def from_project(cls, project_root: Path | str) -> "RuntimeContext":
+        root = Path(project_root).expanduser().resolve()
+        return cls(project_root=root, configuration=load_configuration(root))
+
+    @contextmanager
+    def activate(self) -> Iterator[Configuration]:
+        with configuration_scope(self.configuration):
+            yield self.configuration
+
+    def snapshot(self) -> "RuntimeContext":
+        return RuntimeContext(self.project_root, self.configuration.model_copy(deep=True))
+
+    def redacted_configuration(self) -> dict[str, object]:
+        return self.configuration.model_dump(
+            mode="json",
+            exclude={
+                "downloader": {"session_key"},
+                "webui": {"password", "password_hash"},
+            },
+        )
