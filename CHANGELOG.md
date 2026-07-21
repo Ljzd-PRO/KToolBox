@@ -44,6 +44,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Add ownership-aware output cleanup previews that skip symbolic links and any pre-existing, shared, or modified files.
 - Rebuild HeroUI form primitives with gray-off/blue-on switches, state-correct checkboxes, centered compact list controls, continuous modal surfaces, and direct icon actions for task, creator, and blocker rows.
 - Persist presentation-only task target snapshots so queues remain readable offline by post title and creator name without changing execution, deduplication, or resource locks.
+- Standardize Chinese product terminology as “作品”, “平台”, and “忽略规则”, including the overview heading and the sync-all-creators control.
 
 ## Testing and quality
 
@@ -75,7 +76,7 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 ## Pawchive API
 
 - 新增实例化异步 `PawchiveClient`，实现 OpenAPI 中全部 14 个公开操作。
-- 明确排除受 `cookieAuth` 保护的 5 个账号收藏操作；公开投稿标记仍然实现。
+- 明确排除受 `cookieAuth` 保护的 5 个账号收藏操作；公开作品标记仍然实现。
 - 新增严格的 Pydantic 请求约束和生成的 Pydantic v2 响应模型，覆盖全部文档字段与已确认字段，同时保留未知字段。
 - 新增传输、HTTP、认证、未找到、冲突和响应校验类型化异常。
 - 只重试传输错误、`429` 和 `5xx`；不跟随重定向，也不重试普通 `4xx` 与校验失败。
@@ -86,11 +87,11 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 使用 Cyclopts 命令、直接 Rich 帮助、Shell 补全、常规连字符选项、机器可读输出和明确的 `0`/`1`/`2`/`130` 退出码替换 Python Fire。
 - 为 7 个 v0 命令名新增隐藏兼容别名，每次调用提示一次弃用。
 - 新增项目级 `ktoolbox.toml`，包含可启停作者清单、别名、保留注释的原子写入、路径发现、校验和 Urwid 编辑支持。
-- 新增可扩展异步投稿屏蔽器，支持有序全局/作者作用域、递归 any/all 规则、取反、安全嵌套字段选择器及 contains/equals/regex/exists 操作。
+- 新增可扩展异步作品忽略规则，支持有序全局/作者作用域、递归 any/all 规则、取反、安全嵌套字段选择器及 contains/equals/regex/exists 操作。
 - 新增多作者同步：有界并发生产者、按作者公平轮转队列、流式启动、共享客户端与下载池、部分失败汇总和稳定作者目录。
 - 使用 Rich 实时进度、单文件与总下载速度、Rich 感知日志和适用于非 TTY、`NO_COLOR`、`--plain` 的确定性逐行输出替换 tqdm 与手写 ANSI 进度层。
 - 在 Actions、任务生成和 CLI 工作流中注入并复用 `PawchiveClient`。
-- 通过 Profile 获取作者名，使用 Pawchive 投稿列表及直接投稿响应结构。
+- 通过 Profile 获取作者名，使用 Pawchive 作品列表及直接作品响应结构。
 - 从修订列表选择指定版本，不再请求不存在的单修订详情端点。
 - 在新模型下保留断点续传、筛选、进度、元数据输出、文件大小限制和可选硬链接存储桶。
 
@@ -100,12 +101,13 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 新增 `ktoolbox webui [项目目录]`、主机/端口/浏览器覆盖参数及 `webui hash-password`；没有显式单账户时拒绝启动，并优先使用 Argon2id 密码哈希。
 - WebUI 项目尚无 `ktoolbox.toml` 时给出警告，并以原子写入方式创建最小有效配置。
 - 新增登录速率限制、哈希化不透明会话、严格 Cookie、CSRF 与 Origin 校验、安全响应头、脱敏配置快照及持久项目锁。
-- 新增双语、响应式深浅色流程，覆盖项目概览、`.env`/`prod.env` 与 TOML 编辑、作者清单、递归屏蔽器、Pawchive 作者/投稿查询、修订查看、站点版本与任务创建。
+- 新增双语、响应式深浅色流程，覆盖项目概览、`.env`/`prod.env` 与 TOML 编辑、作者清单、递归忽略规则、Pawchive 作者/作品查询、修订查看、站点版本与任务创建。
 - 从 Pydantic 元数据及中英文配置 docstring 生成可读双语标签和说明，提供来源标记、秘密遮蔽、类型化与高级编辑、校验、差异预览、ETag 冲突检测和原子写入。
 - 新增 WAL SQLite 队列，支持并发调度、资源阻塞与去重、不可变尝试、暂停/恢复/停止/编辑/排序/重跑/删除、重启恢复、SSE 续接、总速度/单文件速度、ETA 和结构化日志。
 - 新增基于输出归属的删除预览，跳过符号链接及任何既存、共享或已修改文件。
-- 重建 HeroUI 表单基础组件：开关关闭灰、开启蓝，复选框严格按状态显示标记，列表紧凑开关居中，弹窗表面连续，并为任务、作者和屏蔽器条目直接展示图标操作。
-- 持久化仅用于展示的任务目标快照，使队列离线时仍可按投稿标题和作者名识别，且不影响执行、去重或资源锁。
+- 重建 HeroUI 表单基础组件：开关关闭灰、开启蓝，复选框严格按状态显示标记，列表紧凑开关居中，弹窗表面连续，并为任务、作者和忽略规则条目直接展示图标操作。
+- 持久化仅用于展示的任务目标快照，使队列离线时仍可按作品标题和作者名识别，且不影响执行、去重或资源锁。
+- 统一使用“作品”“平台”“忽略规则”等中文产品术语，并将同步全部作者选项明确为“同步所有已启用作者”。
 
 ## 测试与质量
 

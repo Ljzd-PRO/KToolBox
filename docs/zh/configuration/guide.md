@@ -3,7 +3,7 @@
 KToolBox 使用两层配置：
 
 - `.env`、`prod.env` 与进程变量控制 API、传输、命名及全局下载行为。
-- `ktoolbox.toml` 保存项目作者清单与有序投稿屏蔽器。
+- `ktoolbox.toml` 保存项目作者清单与有序作品忽略规则。
 
 KToolBox 会从当前工作目录先读取 `.env`，再读取 `prod.env`。`prod.env` 中的同名值会覆盖 `.env`，进程环境变量优先级最高。
 
@@ -76,9 +76,9 @@ enabled = false
 
 简单清单项建议通过 `creator add`、`remove`、`enable`、`disable` 管理。无目标 `sync` 使用全部已启用项；显式别名或身份无论 `enabled` 状态都会运行。
 
-## 投稿屏蔽器 {#post-blockers}
+## 作品忽略规则 {#post-blockers}
 
-屏蔽器按 TOML 顺序执行，第一个命中项会排除投稿。全局作用域应用于每位同步作者；作者作用域列出精确 `service:id`。禁用屏蔽器会保留配置但不运行。
+忽略规则按 TOML 顺序执行，第一个命中项会排除作品。全局作用域应用于每位同步作者；作者作用域列出精确 `service:id`。禁用忽略规则会保留配置但不运行。
 
 ```toml
 [[blockers]]
@@ -107,9 +107,9 @@ options = { rule = { kind = "group", mode = "all", conditions = [{ kind = "field
 
 比较默认不区分大小写，设置 `case_sensitive = true` 后区分。安全点路径可带 `[*]` 列表选择器，例如 `tags[*]`、`file.name`、`attachments[*].name`。缺失路径不匹配，永远不会执行 Python 表达式或任意代码。
 
-屏蔽器在列表响应阶段执行，早于详情、修订、目录、元数据和下载任务。被排除投稿及其修订不会进入作者索引，也不会打印匹配文本。异步 `PostBlocker` 接口与注册表允许未来新增屏蔽器类型而无需修改同步协调器。
+忽略规则在列表响应阶段执行，早于详情、修订、目录、元数据和下载任务。被排除作品及其修订不会进入作者索引，也不会打印匹配文本。异步 `PostBlocker` 接口与注册表允许未来新增忽略规则类型而无需修改同步协调器。
 
-`KTOOLBOX_JOB__KEYWORDS_EXCLUDE` 仍作为弃用的隐式全局标题包含屏蔽器接受。KToolBox 不会自动改写，请手动迁移到 `ktoolbox.toml`。
+`KTOOLBOX_JOB__KEYWORDS_EXCLUDE` 仍作为弃用的隐式全局标题包含忽略规则接受。KToolBox 不会自动改写，请手动迁移到 `ktoolbox.toml`。
 
 ## Pawchive 端点
 
@@ -137,7 +137,7 @@ KTOOLBOX_JOB__BLOCK_LIST='["*.zip", "*.psd"]'
 KTOOLBOX_JOB__SEQUENTIAL_FILENAME_EXCLUDES='[".zip", ".psd"]'
 ```
 
-相对输出路径和存储桶路径基于当前工作目录解析。将附件路径设为 `./`，可把附件直接放入投稿目录：
+相对输出路径和存储桶路径基于当前工作目录解析。将附件路径设为 `./`，可把附件直接放入作品目录：
 
 ```dotenv
 KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
@@ -145,7 +145,7 @@ KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
 
 ## 命名模板
 
-投稿和文件模板可使用 `id`、`user`、`service`、`title`、`added`、`published` 和 `edited`。文件模板中的空 `{}` 代表原始或按顺序生成的基础文件名。
+作品和文件模板可使用 `id`、`user`、`service`、`title`、`added`、`published` 和 `edited`。文件模板中的空 `{}` 代表原始或按顺序生成的基础文件名。
 
 ```dotenv
 KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title:.60}
@@ -164,7 +164,7 @@ KTOOLBOX_JOB__POST_STRUCTURE__FILE={id}_{}
 KTOOLBOX_JOB__MIN_FILE_SIZE=1024
 KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
 
-# 只下载投稿封面，不下载附件。
+# 只下载作品封面，不下载附件。
 KTOOLBOX_JOB__DOWNLOAD_FILE=True
 KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=False
 ```

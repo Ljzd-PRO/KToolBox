@@ -4,13 +4,13 @@
 
 KToolBox v1 实现 Pawchive 中无需登录的 14 个操作。OpenAPI 中受 `cookieAuth` 保护的 5 个操作明确排除，因此 API 客户端不会接受或发送账号会话。
 
-投稿标记是独立的公开操作，已经实现。请有意识地调用：成功标记会改变服务端状态，重复标记可能抛出 `PawchiveConflictError`。
+作品标记是独立的公开操作，已经实现。请有意识地调用：成功标记会改变服务端状态，重复标记可能抛出 `PawchiveConflictError`。
 
 ## API 调用失败时怎么办？
 
 CLI 会报告类型化的 Pawchive 错误，不会返回只解析了一部分的响应。常见类型包括传输、HTTP、认证、未找到、冲突和响应校验错误。
 
-- 检查 URL 或 `service`、作者 ID、投稿 ID 是否正确。
+- 检查 URL 或 `service`、作者 ID、作品 ID 是否正确。
 - 网络较慢时增大 `KTOOLBOX_API__TIMEOUT`。
 - 对临时传输错误、`429` 或 `5xx`，调整 `KTOOLBOX_API__RETRY_TIMES` 与 `KTOOLBOX_API__RETRY_INTERVAL`。
 - 不要向 API 配置添加账号 Cookie；API 请求不会使用它。
@@ -43,9 +43,9 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 #KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=False
 ```
 
-`download_file` 指投稿主文件，通常为封面。两个选项默认均为 `True`。
+`download_file` 指作品主文件，通常为封面。两个选项默认均为 `True`。
 
-## 能否把附件直接放进投稿目录？
+## 能否把附件直接放进作品目录？
 
 ```dotenv
 KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
@@ -102,7 +102,7 @@ ktoolbox sync
 
 ## 如何为不同作者排除不同主题？
 
-在 `ktoolbox.toml` 中添加不同 `[[blockers]]`。所有作者共享的规则使用 `scope.mode = "global"`；特定作者规则使用 `scope.mode = "creators"` 并填写精确 `service:id`。屏蔽器按文件顺序求值，第一个命中后停止。
+在 `ktoolbox.toml` 中添加不同 `[[blockers]]`。所有作者共享的规则使用 `scope.mode = "global"`；特定作者规则使用 `scope.mode = "creators"` 并填写精确 `service:id`。忽略规则按文件顺序求值，第一个命中后停止。
 
 长时间同步前先校验正则与作用域：
 

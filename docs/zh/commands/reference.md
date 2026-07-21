@@ -21,29 +21,29 @@
 
 | 命令 | 用途 |
 | --- | --- |
-| `download` | 下载一篇投稿或指定修订。 |
+| `download` | 下载一篇作品或指定修订。 |
 | `sync [目标 ...]` | 同步显式作者；无目标时同步清单中全部已启用作者。 |
 | `creator list/add/remove/enable/disable/search` | 管理作者清单或搜索 Pawchive 作者。 |
-| `post show/search` | 查看投稿或搜索作者投稿。 |
+| `post show/search` | 查看作品或搜索作者作品。 |
 | `config edit/example/validate/path` | 编辑或查看环境与项目配置。 |
 | `site-version` | 打印 Pawchive 应用版本。 |
 | `webui [项目目录]` | 为一个项目运行可选 HeroUI 面板。 |
 
 ## `download`
 
-提供 Pawchive 投稿 URL，或同时提供 `--service`、`--creator-id`、`--post-id`。
+提供 Pawchive 作品 URL，或同时提供 `--service`、`--creator-id`、`--post-id`。
 
 | 参数或选项 | 类型 | 默认值 | 含义 |
 | --- | --- | --- | --- |
-| `POST` | 字符串 | 省略 | Pawchive 投稿或修订 URL。 |
-| `--service` | 字符串 | 省略 | 作者服务。 |
+| `POST` | 字符串 | 省略 | Pawchive 作品或修订 URL。 |
+| `--service` | 字符串 | 省略 | 作者所在平台。 |
 | `--creator-id` | 字符串 | 省略 | 作者 ID。 |
-| `--post-id` | 字符串 | 省略 | 投稿 ID。 |
+| `--post-id` | 字符串 | 省略 | 作品 ID。 |
 | `--revision-id` | 字符串 | 省略 | 从修订列表选择此 ID。 |
 | `-o`、`--output`、`--path` | 路径 | `.` | 输出根目录。 |
 | `--dump-post-data` / `--no-dump-post-data` | 布尔值 | 启用 | 将已校验元数据保存到 `post.json`。 |
 
-`download` 有意不应用作者清单屏蔽器。
+`download` 有意不应用作者清单忽略规则。
 
 ## `sync`
 
@@ -58,9 +58,9 @@
 | `--mix-posts` / `--no-mix-posts` | 布尔值 | 环境配置 | 覆盖 `job.mix_posts`。 |
 | `--start-time`、`--start` | 日期 | 省略 | 包含边界的发布日期下限，`YYYY-MM-DD`。 |
 | `--end-time`、`--end` | 日期 | 省略 | 包含边界的发布日期上限，`YYYY-MM-DD`。 |
-| `--offset` | 整数 | `0` | 起始投稿索引。 |
-| `--length` | 整数 | 全部 | 每位作者最多接受的投稿数。 |
-| `--keywords` | 重复字符串 | 环境配置 | 包含标题含任一值的投稿。 |
+| `--offset` | 整数 | `0` | 起始作品索引。 |
+| `--length` | 整数 | 全部 | 每位作者最多接受的作品数。 |
+| `--keywords` | 重复字符串 | 环境配置 | 包含标题含任一值的作品。 |
 | `--keywords-exclude` | 重复字符串 | 环境配置 | 弃用的标题排除兼容输入。 |
 
 `job.creator_concurrency` 限制作者生产并发，`job.count` 限制共享文件工作器。
@@ -80,17 +80,17 @@
 
 | 命令 | 参数与选项 | 含义 |
 | --- | --- | --- |
-| `post search` | `--creator-id`/`--id`、`--name`、`--service`、`-q`/`--query`、`-o`/`--offset`、`--dump`、`--json` | 搜索所选作者投稿。直接 API 查询至少 3 个字符，API 偏移量必须是 50 的倍数。 |
-| `post show SERVICE CREATOR_ID POST_ID [REVISION_ID]` | `--dump`、`--json` | 查看当前投稿元数据或一个指定修订。 |
+| `post search` | `--creator-id`/`--id`、`--name`、`--service`、`-q`/`--query`、`-o`/`--offset`、`--dump`、`--json` | 搜索所选作者作品。直接 API 查询至少 3 个字符，API 偏移量必须是 50 的倍数。 |
+| `post show SERVICE CREATOR_ID POST_ID [REVISION_ID]` | `--dump`、`--json` | 查看当前作品元数据或一个指定修订。 |
 
-未使用 `--json` 时，终端表格会有意省略投稿正文。
+未使用 `--json` 时，终端表格会有意省略作品正文。
 
 ## `config`
 
 | 命令 | 含义 |
 | --- | --- |
 | `config path` | 不换行地打印已解析项目路径。 |
-| `config validate` | 校验 Schema 版本、作者唯一性、屏蔽器类型、作用域、条件与正则表达式。 |
+| `config validate` | 校验 Schema 版本、作者唯一性、忽略规则类型、作用域、条件与正则表达式。 |
 | `config example` | 根据配置模型 docstring 渲染全部 dotenv 设置。 |
 | `config edit` | 打开可选 Urwid 编辑器并在保存前校验。 |
 

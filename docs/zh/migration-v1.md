@@ -20,7 +20,7 @@ KToolBox v1 对后端和 Python 库 API 都进行了不兼容升级。
 | `.data.post` 等包装响应 | 直接返回类型化的 `Post`、`Revision` 等 Pydantic 模型 |
 | Python Fire 命令面 | Cyclopts 命令树、连字符选项和明确退出码 |
 | 每次只能同步一位作者 | 任意数量目标或已启用项目清单 |
-| 仅全局 `keywords_exclude` | 有序的全局与作者级 `field-match` 屏蔽器 |
+| 仅全局 `keywords_exclude` | 有序的全局与作者级 `field-match` 忽略规则 |
 
 新的默认值为：
 
@@ -50,9 +50,9 @@ KTOOLBOX_DOWNLOADER__FILE_PATH_PREFIX=/data
 
 CLI 失败改用进程状态：`0` 成功，`1` 远程/作者/下载失败，`2` 参数/配置失败，`130` 中断。JSON 与表格写入 stdout，进度与日志写入 stderr。
 
-## 项目清单与屏蔽器
+## 项目清单与忽略规则
 
-仅在需要可复用清单或结构化屏蔽器时创建 `ktoolbox.toml`；缺失文件表示有效的空项目。
+仅在需要可复用清单或结构化忽略规则时创建 `ktoolbox.toml`；缺失文件表示有效的空项目。
 
 ```toml
 schema_version = 1
@@ -64,7 +64,7 @@ alias = "studio-a"
 enabled = true
 ```
 
-请将非空 `KTOOLBOX_JOB__KEYWORDS_EXCLUDE` 迁移为全局 `field-match` 标题条件。旧设置仍会作为隐式屏蔽器生效并发出警告，但 KToolBox 不会改写本地文件。详见[配置指南](configuration/guide.md#post-blockers)。
+请将非空 `KTOOLBOX_JOB__KEYWORDS_EXCLUDE` 迁移为全局 `field-match` 标题条件。旧设置仍会作为隐式忽略规则生效并发出警告，但 KToolBox 不会改写本地文件。详见[配置指南](configuration/guide.md#post-blockers)。
 
 `KTOOLBOX_JOB__CREATOR_CONCURRENCY` 默认 `4`，限制作者生产者；现有 `KTOOLBOX_JOB__COUNT` 继续限制文件工作器。
 

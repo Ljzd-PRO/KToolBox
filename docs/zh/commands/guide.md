@@ -18,7 +18,7 @@ ktoolbox creator list --json --config ./ktoolbox.toml
 
 `--verbose` 输出诊断日志，`--quiet` 隐藏进度和普通日志，`--plain` 使用稳定逐行进度，`--no-color` 保留交互布局但不输出 ANSI 颜色。
 
-## 下载单篇投稿
+## 下载单篇作品
 
 可传入 Pawchive 页面 URL，或完整的三个身份字段：
 
@@ -32,9 +32,9 @@ ktoolbox download \
   --output downloads
 ```
 
-使用 `--revision-id` 选择一个修订。Pawchive 没有单修订详情端点，因此 KToolBox 会读取修订列表并匹配该 ID。设置 `KTOOLBOX_JOB__INCLUDE_REVISIONS=True` 可在下载当前投稿时包含全部修订。
+使用 `--revision-id` 选择一个修订。Pawchive 没有单修订详情端点，因此 KToolBox 会读取修订列表并匹配该 ID。设置 `KTOOLBOX_JOB__INCLUDE_REVISIONS=True` 可在下载当前作品时包含全部修订。
 
-中断后重新执行同一命令即可。完整文件会被跳过，兼容的临时文件会通过 HTTP Range 续传。显式 `download` 不应用同步屏蔽器。
+中断后重新执行同一命令即可。完整文件会被跳过，兼容的临时文件会通过 HTTP Range 续传。显式 `download` 不应用同步忽略规则。
 
 ## 同步多个作者
 
@@ -48,7 +48,7 @@ ktoolbox sync fanbox:123 --length 1
 ktoolbox sync fanbox:123 patreon:456 studio-c --length 10
 ```
 
-省略 `--length` 会遍历全部页面。CLI 的 `--offset` 表示投稿索引，KToolBox 会将其转换为 Pawchive 的 50 项分页偏移量。
+省略 `--length` 会遍历全部页面。CLI 的 `--offset` 表示作品索引，KToolBox 会将其转换为 Pawchive 的 50 项分页偏移量。
 
 ```bash
 ktoolbox sync fanbox:123 --offset 10 --length 5
@@ -72,11 +72,11 @@ ktoolbox creator remove studio-b
 
 不带目标运行 `ktoolbox sync` 会同步清单中全部已启用作者；显式指定已禁用作者时仍会执行。`service:id` 必须唯一，别名可选且唯一，配置写回会保留注释。
 
-## 排除非作品投稿
+## 排除非创作类内容
 
-在 `ktoolbox.toml` 中定义有序字段屏蔽器。它们可全局生效或仅作用于指定 `service:id` 作者，并可检查标题、正文、标签、文件名、ID 及嵌套列表路径。第一个命中的屏蔽器会在详情、修订、元数据、目录和下载任务创建前排除投稿。
+在 `ktoolbox.toml` 中定义有序字段忽略规则。它们可全局生效或仅作用于指定 `service:id` 作者，并可检查标题、正文、标签、文件名、ID 及嵌套列表路径。第一个命中的忽略规则会在详情、修订、元数据、目录和下载任务创建前排除作品。
 
-完整示例见[配置指南](../configuration/guide.md#post-blockers)。`KTOOLBOX_JOB__KEYWORDS_EXCLUDE` 仅作为迁移用的弃用全局标题屏蔽器保留。
+完整示例见[配置指南](../configuration/guide.md#post-blockers)。`KTOOLBOX_JOB__KEYWORDS_EXCLUDE` 仅作为迁移用的弃用全局标题忽略规则保留。
 
 ## 查询公开数据
 
@@ -98,7 +98,7 @@ ktoolbox config edit
 ktoolbox site-version
 ```
 
-编辑器需要可选 `urwid` 依赖。它可编辑 dotenv 设置与作者/屏蔽器项目文档，并在保存前校验。
+编辑器需要可选 `urwid` 依赖。它可编辑 dotenv 设置与作者/忽略规则项目文档，并在保存前校验。
 
 ## 运行可选项目面板
 
@@ -108,7 +108,7 @@ ktoolbox site-version
 ktoolbox webui . --host 127.0.0.1
 ```
 
-面板把同一套下载、同步、作者、屏蔽器、查询和配置能力组织成项目操作，并提供持久任务进度与控制。监听网络接口前请先阅读 [WebUI 指南](../webui.md)。
+面板把同一套下载、同步、作者、忽略规则、查询和配置能力组织成项目操作，并提供持久任务进度与控制。监听网络接口前请先阅读 [WebUI 指南](../webui.md)。
 
 ## 退出状态
 
