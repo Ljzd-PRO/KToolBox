@@ -89,6 +89,28 @@ def test_rich_reporter_keeps_long_download_descriptions_on_one_line() -> None:
     assert "…" in rendered_lines[0]
 
 
+def test_rich_reporter_sums_active_download_speeds() -> None:
+    reporter = RichProgressReporter(Console(file=StringIO(), force_terminal=True, color_system=None))
+    current_time = 0.0
+    reporter.downloads.get_time = lambda: current_time
+    reporter.download_started("download-1", "fanbox:1", "one.bin", 1_000, 0)
+    reporter.download_started("download-2", "patreon:2", "two.bin", 2_000, 0)
+
+    current_time = 1.0
+    reporter.download_advanced("download-1", 100)
+    reporter.download_advanced("download-2", 200)
+    current_time = 2.0
+    reporter.download_advanced("download-1", 100)
+    reporter.download_advanced("download-2", 200)
+
+    overall_task = reporter.overall.tasks[0]
+    assert overall_task.fields["transfer_speed"] == "300 bytes/s"
+    reporter.download_finished("download-1", "completed")
+    assert overall_task.fields["transfer_speed"] == "200 bytes/s"
+    reporter.download_finished("download-2", "completed")
+    assert overall_task.fields["transfer_speed"] == "?"
+
+
 def test_rich_reporter_handles_idempotence_failures_and_missing_tasks() -> None:
     output = StringIO()
     reporter = RichProgressReporter(Console(file=output, force_terminal=True, color_system=None))

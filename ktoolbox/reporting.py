@@ -4,6 +4,7 @@ import os
 from dataclasses import dataclass
 from typing import Protocol
 
+from rich import filesize
 from rich.console import Console, Group
 from rich.live import Live
 from rich.progress import (
@@ -128,6 +129,7 @@ class RichProgressReporter(NullProgressReporter):
             MofNCompleteColumn(),
             TaskProgressColumn(),
             TextColumn("{task.fields[status]}"),
+            TextColumn("Total {task.fields[transfer_speed]}", style="progress.data.speed"),
             console=console,
             auto_refresh=False,
         )
@@ -150,7 +152,12 @@ class RichProgressReporter(NullProgressReporter):
             console=console,
             auto_refresh=False,
         )
-        self._overall_task = self.overall.add_task("Files", total=0, status="waiting")
+        self._overall_task = self.overall.add_task(
+            "Files",
+            total=0,
+            status="waiting",
+            transfer_speed="?",
+        )
         self._creator_tasks: dict[str, TaskID] = {}
         self._download_tasks: dict[str, TaskID] = {}
         self._failed = 0
@@ -212,11 +219,13 @@ class RichProgressReporter(NullProgressReporter):
         task_id = self._download_tasks.get(task_key)
         if task_id is not None:
             self.downloads.advance(task_id, amount)
+            self._refresh_transfer_speed()
 
     def download_finished(self, task_key: str, status: str) -> None:
         task_id = self._download_tasks.pop(task_key, None)
         if task_id is not None:
             self.downloads.remove_task(task_id)
+            self._refresh_transfer_speed()
         if status == "failed":
             self._failed += 1
         elif status == "existed":
@@ -229,6 +238,12 @@ class RichProgressReporter(NullProgressReporter):
             self._overall_task,
             status=f"{self._existed} existing, {self._failed} failed",
         )
+
+    def _refresh_transfer_speed(self) -> None:
+        speeds = [task.finished_speed or task.speed for task in self.downloads.tasks]
+        known_speeds = [speed for speed in speeds if speed is not None]
+        transfer_speed = f"{filesize.decimal(int(sum(known_speeds)))}/s" if known_speeds else "?"
+        self.overall.update(self._overall_task, transfer_speed=transfer_speed)
 
 
 @dataclass(slots=True)

@@ -25,7 +25,7 @@ KToolBox v1 uses Pawchive as its only supported backend. It provides typed acces
 - Limit file sizes, select extensions, filter titles and dates, and control cover/attachment downloads.
 - Customize directory structure, post names, file names, sequential names, and year/month grouping.
 - Save post metadata, creator indices, extracted content, content images, and matching external links.
-- Stream jobs from concurrent creator producers into one fair download pool with stable Rich progress.
+- Stream jobs from concurrent creator producers into one fair download pool with stable Rich progress, per-file speeds, and aggregate throughput.
 - Use a fully offline MockTransport-based test suite; accidental network access is blocked in tests.
 
 ## Requirements

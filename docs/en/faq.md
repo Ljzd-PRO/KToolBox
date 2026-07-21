@@ -112,7 +112,7 @@ ktoolbox config validate
 
 ## Why does progress look different in a redirected log?
 
-Rich live progress is used only on an interactive terminal. Pipes, CI, `NO_COLOR`, and `--plain` use stable line output so log messages cannot corrupt an ANSI live region. Use `--no-color` when you want the interactive layout without color, or `--quiet` to suppress progress and ordinary logs.
+Rich live progress is used only on an interactive terminal. It shows each active file's speed and ETA, plus the aggregate speed of all active downloads on the `Files` row. Pipes, CI, `NO_COLOR`, and `--plain` use stable line output so log messages cannot corrupt an ANSI live region. Use `--no-color` when you want the interactive layout without color, or `--quiet` to suppress progress and ordinary logs.
 
 ## Is uvloop or winloop required?
 
