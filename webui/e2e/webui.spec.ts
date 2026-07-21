@@ -1,6 +1,28 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+const browserErrors = new WeakMap<Page, string[]>();
+
+test.beforeEach(({ page }) => {
+  const errors: string[] = [];
+  browserErrors.set(page, errors);
+  page.on("pageerror", (error) => errors.push(`page: ${error.message}`));
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(`console: ${message.text()}`);
+  });
+  page.on("requestfailed", (request) => {
+    const failure = request.failure()?.errorText ?? "unknown failure";
+    if (!failure.includes("ERR_ABORTED")) errors.push(`request: ${request.method()} ${request.url()} (${failure})`);
+  });
+  page.on("response", (response) => {
+    if (response.status() >= 500) errors.push(`response: ${response.status()} ${response.url()}`);
+  });
+});
+
+test.afterEach(({ page }) => {
+  expect(browserErrors.get(page)).toEqual([]);
+});
+
 
 async function signIn(page: Page) {
   await page.goto("/");
@@ -8,6 +30,9 @@ async function signIn(page: Page) {
   await page.getByLabel("Password", { exact: true }).fill("fixture-password");
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByRole("heading", { name: "Download operations at a glance" })).toBeVisible();
+  const errors = browserErrors.get(page) ?? [];
+  expect(errors.filter((error) => !error.includes("status of 401 (Unauthorized)"))).toEqual([]);
+  errors.length = 0;
 }
 
 
