@@ -7,10 +7,13 @@ from pathlib import Path
 import httpx
 import pytest
 from argon2 import PasswordHasher
+from fastapi import HTTPException, Request
 
+import ktoolbox.webui.auth as auth_module
 from ktoolbox.configuration import Configuration, RuntimeContext
 from ktoolbox.webui.app import create_app
-from ktoolbox.webui.auth import CSRF_HEADER, LoginRateLimiter
+from ktoolbox.webui.auth import CSRF_HEADER, AuthService, LoginRateLimiter, client_identifier
+from ktoolbox.webui.database import WebUIDatabase
 
 
 @asynccontextmanager
@@ -128,3 +131,38 @@ async def test_missing_or_invalid_credentials_fail_startup(tmp_path: Path) -> No
     with pytest.raises(ValueError, match="valid Argon2"):
         async with invalid.router.lifespan_context(invalid):
             pass
+
+
+def test_rate_limiter_expires_old_attempts_and_client_identifier_falls_back(monkeypatch) -> None:
+    limiter = LoginRateLimiter(maximum=1, window_seconds=5)
+    limiter._attempts["client"].append(1)
+    monkeypatch.setattr(auth_module.time, "monotonic", lambda: 10.0)
+    limiter.check("client")
+    assert not limiter._attempts["client"]
+
+    request = Request(
+        {
+            "type": "http",
+            "method": "GET",
+            "path": "/",
+            "headers": [],
+            "query_string": b"",
+            "scheme": "http",
+            "server": ("testserver", 80),
+            "client": None,
+        }
+    )
+    assert client_identifier(request) == "unknown"
+
+
+@pytest.mark.asyncio
+async def test_auth_service_rejects_missing_password_and_unknown_session(tmp_path: Path) -> None:
+    database = WebUIDatabase(tmp_path / "auth.sqlite3")
+    await database.initialize()
+    service = AuthService(Configuration(_env_file=None, webui={"username": "owner"}).webui, database)
+    with pytest.raises(ValueError, match="PASSWORD_HASH or KTOOLBOX_WEBUI__PASSWORD"):
+        service.validate_configuration()
+    assert service._credentials_match("owner", "anything") is False
+    with pytest.raises(HTTPException, match="Session expired"):
+        await service.session("unknown-token")
+    await service.logout(None)

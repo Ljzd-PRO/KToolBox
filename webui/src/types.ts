@@ -1,17 +1,10 @@
-export type Session = {
-  authenticated: boolean;
-  username: string;
-  csrf_token: string;
-  created_at: string;
-};
+import type { components } from "./generated/api";
 
-export type ProjectSummary = {
-  name: string;
-  root: string;
-  project_config: string;
-  dotenv_files: string[];
-  version: string;
-};
+export type WebUIApiSchemas = components["schemas"];
+
+export type Session = WebUIApiSchemas["SessionResponse"];
+
+export type ProjectSummary = WebUIApiSchemas["ProjectSummaryResponse"];
 
 export type CreatorReference = {
   service: string;
@@ -86,17 +79,7 @@ export type ProjectDocument = TextDocument & {
   };
 };
 
-export type TaskStatus =
-  | "queued"
-  | "blocked"
-  | "running"
-  | "pause_requested"
-  | "paused"
-  | "stop_requested"
-  | "stopped"
-  | "completed"
-  | "failed"
-  | "interrupted";
+export type TaskStatus = WebUIApiSchemas["TaskStatus"];
 
 export type DownloadTaskSpec = {
   kind: "download";
@@ -181,20 +164,9 @@ export type TaskAttempt = {
   error: string | null;
 };
 
-export type TaskArtifact = {
-  path: string;
-  size: number;
-  mtime_ns: number;
-  removable: boolean;
-  reason: string | null;
-};
+export type TaskArtifact = WebUIApiSchemas["TaskArtifact"];
 
-export type TaskCleanupPreview = {
-  task_id: string;
-  artifacts: TaskArtifact[];
-  removable_files: number;
-  removable_bytes: number;
-};
+export type TaskCleanupPreview = WebUIApiSchemas["TaskCleanupPreview"];
 
 export type CreatorSummary = {
   id: string;

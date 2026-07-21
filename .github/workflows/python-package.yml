@@ -88,9 +88,9 @@ jobs:
             bash -c "
               apt-get update && apt-get install -y git binutils &&
               pip install poetry &&
-              poetry install --with pyinstaller --extras urwid --extras uvloop &&
+              poetry install --with pyinstaller --extras urwid --extras webui --extras uvloop &&
               poetry run pyinstaller ktoolbox.spec --distpath dist &&
-              cp README.md README_zh-CN.md example.env .env LICENSE dist/
+              cp README.md README_zh-CN.md example.env LICENSE dist/
             "
 
       - name: Upload Executable

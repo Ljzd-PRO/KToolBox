@@ -6,7 +6,10 @@ from pathlib import Path
 
 import httpx
 import pytest
+from pydantic import BaseModel
 
+import ktoolbox.webui.config_schema as config_schema_module
+import ktoolbox.webui.config_store as config_store_module
 from ktoolbox.configuration import Configuration, RuntimeContext
 from ktoolbox.webui.app import create_app
 from ktoolbox.webui.auth import CSRF_HEADER
@@ -94,6 +97,80 @@ def test_dotenv_store_preserves_comments_validates_and_detects_conflicts(tmp_pat
     assert path.read_text(encoding="utf-8") == before_validation
 
 
+def test_config_schema_docstring_and_environment_source_edges(tmp_path: Path, monkeypatch) -> None:
+    class UndocumentedConfiguration(BaseModel):
+        value: str = "default"
+
+    descriptions: dict[str, str] = {}
+    config_schema_module._collect_descriptions(UndocumentedConfiguration, "", "en", descriptions)
+    assert descriptions == {}
+    assert config_schema_module._parse_ivar_descriptions("No ivar metadata here.") == {}
+
+    class TextNode:
+        def __init__(self, text: str) -> None:
+            self.text = text
+
+        def astext(self) -> str:
+            return self.text
+
+    class Document:
+        @staticmethod
+        def findall(_node_type):
+            return [
+                [TextNode("parameter ignored"), TextNode("ignored")],
+                [TextNode("ivar retained"), TextNode("Retained description")],
+            ]
+
+    publish_doctree = config_schema_module.publish_doctree
+    monkeypatch.setattr(config_schema_module, "publish_doctree", lambda *_args, **_kwargs: Document())
+    assert config_schema_module._parse_ivar_descriptions(":ivar retained: text") == {"retained": "Retained description"}
+    monkeypatch.setattr(config_schema_module, "publish_doctree", publish_doctree)
+
+    monkeypatch.setenv("KTOOLBOX_JOB__COUNT", "9")
+    schema = build_config_schema(Configuration(_env_file=None), tmp_path, "en")
+    count = next(field for field in schema.fields if field.path == "job.count")
+    assert count.source == "environment"
+
+
+def test_dotenv_store_delete_syntax_and_io_failures(tmp_path: Path, monkeypatch) -> None:
+    path = tmp_path / ".env"
+    path.write_text("REMOVE_ME=value\n", encoding="utf-8")
+    store = DotenvFileStore(tmp_path)
+    current = store.read("dotenv")
+    store.patch("dotenv", {"REMOVE_ME": None}, current.revision)
+    assert "REMOVE_ME" not in path.read_text(encoding="utf-8")
+
+    with pytest.raises(ConfigurationFileError, match="invalid dotenv syntax on line"):
+        store.validate("dotenv", "BROKEN LINE")
+
+    path.unlink()
+    path.mkdir()
+    with pytest.raises(ConfigurationFileError, match="unable to read"):
+        store.read("dotenv")
+    path.rmdir()
+
+    current = store.read("dotenv")
+
+    def fail_replace(*_args, **_kwargs) -> None:
+        raise OSError("replace failed")
+
+    monkeypatch.setattr(config_store_module.os, "replace", fail_replace)
+    with pytest.raises(ConfigurationFileError, match="unable to save"):
+        store.replace("dotenv", "KTOOLBOX_JOB__COUNT=3\n", current.revision)
+
+
+def test_dotenv_store_handles_temporary_file_creation_failure(tmp_path: Path, monkeypatch) -> None:
+    store = DotenvFileStore(tmp_path)
+    current = store.read("dotenv")
+
+    def fail_temporary_file(*_args, **_kwargs):
+        raise OSError("temporary file failed")
+
+    monkeypatch.setattr(config_store_module, "NamedTemporaryFile", fail_temporary_file)
+    with pytest.raises(ConfigurationFileError, match="unable to save"):
+        store.replace("dotenv", "KTOOLBOX_JOB__COUNT=3\n", current.revision)
+
+
 @pytest.mark.asyncio
 async def test_config_schema_and_dotenv_endpoints(tmp_path: Path) -> None:
     async with configured_client(tmp_path) as (client, csrf):
@@ -147,7 +224,7 @@ async def test_config_schema_and_dotenv_endpoints(tmp_path: Path) -> None:
 
         example = await client.get("/api/v1/config/example")
         assert example.status_code == 200
-        assert "attachment; filename=\"example.env\"" == example.headers["content-disposition"]
+        assert 'attachment; filename="example.env"' == example.headers["content-disposition"]
         assert "KTOOLBOX" in example.text
 
 
@@ -237,7 +314,5 @@ async def test_raw_project_update_requires_current_revision_and_valid_toml(tmp_p
 
         valid = await client.post("/api/v1/config/project/validate", json={"content": current.json()["content"]})
         assert valid.json() == {"valid": True}
-        invalid_validation = await client.post(
-            "/api/v1/config/project/validate", json={"content": "not = [valid"}
-        )
+        invalid_validation = await client.post("/api/v1/config/project/validate", json={"content": "not = [valid"})
         assert invalid_validation.status_code == 422

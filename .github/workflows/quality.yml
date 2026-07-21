@@ -31,9 +31,11 @@ jobs:
       - name: Lint contract tooling
         run: >-
           poetry run ruff check
+          scripts
           k_generator
           ktoolbox/api
           ktoolbox/blocker
+          ktoolbox/webui
           ktoolbox/action/base.py
           ktoolbox/action/fetch.py
           ktoolbox/action/search.py
@@ -53,9 +55,11 @@ jobs:
       - name: Check contract tooling formatting
         run: >-
           poetry run ruff format --check
+          scripts
           k_generator
           ktoolbox/api
           ktoolbox/blocker
+          ktoolbox/webui
           ktoolbox/action/base.py
           ktoolbox/action/fetch.py
           ktoolbox/action/search.py
@@ -90,6 +94,14 @@ jobs:
           ktoolbox/reporting.py
           ktoolbox/sync.py
 
+      - name: Type-check WebUI services and contract tooling
+        run: >-
+          poetry run mypy
+          ktoolbox/webui
+          scripts/export_webui_openapi.py
+          scripts/check_webui_wheel.py
+          tests/webui_e2e_server.py
+
       - name: Compile Python sources
         run: poetry run python -m compileall -q ktoolbox k_generator
 
@@ -122,6 +134,19 @@ jobs:
           --cov-branch
           --cov-fail-under=100
 
+      - name: Test WebUI security configuration and scheduler at 100% coverage
+        run: >-
+          poetry run pytest
+          tests/ktoolbox/test_webui_auth.py
+          tests/ktoolbox/test_webui_config.py
+          tests/ktoolbox/test_webui_tasks.py
+          --cov=ktoolbox.webui.auth
+          --cov=ktoolbox.webui.config_schema
+          --cov=ktoolbox.webui.config_store
+          --cov=ktoolbox.webui.task_scheduler
+          --cov-branch
+          --cov-fail-under=100
+
       - name: Run hermetic test suite at 85% coverage
         run: poetry run pytest --cov --cov-fail-under=85
 
@@ -130,3 +155,58 @@ jobs:
 
       - name: Build source and wheel distributions
         run: poetry build
+
+  webui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: webui/package-lock.json
+
+      - name: Setup Python environment
+        uses: ./.github/actions/setup-python
+        with:
+          python-version: "3.12"
+
+      - name: Install WebUI dependencies from lock file
+        working-directory: webui
+        run: npm ci
+
+      - name: Check generated FastAPI contract and TypeScript types
+        working-directory: webui
+        run: npm run check:api
+
+      - name: Type-check and lint WebUI
+        working-directory: webui
+        run: |
+          npm run typecheck
+          npm run lint
+
+      - name: Run WebUI unit tests
+        working-directory: webui
+        run: npm run test
+
+      - name: Build packaged WebUI assets
+        working-directory: webui
+        run: npm run build
+
+      - name: Check packaged assets are current
+        run: git diff --exit-code -- ktoolbox/webui/static
+
+      - name: Install Playwright Chromium
+        working-directory: webui
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser lifecycle and accessibility tests
+        working-directory: webui
+        run: npm run test:e2e
+
+      - name: Verify wheel contains the production WebUI
+        run: |
+          poetry build
+          poetry run python scripts/check_webui_wheel.py

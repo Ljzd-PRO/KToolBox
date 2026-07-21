@@ -9,15 +9,23 @@ import httpx
 import pytest
 
 from ktoolbox.configuration import Configuration, RuntimeContext
+from ktoolbox.project_config import CreatorReference
 from ktoolbox.reporting import ProgressReporter
 from ktoolbox.webui.app import create_app
 from ktoolbox.webui.auth import CSRF_HEADER
 from ktoolbox.webui.database import WebUIDatabase
 from ktoolbox.webui.project_lock import ProjectAlreadyRunningError
 from ktoolbox.webui.task_executor import TaskExecutionSnapshot
-from ktoolbox.webui.task_models import DownloadTaskSpec, TaskRecord, TaskStatus
+from ktoolbox.webui.task_models import DownloadTaskSpec, SyncTaskSpec, TaskRecord, TaskStatus
 from ktoolbox.webui.task_reporter import WebTaskReporter
-from ktoolbox.webui.task_store import TaskStore
+from ktoolbox.webui.task_scheduler import (
+    TaskResources,
+    TaskScheduler,
+    _error_text,
+    _load_snapshot,
+    task_resources,
+)
+from ktoolbox.webui.task_store import InvalidTaskStateError, TaskStore
 
 
 class ControlledExecutor:
@@ -96,6 +104,37 @@ async def wait_for_status(client: httpx.AsyncClient, task_id: str, expected: Tas
             return body
         await asyncio.sleep(0.02)
     raise AssertionError(f"task {task_id} did not reach {expected.value}")
+
+
+async def scheduler_parts(
+    tmp_path: Path,
+    executor,
+    *,
+    concurrency: int = 1,
+) -> tuple[TaskScheduler, TaskStore]:
+    (tmp_path / "ktoolbox.toml").write_text("schema_version = 1\n", encoding="utf-8")
+    database = WebUIDatabase(tmp_path / "scheduler.sqlite3")
+    await database.initialize()
+    store = TaskStore(database)
+    context = RuntimeContext(
+        tmp_path,
+        Configuration(_env_file=None, webui={"username": "owner", "password": "secret"}),
+    )
+    return TaskScheduler(context, store, max_concurrency=concurrency, executor=executor), store
+
+
+async def wait_for_store_status(
+    scheduler: TaskScheduler,
+    store: TaskStore,
+    task_id: str,
+    status: TaskStatus,
+) -> TaskRecord:
+    for _ in range(100):
+        record = await store.get(task_id)
+        if record.status is status and task_id not in scheduler._running:
+            return record
+        await asyncio.sleep(0.01)
+    raise AssertionError(f"task {task_id} did not settle as {status.value}")
 
 
 @pytest.mark.asyncio
@@ -238,3 +277,184 @@ async def test_project_lock_rejects_a_second_scheduler(tmp_path: Path) -> None:
         with pytest.raises(ProjectAlreadyRunningError):
             async with second.router.lifespan_context(second):
                 pass
+
+
+def test_task_resource_conflicts_identity_forms_and_error_text(tmp_path: Path) -> None:
+    shared = tmp_path / "shared"
+    base = TaskResources(shared, frozenset({"fanbox:one"}), frozenset({"fanbox:one:42"}))
+    assert base.conflicts_with(TaskResources(tmp_path / "other", base.creators, base.posts)) is False
+    assert base.conflicts_with(TaskResources(shared, frozenset(), base.posts)) is True
+    assert base.conflicts_with(TaskResources(shared, base.creators, frozenset())) is True
+    assert base.conflicts_with(TaskResources(shared, frozenset({"fanbox:two"}), frozenset())) is False
+
+    sync = task_resources(
+        SyncTaskSpec(
+            creators=[CreatorReference(service="FanBox", creator_id="One")],
+            output=shared,
+        )
+    )
+    assert sync.creators == frozenset({"fanbox:one"})
+    assert sync.posts == frozenset()
+
+    url = task_resources(DownloadTaskSpec(post="https://pawchive.pw/fanbox/user/One/post/42", output=shared))
+    assert url.creators == frozenset({"fanbox:one"})
+    assert url.posts == frozenset({"fanbox:one:42"})
+
+    no_identity = DownloadTaskSpec.model_construct(
+        post=None,
+        service=None,
+        creator_id=None,
+        post_id=None,
+        output=shared,
+    )
+    assert task_resources(no_identity).creators == frozenset()
+    no_post = DownloadTaskSpec.model_construct(
+        post=None,
+        service="fanbox",
+        creator_id="one",
+        post_id=None,
+        output=shared,
+    )
+    assert task_resources(no_post).posts == frozenset()
+
+    assert _error_text(RuntimeError()) == "RuntimeError"
+    assert len(_error_text(RuntimeError("x" * 3000))) == 2000
+
+
+@pytest.mark.asyncio
+async def test_scheduler_control_methods_and_validation(tmp_path: Path) -> None:
+    executor = ControlledExecutor()
+    scheduler, store = await scheduler_parts(tmp_path, executor)
+    with pytest.raises(ValueError, match="concurrency"):
+        TaskScheduler(scheduler.context, store, max_concurrency=0, executor=executor)
+
+    task = await scheduler.create(
+        DownloadTaskSpec(service="fanbox", creator_id="one", post_id="42", output=tmp_path / "one")
+    )
+    updated = await scheduler.update(
+        task.id,
+        DownloadTaskSpec(service="fanbox", creator_id="one", post_id="43", output=tmp_path / "one"),
+    )
+    assert updated.revision == task.revision + 1
+    assert (await scheduler.reorder(task.id, 9)).position == 9
+    assert (await scheduler.pause(task.id)).status is TaskStatus.paused
+    assert (await scheduler.stop_task(task.id)).status is TaskStatus.stopped
+    assert (await scheduler.resume(task.id)).status is TaskStatus.queued
+    with pytest.raises(InvalidTaskStateError, match="cannot be resumed"):
+        await scheduler.resume(task.id)
+
+    await store.set_status(task.id, TaskStatus.completed)
+    with pytest.raises(InvalidTaskStateError, match="only queued"):
+        await scheduler.pause(task.id)
+    with pytest.raises(InvalidTaskStateError, match="cannot be stopped"):
+        await scheduler.stop_task(task.id)
+    await store.set_status(task.id, TaskStatus.running)
+    with pytest.raises(InvalidTaskStateError, match="before reordering"):
+        await scheduler.reorder(task.id, 1)
+    await scheduler.stop()
+
+
+@pytest.mark.asyncio
+async def test_scheduler_start_is_idempotent_and_dispatch_timeout(tmp_path: Path) -> None:
+    scheduler, _ = await scheduler_parts(tmp_path, ControlledExecutor())
+    await scheduler.start()
+    dispatch_task = scheduler._dispatch_task
+    await scheduler.start()
+    assert scheduler._dispatch_task is dispatch_task
+    await asyncio.sleep(0.3)
+    await scheduler.stop()
+    await scheduler.stop()
+
+
+@pytest.mark.asyncio
+async def test_scheduler_dispatches_fairly_across_conflicts_and_capacity(tmp_path: Path) -> None:
+    executor = ControlledExecutor()
+    scheduler, store = await scheduler_parts(tmp_path, executor, concurrency=1)
+    first = await store.create(
+        DownloadTaskSpec(service="fanbox", creator_id="one", post_id="42", output=tmp_path / "one")
+    )
+    second = await store.create(
+        DownloadTaskSpec(service="fanbox", creator_id="two", post_id="42", output=tmp_path / "two")
+    )
+    conflict = await store.create(
+        DownloadTaskSpec(service="fanbox", creator_id="one", post_id="99", output=tmp_path / "one")
+    )
+
+    await scheduler._dispatch_ready_tasks()
+    assert await executor.started.get() == first.id
+    assert (await store.get(second.id)).status is TaskStatus.queued
+    blocked = await store.get(conflict.id)
+    assert blocked.status is TaskStatus.blocked
+    assert blocked.blocked_by == first.id
+    await scheduler._dispatch_ready_tasks()
+    assert (await store.get(conflict.id)).blocked_by == first.id
+
+    executor.release[first.id].set()
+    await wait_for_store_status(scheduler, store, first.id, TaskStatus.completed)
+    await scheduler._dispatch_ready_tasks()
+    assert await executor.started.get() == second.id
+    assert (await store.get(conflict.id)).status is TaskStatus.queued
+
+    executor.release[second.id].set()
+    await wait_for_store_status(scheduler, store, second.id, TaskStatus.completed)
+    await scheduler._dispatch_ready_tasks()
+    assert await executor.started.get() == conflict.id
+    executor.release[conflict.id].set()
+    await wait_for_store_status(scheduler, store, conflict.id, TaskStatus.completed)
+
+    scheduler._stopping = True
+    await scheduler._dispatch_ready_tasks()
+
+
+@pytest.mark.asyncio
+async def test_scheduler_stop_interrupts_running_task(tmp_path: Path) -> None:
+    executor = ControlledExecutor()
+    scheduler, store = await scheduler_parts(tmp_path, executor)
+    task = await store.create(
+        DownloadTaskSpec(service="fanbox", creator_id="one", post_id="42", output=tmp_path / "one")
+    )
+    await scheduler._dispatch_ready_tasks()
+    assert await executor.started.get() == task.id
+    await scheduler.stop()
+    assert (await store.get(task.id)).status is TaskStatus.interrupted
+
+
+@pytest.mark.asyncio
+async def test_scheduler_records_snapshot_and_executor_failures(tmp_path: Path) -> None:
+    class FailingExecutor:
+        async def __call__(self, *_args, **_kwargs) -> None:
+            raise RuntimeError("fixture executor failed")
+
+    scheduler, store = await scheduler_parts(tmp_path, FailingExecutor())
+    task = await store.create(
+        DownloadTaskSpec(service="fanbox", creator_id="one", post_id="42", output=tmp_path / "one")
+    )
+    await scheduler._dispatch_ready_tasks()
+    failed = await wait_for_store_status(scheduler, store, task.id, TaskStatus.failed)
+    assert failed.error == "fixture executor failed"
+
+    broken_root = tmp_path / "broken"
+    broken_root.mkdir()
+    scheduler, store = await scheduler_parts(broken_root, ControlledExecutor())
+    (broken_root / "ktoolbox.toml").write_text("not = [valid", encoding="utf-8")
+    task = await store.create(
+        DownloadTaskSpec(service="fanbox", creator_id="one", post_id="42", output=broken_root / "one")
+    )
+    await scheduler._launch(task, task_resources(task.spec))
+    assert (await store.get(task.id)).status is TaskStatus.failed
+
+
+@pytest.mark.asyncio
+async def test_scheduler_cancellation_without_running_entry_is_interrupted(tmp_path: Path) -> None:
+    async def cancel_executor(*_args, **_kwargs) -> None:
+        raise asyncio.CancelledError
+
+    scheduler, store = await scheduler_parts(tmp_path, cancel_executor)
+    task = await store.create(
+        DownloadTaskSpec(service="fanbox", creator_id="one", post_id="42", output=tmp_path / "one")
+    )
+    snapshot = _load_snapshot(tmp_path)
+    attempt = await store.start_attempt(task, snapshot.redacted())
+    task = await store.set_status(task.id, TaskStatus.running)
+    await scheduler._execute(task, snapshot, attempt.id)
+    assert (await store.get(task.id)).status is TaskStatus.interrupted
