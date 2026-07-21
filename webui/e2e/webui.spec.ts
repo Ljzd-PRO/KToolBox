@@ -50,6 +50,15 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   expect(Math.abs((controlBox?.y ?? 0) - (labelBox?.y ?? 0))).toBeLessThan(2);
   expect(controlBox?.x ?? 0).toBeLessThan(labelBox?.x ?? 0);
 
+  const startDateCheckbox = formSurface.getByRole("checkbox", { name: "Apply start date" });
+  const startDateRoot = startDateCheckbox.locator('xpath=ancestor::*[@data-slot="checkbox"]');
+  await expect(startDateCheckbox).not.toBeChecked();
+  await expect(startDateRoot.locator('[data-slot="checkbox-indicator"]')).toHaveCount(0);
+  await startDateCheckbox.press("Space");
+  await expect(startDateCheckbox).toBeChecked();
+  await expect(startDateRoot.locator('[data-slot="checkbox-indicator"]')).toHaveCount(1);
+  await startDateCheckbox.press("Space");
+
   const [scrollBox, actionBox] = await Promise.all([formScroll.boundingBox(), formActions.boundingBox()]);
   expect(scrollBox).not.toBeNull();
   expect(actionBox).not.toBeNull();

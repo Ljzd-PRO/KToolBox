@@ -70,6 +70,11 @@ describe("form selection controls", () => {
 
     rerender(<FormCheckbox isSelected label="Apply start date" onChange={() => undefined} />);
     expect(container.querySelector('[data-slot="checkbox-indicator"]')).toBeInTheDocument();
+
+    rerender(<FormCheckbox isIndeterminate isSelected={false} label="Apply start date" onChange={() => undefined} />);
+    expect(container.querySelector('[data-slot="checkbox"]')).toHaveAttribute("data-indeterminate", "true");
+    expect(container.querySelector('[data-slot="checkbox-indicator"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-slot="checkbox-indicator"] svg')).toHaveAttribute("aria-hidden", "true");
   });
 
   it("provides a compact, accessible list switch without visible label content", () => {
