@@ -44,6 +44,14 @@ urwid = [
     "urwid>=2.6.16,<3.0.0; sys_platform != 'win32'",
     "urwid[curses]>=2.6.16,<3.0.0; sys_platform == 'win32'",
 ]
+webui = [
+    "aiosqlite>=0.20,<1.0",
+    "argon2-cffi>=23.1,<26.0",
+    "docstring-parser>=0.16,<1.0",
+    "fastapi>=0.115,<1.0",
+    "filelock>=3.18,<4.0",
+    "uvicorn>=0.34,<1.0",
+]
 
 [tool.poetry]
 packages = [{ include = "ktoolbox" }]

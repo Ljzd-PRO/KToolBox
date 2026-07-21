@@ -120,7 +120,8 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-# .env
+.env
+prod.env
 .venv
 env/
 venv/
@@ -161,3 +162,9 @@ cython_debug/
 
 # KToolBox local runtime state
 .ktoolbox/
+
+# WebUI
+webui/node_modules/
+webui/coverage/
+webui/playwright-report/
+webui/test-results/
