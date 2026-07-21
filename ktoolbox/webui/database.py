@@ -55,6 +55,7 @@ class WebUIDatabase:
                     kind TEXT NOT NULL,
                     status TEXT NOT NULL,
                     spec_json TEXT NOT NULL,
+                    presentation_json TEXT,
                     position INTEGER NOT NULL,
                     revision INTEGER NOT NULL DEFAULT 1,
                     progress_json TEXT NOT NULL DEFAULT '{}',
@@ -105,6 +106,11 @@ class WebUIDatabase:
             await connection.execute(
                 "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
                 (2, utc_now().isoformat()),
+            )
+            await _ensure_column(connection, "tasks", "presentation_json", "TEXT")
+            await connection.execute(
+                "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
+                (3, utc_now().isoformat()),
             )
             await connection.commit()
 
@@ -168,3 +174,16 @@ class WebUIDatabase:
 
     def connect(self) -> aiosqlite.Connection:
         return self._connect()
+
+
+async def _ensure_column(
+    connection: aiosqlite.Connection,
+    table: str,
+    column: str,
+    definition: str,
+) -> None:
+    cursor = await connection.execute(f"PRAGMA table_info({table})")
+    rows = await cursor.fetchall()
+    await cursor.close()
+    if column not in {str(row[1]) for row in rows}:
+        await connection.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")

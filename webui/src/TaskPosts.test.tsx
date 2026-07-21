@@ -88,11 +88,54 @@ describe("task and post workflows", () => {
     expect(await screen.findByText(/fixture ready/)).toBeInTheDocument();
   });
 
-  it("searches typed post metadata without requesting remote media", async () => {
+  it("creates a download with a presentation snapshot without requesting remote media", async () => {
     window.history.replaceState({}, "", "/posts");
-    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+    const createdTask = {
+      id: "task-created",
+      kind: "download",
+      status: "queued",
+      position: 1,
+      revision: 0,
+      spec: {
+        kind: "download",
+        service: "fanbox",
+        creator_id: "42",
+        post_id: "99",
+        revision_id: null,
+        output: "downloads",
+        dump_post_data: true,
+      },
+      presentation: {
+        target_key: "download/fanbox/42/99/",
+        title: "Fictional fixture",
+        creator_name: "Demo Studio",
+      },
+      progress: {
+        queued_files: 0,
+        processed_files: 0,
+        completed_files: 0,
+        existing_files: 0,
+        failed_files: 0,
+        transferred_bytes: 0,
+        total_bytes: null,
+        speed_bps: 0,
+        eta_seconds: null,
+        active_creators: [],
+        active_downloads: {},
+      },
+      error: null,
+      blocked_by: null,
+      created_at: "2026-07-21T00:00:00Z",
+      updated_at: "2026-07-21T00:00:00Z",
+    };
+    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const path = String(input);
       if (path.endsWith("/session")) return json(session);
+      if (path.endsWith("/tasks") && init?.method === "POST") return json(createdTask, 201);
+      if (path.endsWith("/tasks")) return json([createdTask]);
+      if (path.endsWith("/creators")) return json([]);
+      if (path.includes("/tasks/task-created/events")) return json([]);
+      if (path.endsWith("/tasks/task-created/attempts")) return json([]);
       if (path.includes("/pawchive/posts/fanbox/42/99/revisions")) return json([]);
       if (path.includes("/pawchive/posts/fanbox/42/99")) {
         return json({ id: "99", user: "42", service: "fanbox", title: "Fictional fixture", content: "Safe fixture body" });
@@ -108,11 +151,32 @@ describe("task and post workflows", () => {
     render(<BrowserRouter><App /></BrowserRouter>);
     await screen.findByRole("heading", { name: "Posts" });
     await user.type(screen.getByRole("textbox", { name: "Creator ID" }), "42");
+    await user.type(screen.getByRole("textbox", { name: "Creator name" }), "Demo Studio");
     await user.click(screen.getByRole("button", { name: "Search posts" }));
     expect((await screen.findAllByText("Fictional fixture")).length).toBeGreaterThan(0);
     await user.click(screen.getAllByRole("button", { name: "Post details" })[0]);
 
     expect(await screen.findByText("Remote media stays unloaded")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Create download task" }));
+    expect(await screen.findByRole("heading", { name: "Task details" })).toBeInTheDocument();
+    const createCall = fetchMock.mock.calls.find(([input, init]) => String(input).endsWith("/tasks") && init?.method === "POST");
+    expect(createCall).toBeDefined();
+    expect(JSON.parse(String(createCall?.[1]?.body))).toEqual({
+      spec: {
+        kind: "download",
+        service: "fanbox",
+        creator_id: "42",
+        post_id: "99",
+        revision_id: null,
+        output: "downloads",
+        dump_post_data: true,
+      },
+      presentation: {
+        target_key: "download/fanbox/42/99/",
+        title: "Fictional fixture",
+        creator_name: "Demo Studio",
+      },
+    });
     expect(fetchMock.mock.calls.every(([input]) => !/\.(jpg|png|gif|mp4)(\?|$)/i.test(String(input)))).toBe(true);
   });
 });

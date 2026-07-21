@@ -4,10 +4,12 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Annotated, Literal
+from urllib.parse import quote
 
-from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, field_validator, model_validator
 
 from ktoolbox.project_config import CreatorReference
+from ktoolbox.utils import parse_webpage_url
 
 
 class TaskStatus(str, Enum):
@@ -91,6 +93,63 @@ TaskSpec = Annotated[DownloadTaskSpec | SyncTaskSpec, Field(discriminator="kind"
 TASK_SPEC_ADAPTER: TypeAdapter[TaskSpec] = TypeAdapter(TaskSpec)
 
 
+class TaskPresentationSnapshot(BaseModel):
+    """Non-executable labels captured when a task is created from Pawchive data."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    target_key: Annotated[str, Field(min_length=1, max_length=1024)]
+    title: Annotated[str, Field(max_length=500)] | None = None
+    creator_name: Annotated[str, Field(max_length=200)] | None = None
+
+    @field_validator("title", "creator_name", mode="before")
+    @classmethod
+    def empty_label_to_none(cls, value: object) -> object:
+        return None if isinstance(value, str) and not value.strip() else value
+
+
+def task_target_key(spec: TaskSpec) -> str | None:
+    """Return a canonical key for display metadata without changing task identity."""
+
+    if not isinstance(spec, DownloadTaskSpec):
+        return None
+    if spec.post:
+        service, creator_id, post_id, parsed_revision = parse_webpage_url(spec.post)
+        revision_id = parsed_revision or spec.revision_id
+    else:
+        service, creator_id, post_id, revision_id = (
+            spec.service,
+            spec.creator_id,
+            spec.post_id,
+            spec.revision_id,
+        )
+    if not service or not creator_id or not post_id:
+        return None
+    values = (service.casefold(), creator_id, post_id, revision_id or "")
+    return "download/" + "/".join(quote(value, safe="") for value in values)
+
+
+def validate_task_presentation(
+    spec: TaskSpec,
+    presentation: TaskPresentationSnapshot | None,
+) -> TaskPresentationSnapshot | None:
+    if presentation is None:
+        return None
+    expected = task_target_key(spec)
+    if expected is None:
+        raise ValueError("presentation snapshots are only supported for download tasks")
+    if presentation.target_key != expected:
+        raise ValueError("presentation target_key does not match the task target")
+    return presentation
+
+
+class TaskCreateRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    spec: TaskSpec
+    presentation: TaskPresentationSnapshot | None = None
+
+
 class ActiveDownload(BaseModel):
     creator_key: str
     filename: str
@@ -118,6 +177,7 @@ class TaskRecord(BaseModel):
     kind: Literal["download", "sync"]
     status: TaskStatus
     spec: TaskSpec
+    presentation: TaskPresentationSnapshot | None = None
     position: int
     revision: int
     progress: TaskProgress = Field(default_factory=TaskProgress)
@@ -164,6 +224,7 @@ class TaskCleanupPreview(BaseModel):
 
 class TaskUpdateRequest(BaseModel):
     spec: TaskSpec
+    presentation: TaskPresentationSnapshot | None = None
 
 
 class TaskReorderRequest(BaseModel):

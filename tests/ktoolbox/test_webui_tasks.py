@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import sqlite3
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -16,7 +17,14 @@ from ktoolbox.webui.auth import CSRF_HEADER
 from ktoolbox.webui.database import WebUIDatabase
 from ktoolbox.webui.project_lock import ProjectAlreadyRunningError
 from ktoolbox.webui.task_executor import TaskExecutionSnapshot
-from ktoolbox.webui.task_models import DownloadTaskSpec, SyncTaskSpec, TaskRecord, TaskStatus
+from ktoolbox.webui.task_models import (
+    DownloadTaskSpec,
+    SyncTaskSpec,
+    TaskPresentationSnapshot,
+    TaskRecord,
+    TaskStatus,
+    task_target_key,
+)
 from ktoolbox.webui.task_reporter import WebTaskReporter
 from ktoolbox.webui.task_scheduler import (
     TaskResources,
@@ -86,14 +94,25 @@ async def task_client(
             yield client, {CSRF_HEADER: login.json()["csrf_token"]}
 
 
-def task_payload(creator: str, *, output: str = "downloads") -> dict[str, object]:
-    return {
-        "kind": "download",
-        "service": "fanbox",
-        "creator_id": creator,
-        "post_id": "42",
-        "output": output,
+def task_payload(
+    creator: str,
+    *,
+    output: str = "downloads",
+    post_id: str = "42",
+    presentation: dict[str, object] | None = None,
+) -> dict[str, object]:
+    payload: dict[str, object] = {
+        "spec": {
+            "kind": "download",
+            "service": "fanbox",
+            "creator_id": creator,
+            "post_id": post_id,
+            "output": output,
+        }
     }
+    if presentation is not None:
+        payload["presentation"] = presentation
+    return payload
 
 
 async def wait_for_status(client: httpx.AsyncClient, task_id: str, expected: TaskStatus) -> dict[str, object]:
@@ -148,7 +167,7 @@ async def test_task_concurrency_duplicate_blocking_and_resume(tmp_path: Path) ->
         blocked = (
             await client.post(
                 "/api/v1/tasks",
-                json={**task_payload("one"), "post_id": "99"},
+                json=task_payload("one", post_id="99"),
                 headers=headers,
             )
         ).json()
@@ -182,6 +201,113 @@ async def test_task_concurrency_duplicate_blocking_and_resume(tmp_path: Path) ->
         assert [item["status"] for item in attempts.json()] == ["completed", "paused"]
         events = await client.get(f"/api/v1/tasks/{first['id']}/events", params={"after": 0})
         assert any(item["data"].get("progress", {}).get("transferred_bytes") == 100 for item in events.json())
+
+
+@pytest.mark.asyncio
+async def test_task_presentation_round_trip_validation_and_update_semantics(tmp_path: Path) -> None:
+    executor = ControlledExecutor()
+    target_key = "download/fanbox/one/42/"
+    presentation = {
+        "target_key": target_key,
+        "title": "Fictional project study",
+        "creator_name": "Demo Studio",
+    }
+    async with task_client(tmp_path, executor, concurrency=1) as (client, headers):
+        created_response = await client.post(
+            "/api/v1/tasks",
+            json=task_payload("one", presentation=presentation),
+            headers=headers,
+        )
+        assert created_response.status_code == 201
+        created = created_response.json()
+        assert created["presentation"] == presentation
+
+        duplicate = await client.post(
+            "/api/v1/tasks",
+            json=task_payload(
+                "one",
+                presentation={**presentation, "title": "A different display title"},
+            ),
+            headers=headers,
+        )
+        assert duplicate.status_code == 409
+
+        invalid = await client.post(
+            "/api/v1/tasks",
+            json=task_payload(
+                "other",
+                presentation={**presentation, "target_key": "download/fanbox/wrong/42/"},
+            ),
+            headers=headers,
+        )
+        assert invalid.status_code == 422
+
+        await wait_for_status(client, created["id"], TaskStatus.running)
+        await client.post(f"/api/v1/tasks/{created['id']}/pause", headers=headers)
+        paused = await wait_for_status(client, created["id"], TaskStatus.paused)
+
+        preserved = await client.patch(
+            f"/api/v1/tasks/{created['id']}",
+            json={"spec": paused["spec"]},
+            headers=headers,
+        )
+        assert preserved.status_code == 200
+        assert preserved.json()["presentation"] == presentation
+
+        changed_spec = {**preserved.json()["spec"], "post_id": "43"}
+        cleared = await client.patch(
+            f"/api/v1/tasks/{created['id']}",
+            json={"spec": changed_spec},
+            headers=headers,
+        )
+        assert cleared.status_code == 200
+        assert cleared.json()["presentation"] is None
+
+
+@pytest.mark.asyncio
+async def test_task_presentation_database_migration_and_store_round_trip(tmp_path: Path) -> None:
+    database_path = tmp_path / "legacy.sqlite3"
+    with sqlite3.connect(database_path) as connection:
+        connection.execute(
+            """
+            CREATE TABLE tasks (
+                id TEXT PRIMARY KEY,
+                kind TEXT NOT NULL,
+                status TEXT NOT NULL,
+                spec_json TEXT NOT NULL,
+                position INTEGER NOT NULL,
+                revision INTEGER NOT NULL DEFAULT 1,
+                progress_json TEXT NOT NULL DEFAULT '{}',
+                error TEXT,
+                blocked_by TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+
+    database = WebUIDatabase(database_path)
+    await database.initialize()
+    async with database.connect() as connection:
+        cursor = await connection.execute("PRAGMA table_info(tasks)")
+        columns = {str(row[1]) for row in await cursor.fetchall()}
+        await cursor.close()
+        cursor = await connection.execute("SELECT version FROM schema_migrations ORDER BY version")
+        versions = [int(row[0]) for row in await cursor.fetchall()]
+        await cursor.close()
+    assert "presentation_json" in columns
+    assert versions == [1, 2, 3]
+
+    store = TaskStore(database)
+    spec = DownloadTaskSpec(service="FanBox", creator_id="creator/id", post_id="42", output=tmp_path)
+    assert task_target_key(spec) == "download/fanbox/creator%2Fid/42/"
+    presentation = TaskPresentationSnapshot(
+        target_key=task_target_key(spec) or "",
+        title="Fictional title",
+        creator_name="Demo Studio",
+    )
+    task = await store.create(spec, presentation)
+    assert task.presentation == presentation
 
 
 @pytest.mark.asyncio

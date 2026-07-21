@@ -13,6 +13,7 @@ from ktoolbox.webui.task_executor import CoreTaskExecutor, TaskExecutionSnapshot
 from ktoolbox.webui.task_models import (
     RUNNING_TASK_STATUSES,
     SyncTaskSpec,
+    TaskPresentationSnapshot,
     TaskRecord,
     TaskSpec,
     TaskStatus,
@@ -88,14 +89,23 @@ class TaskScheduler:
         if running:
             await asyncio.gather(*(item.task for item in running), return_exceptions=True)
 
-    async def create(self, spec: TaskSpec) -> TaskRecord:
-        task = await self.store.create(spec)
+    async def create(
+        self,
+        spec: TaskSpec,
+        presentation: TaskPresentationSnapshot | None = None,
+    ) -> TaskRecord:
+        task = await self.store.create(spec, presentation)
         self._wake.set()
         return task
 
-    async def update(self, task_id: str, spec: TaskSpec) -> TaskRecord:
+    async def update(
+        self,
+        task_id: str,
+        spec: TaskSpec,
+        presentation: TaskPresentationSnapshot | None = None,
+    ) -> TaskRecord:
         async with self._control_lock:
-            task = await self.store.update_spec(task_id, spec)
+            task = await self.store.update_spec(task_id, spec, presentation)
         self._wake.set()
         return task
 

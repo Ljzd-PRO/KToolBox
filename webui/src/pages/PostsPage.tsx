@@ -34,7 +34,8 @@ import {
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { formatDateTime } from "../lib/format";
-import type { PawchivePost, PawchiveRevision, TaskRecord } from "../types";
+import { downloadTaskTargetKey } from "../lib/taskPresentation";
+import type { DownloadTaskSpec, PawchivePost, PawchiveRevision, TaskRecord } from "../types";
 
 export function PostsPage() {
   const { t, i18n } = useTranslation();
@@ -100,17 +101,30 @@ export function PostsPage() {
     if (!session || !selected) return;
     setCreating(true);
     try {
+      const revisionId = selectedRevision || null;
+      const spec: DownloadTaskSpec = {
+        kind: "download",
+        service: selected.service,
+        creator_id: selected.user,
+        post_id: selected.id,
+        revision_id: revisionId,
+        output,
+        dump_post_data: dumpMetadata,
+      };
+      const title = detailsQuery.data?.title ?? selected.title;
+      const snapshotCreatorName = creatorName.trim() || null;
       const task = await api<TaskRecord>("/tasks", {
         method: "POST",
         csrfToken: session.csrf_token,
         body: {
-          kind: "download",
-          service: selected.service,
-          creator_id: selected.user,
-          post_id: selected.id,
-          revision_id: selectedRevision || null,
-          output,
-          dump_post_data: dumpMetadata,
+          spec,
+          presentation: title || snapshotCreatorName
+            ? {
+                target_key: downloadTaskTargetKey(selected.service, selected.user, selected.id, revisionId),
+                title: title || null,
+                creator_name: snapshotCreatorName,
+              }
+            : null,
         },
       });
       await queryClient.invalidateQueries({ queryKey: ["tasks"] });

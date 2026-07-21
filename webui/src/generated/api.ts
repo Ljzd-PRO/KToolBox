@@ -1000,6 +1000,12 @@ export interface components {
             /** Task Id */
             task_id: string;
         };
+        /** TaskCreateRequest */
+        TaskCreateRequest: {
+            presentation?: components["schemas"]["TaskPresentationSnapshot"] | null;
+            /** Spec */
+            spec: components["schemas"]["DownloadTaskSpec"] | components["schemas"]["SyncTaskSpec"];
+        };
         /** TaskEvent */
         TaskEvent: {
             /**
@@ -1017,6 +1023,18 @@ export interface components {
             id: number;
             /** Task Id */
             task_id?: string | null;
+        };
+        /**
+         * TaskPresentationSnapshot
+         * @description Non-executable labels captured when a task is created from Pawchive data.
+         */
+        TaskPresentationSnapshot: {
+            /** Creator Name */
+            creator_name?: string | null;
+            /** Target Key */
+            target_key: string;
+            /** Title */
+            title?: string | null;
         };
         /** TaskProgress */
         TaskProgress: {
@@ -1086,6 +1104,7 @@ export interface components {
             kind: "download" | "sync";
             /** Position */
             position: number;
+            presentation?: components["schemas"]["TaskPresentationSnapshot"] | null;
             progress?: components["schemas"]["TaskProgress"];
             /** Revision */
             revision: number;
@@ -1110,6 +1129,7 @@ export interface components {
         TaskStatus: "queued" | "blocked" | "running" | "pause_requested" | "paused" | "stop_requested" | "stopped" | "completed" | "failed" | "interrupted";
         /** TaskUpdateRequest */
         TaskUpdateRequest: {
+            presentation?: components["schemas"]["TaskPresentationSnapshot"] | null;
             /** Spec */
             spec: components["schemas"]["DownloadTaskSpec"] | components["schemas"]["SyncTaskSpec"];
         };
@@ -1944,7 +1964,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["DownloadTaskSpec"] | components["schemas"]["SyncTaskSpec"];
+                "application/json": components["schemas"]["TaskCreateRequest"];
             };
         };
         responses: {

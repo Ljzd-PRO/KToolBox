@@ -16,6 +16,7 @@ from ktoolbox.webui.task_models import (
     TaskAttempt,
     TaskCleanupPreview,
     TaskEvent,
+    TaskPresentationSnapshot,
     TaskProgress,
     TaskRecord,
     TaskSpec,
@@ -61,7 +62,11 @@ class TaskStore:
             await connection.commit()
             return cursor.rowcount
 
-    async def create(self, spec: TaskSpec) -> TaskRecord:
+    async def create(
+        self,
+        spec: TaskSpec,
+        presentation: TaskPresentationSnapshot | None = None,
+    ) -> TaskRecord:
         spec_json = _spec_json(spec)
         duplicate = await self.find_duplicate(spec_json)
         if duplicate is not None:
@@ -78,14 +83,15 @@ class TaskStore:
             await connection.execute(
                 """
                 INSERT INTO tasks(
-                    id, kind, status, spec_json, position, progress_json, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    id, kind, status, spec_json, presentation_json, position, progress_json, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     task_id,
                     spec.kind,
                     TaskStatus.queued.value,
                     spec_json,
+                    _presentation_json(presentation),
                     position,
                     TaskProgress().model_dump_json(),
                     now,
@@ -153,7 +159,12 @@ class TaskStore:
         )
         return await self.get(task_id)
 
-    async def update_spec(self, task_id: str, spec: TaskSpec) -> TaskRecord:
+    async def update_spec(
+        self,
+        task_id: str,
+        spec: TaskSpec,
+        presentation: TaskPresentationSnapshot | None = None,
+    ) -> TaskRecord:
         task = await self.get(task_id)
         if task.status in RUNNING_TASK_STATUSES:
             raise InvalidTaskStateError("pause or stop a running task before editing it")
@@ -166,10 +177,11 @@ class TaskStore:
             await connection.execute(
                 """
                 UPDATE tasks
-                SET kind = ?, spec_json = ?, revision = revision + 1, updated_at = ?, error = NULL, blocked_by = NULL
+                SET kind = ?, spec_json = ?, presentation_json = ?, revision = revision + 1,
+                    updated_at = ?, error = NULL, blocked_by = NULL
                 WHERE id = ?
                 """,
-                (spec.kind, spec_json, now, task_id),
+                (spec.kind, spec_json, _presentation_json(presentation), now, task_id),
             )
             await connection.commit()
         await self.add_event(task_id, "task.updated", {"kind": spec.kind})
@@ -359,12 +371,21 @@ def _spec_json(spec: TaskSpec) -> str:
     return json.dumps(spec.model_dump(mode="json"), ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
 
+def _presentation_json(presentation: TaskPresentationSnapshot | None) -> str | None:
+    return presentation.model_dump_json() if presentation is not None else None
+
+
 def _task_from_row(row: aiosqlite.Row) -> TaskRecord:
     return TaskRecord(
         id=row["id"],
         kind=row["kind"],
         status=TaskStatus(row["status"]),
         spec=TASK_SPEC_ADAPTER.validate_json(row["spec_json"]),
+        presentation=(
+            TaskPresentationSnapshot.model_validate_json(row["presentation_json"])
+            if row["presentation_json"] is not None
+            else None
+        ),
         position=row["position"],
         revision=row["revision"],
         progress=TaskProgress.model_validate_json(row["progress_json"]),

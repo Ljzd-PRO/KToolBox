@@ -1453,6 +1453,44 @@
         "title": "TaskCleanupPreview",
         "type": "object"
       },
+      "TaskCreateRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "presentation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaskPresentationSnapshot"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "spec": {
+            "discriminator": {
+              "mapping": {
+                "download": "#/components/schemas/DownloadTaskSpec",
+                "sync": "#/components/schemas/SyncTaskSpec"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DownloadTaskSpec"
+              },
+              {
+                "$ref": "#/components/schemas/SyncTaskSpec"
+              }
+            ],
+            "title": "Spec"
+          }
+        },
+        "required": [
+          "spec"
+        ],
+        "title": "TaskCreateRequest",
+        "type": "object"
+      },
       "TaskEvent": {
         "properties": {
           "created_at": {
@@ -1492,6 +1530,47 @@
           "created_at"
         ],
         "title": "TaskEvent",
+        "type": "object"
+      },
+      "TaskPresentationSnapshot": {
+        "additionalProperties": false,
+        "description": "Non-executable labels captured when a task is created from Pawchive data.",
+        "properties": {
+          "creator_name": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Creator Name"
+          },
+          "target_key": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Target Key",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "target_key"
+        ],
+        "title": "TaskPresentationSnapshot",
         "type": "object"
       },
       "TaskProgress": {
@@ -1616,6 +1695,16 @@
             "title": "Position",
             "type": "integer"
           },
+          "presentation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaskPresentationSnapshot"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "progress": {
             "$ref": "#/components/schemas/TaskProgress"
           },
@@ -1695,6 +1784,16 @@
       },
       "TaskUpdateRequest": {
         "properties": {
+          "presentation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaskPresentationSnapshot"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "spec": {
             "discriminator": {
               "mapping": {
@@ -2990,22 +3089,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "discriminator": {
-                  "mapping": {
-                    "download": "#/components/schemas/DownloadTaskSpec",
-                    "sync": "#/components/schemas/SyncTaskSpec"
-                  },
-                  "propertyName": "kind"
-                },
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/DownloadTaskSpec"
-                  },
-                  {
-                    "$ref": "#/components/schemas/SyncTaskSpec"
-                  }
-                ],
-                "title": "Payload"
+                "$ref": "#/components/schemas/TaskCreateRequest"
               }
             }
           },

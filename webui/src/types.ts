@@ -108,6 +108,17 @@ export type SyncTaskSpec = {
 
 export type TaskSpec = DownloadTaskSpec | SyncTaskSpec;
 
+export type TaskPresentationSnapshot = {
+  target_key: string;
+  title?: string | null;
+  creator_name?: string | null;
+};
+
+export type TaskCreateRequest = {
+  spec: TaskSpec;
+  presentation?: TaskPresentationSnapshot | null;
+};
+
 export type ActiveDownload = {
   creator_key: string;
   filename: string;
@@ -135,6 +146,7 @@ export type TaskRecord = {
   kind: "download" | "sync";
   status: TaskStatus;
   spec: TaskSpec;
+  presentation: TaskPresentationSnapshot | null;
   position: number;
   revision: number;
   progress: TaskProgress;

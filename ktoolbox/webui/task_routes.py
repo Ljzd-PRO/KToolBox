@@ -17,11 +17,15 @@ from ktoolbox.webui.task_models import (
     SyncTaskSpec,
     TaskAttempt,
     TaskCleanupPreview,
+    TaskCreateRequest,
     TaskEvent,
+    TaskPresentationSnapshot,
     TaskRecord,
     TaskReorderRequest,
     TaskSpec,
     TaskUpdateRequest,
+    task_target_key,
+    validate_task_presentation,
 )
 from ktoolbox.webui.task_scheduler import TaskScheduler
 from ktoolbox.webui.task_store import (
@@ -52,13 +56,14 @@ def create_task_router(project_root: Path) -> APIRouter:
 
     @router.post("/tasks", response_model=TaskRecord, status_code=status.HTTP_201_CREATED)
     async def create_task(
-        payload: TaskSpec,
+        payload: TaskCreateRequest,
         _: Annotated[WebUISession, Depends(require_csrf)],
         scheduler: Annotated[TaskScheduler, Depends(task_scheduler)],
     ) -> TaskRecord:
-        spec = await asyncio.to_thread(_normalize_spec, payload, project_root)
+        spec = await asyncio.to_thread(_normalize_spec, payload.spec, project_root)
+        presentation = validate_task_presentation(spec, payload.presentation)
         try:
-            return await scheduler.create(spec)
+            return await scheduler.create(spec, presentation)
         except DuplicateTaskError as error:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -79,9 +84,12 @@ def create_task_router(project_root: Path) -> APIRouter:
         payload: TaskUpdateRequest,
         _: Annotated[WebUISession, Depends(require_csrf)],
         scheduler: Annotated[TaskScheduler, Depends(task_scheduler)],
+        store: Annotated[TaskStore, Depends(task_store)],
     ) -> TaskRecord:
         spec = await asyncio.to_thread(_normalize_spec, payload.spec, project_root)
-        return await _state_action(scheduler.update(task_id, spec))
+        current = await _task_or_404(store, task_id)
+        presentation = _updated_presentation(current, spec, payload)
+        return await _state_action(scheduler.update(task_id, spec, presentation))
 
     @router.post("/tasks/{task_id}/reorder", response_model=TaskRecord)
     async def reorder_task(
@@ -224,6 +232,18 @@ async def _state_action(operation: Coroutine[Any, Any, TaskRecord]) -> TaskRecor
         ) from error
     except InvalidTaskStateError as error:
         raise HTTPException(status.HTTP_409_CONFLICT, str(error)) from error
+
+
+def _updated_presentation(
+    current: TaskRecord,
+    spec: TaskSpec,
+    payload: TaskUpdateRequest,
+) -> TaskPresentationSnapshot | None:
+    if "presentation" in payload.model_fields_set:
+        return validate_task_presentation(spec, payload.presentation)
+    if task_target_key(current.spec) == task_target_key(spec):
+        return current.presentation
+    return None
 
 
 def _normalize_spec(spec: TaskSpec, project_root: Path) -> TaskSpec:

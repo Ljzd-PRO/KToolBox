@@ -96,7 +96,7 @@ export function TasksPage() {
     setSaving(true);
     try {
       const task = editor === "new"
-        ? await api<TaskRecord>("/tasks", { method: "POST", body: spec, csrfToken: session.csrf_token })
+        ? await api<TaskRecord>("/tasks", { method: "POST", body: { spec }, csrfToken: session.csrf_token })
         : await api<TaskRecord>(`/tasks/${editor.id}`, {
             method: "PATCH",
             body: { spec },
