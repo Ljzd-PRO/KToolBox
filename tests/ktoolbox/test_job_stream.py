@@ -116,21 +116,24 @@ async def test_download_pool_bounds_concurrency_and_reuses_client(tmp_path: Path
 
 
 async def test_download_pool_classifies_results_and_exceptions(tmp_path: Path) -> None:
-    queue = FairJobQueue(lane_size=3)
+    queue = FairJobQueue(lane_size=4)
     queue.register("fanbox:a")
-    for name in ("exists", "failure", "exception"):
+    for name in ("exists", "empty-success", "failure", "exception"):
         await queue.put("fanbox:a", job(tmp_path, name))
     await queue.close("fanbox:a")
 
     async def download(queued: QueuedJob, client, observer) -> DownloaderRet[str]:
         if queued.job.alt_filename == "exists":
             return DownloaderRet(code=RetCodeEnum.FileExisted)
+        if queued.job.alt_filename == "empty-success":
+            return DownloaderRet()
         if queued.job.alt_filename == "failure":
             return DownloaderRet(code=RetCodeEnum.GeneralFailure, message="failed")
         raise RuntimeError("broken")
 
     summary = await DownloadWorkerPool(2, download=download).run(queue)
-    assert summary.total == 3
+    assert summary.total == 4
+    assert summary.completed == 1
     assert summary.existed == 1
     assert summary.failed == 2
     assert not summary.successful
