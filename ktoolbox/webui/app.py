@@ -25,6 +25,7 @@ from ktoolbox.webui.models import (
     ProjectSummaryResponse,
     SessionResponse,
 )
+from ktoolbox.webui.pawchive_routes import create_pawchive_router
 from ktoolbox.webui.project_routes import create_project_router
 
 
@@ -49,6 +50,7 @@ def create_app(context: RuntimeContext) -> FastAPI:
     app.state.database = database
     app.state.auth = auth
     app.include_router(create_project_router(context.project_root))
+    app.include_router(create_pawchive_router())
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next: RequestResponseEndpoint) -> Response:

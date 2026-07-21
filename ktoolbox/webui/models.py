@@ -84,3 +84,7 @@ class CreatorUpdateRequest(BaseModel):
 
 class BlockerListResponse(BaseModel):
     blockers: list[BlockerSpec]
+
+
+class SiteVersionResponse(BaseModel):
+    version: str
