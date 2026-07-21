@@ -119,6 +119,8 @@ ktoolbox webui /path/to/project
 
 ![KToolBox WebUI 配置](docs/assets/webui/09-configuration-light.png)
 
+任务条目会在离线展示快照中保留可读的投稿标题与作者名。桌面和移动布局直接展示详情、生命周期、编辑、排序和删除操作；表单开关采用“关闭灰、开启蓝”，复选框则仅在真正选中时显示标记。
+
 默认监听 `0.0.0.0:8789`，便于在可信局域网使用，但 HTTP 无法加密传输账户凭据和项目数据。在不可信网络中请绑定 `127.0.0.1` 或置于 HTTPS 反向代理之后。项目没有默认账户，未配置有效凭据时会拒绝启动。任务生命周期、安全措施与部署方法详见 [WebUI 指南](https://ktoolbox.readthedocs.io/latest/zh/webui/)。
 
 ## 配置

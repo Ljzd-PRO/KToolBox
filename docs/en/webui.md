@@ -50,7 +50,7 @@ The interface follows the browser language on first use and supports persistent 
 
 ![Light configuration editor](../assets/webui/09-configuration-light.png)
 
-Editable areas use a muted secondary surface with distinct field backgrounds. Field icons aid scanning, while switches and checkboxes remain left-aligned with their labels instead of resembling centered action buttons.
+Editable areas use a muted secondary surface with distinct field backgrounds. Field icons aid scanning, while form switches and checkboxes remain left-aligned with their labels instead of resembling centered action buttons. Switches use a gray track when off and a blue track when on; checkboxes render their indicator only when selected or indeterminate. Editable modal content and its fixed action bar share one continuous surface.
 
 The main areas are:
 
@@ -81,6 +81,12 @@ Before a save, the server parses and validates the proposed file and returns a s
 ## Task lifecycle
 
 `sync` and `download` tasks preserve the complete corresponding CLI inputs. A targetless synchronization resolves the currently enabled roster when the task is created. Each attempt then receives an immutable, redacted configuration snapshot; later configuration edits affect only future attempts.
+
+Each task also stores a presentation-only snapshot with its normalized target key and optional post title and creator name. It remains readable offline and never affects execution, deduplication, or resource locking. Queue rows lead with that target instead of an output path, and details, pause/resume, stop, edit, ordering, and delete controls remain directly visible.
+
+![Desktop task queue with readable targets](../assets/webui/21-task-queue-1440-dark-zh.png)
+
+![Mobile task queue with direct actions](../assets/webui/22-task-queue-mobile-light-zh.png)
 
 ![Dark task editor](../assets/webui/18-task-form-1024-dark-zh.png)
 
