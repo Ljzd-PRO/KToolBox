@@ -6,10 +6,11 @@ import time
 from collections import defaultdict, deque
 from dataclasses import dataclass
 from datetime import timedelta
+from typing import Annotated, cast
 
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError
-from fastapi import HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status
 
 from ktoolbox.configuration import WebUIConfiguration
 from ktoolbox.webui.database import WebUIDatabase, WebUISession
@@ -136,3 +137,19 @@ class AuthService:
 
 def client_identifier(request: Request) -> str:
     return request.client.host if request.client else "unknown"
+
+
+def auth_service(request: Request) -> AuthService:
+    return cast(AuthService, request.app.state.auth)
+
+
+async def require_session(request: Request) -> WebUISession:
+    return await auth_service(request).session(request.cookies.get(SESSION_COOKIE))
+
+
+async def require_csrf(
+    request: Request,
+    session: Annotated[WebUISession, Depends(require_session)],
+) -> WebUISession:
+    auth_service(request).verify_csrf(request, session)
+    return session

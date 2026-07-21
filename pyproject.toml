@@ -48,6 +48,7 @@ webui = [
     "aiosqlite>=0.20,<1.0",
     "argon2-cffi>=23.1,<26.0",
     "docstring-parser>=0.16,<1.0",
+    "docutils>=0.21,<0.23",
     "fastapi>=0.115,<1.0",
     "filelock>=3.18,<4.0",
     "uvicorn>=0.34,<1.0",

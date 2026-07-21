@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Annotated, cast
+from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.responses import JSONResponse
@@ -11,7 +11,13 @@ from starlette.middleware.base import RequestResponseEndpoint
 
 from ktoolbox import __version__
 from ktoolbox.configuration import RuntimeContext
-from ktoolbox.webui.auth import SESSION_COOKIE, AuthService, client_identifier
+from ktoolbox.webui.auth import (
+    SESSION_COOKIE,
+    AuthService,
+    client_identifier,
+    require_csrf,
+    require_session,
+)
 from ktoolbox.webui.database import WebUIDatabase, WebUISession
 from ktoolbox.webui.models import (
     HealthResponse,
@@ -19,22 +25,7 @@ from ktoolbox.webui.models import (
     ProjectSummaryResponse,
     SessionResponse,
 )
-
-
-def auth_service(request: Request) -> AuthService:
-    return cast(AuthService, request.app.state.auth)
-
-
-async def require_session(request: Request) -> WebUISession:
-    return await auth_service(request).session(request.cookies.get(SESSION_COOKIE))
-
-
-async def require_csrf(
-    request: Request,
-    session: Annotated[WebUISession, Depends(require_session)],
-) -> WebUISession:
-    auth_service(request).verify_csrf(request, session)
-    return session
+from ktoolbox.webui.project_routes import create_project_router
 
 
 def create_app(context: RuntimeContext) -> FastAPI:
@@ -57,6 +48,7 @@ def create_app(context: RuntimeContext) -> FastAPI:
     app.state.runtime_context = context
     app.state.database = database
     app.state.auth = auth
+    app.include_router(create_project_router(context.project_root))
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next: RequestResponseEndpoint) -> Response:
