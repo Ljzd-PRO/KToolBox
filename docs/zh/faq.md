@@ -114,6 +114,22 @@ ktoolbox config validate
 
 Rich 实时进度仅用于交互终端。界面会显示每个活动文件的速度与预计剩余时间，并在 `Files` 总体行显示所有活动下载的速度总和。管道、CI、`NO_COLOR` 与 `--plain` 使用稳定逐行输出，日志不会破坏 ANSI 实时区域。需要无颜色交互布局时使用 `--no-color`，完全隐藏进度与普通日志时使用 `--quiet`。
 
+## 为什么 WebUI 拒绝启动？
+
+请安装 `ktoolbox[webui]`，传入包含 `ktoolbox.toml` 的目录，并配置 `KTOOLBOX_WEBUI__USERNAME` 以及 `KTOOLBOX_WEBUI__PASSWORD_HASH` 或 `KTOOLBOX_WEBUI__PASSWORD`。应优先使用有效的 Argon2 哈希。同一项目已经运行另一个 WebUI 时，项目锁也会拒绝启动。
+
+## 可以安全地把 WebUI 暴露到网络吗？
+
+默认服务是明文 HTTP，因此只应在可信局域网使用 `0.0.0.0`。本机使用请绑定 `127.0.0.1`，远程访问则应置于 HTTPS 反向代理之后。认证、CSRF、严格 Cookie、速率限制和安全响应头能保护应用本身，但无法加密 HTTP 网络链路。
+
+## WebUI 任务在服务重启后会怎样？
+
+排队任务仍保持排队。原本正在运行的任务会标记为 `interrupted`，不会静默自动重启，因为配置与远端状态可能已经变化；请检查后手动恢复。已完成文件与可续传临时文件会保留。
+
+## 删除 WebUI 任务会误删无关文件吗？
+
+普通删除只移除任务历史。删除输出必须先预览并再次确认，随后会核对任务的输出归属记录和文件元数据；既存、已修改、共享、非普通文件和符号链接路径都会跳过。
+
 ## uvloop 或 winloop 是必需的吗？
 
 不是。它们只是可选的事件循环优化。Linux/macOS 使用 `ktoolbox[uvloop]`，Windows 使用 `ktoolbox[winloop]`。两者都未安装时，KToolBox 会继续使用 Python 标准 asyncio 循环。

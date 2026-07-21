@@ -43,6 +43,8 @@ pipx install "ktoolbox[urwid]" --force
 ktoolbox config edit
 ```
 
+The optional [WebUI](../webui.md) exposes the same bilingual docstring descriptions through typed controls, final-value source indicators, secret masking, raw dotenv/TOML editing, validation, diff preview, and ETag conflict protection.
+
 Inspect or validate the project file without opening the editor:
 
 ```bash

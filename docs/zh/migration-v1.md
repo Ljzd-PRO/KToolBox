@@ -68,6 +68,19 @@ enabled = true
 
 `KTOOLBOX_JOB__CREATOR_CONCURRENCY` 默认 `4`，限制作者生产者；现有 `KTOOLBOX_JOB__COUNT` 继续限制文件工作器。
 
+## 可选 WebUI
+
+v1 新增全新的 HeroUI 面板，不会迁移或复用历史实验性 `webui` 分支。请安装 `ktoolbox[webui]`，确认绑定目录包含 `ktoolbox.toml`，并配置一个新账户；项目不会创建默认凭据。
+
+```bash
+ktoolbox webui hash-password
+ktoolbox webui /path/to/project --host 127.0.0.1
+```
+
+`.env` 与 `prod.env` 现在是被忽略的本地文件，不再作为受版本控制示例。请在其中保存凭据和下载会话，以 `example.env` 作为公开模板；升级前应检查曾经被跟踪的 dotenv 文件。WebUI 会创建 `.ktoolbox/webui.sqlite3` 与项目锁，但不会改变 CLI 下载输出格式。
+
+HTTP 部署风险和持久任务语义详见 [WebUI 指南](webui.md)。
+
 ## Python 库 API
 
 旧 `BaseAPI`、类调用器、模块级 `get_*` 函数、`APIRet` 和 Kemono 响应包装已直接删除，不提供兼容别名。请改用实例化的异步客户端：

@@ -2,7 +2,7 @@
 
 # KToolBox
 
-An asynchronous CLI and Python client for downloading public posts from [Pawchive](https://pawchive.pw/).
+An asynchronous CLI, HeroUI management panel, and Python client for downloading public posts from [Pawchive](https://pawchive.pw/).
 
 [![PyPI](https://img.shields.io/pypi/v/ktoolbox?logo=python)](https://pypi.org/project/ktoolbox/)
 [![Python](https://img.shields.io/badge/Python-3.10--3.14-blue)](https://www.python.org/)
@@ -26,6 +26,7 @@ KToolBox v1 uses Pawchive as its only supported backend. It provides typed acces
 - Customize directory structure, post names, file names, sequential names, and year/month grouping.
 - Save post metadata, creator indices, extracted content, content images, and matching external links.
 - Stream jobs from concurrent creator producers into one fair download pool with stable Rich progress, per-file speeds, and aggregate throughput.
+- Manage one synchronization project through a bilingual, responsive HeroUI panel with persistent tasks, live progress, configuration forms, roster and blocker editors, and light/dark themes.
 - Use a fully offline MockTransport-based test suite; accidental network access is blocked in tests.
 
 ## Requirements
@@ -49,6 +50,12 @@ pipx install "ktoolbox[urwid,winloop]" --force
 
 # Linux / macOS
 pipx install "ktoolbox[urwid,uvloop]" --force
+```
+
+Install the optional WebUI runtime:
+
+```bash
+pipx install "ktoolbox[webui]" --force
 ```
 
 ## Quick Start
@@ -90,6 +97,29 @@ ktoolbox sync
 ```
 
 Downloaded files are skipped on later runs. Incomplete temporary files are resumed when the file host supports ranges.
+
+## WebUI
+
+The WebUI binds to one directory containing `ktoolbox.toml`. Configure a single account, preferably with an Argon2id hash:
+
+```bash
+ktoolbox webui hash-password
+```
+
+Add the printed hash and account name to the project's `.env`, then start the panel:
+
+```dotenv
+KTOOLBOX_WEBUI__USERNAME=owner
+KTOOLBOX_WEBUI__PASSWORD_HASH='$argon2id$...'
+```
+
+```bash
+ktoolbox webui /path/to/project
+```
+
+![KToolBox WebUI configuration](docs/assets/webui/09-configuration-light.png)
+
+The default `0.0.0.0:8789` listener is convenient on a trusted LAN, but HTTP does not protect credentials or project data in transit. Bind to `127.0.0.1` or put the service behind HTTPS for untrusted networks. There is no default account, and startup fails until valid credentials are configured. See the [WebUI guide](https://ktoolbox.readthedocs.io/latest/webui/) for task lifecycle, security, and deployment details.
 
 ## Configuration
 
@@ -176,6 +206,7 @@ poetry run pytest --cov
 poetry run ruff check k_generator ktoolbox/api ktoolbox/blocker ktoolbox/cli.py ktoolbox/cli_app.py ktoolbox/job/stream.py ktoolbox/project_config.py ktoolbox/reporting.py ktoolbox/sync.py tests
 poetry run mypy --strict ktoolbox/api/client.py ktoolbox/api/errors.py ktoolbox/api/parameters.py ktoolbox/api/utils.py ktoolbox/blocker ktoolbox/cli.py ktoolbox/cli_app.py ktoolbox/job/stream.py ktoolbox/project_config.py ktoolbox/reporting.py ktoolbox/sync.py
 poetry run mkdocs build --strict
+cd webui && npm ci && npm run typecheck && npm run lint && npm run test && npm run build && npm run test:e2e
 ```
 
 Default tests are hermetic and must not contact Pawchive or any other remote service.

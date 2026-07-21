@@ -100,6 +100,16 @@ ktoolbox site-version
 
 The editor needs the `urwid` optional dependency. It edits both dotenv settings and the roster/blocker project document, then validates before saving.
 
+## Run the optional project panel
+
+After installing `ktoolbox[webui]` and configuring an account, bind the panel to a directory containing `ktoolbox.toml`:
+
+```bash
+ktoolbox webui . --host 127.0.0.1
+```
+
+The panel exposes the same download, synchronization, roster, blocker, query, and configuration workflows as managed project actions, with persistent task progress and controls. See the [WebUI guide](../webui.md) before listening on a network interface.
+
 ## Exit status
 
 | Code | Meaning |

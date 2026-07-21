@@ -1,6 +1,6 @@
 # KToolBox
 
-KToolBox is an asynchronous command-line downloader and typed Python client for public [Pawchive](https://pawchive.pw/) data. Version 1 supports Pawchive exclusively and requires Python 3.10 through 3.14.
+KToolBox is an asynchronous command-line downloader, HeroUI project panel, and typed Python client for public [Pawchive](https://pawchive.pw/) data. Version 1 supports Pawchive exclusively and requires Python 3.10 through 3.14.
 
 ## What it does
 
@@ -9,6 +9,7 @@ KToolBox is an asynchronous command-line downloader and typed Python client for 
 - Resumes partial files and skips files that already exist.
 - Filters by date, title, filename pattern, and file size.
 - Controls cover, attachment, content image, metadata, and external-link output separately.
+- Provides a persistent, bilingual WebUI for project configuration, roster and blocker editing, Pawchive queries, and task lifecycle control.
 - Exposes all 14 public Pawchive OpenAPI operations through validated Pydantic models.
 
 Account-authenticated favorites operations are intentionally not implemented. A downloader session key, when configured, is sent only to the file host.
@@ -29,6 +30,12 @@ pipx install "ktoolbox[urwid,uvloop]" --force
 
 # Windows
 pipx install "ktoolbox[urwid,winloop]" --force
+```
+
+Install the browser panel separately when needed:
+
+```bash
+pipx install "ktoolbox[webui]" --force
 ```
 
 ## Quick start
@@ -60,6 +67,7 @@ Existing files are skipped on repeat runs. An incomplete file with the configure
 ## Next steps
 
 - [Command guide](commands/guide.md)
+- [WebUI guide](webui.md)
 - [Configuration guide](configuration/guide.md)
 - [Python API](api.md)
 - [Migrating to v1](migration-v1.md)

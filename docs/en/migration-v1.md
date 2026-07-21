@@ -68,6 +68,19 @@ Move non-empty `KTOOLBOX_JOB__KEYWORDS_EXCLUDE` values to a global `field-match`
 
 `KTOOLBOX_JOB__CREATOR_CONCURRENCY` defaults to `4` and limits creator producers. Existing `KTOOLBOX_JOB__COUNT` continues to limit file workers.
 
+## Optional WebUI
+
+v1 adds a new HeroUI panel; it does not migrate or reuse the historical experimental `webui` branch. Install `ktoolbox[webui]`, make sure the bound directory contains `ktoolbox.toml`, and configure a new single account. No default credentials are created.
+
+```bash
+ktoolbox webui hash-password
+ktoolbox webui /path/to/project --host 127.0.0.1
+```
+
+`.env` and `prod.env` are now ignored local files rather than version-controlled examples. Keep credentials and downloader sessions there, use `example.env` as the public template, and audit any older tracked dotenv file before upgrading. The WebUI creates `.ktoolbox/webui.sqlite3` and a project lock; neither changes CLI download output formats.
+
+See the [WebUI guide](webui.md) for HTTP deployment risks and persistent task semantics.
+
 ## Library API
 
 The old `BaseAPI`, class invokers, module-level `get_*` functions, `APIRet`, and Kemono response wrappers were removed without compatibility aliases. Use an instantiated asynchronous client:

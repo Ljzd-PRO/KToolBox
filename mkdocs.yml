@@ -18,6 +18,7 @@ nav:
   - Commands:
     - Guide: commands/guide.md
     - Reference: commands/reference.md
+  - WebUI: webui.md
   - Configuration:
     - Guide: configuration/guide.md
     - Reference: configuration/reference.md
@@ -44,6 +45,7 @@ plugins:
             Migrating to v1: 迁移至 v1
             More: 更多
             Commands: 命令
+            WebUI: WebUI
             Configuration: 配置
             Guide: 向导
             Reference: 参考

@@ -114,6 +114,22 @@ ktoolbox config validate
 
 Rich live progress is used only on an interactive terminal. It shows each active file's speed and ETA, plus the aggregate speed of all active downloads on the `Files` row. Pipes, CI, `NO_COLOR`, and `--plain` use stable line output so log messages cannot corrupt an ANSI live region. Use `--no-color` when you want the interactive layout without color, or `--quiet` to suppress progress and ordinary logs.
 
+## Why does the WebUI refuse to start?
+
+Install `ktoolbox[webui]`, pass a directory containing `ktoolbox.toml`, and configure `KTOOLBOX_WEBUI__USERNAME` plus `KTOOLBOX_WEBUI__PASSWORD_HASH` or `KTOOLBOX_WEBUI__PASSWORD`. The hash is preferred and must be a valid Argon2 value. A second WebUI process for the same project is also rejected by the project lock.
+
+## Is it safe to expose the WebUI on my network?
+
+The default server is plain HTTP, so use `0.0.0.0` only on a trusted LAN. Bind to `127.0.0.1` for local use or place it behind an HTTPS reverse proxy for remote access. Authentication, CSRF, strict cookies, rate limiting, and security headers protect the application itself, but they cannot encrypt an HTTP network path.
+
+## What happens to a WebUI task after a restart?
+
+Queued tasks remain queued. Work that was running is marked `interrupted` rather than silently restarted, because its configuration and remote state may have changed. Review and resume it manually. Completed files and resumable temporary files remain available.
+
+## Can deleting a WebUI task remove unrelated files?
+
+Ordinary deletion removes only task history. Output deletion requires a preview and confirmation, then checks the task's artifact ownership records and file metadata. It skips pre-existing, modified, shared, non-regular, and symbolic-link paths.
+
 ## Is uvloop or winloop required?
 
 No. They are optional event-loop optimizations. Use `ktoolbox[uvloop]` on Linux/macOS or `ktoolbox[winloop]` on Windows. If neither is installed, KToolBox continues with Python's standard asyncio loop.

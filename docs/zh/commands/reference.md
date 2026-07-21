@@ -27,6 +27,7 @@
 | `post show/search` | 查看投稿或搜索作者投稿。 |
 | `config edit/example/validate/path` | 编辑或查看环境与项目配置。 |
 | `site-version` | 打印 Pawchive 应用版本。 |
+| `webui [项目目录]` | 为一个项目运行可选 HeroUI 面板。 |
 
 ## `download`
 
@@ -92,6 +93,20 @@
 | `config validate` | 校验 Schema 版本、作者唯一性、屏蔽器类型、作用域、条件与正则表达式。 |
 | `config example` | 根据配置模型 docstring 渲染全部 dotenv 设置。 |
 | `config edit` | 打开可选 Urwid 编辑器并在保存前校验。 |
+
+## `webui`
+
+使用这些命令前请安装 `ktoolbox[webui]`。默认命令要求目标目录包含 `ktoolbox.toml`，并已在项目配置中提供有效的单账户凭据。
+
+| 参数或选项 | 默认值 | 含义 |
+| --- | --- | --- |
+| `项目目录` | `.` | 此进程固定服务的同步项目。 |
+| `--host` | `webui.host` | 覆盖监听接口。 |
+| `--port` | `webui.port` | 覆盖 TCP 端口。 |
+| `--no-open` | 禁用 | 不在默认浏览器中打开本机 URL。 |
+| `webui hash-password` | | 使用隐藏终端输入提示两次，并打印 Argon2id 哈希。 |
+
+内置服务会打印 HTTP 安全警告。暴露到本机以外之前，请先阅读 [WebUI 指南](../webui.md)。
 
 ## 兼容别名
 

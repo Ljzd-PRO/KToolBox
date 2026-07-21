@@ -27,6 +27,7 @@ Running `ktoolbox` without arguments prints root help and exits successfully.
 | `post show/search` | Inspect a post or search creator posts. |
 | `config edit/example/validate/path` | Edit or inspect environment and project configuration. |
 | `site-version` | Print the Pawchive application version. |
+| `webui [PROJECT_DIR]` | Run the optional HeroUI panel for one project. |
 
 ## `download`
 
@@ -92,6 +93,20 @@ Without `--json`, query commands deliberately omit post body text from terminal 
 | `config validate` | Validate schema version, creator uniqueness, blocker types, scopes, conditions, and regular expressions. |
 | `config example` | Render all dotenv settings from configuration model docstrings. |
 | `config edit` | Open the optional Urwid editor and validate before saving. |
+
+## `webui`
+
+Install `ktoolbox[webui]` before using these commands. The default command requires a directory containing `ktoolbox.toml` and valid single-account credentials in project configuration.
+
+| Argument or option | Default | Meaning |
+| --- | --- | --- |
+| `PROJECT_DIR` | `.` | Fixed synchronization project served by this process. |
+| `--host` | `webui.host` | Override the listen interface. |
+| `--port` | `webui.port` | Override the TCP port. |
+| `--no-open` | disabled | Do not open the local URL in the default browser. |
+| `webui hash-password` | | Prompt twice through hidden terminal input and print an Argon2id hash. |
+
+The built-in server prints an HTTP security warning. See the [WebUI guide](../webui.md) before exposing it beyond localhost.
 
 ## Compatibility aliases
 

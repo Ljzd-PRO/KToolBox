@@ -123,6 +123,24 @@ API 配置组有意不包含会话密钥。
 
 条件组使用 `kind = "group"`、`mode = "any"` 或 `"all"`、非空 `conditions` 列表及可选 `negate`。字段条件使用 `kind = "field"`、安全点路径 `field`、`contains`、`equals`、`regex`、`exists` 之一，以及可选 `case_sensitive`、`negate` 或 `expected`。非 `exists` 操作符要求非空 `values`；`exists` 禁止 `values`。
 
+## `webui`
+
+仅在安装 `ktoolbox[webui]` 后需要这些配置。项目没有默认凭据，缺少用户名或两种密码配置时，服务会拒绝启动。
+
+| 字段 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `host` | 字符串 | `0.0.0.0` | HTTP 监听接口；可信局域网以外建议使用 `127.0.0.1`。 |
+| `port` | 整数 | `8789` | HTTP 监听端口，范围 1–65535。 |
+| `open_browser` | 布尔值 | `True` | 启动后打开本机面板 URL。 |
+| `username` | 字符串 | 空 | 单账户必填用户名。 |
+| `password_hash` | 秘密字符串 | 空 | 推荐的 Argon2id 密码哈希。 |
+| `password` | 秘密字符串 | 空 | 明文后备值；设置 `password_hash` 后忽略。 |
+| `max_active_tasks` | 整数 | `2` | 顶层并发任务数，范围 1–16。 |
+| `session_idle_hours` | 整数 | `24` | 从最后一次使用开始计算的会话期限。 |
+| `session_absolute_hours` | 整数 | `168` | 从登录时间开始计算的会话最长期限。 |
+
+环境变量仍使用常规前缀，例如 `KTOOLBOX_WEBUI__PASSWORD_HASH`。请用 `ktoolbox webui hash-password` 生成哈希；Argon2 哈希包含 `$`，写入 dotenv 时应加引号。命令行 `--host`、`--port`、`--no-open` 只覆盖一次启动。
+
 ## `logger`
 
 | 字段 | 类型 | 默认值 | 说明 |

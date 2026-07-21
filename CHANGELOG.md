@@ -32,12 +32,23 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Select a requested revision from the revision list instead of calling a nonexistent detail endpoint.
 - Retain resumable downloads, filters, progress reporting, metadata output, file-size limits, and optional hard-link bucket storage under the new models.
 
+## HeroUI WebUI
+
+- Add an optional React 19, TypeScript, Tailwind CSS v4, HeroUI v3, and Lucide management panel whose production assets are embedded in wheels and standalone builds.
+- Add `ktoolbox webui [PROJECT_DIR]`, host/port/browser overrides, and `webui hash-password`; refuse startup without an explicit single account and prefer Argon2id password hashes.
+- Add rate-limited authentication with hashed opaque sessions, strict cookies, CSRF and Origin validation, security headers, redacted configuration snapshots, and a persistent project lock.
+- Add bilingual, responsive light/dark workflows for project overview, `.env`/`prod.env` and TOML editing, author roster, recursive blockers, Pawchive creator/post queries, revision inspection, site version, and task creation.
+- Generate readable bilingual form labels and descriptions from Pydantic metadata and English/Chinese configuration docstrings; include source indicators, secret masking, typed and advanced editors, validation, diff preview, ETag conflict detection, and atomic writes.
+- Add a WAL-backed SQLite queue with concurrent scheduling, resource blocking and deduplication, immutable attempts, pause/resume/stop/edit/reorder/rerun/delete actions, restart recovery, SSE replay, aggregate/per-file speeds, ETA, and structured logs.
+- Add ownership-aware output cleanup previews that skip symbolic links and any pre-existing, shared, or modified files.
+
 ## Testing and quality
 
-- Replace the test suite with 164 fully offline tests using RESPX, HTTPX transports, dependency injection, and temporary filesystems; accidental sockets are blocked.
+- Replace the test suite with fully offline tests using RESPX, HTTPX transports, dependency injection, and temporary filesystems; accidental sockets are blocked.
 - Cover every public operation, parameter and response contract, status mapping, retry path, malformed response, schema drift report, and client lifecycle.
-- Enforce 100% line and branch coverage for the handwritten API layer and at least 85% for the full project.
-- Add Ruff, strict API-layer Mypy, warnings-as-errors, OpenAPI validation, generation checks, `compileall`, package builds, and strict bilingual documentation builds.
+- Enforce 100% line and branch coverage for the handwritten API layer and WebUI authentication/configuration/scheduler core, plus at least 85% for the full project.
+- Add Vitest/Testing Library and offline Playwright tests for routes, task lifecycle, desktop/mobile layouts, light/dark themes, and Axe accessibility checks.
+- Add Ruff, Mypy, warnings-as-errors, Python and TypeScript OpenAPI generation checks, Node 24 lockfile builds, wheel/PyInstaller asset checks, `compileall`, package builds, and strict bilingual documentation builds.
 
 ## Fixes
 
@@ -79,12 +90,23 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 从修订列表选择指定版本，不再请求不存在的单修订详情端点。
 - 在新模型下保留断点续传、筛选、进度、元数据输出、文件大小限制和可选硬链接存储桶。
 
+## HeroUI WebUI
+
+- 新增可选 React 19、TypeScript、Tailwind CSS v4、HeroUI v3 与 Lucide 管理面板，生产资源会嵌入 wheel 和独立构建。
+- 新增 `ktoolbox webui [项目目录]`、主机/端口/浏览器覆盖参数及 `webui hash-password`；没有显式单账户时拒绝启动，并优先使用 Argon2id 密码哈希。
+- 新增登录速率限制、哈希化不透明会话、严格 Cookie、CSRF 与 Origin 校验、安全响应头、脱敏配置快照及持久项目锁。
+- 新增双语、响应式深浅色流程，覆盖项目概览、`.env`/`prod.env` 与 TOML 编辑、作者清单、递归屏蔽器、Pawchive 作者/投稿查询、修订查看、站点版本与任务创建。
+- 从 Pydantic 元数据及中英文配置 docstring 生成可读双语标签和说明，提供来源标记、秘密遮蔽、类型化与高级编辑、校验、差异预览、ETag 冲突检测和原子写入。
+- 新增 WAL SQLite 队列，支持并发调度、资源阻塞与去重、不可变尝试、暂停/恢复/停止/编辑/排序/重跑/删除、重启恢复、SSE 续接、总速度/单文件速度、ETA 和结构化日志。
+- 新增基于输出归属的删除预览，跳过符号链接及任何既存、共享或已修改文件。
+
 ## 测试与质量
 
-- 使用 RESPX、HTTPX Transport、依赖注入和临时文件系统重建 164 项完全离线测试，并阻止意外 Socket。
+- 使用 RESPX、HTTPX Transport、依赖注入和临时文件系统重建完全离线测试，并阻止意外 Socket。
 - 覆盖全部公开操作、参数与响应契约、状态映射、重试路径、非法响应、Schema 漂移报告和客户端生命周期。
-- 手写 API 层强制 100% 行与分支覆盖率，全项目覆盖率不低于 85%。
-- 加入 Ruff、API 层严格 Mypy、警告即错误、OpenAPI 校验、生成一致性检查、`compileall`、包构建和双语文档严格构建。
+- 手写 API 层及 WebUI 认证/配置/调度核心强制 100% 行与分支覆盖率，全项目覆盖率不低于 85%。
+- 加入 Vitest/Testing Library 和离线 Playwright 测试，覆盖路由、任务生命周期、桌面/移动布局、深浅主题与 Axe 无障碍检查。
+- 加入 Ruff、Mypy、警告即错误、Python 与 TypeScript OpenAPI 生成一致性检查、Node 24 锁文件构建、wheel/PyInstaller 资源检查、`compileall`、包构建和双语文档严格构建。
 
 ## 修复
 
