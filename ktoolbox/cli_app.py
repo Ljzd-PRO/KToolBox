@@ -476,7 +476,7 @@ async def webui_run(
     *,
     host: str | None = None,
     port: int | None = None,
-    no_open: bool = False,
+    no_open: Annotated[bool, Parameter(negative=())] = False,
 ) -> int:
     """Run the WebUI for one directory containing ktoolbox.toml."""
     try:

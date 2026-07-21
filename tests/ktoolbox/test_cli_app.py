@@ -52,6 +52,13 @@ def test_webui_command_forwards_server_options(tmp_path: Path) -> None:
     )
 
 
+def test_webui_help_has_only_the_intended_no_open_flag(capsys) -> None:
+    assert app(["webui", "--help"], result_action="return_int_as_exit_code_else_zero") == 0
+    output = capsys.readouterr().out
+    assert "--no-open" in output
+    assert "--no-no-open" not in output
+
+
 def test_webui_hash_password_command(capsys) -> None:
     with patch("ktoolbox.webui.server.generate_password_hash", return_value="$argon2id$example"):
         assert app(["webui", "hash-password"]) == 0
