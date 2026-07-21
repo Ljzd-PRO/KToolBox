@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Protocol
 
 from rich import filesize
@@ -52,6 +53,8 @@ class ProgressReporter(Protocol):
 
     def download_finished(self, task_key: str, status: str) -> None: ...
 
+    def artifact_created(self, path: Path) -> None: ...
+
 
 class NullProgressReporter:
     def start(self) -> None:
@@ -83,6 +86,9 @@ class NullProgressReporter:
         return None
 
     def download_finished(self, task_key: str, status: str) -> None:
+        return None
+
+    def artifact_created(self, path: Path) -> None:
         return None
 
 

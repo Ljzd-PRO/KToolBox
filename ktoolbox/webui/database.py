@@ -49,11 +49,62 @@ class WebUIDatabase:
                     created_at TEXT NOT NULL,
                     last_seen_at TEXT NOT NULL
                 );
+
+                CREATE TABLE IF NOT EXISTS tasks (
+                    id TEXT PRIMARY KEY,
+                    kind TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    spec_json TEXT NOT NULL,
+                    position INTEGER NOT NULL,
+                    revision INTEGER NOT NULL DEFAULT 1,
+                    progress_json TEXT NOT NULL DEFAULT '{}',
+                    error TEXT,
+                    blocked_by TEXT,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS task_attempts (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    task_id TEXT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+                    sequence INTEGER NOT NULL,
+                    status TEXT NOT NULL,
+                    spec_json TEXT NOT NULL,
+                    configuration_json TEXT NOT NULL,
+                    started_at TEXT NOT NULL,
+                    finished_at TEXT,
+                    error TEXT,
+                    UNIQUE(task_id, sequence)
+                );
+
+                CREATE TABLE IF NOT EXISTS task_events (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    task_id TEXT REFERENCES tasks(id) ON DELETE CASCADE,
+                    event_type TEXT NOT NULL,
+                    data_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS task_artifacts (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    task_id TEXT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+                    path TEXT NOT NULL,
+                    size INTEGER NOT NULL,
+                    mtime_ns INTEGER NOT NULL,
+                    UNIQUE(task_id, path)
+                );
+
+                CREATE INDEX IF NOT EXISTS task_events_cursor ON task_events(id);
+                CREATE INDEX IF NOT EXISTS tasks_queue ON tasks(status, position);
                 """
             )
             await connection.execute(
                 "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
                 (1, utc_now().isoformat()),
+            )
+            await connection.execute(
+                "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
+                (2, utc_now().isoformat()),
             )
             await connection.commit()
 
@@ -114,3 +165,6 @@ class WebUIDatabase:
 
     def _connect(self) -> aiosqlite.Connection:
         return aiosqlite.connect(self.path)
+
+    def connect(self) -> aiosqlite.Connection:
+        return self._connect()

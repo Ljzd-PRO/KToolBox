@@ -156,6 +156,8 @@ class DownloadWorkerPool:
                 elif result.code == RetCodeEnum.Success:
                     summary.completed += 1
                     status = "completed"
+                    if result.data:
+                        self.reporter.artifact_created(queued.job.path / result.data)
                 else:
                     summary.failed += 1
                     logger.error(result.message)

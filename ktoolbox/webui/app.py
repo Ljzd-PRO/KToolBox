@@ -26,18 +26,37 @@ from ktoolbox.webui.models import (
     SessionResponse,
 )
 from ktoolbox.webui.pawchive_routes import create_pawchive_router
+from ktoolbox.webui.project_lock import ProjectProcessLock
 from ktoolbox.webui.project_routes import create_project_router
+from ktoolbox.webui.task_executor import TaskExecutor
+from ktoolbox.webui.task_routes import create_task_router
+from ktoolbox.webui.task_scheduler import TaskScheduler
+from ktoolbox.webui.task_store import TaskStore
 
 
-def create_app(context: RuntimeContext) -> FastAPI:
+def create_app(context: RuntimeContext, *, task_executor: TaskExecutor | None = None) -> FastAPI:
     database = WebUIDatabase(context.project_root / ".ktoolbox" / "webui.sqlite3")
     auth = AuthService(context.configuration.webui, database)
+    task_store = TaskStore(database)
+    task_scheduler = TaskScheduler(
+        context,
+        task_store,
+        max_concurrency=context.configuration.webui.max_active_tasks,
+        executor=task_executor,
+    )
+    project_lock = ProjectProcessLock(context.project_root / ".ktoolbox" / "webui.lock")
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         auth.validate_configuration()
-        await database.initialize()
-        yield
+        await project_lock.acquire()
+        try:
+            await database.initialize()
+            await task_scheduler.start()
+            yield
+        finally:
+            await task_scheduler.stop()
+            await project_lock.release()
 
     app = FastAPI(
         title="KToolBox WebUI API",
@@ -49,8 +68,11 @@ def create_app(context: RuntimeContext) -> FastAPI:
     app.state.runtime_context = context
     app.state.database = database
     app.state.auth = auth
+    app.state.task_store = task_store
+    app.state.task_scheduler = task_scheduler
     app.include_router(create_project_router(context.project_root))
     app.include_router(create_pawchive_router())
+    app.include_router(create_task_router(context.project_root))
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next: RequestResponseEndpoint) -> Response:
