@@ -184,7 +184,7 @@ export function BlockersPage() {
       ) : (
         <section className="grid gap-3">
           {blockers.map((blocker, index) => (
-            <Surface className="rounded-lg border border-border p-4" key={blocker.id}>
+            <Surface className="data-list-card rounded-lg border border-border p-4" key={blocker.id}>
               <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_5rem_auto] lg:items-center">
                 <div className="flex min-w-0 flex-1 items-start gap-3">
                   <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-default text-muted" aria-hidden="true">

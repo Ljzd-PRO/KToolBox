@@ -390,7 +390,7 @@ export function PageHeader({
           <p className="text-sm leading-relaxed text-muted">{description}</p>
         </div>
       ) : <span className="sr-only">{description}</span>}
-      {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
+      {actions ? <div className="ml-auto flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
     </header>
   );
 }
@@ -702,17 +702,15 @@ export function FormModal({
                 <X aria-hidden="true" size={18} />
               </Modal.CloseTrigger>
             </Modal.Header>
-            <Modal.Body className="app-form-modal-body p-0">
-              <Surface
-                className="app-form-modal-surface control-surface rounded-none border-0 p-4 shadow-none sm:p-5"
-                variant="secondary"
-              >
-                {children}
-              </Surface>
-            </Modal.Body>
-            <Modal.Footer className="app-form-modal-actions flex flex-wrap justify-end gap-2 border-t border-border px-5 py-4">
-              {actions}
-            </Modal.Footer>
+            <Surface
+              className="app-form-modal-surface control-surface min-h-0 flex-1 overflow-hidden rounded-none border-0 shadow-none"
+              variant="secondary"
+            >
+              <Modal.Body className="app-form-modal-body p-4 sm:p-5">{children}</Modal.Body>
+              <Modal.Footer className="app-form-modal-actions flex flex-wrap justify-end gap-2 border-t border-border px-5 py-4">
+                {actions}
+              </Modal.Footer>
+            </Surface>
           </Modal.Dialog>
         </Modal.Container>
       </Modal.Backdrop>

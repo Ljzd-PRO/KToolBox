@@ -172,7 +172,7 @@ export function PostsPage() {
       <section className="grid gap-3">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-lg font-semibold">{t("posts.results")}</h2>
-          <Chip size="sm" variant="soft">{results.length}</Chip>
+          <Chip color="accent" size="sm" variant="soft">{results.length}</Chip>
         </div>
         {searched && !results.length ? <EmptyPanel title={t("posts.empty")} /> : null}
         {!searched ? <EmptyPanel description={t("posts.searchHint")} title={t("posts.searchReady")} /> : null}
@@ -202,7 +202,7 @@ export function PostsPage() {
             </DataTableFrame>
             <div className="grid gap-3 md:hidden">
               {results.map((post) => (
-                <Surface className="grid gap-3 rounded-lg border border-border p-4" key={`${post.service}:${post.user}:${post.id}`}>
+                <Surface className="data-mobile-card grid gap-3 rounded-lg border border-border p-4" key={`${post.service}:${post.user}:${post.id}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0"><p className="truncate font-medium">{post.title || `#${post.id}`}</p><p className="mt-1 text-xs text-muted">{post.service}:{post.user}</p></div>
                     <IconButton icon={Eye} label={t("posts.details")} onPress={() => openPost(post)} />

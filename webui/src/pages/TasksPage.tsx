@@ -54,6 +54,7 @@ const stoppable = new Set<TaskStatus>(["queued", "blocked", "running", "paused"]
 const resumable = new Set<TaskStatus>(["paused", "stopped", "completed", "failed", "interrupted"]);
 const editable = new Set<TaskStatus>(["queued", "blocked", "paused", "stopped", "completed", "failed", "interrupted"]);
 const deletable = new Set<TaskStatus>(["paused", "stopped", "completed", "failed", "interrupted"]);
+const speedVisible = new Set<TaskStatus>(["running", "pause_requested", "stop_requested"]);
 
 export function TasksPage() {
   const { t } = useTranslation();
@@ -253,8 +254,8 @@ function TaskList({ tasks, handlers, onCreate }: { tasks: TaskRecord[]; handlers
       />
       {!tasks.length ? <EmptyPanel title={t("tasks.empty")} /> : (
         <>
-          <DataTableFrame className="hidden min-[1360px]:block">
-            <Table.Content aria-label={t("tasks.title")} className="task-table-content min-w-[1100px]">
+          <DataTableFrame className="hidden xl:block">
+            <Table.Content aria-label={t("tasks.title")} className="task-table-content min-w-[940px]">
               <Table.Header>
                 <Table.Column isRowHeader>{t("tasks.target")}</Table.Column>
                 <Table.Column>{t("common.status")}</Table.Column>
@@ -267,21 +268,21 @@ function TaskList({ tasks, handlers, onCreate }: { tasks: TaskRecord[]; handlers
               <Table.Body>
                 {tasks.map((task, index) => (
                   <Table.Row className="task-table-row" id={task.id} key={task.id}>
-                    <Table.Cell className="w-60 min-w-60 max-w-60"><TaskTarget task={task} /></Table.Cell>
+                    <Table.Cell className="w-56 min-w-56 max-w-56"><TaskTarget task={task} /></Table.Cell>
                     <Table.Cell className="min-w-24"><TaskStatusChip status={task.status} /></Table.Cell>
                     <Table.Cell className="min-w-28"><TaskProgressSummary task={task} /></Table.Cell>
-                    <Table.Cell className="min-w-20 whitespace-nowrap text-sm font-medium tabular-nums">{formatBytes(task.progress.speed_bps, "/s")}</Table.Cell>
-                    <Table.Cell><code className="block max-w-32 truncate text-xs text-muted" title={task.spec.output}>{task.spec.output}</code></Table.Cell>
+                    <Table.Cell className="min-w-20 whitespace-nowrap text-sm font-medium tabular-nums">{formatBytes(taskSpeed(task), "/s")}</Table.Cell>
+                    <Table.Cell><code className="block max-w-28 truncate text-xs text-muted" title={task.spec.output}>{task.spec.output}</code></Table.Cell>
                     <Table.Cell className="w-24 max-w-24 text-xs leading-relaxed text-muted"><TaskCreatedTime locale={i18n.language} value={task.created_at} /></Table.Cell>
-                    <Table.Cell className="min-w-[332px]"><TaskActions canMoveDown={index < tasks.length - 1} canMoveUp={index > 0} task={task} handlers={handlers} /></Table.Cell>
+                    <Table.Cell className="w-[196px] min-w-[196px]"><TaskActions canMoveDown={index < tasks.length - 1} canMoveUp={index > 0} task={task} handlers={handlers} /></Table.Cell>
                   </Table.Row>
                 ))}
               </Table.Body>
             </Table.Content>
           </DataTableFrame>
-          <div className="grid gap-3 min-[1360px]:hidden">
+          <div className="grid gap-3 xl:hidden">
             {tasks.map((task, index) => (
-              <Surface className="task-mobile-card grid gap-4 rounded-lg border border-border p-4" key={task.id}>
+              <Surface className="data-mobile-card task-mobile-card grid gap-4 rounded-lg border border-border p-4" key={task.id}>
                 <div className="flex min-w-0 flex-wrap items-start gap-3">
                   <div className="min-w-64 flex-1"><TaskTarget task={task} /></div>
                   <div className="ml-auto shrink-0"><TaskStatusChip status={task.status} /></div>
@@ -290,7 +291,7 @@ function TaskList({ tasks, handlers, onCreate }: { tasks: TaskRecord[]; handlers
                   <TaskProgressSummary task={task} />
                   <div className="text-right">
                     <p className="text-xs text-muted">{t("tasks.totalSpeed")}</p>
-                    <strong className="text-sm tabular-nums text-foreground">{formatBytes(task.progress.speed_bps, "/s")}</strong>
+                    <strong className="text-sm tabular-nums text-foreground">{formatBytes(taskSpeed(task), "/s")}</strong>
                   </div>
                 </div>
                 <div className="grid gap-1 border-t border-border pt-3 text-xs text-muted">
@@ -360,7 +361,7 @@ function TaskActions({
   const unavailable = (action: string) => t("tasks.actionUnavailable", { action, status });
   const lifecycleAction = canResume ? t("tasks.resume") : t("tasks.pause");
   return (
-    <div className={mobile ? "task-action-grid grid grid-cols-4 justify-items-center gap-1 border-t border-border pt-3" : "task-action-grid flex items-center justify-end gap-1"}>
+    <div className={mobile ? "task-action-grid grid grid-cols-4 justify-items-center gap-1 border-t border-border pt-3" : "task-action-grid grid w-[188px] grid-cols-4 justify-items-center gap-1"}>
       <IconButton icon={Eye} label={t("tasks.details")} onPress={() => handlers.details(task)} />
       <IconButton
         icon={canResume ? Play : Pause}
@@ -417,7 +418,7 @@ function TaskDetails({
       <Surface className="grid gap-5 rounded-lg border border-border p-5">
         <ProgressMeter isIndeterminate={task.status === "running" && !progress.total_bytes && !progress.queued_files} label={t("tasks.progress")} value={percent} />
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <Metric label={t("tasks.totalSpeed")} value={formatBytes(progress.speed_bps, "/s")} />
+          <Metric label={t("tasks.totalSpeed")} value={formatBytes(taskSpeed(task), "/s")} />
           <Metric label={t("tasks.transferred")} value={`${formatBytes(progress.transferred_bytes)} / ${formatBytes(progress.total_bytes)}`} />
           <Metric label={t("tasks.files")} value={`${progress.processed_files} / ${progress.queued_files}`} />
           <Metric label="ETA" value={formatDuration(progress.eta_seconds)} />
@@ -460,6 +461,10 @@ function TaskDetails({
 
 function Metric({ label, value }: { label: string; value: string }) {
   return <div className="min-w-0 rounded-lg bg-default p-4"><p className="text-xs text-muted">{label}</p><p className="mt-1 truncate font-semibold tabular-nums" title={value}>{value}</p></div>;
+}
+
+function taskSpeed(task: TaskRecord): number {
+  return speedVisible.has(task.status) ? task.progress.speed_bps : 0;
 }
 
 function eventMessage(event: TaskEvent): string {

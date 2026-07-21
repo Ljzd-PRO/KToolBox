@@ -104,7 +104,7 @@ describe("form surfaces", () => {
     expect(icon).toHaveAttribute("aria-hidden", "true");
   });
 
-  it("uses one secondary body surface with a fixed modal footer", () => {
+  it("keeps the scroll body and fixed footer in one secondary surface", () => {
     render(
       <FormModal
         actions={<span>Save action</span>}
@@ -117,10 +117,12 @@ describe("form surfaces", () => {
     );
 
     const surface = document.querySelector<HTMLElement>(".app-form-modal-surface");
+    const body = document.querySelector<HTMLElement>(".app-form-modal-body");
     const actions = document.querySelector<HTMLElement>(".app-form-modal-actions");
     expect(surface?.querySelector("input")).toBeInTheDocument();
     expect(surface).toHaveClass("rounded-none", "border-0");
-    expect(surface).not.toContainElement(actions);
+    expect(surface).toContainElement(body);
+    expect(surface).toContainElement(actions);
     expect(actions).toHaveTextContent("Save action");
     expect(actions).toHaveAttribute("data-slot", "modal-footer");
   });

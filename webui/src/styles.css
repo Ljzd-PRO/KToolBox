@@ -17,7 +17,7 @@
   --border-subtle: #e3e7ef;
   --text-primary: #0f172a;
   --text-secondary: #475569;
-  --text-muted: #64748b;
+  --text-muted: #5b6b7e;
   --accent: #2563eb;
   --accent-hover: #1d4ed8;
   --accent-strong: #1d4ed8;
@@ -51,6 +51,8 @@
   --surface-shadow: 0 1px 2px rgb(15 23 42 / 0.05);
   --control-track-off: #cbd5e1;
   --control-track-off-hover: #b8c3d1;
+  --control-track-on: #2563eb;
+  --control-track-on-hover: #1d4ed8;
   --control-border: #94a3b8;
   --control-surface-off: #e2e8f0;
   --ktoolbox-teal: #059669;
@@ -136,6 +138,8 @@
   --surface-shadow: 0 1px 2px rgb(0 0 0 / 0.18);
   --control-track-off: #475569;
   --control-track-off-hover: #52627a;
+  --control-track-on: #3b82f6;
+  --control-track-on-hover: #60a5fa;
   --control-border: #64748b;
   --control-surface-off: #334155;
   --ktoolbox-teal: #34d399;
@@ -342,9 +346,21 @@ code {
   background: var(--surface);
 }
 
-.task-table-row {
+.app-table-frame [data-slot="table-row"] {
   border-bottom: 1px solid var(--separator);
   transition: background-color 140ms ease;
+}
+
+.app-table-frame [data-slot="table-row"]:last-child {
+  border-bottom: 0;
+}
+
+.app-table-frame [data-slot="table-row"]:hover {
+  background: color-mix(in oklab, var(--surface) 92%, var(--accent) 8%);
+}
+
+.task-table-row {
+  min-height: 5.75rem;
 }
 
 .task-table-content [data-slot="table-column"],
@@ -352,16 +368,19 @@ code {
   padding-inline: 0.625rem;
 }
 
-.task-table-row:last-child {
-  border-bottom: 0;
-}
-
-.task-table-row:hover {
-  background: color-mix(in oklab, var(--surface) 92%, var(--accent) 8%);
-}
-
 .task-mobile-card {
   box-shadow: 0 1px 2px color-mix(in oklab, black 7%, transparent);
+}
+
+.data-mobile-card,
+.data-list-card {
+  transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.data-mobile-card:hover,
+.data-list-card:hover {
+  border-color: color-mix(in oklab, var(--border) 60%, var(--accent) 40%);
+  box-shadow: 0 4px 14px color-mix(in oklab, var(--foreground) 8%, transparent);
 }
 
 .task-mobile-card .task-target-title {
@@ -431,8 +450,8 @@ code {
   --switch-control-bg: var(--control-track-off);
   --switch-control-bg-hover: var(--control-track-off-hover);
   --switch-control-bg-pressed: var(--control-track-off-hover);
-  --switch-control-bg-checked: var(--accent);
-  --switch-control-bg-checked-hover: var(--accent-hover);
+  --switch-control-bg-checked: var(--control-track-on);
+  --switch-control-bg-checked-hover: var(--control-track-on-hover);
 }
 
 .form-switch > [data-slot="description"] {
@@ -473,26 +492,33 @@ code {
 
 .app-form-modal-body {
   min-height: 0;
+  margin-inline: 0 !important;
   overflow-y: auto;
-  background: var(--console-subtle);
+  background: transparent;
 }
 
 .app-form-modal-surface {
+  display: grid;
+  gap: 0 !important;
+  grid-template-rows: minmax(0, 1fr) auto;
   width: 100%;
   background: var(--console-subtle);
 }
 
 .app-form-modal-actions {
   flex: none;
+  margin-top: 0 !important;
   border-top-color: var(--separator);
-  background: var(--console-panel);
+  background: transparent;
 }
 
 .app-confirm-modal-body {
+  margin-inline: 0 !important;
   overflow: hidden;
 }
 
 .app-confirm-modal-actions {
+  margin-top: 0 !important;
   border-top-color: var(--separator);
   background: var(--console-panel);
 }

@@ -36,7 +36,7 @@ async function signIn(page: Page) {
   await page.getByLabel("Username").fill("playwright");
   await page.getByLabel("Password", { exact: true }).fill("fixture-password");
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page.getByRole("heading", { name: "Download operations at a glance" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Overview", exact: true })).toBeVisible();
   const errors = browserErrors.get(page) ?? [];
   expect(errors.filter((error) => !error.includes("status of 401 (Unauthorized)"))).toEqual([]);
   errors.length = 0;
@@ -50,6 +50,8 @@ test("authenticated shell is accessible in desktop and mobile themes", async ({ 
 
   await page.getByRole("button", { name: "Use dark theme" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.getByRole("button", { name: "Use emerald accent" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme-color", "emerald");
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole("button", { name: "Open navigation" }).click();
   await expect(page.getByRole("link", { name: "Tasks" })).toBeVisible();
@@ -86,7 +88,7 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   await page.getByRole("link", { name: "Tasks" }).click();
   await page.getByRole("button", { name: "Create task" }).click();
   const formSurface = page.locator(".app-form-modal-surface");
-  const formScroll = page.locator(".app-form-modal-scroll");
+  const formScroll = page.locator(".app-form-modal-body");
   const formActions = page.locator(".app-form-modal-actions");
   await expect(formSurface).toBeVisible();
   await expect(formActions).toBeVisible();
@@ -117,7 +119,7 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   expect(actionBox).not.toBeNull();
   expect(Math.abs((scrollBox?.y ?? 0) + (scrollBox?.height ?? 0) - (actionBox?.y ?? 0))).toBeLessThan(1);
   expect(await formSurface.locator(".app-form-modal-actions").count()).toBe(1);
-  expect(await page.locator('[data-slot="modal-footer"]').count()).toBe(0);
+  expect(await page.locator('[data-slot="modal-footer"]').count()).toBe(1);
 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
@@ -245,6 +247,7 @@ test("task lifecycle remains operable through pause resume and stop", async ({ p
 
   await page.getByRole("button", { name: "Pause" }).click();
   await expect(page.getByText("Paused", { exact: true })).toBeVisible();
+  await expect(page.getByText("0 B/s", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Resume" }).click();
   await expect(page.getByText("Running", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Stop" }).click();

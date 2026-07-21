@@ -211,7 +211,7 @@ export function CreatorsPage() {
       <section className="grid gap-3">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-lg font-semibold">{t("creators.roster")}</h2>
-          <Chip size="sm" variant="soft">{creators.length}</Chip>
+          <Chip color="accent" size="sm" variant="soft">{creators.length}</Chip>
         </div>
         {!creators.length ? (
           <EmptyPanel title={t("creators.empty")} />
@@ -251,7 +251,7 @@ export function CreatorsPage() {
             </DataTableFrame>
             <div className="grid gap-3 md:hidden">
               {creators.map((creator) => (
-                <Surface className="rounded-lg border border-border p-4" key={`${creator.service}:${creator.creator_id}`}>
+                <Surface className="data-mobile-card rounded-lg border border-border p-4" key={`${creator.service}:${creator.creator_id}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="truncate font-medium">{creator.alias || creator.creator_id}</p>

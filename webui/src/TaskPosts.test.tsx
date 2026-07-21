@@ -161,7 +161,7 @@ describe("task and post workflows", () => {
           keywords_exclude: [],
         },
         presentation: null,
-        progress: { ...progress, speed_bps: 0 },
+        progress: { ...progress, speed_bps: 2048 },
         error: null,
         blocked_by: null,
         created_at: "2026-07-21T00:02:00Z",
@@ -188,6 +188,7 @@ describe("task and post workflows", () => {
     expect(screen.getAllByText("Demo Studio · fanbox:42 · #99 · rev. 3")).toHaveLength(2);
     expect(screen.getAllByText("2 creators")).toHaveLength(2);
     expect(screen.getAllByText("Demo Studio · Type Lab")).toHaveLength(2);
+    expect(screen.getAllByText("0 B/s").length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByRole("button", { name: "Task details" }).length).toBeGreaterThanOrEqual(4);
     expect(screen.getAllByRole("button", { name: "Pause" }).length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByRole("button", { name: "Resume" }).length).toBeGreaterThanOrEqual(2);
