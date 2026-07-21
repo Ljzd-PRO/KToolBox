@@ -8,6 +8,26 @@ export default defineConfig({
     outDir: "../ktoolbox/webui/static",
     emptyOutDir: true,
     sourcemap: false,
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: "react-runtime",
+              test: /node_modules\/(react|react-dom|react-router|scheduler)\//,
+            },
+            {
+              name: "heroui",
+              test: /node_modules\/(@heroui|react-aria|@react-aria|@react-stately|@react-types)\//,
+            },
+            {
+              name: "data-runtime",
+              test: /node_modules\/(@tanstack|i18next|react-i18next)\//,
+            },
+          ],
+        },
+      },
+    },
   },
   server: {
     proxy: {

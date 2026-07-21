@@ -23,6 +23,39 @@ def test_root_help_uses_hyphenated_commands(capsys) -> None:
     assert "download-post" not in output
     assert "download_post" not in output
     assert "--install-completion" in output
+    assert "webui" in output
+
+
+def test_webui_command_forwards_server_options(tmp_path: Path) -> None:
+    project = tmp_path / "project"
+    server = AsyncMock()
+    with patch("ktoolbox.webui.server.run_webui", new=server):
+        assert (
+            app(
+                [
+                    "webui",
+                    str(project),
+                    "--host",
+                    "127.0.0.1",
+                    "--port",
+                    "9000",
+                    "--no-open",
+                ]
+            )
+            == 0
+        )
+    server.assert_awaited_once_with(
+        project,
+        host="127.0.0.1",
+        port=9000,
+        open_browser=False,
+    )
+
+
+def test_webui_hash_password_command(capsys) -> None:
+    with patch("ktoolbox.webui.server.generate_password_hash", return_value="$argon2id$example"):
+        assert app(["webui", "hash-password"]) == 0
+    assert "$argon2id$example" in capsys.readouterr().out
 
 
 def test_download_uses_friendly_option_names() -> None:

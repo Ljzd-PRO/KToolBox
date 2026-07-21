@@ -28,6 +28,10 @@ async def test_plaintext_login_session_project_and_logout(tmp_path: Path) -> Non
     async with web_client(tmp_path, webui={"username": "owner", "password": "correct horse"}) as client:
         assert (await client.get("/api/v1/health")).json() == {"status": "ok"}
         assert (await client.get("/api/v1/project")).status_code == 401
+        frontend = await client.get("/")
+        assert frontend.status_code == 200
+        assert "KToolBox" in frontend.text
+        assert frontend.headers["content-security-policy"].startswith("default-src 'self'")
 
         response = await client.post(
             "/api/v1/session/login",

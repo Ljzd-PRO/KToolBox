@@ -168,3 +168,5 @@ webui/node_modules/
 webui/coverage/
 webui/playwright-report/
 webui/test-results/
+!webui/src/lib/
+!webui/src/lib/**

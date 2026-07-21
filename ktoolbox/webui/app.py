@@ -6,7 +6,8 @@ from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import RequestResponseEndpoint
 
 from ktoolbox import __version__
@@ -73,6 +74,11 @@ def create_app(context: RuntimeContext, *, task_executor: TaskExecutor | None = 
     app.include_router(create_project_router(context.project_root))
     app.include_router(create_pawchive_router())
     app.include_router(create_task_router(context.project_root))
+
+    static_root = Path(__file__).parent / "static"
+    assets_root = static_root / "assets"
+    if assets_root.is_dir():
+        app.mount("/assets", StaticFiles(directory=assets_root), name="webui-assets")
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next: RequestResponseEndpoint) -> Response:
@@ -151,5 +157,12 @@ def create_app(context: RuntimeContext, *, task_executor: TaskExecutor | None = 
     @app.exception_handler(HTTPException)
     async def http_error_handler(_: Request, error: HTTPException) -> JSONResponse:
         return JSONResponse(status_code=error.status_code, content={"detail": error.detail}, headers=error.headers)
+
+    @app.get("/{path:path}", include_in_schema=False)
+    async def frontend(path: str) -> FileResponse:
+        index = static_root / "index.html"
+        if path.startswith("api/") or not index.is_file():
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not found")
+        return FileResponse(index, headers={"Cache-Control": "no-cache"})
 
     return app

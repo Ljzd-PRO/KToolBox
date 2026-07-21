@@ -60,9 +60,11 @@ app = App(
 creator_app = App(name="creator", help="Manage and search creators.")
 post_app = App(name="post", help="Inspect and search posts.")
 config_app = App(name="config", help="Inspect and edit KToolBox configuration.")
+webui_app = App(name="webui", help="Run the local HeroUI management panel.")
 app.command(creator_app)
 app.command(post_app)
 app.command(config_app)
+app.command(webui_app)
 app.register_install_completion_command()
 app.meta.group_parameters = Group("Global options", sort_key=0)
 
@@ -465,6 +467,42 @@ async def site_version() -> int:
     except PawchiveError as error:
         return _command_error("Pawchive error", str(error))
     stdout.print(version)
+    return 0
+
+
+@webui_app.default
+async def webui_run(
+    project_dir: Path = Path("."),
+    *,
+    host: str | None = None,
+    port: int | None = None,
+    no_open: bool = False,
+) -> int:
+    """Run the WebUI for one directory containing ktoolbox.toml."""
+    try:
+        from ktoolbox.webui.server import run_webui
+
+        await run_webui(
+            project_dir,
+            host=host,
+            port=port,
+            open_browser=False if no_open else None,
+        )
+    except (RuntimeError, ValueError) as error:
+        return _command_error("WebUI error", str(error), code=2)
+    return 0
+
+
+@webui_app.command(name="hash-password")
+def webui_hash_password() -> int:
+    """Generate an Argon2id password hash using hidden terminal input."""
+    try:
+        from ktoolbox.webui.server import generate_password_hash
+
+        password_hash = generate_password_hash()
+    except (RuntimeError, ValueError) as error:
+        return _command_error("Password error", str(error), code=2)
+    stdout.print(password_hash, markup=False, highlight=False)
     return 0
 
 
