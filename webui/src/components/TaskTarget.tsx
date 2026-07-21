@@ -1,5 +1,5 @@
 import { Button, Chip, Tooltip } from "@heroui/react";
-import { Download, RefreshCw } from "lucide-react";
+import { IconDownload as Download, IconRefresh as RefreshCw } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 
 import type { TaskRecord, TaskSpec } from "../types";

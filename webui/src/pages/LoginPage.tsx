@@ -1,5 +1,11 @@
 import { Alert, Button, toast } from "@heroui/react";
-import { KeyRound, LockKeyhole, LogIn, ShieldAlert, UserRound } from "lucide-react";
+import {
+  IconKey as KeyRound,
+  IconLock as LockKeyhole,
+  IconLogin as LogIn,
+  IconShieldExclamation as ShieldAlert,
+  IconUser as UserRound,
+} from "@tabler/icons-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 

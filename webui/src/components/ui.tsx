@@ -29,24 +29,35 @@ import {
   useOverlayState,
 } from "@heroui/react";
 import type { DateValue } from "@internationalized/date";
-import { Check, ChevronDown, Eye, EyeOff, Inbox, Minus, Plus, Search, X, type LucideIcon } from "lucide-react";
+import {
+  IconCheck as Check,
+  IconChevronDown as ChevronDown,
+  IconEye as Eye,
+  IconEyeOff as EyeOff,
+  IconInbox as Inbox,
+  IconMinus as Minus,
+  IconPlus as Plus,
+  IconSearch as Search,
+  IconX as X,
+  type TablerIcon,
+} from "@tabler/icons-react";
 import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { TaskStatus } from "../types";
 
-function FieldLabel({ label, icon: Icon }: { label: ReactNode; icon?: LucideIcon }) {
+function FieldLabel({ label, icon: Icon }: { label: ReactNode; icon?: TablerIcon }) {
   return (
-    <Label className="field-label flex min-w-0 flex-1 items-center gap-2 text-sm font-medium text-foreground">
-      {Icon ? <Icon aria-hidden="true" className="field-label-icon shrink-0" size={16} strokeWidth={1.8} /> : null}
-      <span className="min-w-0">{label}</span>
+    <Label className="field-label flex min-w-0 flex-1 items-center gap-1.5 text-sm font-semibold text-[var(--text-secondary)]">
+      {Icon ? <Icon aria-hidden="true" className="field-label-icon shrink-0" size={15} stroke={1.8} /> : null}
+      <span className="min-w-0 truncate">{label}</span>
     </Label>
   );
 }
 
 export function FormSurface({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <Surface className={cn("form-surface rounded-lg border border-border p-4", className)} variant="secondary">
+    <Surface className={cn("form-surface control-surface rounded-lg border border-border p-4", className)} variant="secondary">
       {children}
     </Surface>
   );
@@ -70,7 +81,7 @@ export function IconButton({
   tooltip,
 }: {
   label: string;
-  icon: LucideIcon;
+  icon: TablerIcon;
   onPress: () => void;
   variant?: React.ComponentProps<typeof Button>["variant"];
   isDisabled?: boolean;
@@ -84,13 +95,11 @@ export function IconButton({
         aria-disabled={isDisabled || undefined}
         aria-label={label}
         className={cn("size-11 min-w-11 shrink-0 aria-disabled:cursor-not-allowed aria-disabled:opacity-50", className)}
-        data-disabled={isDisabled || undefined}
+        isDisabled={isDisabled}
         variant={variant}
-        onPress={() => {
-          if (!isDisabled) onPress();
-        }}
+        onPress={onPress}
       >
-        <Icon aria-hidden="true" size={18} strokeWidth={1.8} />
+        <Icon aria-hidden="true" size={18} stroke={1.8} />
       </Button>
       <Tooltip.Content>{tooltip ?? label}</Tooltip.Content>
     </Tooltip>
@@ -120,7 +129,7 @@ export function FormField({
   isInvalid?: boolean;
   errorMessage?: string;
   placeholder?: string;
-  icon?: LucideIcon;
+  icon?: TablerIcon;
 }) {
   return (
     <TextField.Root
@@ -158,7 +167,7 @@ export function PasswordField({
   placeholder?: string;
   isRequired?: boolean;
   isDisabled?: boolean;
-  icon?: LucideIcon;
+  icon?: TablerIcon;
 }) {
   const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
@@ -218,7 +227,7 @@ export function NumberInput({
   maxValue?: number;
   step?: number;
   isDisabled?: boolean;
-  icon?: LucideIcon;
+  icon?: TablerIcon;
 }) {
   const { t } = useTranslation();
   return (
@@ -261,7 +270,7 @@ export function DateRangeInput({
   description?: string;
   value: DateRangeValue | null;
   onChange: (value: DateRangeValue | null) => void;
-  icon?: LucideIcon;
+  icon?: TablerIcon;
 }) {
   return (
     <DateRangePicker className="grid gap-1.5" value={value} onChange={onChange}>
@@ -345,7 +354,7 @@ export function CodeEditor({
   onChange: (value: string) => void;
   description?: string;
   rows?: number;
-  icon?: LucideIcon;
+  icon?: TablerIcon;
 }) {
   return (
     <TextField.Root className="grid gap-1.5" fullWidth value={value} onChange={onChange}>
@@ -365,17 +374,22 @@ export function PageHeader({
   title,
   description,
   actions,
+  showDescription = false,
 }: {
   title: string;
   description: string;
   actions?: ReactNode;
+  showDescription?: boolean;
 }) {
+  if (!actions && !showDescription) return null;
   return (
-    <header className="flex flex-col justify-between gap-4 border-b border-border pb-5 sm:flex-row sm:items-end">
-      <div className="min-w-0">
-        <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
-        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">{description}</p>
-      </div>
+    <header aria-label={title} className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+      {showDescription ? (
+        <div className="min-w-0">
+          <h2 className="sr-only">{title}</h2>
+          <p className="text-sm leading-relaxed text-muted">{description}</p>
+        </div>
+      ) : <span className="sr-only">{description}</span>}
       {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
     </header>
   );
@@ -442,23 +456,26 @@ export function FormSwitchField({
   isSelected: boolean;
   onChange: (selected: boolean) => void;
   isDisabled?: boolean;
-  icon?: LucideIcon;
+  icon?: TablerIcon;
   className?: string;
 }) {
   return (
     <Switch.Root
-      className={cn("form-switch min-h-11", className)}
+      className={cn(
+        "form-switch min-h-11 rounded-lg border border-[var(--field-border)] bg-surface px-3 py-2 shadow-[var(--field-shadow)]",
+        className,
+      )}
       isDisabled={isDisabled}
       isSelected={isSelected}
       onChange={onChange}
     >
-      <Switch.Content className="min-w-0">
+      <Switch.Content className="min-w-0 items-center gap-3">
         <Switch.Control className="shrink-0">
           <Switch.Thumb />
         </Switch.Control>
         <FieldLabel icon={icon} label={label} />
       </Switch.Content>
-      {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
+      {description ? <Description className="pl-[3.75rem] text-xs leading-relaxed text-muted">{description}</Description> : null}
     </Switch.Root>
   );
 }
@@ -513,18 +530,18 @@ export function FormCheckbox({
   isDisabled?: boolean;
   isIndeterminate?: boolean;
   className?: string;
-  icon?: LucideIcon;
+  icon?: TablerIcon;
 }) {
   return (
     <Checkbox
-      className={cn("form-checkbox min-h-11", className)}
+      className={cn("form-checkbox min-h-11 rounded-lg px-2 py-1", className)}
       isDisabled={isDisabled}
       isIndeterminate={isIndeterminate}
       isSelected={isSelected}
       variant="secondary"
       onChange={onChange}
     >
-      <Checkbox.Content className="w-full min-w-0">
+      <Checkbox.Content className="w-full min-w-0 items-center gap-3">
         <Checkbox.Control className="shrink-0">
           {isSelected || isIndeterminate ? (
             <Checkbox.Indicator>
@@ -534,7 +551,7 @@ export function FormCheckbox({
         </Checkbox.Control>
         <FieldLabel icon={icon} label={label} />
       </Checkbox.Content>
-      {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
+      {description ? <Description className="pl-[2.875rem] text-xs leading-relaxed text-muted">{description}</Description> : null}
     </Checkbox>
   );
 }
@@ -556,7 +573,7 @@ export function SelectField({
   onChange: (value: string) => void;
   description?: string;
   isDisabled?: boolean;
-  icon?: LucideIcon;
+  icon?: TablerIcon;
 }) {
   const selected = options.find((option) => option.value === value);
   return (
@@ -604,7 +621,7 @@ export function AutocompleteField({
   options: SelectOption[];
   onChange: (value: string) => void;
   placeholder: string;
-  icon?: LucideIcon;
+  icon?: TablerIcon;
 }) {
   const { t } = useTranslation();
   const selected = options.find((option) => option.value === value);
@@ -672,6 +689,7 @@ export function FormModal({
   const state = useOverlayState({ isOpen: open, onOpenChange });
   return (
     <Modal state={state}>
+      <Modal.Trigger aria-hidden="true" className="hidden" tabIndex={-1} />
       <Modal.Backdrop>
         <Modal.Container className="mx-3" placement="center" scroll="inside" size={size}>
           <Modal.Dialog className="overflow-hidden">
@@ -684,14 +702,17 @@ export function FormModal({
                 <X aria-hidden="true" size={18} />
               </Modal.CloseTrigger>
             </Modal.Header>
-            <Modal.Body className="app-form-modal-body p-4 sm:p-5">
-              <FormSurface className="app-form-modal-surface p-0">
-                <div className="app-form-modal-scroll p-4 sm:p-5">{children}</div>
-                <div className="app-form-modal-actions flex flex-wrap justify-end gap-2 border-t border-border px-4 py-3 sm:px-5 sm:py-4">
-                  {actions}
-                </div>
-              </FormSurface>
+            <Modal.Body className="app-form-modal-body p-0">
+              <Surface
+                className="app-form-modal-surface control-surface rounded-none border-0 p-4 shadow-none sm:p-5"
+                variant="secondary"
+              >
+                {children}
+              </Surface>
             </Modal.Body>
+            <Modal.Footer className="app-form-modal-actions flex flex-wrap justify-end gap-2 border-t border-border px-5 py-4">
+              {actions}
+            </Modal.Footer>
           </Modal.Dialog>
         </Modal.Container>
       </Modal.Backdrop>
@@ -718,6 +739,7 @@ export function ConfirmModal({
   const state = useOverlayState({ isOpen: open, onOpenChange });
   return (
     <Modal state={state}>
+      <Modal.Trigger aria-hidden="true" className="hidden" tabIndex={-1} />
       <Modal.Backdrop>
         <Modal.Container className="mx-3" placement="center" scroll="inside" size={size}>
           <Modal.Dialog className="overflow-hidden">
@@ -730,12 +752,10 @@ export function ConfirmModal({
                 <X aria-hidden="true" size={18} />
               </Modal.CloseTrigger>
             </Modal.Header>
-            <Modal.Body className="app-confirm-modal-body p-0">
-              <div className="app-confirm-modal-content p-5">{children}</div>
-              <div className="app-confirm-modal-actions flex flex-wrap justify-end gap-2 border-t border-border px-5 py-4">
-                {actions}
-              </div>
-            </Modal.Body>
+            <Modal.Body className="app-confirm-modal-body p-5">{children}</Modal.Body>
+            <Modal.Footer className="app-confirm-modal-actions flex flex-wrap justify-end gap-2 border-t border-border px-5 py-4">
+              {actions}
+            </Modal.Footer>
           </Modal.Dialog>
         </Modal.Container>
       </Modal.Backdrop>

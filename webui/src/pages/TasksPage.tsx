@@ -7,18 +7,18 @@ import {
 } from "@heroui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowUp,
-  Eye,
-  Pause,
-  Pencil,
-  Play,
-  Plus,
-  Square,
-  Trash2,
-  X,
-} from "lucide-react";
+  IconArrowDown as ArrowDown,
+  IconArrowLeft as ArrowLeft,
+  IconArrowUp as ArrowUp,
+  IconEye as Eye,
+  IconPencil as Pencil,
+  IconPlayerPause as Pause,
+  IconPlayerPlay as Play,
+  IconPlayerStop as Square,
+  IconPlus as Plus,
+  IconTrash as Trash2,
+  IconX as X,
+} from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
@@ -398,6 +398,7 @@ function TaskDetails({
     <>
       <PageHeader
         description={`${t(`common.${task.kind}`)} · ${task.id}`}
+        showDescription
         title={t("tasks.details")}
         actions={
           <div className="flex flex-wrap gap-2">

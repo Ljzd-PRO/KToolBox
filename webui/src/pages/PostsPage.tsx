@@ -1,20 +1,20 @@
 import { Alert, Button, Chip, Surface, Table, toast } from "@heroui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ChevronDown,
-  ChevronUp,
-  Cloud,
-  Download,
-  Eye,
-  FileJson,
-  FileSearch,
-  FolderOutput,
-  History,
-  ListStart,
-  Search,
-  UserRound,
-  X,
-} from "lucide-react";
+  IconChevronDown as ChevronDown,
+  IconChevronUp as ChevronUp,
+  IconCloud as Cloud,
+  IconDownload as Download,
+  IconEye as Eye,
+  IconFileSearch as FileSearch,
+  IconFolder as FolderOutput,
+  IconHistory as History,
+  IconJson as FileJson,
+  IconList as ListStart,
+  IconSearch as Search,
+  IconUser as UserRound,
+  IconX as X,
+} from "@tabler/icons-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";

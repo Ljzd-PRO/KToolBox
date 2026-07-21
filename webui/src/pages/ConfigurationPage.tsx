@@ -1,28 +1,28 @@
 import { Alert, Button, Chip, Surface, Tabs, toast } from "@heroui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Braces,
-  Check,
-  Cloud,
-  Download,
-  Eraser,
-  FileCheck2,
-  FileCog,
-  FileText,
-  Hash,
-  KeyRound,
-  ListTodo,
-  PanelTop,
-  Save,
-  Search,
-  Settings2,
-  ShieldAlert,
-  TextCursorInput,
-  ToggleLeft,
-  Undo2,
-  X,
-  type LucideIcon,
-} from "lucide-react";
+  IconArrowBackUp as Undo2,
+  IconBraces as Braces,
+  IconCheck as Check,
+  IconCloud as Cloud,
+  IconDeviceFloppy as Save,
+  IconDownload as Download,
+  IconEraser as Eraser,
+  IconFileCheck as FileCheck2,
+  IconFileSettings as FileCog,
+  IconFileText as FileText,
+  IconForms as TextCursorInput,
+  IconHash as Hash,
+  IconKey as KeyRound,
+  IconLayoutNavbar as PanelTop,
+  IconListCheck as ListTodo,
+  IconSearch as Search,
+  IconSettings as Settings2,
+  IconShieldExclamation as ShieldAlert,
+  IconToggleLeft as ToggleLeft,
+  IconX as X,
+  type TablerIcon,
+} from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
@@ -452,7 +452,7 @@ function ConfigFieldEditor({
   );
 }
 
-function configurationIcon(field: ConfigField, type: string | undefined): LucideIcon {
+function configurationIcon(field: ConfigField, type: string | undefined): TablerIcon {
   if (field.secret) return KeyRound;
   if (type === "boolean") return ToggleLeft;
   if (type === "integer" || type === "number") return Hash;

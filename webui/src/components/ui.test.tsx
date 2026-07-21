@@ -1,6 +1,6 @@
 import { Table } from "@heroui/react";
 import { render, screen } from "@testing-library/react";
-import { Search } from "lucide-react";
+import { IconSearch as Search } from "@tabler/icons-react";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -104,7 +104,7 @@ describe("form surfaces", () => {
     expect(icon).toHaveAttribute("aria-hidden", "true");
   });
 
-  it("keeps editable content and actions inside one continuous form surface", () => {
+  it("uses one secondary body surface with a fixed modal footer", () => {
     render(
       <FormModal
         actions={<span>Save action</span>}
@@ -117,12 +117,12 @@ describe("form surfaces", () => {
     );
 
     const surface = document.querySelector<HTMLElement>(".app-form-modal-surface");
-    const scroll = document.querySelector<HTMLElement>(".app-form-modal-scroll");
     const actions = document.querySelector<HTMLElement>(".app-form-modal-actions");
-    expect(surface).toContainElement(scroll);
-    expect(surface).toContainElement(actions);
+    expect(surface?.querySelector("input")).toBeInTheDocument();
+    expect(surface).toHaveClass("rounded-none", "border-0");
+    expect(surface).not.toContainElement(actions);
     expect(actions).toHaveTextContent("Save action");
-    expect(document.querySelector('[data-slot="modal-footer"]')).not.toBeInTheDocument();
+    expect(actions).toHaveAttribute("data-slot", "modal-footer");
   });
 
   it("uses the dialog itself as the only surface for confirmations", () => {
@@ -138,8 +138,10 @@ describe("form surfaces", () => {
     );
 
     const body = document.querySelector<HTMLElement>(".app-confirm-modal-body");
-    expect(body).toContainElement(document.querySelector(".app-confirm-modal-content"));
-    expect(body).toContainElement(document.querySelector(".app-confirm-modal-actions"));
+    const actions = document.querySelector<HTMLElement>(".app-confirm-modal-actions");
+    expect(body).toHaveTextContent("Deletion warning");
+    expect(body).not.toContainElement(actions);
+    expect(actions).toHaveAttribute("data-slot", "modal-footer");
     expect(body?.querySelector(".form-surface")).not.toBeInTheDocument();
   });
 });

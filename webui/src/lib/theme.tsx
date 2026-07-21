@@ -2,11 +2,14 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 
 type ThemeMode = "light" | "dark" | "system";
 type EffectiveTheme = "light" | "dark";
+export type ThemeColor = "blue" | "emerald" | "violet" | "rose" | "amber";
 
 type ThemeContextValue = {
   mode: ThemeMode;
   effective: EffectiveTheme;
+  color: ThemeColor;
   setMode: (mode: ThemeMode) => void;
+  setColor: (color: ThemeColor) => void;
   toggle: () => void;
 };
 
@@ -18,7 +21,9 @@ function systemTheme(): EffectiveTheme {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const stored = localStorage.getItem("ktoolbox-theme") as ThemeMode | null;
+  const storedColor = localStorage.getItem("ktoolbox-theme-color") as ThemeColor | null;
   const [mode, setModeState] = useState<ThemeMode>(stored ?? "system");
+  const [color, setColorState] = useState<ThemeColor>(storedColor ?? "blue");
   const [system, setSystem] = useState<EffectiveTheme>(systemTheme);
   const effective = mode === "system" ? system : mode;
 
@@ -31,16 +36,23 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.dataset.theme = effective;
+    document.documentElement.dataset.colorScheme = effective;
+    document.documentElement.dataset.themeColor = color;
     document.documentElement.style.colorScheme = effective;
-  }, [effective]);
+  }, [color, effective]);
 
   const value = useMemo<ThemeContextValue>(
     () => ({
       mode,
       effective,
+      color,
       setMode: (next) => {
         setModeState(next);
         localStorage.setItem("ktoolbox-theme", next);
+      },
+      setColor: (next) => {
+        setColorState(next);
+        localStorage.setItem("ktoolbox-theme-color", next);
       },
       toggle: () => {
         const next = effective === "dark" ? "light" : "dark";
@@ -48,7 +60,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         localStorage.setItem("ktoolbox-theme", next);
       },
     }),
-    [effective, mode],
+    [color, effective, mode],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

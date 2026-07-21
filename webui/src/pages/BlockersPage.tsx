@@ -1,23 +1,23 @@
 import { Button, Chip, Surface, toast } from "@heroui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ArrowDown,
-  ArrowUp,
-  Ban,
-  Braces,
-  CaseSensitive,
-  Check,
-  Equal,
-  Fingerprint,
-  GitBranchPlus,
-  ListTree,
-  Pencil,
-  Plus,
-  Power,
-  Trash2,
-  UsersRound,
-  X,
-} from "lucide-react";
+  IconArrowDown as ArrowDown,
+  IconArrowUp as ArrowUp,
+  IconBan as Ban,
+  IconBraces as Braces,
+  IconCheck as Check,
+  IconEqual as Equal,
+  IconFingerprint as Fingerprint,
+  IconGitBranch as GitBranchPlus,
+  IconLetterCase as CaseSensitive,
+  IconListTree as ListTree,
+  IconPencil as Pencil,
+  IconPlus as Plus,
+  IconPower as Power,
+  IconTrash as Trash2,
+  IconUsersGroup as UsersRound,
+  IconX as X,
+} from "@tabler/icons-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 

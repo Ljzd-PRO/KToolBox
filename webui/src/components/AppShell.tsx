@@ -1,46 +1,51 @@
-import { Alert, Button, Drawer, toast, useOverlayState } from "@heroui/react";
+import { Button, Drawer, Surface, Tooltip, toast, useOverlayState } from "@heroui/react";
 import {
-  Ban,
-  BookUser,
-  Boxes,
-  CircleGauge,
-  FileCog,
-  FileSearch,
-  Languages,
-  LogOut,
-  Menu,
-  Moon,
-  Settings2,
-  ShieldAlert,
-  Sun,
-  Wrench,
-  X,
-  type LucideIcon,
-} from "lucide-react";
+  IconAdjustmentsHorizontal,
+  IconAddressBook,
+  IconBan,
+  IconDeviceDesktop,
+  IconFileSearch,
+  IconGauge,
+  IconLanguage,
+  IconLogout,
+  IconMenu2,
+  IconMoon,
+  IconPackages,
+  IconPalette,
+  IconSettingsCog,
+  IconShieldLock,
+  IconSun,
+  IconTool,
+  IconX,
+  type TablerIcon,
+} from "@tabler/icons-react";
+import { useEffect } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { toggleLanguage } from "../lib/i18n";
-import { useTheme } from "../lib/theme";
+import { useTheme, type ThemeColor } from "../lib/theme";
 import { IconButton } from "./ui";
 
 type NavigationItem = {
   key: string;
   path: string;
-  icon: LucideIcon;
+  icon: TablerIcon;
 };
 
 const navigation: NavigationItem[] = [
-  { key: "overview", path: "/", icon: CircleGauge },
-  { key: "tasks", path: "/tasks", icon: Boxes },
-  { key: "creators", path: "/creators", icon: BookUser },
-  { key: "posts", path: "/posts", icon: FileSearch },
-  { key: "blockers", path: "/blockers", icon: Ban },
-  { key: "configuration", path: "/configuration", icon: FileCog },
-  { key: "system", path: "/system", icon: Settings2 },
+  { key: "overview", path: "/", icon: IconGauge },
+  { key: "tasks", path: "/tasks", icon: IconPackages },
+  { key: "creators", path: "/creators", icon: IconAddressBook },
+  { key: "posts", path: "/posts", icon: IconFileSearch },
+  { key: "blockers", path: "/blockers", icon: IconBan },
+  { key: "configuration", path: "/configuration", icon: IconSettingsCog },
+  { key: "system", path: "/system", icon: IconAdjustmentsHorizontal },
 ];
+
+const themeColors: ThemeColor[] = ["blue", "emerald", "violet", "rose", "amber"];
 
 function Navigation({ onSelect }: { onSelect?: () => void }) {
   const { t } = useTranslation();
@@ -49,33 +54,102 @@ function Navigation({ onSelect }: { onSelect?: () => void }) {
       {navigation.map(({ key, path, icon: Icon }) => (
         <NavLink
           className={({ isActive }) =>
-            `nav-link flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium ${isActive ? "nav-link-active" : ""}`
+            `nav-link relative flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold ${isActive ? "nav-link-active" : ""}`
           }
           end={path === "/"}
           key={key}
           to={path}
           onClick={onSelect}
         >
-          <Icon aria-hidden="true" size={18} strokeWidth={1.8} />
-          <span>{t(`nav.${key}`)}</span>
+          <Icon aria-hidden="true" className="shrink-0" size={19} stroke={1.8} />
+          <span className="truncate">{t(`nav.${key}`)}</span>
         </NavLink>
       ))}
     </nav>
   );
 }
 
-function Brand() {
+function Brand({ version }: { version?: string }) {
   const { t } = useTranslation();
   return (
     <div className="flex min-w-0 items-center gap-3">
-      <span className="brand-mark grid size-10 shrink-0 place-items-center rounded-lg" aria-hidden="true">
-        <Wrench size={20} strokeWidth={2} />
+      <span className="brand-mark grid size-14 shrink-0 place-items-center rounded-lg" aria-hidden="true">
+        <IconTool size={27} stroke={1.8} />
       </span>
-      <div className="min-w-0">
-        <div className="truncate font-semibold text-foreground">{t("brand")}</div>
-        <div className="truncate text-xs text-muted">{t("subtitle")}</div>
+      <div className="grid min-w-0 gap-0.5">
+        <div className="truncate text-lg font-bold leading-tight text-foreground">{t("brand")}</div>
+        <div className="truncate text-xs font-medium text-muted">{t("subtitle")}</div>
+        {version ? (
+          <span className="mt-0.5 w-fit rounded-md bg-default px-1.5 py-0.5 text-[0.6875rem] font-semibold leading-none text-muted">
+            v{version}
+          </span>
+        ) : null}
       </div>
     </div>
+  );
+}
+
+function ThemeControls({ compact = false }: { compact?: boolean }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const modes = [
+    { value: "system" as const, icon: IconDeviceDesktop, label: t("shell.themeSystem") },
+    { value: "light" as const, icon: IconSun, label: t("shell.themeLight") },
+    { value: "dark" as const, icon: IconMoon, label: t("shell.themeDark") },
+  ];
+  return (
+    <Surface
+      aria-label={t("shell.theme")}
+      className={`theme-control min-h-11 rounded-lg ${compact ? "grid w-full justify-items-center gap-1 p-2" : "flex items-center gap-1 p-1"}`}
+      role="group"
+    >
+      <div className="flex items-center gap-1">
+        <IconPalette aria-hidden="true" className="mx-1 shrink-0 text-muted" size={16} stroke={1.8} />
+        {themeColors.map((color) => {
+          const label = t(`shell.themeColors.${color}`);
+          return (
+            <Tooltip key={color}>
+              <Button
+                isIconOnly
+                aria-label={label}
+                aria-pressed={theme.color === color}
+                className="h-8 w-8 min-w-8 rounded-lg"
+                size="sm"
+                variant="ghost"
+                onPress={() => theme.setColor(color)}
+              >
+                <span
+                  aria-hidden="true"
+                  className="theme-swatch size-3.5 rounded-full"
+                  data-color={color}
+                  data-selected={theme.color === color}
+                />
+              </Button>
+              <Tooltip.Content>{label}</Tooltip.Content>
+            </Tooltip>
+          );
+        })}
+      </div>
+      <span aria-hidden="true" className={compact ? "h-px w-full bg-border" : "mx-1 h-6 w-px bg-border"} />
+      <div className="flex items-center gap-1">
+        {modes.map(({ value, icon: Icon, label }) => (
+          <Tooltip key={value}>
+            <Button
+              isIconOnly
+              aria-label={label}
+              aria-pressed={theme.mode === value}
+              className="h-8 w-8 min-w-8 rounded-lg"
+              size="sm"
+              variant={theme.mode === value ? "secondary" : "ghost"}
+              onPress={() => theme.setMode(value)}
+            >
+              <Icon aria-hidden="true" size={16} stroke={1.8} />
+            </Button>
+            <Tooltip.Content>{label}</Tooltip.Content>
+          </Tooltip>
+        ))}
+      </div>
+    </Surface>
   );
 }
 
@@ -85,7 +159,15 @@ export function AppShell() {
   const theme = useTheme();
   const drawer = useOverlayState();
   const location = useLocation();
-  const active = navigation.find((item) => (item.path === "/" ? location.pathname === "/" : location.pathname.startsWith(item.path)));
+  const active =
+    navigation.find((item) =>
+      item.path === "/" ? location.pathname === "/" : location.pathname.startsWith(item.path),
+    ) ?? navigation[0];
+  const ActiveIcon = active.icon;
+
+  useEffect(() => {
+    document.title = `${t(`nav.${active.key}`)} - ${t("brand")}`;
+  }, [active.key, t]);
 
   async function signOut() {
     try {
@@ -95,82 +177,106 @@ export function AppShell() {
     }
   }
 
+  const securityNotice = (
+    <Tooltip>
+      <Button className="h-11 max-w-56 justify-start" variant="outline">
+        <IconShieldLock aria-hidden="true" className="shrink-0 text-[var(--ktoolbox-yellow)]" size={17} stroke={1.8} />
+        <span className="truncate">{t("shell.securityTitle")}</span>
+      </Button>
+      <Tooltip.Content>{t("shell.securityBody")}</Tooltip.Content>
+    </Tooltip>
+  );
+
   return (
     <div className="min-h-dvh bg-background text-foreground lg:grid lg:grid-cols-[240px_minmax(0,1fr)]">
       <aside className="sidebar hidden min-h-dvh border-r border-border lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col">
-        <div className="border-b border-border p-4">
+        <div className="px-5 py-5">
           <Brand />
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto p-3">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-2">
           <Navigation />
         </div>
-        <div className="border-t border-border p-3">
-          <div className="mb-2 truncate px-3 text-xs font-medium text-muted">{session?.username}</div>
+        <div className="grid gap-2 border-t border-border px-4 py-4">
+          <div className="flex min-w-0 items-center gap-2 px-2 text-xs font-medium text-muted">
+            <IconShieldLock aria-hidden="true" className="shrink-0 text-[var(--ktoolbox-teal)]" size={16} stroke={1.8} />
+            <span className="truncate">{session?.username}</span>
+          </div>
           <Button className="w-full justify-start" variant="ghost" onPress={signOut}>
-            <LogOut aria-hidden="true" size={18} />
+            <IconLogout aria-hidden="true" size={18} stroke={1.8} />
             {t("shell.logout")}
           </Button>
         </div>
       </aside>
 
       <div className="min-w-0">
-        <header className="app-header sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
-          <div className="flex min-h-16 items-center gap-3 px-4 sm:px-6 lg:px-8">
-            <div className="lg:hidden">
-              <IconButton icon={Menu} label={t("shell.menu")} onPress={drawer.open} />
-            </div>
+        <header className="shell-workbar sticky top-0 z-30 border-b border-border">
+          <div className="mx-auto flex min-h-[5.5rem] w-full max-w-7xl items-center gap-4 px-4 pl-20 sm:px-6 sm:pl-20 lg:px-8 lg:pl-8">
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-foreground">{t(`nav.${active?.key ?? "overview"}`)}</p>
-              <p className="truncate text-xs text-muted">{session?.username}</p>
+              <p className="truncate text-xs font-semibold text-[var(--accent-strong)]">{t("brand")}</p>
+              <h1 className="mt-1 flex min-w-0 items-center gap-2 text-2xl font-bold text-foreground">
+                <span className="page-title-icon grid size-9 shrink-0 place-items-center rounded-lg">
+                  <ActiveIcon aria-hidden="true" size={21} stroke={1.8} />
+                </span>
+                <span className="truncate">{t(`nav.${active.key}`)}</span>
+              </h1>
             </div>
-            <IconButton icon={Languages} label={t("shell.language")} onPress={() => void toggleLanguage()} />
-            <IconButton
-              icon={theme.effective === "dark" ? Sun : Moon}
-              label={theme.effective === "dark" ? t("shell.light") : t("shell.dark")}
-              onPress={theme.toggle}
-            />
-            <div className="hidden sm:block">
-              <IconButton icon={LogOut} label={t("shell.logout")} onPress={() => void signOut()} />
+            <div className="hidden min-w-0 items-center gap-2 xl:flex">
+              <ThemeControls />
+              {securityNotice}
+            </div>
+            <IconButton icon={IconLanguage} label={t("shell.language")} onPress={() => void toggleLanguage()} />
+            <div className="hidden sm:block xl:hidden">
+              <IconButton
+                icon={theme.effective === "dark" ? IconSun : IconMoon}
+                label={theme.effective === "dark" ? t("shell.themeLight") : t("shell.themeDark")}
+                onPress={theme.toggle}
+              />
             </div>
           </div>
-          <Alert className="security-strip rounded-none border-x-0 border-b-0 px-4 py-2 sm:px-6 lg:px-8" status="warning">
-            <Alert.Indicator>
-              <ShieldAlert aria-hidden="true" size={16} />
-            </Alert.Indicator>
-            <Alert.Content className="flex-row items-baseline gap-2">
-              <Alert.Title className="text-xs">{t("shell.securityTitle")}</Alert.Title>
-              <Alert.Description className="hidden text-xs sm:inline">{t("shell.securityBody")}</Alert.Description>
-            </Alert.Content>
-          </Alert>
         </header>
 
-        <main className="mx-auto w-full max-w-[1520px] p-4 sm:p-6 lg:p-8">
+        <main className="mx-auto grid w-full max-w-7xl gap-5 p-4 sm:p-6 lg:p-8">
+          <div className="flex min-w-0 items-center justify-between gap-2 xl:hidden">
+            {securityNotice}
+            <span className="min-w-0 truncate text-xs font-medium text-muted">{session?.username}</span>
+          </div>
           <Outlet />
         </main>
       </div>
 
       <Drawer state={drawer}>
-        <Drawer.Backdrop>
+        <Drawer.Trigger
+          aria-label={t("shell.menu")}
+          className="mobile-menu-button fixed left-4 top-[calc(env(safe-area-inset-top)+1rem)] z-40 size-12 min-w-12 rounded-full lg:hidden"
+        >
+          <IconMenu2 aria-hidden="true" size={22} stroke={1.9} />
+        </Drawer.Trigger>
+        <Drawer.Backdrop variant="blur">
           <Drawer.Content placement="left">
-            <Drawer.Dialog className="p-0">
-              <Drawer.Heading className="sr-only">{t("shell.menu")}</Drawer.Heading>
-              <Drawer.Header className="border-b border-border p-4">
+            <Drawer.Dialog className="w-[82vw] max-w-80 p-0">
+              <Drawer.Header className="border-b border-border px-4 py-4">
                 <div className="flex items-center justify-between gap-3">
-                  <Brand />
+                  <Drawer.Heading className="text-base font-semibold text-foreground">{t("shell.navigation")}</Drawer.Heading>
                   <Drawer.CloseTrigger
                     aria-label={t("shell.closeMenu")}
-                    className="grid size-11 place-items-center rounded-lg text-muted hover:bg-default"
+                    className="grid size-10 place-items-center rounded-lg text-muted hover:bg-default"
                   >
-                    <X aria-hidden="true" size={19} />
+                    <IconX aria-hidden="true" size={18} stroke={1.8} />
                   </Drawer.CloseTrigger>
                 </div>
               </Drawer.Header>
-              <Drawer.Body className="p-3">
+              <Drawer.Body className="grid min-h-0 content-start gap-5 p-4">
+                <Brand />
                 <Navigation onSelect={drawer.close} />
               </Drawer.Body>
-              <div className="border-t border-border p-3">
+              <div className="grid gap-3 border-t border-border p-4">
+                <ThemeControls compact />
+                <div className="flex min-w-0 items-center gap-2 px-2 text-xs font-medium text-muted">
+                  <IconShieldLock aria-hidden="true" className="shrink-0 text-[var(--ktoolbox-teal)]" size={16} stroke={1.8} />
+                  <span className="truncate">{session?.username}</span>
+                </div>
                 <Button className="w-full justify-start" variant="ghost" onPress={signOut}>
-                  <LogOut aria-hidden="true" size={18} />
+                  <IconLogout aria-hidden="true" size={18} stroke={1.8} />
                   {t("shell.logout")}
                 </Button>
               </div>

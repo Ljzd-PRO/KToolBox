@@ -7,7 +7,19 @@ import {
   toast,
 } from "@heroui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Cloud, Pencil, Plus, Power, Search, Tag, Trash2, UserPlus, UserRound, X } from "lucide-react";
+import {
+  IconCheck as Check,
+  IconCloud as Cloud,
+  IconPencil as Pencil,
+  IconPlus as Plus,
+  IconPower as Power,
+  IconSearch as Search,
+  IconTag as Tag,
+  IconTrash as Trash2,
+  IconUser as UserRound,
+  IconUserPlus as UserPlus,
+  IconX as X,
+} from "@tabler/icons-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 

@@ -1,6 +1,12 @@
 import { Button, Chip, Surface, toast } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
-import { CheckCircle2, CloudCog, FileCode2, FolderOpen, RefreshCw } from "lucide-react";
+import {
+  IconCircleCheck as CheckCircle2,
+  IconCloudCog as CloudCog,
+  IconFileCode as FileCode2,
+  IconFolderOpen as FolderOpen,
+  IconRefresh as RefreshCw,
+} from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 
 import { PageHeader, PageLoading } from "../components/ui";

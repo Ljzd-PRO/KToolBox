@@ -1,6 +1,13 @@
 import { Button, Chip, Surface, Table } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, BookUser, Boxes, CheckCircle2, Clock3, Play } from "lucide-react";
+import {
+  IconAddressBook as BookUser,
+  IconArrowRight as ArrowRight,
+  IconCircleCheck as CheckCircle2,
+  IconClock as Clock3,
+  IconPackages as Boxes,
+  IconPlayerPlay as Play,
+} from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -46,17 +53,13 @@ export function DashboardPage() {
   ];
 
   return (
-    <div className="grid gap-6">
-      <section className="overview-heading flex flex-col justify-between gap-5 border-b border-border pb-6 md:flex-row md:items-end">
-        <div>
-          <div className="mb-2 flex items-center gap-2">
-            <Chip color="accent" size="sm" variant="soft">
-              {t("overview.eyebrow")}
-            </Chip>
-            <span className="truncate text-xs text-muted">{project.data?.name}</span>
-          </div>
-          <h1 className="max-w-3xl text-2xl font-semibold text-foreground sm:text-3xl">{t("overview.title")}</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{t("overview.description")}</p>
+    <div className="grid gap-5">
+      <section className="overview-heading flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+        <div className="flex min-w-0 items-center gap-2">
+          <Chip color="accent" size="sm" variant="soft">
+            {t("overview.eyebrow")}
+          </Chip>
+          <span className="truncate text-xs font-medium text-muted">{project.data?.name}</span>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="primary" onPress={() => navigate("/tasks?create=sync")}>

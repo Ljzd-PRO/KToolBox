@@ -1,4 +1,4 @@
-import { Construction } from "lucide-react";
+import { IconTools as Construction } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 
 import { EmptyPanel, PageHeader } from "../components/ui";
