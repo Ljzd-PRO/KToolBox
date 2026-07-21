@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 
 import {
   AppModal,
@@ -278,7 +279,9 @@ export function ConfigurationPage() {
                   <p className="mt-1 text-xs leading-relaxed text-muted">{field.description}</p>
                 </div>
                 <code className="min-w-0 break-all text-xs text-muted">{displayValue(field)}</code>
-                <Chip color={sourceColors[field.source] ?? "default"} size="sm" variant="soft">{field.source}</Chip>
+                <Chip color={sourceColors[field.source] ?? "default"} size="sm" variant="soft">
+                  {configurationSourceLabel(field.source, t)}
+                </Chip>
               </div>
             ))}
           </Surface>
@@ -434,7 +437,9 @@ function ConfigFieldEditor({
     <div className="grid gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
       <div className="min-w-0">{control}</div>
       <div className="flex flex-wrap items-center gap-2 lg:max-w-60 lg:justify-end">
-        <Chip color={sourceColors[field.source] ?? "default"} size="sm" variant="soft">{field.source}</Chip>
+        <Chip color={sourceColors[field.source] ?? "default"} size="sm" variant="soft">
+          {configurationSourceLabel(field.source, t)}
+        </Chip>
         <Chip color={field.apply_mode === "restart" ? "warning" : "success"} size="sm" variant="soft">
           {field.apply_mode === "restart" ? t("configuration.restart") : t("configuration.nextTask")}
         </Chip>
@@ -458,6 +463,12 @@ function configurationIcon(field: ConfigField, type: string | undefined): Lucide
   if (section === "job") return ListTodo;
   if (section === "webui") return PanelTop;
   return TextCursorInput;
+}
+
+function configurationSourceLabel(source: string, t: TFunction): string {
+  if (source === "default") return t("configuration.sourceDefault");
+  if (source === "environment") return t("configuration.sourceEnvironment");
+  return source;
 }
 
 function schemaType(schema: Record<string, unknown>): string | undefined {

@@ -45,7 +45,7 @@ const navigation: NavigationItem[] = [
 function Navigation({ onSelect }: { onSelect?: () => void }) {
   const { t } = useTranslation();
   return (
-    <nav aria-label="Primary" className="grid gap-1">
+    <nav aria-label={t("shell.primaryNavigation")} className="grid gap-1">
       {navigation.map(({ key, path, icon: Icon }) => (
         <NavLink
           className={({ isActive }) =>

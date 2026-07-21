@@ -173,6 +173,7 @@ code {
 }
 
 .app-modal-form-footer {
+  margin-top: 0;
   border-top-color: var(--separator);
   background: var(--surface-secondary);
 }

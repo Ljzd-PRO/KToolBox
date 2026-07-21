@@ -171,7 +171,7 @@ export function CreatorsPage() {
                   <Search aria-hidden="true" size={16} />
                 </SearchField.SearchIcon>
                 <SearchField.Input placeholder={t("creators.searchPlaceholder")} />
-                <SearchField.ClearButton />
+                <SearchField.ClearButton aria-label={t("common.clearSearch")} />
               </SearchField.Group>
             </SearchField>
             <Button isPending={searching} type="submit" variant="primary">

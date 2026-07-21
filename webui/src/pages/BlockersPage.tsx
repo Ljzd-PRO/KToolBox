@@ -183,7 +183,9 @@ export function BlockersPage() {
                       <Chip color={blocker.enabled ? "success" : "default"} size="sm" variant="soft">
                         {blocker.enabled ? t("common.enabled") : t("common.disabled")}
                       </Chip>
-                      <Chip color="accent" size="sm" variant="soft">{blocker.type}</Chip>
+                      <Chip color="accent" size="sm" variant="soft">
+                        {blocker.type === "field-match" ? t("blockers.fieldMatch") : blocker.type}
+                      </Chip>
                     </div>
                     <p className="mt-1 text-xs text-muted">
                       {blocker.scope.mode === "global"
@@ -418,8 +420,21 @@ function ConditionEditor({
   removable: boolean;
 }) {
   const { t } = useTranslation();
-  const fieldOptions = ["title", "content", "tags[*]", "file.name", "attachments[*].name", "id", "service"].map((value) => ({ value, label: value }));
-  const operatorOptions = ["contains", "equals", "regex", "exists"].map((value) => ({ value, label: value }));
+  const fieldOptions = [
+    { value: "title", label: t("blockers.fields.title") },
+    { value: "content", label: t("blockers.fields.content") },
+    { value: "tags[*]", label: t("blockers.fields.tags") },
+    { value: "file.name", label: t("blockers.fields.fileName") },
+    { value: "attachments[*].name", label: t("blockers.fields.attachmentName") },
+    { value: "id", label: t("blockers.fields.postId") },
+    { value: "service", label: t("blockers.fields.service") },
+  ];
+  const operatorOptions = [
+    { value: "contains", label: t("blockers.operators.contains") },
+    { value: "equals", label: t("blockers.operators.equals") },
+    { value: "regex", label: t("blockers.operators.regex") },
+    { value: "exists", label: t("blockers.operators.exists") },
+  ];
   return (
     <div className="grid gap-4 border-l-2 border-border pl-4">
       <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,0.75fr)_auto]">

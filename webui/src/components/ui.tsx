@@ -375,8 +375,9 @@ export function PageHeader({
 }
 
 export function PageLoading() {
+  const { t } = useTranslation();
   return (
-    <div aria-label="Loading" className="grid gap-4" role="status">
+    <div aria-label={t("common.loading")} className="grid gap-4" role="status">
       <Skeleton className="h-20 rounded-lg" />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (
@@ -591,7 +592,7 @@ export function AutocompleteField({
                 <Search aria-hidden="true" size={15} />
               </SearchField.SearchIcon>
               <SearchField.Input placeholder={placeholder} />
-              <SearchField.ClearButton />
+              <SearchField.ClearButton aria-label={t("common.clearSearch")} />
             </SearchField.Group>
           </SearchField>
           <ListBox aria-label={label}>

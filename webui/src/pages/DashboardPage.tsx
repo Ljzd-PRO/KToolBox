@@ -69,7 +69,7 @@ export function DashboardPage() {
         </div>
       </section>
 
-      <section aria-label="Statistics" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section aria-label={t("overview.statistics")} className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map(({ label, value, icon: Icon, tone }) => (
           <Surface className="stat-tile rounded-lg border border-border p-4" data-tone={tone} key={label}>
             <div className="mb-4 flex items-center justify-between gap-3">

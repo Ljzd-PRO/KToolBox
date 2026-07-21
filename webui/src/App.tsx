@@ -1,6 +1,7 @@
 import { Spinner, ToastProvider } from "@heroui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Navigate, Route, Routes } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { AppShell } from "./components/AppShell";
 import { AuthProvider, useAuth } from "./lib/auth";
@@ -21,11 +22,12 @@ const queryClient = new QueryClient({
 });
 
 function AuthenticatedApplication() {
+  const { t } = useTranslation();
   const { session, loading } = useAuth();
   if (loading) {
     return (
       <main className="grid min-h-dvh place-items-center bg-background text-foreground">
-        <Spinner aria-label="Loading session" size="lg" />
+        <Spinner aria-label={t("common.loading")} size="lg" />
       </main>
     );
   }
