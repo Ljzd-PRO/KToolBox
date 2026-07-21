@@ -1,10 +1,9 @@
-import { Button, Checkbox, Chip, Surface, toast } from "@heroui/react";
+import { Button, Chip, Surface, toast } from "@heroui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowDown,
   ArrowUp,
   Braces,
-  Check,
   GitBranchPlus,
   Pencil,
   Plus,
@@ -17,6 +16,7 @@ import {
   AppModal,
   AutocompleteField,
   EmptyPanel,
+  FormCheckbox,
   FormField,
   PageHeader,
   PageLoading,
@@ -452,19 +452,17 @@ function ConditionEditor({
       ) : null}
       <div className="flex flex-wrap items-center gap-5">
         {condition.operator !== "exists" ? (
-          <Checkbox isSelected={condition.case_sensitive} onChange={(case_sensitive) => onChange({ ...condition, case_sensitive })}>
-            <Checkbox.Control>
-              <Checkbox.Indicator><Check aria-hidden="true" size={12} /></Checkbox.Indicator>
-            </Checkbox.Control>
-            <Checkbox.Content>{t("blockers.caseSensitive")}</Checkbox.Content>
-          </Checkbox>
+          <FormCheckbox
+            isSelected={condition.case_sensitive}
+            label={t("blockers.caseSensitive")}
+            onChange={(case_sensitive) => onChange({ ...condition, case_sensitive })}
+          />
         ) : null}
-        <Checkbox isSelected={condition.negate} onChange={(negate) => onChange({ ...condition, negate })}>
-          <Checkbox.Control>
-            <Checkbox.Indicator><Check aria-hidden="true" size={12} /></Checkbox.Indicator>
-          </Checkbox.Control>
-          <Checkbox.Content>{t("blockers.negate")}</Checkbox.Content>
-        </Checkbox>
+        <FormCheckbox
+          isSelected={condition.negate}
+          label={t("blockers.negate")}
+          onChange={(negate) => onChange({ ...condition, negate })}
+        />
       </div>
     </div>
   );

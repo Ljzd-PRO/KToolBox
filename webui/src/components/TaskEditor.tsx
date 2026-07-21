@@ -1,5 +1,5 @@
-import { Button, Checkbox, Chip, Surface, Tabs } from "@heroui/react";
-import { Check, Download, RefreshCw } from "lucide-react";
+import { Button, Chip, Surface, Tabs } from "@heroui/react";
+import { Download, RefreshCw } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { parseDate } from "@internationalized/date";
@@ -9,6 +9,7 @@ import {
   AppModal,
   DateRangeInput,
   type DateRangeValue,
+  FormCheckbox,
   FormField,
   NumberInput,
   SelectField,
@@ -138,14 +139,21 @@ export function TaskEditor({
                   {creators.map((creator) => {
                     const key = `${creator.service}:${creator.creator_id}`;
                     return (
-                      <Checkbox isSelected={selectedCreators.has(key)} key={key} onChange={(selected) => toggleCreator(key, selected)}>
-                        <Checkbox.Control><Checkbox.Indicator><Check aria-hidden="true" size={12} /></Checkbox.Indicator></Checkbox.Control>
-                        <Checkbox.Content className="min-w-0 flex-1">
-                          <span className="block truncate text-sm font-medium">{creator.alias || creator.creator_id}</span>
-                          <span className="block truncate text-xs text-muted">{key}</span>
-                        </Checkbox.Content>
-                        {!creator.enabled ? <Chip size="sm" variant="soft">{t("common.disabled")}</Chip> : null}
-                      </Checkbox>
+                      <FormCheckbox
+                        className="w-full"
+                        isSelected={selectedCreators.has(key)}
+                        key={key}
+                        label={
+                          <span className="flex min-w-0 items-center justify-between gap-3">
+                            <span className="min-w-0">
+                              <span className="block truncate text-sm font-medium">{creator.alias || creator.creator_id}</span>
+                              <span className="block truncate text-xs text-muted">{key}</span>
+                            </span>
+                            {!creator.enabled ? <Chip className="shrink-0" size="sm" variant="soft">{t("common.disabled")}</Chip> : null}
+                          </span>
+                        }
+                        onChange={(selected) => toggleCreator(key, selected)}
+                      />
                     );
                   })}
                 </Surface>
@@ -217,12 +225,7 @@ function CheckOption({
   selected: boolean;
   onChange: (selected: boolean) => void;
 }) {
-  return (
-    <Checkbox isSelected={selected} onChange={onChange}>
-      <Checkbox.Control><Checkbox.Indicator><Check aria-hidden="true" size={12} /></Checkbox.Indicator></Checkbox.Control>
-      <Checkbox.Content>{label}</Checkbox.Content>
-    </Checkbox>
-  );
+  return <FormCheckbox isSelected={selected} label={label} onChange={onChange} />;
 }
 
 function splitList(value: string): string[] {

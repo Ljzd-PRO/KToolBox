@@ -1,6 +1,5 @@
 import {
   Button,
-  Checkbox,
   Chip,
   Dropdown,
   Surface,
@@ -12,7 +11,6 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowUp,
-  Check,
   Eye,
   MoreHorizontal,
   Pause,
@@ -31,6 +29,7 @@ import {
   AppModal,
   DataTableFrame,
   EmptyPanel,
+  FormCheckbox,
   IconButton,
   PageHeader,
   PageLoading,
@@ -225,10 +224,7 @@ export function TasksPage() {
               </div>
             </Surface>
           )}
-          <Checkbox isSelected={deleteOutput} onChange={setDeleteOutput}>
-            <Checkbox.Control><Checkbox.Indicator><Check aria-hidden="true" size={12} /></Checkbox.Indicator></Checkbox.Control>
-            <Checkbox.Content>{t("tasks.deleteOutput")}</Checkbox.Content>
-          </Checkbox>
+          <FormCheckbox isSelected={deleteOutput} label={t("tasks.deleteOutput")} onChange={setDeleteOutput} />
           {deleteOutput ? <p className="break-all text-xs text-danger">{t("tasks.deleteConfirmation", { id: removing?.id })}</p> : null}
         </div>
       </AppModal>

@@ -1,6 +1,7 @@
 import {
   Autocomplete,
   Button,
+  Checkbox,
   Chip,
   Description,
   DateField,
@@ -403,23 +404,58 @@ export function Toggle({
 }) {
   return (
     <Switch.Root
-      className="flex min-h-11 items-center justify-between gap-4"
+      className="min-h-11"
       isDisabled={isDisabled}
       isSelected={isSelected}
       onChange={onChange}
     >
       <Switch.Content className="min-w-0">
-        <span className="block text-sm font-medium text-foreground">{label}</span>
-        {description ? <span className="mt-0.5 block text-xs leading-relaxed text-muted">{description}</span> : null}
+        <Switch.Control className="shrink-0">
+          <Switch.Thumb>
+            <Switch.Icon>
+              <Check aria-hidden="true" size={11} />
+            </Switch.Icon>
+          </Switch.Thumb>
+        </Switch.Control>
+        <Label className="min-w-0 text-sm font-medium text-foreground">{label}</Label>
       </Switch.Content>
-      <Switch.Control className="shrink-0">
-        <Switch.Thumb>
-          <Switch.Icon>
-            <Check aria-hidden="true" size={11} />
-          </Switch.Icon>
-        </Switch.Thumb>
-      </Switch.Control>
+      {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
     </Switch.Root>
+  );
+}
+
+export function FormCheckbox({
+  label,
+  description,
+  isSelected,
+  onChange,
+  isDisabled,
+  className,
+}: {
+  label: ReactNode;
+  description?: string;
+  isSelected: boolean;
+  onChange: (selected: boolean) => void;
+  isDisabled?: boolean;
+  className?: string;
+}) {
+  return (
+    <Checkbox
+      className={className}
+      isDisabled={isDisabled}
+      isSelected={isSelected}
+      onChange={onChange}
+    >
+      <Checkbox.Content className="w-full min-w-0">
+        <Checkbox.Control className="shrink-0">
+          <Checkbox.Indicator>
+            <Check aria-hidden="true" size={12} />
+          </Checkbox.Indicator>
+        </Checkbox.Control>
+        <Label className="min-w-0 flex-1 text-sm font-medium text-foreground">{label}</Label>
+      </Checkbox.Content>
+      {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
+    </Checkbox>
   );
 }
 
