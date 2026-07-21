@@ -30,12 +30,7 @@ function AuthenticatedApplication() {
     );
   }
   if (!session) {
-    return (
-      <>
-        <LoginPage />
-        <ToastProvider placement="top" width={360} />
-      </>
-    );
+    return <LoginPage />;
   }
   return (
     <Routes>
@@ -59,6 +54,7 @@ export function App() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <AuthenticatedApplication />
+          <ToastProvider placement="top" width={360} />
         </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>

@@ -1,4 +1,4 @@
-import { Alert, Button, Drawer, ToastProvider, toast, useOverlayState } from "@heroui/react";
+import { Alert, Button, Drawer, toast, useOverlayState } from "@heroui/react";
 import {
   Ban,
   BookUser,
@@ -153,6 +153,7 @@ export function AppShell() {
         <Drawer.Backdrop>
           <Drawer.Content placement="left">
             <Drawer.Dialog className="p-0">
+              <Drawer.Heading className="sr-only">{t("shell.menu")}</Drawer.Heading>
               <Drawer.Header className="border-b border-border p-4">
                 <div className="flex items-center justify-between gap-3">
                   <Brand />
@@ -177,7 +178,6 @@ export function AppShell() {
           </Drawer.Content>
         </Drawer.Backdrop>
       </Drawer>
-      <ToastProvider placement="top" width={360} />
     </div>
   );
 }

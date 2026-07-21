@@ -19,7 +19,6 @@ export function LoginPage() {
     setSubmitting(true);
     try {
       await login(username, password);
-      toast.success(t("login.submit"));
     } catch (error) {
       toast.danger(t("login.failed"), { description: errorText(error) });
     } finally {
@@ -54,7 +53,7 @@ export function LoginPage() {
               <Alert.Description>{t("shell.securityBody")}</Alert.Description>
             </Alert.Content>
           </Alert>
-          <form className="grid gap-5" onSubmit={submit}>
+          <form aria-busy={submitting} className="grid gap-5" onSubmit={submit}>
             <FormField
               autoComplete="username"
               isRequired
@@ -63,7 +62,12 @@ export function LoginPage() {
               onChange={setUsername}
             />
             <PasswordField label={t("login.password")} value={password} onChange={setPassword} />
-            <Button className="mt-1 w-full" isPending={submitting} type="submit" variant="primary">
+            <Button
+              className="mt-1 w-full"
+              isDisabled={submitting}
+              type="submit"
+              variant="primary"
+            >
               <LogIn aria-hidden="true" size={18} />
               {submitting ? t("login.signingIn") : t("login.submit")}
             </Button>

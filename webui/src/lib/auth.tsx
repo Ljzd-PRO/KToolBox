@@ -42,6 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           method: "POST",
           body: { username, password },
         });
+        if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
         setSession(next);
       },
       logout: async () => {
