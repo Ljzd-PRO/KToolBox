@@ -23,11 +23,11 @@ class DownloaderConfiguration(ktoolbox.configuration.DownloaderConfiguration):
     文件下载器配置
 
     :ivar scheme: 下载器的 URL 协议
-    :ivar files_netloc: Pawchive 投稿文件的主机地址
+    :ivar files_netloc: Pawchive 作品文件的主机地址
     :ivar file_path_prefix: API 文件路径前添加的路径前缀
     :ivar session_key: 仅发送给文件主机的可选会话 Cookie
     :ivar timeout: 下载器请求超时时间
-    :ivar encoding: 文件名解析和帖子 ``内容``、``external_links`` 保存的字符集
+    :ivar encoding: 文件名解析和作品 ``内容``、``external_links`` 保存的字符集
     :ivar buffer_size: 每个下载文件的文件 I/O 缓冲区字节数
     :ivar chunk_size: 下载器流的分块字节数
     :ivar temp_suffix: 下载文件的临时文件名后缀
@@ -49,7 +49,7 @@ class DownloaderConfiguration(ktoolbox.configuration.DownloaderConfiguration):
 class PostStructureConfiguration(ktoolbox.configuration.PostStructureConfiguration):
     # noinspection SpellCheckingInspection
     """
-    帖子路径结构模型
+    作品路径结构模型
 
     - 默认结构:
     ```
@@ -83,9 +83,9 @@ class PostStructureConfiguration(ktoolbox.configuration.PostStructureConfigurati
         | ``edited``   | 日期   |
 
     :ivar attachments: 附件目录的子路径
-    :ivar content: 帖子内容文件的子路径
+    :ivar content: 作品内容文件的子路径
     :ivar external_links: 外部链接文件的子路径（用于保存内容中发现的云存储链接）
-    :ivar file: 帖子 `file` 文件名的格式（`file` 不是 `attachment`，每个帖子只有一个 `file`，通常为封面图片）。\
+    :ivar file: 作品 `file` 文件名的格式（`file` 不是 `attachment`，每个作品只有一个 `file`，通常为封面图片）。\
     通过插入空的 ``{}`` 自定义文件名格式。可使用 [属性][ktoolbox._configuration_zh.JobConfiguration]。\
     例如：``{title}_{}`` 可能生成 ``TheTitle_Stelle_lv5_logo.gif``、``TheTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg`` 等文件名。\
     同时，你也可以使用 Python 格式规格迷你语言的格式化功能，例如：``{title:.6}_{}`` 可以将标题长度缩短为 6 个字符，\
@@ -125,13 +125,13 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
 
     :ivar count: 并发下载的协程数量
     :ivar creator_concurrency: 同时获取并准备的作者数量上限
-    :ivar include_revisions: 下载时包含修订帖子
-    :ivar post_dirname_format: 自定义帖子目录名格式，可使用 [属性][ktoolbox._configuration_zh.JobConfiguration]。\
+    :ivar include_revisions: 下载时包含修订作品
+    :ivar post_dirname_format: 自定义作品目录名格式，可使用 [属性][ktoolbox._configuration_zh.JobConfiguration]。\
     例如：``[{published}]{id}`` 可以生成类似 ``[2024-1-1]123123`` 的目录名，\
     ``{user}_{published}_{title}`` 可以生成类似 ``234234_2024-1-1_TheTitle`` 的目录名。\
     同时，你也可以使用 Python 格式规格迷你语言的格式化功能，例如：``{title:.6}`` 可以将标题长度缩短为 6 个字符，像 ``HiEveryoneThisIsALongTitle`` 会变成 ``HiEver``
-    :ivar post_structure: 帖子路径结构
-    :ivar mix_posts: 在创作者目录下将不同帖子的所有文件保存到同一路径，不创建帖子目录，且不会记录 ``CreatorIndices``
+    :ivar post_structure: 作品路径结构
+    :ivar mix_posts: 在创作者目录下将不同作品的所有文件保存到同一路径，不创建作品目录，且不会记录 ``CreatorIndices``
     :ivar sequential_filename: 附件按数字顺序重命名，如 ``1.png``、``2.png`` 等
     :ivar sequential_filename_excludes: 启用 ``sequential_filename`` 时排除按顺序命名的文件扩展名，这些文件将保留原始名称。例如 ``[".psd", ".zip", ".mp4"]``
     :ivar filename_format: 通过插入空的 ``{}`` 自定义文件名格式，表示基本文件名。可使用 [属性][ktoolbox._configuration_zh.JobConfiguration]。\
@@ -140,18 +140,18 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
     同时，你也可以使用 Python 格式规格迷你语言的格式化功能，例如：``{title:.6}`` 可以将标题长度缩短为 6 个字符，像 ``HiEveryoneThisIsALongTitle`` 会变成 ``HiEver``
     :ivar allow_list: 下载匹配这些模式（Unix shell 风格）的文件，如 ``["*.png"]``
     :ivar block_list: 不下载匹配这些模式（Unix shell 风格）的文件，如 ``["*.psd","*.zip"]``
-    :ivar extract_content: 提取帖子内容并保存到单独文件（文件名由 ``config.job.post_structure.content`` 定义）
-    :ivar extract_content_images: 提取并下载帖子正文中的图片
-    :ivar extract_external_links: 从帖子内容中提取外部文件分享链接并保存到单独文件（文件名由 ``config.job.post_structure.external_links`` 定义）
+    :ivar extract_content: 提取作品内容并保存到单独文件（文件名由 ``config.job.post_structure.content`` 定义）
+    :ivar extract_content_images: 提取并下载作品正文中的图片
+    :ivar extract_external_links: 从作品内容中提取外部文件分享链接并保存到单独文件（文件名由 ``config.job.post_structure.external_links`` 定义）
     :ivar external_link_patterns: 用于提取外部链接的正则表达式模式
     :ivar group_by_year: 根据发布日期按年分组到不同目录
     :ivar group_by_month: 根据发布日期按月分组到不同目录（需要启用 group_by_year）
     :ivar year_dirname_format: 自定义年份目录名格式。可用属性：``year``。例如：``{year}`` > ``2024``，``Year_{year}`` > ``Year_2024``
     :ivar month_dirname_format: 自定义月份目录名格式。可用属性：``year``、``month``。例如：``{year}-{month}`` > ``2024-01``，``{year}_{month}`` > ``2024_01``
-    :ivar keywords: 按帖子标题关键词过滤（不区分大小写）
-    :ivar keywords_exclude: 已弃用的标题排除关键词，会转换成隐式全局字段匹配屏蔽器；新配置应在 ``ktoolbox.toml`` 中定义结构化屏蔽器
-    :ivar download_file: 是否下载帖子文件（通常为封面图片）。设置为 False 可跳过文件下载。
-    :ivar download_attachments: 是否下载帖子附件。设置为 False 可跳过附件下载。
+    :ivar keywords: 按作品标题关键词过滤（不区分大小写）
+    :ivar keywords_exclude: 已弃用的标题排除关键词，会转换成隐式全局字段匹配忽略规则；新配置应在 ``ktoolbox.toml`` 中定义结构化忽略规则
+    :ivar download_file: 是否下载作品文件（通常为封面图片）。设置为 False 可跳过文件下载。
+    :ivar download_attachments: 是否下载作品附件。设置为 False 可跳过附件下载。
     :ivar min_file_size: 最小文件大小（字节）。小于此大小的文件将被跳过。设置为 None 禁用最小文件大小过滤。
     :ivar max_file_size: 最大文件大小（字节）。大于此大小的文件将被跳过。设置为 None 禁用最大文件大小过滤。
     """

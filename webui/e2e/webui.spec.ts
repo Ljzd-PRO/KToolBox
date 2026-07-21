@@ -2,6 +2,13 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 const browserErrors = new WeakMap<Page, string[]>();
+const legacyChineseTerms = new RegExp([
+  "\u6295\u7a3f",
+  "\u5e16\u5b50",
+  "\u5c4f\u853d\u5668",
+  "\u4e00\u89c8\u4e0b\u8f7d\u8fd0\u884c\u72b6\u6001",
+  "\u5168\u90e8\u542f\u7528\u4f5c\u8005",
+].join("|"));
 
 test.beforeEach(({ page }) => {
   const errors: string[] = [];
@@ -50,6 +57,27 @@ test("authenticated shell is accessible in desktop and mobile themes", async ({ 
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
   const mobileScan = await new AxeBuilder({ page }).analyze();
   expect(mobileScan.violations).toEqual([]);
+});
+
+
+test("Chinese product terminology stays consistent across workflows", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("button", { name: "Switch language" }).click();
+  await expect(page.getByRole("heading", { name: "概览", exact: true })).toBeVisible();
+  await expect(page.locator("body")).not.toContainText(legacyChineseTerms);
+
+  await page.getByRole("link", { name: "任务" }).click();
+  await page.getByRole("button", { name: "创建任务" }).click();
+  await expect(page.getByRole("switch", { name: "同步所有已启用作者" })).toBeVisible();
+  await page.getByRole("button", { name: "取消" }).click();
+
+  await page.getByRole("link", { name: "作品" }).click();
+  await expect(page.getByRole("heading", { name: "作品", exact: true })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "平台" })).toBeVisible();
+
+  await page.getByRole("link", { name: "忽略规则" }).click();
+  await expect(page.getByRole("heading", { name: "忽略规则", exact: true })).toBeVisible();
+  await expect(page.locator("body")).not.toContainText(legacyChineseTerms);
 });
 
 

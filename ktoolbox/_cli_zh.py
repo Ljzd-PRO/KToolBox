@@ -66,7 +66,7 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             dump: Path = None
     ):
         """
-        搜索创作者的帖子，可使用多个参数作为关键词。
+        搜索创作者的作品，可使用多个参数作为关键词。
 
         :param id: 创作者 ID
         :param name: 创作者名称
@@ -80,11 +80,11 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
     @staticmethod
     async def get_post(service: str, creator_id: str, post_id: str, revision_id: str = None, *, dump: Path = None):
         """
-        获取指定帖子或修订版本
+        获取指定作品或修订版本
 
         :param service: 平台名称
         :param creator_id: 创作者 ID
-        :param post_id: 帖子 ID
+        :param post_id: 作品 ID
         :param revision_id: 修订版本 ID（可选）
         :param dump: 将结果导出为 JSON 文件
         """
@@ -100,11 +100,11 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             dump_post_data=True
     ):
         """
-        下载指定帖子或修订版本（通过 URL）
+        下载指定作品或修订版本（通过 URL）
 
-        :param url: 帖子链接
+        :param url: 作品链接
         :param path: 下载路径，默认为当前目录
-        :param dump_post_data: 是否在帖子目录中保存 post.json 数据
+        :param dump_post_data: 是否在作品目录中保存 post.json 数据
         """
         ...
 
@@ -120,14 +120,14 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             dump_post_data=True
     ):
         """
-        下载指定帖子或修订版本（通过参数）
+        下载指定作品或修订版本（通过参数）
 
         :param service: 平台名称
         :param creator_id: 创作者 ID
-        :param post_id: 帖子 ID
+        :param post_id: 作品 ID
         :param revision_id: 修订版本 ID（可选）
         :param path: 下载路径，默认为当前目录
-        :param dump_post_data: 是否在帖子目录中保存 post.json 数据
+        :param dump_post_data: 是否在作品目录中保存 post.json 数据
         """
         ...
 
@@ -143,15 +143,15 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             dump_post_data=True
     ):
         """
-        下载指定帖子或修订版本
+        下载指定作品或修订版本
 
-        :param url: 帖子链接
+        :param url: 作品链接
         :param service: 平台名称
         :param creator_id: 创作者 ID
-        :param post_id: 帖子 ID
+        :param post_id: 作品 ID
         :param revision_id: 修订版本 ID（可选）
         :param path: 下载路径，默认为当前目录
-        :param dump_post_data: 是否在帖子目录中保存 post.json 数据
+        :param dump_post_data: 是否在作品目录中保存 post.json 数据
         """
         return await super().download_post(
             url=url,
@@ -177,16 +177,16 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             keywords_exclude: str = None
     ):
         """
-        同步创作者所有帖子（通过 URL）
+        同步创作者所有作品（通过 URL）
 
-        :param url: 帖子链接
+        :param url: 作品链接
         :param path: 下载路径，默认为当前目录
         :param save_creator_indices: 是否记录 CreatorIndices 数据
-        :param mix_posts: 是否将不同帖子的所有文件保存到同一路径
-        :param start_time: 帖子发布时间范围起始
-        :param end_time: 帖子发布时间范围结束
-        :param keywords: 按标题过滤帖子，逗号分隔关键词
-        :param keywords_exclude: 按标题排除帖子，逗号分隔关键词
+        :param mix_posts: 是否将不同作品的所有文件保存到同一路径
+        :param start_time: 作品发布时间范围起始
+        :param end_time: 作品发布时间范围结束
+        :param keywords: 按标题过滤作品，逗号分隔关键词
+        :param keywords_exclude: 按标题排除作品，逗号分隔关键词
         """
         ...
 
@@ -205,17 +205,17 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             keywords_exclude: str = None
     ):
         """
-        同步创作者所有帖子（通过参数）
+        同步创作者所有作品（通过参数）
 
         :param service: 平台名称
         :param creator_id: 创作者 ID
         :param path: 下载路径，默认为当前目录
         :param save_creator_indices: 是否记录 CreatorIndices 数据
-        :param mix_posts: 是否将不同帖子的所有文件保存到同一路径
-        :param start_time: 帖子发布时间范围起始
-        :param end_time: 帖子发布时间范围结束
-        :param keywords: 按标题过滤帖子，逗号分隔关键词
-        :param keywords_exclude: 按标题排除帖子，逗号分隔关键词
+        :param mix_posts: 是否将不同作品的所有文件保存到同一路径
+        :param start_time: 作品发布时间范围起始
+        :param end_time: 作品发布时间范围结束
+        :param keywords: 按标题过滤作品，逗号分隔关键词
+        :param keywords_exclude: 按标题排除作品，逗号分隔关键词
         """
         ...
 
@@ -236,24 +236,24 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             keywords_exclude: str = None
     ):
         """
-        同步创作者所有帖子
+        同步创作者所有作品
 
-        可在下载完成后随时更新目录，例如创作者发布新帖子后进行更新。
+        可在下载完成后随时更新目录，例如创作者发布新作品后进行更新。
 
         * ``start_time`` 和 ``end_time`` 示例：``2023-12-7``，``2023-12-07``
 
-        :param url: 帖子链接
+        :param url: 作品链接
         :param service: 平台名称
         :param creator_id: 创作者 ID
         :param path: 下载路径，默认为当前目录
         :param save_creator_indices: 是否记录 CreatorIndices 数据
-        :param mix_posts: 是否将不同帖子的所有文件保存到同一路径
-        :param start_time: 帖子发布时间范围起始，格式 ``%Y-%m-%d``
-        :param end_time: 帖子发布时间范围结束，格式 ``%Y-%m-%d``
+        :param mix_posts: 是否将不同作品的所有文件保存到同一路径
+        :param start_time: 作品发布时间范围起始，格式 ``%Y-%m-%d``
+        :param end_time: 作品发布时间范围结束，格式 ``%Y-%m-%d``
         :param offset: 结果偏移量
-        :param length: 获取帖子数量，默认为全部
-        :param keywords: 按标题过滤帖子，逗号分隔关键词
-        :param keywords_exclude: 按标题排除帖子，逗号分隔关键词
+        :param length: 获取作品数量，默认为全部
+        :param keywords: 按标题过滤作品，逗号分隔关键词
+        :param keywords_exclude: 按标题排除作品，逗号分隔关键词
         """
         return await super().sync_creator(
             url=url,

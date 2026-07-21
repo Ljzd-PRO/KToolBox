@@ -64,6 +64,10 @@ def test_config_metadata_is_complete_bilingual_and_redacts_secrets(tmp_path: Pat
     assert count.label == "Concurrent downloads"
     assert count.json_schema["minimum"] == 1
     assert next(field for field in chinese.fields if field.path == "job.count").label == "并发下载数"
+    post_directory = next(field for field in chinese.fields if field.path == "job.post_dirname_format")
+    assert post_directory.label == "作品目录格式"
+    forbidden_terms = ("\u6295\u7a3f", "\u5e16\u5b50", "\u5c4f\u853d\u5668")
+    assert not any(term in f"{field.label} {field.description}" for field in chinese.fields for term in forbidden_terms)
 
 
 def test_dotenv_store_preserves_comments_validates_and_detects_conflicts(tmp_path: Path) -> None:
