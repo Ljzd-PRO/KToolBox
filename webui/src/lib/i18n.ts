@@ -115,6 +115,8 @@ const resources = {
         empty: "No blockers configured",
         saved: "Blockers saved",
         remove: "Remove blocker",
+        removeTitle: "Remove this blocker?",
+        removeBody: "The {{id}} rule will stop applying to future sync tasks.",
       },
       configuration: {
         title: "Configuration",
@@ -267,6 +269,7 @@ const resources = {
         environmentFiles: "Environment files",
         check: "Check Pawchive",
         unavailable: "Unavailable",
+        apiReady: "API ready",
       },
       common: {
         loading: "Loading",
@@ -418,6 +421,8 @@ const resources = {
         empty: "尚未配置屏蔽器",
         saved: "屏蔽器已保存",
         remove: "移除屏蔽器",
+        removeTitle: "移除此屏蔽器？",
+        removeBody: "规则 {{id}} 将不再应用于之后创建的同步任务。",
       },
       configuration: {
         title: "配置",
@@ -567,6 +572,7 @@ const resources = {
         environmentFiles: "环境配置文件",
         check: "检查 Pawchive",
         unavailable: "不可用",
+        apiReady: "API 就绪",
       },
       common: {
         loading: "加载中",

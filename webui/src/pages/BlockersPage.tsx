@@ -24,6 +24,7 @@ import { useTranslation } from "react-i18next";
 import {
   AutocompleteField,
   CompactSwitch,
+  ConfirmModal,
   EmptyPanel,
   FormCheckbox,
   FormField,
@@ -84,6 +85,7 @@ export function BlockersPage() {
   const [editorIndex, setEditorIndex] = useState<number | null>(null);
   const [scopeCandidate, setScopeCandidate] = useState("");
   const [saving, setSaving] = useState(false);
+  const [removingIndex, setRemovingIndex] = useState<number | null>(null);
 
   if (blockersQuery.isLoading || creatorsQuery.isLoading) return <PageLoading />;
   const blockers = blockersQuery.data?.blockers ?? [];
@@ -139,6 +141,16 @@ export function BlockersPage() {
     await replaceBlockers(next);
   }
 
+  async function removeBlocker() {
+    if (removingIndex === null) return;
+    try {
+      await replaceBlockers(blockers.filter((_, index) => index !== removingIndex));
+      setRemovingIndex(null);
+    } catch {
+      // Toast is emitted by replaceBlockers; keep the confirmation open for retry.
+    }
+  }
+
   function updateEditorScope(mode: "global" | "creators") {
     if (!editor) return;
     setEditor({
@@ -173,7 +185,7 @@ export function BlockersPage() {
         <section className="grid gap-3">
           {blockers.map((blocker, index) => (
             <Surface className="rounded-lg border border-border p-4" key={blocker.id}>
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+              <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_5rem_auto] lg:items-center">
                 <div className="flex min-w-0 flex-1 items-start gap-3">
                   <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-default text-muted" aria-hidden="true">
                     <Braces size={18} />
@@ -195,8 +207,9 @@ export function BlockersPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center justify-end gap-1">
+                <div className="list-switch-cell flex min-h-11 items-center justify-center lg:w-20">
                   <CompactSwitch
+                    isDisabled={saving}
                     isSelected={blocker.enabled}
                     label={t("blockers.enabled")}
                     onChange={(enabled) => {
@@ -205,23 +218,29 @@ export function BlockersPage() {
                       void replaceBlockers(next);
                     }}
                   />
+                </div>
+                <div className="flex flex-wrap items-center justify-center gap-1 lg:justify-end">
                   <IconButton
                     icon={ArrowUp}
                     isDisabled={index === 0 || saving}
                     label={t("tasks.moveUp")}
+                    tooltip={index === 0 ? t("tasks.firstInQueue") : t("tasks.moveUp")}
                     onPress={() => void move(index, -1)}
                   />
                   <IconButton
                     icon={ArrowDown}
                     isDisabled={index === blockers.length - 1 || saving}
                     label={t("tasks.moveDown")}
+                    tooltip={index === blockers.length - 1 ? t("tasks.lastInQueue") : t("tasks.moveDown")}
                     onPress={() => void move(index, 1)}
                   />
-                  <IconButton icon={Pencil} label={t("common.edit")} onPress={() => openEditor(blocker, index)} />
+                  <IconButton icon={Pencil} isDisabled={saving} label={t("common.edit")} onPress={() => openEditor(blocker, index)} />
                   <IconButton
+                    className="text-danger"
                     icon={Trash2}
+                    isDisabled={saving}
                     label={t("blockers.remove")}
-                    onPress={() => void replaceBlockers(blockers.filter((_, itemIndex) => itemIndex !== index))}
+                    onPress={() => setRemovingIndex(index)}
                   />
                 </div>
               </div>
@@ -326,6 +345,24 @@ export function BlockersPage() {
           </form>
         ) : null}
       </FormModal>
+
+      <ConfirmModal
+        actions={
+          <>
+            <Button variant="ghost" onPress={() => setRemovingIndex(null)}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
+            <Button isPending={saving} variant="danger" onPress={() => void removeBlocker()}>
+              <Trash2 aria-hidden="true" size={17} />
+              {t("common.remove")}
+            </Button>
+          </>
+        }
+        open={removingIndex !== null}
+        size="md"
+        title={t("blockers.removeTitle")}
+        onOpenChange={(open) => !open && setRemovingIndex(null)}
+      >
+        <p className="text-sm leading-relaxed text-muted">{t("blockers.removeBody", { id: removingIndex === null ? "" : blockers[removingIndex]?.id })}</p>
+      </ConfirmModal>
     </div>
   );
 }

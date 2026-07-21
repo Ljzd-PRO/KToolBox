@@ -42,7 +42,7 @@ export function SystemPage() {
             </div>
             <Chip color="success" size="sm" variant="soft">
               <CheckCircle2 aria-hidden="true" size={14} />
-              API ready
+              {t("system.apiReady")}
             </Chip>
           </div>
         </Surface>

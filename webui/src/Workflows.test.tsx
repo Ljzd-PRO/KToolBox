@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { App } from "./App";
+import { queryClient } from "./lib/query";
 
 const session = {
   authenticated: true,
@@ -19,6 +20,7 @@ function json(body: unknown, status = 200) {
 }
 
 afterEach(() => {
+  queryClient.clear();
   vi.unstubAllGlobals();
   window.history.replaceState({}, "", "/");
   localStorage.clear();
@@ -39,11 +41,15 @@ describe("project workflows", () => {
       }),
     );
 
-    render(<BrowserRouter><App /></BrowserRouter>);
+    const { container } = render(<BrowserRouter><App /></BrowserRouter>);
 
     expect(await screen.findByRole("heading", { name: "Creators" })).toBeInTheDocument();
     expect(screen.getAllByText("Studio Sample").length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "Add creator" })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Edit Studio Sample" }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("button", { name: "Remove Studio Sample" }).length).toBeGreaterThan(0);
+    expect(screen.queryByRole("button", { name: /Actions Studio Sample/ })).not.toBeInTheDocument();
+    expect(container.querySelector(".list-switch-cell")).toContainElement(screen.getAllByRole("switch")[0]);
   });
 
   it("renders scoped blocker controls from project TOML", async () => {
@@ -86,11 +92,14 @@ describe("project workflows", () => {
       }),
     );
 
-    render(<BrowserRouter><App /></BrowserRouter>);
+    const { container } = render(<BrowserRouter><App /></BrowserRouter>);
 
     expect(await screen.findByRole("heading", { name: "Blockers" })).toBeInTheDocument();
     expect(screen.getByText("daily-sharing")).toBeInTheDocument();
     expect(screen.getByText(/Selected creators: fanbox:42/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Remove blocker" })).toBeInTheDocument();
+    expect(container.querySelector(".list-switch-cell")).toContainElement(screen.getByRole("switch", { name: "Rule enabled" }));
   });
 
   it("renders typed configuration labels and docstring descriptions", async () => {
@@ -136,11 +145,14 @@ describe("project workflows", () => {
       }),
     );
 
-    render(<BrowserRouter><App /></BrowserRouter>);
+    const { container } = render(<BrowserRouter><App /></BrowserRouter>);
 
     expect(await screen.findByRole("heading", { name: "Configuration" })).toBeInTheDocument();
     expect(screen.getByText("API request timeout")).toBeInTheDocument();
     expect(screen.getByText("Pawchive API request timeout")).toBeInTheDocument();
     expect(screen.queryByText("api.timeout")).not.toBeInTheDocument();
+    const saveBar = container.querySelector(".config-save-bar");
+    expect(saveBar).toBeInTheDocument();
+    expect(saveBar?.closest(".form-surface")).toBeInTheDocument();
   });
 });

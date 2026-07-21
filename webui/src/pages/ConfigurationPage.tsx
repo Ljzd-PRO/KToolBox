@@ -5,6 +5,7 @@ import {
   Check,
   Cloud,
   Download,
+  Eraser,
   FileCheck2,
   FileCog,
   FileText,
@@ -18,6 +19,7 @@ import {
   ShieldAlert,
   TextCursorInput,
   ToggleLeft,
+  Undo2,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -254,10 +256,7 @@ export function ConfigurationPage() {
                   onDiscard={() => discardField(field)}
                 />
               ))}
-            </FormSurface>
-
-            <div className="sticky bottom-4 z-10 flex justify-end">
-              <Surface className="flex items-center gap-3 rounded-lg border border-border p-3 shadow-lg">
+              <div className="config-save-bar sticky bottom-0 z-10 flex flex-wrap items-center justify-between gap-3 p-3">
                 <Chip color={changedFields.length ? "accent" : "default"} variant="soft">
                   {t("configuration.pendingCount", { count: changedFields.length })}
                 </Chip>
@@ -265,8 +264,8 @@ export function ConfigurationPage() {
                   <Save aria-hidden="true" size={17} />
                   {t("configuration.review")}
                 </Button>
-              </Surface>
-            </div>
+              </div>
+            </FormSurface>
           </div>
         </Tabs.Panel>
 
@@ -444,9 +443,9 @@ function ConfigFieldEditor({
           {field.apply_mode === "restart" ? t("configuration.restart") : t("configuration.nextTask")}
         </Chip>
         {disabled ? <Chip color="warning" size="sm" variant="soft">{t("configuration.inherited")}</Chip> : null}
-        {isPending ? <Button size="sm" variant="ghost" onPress={onDiscard}>{t("common.undo")}</Button> : null}
+        {isPending ? <Button size="sm" variant="ghost" onPress={onDiscard}><Undo2 aria-hidden="true" size={15} />{t("common.undo")}</Button> : null}
         {!disabled && field.source !== "default" ? (
-          <Button size="sm" variant="ghost" onPress={() => onChange(null)}>{t("configuration.clear")}</Button>
+          <Button size="sm" variant="ghost" onPress={() => onChange(null)}><Eraser aria-hidden="true" size={15} />{t("configuration.clear")}</Button>
         ) : null}
       </div>
     </div>

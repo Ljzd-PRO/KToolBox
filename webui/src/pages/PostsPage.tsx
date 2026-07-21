@@ -26,6 +26,7 @@ import {
   FormModal,
   FormSwitchField,
   FormSurface,
+  IconButton,
   NumberInput,
   PageHeader,
   PageLoading,
@@ -151,14 +152,16 @@ export function PostsPage() {
     <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6">
       <PageHeader description={t("posts.description")} title={t("posts.title")} />
       <FormSurface>
-        <form className="grid gap-4 lg:grid-cols-5" onSubmit={searchPosts}>
+        <form className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" onSubmit={searchPosts}>
           <FormField icon={Cloud} label={t("posts.service")} value={service} onChange={setService} />
           <FormField icon={UserRound} label={t("posts.creatorId")} value={creatorId} onChange={setCreatorId} />
           <FormField icon={UserRound} label={t("posts.creatorName")} value={creatorName} onChange={setCreatorName} />
-          <FormField icon={Search} label={t("posts.query")} value={query} onChange={setQuery} />
           <NumberInput icon={ListStart} label={t("tasks.offset")} minValue={0} step={50} value={offset} onChange={setOffset} />
-          <div className="flex justify-end lg:col-span-5">
-            <Button isPending={searching} type="submit" variant="primary">
+          <div className="md:col-span-2 xl:col-span-3">
+            <FormField icon={Search} label={t("posts.query")} value={query} onChange={setQuery} />
+          </div>
+          <div className="flex items-end justify-end">
+            <Button className="w-full md:w-auto" isPending={searching} type="submit" variant="primary">
               <Search aria-hidden="true" size={17} />
               {t("posts.search")}
             </Button>
@@ -191,7 +194,7 @@ export function PostsPage() {
                           <Table.Cell><code className="text-xs">{post.user}</code></Table.Cell>
                           <Table.Cell><Chip size="sm" variant="soft">{post.service}</Chip></Table.Cell>
                           <Table.Cell className="text-xs text-muted">{formatDateTime(post.published, i18n.language)}</Table.Cell>
-                          <Table.Cell><Button isIconOnly aria-label={t("posts.details")} size="sm" variant="ghost" onPress={() => openPost(post)}><Eye aria-hidden="true" size={17} /></Button></Table.Cell>
+                          <Table.Cell><IconButton icon={Eye} label={t("posts.details")} onPress={() => openPost(post)} /></Table.Cell>
                         </Table.Row>
                       ))}
                     </Table.Body>
@@ -202,7 +205,7 @@ export function PostsPage() {
                 <Surface className="grid gap-3 rounded-lg border border-border p-4" key={`${post.service}:${post.user}:${post.id}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0"><p className="truncate font-medium">{post.title || `#${post.id}`}</p><p className="mt-1 text-xs text-muted">{post.service}:{post.user}</p></div>
-                    <Button isIconOnly aria-label={t("posts.details")} size="sm" variant="ghost" onPress={() => openPost(post)}><Eye aria-hidden="true" size={17} /></Button>
+                    <IconButton icon={Eye} label={t("posts.details")} onPress={() => openPost(post)} />
                   </div>
                   <p className="text-xs text-muted">{formatDateTime(post.published, i18n.language)}</p>
                 </Surface>

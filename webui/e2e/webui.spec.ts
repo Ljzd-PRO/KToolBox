@@ -105,6 +105,61 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
 });
 
 
+test("roster blockers and configuration keep controls aligned and visible", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("link", { name: "Creators" }).click();
+
+  const creatorRow = page.getByRole("row").filter({ hasText: "Demo Studio" });
+  await expect(creatorRow.getByRole("button", { name: "Edit Demo Studio" })).toBeVisible();
+  await expect(creatorRow.getByRole("button", { name: "Remove Demo Studio" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Actions Demo Studio/ })).toHaveCount(0);
+  const creatorSwitchCell = creatorRow.locator(".list-switch-cell");
+  const creatorSwitchControl = creatorSwitchCell.locator('[data-slot="switch-control"]');
+  const [creatorCellBox, creatorControlBox] = await Promise.all([
+    creatorSwitchCell.boundingBox(),
+    creatorSwitchControl.boundingBox(),
+  ]);
+  expect(creatorCellBox).not.toBeNull();
+  expect(creatorControlBox).not.toBeNull();
+  expect(Math.abs(
+    (creatorCellBox?.x ?? 0) + (creatorCellBox?.width ?? 0) / 2
+      - (creatorControlBox?.x ?? 0) - (creatorControlBox?.width ?? 0) / 2,
+  )).toBeLessThan(1);
+
+  await page.getByRole("link", { name: "Blockers" }).click();
+  await page.getByRole("button", { name: "Add blocker" }).click();
+  await page.getByRole("textbox", { name: /Rule ID/ }).fill("daily-sharing");
+  await page.getByRole("textbox", { name: "Values" }).fill("fictional-daily");
+  await page.getByRole("dialog", { name: "Add blocker" }).getByRole("button", { name: "Save" }).click();
+
+  const blockerCard = page.getByRole("heading", { name: "daily-sharing" }).locator("xpath=ancestor::section");
+  await expect(blockerCard.getByRole("button", { name: "Edit" })).toBeVisible();
+  await expect(blockerCard.getByRole("button", { name: "Remove blocker" })).toBeVisible();
+  const blockerSwitchCell = blockerCard.locator(".list-switch-cell");
+  const blockerSwitchControl = blockerSwitchCell.locator('[data-slot="switch-control"]');
+  const [blockerCellBox, blockerControlBox] = await Promise.all([
+    blockerSwitchCell.boundingBox(),
+    blockerSwitchControl.boundingBox(),
+  ]);
+  expect(blockerCellBox).not.toBeNull();
+  expect(blockerControlBox).not.toBeNull();
+  expect(Math.abs(
+    (blockerCellBox?.x ?? 0) + (blockerCellBox?.width ?? 0) / 2
+      - (blockerControlBox?.x ?? 0) - (blockerControlBox?.width ?? 0) / 2,
+  )).toBeLessThan(1);
+
+  await blockerCard.getByRole("button", { name: "Remove blocker" }).click();
+  await expect(page.getByRole("dialog", { name: "Remove this blocker?" })).toBeVisible();
+  await page.getByRole("dialog", { name: "Remove this blocker?" }).getByRole("button", { name: "Cancel" }).click();
+
+  await page.getByRole("link", { name: "Configuration" }).click();
+  const saveBar = page.locator(".config-save-bar");
+  await expect(saveBar).toBeVisible();
+  expect(await saveBar.evaluate((element) => Boolean(element.closest(".form-surface")))).toBe(true);
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+});
+
+
 test("task lifecycle remains operable through pause resume and stop", async ({ page }) => {
   await signIn(page);
   await page.getByRole("link", { name: "Tasks" }).click();

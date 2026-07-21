@@ -1,14 +1,13 @@
 import {
   Button,
   Chip,
-  Dropdown,
   SearchField,
   Surface,
   Table,
   toast,
 } from "@heroui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Cloud, MoreHorizontal, Pencil, Plus, Power, Search, Tag, Trash2, UserPlus, UserRound, X } from "lucide-react";
+import { Check, Cloud, Pencil, Plus, Power, Search, Tag, Trash2, UserPlus, UserRound, X } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -222,18 +221,16 @@ export function CreatorsPage() {
                           <Table.Cell>{creator.service}</Table.Cell>
                           <Table.Cell><code className="text-xs">{creator.creator_id}</code></Table.Cell>
                           <Table.Cell className="w-24 text-center">
-                            <CompactSwitch
-                              isSelected={creator.enabled}
-                              label={creator.enabled ? t("common.enabled") : t("common.disabled")}
-                              onChange={(enabled) => void setEnabled(creator, enabled)}
-                            />
+                            <div className="list-switch-cell mx-auto flex w-20 items-center justify-center">
+                              <CompactSwitch
+                                isSelected={creator.enabled}
+                                label={creator.enabled ? t("common.enabled") : t("common.disabled")}
+                                onChange={(enabled) => void setEnabled(creator, enabled)}
+                              />
+                            </div>
                           </Table.Cell>
                           <Table.Cell className="text-right">
-                            <CreatorActions
-                              creator={creator}
-                              onEdit={() => openEdit(creator)}
-                              onRemove={() => setRemoving(creator)}
-                            />
+                            <CreatorActions creator={creator} onEdit={() => openEdit(creator)} onRemove={() => setRemoving(creator)} />
                           </Table.Cell>
                         </Table.Row>
                       ))}
@@ -250,12 +247,18 @@ export function CreatorsPage() {
                     </div>
                     <CreatorActions creator={creator} onEdit={() => openEdit(creator)} onRemove={() => setRemoving(creator)} />
                   </div>
-                  <div className="mt-4 border-t border-border pt-3">
-                    <FormSwitchField
-                      isSelected={creator.enabled}
-                      label={creator.enabled ? t("common.enabled") : t("common.disabled")}
-                      onChange={(enabled) => void setEnabled(creator, enabled)}
-                    />
+                  <div className="mt-4 flex min-h-14 items-center justify-between gap-3 border-t border-border pt-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium">{t("creators.enabled")}</p>
+                      <p className="mt-0.5 text-xs text-muted">{creator.enabled ? t("common.enabled") : t("common.disabled")}</p>
+                    </div>
+                    <div className="list-switch-cell flex w-20 shrink-0 items-center justify-center">
+                      <CompactSwitch
+                        isSelected={creator.enabled}
+                        label={creator.enabled ? t("common.enabled") : t("common.disabled")}
+                        onChange={(enabled) => void setEnabled(creator, enabled)}
+                      />
+                    </div>
                   </div>
                 </Surface>
               ))}
@@ -342,28 +345,11 @@ function CreatorActions({
   onRemove: () => void;
 }) {
   const { t } = useTranslation();
+  const name = creator.alias || creator.creator_id;
   return (
-    <Dropdown>
-      <Dropdown.Trigger>
-        <Button isIconOnly aria-label={`${t("common.actions")} ${creator.alias || creator.creator_id}`} size="sm" variant="ghost">
-          <MoreHorizontal aria-hidden="true" size={18} />
-        </Button>
-      </Dropdown.Trigger>
-      <Dropdown.Popover>
-        <Dropdown.Menu
-          aria-label={t("common.actions")}
-          onAction={(key) => (key === "edit" ? onEdit() : onRemove())}
-        >
-          <Dropdown.Item id="edit" textValue={t("common.edit")}>
-            <Pencil aria-hidden="true" size={16} />
-            {t("common.edit")}
-          </Dropdown.Item>
-          <Dropdown.Item id="remove" textValue={t("common.remove")}>
-            <Trash2 aria-hidden="true" size={16} />
-            {t("common.remove")}
-          </Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown.Popover>
-    </Dropdown>
+    <div className="flex items-center justify-end gap-1">
+      <IconButton icon={Pencil} label={`${t("common.edit")} ${name}`} onPress={onEdit} />
+      <IconButton className="text-danger" icon={Trash2} label={`${t("common.remove")} ${name}`} onPress={onRemove} />
+    </div>
   );
 }

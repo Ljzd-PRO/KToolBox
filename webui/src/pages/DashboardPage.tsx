@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { DataTableFrame, EmptyPanel, PageLoading, TaskStatusChip } from "../components/ui";
+import { TaskTarget } from "../components/TaskTarget";
 import { api } from "../lib/api";
 import type { CreatorReference, ProjectSummary, TaskRecord } from "../types";
 
@@ -92,10 +93,11 @@ export function DashboardPage() {
           </Button>
         </div>
         {records.length ? (
-          <DataTableFrame>
-            <Table.Content aria-label={t("overview.recent")}>
+          <>
+            <DataTableFrame className="hidden md:block">
+              <Table.Content aria-label={t("overview.recent")}>
                   <Table.Header>
-                    <Table.Column isRowHeader>{t("common.type")}</Table.Column>
+                    <Table.Column isRowHeader>{t("tasks.target")}</Table.Column>
                     <Table.Column>{t("common.status")}</Table.Column>
                     <Table.Column>{t("common.created")}</Table.Column>
                     <Table.Column className="text-right">{t("common.actions")}</Table.Column>
@@ -103,7 +105,7 @@ export function DashboardPage() {
                   <Table.Body>
                     {records.slice(0, 6).map((task) => (
                       <Table.Row key={task.id}>
-                        <Table.Cell className="capitalize">{t(`common.${task.kind}`)}</Table.Cell>
+                        <Table.Cell className="min-w-60"><TaskTarget task={task} /></Table.Cell>
                         <Table.Cell>
                           <TaskStatusChip status={task.status} />
                         </Table.Cell>
@@ -127,8 +129,25 @@ export function DashboardPage() {
                       </Table.Row>
                     ))}
                   </Table.Body>
-            </Table.Content>
-          </DataTableFrame>
+              </Table.Content>
+            </DataTableFrame>
+            <div className="grid gap-3 md:hidden">
+              {records.slice(0, 6).map((task) => (
+                <Surface className="grid gap-3 rounded-lg border border-border p-4" key={task.id}>
+                  <div className="flex min-w-0 items-start justify-between gap-3">
+                    <TaskTarget task={task} />
+                    <TaskStatusChip status={task.status} />
+                  </div>
+                  <div className="flex items-center justify-between gap-3 border-t border-border pt-3">
+                    <time className="text-xs text-muted">{new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "medium", timeStyle: "short" }).format(new Date(task.created_at))}</time>
+                    <Button isIconOnly aria-label={t("tasks.details")} size="sm" variant="ghost" onPress={() => navigate(`/tasks/${task.id}`)}>
+                      <ArrowRight aria-hidden="true" size={16} />
+                    </Button>
+                  </div>
+                </Surface>
+              ))}
+            </div>
+          </>
         ) : (
           <EmptyPanel title={t("overview.empty")} />
         )}

@@ -217,6 +217,11 @@ code {
   box-shadow: var(--surface-shadow);
 }
 
+.config-save-bar {
+  background: color-mix(in oklab, var(--surface-secondary) 92%, var(--surface) 8%);
+  box-shadow: 0 -1px 0 var(--border), 0 -8px 18px color-mix(in oklab, var(--background) 72%, transparent);
+}
+
 .field-label-icon {
   color: color-mix(in oklab, var(--accent) 42%, var(--muted) 58%);
 }
