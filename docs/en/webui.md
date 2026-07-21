@@ -50,6 +50,8 @@ The interface follows the browser language on first use and supports persistent 
 
 ![Light configuration editor](../assets/webui/09-configuration-light.png)
 
+Editable areas use a muted secondary surface with distinct field backgrounds. Field icons aid scanning, while switches and checkboxes remain left-aligned with their labels instead of resembling centered action buttons.
+
 The main areas are:
 
 - **Overview:** project path, queue health, active transfer totals, and recent tasks.
@@ -59,6 +61,8 @@ The main areas are:
 - **Blockers:** order and scope `field-match` blockers and compose nested `any`/`all`, contains, equals, regular expression, and existence conditions.
 - **Configuration:** edit `.env`, `prod.env`, and `ktoolbox.toml` through typed forms or advanced text views.
 - **System:** inspect the project and application versions and download an example environment file.
+
+![Task editor on a narrow screen](../assets/webui/19-task-form-mobile-light-zh.png)
 
 ![Creator roster on a narrow screen](../assets/webui/12-creators-mobile-light-zh.png)
 
@@ -70,11 +74,15 @@ The `.env` and `prod.env` tabs show each final effective value and a source Chip
 
 Before a save, the server parses and validates the proposed file and returns a semantic diff. Saving uses an ETag to reject stale edits and atomically replaces the file. The TOML editor uses the existing TomlKit/Pydantic store so comments survive structured roster and blocker changes.
 
-![Scoped blocker editor](../assets/webui/13-blockers-1024-dark-zh.png)
+![Dark configuration editor](../assets/webui/20-configuration-1024-dark-zh.png)
+
+![Scoped blocker editor](../assets/webui/17-blocker-form-1024-light-zh.png)
 
 ## Task lifecycle
 
 `sync` and `download` tasks preserve the complete corresponding CLI inputs. A targetless synchronization resolves the currently enabled roster when the task is created. Each attempt then receives an immutable, redacted configuration snapshot; later configuration edits affect only future attempts.
+
+![Dark task editor](../assets/webui/18-task-form-1024-dark-zh.png)
 
 The top-level queue runs two tasks by default (`KTOOLBOX_WEBUI__MAX_ACTIVE_TASKS`) while each task retains its configured creator and file concurrency. Identical active tasks resolve to the existing task. Tasks with overlapping normalized outputs, creators, or posts wait in `blocked` until the resource lock is released.
 

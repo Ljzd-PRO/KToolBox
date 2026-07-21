@@ -50,6 +50,8 @@ KToolBox 只提供一个本地 WebUI 账户，且没有默认凭据。`KTOOLBOX_
 
 ![浅色配置编辑器](../assets/webui/09-configuration-light.png)
 
+可编辑区域使用柔和的次级表面，输入控件具有独立的字段背景；字段图标便于快速扫描，开关与复选框则和标签一起靠左排列，不会表现成居中的操作按钮。
+
 主要页面包括：
 
 - **概览：** 项目路径、队列状态、活动传输统计和近期任务。
@@ -59,6 +61,8 @@ KToolBox 只提供一个本地 WebUI 账户，且没有默认凭据。`KTOOLBOX_
 - **屏蔽器：** 排序、设置作用域，并组合嵌套 `any`/`all`、包含、等于、正则和存在条件。
 - **配置：** 使用类型化表单或高级原文视图编辑 `.env`、`prod.env` 与 `ktoolbox.toml`。
 - **系统：** 查看项目与应用版本，并下载环境配置示例。
+
+![窄屏任务编辑器](../assets/webui/19-task-form-mobile-light-zh.png)
 
 ![窄屏作者清单](../assets/webui/12-creators-mobile-light-zh.png)
 
@@ -70,11 +74,15 @@ KToolBox 只提供一个本地 WebUI 账户，且没有默认凭据。`KTOOLBOX_
 
 保存前，服务端会解析、校验候选文件并返回语义差异。保存使用 ETag 拒绝过期编辑，并以原子替换落盘。TOML 编辑沿用现有 TomlKit/Pydantic 存储，因此结构化修改作者与屏蔽器时会保留注释。
 
-![作者作用域屏蔽器](../assets/webui/13-blockers-1024-dark-zh.png)
+![深色配置编辑器](../assets/webui/20-configuration-1024-dark-zh.png)
+
+![作者作用域屏蔽器](../assets/webui/17-blocker-form-1024-light-zh.png)
 
 ## 任务生命周期
 
 `sync` 与 `download` 任务覆盖对应 CLI 的完整输入。创建无目标同步时，会立即解析并保存当前已启用作者。每次尝试都会取得不可变且脱敏的配置快照，之后的配置修改只影响未来尝试。
+
+![深色任务编辑器](../assets/webui/18-task-form-1024-dark-zh.png)
 
 顶层队列默认同时运行两个任务（`KTOOLBOX_WEBUI__MAX_ACTIVE_TASKS`），每个任务内部仍保留作者和文件并发配置。完全相同的活动任务会返回现有任务；规范化输出、作者或投稿资源发生重叠时，新任务进入 `blocked`，等待资源锁释放。
 
