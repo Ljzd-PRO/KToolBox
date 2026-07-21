@@ -488,6 +488,9 @@ async def webui_run(
             port=port,
             open_browser=False if no_open else None,
         )
+    except KeyboardInterrupt:
+        stderr.print("[yellow]WebUI stopped by user.[/yellow]")
+        return 130
     except (RuntimeError, ValueError) as error:
         return _command_error("WebUI error", str(error), code=2)
     return 0

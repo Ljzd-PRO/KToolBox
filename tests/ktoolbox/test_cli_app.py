@@ -59,6 +59,12 @@ def test_webui_help_has_only_the_intended_no_open_flag(capsys) -> None:
     assert "--no-no-open" not in output
 
 
+def test_webui_interrupt_returns_expected_status(capsys) -> None:
+    with patch("ktoolbox.webui.server.run_webui", new=AsyncMock(side_effect=KeyboardInterrupt)):
+        assert app(["webui"], result_action="return_int_as_exit_code_else_zero") == 130
+    assert "WebUI stopped by user." in capsys.readouterr().err
+
+
 def test_webui_hash_password_command(capsys) -> None:
     with patch("ktoolbox.webui.server.generate_password_hash", return_value="$argon2id$example"):
         assert app(["webui", "hash-password"]) == 0
