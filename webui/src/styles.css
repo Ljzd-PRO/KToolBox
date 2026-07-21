@@ -426,6 +426,10 @@ code {
 }
 
 @media (max-width: 639px) {
+  .app-modal-dialog {
+    padding: 0 !important;
+  }
+
   .configuration-tabs [data-slot="tabs-list"] {
     width: 100%;
     min-width: 0;

@@ -127,6 +127,11 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   const modalScan = await new AxeBuilder({ page }).analyze();
   expect(modalScan.violations).toEqual([]);
 
+  await page.setViewportSize({ width: 320, height: 700 });
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+  await expect(formSurface.getByText("All enabled creators", { exact: true })).toBeVisible();
+  expect(await formActions.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
+
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.getByLabel("Output directory").fill("visual-hierarchy-downloads");
   await page.getByRole("dialog", { name: "Create task" }).getByRole("button", { name: "Create task" }).click();

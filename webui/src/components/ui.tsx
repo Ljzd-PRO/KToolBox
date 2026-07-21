@@ -50,7 +50,7 @@ function FieldLabel({ label, icon: Icon }: { label: ReactNode; icon?: TablerIcon
   return (
     <Label className="field-label flex min-w-0 flex-1 items-center gap-1.5 text-sm font-semibold text-[var(--text-secondary)]">
       {Icon ? <Icon aria-hidden="true" className="field-label-icon shrink-0" size={15} stroke={1.8} /> : null}
-      <span className="min-w-0 truncate">{label}</span>
+      <span className="min-w-0 break-words leading-snug">{label}</span>
     </Label>
   );
 }
@@ -692,7 +692,7 @@ export function FormModal({
       <Modal.Trigger aria-hidden="true" className="hidden" tabIndex={-1} />
       <Modal.Backdrop>
         <Modal.Container className="mx-3" placement="center" scroll="inside" size={size}>
-          <Modal.Dialog className="overflow-hidden">
+          <Modal.Dialog className="app-modal-dialog overflow-hidden">
             <Modal.Header className="flex items-center justify-between gap-3 border-b border-border px-5 py-4">
               <Modal.Heading className="text-lg font-semibold text-foreground">{title}</Modal.Heading>
               <Modal.CloseTrigger
@@ -740,7 +740,7 @@ export function ConfirmModal({
       <Modal.Trigger aria-hidden="true" className="hidden" tabIndex={-1} />
       <Modal.Backdrop>
         <Modal.Container className="mx-3" placement="center" scroll="inside" size={size}>
-          <Modal.Dialog className="overflow-hidden">
+          <Modal.Dialog className="app-modal-dialog overflow-hidden">
             <Modal.Header className="flex items-center justify-between gap-3 border-b border-border px-5 py-4">
               <Modal.Heading className="text-lg font-semibold text-foreground">{title}</Modal.Heading>
               <Modal.CloseTrigger
