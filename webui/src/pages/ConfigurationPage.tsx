@@ -29,13 +29,13 @@ import {
   AppModal,
   CodeEditor,
   FormField,
+  FormSwitchField,
   FormSurface,
   NumberInput,
   PageHeader,
   PageLoading,
   PasswordField,
   SelectField,
-  Toggle,
 } from "../components/ui";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
@@ -393,7 +393,7 @@ function ConfigFieldEditor({
       onChange={onChange}
     />
   ) : type === "boolean" ? (
-    <Toggle
+    <FormSwitchField
       description={field.description}
       icon={icon}
       isDisabled={disabled}

@@ -24,12 +24,12 @@ import {
   DataTableFrame,
   EmptyPanel,
   FormField,
+  FormSwitchField,
   FormSurface,
   NumberInput,
   PageHeader,
   PageLoading,
   SelectField,
-  Toggle,
 } from "../components/ui";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
@@ -223,7 +223,7 @@ export function PostsPage() {
             <FormSurface className="grid gap-4">
               <SelectField icon={History} label={t("posts.revision")} options={revisionOptions} value={selectedRevision} onChange={setSelectedRevision} />
               <FormField icon={FolderOutput} isRequired label={t("tasks.output")} value={output} onChange={setOutput} />
-              <Toggle icon={FileJson} isSelected={dumpMetadata} label={t("tasks.dumpMetadata")} onChange={setDumpMetadata} />
+              <FormSwitchField icon={FileJson} isSelected={dumpMetadata} label={t("tasks.dumpMetadata")} onChange={setDumpMetadata} />
             </FormSurface>
             <Alert status="warning">
               <Alert.Indicator><FileSearch aria-hidden="true" size={18} /></Alert.Indicator>

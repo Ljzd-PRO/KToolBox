@@ -66,19 +66,21 @@ export function IconButton({
   onPress,
   variant = "ghost",
   isDisabled,
+  className,
 }: {
   label: string;
   icon: LucideIcon;
   onPress: () => void;
   variant?: React.ComponentProps<typeof Button>["variant"];
   isDisabled?: boolean;
+  className?: string;
 }) {
   return (
     <Tooltip>
       <Button
         isIconOnly
         aria-label={label}
-        className="size-11 min-w-11 shrink-0"
+        className={cn("size-11 min-w-11 shrink-0", className)}
         isDisabled={isDisabled}
         variant={variant}
         onPress={onPress}
@@ -421,13 +423,14 @@ export function TaskStatusChip({ status }: { status: TaskStatus }) {
   );
 }
 
-export function Toggle({
+export function FormSwitchField({
   label,
   description,
   isSelected,
   onChange,
   isDisabled,
   icon,
+  className,
 }: {
   label: string;
   description?: string;
@@ -435,26 +438,56 @@ export function Toggle({
   onChange: (selected: boolean) => void;
   isDisabled?: boolean;
   icon?: LucideIcon;
+  className?: string;
 }) {
   return (
     <Switch.Root
-      className="min-h-11"
+      className={cn("form-switch min-h-11", className)}
       isDisabled={isDisabled}
       isSelected={isSelected}
       onChange={onChange}
     >
       <Switch.Content className="min-w-0">
         <Switch.Control className="shrink-0">
-          <Switch.Thumb>
-            <Switch.Icon>
-              <Check aria-hidden="true" size={11} />
-            </Switch.Icon>
-          </Switch.Thumb>
+          <Switch.Thumb />
         </Switch.Control>
         <FieldLabel icon={icon} label={label} />
       </Switch.Content>
       {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
     </Switch.Root>
+  );
+}
+
+export function CompactSwitch({
+  label,
+  isSelected,
+  onChange,
+  isDisabled,
+  className,
+}: {
+  label: string;
+  isSelected: boolean;
+  onChange: (selected: boolean) => void;
+  isDisabled?: boolean;
+  className?: string;
+}) {
+  return (
+    <Tooltip>
+      <Switch.Root
+        aria-label={label}
+        className={cn("compact-switch", className)}
+        isDisabled={isDisabled}
+        isSelected={isSelected}
+        onChange={onChange}
+      >
+        <Switch.Content className="compact-switch-content">
+          <Switch.Control>
+            <Switch.Thumb />
+          </Switch.Control>
+        </Switch.Content>
+      </Switch.Root>
+      <Tooltip.Content>{label}</Tooltip.Content>
+    </Tooltip>
   );
 }
 
@@ -464,6 +497,7 @@ export function FormCheckbox({
   isSelected,
   onChange,
   isDisabled,
+  isIndeterminate = false,
   className,
   icon,
 }: {
@@ -472,21 +506,26 @@ export function FormCheckbox({
   isSelected: boolean;
   onChange: (selected: boolean) => void;
   isDisabled?: boolean;
+  isIndeterminate?: boolean;
   className?: string;
   icon?: LucideIcon;
 }) {
   return (
     <Checkbox
-      className={className}
+      className={cn("form-checkbox min-h-11", className)}
       isDisabled={isDisabled}
+      isIndeterminate={isIndeterminate}
       isSelected={isSelected}
+      variant="secondary"
       onChange={onChange}
     >
       <Checkbox.Content className="w-full min-w-0">
         <Checkbox.Control className="shrink-0">
-          <Checkbox.Indicator>
-            <Check aria-hidden="true" size={12} />
-          </Checkbox.Indicator>
+          {isSelected || isIndeterminate ? (
+            <Checkbox.Indicator>
+              {isIndeterminate ? <Minus aria-hidden="true" size={12} /> : <Check aria-hidden="true" size={12} />}
+            </Checkbox.Indicator>
+          ) : null}
         </Checkbox.Control>
         <FieldLabel icon={icon} label={label} />
       </Checkbox.Content>

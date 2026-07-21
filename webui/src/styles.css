@@ -32,6 +32,10 @@
   --field-border-focus: color-mix(in oklab, var(--accent) 62%, var(--border) 38%);
   --field-border-width: 1px;
   --field-shadow: 0 1px 2px color-mix(in oklab, black 8%, transparent);
+  --control-track-off: oklch(0.83 0.018 250);
+  --control-track-off-hover: oklch(0.78 0.022 250);
+  --control-border: oklch(0.68 0.025 250);
+  --control-surface-off: oklch(0.9 0.012 250);
   --ktoolbox-teal: oklch(0.61 0.13 178);
   --ktoolbox-yellow: oklch(0.82 0.16 86);
 }
@@ -61,6 +65,10 @@
   --field-border-focus: color-mix(in oklab, var(--accent) 68%, var(--border) 32%);
   --field-border-width: 1px;
   --field-shadow: none;
+  --control-track-off: oklch(0.43 0.027 255);
+  --control-track-off-hover: oklch(0.49 0.03 255);
+  --control-border: oklch(0.55 0.028 255);
+  --control-surface-off: oklch(0.34 0.024 258);
   --ktoolbox-teal: oklch(0.73 0.12 176);
   --ktoolbox-yellow: oklch(0.83 0.14 88);
 }
@@ -170,6 +178,51 @@ code {
 
 .field-label-icon {
   color: color-mix(in oklab, var(--accent) 42%, var(--muted) 58%);
+}
+
+.form-switch,
+.compact-switch {
+  --switch-control-bg: var(--control-track-off);
+  --switch-control-bg-hover: var(--control-track-off-hover);
+  --switch-control-bg-pressed: var(--control-track-off-hover);
+  --switch-control-bg-checked: var(--accent);
+  --switch-control-bg-checked-hover: var(--accent-hover);
+}
+
+.form-switch > [data-slot="description"] {
+  max-width: 52rem;
+}
+
+.compact-switch {
+  display: inline-flex;
+  min-height: 44px;
+  width: 52px;
+  align-items: center;
+  justify-content: center;
+}
+
+.compact-switch-content {
+  display: inline-flex;
+  height: 44px;
+  width: 52px;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+.form-checkbox {
+  --checkbox-control-bg: var(--control-surface-off);
+}
+
+.form-checkbox .checkbox__control {
+  height: 1.125rem;
+  width: 1.125rem;
+  border-color: var(--control-border);
+}
+
+.form-checkbox[data-selected="true"] .checkbox__control,
+.form-checkbox[data-indeterminate="true"] .checkbox__control {
+  border-color: transparent;
 }
 
 .app-modal-form-footer {

@@ -24,14 +24,15 @@ import { useTranslation } from "react-i18next";
 import {
   AppModal,
   AutocompleteField,
+  CompactSwitch,
   EmptyPanel,
   FormCheckbox,
   FormField,
+  FormSwitchField,
   IconButton,
   PageHeader,
   PageLoading,
   SelectField,
-  Toggle,
 } from "../components/ui";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
@@ -195,7 +196,7 @@ export function BlockersPage() {
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center justify-end gap-1">
-                  <Toggle
+                  <CompactSwitch
                     isSelected={blocker.enabled}
                     label={t("blockers.enabled")}
                     onChange={(enabled) => {
@@ -260,7 +261,7 @@ export function BlockersPage() {
                 onChange={(type) => setEditor({ ...editor, type })}
               />
             </div>
-            <Toggle
+            <FormSwitchField
               icon={Power}
               isSelected={editor.enabled}
               label={t("blockers.enabled")}
@@ -366,7 +367,7 @@ function ConditionGroupEditor({
             onChange={(mode) => onChange({ ...group, mode: mode as "any" | "all" })}
           />
         </div>
-        <Toggle icon={Ban} isSelected={group.negate} label={t("blockers.negate")} onChange={(negate) => onChange({ ...group, negate })} />
+        <FormSwitchField icon={Ban} isSelected={group.negate} label={t("blockers.negate")} onChange={(negate) => onChange({ ...group, negate })} />
         {removable ? (
           <Button isIconOnly aria-label={t("common.remove")} variant="ghost" onPress={onRemove}>
             <Trash2 aria-hidden="true" size={17} />

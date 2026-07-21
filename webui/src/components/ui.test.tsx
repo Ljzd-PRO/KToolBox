@@ -1,9 +1,17 @@
 import { Table } from "@heroui/react";
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { Search } from "lucide-react";
 import { describe, expect, it } from "vitest";
 
-import { AppModal, DataTableFrame, FormCheckbox, FormField, FormSurface, Toggle } from "./ui";
+import {
+  AppModal,
+  CompactSwitch,
+  DataTableFrame,
+  FormCheckbox,
+  FormField,
+  FormSurface,
+  FormSwitchField,
+} from "./ui";
 
 describe("DataTableFrame", () => {
   it("uses one bordered scroll container without a wrapping surface", () => {
@@ -32,7 +40,7 @@ describe("DataTableFrame", () => {
 describe("form selection controls", () => {
   it("nests the switch control and label inside the clickable content", () => {
     const { container } = render(
-      <Toggle description="Used during synchronization" isSelected label="Save index" onChange={() => undefined} />,
+      <FormSwitchField description="Used during synchronization" isSelected label="Save index" onChange={() => undefined} />,
     );
 
     const root = container.querySelector('[data-slot="switch"]');
@@ -42,10 +50,11 @@ describe("form selection controls", () => {
     expect(content).toContainElement(control);
     expect(content).toHaveTextContent("Save index");
     expect(description?.parentElement).toBe(root);
+    expect(container.querySelector('[data-slot="switch-icon"]')).not.toBeInTheDocument();
   });
 
-  it("nests the checkbox control and label inside the clickable content", () => {
-    const { container } = render(
+  it("only renders a checkbox indicator for selected or indeterminate states", () => {
+    const { container, rerender } = render(
       <FormCheckbox description="Optional setting" isSelected={false} label="Apply start date" onChange={() => undefined} />,
     );
 
@@ -56,6 +65,21 @@ describe("form selection controls", () => {
     expect(content).toContainElement(control);
     expect(content).toHaveTextContent("Apply start date");
     expect(description?.parentElement).toBe(root);
+    expect(container.querySelector('[data-slot="checkbox-indicator"]')).not.toBeInTheDocument();
+
+    rerender(<FormCheckbox isSelected label="Apply start date" onChange={() => undefined} />);
+    expect(container.querySelector('[data-slot="checkbox-indicator"]')).toBeInTheDocument();
+  });
+
+  it("provides a compact, accessible list switch without visible label content", () => {
+    const { container } = render(
+      <CompactSwitch isSelected={false} label="Enable creator" onChange={() => undefined} />,
+    );
+
+    const root = container.querySelector('[data-slot="switch"]');
+    expect(screen.getByRole("switch", { name: "Enable creator" })).toBeInTheDocument();
+    expect(root).toHaveClass("compact-switch");
+    expect(root).not.toHaveTextContent("Enable creator");
   });
 });
 

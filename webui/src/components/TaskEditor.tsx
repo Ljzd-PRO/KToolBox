@@ -33,9 +33,9 @@ import {
   type DateRangeValue,
   FormCheckbox,
   FormField,
+  FormSwitchField,
   NumberInput,
   SelectField,
-  Toggle,
 } from "./ui";
 
 export function TaskEditor({
@@ -152,7 +152,7 @@ export function TaskEditor({
           </Tabs.ListContainer>
           <Tabs.Panel className="grid gap-5 pt-5" id="sync">
             <section className="grid gap-3">
-              <Toggle
+              <FormSwitchField
                 description={t("tasks.allEnabledHint")}
                 icon={UsersRound}
                 isSelected={allEnabled}
@@ -212,7 +212,7 @@ export function TaskEditor({
             </div>
             <FormField description={t("tasks.keywordHint")} icon={Tags} label={t("tasks.keywords")} value={keywords} onChange={setKeywords} />
             <FormField description={t("tasks.keywordHint")} icon={FilterX} label={t("tasks.excludedKeywords")} value={excludedKeywords} onChange={setExcludedKeywords} />
-            <Toggle icon={BookOpenCheck} isSelected={saveIndices} label={t("tasks.saveIndex")} onChange={setSaveIndices} />
+            <FormSwitchField icon={BookOpenCheck} isSelected={saveIndices} label={t("tasks.saveIndex")} onChange={setSaveIndices} />
           </Tabs.Panel>
           <Tabs.Panel className="grid gap-5 pt-5" id="download">
             <SelectField
@@ -235,7 +235,7 @@ export function TaskEditor({
               </div>
             )}
             <FormField icon={History} label={t("tasks.revision")} value={revisionId} onChange={setRevisionId} />
-            <Toggle icon={FileJson} isSelected={dumpMetadata} label={t("tasks.dumpMetadata")} onChange={setDumpMetadata} />
+            <FormSwitchField icon={FileJson} isSelected={dumpMetadata} label={t("tasks.dumpMetadata")} onChange={setDumpMetadata} />
           </Tabs.Panel>
         </Tabs>
         <FormField icon={FolderOutput} isRequired label={t("tasks.output")} value={output} onChange={setOutput} />

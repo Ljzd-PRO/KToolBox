@@ -14,14 +14,15 @@ import { useTranslation } from "react-i18next";
 
 import {
   AppModal,
+  CompactSwitch,
   DataTableFrame,
   EmptyPanel,
   FormField,
+  FormSwitchField,
   FormSurface,
   IconButton,
   PageHeader,
   PageLoading,
-  Toggle,
 } from "../components/ui";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
@@ -219,8 +220,8 @@ export function CreatorsPage() {
                           <Table.Cell className="font-medium">{creator.alias || creator.creator_id}</Table.Cell>
                           <Table.Cell>{creator.service}</Table.Cell>
                           <Table.Cell><code className="text-xs">{creator.creator_id}</code></Table.Cell>
-                          <Table.Cell>
-                            <Toggle
+                          <Table.Cell className="w-24 text-center">
+                            <CompactSwitch
                               isSelected={creator.enabled}
                               label={creator.enabled ? t("common.enabled") : t("common.disabled")}
                               onChange={(enabled) => void setEnabled(creator, enabled)}
@@ -249,7 +250,7 @@ export function CreatorsPage() {
                     <CreatorActions creator={creator} onEdit={() => openEdit(creator)} onRemove={() => setRemoving(creator)} />
                   </div>
                   <div className="mt-4 border-t border-border pt-3">
-                    <Toggle
+                    <FormSwitchField
                       isSelected={creator.enabled}
                       label={creator.enabled ? t("common.enabled") : t("common.disabled")}
                       onChange={(enabled) => void setEnabled(creator, enabled)}
@@ -299,7 +300,7 @@ export function CreatorsPage() {
               value={editor.alias ?? ""}
               onChange={(alias) => setEditor({ ...editor, alias: alias || null })}
             />
-            <Toggle
+            <FormSwitchField
               description={t("creators.enabledHint")}
               icon={Power}
               isSelected={editor.enabled}
