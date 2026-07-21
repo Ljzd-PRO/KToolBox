@@ -540,6 +540,7 @@ void i18n.use(initReactI18next).init({
   lng: storedLanguage || browserLanguage,
   fallbackLng: "en",
   interpolation: { escapeValue: false },
+  showSupportNotice: false,
 });
 
 export async function toggleLanguage(): Promise<void> {
