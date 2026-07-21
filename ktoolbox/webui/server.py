@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import getpass
+import sys
 import threading
 import webbrowser
 from pathlib import Path
@@ -9,6 +10,7 @@ import anyio
 from argon2 import PasswordHasher
 
 from ktoolbox.configuration import RuntimeContext, WebUIConfiguration, load_configuration
+from ktoolbox.project_config import ProjectConfigStore, ProjectConfiguration
 
 
 def generate_password_hash() -> str:
@@ -70,6 +72,15 @@ async def run_webui(
 
 def _project_root(project_dir: Path) -> Path:
     root = project_dir.expanduser().resolve()
-    if not (root / "ktoolbox.toml").is_file():
-        raise ValueError(f"{root} does not contain ktoolbox.toml")
+    project_config = root / "ktoolbox.toml"
+    if project_config.is_file():
+        return root
+    if project_config.exists():
+        raise ValueError(f"{project_config} is not a regular file")
+
+    ProjectConfigStore(project_config).save(ProjectConfiguration())
+    print(
+        f"Warning: {project_config} was not found; created a new project configuration.",
+        file=sys.stderr,
+    )
     return root

@@ -4,13 +4,12 @@ KToolBox WebUI is a project-bound management panel built with React and HeroUI. 
 
 ## Install and start
 
-Install the optional runtime and create a project document:
+Install the optional runtime and create a project directory:
 
 ```bash
 pipx install "ktoolbox[webui]" --force
 mkdir ktoolbox-project
 cd ktoolbox-project
-printf 'schema_version = 1\n' > ktoolbox.toml
 ```
 
 Generate an Argon2id password hash using hidden terminal input:
@@ -33,7 +32,7 @@ ktoolbox webui .
 ktoolbox webui . --host 127.0.0.1 --port 8789 --no-open
 ```
 
-The default is `0.0.0.0:8789` and the local browser opens automatically. `--host`, `--port`, and `--no-open` override environment configuration for that process. Startup fails when `ktoolbox.toml`, the username, or both password forms are missing.
+The default is `0.0.0.0:8789` and the local browser opens automatically. `--host`, `--port`, and `--no-open` override environment configuration for that process. If `ktoolbox.toml` is missing, startup prints a warning and atomically creates a minimal valid project document. Startup still fails when the username or both password forms are missing.
 
 ## Security model
 

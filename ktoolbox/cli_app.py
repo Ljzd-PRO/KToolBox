@@ -478,7 +478,7 @@ async def webui_run(
     port: int | None = None,
     no_open: Annotated[bool, Parameter(negative=())] = False,
 ) -> int:
-    """Run the WebUI for one directory containing ktoolbox.toml."""
+    """Run the WebUI for a project directory, creating ktoolbox.toml if needed."""
     try:
         from ktoolbox.webui.server import run_webui
 

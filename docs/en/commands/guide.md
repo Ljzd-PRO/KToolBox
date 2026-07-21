@@ -102,7 +102,7 @@ The editor needs the `urwid` optional dependency. It edits both dotenv settings 
 
 ## Run the optional project panel
 
-After installing `ktoolbox[webui]` and configuring an account, bind the panel to a directory containing `ktoolbox.toml`:
+After installing `ktoolbox[webui]` and configuring an account, bind the panel to a project directory. A missing `ktoolbox.toml` is created automatically after a terminal warning:
 
 ```bash
 ktoolbox webui . --host 127.0.0.1
