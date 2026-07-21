@@ -20,16 +20,16 @@ export function TaskTarget({ task }: { task: TaskRecord }) {
       <div className="task-target flex min-w-0 flex-1 items-start gap-3">
         <span className="task-kind-icon" data-kind="sync"><RefreshCw aria-hidden="true" size={18} /></span>
         <div className="min-w-0">
-          <div className="flex min-w-0 items-center gap-2">
-            <p className="task-target-title truncate text-sm font-semibold" title={t("tasks.creatorCount", { count: names.length })}>{t("tasks.creatorCount", { count: names.length })}</p>
+          <p className="task-target-title truncate text-sm font-semibold" title={t("tasks.creatorCount", { count: names.length })}>{t("tasks.creatorCount", { count: names.length })}</p>
+          <div className="mt-1 flex min-w-0 items-center gap-2">
             <Chip className="shrink-0" size="sm" variant="soft">{t("common.sync")}</Chip>
+            {roster ? (
+              <Tooltip>
+                <Button className="h-auto min-h-0 max-w-full justify-start truncate p-0 text-left text-xs font-normal text-muted" size="sm" variant="ghost">{summary}</Button>
+                <Tooltip.Content className="max-w-sm whitespace-pre-line">{roster}</Tooltip.Content>
+              </Tooltip>
+            ) : <p className="truncate text-xs text-muted">{summary}</p>}
           </div>
-          {roster ? (
-            <Tooltip>
-              <Button className="mt-1 h-auto min-h-0 max-w-full justify-start truncate p-0 text-left text-xs font-normal text-muted" size="sm" variant="ghost">{summary}</Button>
-              <Tooltip.Content className="max-w-sm whitespace-pre-line">{roster}</Tooltip.Content>
-            </Tooltip>
-          ) : <p className="mt-1 truncate text-xs text-muted">{summary}</p>}
         </div>
       </div>
     );
@@ -48,11 +48,11 @@ export function TaskTarget({ task }: { task: TaskRecord }) {
     <div className="task-target flex min-w-0 flex-1 items-start gap-3">
       <span className="task-kind-icon" data-kind="download"><Download aria-hidden="true" size={18} /></span>
       <div className="min-w-0">
-        <div className="flex min-w-0 items-center gap-2">
-          <p className="task-target-title truncate text-sm font-semibold" title={title}>{title}</p>
+        <p className="task-target-title truncate text-sm font-semibold" title={title}>{title}</p>
+        <div className="mt-1 flex min-w-0 items-center gap-2">
           <Chip className="shrink-0" color="accent" size="sm" variant="soft">{t("common.download")}</Chip>
+          <p className="truncate text-xs text-muted" title={metadata}>{metadata}</p>
         </div>
-        <p className="mt-1 truncate text-xs text-muted" title={metadata}>{metadata}</p>
       </div>
     </div>
   );

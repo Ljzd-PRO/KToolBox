@@ -178,7 +178,13 @@ describe("task and post workflows", () => {
 
     render(<BrowserRouter><App /></BrowserRouter>);
 
-    expect(await screen.findAllByText("Fictional cover study")).toHaveLength(2);
+    const downloadTitles = await screen.findAllByText("Fictional cover study");
+    expect(downloadTitles).toHaveLength(2);
+    for (const title of downloadTitles) {
+      expect(title.parentElement?.firstElementChild).toBe(title);
+      expect(title.nextElementSibling).toHaveTextContent("Download");
+      expect(title.nextElementSibling).toHaveTextContent("Demo Studio · fanbox:42 · #99 · rev. 3");
+    }
     expect(screen.getAllByText("Demo Studio · fanbox:42 · #99 · rev. 3")).toHaveLength(2);
     expect(screen.getAllByText("2 creators")).toHaveLength(2);
     expect(screen.getAllByText("Demo Studio · Type Lab")).toHaveLength(2);
