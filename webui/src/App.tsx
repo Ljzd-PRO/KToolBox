@@ -6,6 +6,9 @@ import { AppShell } from "./components/AppShell";
 import { AuthProvider, useAuth } from "./lib/auth";
 import { ThemeProvider } from "./lib/theme";
 import { DashboardPage } from "./pages/DashboardPage";
+import { BlockersPage } from "./pages/BlockersPage";
+import { CreatorsPage } from "./pages/CreatorsPage";
+import { ConfigurationPage } from "./pages/ConfigurationPage";
 import { LoginPage } from "./pages/LoginPage";
 import { PlaceholderPage } from "./pages/PlaceholderPage";
 import { SystemPage } from "./pages/SystemPage";
@@ -38,10 +41,10 @@ function AuthenticatedApplication() {
       <Route element={<AppShell />}>
         <Route index element={<DashboardPage />} />
         <Route element={<PlaceholderPage page="tasks" />} path="tasks/*" />
-        <Route element={<PlaceholderPage page="creators" />} path="creators" />
+        <Route element={<CreatorsPage />} path="creators" />
         <Route element={<PlaceholderPage page="posts" />} path="posts" />
-        <Route element={<PlaceholderPage page="blockers" />} path="blockers" />
-        <Route element={<PlaceholderPage page="configuration" />} path="configuration" />
+        <Route element={<BlockersPage />} path="blockers" />
+        <Route element={<ConfigurationPage />} path="configuration" />
         <Route element={<SystemPage />} path="system" />
         <Route element={<Navigate replace to="/" />} path="*" />
       </Route>

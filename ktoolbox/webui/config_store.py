@@ -54,10 +54,15 @@ class DotenvFileStore:
     def replace(self, name: str, content: str, expected_revision: str) -> RuntimeContext:
         current = self.read(name)
         self._check_revision(current, expected_revision)
-        self._validate_content(content)
-        self._validate_configuration(name, content)
+        self.validate(name, content)
         self._atomic_write(current.path, content)
         return RuntimeContext.from_project(self.project_root)
+
+    def validate(self, name: str, content: str) -> None:
+        """Validate a dotenv candidate against the other project dotenv file."""
+        self._path(name)
+        self._validate_content(content)
+        self._validate_configuration(name, content)
 
     def patch(self, name: str, values: dict[str, str | None], expected_revision: str) -> RuntimeContext:
         current = self.read(name)

@@ -89,6 +89,9 @@ def test_dotenv_store_preserves_comments_validates_and_detects_conflicts(tmp_pat
         store.replace("dotenv", "X=" + "x" * (1024 * 1024), store.read("dotenv").revision)
     with pytest.raises(ConfigurationFileError, match="unknown dotenv"):
         store.read("outside")
+    before_validation = path.read_text(encoding="utf-8")
+    store.validate("dotenv", "KTOOLBOX_JOB__COUNT=9\n")
+    assert path.read_text(encoding="utf-8") == before_validation
 
 
 @pytest.mark.asyncio
@@ -130,6 +133,22 @@ async def test_config_schema_and_dotenv_endpoints(tmp_path: Path) -> None:
         count = next(field for field in refreshed_schema.json()["fields"] if field["path"] == "job.count")
         assert count["value"] == 7
         assert count["source"] == ".env"
+
+        valid = await client.post(
+            "/api/v1/config/dotenv/dotenv/validate",
+            json={"content": "KTOOLBOX_JOB__COUNT=8\n"},
+        )
+        assert valid.json() == {"valid": True}
+        invalid = await client.post(
+            "/api/v1/config/dotenv/dotenv/validate",
+            json={"content": "KTOOLBOX_JOB__COUNT=nope\n"},
+        )
+        assert invalid.status_code == 422
+
+        example = await client.get("/api/v1/config/example")
+        assert example.status_code == 200
+        assert "attachment; filename=\"example.env\"" == example.headers["content-disposition"]
+        assert "KTOOLBOX" in example.text
 
 
 @pytest.mark.asyncio
@@ -215,3 +234,10 @@ async def test_raw_project_update_requires_current_revision_and_valid_toml(tmp_p
             json={"content": "not = [valid"},
         )
         assert invalid.status_code == 422
+
+        valid = await client.post("/api/v1/config/project/validate", json={"content": current.json()["content"]})
+        assert valid.json() == {"valid": True}
+        invalid_validation = await client.post(
+            "/api/v1/config/project/validate", json={"content": "not = [valid"}
+        )
+        assert invalid_validation.status_code == 422

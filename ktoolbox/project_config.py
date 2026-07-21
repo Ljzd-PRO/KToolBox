@@ -155,14 +155,19 @@ class ProjectConfigStore:
         return tomlkit.dumps(document)
 
     def replace_text(self, content: str) -> ProjectConfiguration:
+        configuration, document = self.validate_text(content)
+        self._document = document
+        self.save(configuration)
+        return configuration
+
+    def validate_text(self, content: str) -> tuple[ProjectConfiguration, TOMLDocument]:
+        """Parse and validate project TOML without changing the stored file."""
         try:
             document = tomlkit.parse(content)
             configuration = ProjectConfiguration.model_validate(document.unwrap())
         except (ValueError, TypeError) as error:
             raise ProjectConfigError(f"invalid project configuration {self.path}: {error}") from error
-        self._document = document
-        self.save(configuration)
-        return configuration
+        return configuration, document
 
     def save(self, configuration: ProjectConfiguration) -> None:
         configuration = ProjectConfiguration.model_validate(configuration)

@@ -4,6 +4,8 @@ from pathlib import Path
 from typing import Annotated, Literal, cast
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, Response, status
+from fastapi.responses import PlainTextResponse
+from settings_doc import OutputFormat, render  # type: ignore[import-untyped]
 
 from ktoolbox.blocker.model import BlockerSpec
 from ktoolbox.configuration import RuntimeContext
@@ -26,6 +28,7 @@ from ktoolbox.webui.models import (
     ProjectDocumentResponse,
     TextDocumentResponse,
     TextDocumentUpdate,
+    ValidationResponse,
 )
 
 SessionDependency = Annotated[WebUISession, Depends(require_session)]
@@ -107,6 +110,26 @@ def create_project_router(project_root: Path) -> APIRouter:
         response.headers["ETag"] = f'"{document.revision}"'
         return _document_response(document)
 
+    @router.post("/config/dotenv/{name}/validate", response_model=ValidationResponse)
+    async def validate_dotenv(
+        name: Literal["dotenv", "production"],
+        payload: TextDocumentUpdate,
+        _: SessionDependency,
+    ) -> ValidationResponse:
+        try:
+            dotenv_store.validate(name, payload.content)
+        except ConfigurationFileError as error:
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error)) from error
+        return ValidationResponse()
+
+    @router.get("/config/example", response_class=PlainTextResponse)
+    async def example_configuration(_: SessionDependency) -> PlainTextResponse:
+        content = render(OutputFormat.DOTENV, class_path=("ktoolbox.configuration.Configuration",))
+        return PlainTextResponse(
+            content,
+            headers={"Content-Disposition": 'attachment; filename="example.env"'},
+        )
+
     @router.get("/config/project", response_model=ProjectDocumentResponse)
     async def get_project_config(response: Response, _: SessionDependency) -> ProjectDocumentResponse:
         content = project_store.load_text()
@@ -144,6 +167,17 @@ def create_project_router(project_root: Path) -> APIRouter:
             revision=revision,
             configuration=configuration,
         )
+
+    @router.post("/config/project/validate", response_model=ValidationResponse)
+    async def validate_project_config(
+        payload: TextDocumentUpdate,
+        _: SessionDependency,
+    ) -> ValidationResponse:
+        try:
+            project_store.validate_text(payload.content)
+        except ProjectConfigError as error:
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error)) from error
+        return ValidationResponse()
 
     @router.get("/creators", response_model=list[CreatorReference])
     async def list_creators(_: SessionDependency) -> list[CreatorReference]:

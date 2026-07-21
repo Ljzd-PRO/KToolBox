@@ -66,6 +66,10 @@ class TextDocumentUpdate(BaseModel):
     content: str
 
 
+class ValidationResponse(BaseModel):
+    valid: bool = True
+
+
 class DotenvPatchRequest(BaseModel):
     values: dict[str, str | None]
 
