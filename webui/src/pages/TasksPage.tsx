@@ -19,6 +19,7 @@ import {
   Plus,
   Square,
   Trash2,
+  X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -199,7 +200,7 @@ export function TasksPage() {
       <AppModal
         footer={
           <>
-            <Button variant="ghost" onPress={() => setRemoving(null)}>{t("common.cancel")}</Button>
+            <Button variant="ghost" onPress={() => setRemoving(null)}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
             <Button variant="danger" onPress={() => void deleteTask()}>
               <Trash2 aria-hidden="true" size={17} />
               {t("common.delete")}

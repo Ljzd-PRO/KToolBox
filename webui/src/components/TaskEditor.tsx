@@ -1,5 +1,27 @@
 import { Button, Chip, Surface, Tabs } from "@heroui/react";
-import { Download, RefreshCw } from "lucide-react";
+import {
+  BookOpenCheck,
+  CalendarRange,
+  Check,
+  Cloud,
+  Download,
+  FileJson,
+  FileText,
+  FilterX,
+  Fingerprint,
+  FolderOutput,
+  History,
+  Link,
+  ListFilter,
+  ListStart,
+  Plus,
+  RefreshCw,
+  Shuffle,
+  Tags,
+  UserRound,
+  UsersRound,
+  X,
+} from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { parseDate } from "@internationalized/date";
@@ -107,13 +129,15 @@ export function TaskEditor({
     <AppModal
       footer={
         <>
-          <Button variant="ghost" onPress={onClose}>{t("common.cancel")}</Button>
+          <Button variant="ghost" onPress={onClose}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
           <Button form="task-editor-form" isPending={saving} type="submit" variant="primary">
+            {task ? <Check aria-hidden="true" size={17} /> : <Plus aria-hidden="true" size={17} />}
             {task ? t("common.save") : t("tasks.create")}
           </Button>
         </>
       }
       open
+      formSurface
       size="lg"
       title={task ? t("tasks.edit") : t("tasks.create")}
       onOpenChange={(open) => !open && onClose()}
@@ -130,6 +154,7 @@ export function TaskEditor({
             <section className="grid gap-3">
               <Toggle
                 description={t("tasks.allEnabledHint")}
+                icon={UsersRound}
                 isSelected={allEnabled}
                 label={t("tasks.allEnabled")}
                 onChange={setAllEnabled}
@@ -161,6 +186,7 @@ export function TaskEditor({
             </section>
             <DateRangeInput
               description={t("tasks.dateRangeHint")}
+              icon={CalendarRange}
               label={t("tasks.dateRange")}
               value={dateRange}
               onChange={setDateRange}
@@ -170,9 +196,10 @@ export function TaskEditor({
               <CheckOption label={t("tasks.useEnd")} selected={useEnd} onChange={setUseEnd} />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <NumberInput label={t("tasks.offset")} minValue={0} step={50} value={offset} onChange={setOffset} />
-              <FormField label={t("tasks.limit")} type="number" value={length} onChange={setLength} />
+              <NumberInput icon={ListStart} label={t("tasks.offset")} minValue={0} step={50} value={offset} onChange={setOffset} />
+              <FormField icon={ListFilter} label={t("tasks.limit")} type="number" value={length} onChange={setLength} />
               <SelectField
+                icon={Shuffle}
                 label={t("tasks.mixPosts")}
                 options={[
                   { value: "inherit", label: t("tasks.useConfiguration") },
@@ -183,12 +210,13 @@ export function TaskEditor({
                 onChange={setMixPosts}
               />
             </div>
-            <FormField description={t("tasks.keywordHint")} label={t("tasks.keywords")} value={keywords} onChange={setKeywords} />
-            <FormField description={t("tasks.keywordHint")} label={t("tasks.excludedKeywords")} value={excludedKeywords} onChange={setExcludedKeywords} />
-            <Toggle isSelected={saveIndices} label={t("tasks.saveIndex")} onChange={setSaveIndices} />
+            <FormField description={t("tasks.keywordHint")} icon={Tags} label={t("tasks.keywords")} value={keywords} onChange={setKeywords} />
+            <FormField description={t("tasks.keywordHint")} icon={FilterX} label={t("tasks.excludedKeywords")} value={excludedKeywords} onChange={setExcludedKeywords} />
+            <Toggle icon={BookOpenCheck} isSelected={saveIndices} label={t("tasks.saveIndex")} onChange={setSaveIndices} />
           </Tabs.Panel>
           <Tabs.Panel className="grid gap-5 pt-5" id="download">
             <SelectField
+              icon={Fingerprint}
               label={t("tasks.identityMode")}
               options={[
                 { value: "url", label: t("tasks.postUrl") },
@@ -198,19 +226,19 @@ export function TaskEditor({
               onChange={setDownloadIdentity}
             />
             {downloadIdentity === "url" ? (
-              <FormField isRequired label={t("tasks.postUrl")} value={postUrl} onChange={setPostUrl} />
+              <FormField icon={Link} isRequired label={t("tasks.postUrl")} value={postUrl} onChange={setPostUrl} />
             ) : (
               <div className="grid gap-4 sm:grid-cols-3">
-                <FormField isRequired label={t("posts.service")} value={service} onChange={setService} />
-                <FormField isRequired label={t("posts.creatorId")} value={creatorId} onChange={setCreatorId} />
-                <FormField isRequired label={t("posts.postId")} value={postId} onChange={setPostId} />
+                <FormField icon={Cloud} isRequired label={t("posts.service")} value={service} onChange={setService} />
+                <FormField icon={UserRound} isRequired label={t("posts.creatorId")} value={creatorId} onChange={setCreatorId} />
+                <FormField icon={FileText} isRequired label={t("posts.postId")} value={postId} onChange={setPostId} />
               </div>
             )}
-            <FormField label={t("tasks.revision")} value={revisionId} onChange={setRevisionId} />
-            <Toggle isSelected={dumpMetadata} label={t("tasks.dumpMetadata")} onChange={setDumpMetadata} />
+            <FormField icon={History} label={t("tasks.revision")} value={revisionId} onChange={setRevisionId} />
+            <Toggle icon={FileJson} isSelected={dumpMetadata} label={t("tasks.dumpMetadata")} onChange={setDumpMetadata} />
           </Tabs.Panel>
         </Tabs>
-        <FormField isRequired label={t("tasks.output")} value={output} onChange={setOutput} />
+        <FormField icon={FolderOutput} isRequired label={t("tasks.output")} value={output} onChange={setOutput} />
       </form>
     </AppModal>
   );

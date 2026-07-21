@@ -1,9 +1,9 @@
-import { Alert, Button, Surface, toast } from "@heroui/react";
-import { LockKeyhole, LogIn, ShieldAlert } from "lucide-react";
+import { Alert, Button, toast } from "@heroui/react";
+import { KeyRound, LockKeyhole, LogIn, ShieldAlert, UserRound } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 
-import { FormField, PasswordField } from "../components/ui";
+import { FormField, FormSurface, PasswordField } from "../components/ui";
 import { errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 
@@ -39,7 +39,7 @@ export function LoginPage() {
           </div>
         </header>
 
-        <Surface className="mx-auto w-full max-w-md rounded-lg border border-border p-6 shadow-sm sm:p-8">
+        <FormSurface className="mx-auto w-full max-w-md p-6 sm:p-8">
           <div className="mb-6">
             <h1 className="text-2xl font-semibold">{t("login.title")}</h1>
             <p className="mt-2 text-sm leading-relaxed text-muted">{t("login.description")}</p>
@@ -56,12 +56,13 @@ export function LoginPage() {
           <form aria-busy={submitting} className="grid gap-5" onSubmit={submit}>
             <FormField
               autoComplete="username"
+              icon={UserRound}
               isRequired
               label={t("login.username")}
               value={username}
               onChange={setUsername}
             />
-            <PasswordField label={t("login.password")} value={password} onChange={setPassword} />
+            <PasswordField icon={KeyRound} isRequired label={t("login.password")} value={password} onChange={setPassword} />
             <Button
               className="mt-1 w-full"
               isDisabled={submitting}
@@ -72,7 +73,7 @@ export function LoginPage() {
               {submitting ? t("login.signingIn") : t("login.submit")}
             </Button>
           </form>
-        </Surface>
+        </FormSurface>
 
         <p className="text-center text-xs text-muted">{t("subtitle")}</p>
       </div>

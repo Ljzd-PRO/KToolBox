@@ -12,6 +12,7 @@
   --background: oklch(0.975 0.003 250);
   --surface: oklch(0.995 0.002 250);
   --surface-secondary: oklch(0.955 0.008 250);
+  --surface-tertiary: oklch(0.925 0.01 250);
   --foreground: oklch(0.205 0.018 258);
   --muted: oklch(0.5 0.025 255);
   --border: oklch(0.89 0.012 250);
@@ -19,6 +20,18 @@
   --accent: oklch(0.565 0.19 254);
   --accent-foreground: white;
   --focus: oklch(0.565 0.19 254);
+  --default: oklch(0.94 0.01 250);
+  --default-hover: oklch(0.91 0.014 250);
+  --field-background: var(--surface);
+  --field-foreground: var(--foreground);
+  --field-placeholder: var(--muted);
+  --field-border: var(--border);
+  --field-hover: color-mix(in oklab, var(--surface) 94%, var(--accent) 6%);
+  --field-focus: var(--surface);
+  --field-border-hover: color-mix(in oklab, var(--border) 75%, var(--foreground) 25%);
+  --field-border-focus: color-mix(in oklab, var(--accent) 62%, var(--border) 38%);
+  --field-border-width: 1px;
+  --field-shadow: 0 1px 2px color-mix(in oklab, black 8%, transparent);
   --ktoolbox-teal: oklch(0.61 0.13 178);
   --ktoolbox-yellow: oklch(0.82 0.16 86);
 }
@@ -28,6 +41,7 @@
   --background: oklch(0.17 0.014 258);
   --surface: oklch(0.21 0.016 258);
   --surface-secondary: oklch(0.245 0.02 258);
+  --surface-tertiary: oklch(0.285 0.022 258);
   --foreground: oklch(0.94 0.008 250);
   --muted: oklch(0.7 0.025 250);
   --border: oklch(0.315 0.025 258);
@@ -35,6 +49,18 @@
   --accent: oklch(0.72 0.145 248);
   --accent-foreground: oklch(0.16 0.024 258);
   --focus: oklch(0.72 0.145 248);
+  --default: oklch(0.285 0.022 258);
+  --default-hover: oklch(0.325 0.026 258);
+  --field-background: oklch(0.225 0.018 258);
+  --field-foreground: var(--foreground);
+  --field-placeholder: var(--muted);
+  --field-border: oklch(0.36 0.026 258);
+  --field-hover: oklch(0.255 0.022 258);
+  --field-focus: oklch(0.225 0.018 258);
+  --field-border-hover: oklch(0.45 0.032 258);
+  --field-border-focus: color-mix(in oklab, var(--accent) 68%, var(--border) 32%);
+  --field-border-width: 1px;
+  --field-shadow: none;
   --ktoolbox-teal: oklch(0.73 0.12 176);
   --ktoolbox-yellow: oklch(0.83 0.14 88);
 }
@@ -131,6 +157,24 @@ code {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
+}
+
+.form-surface {
+  --default: var(--surface);
+  --default-hover: color-mix(in oklab, var(--surface) 92%, var(--foreground) 8%);
+  --field-background: var(--surface);
+  --field-hover: color-mix(in oklab, var(--surface) 94%, var(--accent) 6%);
+  --field-focus: var(--surface);
+  box-shadow: var(--surface-shadow);
+}
+
+.field-label-icon {
+  color: color-mix(in oklab, var(--accent) 42%, var(--muted) 58%);
+}
+
+.app-modal-form-footer {
+  border-top-color: var(--separator);
+  background: var(--surface-secondary);
 }
 
 @media (prefers-reduced-motion: reduce) {

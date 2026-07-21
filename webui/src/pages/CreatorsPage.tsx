@@ -8,11 +8,21 @@ import {
   toast,
 } from "@heroui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MoreHorizontal, Pencil, Plus, Search, Trash2, UserPlus } from "lucide-react";
+import { Check, Cloud, MoreHorizontal, Pencil, Plus, Power, Search, Tag, Trash2, UserPlus, UserRound, X } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 
-import { AppModal, DataTableFrame, EmptyPanel, FormField, PageHeader, PageLoading, Toggle } from "../components/ui";
+import {
+  AppModal,
+  DataTableFrame,
+  EmptyPanel,
+  FormField,
+  FormSurface,
+  IconButton,
+  PageHeader,
+  PageLoading,
+  Toggle,
+} from "../components/ui";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { CreatorReference, CreatorSummary } from "../types";
@@ -146,28 +156,30 @@ export function CreatorsPage() {
 
       <section className="grid gap-3">
         <h2 className="text-lg font-semibold">{t("creators.search")}</h2>
-        <form className="flex flex-col gap-2 sm:flex-row" onSubmit={searchCreators}>
-          <SearchField
-            aria-label={t("creators.search")}
-            className="min-w-0 flex-1"
-            fullWidth
-            value={searchTerm}
-            variant="secondary"
-            onChange={setSearchTerm}
-          >
-            <SearchField.Group>
-              <SearchField.SearchIcon>
-                <Search aria-hidden="true" size={16} />
-              </SearchField.SearchIcon>
-              <SearchField.Input placeholder={t("creators.searchPlaceholder")} />
-              <SearchField.ClearButton />
-            </SearchField.Group>
-          </SearchField>
-          <Button isPending={searching} type="submit" variant="outline">
-            <Search aria-hidden="true" size={17} />
-            {t("common.search")}
-          </Button>
-        </form>
+        <FormSurface className="p-3">
+          <form className="flex flex-col gap-2 sm:flex-row" onSubmit={searchCreators}>
+            <SearchField
+              aria-label={t("creators.search")}
+              className="min-w-0 flex-1"
+              fullWidth
+              value={searchTerm}
+              variant="secondary"
+              onChange={setSearchTerm}
+            >
+              <SearchField.Group>
+                <SearchField.SearchIcon>
+                  <Search aria-hidden="true" size={16} />
+                </SearchField.SearchIcon>
+                <SearchField.Input placeholder={t("creators.searchPlaceholder")} />
+                <SearchField.ClearButton />
+              </SearchField.Group>
+            </SearchField>
+            <Button isPending={searching} type="submit" variant="primary">
+              <Search aria-hidden="true" size={17} />
+              {t("common.search")}
+            </Button>
+          </form>
+        </FormSurface>
         {results.length ? (
           <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
             {results.map((creator) => (
@@ -176,9 +188,7 @@ export function CreatorsPage() {
                   <p className="truncate text-sm font-medium">{creator.name || creator.id}</p>
                   <p className="truncate text-xs text-muted">{creator.service}:{creator.id}</p>
                 </div>
-                <Button isIconOnly aria-label={t("creators.add")} size="sm" variant="ghost" onPress={() => openNew(creator)}>
-                  <UserPlus aria-hidden="true" size={17} />
-                </Button>
+                <IconButton icon={UserPlus} label={t("creators.add")} onPress={() => openNew(creator)} />
               </Surface>
             ))}
           </div>
@@ -255,10 +265,11 @@ export function CreatorsPage() {
       <AppModal
         footer={
           <>
-            <Button variant="ghost" onPress={() => setEditor(null)}>{t("common.cancel")}</Button>
-            <Button form="creator-form" isPending={saving} type="submit" variant="primary">{t("common.save")}</Button>
+            <Button variant="ghost" onPress={() => setEditor(null)}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
+            <Button form="creator-form" isPending={saving} type="submit" variant="primary"><Check aria-hidden="true" size={17} />{t("common.save")}</Button>
           </>
         }
+        formSurface
         open={editor !== null}
         title={originalKey ? t("creators.edit") : t("creators.add")}
         onOpenChange={(open) => !open && setEditor(null)}
@@ -267,12 +278,14 @@ export function CreatorsPage() {
           <form className="grid gap-5" id="creator-form" onSubmit={saveCreator}>
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField
+                icon={Cloud}
                 isRequired
                 label={t("creators.service")}
                 value={editor.service}
                 onChange={(service) => setEditor({ ...editor, service })}
               />
               <FormField
+                icon={UserRound}
                 isRequired
                 label={t("creators.creatorId")}
                 value={editor.creator_id}
@@ -281,12 +294,14 @@ export function CreatorsPage() {
             </div>
             <FormField
               description={t("creators.aliasHint")}
+              icon={Tag}
               label={t("creators.alias")}
               value={editor.alias ?? ""}
               onChange={(alias) => setEditor({ ...editor, alias: alias || null })}
             />
             <Toggle
               description={t("creators.enabledHint")}
+              icon={Power}
               isSelected={editor.enabled}
               label={t("creators.enabled")}
               onChange={(enabled) => setEditor({ ...editor, enabled })}
@@ -298,7 +313,7 @@ export function CreatorsPage() {
       <AppModal
         footer={
           <>
-            <Button variant="ghost" onPress={() => setRemoving(null)}>{t("common.cancel")}</Button>
+            <Button variant="ghost" onPress={() => setRemoving(null)}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
             <Button variant="danger" onPress={() => void removeCreator()}>
               <Trash2 aria-hidden="true" size={17} />
               {t("common.remove")}

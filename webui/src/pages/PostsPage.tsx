@@ -1,6 +1,20 @@
 import { Alert, Button, Chip, Surface, Table, toast } from "@heroui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronDown, ChevronUp, Download, Eye, FileSearch, Search } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Cloud,
+  Download,
+  Eye,
+  FileJson,
+  FileSearch,
+  FolderOutput,
+  History,
+  ListStart,
+  Search,
+  UserRound,
+  X,
+} from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +24,7 @@ import {
   DataTableFrame,
   EmptyPanel,
   FormField,
+  FormSurface,
   NumberInput,
   PageHeader,
   PageLoading,
@@ -121,13 +136,13 @@ export function PostsPage() {
   return (
     <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6">
       <PageHeader description={t("posts.description")} title={t("posts.title")} />
-      <Surface className="rounded-lg border border-border p-4">
+      <FormSurface>
         <form className="grid gap-4 lg:grid-cols-5" onSubmit={searchPosts}>
-          <FormField label={t("posts.service")} value={service} onChange={setService} />
-          <FormField label={t("posts.creatorId")} value={creatorId} onChange={setCreatorId} />
-          <FormField label={t("posts.creatorName")} value={creatorName} onChange={setCreatorName} />
-          <FormField label={t("posts.query")} value={query} onChange={setQuery} />
-          <NumberInput label={t("tasks.offset")} minValue={0} step={50} value={offset} onChange={setOffset} />
+          <FormField icon={Cloud} label={t("posts.service")} value={service} onChange={setService} />
+          <FormField icon={UserRound} label={t("posts.creatorId")} value={creatorId} onChange={setCreatorId} />
+          <FormField icon={UserRound} label={t("posts.creatorName")} value={creatorName} onChange={setCreatorName} />
+          <FormField icon={Search} label={t("posts.query")} value={query} onChange={setQuery} />
+          <NumberInput icon={ListStart} label={t("tasks.offset")} minValue={0} step={50} value={offset} onChange={setOffset} />
           <div className="flex justify-end lg:col-span-5">
             <Button isPending={searching} type="submit" variant="primary">
               <Search aria-hidden="true" size={17} />
@@ -135,7 +150,7 @@ export function PostsPage() {
             </Button>
           </div>
         </form>
-      </Surface>
+      </FormSurface>
 
       <section className="grid gap-3">
         <div className="flex items-center justify-between gap-3">
@@ -186,7 +201,7 @@ export function PostsPage() {
       <AppModal
         footer={
           <>
-            <Button variant="ghost" onPress={() => setSelected(null)}>{t("common.close")}</Button>
+            <Button variant="ghost" onPress={() => setSelected(null)}><X aria-hidden="true" size={17} />{t("common.close")}</Button>
             <Button isPending={creating} variant="primary" onPress={() => void createDownload()}>
               <Download aria-hidden="true" size={17} />
               {t("posts.createDownload")}
@@ -205,7 +220,11 @@ export function PostsPage() {
               <Chip size="sm" variant="soft">{details.user}:{details.id}</Chip>
               {"revision_id" in details ? <Chip color="warning" size="sm" variant="soft">{t("posts.revisionLabel", { id: details.revision_id })}</Chip> : null}
             </div>
-            <SelectField label={t("posts.revision")} options={revisionOptions} value={selectedRevision} onChange={setSelectedRevision} />
+            <FormSurface className="grid gap-4">
+              <SelectField icon={History} label={t("posts.revision")} options={revisionOptions} value={selectedRevision} onChange={setSelectedRevision} />
+              <FormField icon={FolderOutput} isRequired label={t("tasks.output")} value={output} onChange={setOutput} />
+              <Toggle icon={FileJson} isSelected={dumpMetadata} label={t("tasks.dumpMetadata")} onChange={setDumpMetadata} />
+            </FormSurface>
             <Alert status="warning">
               <Alert.Indicator><FileSearch aria-hidden="true" size={18} /></Alert.Indicator>
               <Alert.Content><Alert.Title>{t("posts.mediaSafeTitle")}</Alert.Title><Alert.Description>{t("posts.mediaSafeBody")}</Alert.Description></Alert.Content>
@@ -220,8 +239,6 @@ export function PostsPage() {
               </div>
               {showContent ? <div className="max-h-64 overflow-y-auto whitespace-pre-wrap break-words rounded-lg bg-default p-4 text-sm leading-relaxed">{details.content || t("common.none")}</div> : null}
             </div>
-            <FormField isRequired label={t("tasks.output")} value={output} onChange={setOutput} />
-            <Toggle isSelected={dumpMetadata} label={t("tasks.dumpMetadata")} onChange={setDumpMetadata} />
           </div>
         ) : null}
       </AppModal>

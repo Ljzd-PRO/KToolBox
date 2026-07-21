@@ -3,11 +3,20 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowDown,
   ArrowUp,
+  Ban,
   Braces,
+  CaseSensitive,
+  Check,
+  Equal,
+  Fingerprint,
   GitBranchPlus,
+  ListTree,
   Pencil,
   Plus,
+  Power,
   Trash2,
+  UsersRound,
+  X,
 } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
@@ -18,6 +27,7 @@ import {
   EmptyPanel,
   FormCheckbox,
   FormField,
+  IconButton,
   PageHeader,
   PageLoading,
   SelectField,
@@ -192,38 +202,24 @@ export function BlockersPage() {
                       void replaceBlockers(next);
                     }}
                   />
-                  <Button
-                    isIconOnly
-                    aria-label="Move up"
+                  <IconButton
+                    icon={ArrowUp}
                     isDisabled={index === 0 || saving}
-                    size="sm"
-                    variant="ghost"
+                    label={t("tasks.moveUp")}
                     onPress={() => void move(index, -1)}
-                  >
-                    <ArrowUp aria-hidden="true" size={17} />
-                  </Button>
-                  <Button
-                    isIconOnly
-                    aria-label="Move down"
+                  />
+                  <IconButton
+                    icon={ArrowDown}
                     isDisabled={index === blockers.length - 1 || saving}
-                    size="sm"
-                    variant="ghost"
+                    label={t("tasks.moveDown")}
                     onPress={() => void move(index, 1)}
-                  >
-                    <ArrowDown aria-hidden="true" size={17} />
-                  </Button>
-                  <Button isIconOnly aria-label={t("common.edit")} size="sm" variant="ghost" onPress={() => openEditor(blocker, index)}>
-                    <Pencil aria-hidden="true" size={17} />
-                  </Button>
-                  <Button
-                    isIconOnly
-                    aria-label={t("blockers.remove")}
-                    size="sm"
-                    variant="ghost"
+                  />
+                  <IconButton icon={Pencil} label={t("common.edit")} onPress={() => openEditor(blocker, index)} />
+                  <IconButton
+                    icon={Trash2}
+                    label={t("blockers.remove")}
                     onPress={() => void replaceBlockers(blockers.filter((_, itemIndex) => itemIndex !== index))}
-                  >
-                    <Trash2 aria-hidden="true" size={17} />
-                  </Button>
+                  />
                 </div>
               </div>
             </Surface>
@@ -234,10 +230,11 @@ export function BlockersPage() {
       <AppModal
         footer={
           <>
-            <Button variant="ghost" onPress={() => setEditor(null)}>{t("common.cancel")}</Button>
-            <Button form="blocker-form" isPending={saving} type="submit" variant="primary">{t("common.save")}</Button>
+            <Button variant="ghost" onPress={() => setEditor(null)}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
+            <Button form="blocker-form" isPending={saving} type="submit" variant="primary"><Check aria-hidden="true" size={17} />{t("common.save")}</Button>
           </>
         }
+        formSurface
         open={editor !== null}
         size="lg"
         title={editorIndex === null ? t("blockers.add") : t("blockers.edit")}
@@ -247,25 +244,29 @@ export function BlockersPage() {
           <form className="grid gap-6" id="blocker-form" onSubmit={submitEditor}>
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField
+                icon={Fingerprint}
                 isRequired
                 label={t("blockers.id")}
                 value={editor.id}
                 onChange={(id) => setEditor({ ...editor, id })}
               />
               <SelectField
+                icon={Braces}
                 label={t("blockers.type")}
-                options={[{ value: "field-match", label: "Field match" }]}
+                options={[{ value: "field-match", label: t("blockers.fieldMatch") }]}
                 value={editor.type}
                 onChange={(type) => setEditor({ ...editor, type })}
               />
             </div>
             <Toggle
+              icon={Power}
               isSelected={editor.enabled}
               label={t("blockers.enabled")}
               onChange={(enabled) => setEditor({ ...editor, enabled })}
             />
             <div className="grid gap-4 border-t border-border pt-5">
               <SelectField
+                icon={UsersRound}
                 label={t("blockers.scope")}
                 options={[
                   { value: "global", label: t("blockers.global") },
@@ -277,6 +278,7 @@ export function BlockersPage() {
               {editor.scope.mode === "creators" ? (
                 <div className="grid gap-3">
                   <AutocompleteField
+                    icon={UsersRound}
                     label={t("blockers.addScope")}
                     options={creatorOptions.filter((option) => !editor.scope.creators.includes(option.value))}
                     placeholder={t("blockers.addScope")}
@@ -352,6 +354,7 @@ function ConditionGroupEditor({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <div className="min-w-44 flex-1">
           <SelectField
+            icon={ListTree}
             label={t("blockers.mode")}
             options={[
               { value: "any", label: t("blockers.any") },
@@ -361,7 +364,7 @@ function ConditionGroupEditor({
             onChange={(mode) => onChange({ ...group, mode: mode as "any" | "all" })}
           />
         </div>
-        <Toggle isSelected={group.negate} label={t("blockers.negate")} onChange={(negate) => onChange({ ...group, negate })} />
+        <Toggle icon={Ban} isSelected={group.negate} label={t("blockers.negate")} onChange={(negate) => onChange({ ...group, negate })} />
         {removable ? (
           <Button isIconOnly aria-label={t("common.remove")} variant="ghost" onPress={onRemove}>
             <Trash2 aria-hidden="true" size={17} />
@@ -421,12 +424,14 @@ function ConditionEditor({
     <div className="grid gap-4 border-l-2 border-border pl-4">
       <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,0.75fr)_auto]">
         <SelectField
+          icon={ListTree}
           label={t("blockers.field")}
           options={fieldOptions}
           value={condition.field}
           onChange={(field) => onChange({ ...condition, field })}
         />
         <SelectField
+          icon={Equal}
           label={t("blockers.operator")}
           options={operatorOptions}
           value={condition.operator}
@@ -445,6 +450,7 @@ function ConditionEditor({
       {condition.operator !== "exists" ? (
         <FormField
           description={t("blockers.valuesHint")}
+          icon={Braces}
           label={t("blockers.values")}
           value={condition.values.join(", ")}
           onChange={(value) => onChange({ ...condition, values: value.split(",").map((item) => item.trim()) })}
@@ -453,12 +459,14 @@ function ConditionEditor({
       <div className="flex flex-wrap items-center gap-5">
         {condition.operator !== "exists" ? (
           <FormCheckbox
+            icon={CaseSensitive}
             isSelected={condition.case_sensitive}
             label={t("blockers.caseSensitive")}
             onChange={(case_sensitive) => onChange({ ...condition, case_sensitive })}
           />
         ) : null}
         <FormCheckbox
+          icon={Ban}
           isSelected={condition.negate}
           label={t("blockers.negate")}
           onChange={(negate) => onChange({ ...condition, negate })}

@@ -19,11 +19,13 @@ import {
   SearchField,
   Select,
   Skeleton,
+  Surface,
   Switch,
   Table,
   TextArea,
   TextField,
   Tooltip,
+  cn,
   useOverlayState,
 } from "@heroui/react";
 import type { DateValue } from "@internationalized/date";
@@ -32,6 +34,23 @@ import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { TaskStatus } from "../types";
+
+function FieldLabel({ label, icon: Icon }: { label: ReactNode; icon?: LucideIcon }) {
+  return (
+    <Label className="field-label flex min-w-0 flex-1 items-center gap-2 text-sm font-medium text-foreground">
+      {Icon ? <Icon aria-hidden="true" className="field-label-icon shrink-0" size={16} strokeWidth={1.8} /> : null}
+      <span className="min-w-0">{label}</span>
+    </Label>
+  );
+}
+
+export function FormSurface({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <Surface className={cn("form-surface rounded-lg border border-border p-4", className)} variant="secondary">
+      {children}
+    </Surface>
+  );
+}
 
 export function DataTableFrame({ children, className }: { children: ReactNode; className?: string }) {
   return (
@@ -82,6 +101,7 @@ export function FormField({
   isInvalid,
   errorMessage,
   placeholder,
+  icon,
 }: {
   label: string;
   description?: string;
@@ -93,6 +113,7 @@ export function FormField({
   isInvalid?: boolean;
   errorMessage?: string;
   placeholder?: string;
+  icon?: LucideIcon;
 }) {
   return (
     <TextField.Root
@@ -105,7 +126,7 @@ export function FormField({
       variant="secondary"
       onChange={onChange}
     >
-      <Label className="text-sm font-medium text-foreground">{label}</Label>
+      <FieldLabel icon={icon} label={label} />
       <Input autoComplete={autoComplete} placeholder={placeholder} />
       {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
       {errorMessage ? <FieldError>{errorMessage}</FieldError> : null}
@@ -121,6 +142,7 @@ export function PasswordField({
   placeholder,
   isRequired = false,
   isDisabled,
+  icon,
 }: {
   label: string;
   description?: string;
@@ -129,9 +151,11 @@ export function PasswordField({
   placeholder?: string;
   isRequired?: boolean;
   isDisabled?: boolean;
+  icon?: LucideIcon;
 }) {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
-  const visibilityLabel = visible ? "Hide password" : "Show password";
+  const visibilityLabel = visible ? t("common.hidePassword") : t("common.showPassword");
   return (
     <TextField.Root
       className="grid gap-1.5"
@@ -143,7 +167,7 @@ export function PasswordField({
       variant="secondary"
       onChange={onChange}
     >
-      <Label className="text-sm font-medium text-foreground">{label}</Label>
+      <FieldLabel icon={icon} label={label} />
       <InputGroup>
         <InputGroup.Input autoComplete="off" placeholder={placeholder} />
         <InputGroup.Suffix className="p-1">
@@ -177,6 +201,7 @@ export function NumberInput({
   maxValue,
   step,
   isDisabled,
+  icon,
 }: {
   label: string;
   description?: string;
@@ -186,7 +211,9 @@ export function NumberInput({
   maxValue?: number;
   step?: number;
   isDisabled?: boolean;
+  icon?: LucideIcon;
 }) {
+  const { t } = useTranslation();
   return (
     <NumberField
       className="grid gap-1.5"
@@ -199,13 +226,13 @@ export function NumberInput({
       variant="secondary"
       onChange={onChange}
     >
-      <Label className="text-sm font-medium text-foreground">{label}</Label>
+      <FieldLabel icon={icon} label={label} />
       <NumberField.Group>
-        <NumberField.DecrementButton aria-label={`Decrease ${label}`}>
+        <NumberField.DecrementButton aria-label={`${t("common.decrease")} ${label}`}>
           <Minus aria-hidden="true" size={15} />
         </NumberField.DecrementButton>
         <NumberField.Input />
-        <NumberField.IncrementButton aria-label={`Increase ${label}`}>
+        <NumberField.IncrementButton aria-label={`${t("common.increase")} ${label}`}>
           <Plus aria-hidden="true" size={15} />
         </NumberField.IncrementButton>
       </NumberField.Group>
@@ -221,15 +248,17 @@ export function DateRangeInput({
   description,
   value,
   onChange,
+  icon,
 }: {
   label: string;
   description?: string;
   value: DateRangeValue | null;
   onChange: (value: DateRangeValue | null) => void;
+  icon?: LucideIcon;
 }) {
   return (
     <DateRangePicker className="grid gap-1.5" value={value} onChange={onChange}>
-      <Label className="text-sm font-medium text-foreground">{label}</Label>
+      <FieldLabel icon={icon} label={label} />
       <DateField.Group fullWidth variant="secondary">
         <DateField.InputContainer>
           <DateField.Input slot="start">
@@ -302,16 +331,18 @@ export function CodeEditor({
   onChange,
   description,
   rows = 18,
+  icon,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   description?: string;
   rows?: number;
+  icon?: LucideIcon;
 }) {
   return (
     <TextField.Root className="grid gap-1.5" fullWidth value={value} onChange={onChange}>
-      <Label className="text-sm font-medium text-foreground">{label}</Label>
+      <FieldLabel icon={icon} label={label} />
       <TextArea
         className="w-full resize-y font-mono text-xs leading-6"
         rows={rows}
@@ -395,12 +426,14 @@ export function Toggle({
   isSelected,
   onChange,
   isDisabled,
+  icon,
 }: {
   label: string;
   description?: string;
   isSelected: boolean;
   onChange: (selected: boolean) => void;
   isDisabled?: boolean;
+  icon?: LucideIcon;
 }) {
   return (
     <Switch.Root
@@ -417,7 +450,7 @@ export function Toggle({
             </Switch.Icon>
           </Switch.Thumb>
         </Switch.Control>
-        <Label className="min-w-0 text-sm font-medium text-foreground">{label}</Label>
+        <FieldLabel icon={icon} label={label} />
       </Switch.Content>
       {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
     </Switch.Root>
@@ -431,6 +464,7 @@ export function FormCheckbox({
   onChange,
   isDisabled,
   className,
+  icon,
 }: {
   label: ReactNode;
   description?: string;
@@ -438,6 +472,7 @@ export function FormCheckbox({
   onChange: (selected: boolean) => void;
   isDisabled?: boolean;
   className?: string;
+  icon?: LucideIcon;
 }) {
   return (
     <Checkbox
@@ -452,7 +487,7 @@ export function FormCheckbox({
             <Check aria-hidden="true" size={12} />
           </Checkbox.Indicator>
         </Checkbox.Control>
-        <Label className="min-w-0 flex-1 text-sm font-medium text-foreground">{label}</Label>
+        <FieldLabel icon={icon} label={label} />
       </Checkbox.Content>
       {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
     </Checkbox>
@@ -468,6 +503,7 @@ export function SelectField({
   onChange,
   description,
   isDisabled,
+  icon,
 }: {
   label: string;
   value: string;
@@ -475,6 +511,7 @@ export function SelectField({
   onChange: (value: string) => void;
   description?: string;
   isDisabled?: boolean;
+  icon?: LucideIcon;
 }) {
   const selected = options.find((option) => option.value === value);
   return (
@@ -487,7 +524,7 @@ export function SelectField({
       variant="secondary"
       onSelectionChange={(key) => onChange(key == null ? "" : String(key))}
     >
-      <Label className="text-sm font-medium text-foreground">{label}</Label>
+      <FieldLabel icon={icon} label={label} />
       <Select.Trigger>
         <Select.Value>{selected?.label ?? label}</Select.Value>
         <Select.Indicator>
@@ -515,13 +552,16 @@ export function AutocompleteField({
   options,
   onChange,
   placeholder,
+  icon,
 }: {
   label: string;
   value: string;
   options: SelectOption[];
   onChange: (value: string) => void;
   placeholder: string;
+  icon?: LucideIcon;
 }) {
+  const { t } = useTranslation();
   const selected = options.find((option) => option.value === value);
   return (
     <Autocomplete
@@ -531,10 +571,10 @@ export function AutocompleteField({
       variant="secondary"
       onSelectionChange={(key) => onChange(key == null ? "" : String(key))}
     >
-      <Label className="text-sm font-medium text-foreground">{label}</Label>
+      <FieldLabel icon={icon} label={label} />
       <Autocomplete.Trigger>
         <Autocomplete.Value>{selected?.label ?? placeholder}</Autocomplete.Value>
-        <Autocomplete.ClearButton aria-label="Clear selection">
+        <Autocomplete.ClearButton aria-label={t("common.clearSelection")}>
           <X aria-hidden="true" size={15} />
         </Autocomplete.ClearButton>
         <Autocomplete.Indicator>
@@ -545,7 +585,7 @@ export function AutocompleteField({
         <Autocomplete.Filter
           filter={(textValue, inputValue) => textValue.toLocaleLowerCase().includes(inputValue.toLocaleLowerCase())}
         >
-          <SearchField aria-label={`${label} search`} autoFocus variant="secondary">
+          <SearchField aria-label={t("common.searchWithin", { label })} autoFocus variant="secondary">
             <SearchField.Group>
               <SearchField.SearchIcon>
                 <Search aria-hidden="true" size={15} />
@@ -575,6 +615,7 @@ export function AppModal({
   footer,
   onOpenChange,
   size = "lg",
+  formSurface = false,
 }: {
   open: boolean;
   title: string;
@@ -582,7 +623,9 @@ export function AppModal({
   footer?: ReactNode;
   onOpenChange: (open: boolean) => void;
   size?: React.ComponentProps<typeof Modal.Container>["size"];
+  formSurface?: boolean;
 }) {
+  const { t } = useTranslation();
   const state = useOverlayState({ isOpen: open, onOpenChange });
   return (
     <Modal state={state}>
@@ -592,14 +635,31 @@ export function AppModal({
             <Modal.Header className="flex items-center justify-between gap-3 border-b border-border px-5 py-4">
               <Modal.Heading className="text-lg font-semibold text-foreground">{title}</Modal.Heading>
               <Modal.CloseTrigger
-                aria-label="Close"
+                aria-label={t("common.close")}
                 className="grid size-10 place-items-center rounded-lg text-muted hover:bg-default"
               >
                 <X aria-hidden="true" size={18} />
               </Modal.CloseTrigger>
             </Modal.Header>
-            <Modal.Body className="p-5">{children}</Modal.Body>
-            {footer ? <Modal.Footer className="flex flex-wrap justify-end gap-2 border-t border-border px-5 py-4">{footer}</Modal.Footer> : null}
+            <Modal.Body className={formSurface ? "p-4 pb-0 sm:p-5 sm:pb-0" : "p-5"}>
+              {formSurface ? (
+                <FormSurface className="app-modal-form-surface rounded-b-none border-b-0 p-4 sm:p-5">
+                  {children}
+                </FormSurface>
+              ) : children}
+            </Modal.Body>
+            {footer ? (
+              <Modal.Footer
+                className={cn(
+                  "flex flex-wrap justify-end gap-2 px-5 py-4",
+                  formSurface
+                    ? "app-modal-form-footer mx-4 mb-4 rounded-b-lg border border-border sm:mx-5 sm:mb-5"
+                    : "border-t border-border",
+                )}
+              >
+                {footer}
+              </Modal.Footer>
+            ) : null}
           </Modal.Dialog>
         </Modal.Container>
       </Modal.Backdrop>

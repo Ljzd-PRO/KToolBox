@@ -1,6 +1,26 @@
 import { Alert, Button, Chip, Surface, Tabs, toast } from "@heroui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Download, FileCheck2, Save, ShieldAlert } from "lucide-react";
+import {
+  Braces,
+  Check,
+  Cloud,
+  Download,
+  FileCheck2,
+  FileCog,
+  FileText,
+  Hash,
+  KeyRound,
+  ListTodo,
+  PanelTop,
+  Save,
+  Search,
+  Settings2,
+  ShieldAlert,
+  TextCursorInput,
+  ToggleLeft,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -8,6 +28,7 @@ import {
   AppModal,
   CodeEditor,
   FormField,
+  FormSurface,
   NumberInput,
   PageHeader,
   PageLoading,
@@ -200,8 +221,9 @@ export function ConfigurationPage() {
 
         <Tabs.Panel className="min-w-0 pt-5" id="structured">
           <div className="grid gap-5">
-            <Surface className="grid gap-4 rounded-lg border border-border p-4 lg:grid-cols-[minmax(0,220px)_minmax(0,260px)_1fr]">
+            <FormSurface className="grid gap-4 lg:grid-cols-[minmax(0,220px)_minmax(0,260px)_1fr]">
               <SelectField
+                icon={FileText}
                 label={t("configuration.destination")}
                 options={[
                   { value: "dotenv", label: t("configuration.environment") },
@@ -210,16 +232,17 @@ export function ConfigurationPage() {
                 value={destination}
                 onChange={(value) => setDestination(value as DotenvName)}
               />
-              <SelectField label={t("configuration.section")} options={sectionOptions} value={section} onChange={setSection} />
+              <SelectField icon={Settings2} label={t("configuration.section")} options={sectionOptions} value={section} onChange={setSection} />
               <FormField
+                icon={Search}
                 label={t("configuration.search")}
                 placeholder={t("configuration.searchPlaceholder")}
                 value={filter}
                 onChange={setFilter}
               />
-            </Surface>
+            </FormSurface>
 
-            <Surface className="divide-y divide-border rounded-lg border border-border">
+            <FormSurface className="divide-y divide-border p-0">
               {visibleFields.map((field) => (
                 <ConfigFieldEditor
                   field={field}
@@ -230,7 +253,7 @@ export function ConfigurationPage() {
                   onDiscard={() => discardField(field)}
                 />
               ))}
-            </Surface>
+            </FormSurface>
 
             <div className="sticky bottom-4 z-10 flex justify-end">
               <Surface className="flex items-center gap-3 rounded-lg border border-border p-3 shadow-lg">
@@ -270,33 +293,37 @@ export function ConfigurationPage() {
                 <Alert.Description>{t("configuration.rawWarning")}</Alert.Description>
               </Alert.Content>
             </Alert>
-            <SelectField
-              label={t("configuration.file")}
-              options={[
-                { value: "dotenv", label: t("configuration.environment") },
-                { value: "production", label: t("configuration.production") },
-                { value: "project", label: t("configuration.projectToml") },
-              ]}
-              value={rawName}
-              onChange={(value) => setRawName(value as RawName)}
-            />
-            <CodeEditor
-              description={`${t("configuration.filePath")}: ${documents[rawName]?.path ?? ""}`}
-              label={rawName === "project" ? "ktoolbox.toml" : rawName === "dotenv" ? ".env" : "prod.env"}
-              rows={22}
-              value={rawDrafts[rawName] ?? documents[rawName]?.content ?? ""}
-              onChange={(content) => setRawDrafts((current) => ({ ...current, [rawName]: content }))}
-            />
-            <div className="flex flex-wrap justify-end gap-2">
-              <Button variant="outline" onPress={() => void validateRaw()}>
-                <FileCheck2 aria-hidden="true" size={17} />
-                {t("configuration.validate")}
-              </Button>
-              <Button isPending={saving} variant="primary" onPress={() => void saveRaw()}>
-                <Save aria-hidden="true" size={17} />
-                {t("common.save")}
-              </Button>
-            </div>
+            <FormSurface className="grid gap-4">
+              <SelectField
+                icon={FileCog}
+                label={t("configuration.file")}
+                options={[
+                  { value: "dotenv", label: t("configuration.environment") },
+                  { value: "production", label: t("configuration.production") },
+                  { value: "project", label: t("configuration.projectToml") },
+                ]}
+                value={rawName}
+                onChange={(value) => setRawName(value as RawName)}
+              />
+              <CodeEditor
+                description={`${t("configuration.filePath")}: ${documents[rawName]?.path ?? ""}`}
+                icon={Braces}
+                label={rawName === "project" ? "ktoolbox.toml" : rawName === "dotenv" ? ".env" : "prod.env"}
+                rows={22}
+                value={rawDrafts[rawName] ?? documents[rawName]?.content ?? ""}
+                onChange={(content) => setRawDrafts((current) => ({ ...current, [rawName]: content }))}
+              />
+              <div className="flex flex-wrap justify-end gap-2">
+                <Button variant="outline" onPress={() => void validateRaw()}>
+                  <FileCheck2 aria-hidden="true" size={17} />
+                  {t("configuration.validate")}
+                </Button>
+                <Button isPending={saving} variant="primary" onPress={() => void saveRaw()}>
+                  <Save aria-hidden="true" size={17} />
+                  {t("common.save")}
+                </Button>
+              </div>
+            </FormSurface>
           </div>
         </Tabs.Panel>
       </Tabs>
@@ -304,8 +331,8 @@ export function ConfigurationPage() {
       <AppModal
         footer={
           <>
-            <Button variant="ghost" onPress={() => setReviewing(false)}>{t("common.cancel")}</Button>
-            <Button isPending={saving} variant="primary" onPress={() => void saveStructured()}>{t("common.save")}</Button>
+            <Button variant="ghost" onPress={() => setReviewing(false)}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
+            <Button isPending={saving} variant="primary" onPress={() => void saveStructured()}><Check aria-hidden="true" size={17} />{t("common.save")}</Button>
           </>
         }
         open={reviewing}
@@ -351,9 +378,11 @@ function ConfigFieldEditor({
   const type = schemaType(schema);
   const value = isPending ? pendingValue : serializeValue(field.value ?? field.default);
   const enumValues = schemaEnum(schema);
+  const icon = configurationIcon(field, type);
   const control = field.secret ? (
     <PasswordField
       description={field.description}
+      icon={icon}
       isDisabled={disabled}
       label={field.label}
       placeholder={field.is_set ? "••••••••" : ""}
@@ -363,6 +392,7 @@ function ConfigFieldEditor({
   ) : type === "boolean" ? (
     <Toggle
       description={field.description}
+      icon={icon}
       isDisabled={disabled}
       isSelected={String(value).toLocaleLowerCase() === "true"}
       label={field.label}
@@ -371,6 +401,7 @@ function ConfigFieldEditor({
   ) : type === "integer" || type === "number" ? (
     <NumberInput
       description={field.description}
+      icon={icon}
       isDisabled={disabled}
       label={field.label}
       maxValue={schemaNumber(schema, "maximum")}
@@ -382,6 +413,7 @@ function ConfigFieldEditor({
   ) : enumValues.length ? (
     <SelectField
       description={field.description}
+      icon={icon}
       isDisabled={disabled}
       label={field.label}
       options={enumValues.map((item) => ({ value: String(item), label: String(item) }))}
@@ -391,6 +423,7 @@ function ConfigFieldEditor({
   ) : (
     <FormField
       description={field.description}
+      icon={icon}
       label={field.label}
       value={value ?? ""}
       onChange={onChange}
@@ -413,6 +446,18 @@ function ConfigFieldEditor({
       </div>
     </div>
   );
+}
+
+function configurationIcon(field: ConfigField, type: string | undefined): LucideIcon {
+  if (field.secret) return KeyRound;
+  if (type === "boolean") return ToggleLeft;
+  if (type === "integer" || type === "number") return Hash;
+  const section = field.path.split(".", 1)[0];
+  if (section === "api") return Cloud;
+  if (section === "downloader") return Download;
+  if (section === "job") return ListTodo;
+  if (section === "webui") return PanelTop;
+  return TextCursorInput;
 }
 
 function schemaType(schema: Record<string, unknown>): string | undefined {

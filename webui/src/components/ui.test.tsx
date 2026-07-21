@@ -1,8 +1,9 @@
 import { Table } from "@heroui/react";
 import { render } from "@testing-library/react";
+import { Search } from "lucide-react";
 import { describe, expect, it } from "vitest";
 
-import { DataTableFrame, FormCheckbox, Toggle } from "./ui";
+import { AppModal, DataTableFrame, FormCheckbox, FormField, FormSurface, Toggle } from "./ui";
 
 describe("DataTableFrame", () => {
   it("uses one bordered scroll container without a wrapping surface", () => {
@@ -55,5 +56,38 @@ describe("form selection controls", () => {
     expect(content).toContainElement(control);
     expect(content).toHaveTextContent("Apply start date");
     expect(description?.parentElement).toBe(root);
+  });
+});
+
+describe("form surfaces", () => {
+  it("groups fields on a semantic secondary surface and hides decorative icons", () => {
+    const { container } = render(
+      <FormSurface>
+        <FormField icon={Search} label="Search settings" value="" onChange={() => undefined} />
+      </FormSurface>,
+    );
+
+    const surface = container.querySelector(".form-surface");
+    const icon = surface?.querySelector("svg");
+    expect(surface).toHaveClass("surface--secondary");
+    expect(surface).toContainElement(container.querySelector("input"));
+    expect(icon).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("uses the connected form body and footer only for editable modals", () => {
+    render(
+      <AppModal
+        formSurface
+        footer={<span>Save action</span>}
+        open
+        title="Edit task"
+        onOpenChange={() => undefined}
+      >
+        <FormField label="Output" value="downloads" onChange={() => undefined} />
+      </AppModal>,
+    );
+
+    expect(document.querySelector(".app-modal-form-surface")).toBeInTheDocument();
+    expect(document.querySelector(".app-modal-form-footer")).toHaveTextContent("Save action");
   });
 });
