@@ -28,11 +28,11 @@ import { parseDate } from "@internationalized/date";
 
 import type { CreatorReference, DownloadTaskSpec, SyncTaskSpec, TaskRecord, TaskSpec } from "../types";
 import {
-  AppModal,
   DateRangeInput,
   type DateRangeValue,
   FormCheckbox,
   FormField,
+  FormModal,
   FormSwitchField,
   NumberInput,
   SelectField,
@@ -126,8 +126,8 @@ export function TaskEditor({
   }
 
   return (
-    <AppModal
-      footer={
+    <FormModal
+      actions={
         <>
           <Button variant="ghost" onPress={onClose}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
           <Button form="task-editor-form" isPending={saving} type="submit" variant="primary">
@@ -137,7 +137,6 @@ export function TaskEditor({
         </>
       }
       open
-      formSurface
       size="lg"
       title={task ? t("tasks.edit") : t("tasks.create")}
       onOpenChange={(open) => !open && onClose()}
@@ -240,7 +239,7 @@ export function TaskEditor({
         </Tabs>
         <FormField icon={FolderOutput} isRequired label={t("tasks.output")} value={output} onChange={setOutput} />
       </form>
-    </AppModal>
+    </FormModal>
   );
 }
 

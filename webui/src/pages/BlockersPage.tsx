@@ -22,12 +22,12 @@ import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
-  AppModal,
   AutocompleteField,
   CompactSwitch,
   EmptyPanel,
   FormCheckbox,
   FormField,
+  FormModal,
   FormSwitchField,
   IconButton,
   PageHeader,
@@ -230,14 +230,13 @@ export function BlockersPage() {
         </section>
       )}
 
-      <AppModal
-        footer={
+      <FormModal
+        actions={
           <>
             <Button variant="ghost" onPress={() => setEditor(null)}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
             <Button form="blocker-form" isPending={saving} type="submit" variant="primary"><Check aria-hidden="true" size={17} />{t("common.save")}</Button>
           </>
         }
-        formSurface
         open={editor !== null}
         size="lg"
         title={editorIndex === null ? t("blockers.add") : t("blockers.edit")}
@@ -326,7 +325,7 @@ export function BlockersPage() {
             </div>
           </form>
         ) : null}
-      </AppModal>
+      </FormModal>
     </div>
   );
 }

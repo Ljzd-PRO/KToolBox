@@ -648,22 +648,20 @@ export function AutocompleteField({
   );
 }
 
-export function AppModal({
+export function FormModal({
   open,
   title,
   children,
-  footer,
+  actions,
   onOpenChange,
   size = "lg",
-  formSurface = false,
 }: {
   open: boolean;
   title: string;
   children: ReactNode;
-  footer?: ReactNode;
+  actions: ReactNode;
   onOpenChange: (open: boolean) => void;
   size?: React.ComponentProps<typeof Modal.Container>["size"];
-  formSurface?: boolean;
 }) {
   const { t } = useTranslation();
   const state = useOverlayState({ isOpen: open, onOpenChange });
@@ -671,7 +669,7 @@ export function AppModal({
     <Modal state={state}>
       <Modal.Backdrop>
         <Modal.Container className="mx-3" placement="center" scroll="inside" size={size}>
-          <Modal.Dialog>
+          <Modal.Dialog className="overflow-hidden">
             <Modal.Header className="flex items-center justify-between gap-3 border-b border-border px-5 py-4">
               <Modal.Heading className="text-lg font-semibold text-foreground">{title}</Modal.Heading>
               <Modal.CloseTrigger
@@ -681,25 +679,58 @@ export function AppModal({
                 <X aria-hidden="true" size={18} />
               </Modal.CloseTrigger>
             </Modal.Header>
-            <Modal.Body className={formSurface ? "p-4 pb-0 sm:p-5 sm:pb-0" : "p-5"}>
-              {formSurface ? (
-                <FormSurface className="app-modal-form-surface rounded-b-none border-b-0 p-4 sm:p-5">
-                  {children}
-                </FormSurface>
-              ) : children}
+            <Modal.Body className="app-form-modal-body p-4 sm:p-5">
+              <FormSurface className="app-form-modal-surface p-0">
+                <div className="app-form-modal-scroll p-4 sm:p-5">{children}</div>
+                <div className="app-form-modal-actions flex flex-wrap justify-end gap-2 border-t border-border px-4 py-3 sm:px-5 sm:py-4">
+                  {actions}
+                </div>
+              </FormSurface>
             </Modal.Body>
-            {footer ? (
-              <Modal.Footer
-                className={cn(
-                  "flex flex-wrap justify-end gap-2 px-5 py-4",
-                  formSurface
-                    ? "app-modal-form-footer mx-4 mb-4 rounded-b-lg border border-border sm:mx-5 sm:mb-5"
-                    : "border-t border-border",
-                )}
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
+    </Modal>
+  );
+}
+
+export function ConfirmModal({
+  open,
+  title,
+  children,
+  actions,
+  onOpenChange,
+  size = "md",
+}: {
+  open: boolean;
+  title: string;
+  children: ReactNode;
+  actions: ReactNode;
+  onOpenChange: (open: boolean) => void;
+  size?: React.ComponentProps<typeof Modal.Container>["size"];
+}) {
+  const { t } = useTranslation();
+  const state = useOverlayState({ isOpen: open, onOpenChange });
+  return (
+    <Modal state={state}>
+      <Modal.Backdrop>
+        <Modal.Container className="mx-3" placement="center" scroll="inside" size={size}>
+          <Modal.Dialog className="overflow-hidden">
+            <Modal.Header className="flex items-center justify-between gap-3 border-b border-border px-5 py-4">
+              <Modal.Heading className="text-lg font-semibold text-foreground">{title}</Modal.Heading>
+              <Modal.CloseTrigger
+                aria-label={t("common.close")}
+                className="grid size-10 place-items-center rounded-lg text-muted hover:bg-default"
               >
-                {footer}
-              </Modal.Footer>
-            ) : null}
+                <X aria-hidden="true" size={18} />
+              </Modal.CloseTrigger>
+            </Modal.Header>
+            <Modal.Body className="app-confirm-modal-body p-0">
+              <div className="app-confirm-modal-content p-5">{children}</div>
+              <div className="app-confirm-modal-actions flex flex-wrap justify-end gap-2 border-t border-border px-5 py-4">
+                {actions}
+              </div>
+            </Modal.Body>
           </Modal.Dialog>
         </Modal.Container>
       </Modal.Backdrop>

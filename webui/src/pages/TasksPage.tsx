@@ -27,7 +27,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { TaskEditor } from "../components/TaskEditor";
 import {
-  AppModal,
+  ConfirmModal,
   DataTableFrame,
   EmptyPanel,
   FormCheckbox,
@@ -197,8 +197,8 @@ export function TasksPage() {
         />
       ) : null}
 
-      <AppModal
-        footer={
+      <ConfirmModal
+        actions={
           <>
             <Button variant="ghost" onPress={() => setRemoving(null)}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
             <Button variant="danger" onPress={() => void deleteTask()}>
@@ -228,7 +228,7 @@ export function TasksPage() {
           <FormCheckbox isSelected={deleteOutput} label={t("tasks.deleteOutput")} onChange={setDeleteOutput} />
           {deleteOutput ? <p className="break-all text-xs text-danger">{t("tasks.deleteConfirmation", { id: removing?.id })}</p> : null}
         </div>
-      </AppModal>
+      </ConfirmModal>
     </div>
   );
 }

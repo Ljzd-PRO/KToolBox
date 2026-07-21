@@ -32,11 +32,13 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   await signIn(page);
   await page.getByRole("link", { name: "Tasks" }).click();
   await page.getByRole("button", { name: "Create task" }).click();
-  const formSurface = page.locator(".app-modal-form-surface");
-  const formFooter = page.locator(".app-modal-form-footer");
+  const formSurface = page.locator(".app-form-modal-surface");
+  const formScroll = page.locator(".app-form-modal-scroll");
+  const formActions = page.locator(".app-form-modal-actions");
   await expect(formSurface).toBeVisible();
-  await expect(formFooter).toBeVisible();
+  await expect(formActions).toBeVisible();
   await expect(formSurface.locator(".field-label-icon")).not.toHaveCount(0);
+  await expect(formSurface.locator('[data-slot="switch-icon"]')).toHaveCount(0);
 
   const switchContent = formSurface.locator('[data-slot="switch-content"]').filter({ hasText: "All enabled creators" });
   const switchControl = switchContent.locator('[data-slot="switch-control"]');
@@ -48,11 +50,12 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   expect(Math.abs((controlBox?.y ?? 0) - (labelBox?.y ?? 0))).toBeLessThan(2);
   expect(controlBox?.x ?? 0).toBeLessThan(labelBox?.x ?? 0);
 
-  const modalBody = page.locator('[data-slot="modal-body"]');
-  const [bodyBox, footerBox] = await Promise.all([modalBody.boundingBox(), formFooter.boundingBox()]);
-  expect(bodyBox).not.toBeNull();
-  expect(footerBox).not.toBeNull();
-  expect(Math.abs((bodyBox?.y ?? 0) + (bodyBox?.height ?? 0) - (footerBox?.y ?? 0))).toBeLessThan(1);
+  const [scrollBox, actionBox] = await Promise.all([formScroll.boundingBox(), formActions.boundingBox()]);
+  expect(scrollBox).not.toBeNull();
+  expect(actionBox).not.toBeNull();
+  expect(Math.abs((scrollBox?.y ?? 0) + (scrollBox?.height ?? 0) - (actionBox?.y ?? 0))).toBeLessThan(1);
+  expect(await formSurface.locator(".app-form-modal-actions").count()).toBe(1);
+  expect(await page.locator('[data-slot="modal-footer"]').count()).toBe(0);
 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);

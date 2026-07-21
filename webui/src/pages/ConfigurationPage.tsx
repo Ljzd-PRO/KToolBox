@@ -26,8 +26,8 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 
 import {
-  AppModal,
   CodeEditor,
+  ConfirmModal,
   FormField,
   FormSwitchField,
   FormSurface,
@@ -331,8 +331,8 @@ export function ConfigurationPage() {
         </Tabs.Panel>
       </Tabs>
 
-      <AppModal
-        footer={
+      <ConfirmModal
+        actions={
           <>
             <Button variant="ghost" onPress={() => setReviewing(false)}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
             <Button isPending={saving} variant="primary" onPress={() => void saveStructured()}><Check aria-hidden="true" size={17} />{t("common.save")}</Button>
@@ -357,7 +357,7 @@ export function ConfigurationPage() {
             </div>
           ))}
         </div>
-      </AppModal>
+      </ConfirmModal>
     </div>
   );
 }

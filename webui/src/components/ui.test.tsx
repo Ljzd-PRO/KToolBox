@@ -4,11 +4,12 @@ import { Search } from "lucide-react";
 import { describe, expect, it } from "vitest";
 
 import {
-  AppModal,
   CompactSwitch,
+  ConfirmModal,
   DataTableFrame,
   FormCheckbox,
   FormField,
+  FormModal,
   FormSurface,
   FormSwitchField,
 } from "./ui";
@@ -98,20 +99,42 @@ describe("form surfaces", () => {
     expect(icon).toHaveAttribute("aria-hidden", "true");
   });
 
-  it("uses the connected form body and footer only for editable modals", () => {
+  it("keeps editable content and actions inside one continuous form surface", () => {
     render(
-      <AppModal
-        formSurface
-        footer={<span>Save action</span>}
+      <FormModal
+        actions={<span>Save action</span>}
         open
         title="Edit task"
         onOpenChange={() => undefined}
       >
         <FormField label="Output" value="downloads" onChange={() => undefined} />
-      </AppModal>,
+      </FormModal>,
     );
 
-    expect(document.querySelector(".app-modal-form-surface")).toBeInTheDocument();
-    expect(document.querySelector(".app-modal-form-footer")).toHaveTextContent("Save action");
+    const surface = document.querySelector<HTMLElement>(".app-form-modal-surface");
+    const scroll = document.querySelector<HTMLElement>(".app-form-modal-scroll");
+    const actions = document.querySelector<HTMLElement>(".app-form-modal-actions");
+    expect(surface).toContainElement(scroll);
+    expect(surface).toContainElement(actions);
+    expect(actions).toHaveTextContent("Save action");
+    expect(document.querySelector('[data-slot="modal-footer"]')).not.toBeInTheDocument();
+  });
+
+  it("uses the dialog itself as the only surface for confirmations", () => {
+    render(
+      <ConfirmModal
+        actions={<span>Delete action</span>}
+        open
+        title="Delete task"
+        onOpenChange={() => undefined}
+      >
+        <p>Deletion warning</p>
+      </ConfirmModal>,
+    );
+
+    const body = document.querySelector<HTMLElement>(".app-confirm-modal-body");
+    expect(body).toContainElement(document.querySelector(".app-confirm-modal-content"));
+    expect(body).toContainElement(document.querySelector(".app-confirm-modal-actions"));
+    expect(body?.querySelector(".form-surface")).not.toBeInTheDocument();
   });
 });

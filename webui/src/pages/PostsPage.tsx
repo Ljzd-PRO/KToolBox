@@ -20,10 +20,10 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
 import {
-  AppModal,
   DataTableFrame,
   EmptyPanel,
   FormField,
+  FormModal,
   FormSwitchField,
   FormSurface,
   NumberInput,
@@ -198,8 +198,8 @@ export function PostsPage() {
         ) : null}
       </section>
 
-      <AppModal
-        footer={
+      <FormModal
+        actions={
           <>
             <Button variant="ghost" onPress={() => setSelected(null)}><X aria-hidden="true" size={17} />{t("common.close")}</Button>
             <Button isPending={creating} variant="primary" onPress={() => void createDownload()}>
@@ -220,11 +220,11 @@ export function PostsPage() {
               <Chip size="sm" variant="soft">{details.user}:{details.id}</Chip>
               {"revision_id" in details ? <Chip color="warning" size="sm" variant="soft">{t("posts.revisionLabel", { id: details.revision_id })}</Chip> : null}
             </div>
-            <FormSurface className="grid gap-4">
+            <section className="grid gap-4 border-t border-border pt-5">
               <SelectField icon={History} label={t("posts.revision")} options={revisionOptions} value={selectedRevision} onChange={setSelectedRevision} />
               <FormField icon={FolderOutput} isRequired label={t("tasks.output")} value={output} onChange={setOutput} />
               <FormSwitchField icon={FileJson} isSelected={dumpMetadata} label={t("tasks.dumpMetadata")} onChange={setDumpMetadata} />
-            </FormSurface>
+            </section>
             <Alert status="warning">
               <Alert.Indicator><FileSearch aria-hidden="true" size={18} /></Alert.Indicator>
               <Alert.Content><Alert.Title>{t("posts.mediaSafeTitle")}</Alert.Title><Alert.Description>{t("posts.mediaSafeBody")}</Alert.Description></Alert.Content>
@@ -241,7 +241,7 @@ export function PostsPage() {
             </div>
           </div>
         ) : null}
-      </AppModal>
+      </FormModal>
     </div>
   );
 }

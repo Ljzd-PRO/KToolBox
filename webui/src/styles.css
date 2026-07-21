@@ -225,10 +225,40 @@ code {
   border-color: transparent;
 }
 
-.app-modal-form-footer {
-  margin-top: 0;
+.app-form-modal-body {
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.app-form-modal-surface {
+  display: flex;
+  width: 100%;
+  max-height: calc(100dvh - 8.5rem);
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-form-modal-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.app-form-modal-actions {
+  flex: none;
   border-top-color: var(--separator);
   background: var(--surface-secondary);
+}
+
+.app-confirm-modal-body {
+  overflow: hidden;
+}
+
+.app-confirm-modal-actions {
+  border-top-color: var(--separator);
+  background: color-mix(in oklab, var(--surface) 70%, var(--surface-secondary) 30%);
 }
 
 @media (prefers-reduced-motion: reduce) {

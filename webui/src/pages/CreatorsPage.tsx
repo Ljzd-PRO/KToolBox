@@ -13,11 +13,12 @@ import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
-  AppModal,
   CompactSwitch,
+  ConfirmModal,
   DataTableFrame,
   EmptyPanel,
   FormField,
+  FormModal,
   FormSwitchField,
   FormSurface,
   IconButton,
@@ -263,14 +264,13 @@ export function CreatorsPage() {
         )}
       </section>
 
-      <AppModal
-        footer={
+      <FormModal
+        actions={
           <>
             <Button variant="ghost" onPress={() => setEditor(null)}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
             <Button form="creator-form" isPending={saving} type="submit" variant="primary"><Check aria-hidden="true" size={17} />{t("common.save")}</Button>
           </>
         }
-        formSurface
         open={editor !== null}
         title={originalKey ? t("creators.edit") : t("creators.add")}
         onOpenChange={(open) => !open && setEditor(null)}
@@ -309,10 +309,10 @@ export function CreatorsPage() {
             />
           </form>
         ) : null}
-      </AppModal>
+      </FormModal>
 
-      <AppModal
-        footer={
+      <ConfirmModal
+        actions={
           <>
             <Button variant="ghost" onPress={() => setRemoving(null)}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
             <Button variant="danger" onPress={() => void removeCreator()}>
@@ -327,7 +327,7 @@ export function CreatorsPage() {
         onOpenChange={(open) => !open && setRemoving(null)}
       >
         <p className="text-sm leading-relaxed text-muted">{t("creators.removeBody")}</p>
-      </AppModal>
+      </ConfirmModal>
     </div>
   );
 }
