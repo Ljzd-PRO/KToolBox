@@ -46,7 +46,7 @@ Only one scheduler may open a project at a time. A project lock prevents two Web
 
 ## Project workflows
 
-The interface follows the browser language on first use and supports persistent English/Chinese selection. Theme follows the operating system until light or dark mode is selected. Desktop uses a compact sidebar; narrow screens use a Drawer.
+The interface follows the browser language on first use and supports persistent English/Chinese selection. Theme follows the operating system until light or dark mode is selected. Blue, emerald, violet, rose, and amber accent palettes are available; form switches stay blue when enabled so their state remains consistent across palettes. Desktop uses a compact sidebar; narrow screens use a Drawer.
 
 ![Light configuration editor](../assets/webui/09-configuration-light.png)
 
