@@ -86,14 +86,14 @@ id = "skip-life-updates"
 type = "field-match"
 enabled = true
 scope = { mode = "global", creators = [] }
-options = { rule = { kind = "group", mode = "any", conditions = [{ kind = "field", field = "title", operator = "contains", values = ["生活分享", "日常记录"] }, { kind = "field", field = "tags[*]", operator = "equals", values = ["personal"] }] } }
+options = { rule = { kind = "group", mode = "any", conditions = [{ kind = "field", field = "title", operator = "contains", values = ["life update", "daily note"] }, { kind = "field", field = "tags[*]", operator = "equals", values = ["personal"] }] } }
 
 [[blockers]]
 id = "studio-a-progress"
 type = "field-match"
 enabled = true
 scope = { mode = "creators", creators = ["fanbox:123"] }
-options = { rule = { kind = "group", mode = "all", conditions = [{ kind = "field", field = "title", operator = "regex", values = ["进度|练习"] }, { kind = "field", field = "attachments[*].name", operator = "exists", expected = false }] } }
+options = { rule = { kind = "group", mode = "all", conditions = [{ kind = "field", field = "title", operator = "regex", values = ["progress|practice"] }, { kind = "field", field = "attachments[*].name", operator = "exists", expected = false }] } }
 ```
 
 `field-match` 支持递归 `any`/`all` 条件组，组与条件都可设置 `negate`。条件操作符如下：

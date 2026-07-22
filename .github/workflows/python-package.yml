@@ -90,7 +90,7 @@ jobs:
               pip install poetry &&
               poetry install --with pyinstaller --extras urwid --extras webui --extras uvloop &&
               poetry run pyinstaller ktoolbox.spec --distpath dist &&
-              cp README.md README_zh-CN.md example.env LICENSE dist/
+              cp README*.md example.env LICENSE dist/
             "
 
       - name: Upload Executable
