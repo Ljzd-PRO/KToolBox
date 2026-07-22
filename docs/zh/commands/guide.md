@@ -102,7 +102,7 @@ ktoolbox site-version
 
 ## 运行可选项目面板
 
-安装 `ktoolbox[webui]` 并配置账户后，可将面板绑定到项目目录。若缺少 `ktoolbox.toml`，程序会在终端提示警告并自动创建：
+安装 `ktoolbox[webui]` 后，可将面板绑定到项目目录。可以预先配置账户，也可以使用本次运行时终端输出的 `admin` 用户名和随机密码。若缺少 `ktoolbox.toml`，程序会在终端提示警告并自动创建：
 
 ```bash
 ktoolbox webui . --host 127.0.0.1

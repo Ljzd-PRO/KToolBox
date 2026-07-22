@@ -12,7 +12,7 @@ mkdir ktoolbox-project
 cd ktoolbox-project
 ```
 
-通过隐藏终端输入生成 Argon2id 密码哈希：
+启动时可以不配置凭据；未配置时，终端会输出本次进程使用的 `admin` 用户名和新随机密码。如需固定凭据，可通过隐藏终端输入生成 Argon2id 密码哈希：
 
 ```bash
 ktoolbox webui hash-password
@@ -32,11 +32,11 @@ ktoolbox webui .
 ktoolbox webui . --host 127.0.0.1 --port 8789 --no-open
 ```
 
-默认监听 `0.0.0.0:8789` 并自动打开本机浏览器。`--host`、`--port`、`--no-open` 只为本次进程覆盖环境配置。缺少 `ktoolbox.toml` 时，启动过程会在终端显示警告，并以原子写入方式创建一份最小有效项目文件；缺少用户名或两种密码配置时仍会拒绝启动。
+默认监听 `0.0.0.0:8789` 并自动打开本机浏览器。`--host`、`--port`、`--no-open` 只为本次进程覆盖环境配置。缺少 `ktoolbox.toml` 时，启动过程会在终端显示警告，并以原子写入方式创建一份最小有效项目文件。缺少凭据不再阻止启动：用户名留空时使用 `admin`，两种密码均留空时为本次运行生成并在终端输出新密码。
 
 ## 安全模型
 
-KToolBox 只提供一个本地 WebUI 账户，且没有默认凭据。`KTOOLBOX_WEBUI__PASSWORD_HASH` 优先于兼容用的明文 `KTOOLBOX_WEBUI__PASSWORD`；应优先使用哈希，并确保两个 dotenv 文件都不进入版本控制。
+KToolBox 只提供一个本地 WebUI 账户。显式配置始终优先，`KTOOLBOX_WEBUI__PASSWORD_HASH` 又优先于兼容用的明文 `KTOOLBOX_WEBUI__PASSWORD`。两种密码均未配置时，每次启动都会在内存中生成新密码，并只在该进程的终端中连同有效用户名一起输出。稳定部署应优先配置哈希，并确保两个 dotenv 文件都不进入版本控制。
 
 会话使用随机不透明令牌，SQLite 只保存令牌哈希。浏览器 Cookie 具有 `HttpOnly` 与 `SameSite=Strict` 属性，在 HTTPS 请求下还会增加 `Secure`。修改请求需要每个会话独立的 CSRF 令牌并接受同源检查。登录受速率限制，API 响应禁止缓存，应用还会发送严格的内容、嵌入、来源和浏览器权限安全头。
 
@@ -115,9 +115,9 @@ KToolBox 只提供一个本地 WebUI 账户，且没有默认凭据。`KTOOLBOX_
 | `KTOOLBOX_WEBUI__HOST` | `0.0.0.0` | 监听接口。 |
 | `KTOOLBOX_WEBUI__PORT` | `8789` | 监听端口，范围 1–65535。 |
 | `KTOOLBOX_WEBUI__OPEN_BROWSER` | `True` | 启动后打开本机 URL。 |
-| `KTOOLBOX_WEBUI__USERNAME` | 空 | 必填的单账户用户名。 |
-| `KTOOLBOX_WEBUI__PASSWORD_HASH` | 空 | 推荐的 Argon2id 哈希。 |
-| `KTOOLBOX_WEBUI__PASSWORD` | 空 | 明文后备值；存在哈希时忽略。 |
+| `KTOOLBOX_WEBUI__USERNAME` | 空 → 启动时为 `admin` | 可选的单账户用户名。 |
+| `KTOOLBOX_WEBUI__PASSWORD_HASH` | 空 | 推荐的固定 Argon2id 哈希。 |
+| `KTOOLBOX_WEBUI__PASSWORD` | 空 → 每次启动随机生成 | 明文后备值；存在哈希时忽略。 |
 | `KTOOLBOX_WEBUI__MAX_ACTIVE_TASKS` | `2` | 顶层并发任务数，范围 1–16。 |
 | `KTOOLBOX_WEBUI__SESSION_IDLE_HOURS` | `24` | 距最后一次使用的会话期限。 |
 | `KTOOLBOX_WEBUI__SESSION_ABSOLUTE_HOURS` | `168` | 距登录时间的会话最长期限。 |

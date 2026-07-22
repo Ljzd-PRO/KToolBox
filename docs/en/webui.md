@@ -12,7 +12,7 @@ mkdir ktoolbox-project
 cd ktoolbox-project
 ```
 
-Generate an Argon2id password hash using hidden terminal input:
+Credentials are optional at startup. When they are absent, the terminal prints the `admin` username and a new random password valid for that process run. To configure stable credentials, generate an Argon2id password hash using hidden terminal input:
 
 ```bash
 ktoolbox webui hash-password
@@ -32,11 +32,11 @@ ktoolbox webui .
 ktoolbox webui . --host 127.0.0.1 --port 8789 --no-open
 ```
 
-The default is `0.0.0.0:8789` and the local browser opens automatically. `--host`, `--port`, and `--no-open` override environment configuration for that process. If `ktoolbox.toml` is missing, startup prints a warning and atomically creates a minimal valid project document. Startup still fails when the username or both password forms are missing.
+The default is `0.0.0.0:8789` and the local browser opens automatically. `--host`, `--port`, and `--no-open` override environment configuration for that process. If `ktoolbox.toml` is missing, startup prints a warning and atomically creates a minimal valid project document. Missing credentials no longer block startup: an empty username becomes `admin`, and empty password settings produce a new terminal-printed password for that run.
 
 ## Security model
 
-KToolBox has one local WebUI account and no default credentials. `KTOOLBOX_WEBUI__PASSWORD_HASH` takes precedence over the plaintext compatibility setting `KTOOLBOX_WEBUI__PASSWORD`. Prefer the hash and keep both dotenv files out of version control.
+KToolBox has one local WebUI account. Explicit configuration takes precedence; `KTOOLBOX_WEBUI__PASSWORD_HASH` takes precedence over the plaintext compatibility setting `KTOOLBOX_WEBUI__PASSWORD`. If neither password form is configured, KToolBox generates an in-memory password for every launch and prints it with the effective username only in that terminal. Prefer a configured hash for stable deployments and keep both dotenv files out of version control.
 
 Sessions use random opaque tokens. SQLite stores only token hashes; the browser cookie is `HttpOnly` and `SameSite=Strict`, and it becomes `Secure` on HTTPS requests. Mutating requests require a per-session CSRF token and same-origin checks. Login attempts are rate-limited, API responses are not cached, and the application sends restrictive content, frame, referrer, and browser-permission headers.
 
@@ -119,9 +119,9 @@ Deleting a task normally removes only its queue record, attempts, and logs. “D
 | `KTOOLBOX_WEBUI__HOST` | `0.0.0.0` | Listen interface. |
 | `KTOOLBOX_WEBUI__PORT` | `8789` | Listen port, 1–65535. |
 | `KTOOLBOX_WEBUI__OPEN_BROWSER` | `True` | Open the local URL after startup. |
-| `KTOOLBOX_WEBUI__USERNAME` | empty | Required single-account username. |
-| `KTOOLBOX_WEBUI__PASSWORD_HASH` | empty | Preferred Argon2id hash. |
-| `KTOOLBOX_WEBUI__PASSWORD` | empty | Plaintext fallback; ignored when a hash exists. |
+| `KTOOLBOX_WEBUI__USERNAME` | empty → `admin` at startup | Optional single-account username. |
+| `KTOOLBOX_WEBUI__PASSWORD_HASH` | empty | Preferred stable Argon2id hash. |
+| `KTOOLBOX_WEBUI__PASSWORD` | empty → random per startup | Plaintext fallback; ignored when a hash exists. |
 | `KTOOLBOX_WEBUI__MAX_ACTIVE_TASKS` | `2` | Concurrent top-level tasks, 1–16. |
 | `KTOOLBOX_WEBUI__SESSION_IDLE_HOURS` | `24` | Session lifetime since last use. |
 | `KTOOLBOX_WEBUI__SESSION_ABSOLUTE_HOURS` | `168` | Maximum session lifetime since login. |

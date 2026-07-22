@@ -70,7 +70,7 @@ Déplacez les valeurs non vides de `KTOOLBOX_JOB__KEYWORDS_EXCLUDE` vers une con
 
 ## WebUI facultative
 
-La version 1 ajoute un nouveau panneau HeroUI ; elle ne migre ni ne réutilise l'ancienne branche expérimentale `webui`. Installez `ktoolbox[webui]`, sélectionnez un répertoire de projet et configurez un nouveau compte unique. Un fichier `ktoolbox.toml` absent est créé automatiquement après un avertissement ; aucun identifiant par défaut n'est créé.
+La version 1 ajoute un nouveau panneau HeroUI ; elle ne migre ni ne réutilise l'ancienne branche expérimentale `webui`. Installez `ktoolbox[webui]` et sélectionnez un répertoire de projet. Un fichier `ktoolbox.toml` absent est créé automatiquement après un avertissement. Sans compte configuré, chaque démarrage affiche le nom `admin` et un nouveau mot de passe aléatoire ; configurez un compte unique pour conserver des identifiants stables.
 
 ```bash
 ktoolbox webui hash-password

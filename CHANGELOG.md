@@ -35,7 +35,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 ## HeroUI WebUI
 
 - Add an optional React 19, TypeScript, Tailwind CSS v4, HeroUI v3, and Lucide management panel whose production assets are embedded in wheels and standalone builds.
-- Add `ktoolbox webui [PROJECT_DIR]`, host/port/browser overrides, and `webui hash-password`; refuse startup without an explicit single account and prefer Argon2id password hashes.
+- Add `ktoolbox webui [PROJECT_DIR]`, host/port/browser overrides, and `webui hash-password`; use terminal-printed `admin`/random credentials when account settings are absent and prefer configured Argon2id password hashes.
 - Warn and atomically create a minimal `ktoolbox.toml` when the selected WebUI project does not have one yet.
 - Add rate-limited authentication with hashed opaque sessions, strict cookies, CSRF and Origin validation, security headers, redacted configuration snapshots, and a persistent project lock.
 - Add bilingual, responsive light/dark workflows for project overview, `.env`/`prod.env` and TOML editing, author roster, recursive blockers, Pawchive creator/post queries, revision inspection, site version, and task creation.
@@ -104,7 +104,7 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 ## HeroUI WebUI
 
 - 新增可选 React 19、TypeScript、Tailwind CSS v4、HeroUI v3 与 Lucide 管理面板，生产资源会嵌入 wheel 和独立构建。
-- 新增 `ktoolbox webui [项目目录]`、主机/端口/浏览器覆盖参数及 `webui hash-password`；没有显式单账户时拒绝启动，并优先使用 Argon2id 密码哈希。
+- 新增 `ktoolbox webui [项目目录]`、主机/端口/浏览器覆盖参数及 `webui hash-password`；未配置账户时使用终端输出的 `admin`/随机密码，并优先使用已配置的 Argon2id 密码哈希。
 - WebUI 项目尚无 `ktoolbox.toml` 时给出警告，并以原子写入方式创建最小有效配置。
 - 新增登录速率限制、哈希化不透明会话、严格 Cookie、CSRF 与 Origin 校验、安全响应头、脱敏配置快照及持久项目锁。
 - 新增双语、响应式深浅色流程，覆盖项目概览、`.env`/`prod.env` 与 TOML 编辑、作者清单、递归忽略规则、Pawchive 作者/作品查询、修订查看、站点版本与任务创建。

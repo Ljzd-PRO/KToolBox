@@ -116,7 +116,7 @@ Rich 实时进度仅用于交互终端。界面会显示每个活动文件的速
 
 ## 为什么 WebUI 拒绝启动？
 
-请安装 `ktoolbox[webui]`，传入项目目录，并配置 `KTOOLBOX_WEBUI__USERNAME` 以及 `KTOOLBOX_WEBUI__PASSWORD_HASH` 或 `KTOOLBOX_WEBUI__PASSWORD`。若缺少 `ktoolbox.toml`，程序会在终端警告后自动创建。应优先使用有效的 Argon2 哈希。同一项目已经运行另一个 WebUI 时，项目锁也会拒绝启动。
+请安装 `ktoolbox[webui]` 并传入项目目录。账户配置可留空，此时终端会输出本次运行使用的 `admin` 用户名和随机密码。显式配置的密码哈希仍必须是有效的 Argon2 值。若缺少 `ktoolbox.toml`，程序会在终端警告后自动创建；同一项目已经运行另一个 WebUI 时，项目锁仍会拒绝启动。
 
 ## 可以安全地把 WebUI 暴露到网络吗？
 

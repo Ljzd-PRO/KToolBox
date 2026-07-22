@@ -12,7 +12,7 @@ mkdir ktoolbox-project
 cd ktoolbox-project
 ```
 
-透過隱藏的終端機輸入產生 Argon2id 密碼雜湊：
+啟動時可以不設定憑證；未設定時，終端機會輸出本次處理程序使用的 `admin` 使用者名稱和新隨機密碼。如需固定憑證，可透過隱藏的終端機輸入產生 Argon2id 密碼雜湊：
 
 ```bash
 ktoolbox webui hash-password
@@ -32,11 +32,11 @@ ktoolbox webui .
 ktoolbox webui . --host 127.0.0.1 --port 8789 --no-open
 ```
 
-預設為 `0.0.0.0:8789`，本機瀏覽器會自動開啟。`--host`、`--port` 和 `--no-open` 會覆寫該處理程序的環境設定。若缺少 `ktoolbox.toml`，啟動時會列印警告並以原子方式建立最小有效專案文件。缺少使用者名稱或兩種密碼形式時，啟動仍會失敗。
+預設為 `0.0.0.0:8789`，本機瀏覽器會自動開啟。`--host`、`--port` 和 `--no-open` 會覆寫該處理程序的環境設定。若缺少 `ktoolbox.toml`，啟動時會列印警告並以原子方式建立最小有效專案文件。缺少憑證不再阻止啟動：使用者名稱留空時使用 `admin`，兩種密碼均留空時為本次執行產生並在終端機輸出新密碼。
 
 ## 安全模型
 
-KToolBox 只有一個本機 WebUI 帳號，沒有預設憑證。`KTOOLBOX_WEBUI__PASSWORD_HASH` 的優先權高於純文字相容設定 `KTOOLBOX_WEBUI__PASSWORD`。建議使用雜湊，並將兩個 dotenv 檔案排除於版本控制之外。
+KToolBox 只有一個本機 WebUI 帳號。明確設定始終優先，`KTOOLBOX_WEBUI__PASSWORD_HASH` 又優先於純文字相容設定 `KTOOLBOX_WEBUI__PASSWORD`。兩種密碼均未設定時，每次啟動都會在記憶體中產生新密碼，並只在該處理程序的終端機中連同有效使用者名稱一起輸出。穩定部署建議設定雜湊，並將兩個 dotenv 檔案排除於版本控制之外。
 
 工作階段使用隨機不透明權杖。SQLite 只儲存權杖雜湊；瀏覽器 Cookie 使用 `HttpOnly` 和 `SameSite=Strict`，並在 HTTPS 請求上變為 `Secure`。變更狀態的請求需要每個工作階段的 CSRF 權杖和同源檢查。登入嘗試會限制速率，API 回應不快取，應用程式會傳送嚴格的內容、框架、引用來源與瀏覽器權限標頭。
 
@@ -115,9 +115,9 @@ KToolBox 只有一個本機 WebUI 帳號，沒有預設憑證。`KTOOLBOX_WEBUI_
 | `KTOOLBOX_WEBUI__HOST` | `0.0.0.0` | 監聽介面。 |
 | `KTOOLBOX_WEBUI__PORT` | `8789` | 監聽連接埠，1–65535。 |
 | `KTOOLBOX_WEBUI__OPEN_BROWSER` | `True` | 啟動後開啟本機 URL。 |
-| `KTOOLBOX_WEBUI__USERNAME` | 空 | 必填的單一帳號使用者名稱。 |
-| `KTOOLBOX_WEBUI__PASSWORD_HASH` | 空 | 建議使用的 Argon2id 雜湊。 |
-| `KTOOLBOX_WEBUI__PASSWORD` | 空 | 純文字備用值；存在雜湊時忽略。 |
+| `KTOOLBOX_WEBUI__USERNAME` | 空 → 啟動時為 `admin` | 可選的單一帳號使用者名稱。 |
+| `KTOOLBOX_WEBUI__PASSWORD_HASH` | 空 | 建議使用的固定 Argon2id 雜湊。 |
+| `KTOOLBOX_WEBUI__PASSWORD` | 空 → 每次啟動隨機產生 | 純文字備用值；存在雜湊時忽略。 |
 | `KTOOLBOX_WEBUI__MAX_ACTIVE_TASKS` | `2` | 並行頂層工作數，1–16。 |
 | `KTOOLBOX_WEBUI__SESSION_IDLE_HOURS` | `24` | 從最後使用起計算的工作階段存續時間。 |
 | `KTOOLBOX_WEBUI__SESSION_ABSOLUTE_HOURS` | `168` | 從登入起計算的最長工作階段存續時間。 |

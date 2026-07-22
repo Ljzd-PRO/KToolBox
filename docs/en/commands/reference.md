@@ -96,7 +96,7 @@ Without `--json`, query commands deliberately omit post body text from terminal 
 
 ## `webui`
 
-Install `ktoolbox[webui]` before using these commands. The default command accepts a project directory and creates a missing `ktoolbox.toml` after printing a warning. Valid single-account credentials are still required.
+Install `ktoolbox[webui]` before using these commands. The default command accepts a project directory and creates a missing `ktoolbox.toml` after printing a warning. If account settings are absent, it prints an `admin` username and random password for that process run; configure the WebUI fields to use stable custom credentials.
 
 | Argument or option | Default | Meaning |
 | --- | --- | --- |

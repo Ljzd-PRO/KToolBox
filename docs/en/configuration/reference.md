@@ -125,16 +125,16 @@ Condition groups use `kind = "group"`, `mode = "any"` or `"all"`, a non-empty `c
 
 ## `webui`
 
-These settings are needed only when `ktoolbox[webui]` is installed. There are no default credentials, and the server refuses to start without a username and either password form.
+These settings are needed only when `ktoolbox[webui]` is installed. They are optional for startup: an empty username becomes `admin`, and when both password forms are empty the server generates a random password, prints the effective credentials in the terminal, and keeps them only for that process run.
 
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
 | `host` | string | `0.0.0.0` | HTTP listen interface. Prefer `127.0.0.1` outside a trusted LAN. |
 | `port` | integer | `8789` | HTTP listen port, from 1 through 65535. |
 | `open_browser` | boolean | `True` | Open the local panel URL after startup. |
-| `username` | string | empty | Required username for the single account. |
-| `password_hash` | secret string | empty | Preferred Argon2id password hash. |
-| `password` | secret string | empty | Plaintext fallback, ignored when `password_hash` is set. |
+| `username` | string | empty | Optional username; startup uses `admin` when empty. |
+| `password_hash` | secret string | empty | Preferred stable Argon2id password hash. |
+| `password` | secret string | empty | Plaintext fallback; startup generates one when both password forms are empty. |
 | `max_active_tasks` | integer | `2` | Concurrent top-level tasks, from 1 through 16. |
 | `session_idle_hours` | integer | `24` | Session expiry measured from last use. |
 | `session_absolute_hours` | integer | `168` | Maximum session lifetime measured from login. |

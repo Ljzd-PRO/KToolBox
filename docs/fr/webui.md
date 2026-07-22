@@ -12,7 +12,7 @@ mkdir ktoolbox-project
 cd ktoolbox-project
 ```
 
-Générez un hachage de mot de passe Argon2id au moyen d'une saisie masquée dans le terminal :
+Les identifiants sont facultatifs au démarrage. S'ils sont absents, le terminal affiche le nom `admin` et un nouveau mot de passe aléatoire valable pour ce processus. Pour utiliser des identifiants stables, générez un hachage Argon2id au moyen d'une saisie masquée :
 
 ```bash
 ktoolbox webui hash-password
@@ -32,11 +32,11 @@ ktoolbox webui .
 ktoolbox webui . --host 127.0.0.1 --port 8789 --no-open
 ```
 
-La valeur par défaut est `0.0.0.0:8789` et le navigateur local s'ouvre automatiquement. `--host`, `--port` et `--no-open` remplacent la configuration d'environnement pour ce processus. Si `ktoolbox.toml` manque, le démarrage affiche un avertissement et crée atomiquement un document minimal valide. Le démarrage échoue toujours si le nom d'utilisateur ou les deux formes de mot de passe manquent.
+La valeur par défaut est `0.0.0.0:8789` et le navigateur local s'ouvre automatiquement. `--host`, `--port` et `--no-open` remplacent la configuration d'environnement pour ce processus. Si `ktoolbox.toml` manque, le démarrage affiche un avertissement et crée atomiquement un document minimal valide. L'absence d'identifiants ne bloque plus le démarrage : un nom vide devient `admin` et, si les deux formes de mot de passe sont vides, un nouveau mot de passe est généré et affiché dans le terminal pour cette exécution.
 
 ## Modèle de sécurité
 
-KToolBox possède un compte WebUI local et aucun identifiant par défaut. `KTOOLBOX_WEBUI__PASSWORD_HASH` a priorité sur le réglage de compatibilité en clair `KTOOLBOX_WEBUI__PASSWORD`. Préférez le hachage et excluez les deux fichiers dotenv du contrôle de version.
+KToolBox possède un seul compte WebUI local. La configuration explicite est prioritaire et `KTOOLBOX_WEBUI__PASSWORD_HASH` prime sur le réglage compatible en clair `KTOOLBOX_WEBUI__PASSWORD`. Si aucun mot de passe n'est configuré, KToolBox en génère un en mémoire à chaque démarrage et l'affiche avec le nom effectif uniquement dans ce terminal. Pour un déploiement stable, configurez de préférence un hachage et excluez les deux fichiers dotenv du contrôle de version.
 
 Les sessions utilisent des jetons opaques aléatoires. SQLite ne stocke que leur hachage ; le cookie du navigateur est `HttpOnly` et `SameSite=Strict`, et devient `Secure` avec HTTPS. Les requêtes modificatrices exigent un jeton CSRF par session et la vérification de la même origine. Les tentatives de connexion sont limitées, les réponses d'API ne sont pas mises en cache et l'application envoie des en-têtes restrictifs pour le contenu, les cadres, la provenance et les autorisations du navigateur.
 
@@ -115,9 +115,9 @@ Supprimer une tâche ne retire normalement que son enregistrement, ses tentative
 | `KTOOLBOX_WEBUI__HOST` | `0.0.0.0` | Interface d'écoute. |
 | `KTOOLBOX_WEBUI__PORT` | `8789` | Port d'écoute, de 1 à 65535. |
 | `KTOOLBOX_WEBUI__OPEN_BROWSER` | `True` | Ouvrir l'URL locale après le démarrage. |
-| `KTOOLBOX_WEBUI__USERNAME` | vide | Nom requis du compte unique. |
-| `KTOOLBOX_WEBUI__PASSWORD_HASH` | vide | Hachage Argon2id recommandé. |
-| `KTOOLBOX_WEBUI__PASSWORD` | vide | Solution en clair ; ignorée si un hachage existe. |
+| `KTOOLBOX_WEBUI__USERNAME` | vide → `admin` au démarrage | Nom facultatif du compte unique. |
+| `KTOOLBOX_WEBUI__PASSWORD_HASH` | vide | Hachage Argon2id stable recommandé. |
+| `KTOOLBOX_WEBUI__PASSWORD` | vide → aléatoire à chaque démarrage | Solution en clair ; ignorée si un hachage existe. |
 | `KTOOLBOX_WEBUI__MAX_ACTIVE_TASKS` | `2` | Tâches principales simultanées, de 1 à 16. |
 | `KTOOLBOX_WEBUI__SESSION_IDLE_HOURS` | `24` | Durée de session depuis la dernière utilisation. |
 | `KTOOLBOX_WEBUI__SESSION_ABSOLUTE_HOURS` | `168` | Durée maximale depuis la connexion. |
