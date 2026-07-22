@@ -291,11 +291,11 @@ export function NumberInput({
     >
       <FieldLabel icon={icon} label={label} />
       <NumberField.Group>
-        <NumberField.DecrementButton aria-label={`${t("common.decrease")} ${label}`}>
+        <NumberField.DecrementButton aria-label={t("common.decrease")}>
           <Minus aria-hidden="true" size={15} />
         </NumberField.DecrementButton>
         <NumberField.Input />
-        <NumberField.IncrementButton aria-label={`${t("common.increase")} ${label}`}>
+        <NumberField.IncrementButton aria-label={t("common.increase")}>
           <Plus aria-hidden="true" size={15} />
         </NumberField.IncrementButton>
       </NumberField.Group>
@@ -1100,7 +1100,6 @@ export function SelectField({
   const selected = options.find((option) => option.value === value);
   return (
     <Select
-      aria-label={label}
       className="select"
       fullWidth
       isDisabled={isDisabled}
@@ -1197,7 +1196,6 @@ export function AutocompleteField({
   const selected = options.find((option) => option.value === value);
   return (
     <Autocomplete
-      aria-label={label}
       fullWidth
       selectedKey={value || null}
       variant="secondary"

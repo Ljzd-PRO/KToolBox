@@ -643,6 +643,12 @@ code {
   max-width: 12rem;
 }
 
+.pawchive-identity-platform [data-slot="combo-box-input-group"],
+.pawchive-identity-platform [data-slot="input"] {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
 .select-option-content {
   display: flex;
   min-width: 0;
@@ -776,13 +782,13 @@ code {
 }
 
 .app-form-modal-container-wide {
-  width: min(45rem, calc(100vw - 1.5rem)) !important;
-  max-width: 45rem !important;
+  width: min(60rem, calc(100vw - 1.5rem)) !important;
+  max-width: 60rem !important;
 }
 
 .app-form-modal-container-wide .app-modal-dialog {
   width: 100%;
-  max-width: 45rem;
+  max-width: 60rem;
 }
 
 .app-form-modal-surface {
