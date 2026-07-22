@@ -8,7 +8,7 @@ import {
   IconSun,
   IconUser as UserRound,
 } from "@tabler/icons-react";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 import { FormField, FormSurface, IconButton, PasswordField } from "../components/ui";
@@ -24,6 +24,10 @@ export function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    document.title = `${t("login.title")} - ${t("brand")}`;
+  }, [t]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

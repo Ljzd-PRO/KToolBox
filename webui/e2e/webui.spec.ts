@@ -44,6 +44,12 @@ async function signIn(page: Page) {
   errors.length = 0;
 }
 
+async function selectLanguage(page: Page, nativeName: string) {
+  const trigger = page.locator('[data-slot="dropdown-trigger"]').first();
+  await trigger.click();
+  await page.getByRole("menuitemradio", { name: nativeName, exact: true }).click();
+}
+
 
 test("authenticated shell is accessible in desktop and mobile themes", async ({ page }) => {
   await signIn(page);
@@ -114,7 +120,7 @@ test("dashboard links, roster sorting, and platform suggestions work with real H
 
 test("Chinese product terminology stays consistent across workflows", async ({ page }) => {
   await signIn(page);
-  await page.getByRole("button", { name: "Switch language" }).click();
+  await selectLanguage(page, "简体中文");
   await expect(page.getByRole("heading", { name: "概览", exact: true })).toBeVisible();
   await expect(page.locator("body")).not.toContainText(legacyChineseTerms);
 
@@ -373,7 +379,7 @@ test("remote path picker browses the server filesystem from nested forms", async
 
 test("remote path picker localizes every visible control", async ({ page }) => {
   await signIn(page);
-  await page.getByRole("button", { name: "Switch language" }).click();
+  await selectLanguage(page, "简体中文");
   await page.getByRole("link", { name: "任务", exact: true }).click();
   await page.getByRole("button", { name: "创建任务" }).click();
   const taskDialog = page.getByRole("dialog", { name: "创建任务" });
@@ -386,6 +392,53 @@ test("remote path picker localizes every visible control", async ({ page }) => {
   await expect(picker.getByRole("button", { name: "选择目录" })).toBeVisible();
   await expect(picker.getByText("Project", { exact: true })).toHaveCount(0);
 });
+
+
+const localeCases = [
+  { code: "zh-CN", nativeName: "简体中文", pages: [["/", "概览"], ["/tasks", "任务"], ["/creators", "作者"], ["/posts", "作品"], ["/blockers", "忽略规则"], ["/configuration", "配置"], ["/system", "系统"]], create: "创建任务" },
+  { code: "zh-Hant", nativeName: "繁體中文", pages: [["/", "概覽"], ["/tasks", "工作"], ["/creators", "作者"], ["/posts", "作品"], ["/blockers", "忽略規則"], ["/configuration", "設定"], ["/system", "系統"]], create: "建立工作" },
+  { code: "en", nativeName: "English", pages: [["/", "Overview"], ["/tasks", "Tasks"], ["/creators", "Creators"], ["/posts", "Posts"], ["/blockers", "Blockers"], ["/configuration", "Configuration"], ["/system", "System"]], create: "Create task" },
+  { code: "ja", nativeName: "日本語", pages: [["/", "概要"], ["/tasks", "タスク"], ["/creators", "クリエイター"], ["/posts", "作品"], ["/blockers", "除外ルール"], ["/configuration", "設定"], ["/system", "システム"]], create: "タスクを作成" },
+  { code: "ko", nativeName: "한국어", pages: [["/", "개요"], ["/tasks", "작업"], ["/creators", "크리에이터"], ["/posts", "작품"], ["/blockers", "제외 규칙"], ["/configuration", "설정"], ["/system", "시스템"]], create: "작업 만들기" },
+  { code: "fr", nativeName: "Français", pages: [["/", "Aperçu"], ["/tasks", "Tâches"], ["/creators", "Créateurs"], ["/posts", "Œuvres"], ["/blockers", "Règles d’exclusion"], ["/configuration", "Configuration"], ["/system", "Système"]], create: "Créer une tâche" },
+  { code: "ru", nativeName: "Русский", pages: [["/", "Обзор"], ["/tasks", "Задачи"], ["/creators", "Авторы"], ["/posts", "Работы"], ["/blockers", "Правила исключения"], ["/configuration", "Настройки"], ["/system", "Система"]], create: "Создать задачу" },
+] as const;
+
+for (const locale of localeCases) {
+  test(`${locale.nativeName} localizes every primary WebUI route`, async ({ page }) => {
+    await signIn(page);
+    if (locale.code !== "en") await selectLanguage(page, locale.nativeName);
+    await expect(page.locator("html")).toHaveAttribute("lang", locale.code);
+
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("lang", locale.code);
+    await expect(page.getByRole("heading", { name: locale.pages[0][1], exact: true })).toBeVisible();
+
+    for (const [path, heading] of locale.pages) {
+      if (path === "/configuration") {
+        const responsePromise = page.waitForResponse((response) => response.url().includes("/config/schema?locale="));
+        await page.goto(path);
+        const response = await responsePromise;
+        expect(new URL(response.url()).searchParams.get("locale")).toBe(locale.code);
+        expect((await response.json()).locale).toBe(locale.code);
+      } else {
+        await page.goto(path);
+      }
+      await expect(page.getByRole("heading", { name: heading, exact: true })).toBeVisible();
+      await expect(page.locator("body")).not.toContainText(/(?:nav|tasks|creators|posts|blockers|configuration|system)\.[A-Za-z]/);
+    }
+
+    await page.goto("/tasks");
+    await page.getByRole("button", { name: locale.create, exact: true }).click();
+    await expect(page.getByRole("dialog", { name: locale.create, exact: true })).toBeVisible();
+    await page.keyboard.press("Escape");
+
+    await page.setViewportSize({ width: 320, height: 700 });
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+    const scan = await new AxeBuilder({ page }).analyze();
+    expect(scan.violations).toEqual([]);
+  });
+}
 
 
 test("captures the remote path picker visual matrix", async ({ page }, testInfo) => {

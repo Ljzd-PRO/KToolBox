@@ -305,6 +305,7 @@ export const en = {
     "revisionShort": "rev. {{id}}",
     "progress": "Overall progress",
     "totalSpeed": "Total speed",
+    "eta": "Estimated time remaining",
     "transferred": "Transferred",
     "files": "Files",
     "activeCreators": "Active creators",

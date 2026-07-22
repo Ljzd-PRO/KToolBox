@@ -1,4 +1,6 @@
-export function formatBytes(value: number | null | undefined, suffix = ""): string {
+import { currentLanguage } from "./i18n";
+
+export function formatBytes(value: number | null | undefined, suffix = "", locale: string = currentLanguage()): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return "—";
   const units = ["B", "KiB", "MiB", "GiB", "TiB"];
   let amount = Math.max(0, value);
@@ -8,7 +10,11 @@ export function formatBytes(value: number | null | undefined, suffix = ""): stri
     unit += 1;
   }
   const digits = amount >= 100 || unit === 0 ? 0 : amount >= 10 ? 1 : 2;
-  return `${amount.toFixed(digits)} ${units[unit]}${suffix}`;
+  const formatted = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(amount);
+  return `${formatted} ${units[unit]}${suffix}`;
 }
 
 export function formatDuration(seconds: number | null | undefined): string {

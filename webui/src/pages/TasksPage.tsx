@@ -564,7 +564,7 @@ function TaskDetails({
           <Metric label={t("tasks.totalSpeed")} value={formatBytes(taskSpeed(task), "/s")} />
           <Metric label={t("tasks.transferred")} value={`${formatBytes(progress.transferred_bytes)} / ${formatBytes(progress.total_bytes)}`} />
           <Metric label={t("tasks.files")} value={`${progress.processed_files} / ${progress.queued_files}`} />
-          <Metric label="ETA" value={formatDuration(progress.eta_seconds)} />
+          <Metric label={t("tasks.eta")} value={formatDuration(progress.eta_seconds)} />
         </div>
       </Surface>
       <div className="grid gap-5 xl:grid-cols-2">

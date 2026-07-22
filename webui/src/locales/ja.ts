@@ -278,6 +278,7 @@ export const ja = {
     revisionShort: "リビジョン{{id}}",
     progress: "全体の進捗",
     totalSpeed: "合計速度",
+    eta: "推定残り時間",
     transferred: "転送済み",
     files: "ファイル",
     activeCreators: "処理中のクリエイター",

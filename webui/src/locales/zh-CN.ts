@@ -308,6 +308,7 @@ export const zhCN = {
     "revisionShort": "修订 {{id}}",
     "progress": "总体进度",
     "totalSpeed": "总下载速度",
+    "eta": "预计剩余时间",
     "transferred": "已传输",
     "files": "文件",
     "activeCreators": "活动作者",

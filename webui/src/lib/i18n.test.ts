@@ -1,6 +1,19 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
-import { languageOptions, resources, resolveLanguage, supportedLanguages } from "./i18n";
+import i18n, {
+  LANGUAGE_STORAGE_KEY,
+  languageOptions,
+  resources,
+  resolveLanguage,
+  setLanguage,
+  supportedLanguages,
+} from "./i18n";
+
+afterEach(async () => {
+  localStorage.clear();
+  await setLanguage("en");
+  localStorage.clear();
+});
 
 function flatten(value: unknown, prefix = "", output = new Map<string, string>()): Map<string, string> {
   if (typeof value === "string") {
@@ -41,6 +54,13 @@ describe("localization contracts", () => {
     expect(languageOptions.map((option) => option.code)).toEqual(supportedLanguages);
     expect(new Set(languageOptions.map((option) => option.nativeName)).size).toBe(supportedLanguages.length);
     expect(languageOptions.every((option) => option.ariaLocale.includes("-"))).toBe(true);
+  });
+
+  it("persists explicit selection and updates the document language", async () => {
+    await setLanguage("zh-Hant");
+    expect(i18n.resolvedLanguage).toBe("zh-Hant");
+    expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe("zh-Hant");
+    expect(document.documentElement.lang).toBe("zh-Hant");
   });
 
   it.each(supportedLanguages.filter((language) => language !== "en"))(
