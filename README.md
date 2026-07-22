@@ -121,7 +121,7 @@ ktoolbox webui /path/to/project
 
 Task rows preserve readable post titles and creator names in an offline presentation snapshot. Desktop and mobile layouts expose details, lifecycle, editing, ordering, and deletion actions directly, while form switches use gray-off/blue-on tracks and checkboxes show an indicator only when selected.
 
-The default `0.0.0.0:8789` listener is convenient on a trusted LAN, but HTTP does not protect credentials or project data in transit. Bind to `127.0.0.1` or put the service behind HTTPS for untrusted networks. There is no default account, and startup fails until valid credentials are configured. See the [WebUI guide](https://ktoolbox.readthedocs.io/latest/webui/) for task lifecycle, security, and deployment details.
+The default `0.0.0.0:8789` listener is convenient on a trusted LAN, but HTTP does not protect credentials or project data in transit. Bind to `127.0.0.1` or put the service behind HTTPS for untrusted networks. There is no default account, and startup fails until valid credentials are configured. Filesystem-backed path fields can browse the computer running KToolBox; project fields stay inside the bound project, while the storage-bucket and log-directory fields use the server process's host permissions. See the [WebUI guide](https://ktoolbox.readthedocs.io/latest/webui/) for task lifecycle, security, and deployment details.
 
 ## Configuration
 

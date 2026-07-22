@@ -43,10 +43,13 @@ remediation period before publishing details.
 
 ## Scope
 
-This policy covers vulnerabilities in KToolBox's source code, packaged CLI,
-configuration handling, Pawchive API client, and download workflow. Examples
-include arbitrary code execution, path traversal, unsafe file writes, credential
-disclosure, and security boundary bypasses.
+This policy covers vulnerabilities in KToolBox's source code, packaged CLI and
+WebUI, configuration handling, Pawchive API client, and download workflow.
+Examples include arbitrary code execution, path traversal, unsafe file writes,
+credential disclosure, and security boundary bypasses. The WebUI remote path
+picker intentionally exposes filesystem names and metadata readable by the
+server account; escaping a project-scoped picker, reading file contents, or
+performing an unsupported mutation is in scope.
 
 The following are outside this repository's security scope:
 
