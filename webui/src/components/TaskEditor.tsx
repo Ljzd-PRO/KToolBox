@@ -147,6 +147,7 @@ export function TaskEditor({
           </Button>
         </>
       }
+      isWide
       open
       size="lg"
       title={task ? t("tasks.edit") : t("tasks.create")}

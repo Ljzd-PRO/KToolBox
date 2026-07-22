@@ -259,6 +259,7 @@ describe("form surfaces", () => {
     render(
       <FormModal
         actions={<span>Save action</span>}
+        isWide
         open
         title="Edit task"
         onOpenChange={() => undefined}
@@ -268,9 +269,11 @@ describe("form surfaces", () => {
     );
 
     const surface = document.querySelector<HTMLElement>(".app-form-modal-surface");
+    const container = document.querySelector<HTMLElement>(".app-form-modal-container-wide");
     const body = document.querySelector<HTMLElement>(".app-form-modal-body");
     const actions = document.querySelector<HTMLElement>(".app-form-modal-actions");
     expect(surface?.querySelector("input")).toBeInTheDocument();
+    expect(container).toHaveAttribute("data-slot", "modal-container");
     expect(surface).toHaveClass("rounded-none", "border-0");
     expect(surface).toContainElement(body);
     expect(surface).toContainElement(actions);

@@ -1014,6 +1014,7 @@ export function FormModal({
   actions,
   onOpenChange,
   size = "lg",
+  isWide = false,
 }: {
   open: boolean;
   title: string;
@@ -1021,6 +1022,7 @@ export function FormModal({
   actions: ReactNode;
   onOpenChange: (open: boolean) => void;
   size?: React.ComponentProps<typeof Modal.Container>["size"];
+  isWide?: boolean;
 }) {
   const { t } = useTranslation();
   const state = useOverlayState({ isOpen: open, onOpenChange });
@@ -1028,7 +1030,12 @@ export function FormModal({
     <Modal state={state}>
       <Modal.Trigger aria-hidden="true" className="hidden" tabIndex={-1} />
       <Modal.Backdrop>
-        <Modal.Container className="mx-3" placement="center" scroll="inside" size={size}>
+        <Modal.Container
+          className={cn("mx-3", isWide && "app-form-modal-container-wide")}
+          placement="center"
+          scroll="inside"
+          size={size}
+        >
           <Modal.Dialog className="app-modal-dialog overflow-hidden">
             <Modal.Header className="flex items-center justify-between gap-3 border-b border-border px-5 py-4">
               <Modal.Heading className="text-lg font-semibold text-foreground">{title}</Modal.Heading>

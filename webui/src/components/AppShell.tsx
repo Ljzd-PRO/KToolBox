@@ -73,8 +73,8 @@ function Brand({ version }: { version?: string }) {
   const { t } = useTranslation();
   return (
     <div className="flex min-w-0 items-center gap-3">
-      <span className="brand-mark grid size-14 shrink-0 place-items-center rounded-lg" aria-hidden="true">
-        <IconTool size={27} stroke={1.8} />
+      <span className="brand-mark grid size-16 shrink-0 place-items-center rounded-lg" aria-hidden="true">
+        <IconTool size={30} stroke={1.8} />
       </span>
       <div className="grid min-w-0 gap-0.5">
         <div className="truncate text-lg font-bold leading-tight text-foreground">{t("brand")}</div>
@@ -187,9 +187,28 @@ export function AppShell() {
     </Tooltip>
   );
 
+  const compactSecurityNotice = (
+    <Tooltip>
+      <Button
+        isIconOnly
+        aria-label={t("shell.securityTitle")}
+        className="size-11 min-w-11 shrink-0"
+        variant="outline"
+      >
+        <IconShieldLock
+          aria-hidden="true"
+          className="text-[var(--ktoolbox-yellow)]"
+          size={18}
+          stroke={1.8}
+        />
+      </Button>
+      <Tooltip.Content>{t("shell.securityBody")}</Tooltip.Content>
+    </Tooltip>
+  );
+
   return (
-    <div className="min-h-dvh bg-background text-foreground lg:grid lg:grid-cols-[240px_minmax(0,1fr)]">
-      <aside className="sidebar hidden min-h-dvh border-r border-border lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col">
+    <div className="min-h-dvh bg-background text-foreground md:grid md:grid-cols-[240px_minmax(0,1fr)]">
+      <aside className="sidebar hidden min-h-dvh border-r border-border md:sticky md:top-0 md:flex md:h-dvh md:flex-col">
         <div className="px-5 py-5">
           <Brand />
         </div>
@@ -210,7 +229,7 @@ export function AppShell() {
 
       <div className="min-w-0">
         <header className="shell-workbar sticky top-0 z-30 border-b border-border">
-          <div className="mx-auto flex min-h-[5.5rem] w-full max-w-7xl items-center gap-4 px-4 pl-20 sm:px-6 sm:pl-20 lg:px-8 lg:pl-8">
+          <div className="mx-auto flex min-h-20 w-full max-w-7xl items-center gap-3 px-4 pl-20 sm:px-6 sm:pl-20 md:px-8 md:pl-8">
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-semibold text-[var(--accent-strong)]">{t("brand")}</p>
               <h1 className="mt-1 flex min-w-0 items-center gap-2 text-2xl font-bold text-foreground">
@@ -224,6 +243,7 @@ export function AppShell() {
               <ThemeControls />
               {securityNotice}
             </div>
+            <div className="xl:hidden">{compactSecurityNotice}</div>
             <IconButton icon={IconLanguage} label={t("shell.language")} onPress={() => void toggleLanguage()} />
             <div className="hidden sm:block xl:hidden">
               <IconButton
@@ -235,11 +255,7 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="mx-auto grid w-full max-w-7xl gap-5 p-4 sm:p-6 lg:p-8">
-          <div className="flex min-w-0 items-center justify-between gap-2 xl:hidden">
-            {securityNotice}
-            <span className="min-w-0 truncate text-xs font-medium text-muted">{session?.username}</span>
-          </div>
+        <main className="mx-auto grid w-full max-w-7xl gap-5 p-4 sm:p-6 md:p-8">
           <Outlet />
         </main>
       </div>
@@ -247,7 +263,7 @@ export function AppShell() {
       <Drawer state={drawer}>
         <Drawer.Trigger
           aria-label={t("shell.menu")}
-          className="mobile-menu-button fixed left-4 top-[calc(env(safe-area-inset-top)+1rem)] z-40 size-12 min-w-12 rounded-full lg:hidden"
+          className="mobile-menu-button fixed left-4 top-[calc(env(safe-area-inset-top)+1rem)] z-40 grid size-12 min-w-12 place-items-center rounded-full p-0 leading-none md:hidden"
         >
           <IconMenu2 aria-hidden="true" size={22} stroke={1.9} />
         </Drawer.Trigger>

@@ -257,6 +257,7 @@ export function BlockersPage() {
             <Button form="blocker-form" isPending={saving} type="submit" variant="primary"><Check aria-hidden="true" size={17} />{t("common.save")}</Button>
           </>
         }
+        isWide
         open={editor !== null}
         size="lg"
         title={editorIndex === null ? t("blockers.add") : t("blockers.edit")}

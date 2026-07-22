@@ -304,9 +304,24 @@ code {
 }
 
 .mobile-menu-button {
+  display: grid;
+  place-items: center !important;
+  padding: 0 !important;
   background: var(--accent) !important;
   color: var(--accent-foreground) !important;
-  box-shadow: 0 8px 22px rgb(15 23 42 / 0.2);
+  box-shadow: 0 8px 22px rgb(15 23 42 / 0.22);
+  line-height: 0;
+}
+
+.mobile-menu-button > svg {
+  display: block;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .mobile-menu-button {
+    display: none !important;
+  }
 }
 
 .page-title-icon {
@@ -410,7 +425,8 @@ code {
   color: var(--ktoolbox-teal);
 }
 
-.form-surface {
+.form-surface,
+.control-surface {
   background: var(--console-subtle);
   --default: var(--surface);
   --default-hover: color-mix(in oklab, var(--surface) 92%, var(--foreground) 8%);
@@ -672,19 +688,27 @@ code {
   background: transparent;
 }
 
+.app-form-modal-container-wide {
+  width: min(45rem, calc(100vw - 1.5rem)) !important;
+  max-width: 45rem !important;
+}
+
 .app-form-modal-surface {
   display: grid;
   gap: 0 !important;
   grid-template-rows: minmax(0, 1fr) auto;
   width: 100%;
-  background: var(--console-subtle);
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--console-subtle) !important;
+  box-shadow: none !important;
 }
 
 .app-form-modal-actions {
   flex: none;
   margin-top: 0 !important;
   border-top-color: var(--separator);
-  background: transparent;
+  background: var(--console-subtle);
 }
 
 .app-confirm-modal-body {
