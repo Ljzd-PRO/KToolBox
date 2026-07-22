@@ -44,6 +44,8 @@ The built-in server speaks HTTP. Its default LAN listener is appropriate only on
 
 Only one scheduler may open a project at a time. A project lock prevents two WebUI processes from racing over its queue and outputs.
 
+The remote path picker runs with the filesystem permissions of the KToolBox process. Project-scoped task, post, and download-structure fields cannot leave the bound project, including through symbolic links. The storage-bucket and log-directory fields are explicitly host-scoped and may reveal names and metadata anywhere that account can traverse. The picker APIs list metadata and create directories only: they do not read file contents, upload, download, rename, or delete files. Entering a new filename selects a path and does not create an empty file. Treat WebUI access as sensitive host access and do not expose it to untrusted users.
+
 ## Project workflows
 
 The interface follows the browser language on first use and supports persistent English/Chinese selection. Theme follows the operating system until light or dark mode is selected. Blue, emerald, violet, rose, and amber accent palettes are available; form switches stay blue when enabled so their state remains consistent across palettes. Desktop uses a compact sidebar; narrow screens use a Drawer.
@@ -79,6 +81,8 @@ Overview recent tasks, task queues, creator rosters, and post results support co
 Form labels are explicit bilingual text, not Python identifiers. Field descriptions are extracted from the English and Chinese configuration-class `:ivar field:` docstrings, while Pydantic supplies types, defaults, ranges, and secret metadata.
 
 The `.env` and `prod.env` tabs show each final effective value and a source Chip. Values overridden by the process environment are read-only. Secret values are masked by default. Advanced text editing displays an additional warning because it can expose secrets.
+
+Filesystem-backed fields retain manual editing and add a browse button. The dialog shows the remote computer running KToolBox rather than the browser device, with quick locations, breadcrumbs, search, hidden-item control, pagination, and inline directory creation. Project-relative configuration values remain relative after selection; absolute task and post output paths remain absolute. Environment-sourced read-only values cannot open the picker.
 
 Before a save, the server parses and validates the proposed file and returns a semantic diff. Saving uses an ETag to reject stale edits and atomically replaces the file. The TOML editor uses the existing TomlKit/Pydantic store so comments survive structured roster and blocker changes.
 

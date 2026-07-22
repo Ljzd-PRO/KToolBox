@@ -44,6 +44,8 @@ Le serveur intégré utilise HTTP. Son écoute par défaut sur le réseau local 
 
 Un seul planificateur peut ouvrir un projet à la fois. Un verrou empêche deux processus WebUI de se concurrencer sur la file et les sorties.
 
+Le sélecteur de chemin distant utilise les droits du processus KToolBox. Les champs de tâche, de publication et de structure de téléchargement limités au projet ne peuvent pas sortir du projet lié, y compris via un lien symbolique. Les champs du répertoire de stockage et des journaux couvrent explicitement l'hôte et peuvent révéler les noms et métadonnées accessibles à ce compte. Les API du sélecteur se limitent à lister les métadonnées et à créer des répertoires : elles ne lisent pas le contenu, ne transfèrent, ne renomment et ne suppriment aucun fichier. Saisir un nouveau nom sélectionne un chemin sans créer de fichier vide. Considérez l'accès WebUI comme un accès sensible à l'hôte et ne l'accordez pas à des utilisateurs non fiables.
+
 ## Processus du projet
 
 L'interface suit la langue du navigateur lors de la première utilisation et conserve le choix entre l'anglais et le chinois simplifié. Le thème suit le système d'exploitation jusqu'au choix du mode clair ou sombre. Des accents bleu, émeraude, violet, rose et ambre sont proposés ; les interrupteurs activés restent bleus afin que leur état soit cohérent. L'ordinateur utilise une barre latérale compacte et les écrans étroits un Drawer.
@@ -75,6 +77,8 @@ L'identifiant du créateur est placé en premier dans les lignes de bureau comme
 Les libellés sont du texte explicite en anglais et en chinois simplifié, pas des identifiants Python. Les descriptions proviennent des chaînes `:ivar field:` des classes anglaises et chinoises ; Pydantic fournit les types, valeurs par défaut, plages et métadonnées secrètes.
 
 Les onglets `.env` et `prod.env` affichent la valeur effective finale et une puce de provenance. Les valeurs remplacées par l'environnement du processus sont en lecture seule. Les secrets sont masqués par défaut. L'édition avancée du texte affiche un avertissement supplémentaire, car elle peut dévoiler des secrets.
+
+Les champs liés au système de fichiers conservent la saisie manuelle et ajoutent un bouton de navigation. La boîte de dialogue affiche l'ordinateur distant qui exécute KToolBox, et non l'appareil du navigateur, avec emplacements rapides, fil d'Ariane, recherche, éléments cachés, pagination et création de répertoire. Les valeurs de configuration relatives au projet restent relatives après sélection ; les sorties absolues des tâches et publications restent absolues. Les valeurs en lecture seule provenant de l'environnement ne peuvent pas ouvrir le sélecteur.
 
 Avant l'enregistrement, le serveur analyse et valide le fichier proposé, puis renvoie une différence sémantique. Un ETag refuse les modifications obsolètes et le fichier est remplacé atomiquement. L'éditeur TOML utilise le stockage TomlKit/Pydantic existant, les commentaires survivent donc aux changements structurés.
 

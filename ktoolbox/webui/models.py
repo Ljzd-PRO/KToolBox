@@ -34,6 +34,12 @@ class HealthResponse(BaseModel):
     status: str = "ok"
 
 
+class PathSelectorResponse(BaseModel):
+    kind: Literal["directory", "file"]
+    scope: Literal["project", "host"]
+    value_mode: Literal["absolute", "project_relative"]
+
+
 class ConfigFieldResponse(BaseModel):
     path: str
     env_name: str
@@ -47,6 +53,49 @@ class ConfigFieldResponse(BaseModel):
     secret: bool
     source: Literal["default", ".env", "prod.env", "environment"] | str
     apply_mode: Literal["next_task", "restart"]
+    path_selector: PathSelectorResponse | None = None
+
+
+class FilesystemBreadcrumbResponse(BaseModel):
+    label: str
+    path: str
+
+
+class FilesystemLocationResponse(BaseModel):
+    id: str
+    label: str
+    path: str
+
+
+class FilesystemEntryResponse(BaseModel):
+    name: str
+    path: str
+    project_relative_path: str | None = None
+    kind: Literal["directory", "file", "other"]
+    is_symlink: bool
+    navigable: bool
+
+
+class FilesystemBrowseResponse(BaseModel):
+    scope: Literal["project", "host"]
+    mode: Literal["directory", "file"]
+    path: str
+    project_relative_path: str | None = None
+    parent: str | None = None
+    separator: str
+    breadcrumbs: list[FilesystemBreadcrumbResponse]
+    locations: list[FilesystemLocationResponse]
+    entries: list[FilesystemEntryResponse]
+    suggested_name: str | None = None
+    offset: int
+    limit: int
+    has_more: bool
+
+
+class FilesystemCreateDirectoryRequest(BaseModel):
+    scope: Literal["project", "host"]
+    parent: str
+    name: str = Field(min_length=1, max_length=255)
 
 
 class ConfigSchemaResponse(BaseModel):

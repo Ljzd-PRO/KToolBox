@@ -13,10 +13,20 @@ from ktoolbox.api.generated import CreatorProfile, CreatorSummary, Post, Revisio
 from ktoolbox.configuration import RuntimeContext
 from ktoolbox.reporting import ProgressReporter
 from ktoolbox.webui.app import create_app
+from ktoolbox.webui.filesystem import FilesystemBrowser
 from ktoolbox.webui.task_executor import TaskExecutionSnapshot
 from ktoolbox.webui.task_models import SyncTaskSpec, TaskRecord
 
-PROJECT_ROOT = Path(tempfile.mkdtemp(prefix="ktoolbox-playwright-"))
+HOST_ROOT = Path(tempfile.mkdtemp(prefix="ktoolbox-playwright-host-"))
+PROJECT_ROOT = HOST_ROOT / "project"
+PROJECT_ROOT.mkdir()
+HOST_HOME = HOST_ROOT / "home"
+HOST_HOME.mkdir()
+(HOST_ROOT / "shared").mkdir()
+(PROJECT_ROOT / "downloads").mkdir()
+(PROJECT_ROOT / "资料").mkdir()
+(PROJECT_ROOT / "content.txt").write_text("fixture content\n", encoding="utf-8")
+(PROJECT_ROOT / ".hidden-fixture").write_text("hidden\n", encoding="utf-8")
 PROJECT_ROOT.joinpath(".env").write_text(
     "KTOOLBOX_WEBUI__USERNAME=playwright\n"
     "KTOOLBOX_WEBUI__PASSWORD=fixture-password\n"
@@ -136,4 +146,10 @@ app = create_app(
     RuntimeContext.from_project(PROJECT_ROOT),
     task_executor=FixtureExecutor(),
     creator_client_factory=FixtureClient,
+    filesystem_browser=FilesystemBrowser(
+        PROJECT_ROOT,
+        home=HOST_HOME,
+        host_roots=(HOST_ROOT,),
+        restrict_host_to_roots=True,
+    ),
 )

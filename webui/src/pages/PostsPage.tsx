@@ -37,10 +37,12 @@ import {
   SelectField,
   SortableColumn,
 } from "../components/ui";
+import { RemotePathField } from "../components/RemotePathField";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { formatDateTime } from "../lib/format";
 import { stableSort } from "../lib/sorting";
+import { TASK_OUTPUT_PATH_SELECTOR } from "../lib/pathSelectors";
 import { downloadTaskTargetKey } from "../lib/taskPresentation";
 import type { DownloadTaskSpec, PawchivePost, PawchiveRevision, TaskRecord } from "../types";
 
@@ -281,7 +283,14 @@ export function PostsPage() {
             </div>
             <section className="grid gap-4 border-t border-border pt-5">
               <SelectField icon={History} label={t("posts.revision")} options={revisionOptions} value={selectedRevision} onChange={setSelectedRevision} />
-              <FormField icon={FolderOutput} isRequired label={t("tasks.output")} value={output} onChange={setOutput} />
+              <RemotePathField
+                icon={FolderOutput}
+                isRequired
+                label={t("tasks.output")}
+                selector={TASK_OUTPUT_PATH_SELECTOR}
+                value={output}
+                onChange={setOutput}
+              />
               <FormSwitchField icon={FileJson} isSelected={dumpMetadata} label={t("tasks.dumpMetadata")} onChange={setDumpMetadata} />
             </section>
             <Alert status="warning">

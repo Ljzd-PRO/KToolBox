@@ -29,6 +29,8 @@ import { Trans, useTranslation } from "react-i18next";
 import { parseDate, type DateValue } from "@internationalized/date";
 
 import type { CreatorRosterItem, DownloadTaskSpec, SyncTaskSpec, TaskRecord, TaskSpec } from "../types";
+import { TASK_OUTPUT_PATH_SELECTOR } from "../lib/pathSelectors";
+import { RemotePathField } from "./RemotePathField";
 import {
   ChipListField,
   FormCheckbox,
@@ -310,7 +312,15 @@ export function TaskEditor({
             <FormSwitchField description={t("tasks.dumpMetadataHint")} icon={FileJson} isSelected={dumpMetadata} label={t("tasks.dumpMetadata")} onChange={setDumpMetadata} />
           </Tabs.Panel>
         </Tabs>
-        <FormField description={t("tasks.outputHint")} icon={FolderOutput} isRequired label={t("tasks.output")} value={output} onChange={setOutput} />
+        <RemotePathField
+          description={t("tasks.outputHint")}
+          icon={FolderOutput}
+          isRequired
+          label={t("tasks.output")}
+          selector={TASK_OUTPUT_PATH_SELECTOR}
+          value={output}
+          onChange={setOutput}
+        />
       </form>
     </FormModal>
   );
