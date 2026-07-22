@@ -35,6 +35,7 @@ describe("App", () => {
     await user.click(screen.getByRole("button", { name: "Use dark theme" }));
     expect(document.documentElement).toHaveAttribute("data-theme", "dark");
     await user.click(screen.getByRole("button", { name: "Switch language" }));
+    await user.click(screen.getByRole("menuitemradio", { name: /简体中文/ }));
     expect(await screen.findByRole("heading", { name: "登录此同步项目" })).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith("/api/v1/session", expect.objectContaining({ credentials: "same-origin" }));
   });

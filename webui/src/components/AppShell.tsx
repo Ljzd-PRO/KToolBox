@@ -6,7 +6,6 @@ import {
   IconDeviceDesktop,
   IconFileSearch,
   IconGauge,
-  IconLanguage,
   IconLogout,
   IconMenu2,
   IconMoon,
@@ -25,8 +24,8 @@ import { useTranslation } from "react-i18next";
 
 import { errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
-import { toggleLanguage } from "../lib/i18n";
 import { useTheme, type ThemeColor } from "../lib/theme";
+import { LanguageSelector } from "./LanguageSelector";
 import { IconButton } from "./ui";
 
 type NavigationItem = {
@@ -262,7 +261,7 @@ export function AppShell() {
             <div className="xl:hidden">
               <SecurityNotice compact />
             </div>
-            <IconButton icon={IconLanguage} label={t("shell.language")} onPress={() => void toggleLanguage()} />
+            <LanguageSelector />
             <div className="hidden sm:block xl:hidden">
               <IconButton
                 icon={theme.effective === "dark" ? IconSun : IconMoon}
@@ -305,6 +304,7 @@ export function AppShell() {
               </Drawer.Body>
               <div className="grid gap-3 border-t border-border p-4">
                 <ThemeControls compact />
+                <LanguageSelector compact={false} />
                 <div className="flex min-w-0 items-center gap-2 px-2 text-xs font-medium text-muted">
                   <IconShieldLock aria-hidden="true" className="shrink-0 text-[var(--ktoolbox-teal)]" size={16} stroke={1.8} />
                   <span className="truncate">{session?.username}</span>

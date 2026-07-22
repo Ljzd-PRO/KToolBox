@@ -1,7 +1,6 @@
 import { Alert, Button, toast } from "@heroui/react";
 import {
   IconKey as KeyRound,
-  IconLanguage,
   IconLock as LockKeyhole,
   IconLogin as LogIn,
   IconMoon,
@@ -13,9 +12,9 @@ import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 import { FormField, FormSurface, IconButton, PasswordField } from "../components/ui";
+import { LanguageSelector } from "../components/LanguageSelector";
 import { errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
-import { toggleLanguage } from "../lib/i18n";
 import { useTheme } from "../lib/theme";
 
 export function LoginPage() {
@@ -57,7 +56,7 @@ export function LoginPage() {
               label={theme.effective === "dark" ? t("shell.themeLight") : t("shell.themeDark")}
               onPress={theme.toggle}
             />
-            <IconButton icon={IconLanguage} label={t("shell.language")} onPress={() => void toggleLanguage()} />
+            <LanguageSelector />
           </div>
         </header>
 

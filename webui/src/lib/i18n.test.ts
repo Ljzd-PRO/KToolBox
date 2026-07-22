@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { resources, resolveLanguage } from "./i18n";
+import { languageOptions, resources, resolveLanguage, supportedLanguages } from "./i18n";
 
 function flatten(value: unknown, prefix = "", output = new Map<string, string>()): Map<string, string> {
   if (typeof value === "string") {
@@ -25,20 +25,36 @@ function tokens(value: string): string[] {
 }
 
 describe("localization contracts", () => {
-  it("resolves the original browser language behavior", () => {
-    expect(resolveLanguage(["zh-TW", "en-US"])).toBe("zh-CN");
-    expect(resolveLanguage(["fr-FR", "en-US"])).toBe("en");
+  it("maps browser languages to all supported locales", () => {
+    expect(resolveLanguage(["zh-TW", "en-US"])).toBe("zh-Hant");
+    expect(resolveLanguage(["zh-HK"])).toBe("zh-Hant");
+    expect(resolveLanguage(["zh-SG"])).toBe("zh-CN");
+    expect(resolveLanguage(["ja-JP"])).toBe("ja");
+    expect(resolveLanguage(["ko-KR"])).toBe("ko");
+    expect(resolveLanguage(["fr-CA"])).toBe("fr");
+    expect(resolveLanguage(["ru-RU"])).toBe("ru");
+    expect(resolveLanguage(["de-DE", "en-GB"])).toBe("en");
+    expect(resolveLanguage(["de-DE"])).toBe("en");
   });
 
-  it("keeps translated keys and interpolation contracts aligned", () => {
-    const english = flatten(resources.en.translation);
-    const chinese = flatten(resources["zh-CN"].translation);
-    expect(new Set([...chinese.keys()].map(contractKey))).toEqual(new Set([...english.keys()].map(contractKey)));
+  it("registers each locale with one native label and React Aria locale", () => {
+    expect(languageOptions.map((option) => option.code)).toEqual(supportedLanguages);
+    expect(new Set(languageOptions.map((option) => option.nativeName)).size).toBe(supportedLanguages.length);
+    expect(languageOptions.every((option) => option.ariaLocale.includes("-"))).toBe(true);
+  });
 
-    for (const [key, value] of chinese) {
+  it.each(supportedLanguages.filter((language) => language !== "en"))(
+    "keeps %s keys and interpolation contracts aligned",
+    (language) => {
+    const english = flatten(resources.en.translation);
+      const translated = flatten(resources[language].translation);
+      expect(new Set([...translated.keys()].map(contractKey))).toEqual(new Set([...english.keys()].map(contractKey)));
+
+      for (const [key, value] of translated) {
       const source = english.get(key) ?? english.get(contractKey(key));
       expect(source, key).toBeDefined();
       expect(tokens(value), key).toEqual(tokens(source ?? ""));
     }
-  });
+    },
+  );
 });

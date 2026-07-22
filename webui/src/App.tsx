@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { AppShell } from "./components/AppShell";
 import { AuthProvider, useAuth } from "./lib/auth";
+import { normalizeLanguage, reactAriaLocale } from "./lib/i18n";
 import { queryClient } from "./lib/query";
 import { ThemeProvider } from "./lib/theme";
 import { DashboardPage } from "./pages/DashboardPage";
@@ -48,7 +49,7 @@ function AuthenticatedApplication() {
 
 export function App() {
   const { i18n } = useTranslation();
-  const locale = i18n.language.startsWith("zh") ? "zh-CN" : "en-US";
+  const locale = reactAriaLocale(normalizeLanguage(i18n.resolvedLanguage ?? i18n.language));
   return (
     <I18nProvider locale={locale}>
       <ThemeProvider>
