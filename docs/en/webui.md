@@ -66,7 +66,7 @@ The main areas are:
 
 ![Creator roster on a narrow screen](../assets/webui/12-creators-mobile-light-zh.png)
 
-Task creation uses two fixed tabs without overflow controls. Synchronization dates have independent optional start and end boundaries; selecting “No start date” or “No end date” immediately clears that boundary. Title filters use removable HeroUI Chips created with a comma or Enter. Single-work downloads and new roster entries compose Pawchive-style `/platform/user/creator/post/post` paths inside one accessible field group.
+Task creation uses two fixed tabs without overflow controls. Synchronization dates remain one official HeroUI range field in `year/month/day - year/month/day` form, while “No start date” and “No end date” independently clear either boundary. The post offset control advances in steps of 50. Title filters use removable HeroUI Chips created with a comma or Enter. Single-work downloads and new roster entries use independent HeroUI fields separated by code-styled Pawchive path fragments such as `/platform/user/creator/post/post`; the separators are never simulated inputs.
 
 Creator IDs lead both desktop rows and mobile entries. The optional roster note is shown separately and never replaces the identity. When editing an existing creator, its platform and creator ID remain visible but read-only because they identify the stored roster entry.
 
