@@ -32,6 +32,8 @@ describe("TaskEditor", () => {
     expect(screen.getByText(/Synchronize every post from the selected creators/)).toBeInTheDocument();
     expect(screen.getByRole("checkbox", { name: "No start date" })).toBeChecked();
     expect(screen.getByRole("checkbox", { name: "No end date" })).toBeChecked();
+    await user.click(screen.getByRole("button", { name: /^Increase Post offset/ }));
+    expect(screen.getByRole("textbox", { name: "Post offset" })).toHaveValue("50");
 
     await user.type(screen.getByRole("textbox", { name: "Required title keywords" }), "painting,");
     await user.type(screen.getByRole("textbox", { name: "Legacy excluded keywords" }), "daily，");

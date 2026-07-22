@@ -225,7 +225,7 @@ export function TaskEditor({
               }}
             />
             <div className="grid gap-4 sm:grid-cols-2">
-              <NumberInput description={t("tasks.offsetHint")} icon={ListStart} label={t("tasks.offset")} minValue={0} step={1} value={offset} onChange={setOffset} />
+              <NumberInput description={t("tasks.offsetHint")} icon={ListStart} label={t("tasks.offset")} minValue={0} step={50} value={offset} onChange={setOffset} />
               <FormField description={t("tasks.limitHint")} icon={ListFilter} label={t("tasks.limit")} type="number" value={length} onChange={setLength} />
               <SelectField
                 description={t("tasks.mixPostsHint")}
