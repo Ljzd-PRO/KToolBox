@@ -23,6 +23,12 @@ def create_pawchive_router() -> APIRouter:
     def runtime(request: Request) -> RuntimeContext:
         return cast(RuntimeContext, request.app.state.runtime_context).snapshot()
 
+    def upstream_error(message: str) -> HTTPException:
+        return HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail={"code": "upstream_error", "message": message},
+        )
+
     @router.get("/creators", response_model=list[CreatorSummary])
     async def creators(
         request: Request,
@@ -36,9 +42,7 @@ def create_pawchive_router() -> APIRouter:
             async with create_pawchive_client() as client:
                 result = await search_creator(id=creator_id, name=name, service=service, client=client)
         if not result:
-            raise HTTPException(
-                status_code=status.HTTP_502_BAD_GATEWAY, detail=result.message or "creator search failed"
-            )
+            raise upstream_error(result.message or "creator search failed")
         return list(result.data or ())
 
     @router.get("/posts", response_model=list[Post])
@@ -68,7 +72,11 @@ def create_pawchive_router() -> APIRouter:
                 if not any((creator_id, name, service))
                 else status.HTTP_502_BAD_GATEWAY
             )
-            raise HTTPException(status_code=code, detail=result.message or "post search failed")
+            detail_code = "validation_failed" if code == status.HTTP_422_UNPROCESSABLE_CONTENT else "upstream_error"
+            raise HTTPException(
+                status_code=code,
+                detail={"code": detail_code, "message": result.message or "post search failed"},
+            )
         return result.data or []
 
     @router.get("/posts/{service}/{creator_id}/{post_id}", response_model=Post | Revision)
@@ -89,12 +97,18 @@ def create_pawchive_router() -> APIRouter:
                     revisions = await client.list_post_revisions(service, creator_id, post_id)
             revision = next((item for item in revisions if str(item.revision_id) == revision_id), None)
             if revision is None:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="revision not found")
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail={"code": "revision_not_found", "message": "revision not found"},
+                )
             return revision
         except PawchiveNotFoundError as error:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={"code": "resource_not_found", "message": str(error)},
+            ) from error
         except (PawchiveError, ValidationError) as error:
-            raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(error)) from error
+            raise upstream_error(str(error)) from error
 
     @router.get("/posts/{service}/{creator_id}/{post_id}/revisions", response_model=list[Revision])
     async def post_revisions(
@@ -110,9 +124,12 @@ def create_pawchive_router() -> APIRouter:
                 async with create_pawchive_client() as client:
                     return await client.list_post_revisions(service, creator_id, post_id)
         except PawchiveNotFoundError as error:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={"code": "resource_not_found", "message": str(error)},
+            ) from error
         except (PawchiveError, ValidationError) as error:
-            raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(error)) from error
+            raise upstream_error(str(error)) from error
 
     @router.get("/site-version", response_model=SiteVersionResponse)
     async def site_version(request: Request, _: SessionDependency) -> SiteVersionResponse:
@@ -122,7 +139,7 @@ def create_pawchive_router() -> APIRouter:
                 async with create_pawchive_client() as client:
                     version = await client.get_app_version()
         except PawchiveError as error:
-            raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(error)) from error
+            raise upstream_error(str(error)) from error
         return SiteVersionResponse(version=version)
 
     return router

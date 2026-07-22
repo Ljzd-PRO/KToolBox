@@ -48,6 +48,8 @@ def test_validation_payload_omits_submitted_input() -> None:
                 "msg": "Field required",
             }
         ],
+        "code": "validation_failed",
+        "params": {"count": 1},
         "message": "password.0: Field required",
     }
     assert error_payload({"title": "Named failure"}, 400)["message"] == "Named failure"
@@ -67,6 +69,8 @@ async def test_app_errors_always_include_a_readable_message(tmp_path: Path) -> N
             unauthorized = await client.get("/api/v1/project")
             assert unauthorized.json() == {
                 "detail": "Authentication required",
+                "code": "auth_required",
+                "params": {},
                 "message": "Authentication required",
             }
 
@@ -75,5 +79,7 @@ async def test_app_errors_always_include_a_readable_message(tmp_path: Path) -> N
             assert invalid.status_code == 422
             assert "username: Field required" in body["message"]
             assert "password: Field required" in body["message"]
+            assert body["code"] == "validation_failed"
+            assert body["params"] == {"count": 2}
             assert all(set(issue) <= {"type", "loc", "msg"} for issue in body["detail"])
             assert "input" not in invalid.text

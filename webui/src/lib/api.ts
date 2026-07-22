@@ -1,7 +1,11 @@
+import i18n from "./i18n";
+
 export class ApiError extends Error {
   constructor(
     readonly status: number,
     readonly detail: unknown,
+    readonly code?: string,
+    readonly params: Record<string, unknown> = {},
     message?: string,
   ) {
     super(message || detailText(detail, `Request failed (HTTP ${status})`));
@@ -27,14 +31,23 @@ export async function api<T>(path: string, options: ApiOptions = {}): Promise<T>
   if (!response.ok) {
     let detail: unknown = response.statusText;
     let message = response.statusText || `Request failed (HTTP ${response.status})`;
+    let code: string | undefined;
+    let params: Record<string, unknown> = {};
     try {
-      const body = (await response.json()) as { detail?: unknown; message?: unknown };
+      const body = (await response.json()) as {
+        code?: unknown;
+        detail?: unknown;
+        message?: unknown;
+        params?: unknown;
+      };
       detail = body.detail ?? body;
       message = detailText(body.message, detailText(detail, message));
+      code = typeof body.code === "string" ? body.code : undefined;
+      params = isRecord(body.params) ? body.params : {};
     } catch {
       // Preserve the HTTP status text when a proxy returns a non-JSON body.
     }
-    throw new ApiError(response.status, detail, message);
+    throw new ApiError(response.status, detail, code, params, message);
   }
   if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
@@ -49,8 +62,14 @@ export function detailText(detail: unknown, fallback = "Request failed"): string
 }
 
 export function errorText(error: unknown): string {
+  if (error instanceof ApiError) {
+    const key = error.code ? `errors.codes.${error.code}` : "";
+    if (key && i18n.exists(key)) return i18n.t(key, error.params);
+    if (error.message.trim()) return error.message;
+  }
+  if (error instanceof TypeError) return i18n.t("errors.network");
   if (error instanceof Error && error.message.trim()) return error.message;
-  return detailText(error);
+  return detailText(error, i18n.t("errors.requestFailed"));
 }
 
 function detailMessages(detail: unknown): string[] {
