@@ -21,6 +21,7 @@ import {
 } from "@heroui/react";
 import {
   IconAlertTriangle as AlertTriangle,
+  IconArrowRight as ArrowRight,
   IconArrowUp as ArrowUp,
   IconChevronDown as ChevronDown,
   IconChevronRight as ChevronRight,
@@ -473,7 +474,19 @@ export function RemotePathPicker({
                       <InputGroup className="min-w-0 max-w-full overflow-hidden" fullWidth variant="secondary">
                         <InputGroup.Input className="font-mono text-xs" />
                         <InputGroup.Suffix className="p-1">
-                          <Button className="h-9 min-h-9" size="sm" type="submit" variant="ghost">{t("pathPicker.go")}</Button>
+                          <Tooltip>
+                            <Button
+                              aria-label={t("pathPicker.go")}
+                              className="h-9 min-h-9 px-2 max-sm:size-9 max-sm:min-w-9 max-sm:p-0"
+                              size="sm"
+                              type="submit"
+                              variant="ghost"
+                            >
+                              <ArrowRight aria-hidden="true" size={17} />
+                              <span className="max-sm:sr-only">{t("pathPicker.go")}</span>
+                            </Button>
+                            <Tooltip.Content>{t("pathPicker.go")}</Tooltip.Content>
+                          </Tooltip>
                         </InputGroup.Suffix>
                       </InputGroup>
                     </TextField.Root>

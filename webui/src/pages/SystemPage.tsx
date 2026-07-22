@@ -37,10 +37,10 @@ export function SystemPage() {
   ];
 
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 gap-6">
       <PageHeader description={t("system.description")} title={t("system.title")} />
-      <section className="grid gap-3 md:grid-cols-2">
-        <Surface className="rounded-lg border border-border p-5">
+      <section className="grid min-w-0 gap-3 md:grid-cols-2">
+        <Surface className="min-w-0 rounded-lg border border-border p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-sm text-muted">{t("system.appVersion")}</p>
@@ -52,20 +52,20 @@ export function SystemPage() {
             </Chip>
           </div>
         </Surface>
-        <Surface className="rounded-lg border border-border p-5">
-          <div className="flex items-start justify-between gap-4">
+        <Surface className="min-w-0 rounded-lg border border-border p-5">
+          <div className="flex min-w-0 flex-wrap items-start justify-between gap-4">
             <div className="min-w-0">
               <p className="text-sm text-muted">{t("system.pawchiveVersion")}</p>
               <p className="mt-2 truncate text-2xl font-semibold">{pawchive.data?.version ?? t("common.unknown")}</p>
             </div>
-            <Button isPending={pawchive.isFetching} size="sm" variant="outline" onPress={() => void checkVersion()}>
+            <Button className="max-w-full" isPending={pawchive.isFetching} size="sm" variant="outline" onPress={() => void checkVersion()}>
               <RefreshCw aria-hidden="true" size={16} />
               {t("system.check")}
             </Button>
           </div>
         </Surface>
       </section>
-      <section className="grid gap-3">
+      <section className="grid min-w-0 gap-3">
         {rows.map(({ label, value, icon: Icon }) => (
           <Surface className="flex min-w-0 items-start gap-4 rounded-lg border border-border p-4" key={label}>
             <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-default text-muted" aria-hidden="true">

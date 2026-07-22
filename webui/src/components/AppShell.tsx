@@ -247,11 +247,11 @@ export function AppShell() {
           <div className="mx-auto flex min-h-20 w-full max-w-7xl items-center gap-3 px-4 pl-20 sm:px-6 sm:pl-20 md:px-8 md:pl-8">
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-semibold text-[var(--accent-strong)]">{t("brand")}</p>
-              <h1 className="mt-1 flex min-w-0 items-center gap-2 text-2xl font-bold text-foreground">
-                <span className="page-title-icon grid size-9 shrink-0 place-items-center rounded-lg">
+              <h1 className="mt-1 flex min-w-0 items-center gap-2 text-xl font-bold leading-tight text-foreground sm:text-2xl max-[420px]:gap-0">
+                <span className="page-title-icon grid size-9 shrink-0 place-items-center rounded-lg max-[420px]:hidden">
                   <ActiveIcon aria-hidden="true" size={21} stroke={1.8} />
                 </span>
-                <span className="truncate">{t(`nav.${active.key}`)}</span>
+                <span className="min-w-0 break-words">{t(`nav.${active.key}`)}</span>
               </h1>
             </div>
             <div className="hidden min-w-0 items-center gap-2 xl:flex">
