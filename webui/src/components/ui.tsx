@@ -166,7 +166,7 @@ export function FormField({
   isDisabled = false,
 }: {
   label: string;
-  description?: string;
+  description?: ReactNode;
   value: string;
   onChange: (value: string) => void;
   type?: string;

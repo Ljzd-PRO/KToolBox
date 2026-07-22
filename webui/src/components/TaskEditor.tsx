@@ -308,7 +308,22 @@ export function TaskEditor({
                 onServiceChange={setService}
               />
             )}
-            <FormField description={t("tasks.revisionHint")} icon={History} label={t("tasks.revision")} value={revisionId} onChange={setRevisionId} />
+            <FormField
+              description={
+                <Trans
+                  components={{
+                    example: <span className="mt-1 block" />,
+                    code: <code className="inline-path-code break-words" />,
+                    id: <code className="inline-path-code" />,
+                  }}
+                  i18nKey="tasks.revisionHint"
+                />
+              }
+              icon={History}
+              label={t("tasks.revision")}
+              value={revisionId}
+              onChange={setRevisionId}
+            />
             <FormSwitchField description={t("tasks.dumpMetadataHint")} icon={FileJson} isSelected={dumpMetadata} label={t("tasks.dumpMetadata")} onChange={setDumpMetadata} />
           </Tabs.Panel>
         </Tabs>

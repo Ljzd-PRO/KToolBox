@@ -73,6 +73,13 @@ describe("TaskEditor", () => {
     await user.click(screen.getByRole("tab", { name: "Download post" }));
     expect(screen.getByText(/Download one specified post/)).toBeInTheDocument();
     expect(screen.getByText("/platform/user/creator ID/post/post ID", { selector: "code" })).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "https://pawchive.pw/fanbox/user/16456081/post/5715578/revision/8933804",
+        { selector: "code" },
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText("8933804", { selector: "code" })).toBeInTheDocument();
     expect(screen.getByRole("combobox", { name: "Platform" })).toHaveValue("fanbox");
     await user.type(screen.getByRole("textbox", { name: "Creator ID" }), "42");
     await user.type(screen.getByRole("textbox", { name: "Post ID" }), "99");

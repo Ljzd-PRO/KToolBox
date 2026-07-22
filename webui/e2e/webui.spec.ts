@@ -196,6 +196,17 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
 
   await page.getByRole("tab", { name: "Download post" }).click();
   const postPath = formSurface.getByRole("group", { name: "Pawchive post path" });
+  const revisionExample = formSurface.getByText(
+    "https://pawchive.pw/fanbox/user/16456081/post/5715578/revision/8933804",
+    { exact: true },
+  );
+  await revisionExample.scrollIntoViewIfNeeded();
+  await expect(revisionExample).toBeVisible();
+  await expect(revisionExample).toHaveCSS("font-family", /monospace/);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(revisionExample).toBeVisible();
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+  await page.setViewportSize({ width: 1440, height: 900 });
   const platformField = postPath.getByRole("combobox", { name: "Platform" });
   const creatorIdField = postPath.getByRole("textbox", { name: "Creator ID" });
   const postIdField = postPath.getByRole("textbox", { name: "Post ID" });
