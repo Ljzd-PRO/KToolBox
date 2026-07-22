@@ -123,7 +123,7 @@ ktoolbox webui /path/to/project
 
 作者清单以 Pawchive Profile 名称作为主身份，并使用可降级的 24 小时缓存。数据表支持本地化排序，概览统计可直接进入对应筛选视图；所有平台字段均使用 HeroUI ComboBox，提供 Patreon、Pixiv、Fanbox 建议且允许自定义值。
 
-默认监听 `0.0.0.0:8789`，便于在可信局域网使用，但 HTTP 无法加密传输账户凭据和项目数据。在不可信网络中请绑定 `127.0.0.1` 或置于 HTTPS 反向代理之后。项目没有默认账户，未配置有效凭据时会拒绝启动。任务生命周期、安全措施与部署方法详见 [WebUI 指南](https://ktoolbox.readthedocs.io/latest/zh/webui/)。
+默认监听 `0.0.0.0:8789`，便于在可信局域网使用，但 HTTP 无法加密传输账户凭据和项目数据。在不可信网络中请绑定 `127.0.0.1` 或置于 HTTPS 反向代理之后。项目没有默认账户，未配置有效凭据时会拒绝启动。文件系统路径字段可以浏览运行 KToolBox 的计算机；项目字段始终限制在当前同步项目内，空目录只能在明确确认后以非递归方式删除。任务生命周期、安全措施与部署方法详见 [WebUI 指南](https://ktoolbox.readthedocs.io/latest/zh/webui/)。
 
 ## 配置
 

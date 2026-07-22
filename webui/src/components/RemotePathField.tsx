@@ -23,17 +23,24 @@ import {
   IconAlertTriangle as AlertTriangle,
   IconArrowUp as ArrowUp,
   IconChevronDown as ChevronDown,
+  IconChevronRight as ChevronRight,
+  IconCircleCheck as CircleCheck,
+  IconEye as Eye,
   IconFile as File,
   IconFileUnknown as FileUnknown,
   IconFolder as Folder,
+  IconFolderCheck as FolderCheck,
   IconFolderOpen as FolderOpen,
   IconFolderPlus as FolderPlus,
+  IconHome as Home,
   IconRefresh as Refresh,
   IconSearch as Search,
   IconServer as Server,
+  IconTrash as Trash,
   IconX as X,
   type TablerIcon,
 } from "@tabler/icons-react";
+import type { TFunction } from "i18next";
 import {
   useCallback,
   useEffect,
@@ -48,6 +55,7 @@ import { useTranslation } from "react-i18next";
 import { api, ApiError, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { FilesystemBrowse, FilesystemEntry, PathSelector } from "../types";
+import { ConfirmModal, FormModal } from "./ui";
 
 type RemotePathFieldProps = {
   label: string;
@@ -183,7 +191,11 @@ export function RemotePathPicker({
   const [fileName, setFileName] = useState("");
   const [newFolderName, setNewFolderName] = useState("");
   const [creatingFolder, setCreatingFolder] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
   const [showNewFolder, setShowNewFolder] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<FilesystemEntry | null>(null);
+  const [deletingFolder, setDeletingFolder] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -244,7 +256,7 @@ export function RemotePathPicker({
         }
       } catch (requestError) {
         if (requestError instanceof DOMException && requestError.name === "AbortError") return;
-        if (requestId === requestRef.current) setError(errorText(requestError));
+        if (requestId === requestRef.current) setError(filesystemErrorText(requestError, t));
       } finally {
         if (requestId === requestRef.current) {
           setLoading(false);
@@ -283,6 +295,9 @@ export function RemotePathPicker({
   function navigate(path: string) {
     setSearch("");
     setNotice(null);
+    setShowNewFolder(false);
+    setNewFolderName("");
+    setCreateError(null);
     if (selector.kind === "file") setFileName("");
     void load({ path, includeHidden });
   }
@@ -299,16 +314,16 @@ export function RemotePathPicker({
     event.preventDefault();
     event.stopPropagation();
     if (!data || !validLeafName(newFolderName, data.separator)) {
-      setError(t("pathPicker.invalidName"));
+      setCreateError(t("pathPicker.invalidName"));
       return;
     }
     const csrfToken = auth?.session?.csrf_token;
     if (!csrfToken) {
-      setError(t("pathPicker.sessionRequired"));
+      setCreateError(t("pathPicker.sessionRequired"));
       return;
     }
     setCreatingFolder(true);
-    setError(null);
+    setCreateError(null);
     try {
       const entry = await api<FilesystemEntry>("/filesystem/directories", {
         method: "POST",
@@ -317,11 +332,39 @@ export function RemotePathPicker({
       });
       setShowNewFolder(false);
       setNewFolderName("");
-      navigate(entry.path);
+      setSearch("");
+      await load({ path: entry.path, includeHidden });
+      setNotice(t("pathPicker.folderCreated", { name: entry.name }));
     } catch (requestError) {
-      setError(errorText(requestError));
+      setCreateError(filesystemErrorText(requestError, t));
     } finally {
       setCreatingFolder(false);
+    }
+  }
+
+  async function deleteFolder() {
+    if (!deleteTarget) return;
+    const csrfToken = auth?.session?.csrf_token;
+    if (!csrfToken) {
+      setDeleteError(t("pathPicker.sessionRequired"));
+      return;
+    }
+    setDeletingFolder(true);
+    setDeleteError(null);
+    try {
+      await api<void>("/filesystem/directories", {
+        method: "DELETE",
+        csrfToken,
+        body: { scope: selector.scope, path: deleteTarget.path },
+      });
+      const deletedName = deleteTarget.name;
+      setDeleteTarget(null);
+      await load({ path: dataRef.current?.path, search, includeHidden });
+      setNotice(t("pathPicker.folderDeleted", { name: deletedName }));
+    } catch (requestError) {
+      setDeleteError(filesystemErrorText(requestError, t));
+    } finally {
+      setDeletingFolder(false);
     }
   }
 
@@ -337,13 +380,24 @@ export function RemotePathPicker({
     void load({ path: dataRef.current?.path, search, includeHidden });
   }
 
-  const selectedLocation = data?.locations.find((location) => location.path === data.path)?.id ?? null;
+  const selectedLocation = data?.locations
+    .filter((location) => data && pathContains(data.path, location.path, data.separator))
+    .sort((left, right) => right.path.length - left.path.length)[0]?.id ?? null;
+  const currentLocation = data?.locations.find((location) => location.id === selectedLocation) ?? null;
+  const exactLocation = data?.locations.find((location) => location.path === data.path) ?? null;
+  const currentFolderName = data
+    ? exactLocation
+      ? locationLabel(exactLocation, t)
+      : leafName(data.path, data.separator) || data.path
+    : t("pathPicker.location");
   const selectedFilePath = data && fileName
     ? `${data.path}${data.path.endsWith(data.separator) ? "" : data.separator}${fileName}`
     : null;
+  const visibleBreadcrumbs = condenseBreadcrumbs(data?.breadcrumbs ?? []);
 
   return (
-    <Modal state={state}>
+    <>
+      <Modal state={state}>
       <Modal.Trigger aria-hidden="true" className="hidden" tabIndex={-1} />
       <Modal.Backdrop isDismissable>
         <Modal.Container className="remote-path-picker-container mx-3" placement="center" scroll="inside" size="lg">
@@ -360,8 +414,8 @@ export function RemotePathPicker({
                 <X aria-hidden="true" size={18} />
               </Modal.CloseTrigger>
             </Modal.Header>
-            <Modal.Body className="remote-path-picker-body min-h-0 overflow-hidden p-3 sm:p-4">
-              <div className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(10rem,1fr)_auto] gap-3">
+            <Modal.Body className="remote-path-picker-body min-h-0 overflow-hidden p-2 sm:p-4">
+              <div className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(6rem,1fr)_auto] gap-2 sm:grid-rows-[auto_auto_minmax(7rem,1fr)_auto] sm:gap-3">
                 <div className="grid gap-2">
                   <div className="grid min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
                     <Select
@@ -375,21 +429,35 @@ export function RemotePathPicker({
                       }}
                     >
                       <Select.Trigger>
-                        <Select.Value>{data?.locations.find((item) => item.id === selectedLocation)?.label ?? t("pathPicker.location")}</Select.Value>
+                        <Select.Value>{currentLocation ? locationLabel(currentLocation, t) : t("pathPicker.location")}</Select.Value>
                         <Select.Indicator><ChevronDown aria-hidden="true" size={16} /></Select.Indicator>
                       </Select.Trigger>
                       <Select.Popover>
                         <ListBox aria-label={t("pathPicker.location")}>
-                          {(data?.locations ?? []).map((location) => (
-                            <ListBox.Item id={location.id} key={location.id} textValue={location.label}>
-                              {location.label}
-                              <ListBox.ItemIndicator />
-                            </ListBox.Item>
-                          ))}
+                          {(data?.locations ?? []).map((location) => {
+                            const LocationIcon = location.id === "project" ? FolderOpen : location.id === "home" ? Home : Server;
+                            const label = locationLabel(location, t);
+                            return (
+                              <ListBox.Item id={location.id} key={location.id} textValue={label}>
+                                <LocationIcon aria-hidden="true" className="shrink-0 text-muted" size={17} stroke={1.8} />
+                                <span className="min-w-0 flex-1 truncate">{label}</span>
+                                <ListBox.ItemIndicator />
+                              </ListBox.Item>
+                            );
+                          })}
                         </ListBox>
                       </Select.Popover>
                     </Select>
-                    <Button type="button" variant="outline" onPress={() => setShowNewFolder((current) => !current)}>
+                    <Button
+                      aria-expanded={showNewFolder}
+                      isDisabled={!data || loading}
+                      type="button"
+                      variant="outline"
+                      onPress={() => {
+                        setCreateError(null);
+                        setShowNewFolder((current) => !current);
+                      }}
+                    >
                       <FolderPlus aria-hidden="true" size={17} />
                       {t("pathPicker.newFolder")}
                     </Button>
@@ -419,16 +487,26 @@ export function RemotePathPicker({
                   {data?.breadcrumbs.length ? (
                     <div className="min-w-0 overflow-x-auto pb-1">
                       <Breadcrumbs aria-label={t("pathPicker.breadcrumbs")} className="min-w-max">
-                        {data.breadcrumbs.map((crumb) => (
-                          <Breadcrumbs.Item key={crumb.path} onPress={() => navigate(crumb.path)}>{crumb.label}</Breadcrumbs.Item>
-                        ))}
+                        {visibleBreadcrumbs.map((crumb) => {
+                          const matchingLocation = data.locations.find((location) => location.path === crumb.path);
+                          const label = matchingLocation ? locationLabel(matchingLocation, t) : crumb.label;
+                          return (
+                            <Breadcrumbs.Item
+                              aria-label={crumb.collapsedLabel ? `${t("pathPicker.up")}: ${crumb.collapsedLabel}` : undefined}
+                              key={crumb.path}
+                              onPress={() => navigate(crumb.path)}
+                            >
+                              <span title={crumb.collapsedLabel ?? label}>{label}</span>
+                            </Breadcrumbs.Item>
+                          );
+                        })}
                       </Breadcrumbs>
                     </div>
                   ) : null}
                 </div>
 
                 <div className="grid gap-2">
-                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+                  <div className="grid items-center gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
                     <SearchField aria-label={t("pathPicker.search")} value={search} variant="secondary" onChange={setSearch}>
                       <SearchField.Group>
                         <SearchField.SearchIcon><Search aria-hidden="true" size={16} /></SearchField.SearchIcon>
@@ -436,30 +514,27 @@ export function RemotePathPicker({
                         <SearchField.ClearButton aria-label={t("common.clearSearch")} />
                       </SearchField.Group>
                     </SearchField>
-                    <Tooltip>
-                      <Switch.Root aria-label={t("pathPicker.showHidden")} className="compact-switch" isSelected={includeHidden} onChange={setIncludeHidden}>
-                        <Switch.Content className="compact-switch-content">
-                          <Switch.Control><Switch.Thumb /></Switch.Control>
-                        </Switch.Content>
-                      </Switch.Root>
-                      <Tooltip.Content>{t("pathPicker.showHidden")}</Tooltip.Content>
-                    </Tooltip>
+                    <Switch.Root
+                      className="path-picker-hidden-switch min-h-11 rounded-lg border border-[var(--field-border)] bg-surface px-3 py-2 shadow-[var(--field-shadow)]"
+                      isSelected={includeHidden}
+                      onChange={setIncludeHidden}
+                    >
+                      <Switch.Content className="min-w-0 items-center gap-2.5">
+                        <Switch.Control className="shrink-0"><Switch.Thumb /></Switch.Control>
+                        <Label className="flex min-w-0 items-center gap-2 text-sm font-medium text-foreground">
+                          <Eye aria-hidden="true" className="shrink-0 text-muted" size={16} stroke={1.8} />
+                          <span className="min-w-0 break-words">{t("pathPicker.showHidden")}</span>
+                        </Label>
+                      </Switch.Content>
+                    </Switch.Root>
                   </div>
-                  {showNewFolder ? (
-                    <form className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 rounded-lg border border-border bg-default p-2" onSubmit={(event) => void createFolder(event)}>
-                      <TextField.Root aria-label={t("pathPicker.folderName")} fullWidth value={newFolderName} variant="secondary" onChange={setNewFolderName}>
-                        <Input autoFocus placeholder={t("pathPicker.folderName")} />
-                      </TextField.Root>
-                      <Button isPending={creatingFolder} type="submit" variant="primary">{t("common.add")}</Button>
-                    </form>
-                  ) : null}
                   {notice ? <StatusMessage tone="notice" text={notice} /> : null}
                   {error ? <StatusMessage tone="error" text={error} /> : null}
                 </div>
 
                 <Surface className="min-h-0 overflow-y-auto rounded-lg border border-border bg-surface p-1" aria-busy={loading || refreshing}>
                   {loading && !data ? (
-                    <div className="grid h-full min-h-40 place-items-center"><Spinner aria-label={t("common.loading")} /></div>
+                    <div className="grid h-full min-h-28 place-items-center"><Spinner aria-label={t("common.loading")} /></div>
                   ) : data?.entries.length ? (
                     <ListBox
                       aria-label={t("pathPicker.entries")}
@@ -475,6 +550,7 @@ export function RemotePathPicker({
                         const EntryIcon = entry.kind === "directory" ? Folder : entry.kind === "file" ? File : FileUnknown;
                         return (
                           <ListBox.Item
+                            aria-label={entry.name}
                             className="remote-path-entry min-w-0"
                             id={entry.path}
                             isDisabled={disabled}
@@ -482,19 +558,50 @@ export function RemotePathPicker({
                             textValue={entry.name}
                           >
                             <EntryIcon aria-hidden="true" className="shrink-0 text-muted" size={18} stroke={1.8} />
-                            <span className="min-w-0 flex-1 break-all font-mono text-xs text-foreground">{entry.name}</span>
+                            <span className="min-w-0 flex-1 truncate font-mono text-sm text-foreground" title={entry.name}>{entry.name}</span>
                             {entry.is_symlink ? <Chip className="shrink-0" size="sm" variant="soft">{t("pathPicker.symlink")}</Chip> : null}
-                            <ListBox.ItemIndicator />
+                            {entry.deletable ? (
+                              <Tooltip>
+                                <Button
+                                  isIconOnly
+                                  aria-label={t("pathPicker.deleteFolder", { name: entry.name })}
+                                  className="size-9 min-w-9 shrink-0 text-danger hover:bg-danger/10"
+                                  size="sm"
+                                  type="button"
+                                  variant="ghost"
+                                  onClick={(event) => event.stopPropagation()}
+                                  onPress={() => {
+                                    setDeleteError(null);
+                                    setDeleteTarget(entry);
+                                  }}
+                                >
+                                  <Trash aria-hidden="true" size={16} stroke={1.8} />
+                                </Button>
+                                <Tooltip.Content>{t("pathPicker.deleteFolder", { name: entry.name })}</Tooltip.Content>
+                              </Tooltip>
+                            ) : null}
+                            {selector.kind === "file" ? <ListBox.ItemIndicator /> : null}
+                            {entry.kind === "directory" && entry.navigable ? (
+                              <ChevronRight aria-hidden="true" className="shrink-0 text-muted" size={16} />
+                            ) : null}
                           </ListBox.Item>
                         );
                       })}
                     </ListBox>
                   ) : (
-                    <EmptyState className="grid min-h-40 place-items-center p-6 text-center">
+                    <EmptyState className="remote-path-empty-state grid h-full min-h-28 place-items-center p-4 text-center sm:p-6">
                       <div>
-                        <Search aria-hidden="true" className="mx-auto text-muted" size={26} />
-                        <p className="mt-3 font-medium text-foreground">{t("pathPicker.empty")}</p>
-                        <p className="mt-1 text-sm text-muted">{t("pathPicker.emptyHint")}</p>
+                        {search.trim() ? (
+                          <Search aria-hidden="true" className="mx-auto text-muted" size={26} />
+                        ) : (
+                          <FolderOpen aria-hidden="true" className="mx-auto text-muted" size={26} />
+                        )}
+                        <p className="mt-3 font-medium text-foreground">
+                          {t(search.trim() ? "pathPicker.empty" : "pathPicker.emptyDirectory")}
+                        </p>
+                        <p className="remote-path-empty-hint mt-1 text-sm text-muted">
+                          {t(search.trim() ? "pathPicker.emptyHint" : "pathPicker.emptyDirectoryHint")}
+                        </p>
                       </div>
                     </EmptyState>
                   )}
@@ -507,23 +614,30 @@ export function RemotePathPicker({
                   ) : null}
                 </Surface>
 
-                {selector.kind === "file" ? (
-                  <TextField.Root
-                    className="grid gap-1.5"
-                    fullWidth
-                    isInvalid={Boolean(fileName && data && !validLeafName(fileName, data.separator))}
-                    value={fileName}
-                    variant="secondary"
-                    onChange={setFileName}
-                  >
-                    <Label className="text-sm font-semibold text-[var(--text-secondary)]">{t("pathPicker.fileName")}</Label>
-                    <Input className="font-mono text-xs" placeholder={t("pathPicker.fileNamePlaceholder")} />
-                    <Description className="text-xs text-muted">{t("pathPicker.fileNameHint")}</Description>
-                    <FieldError>{t("pathPicker.invalidName")}</FieldError>
-                  </TextField.Root>
-                ) : (
-                  <p className="truncate font-mono text-xs text-muted" title={selectedValue ?? undefined}>{selectedValue}</p>
-                )}
+                <div className="grid gap-2">
+                  {selector.kind === "file" ? (
+                    <TextField.Root
+                      className="grid gap-1.5"
+                      fullWidth
+                      isInvalid={Boolean(fileName && data && !validLeafName(fileName, data.separator))}
+                      value={fileName}
+                      variant="secondary"
+                      onChange={setFileName}
+                    >
+                      <Label className="text-sm font-semibold text-[var(--text-secondary)]">{t("pathPicker.fileName")}</Label>
+                      <Input className="font-mono text-xs" placeholder={t("pathPicker.fileNamePlaceholder")} />
+                      <Description className="text-xs text-muted">{t("pathPicker.fileNameHint")}</Description>
+                      <FieldError>{t("pathPicker.invalidName")}</FieldError>
+                    </TextField.Root>
+                  ) : null}
+                  {selectedValue ? (
+                    <div className="remote-path-selection flex min-w-0 items-center gap-2 rounded-lg border border-[var(--accent-border)] bg-[var(--accent-soft)] px-3 py-2">
+                      <FolderCheck aria-hidden="true" className="shrink-0 text-accent" size={17} stroke={1.8} />
+                      <span className="shrink-0 text-xs font-semibold text-[var(--text-secondary)]">{t("pathPicker.currentSelection")}</span>
+                      <code className="min-w-0 flex-1 truncate text-xs text-foreground" title={selectedValue}>{selectedValue}</code>
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </Modal.Body>
             <Modal.Footer className="flex flex-wrap justify-end gap-2 border-t border-border px-4 py-3 sm:px-5 sm:py-4">
@@ -536,11 +650,87 @@ export function RemotePathPicker({
           </Modal.Dialog>
         </Modal.Container>
       </Modal.Backdrop>
-    </Modal>
+      </Modal>
+      <FormModal
+        actions={(
+          <>
+            <Button isDisabled={creatingFolder} variant="ghost" onPress={() => setShowNewFolder(false)}>
+              <X aria-hidden="true" size={17} />
+              {t("common.cancel")}
+            </Button>
+            <Button form="remote-new-folder-form" isPending={creatingFolder} type="submit" variant="primary">
+              <FolderPlus aria-hidden="true" size={17} />
+              {t("pathPicker.createFolder")}
+            </Button>
+          </>
+        )}
+        open={showNewFolder}
+        size="sm"
+        title={t("pathPicker.newFolder")}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen && !creatingFolder) {
+            setShowNewFolder(false);
+            setNewFolderName("");
+            setCreateError(null);
+          }
+        }}
+      >
+        <form className="grid gap-4" id="remote-new-folder-form" onSubmit={(event) => void createFolder(event)}>
+          <div className="flex min-w-0 items-start gap-3">
+            <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-[var(--accent-soft)] text-accent">
+              <FolderPlus aria-hidden="true" size={19} stroke={1.8} />
+            </span>
+            <p className="min-w-0 text-sm leading-relaxed text-[var(--text-secondary)]">
+              {t("pathPicker.newFolderHint", { name: currentFolderName })}
+            </p>
+          </div>
+          <TextField.Root className="grid gap-1.5" fullWidth value={newFolderName} variant="secondary" onChange={setNewFolderName}>
+            <Label className="text-sm font-semibold text-[var(--text-secondary)]">{t("pathPicker.folderName")}</Label>
+            <Input autoFocus placeholder={t("pathPicker.folderName")} />
+          </TextField.Root>
+          {createError ? <StatusMessage tone="error" text={createError} /> : null}
+        </form>
+      </FormModal>
+      <ConfirmModal
+        actions={(
+          <>
+            <Button isDisabled={deletingFolder} variant="ghost" onPress={() => setDeleteTarget(null)}>
+              <X aria-hidden="true" size={17} />
+              {t("common.cancel")}
+            </Button>
+            <Button isPending={deletingFolder} variant="danger" onPress={() => void deleteFolder()}>
+              <Trash aria-hidden="true" size={17} />
+              {t("pathPicker.deleteFolderConfirm")}
+            </Button>
+          </>
+        )}
+        open={Boolean(deleteTarget)}
+        title={t("pathPicker.deleteFolderTitle")}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen && !deletingFolder) {
+            setDeleteTarget(null);
+            setDeleteError(null);
+          }
+        }}
+      >
+        <div className="grid gap-3">
+          <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
+            {t("pathPicker.deleteFolderBody", { name: deleteTarget?.name ?? "" })}
+          </p>
+          {deleteTarget ? (
+            <code className="block min-w-0 break-all rounded-lg border border-border bg-default px-3 py-2 text-xs text-foreground">
+              {deleteTarget.path}
+            </code>
+          ) : null}
+          {deleteError ? <StatusMessage tone="error" text={deleteError} /> : null}
+        </div>
+      </ConfirmModal>
+    </>
   );
 }
 
 function StatusMessage({ tone, text }: { tone: "notice" | "error"; text: string }) {
+  const StatusIcon = tone === "error" ? AlertTriangle : CircleCheck;
   return (
     <div
       className={tone === "error"
@@ -548,7 +738,7 @@ function StatusMessage({ tone, text }: { tone: "notice" | "error"; text: string 
         : "flex items-start gap-2 rounded-lg border border-[var(--accent-border)] bg-[var(--accent-soft)] p-3 text-sm text-foreground"}
       role={tone === "error" ? "alert" : "status"}
     >
-      <AlertTriangle aria-hidden="true" className="mt-0.5 shrink-0" size={17} />
+      <StatusIcon aria-hidden="true" className="mt-0.5 shrink-0" size={17} />
       <span className="min-w-0 break-words">{text}</span>
     </div>
   );
@@ -561,4 +751,38 @@ function leafName(path: string, separator: string): string {
 
 function validLeafName(value: string, separator: string): boolean {
   return Boolean(value) && value === value.trim() && ![".", ".."].includes(value) && ![separator, "/", "\\", "\0"].some((part) => value.includes(part));
+}
+
+function pathContains(path: string, parent: string, separator: string): boolean {
+  if (path === parent) return true;
+  const prefix = parent.endsWith(separator) ? parent : `${parent}${separator}`;
+  return path.startsWith(prefix);
+}
+
+function condenseBreadcrumbs(
+  breadcrumbs: FilesystemBrowse["breadcrumbs"],
+): Array<FilesystemBrowse["breadcrumbs"][number] & { collapsedLabel?: string }> {
+  if (breadcrumbs.length <= 5) return breadcrumbs;
+  const collapsed = breadcrumbs[breadcrumbs.length - 4];
+  return [
+    breadcrumbs[0],
+    { ...collapsed, label: "…", collapsedLabel: collapsed.label },
+    ...breadcrumbs.slice(-3),
+  ];
+}
+
+function locationLabel(location: FilesystemBrowse["locations"][number], t: TFunction): string {
+  if (location.id === "project") return t("pathPicker.locations.project");
+  if (location.id === "home") return t("pathPicker.locations.home");
+  return location.label;
+}
+
+function filesystemErrorText(error: unknown, t: TFunction): string {
+  if (error instanceof ApiError && error.detail && typeof error.detail === "object" && "code" in error.detail) {
+    const code = String((error.detail as { code: unknown }).code);
+    return t(`pathPicker.errors.${code}`, {
+      defaultValue: t("pathPicker.errors.filesystem_error"),
+    });
+  }
+  return errorText(error);
 }

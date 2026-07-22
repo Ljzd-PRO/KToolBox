@@ -256,6 +256,7 @@ test("remote path picker browses the server filesystem from nested forms", async
   const picker = page.getByRole("dialog", { name: "Output directory" });
   await expect(picker).toBeVisible();
   await expect(picker.getByText("Project files")).toBeVisible();
+  await expect(picker.getByRole("switch", { name: "Show hidden items" })).toBeVisible();
   await expect(picker.getByRole("textbox", { name: "Remote path" })).toHaveValue(/[/\\]downloads$/);
   await picker.getByRole("button", { name: "Parent directory" }).click();
   await expect(picker.getByRole("option", { name: "downloads" })).toBeVisible();
@@ -275,14 +276,23 @@ test("remote path picker browses the server filesystem from nested forms", async
   await page.setViewportSize({ width: 390, height: 844 });
   await browseButton.click();
   await picker.getByRole("button", { name: "New folder" }).click();
-  await picker.getByRole("textbox", { name: "Folder name" }).fill("e2e-created");
-  await picker.getByRole("button", { name: "Add" }).click();
+  const createFolderDialog = page.getByRole("dialog", { name: "New folder" });
+  await expect(createFolderDialog.getByText(/Create an empty folder/)).toBeVisible();
+  await createFolderDialog.getByRole("textbox", { name: "Folder name" }).fill("e2e-created");
+  await createFolderDialog.getByRole("button", { name: "Create folder" }).click();
   await expect(picker.getByRole("textbox", { name: "Remote path" })).toHaveValue(/[/\\]e2e-created$/);
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
   expect(await picker.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
   const pickerScan = await new AxeBuilder({ page }).include(".remote-path-picker-container").analyze();
   expect(pickerScan.violations).toEqual([]);
-  await picker.getByRole("button", { name: "Select directory" }).click();
+  await picker.getByRole("button", { name: "Parent directory" }).click();
+  await picker.getByRole("button", { name: "Delete folder e2e-created" }).click();
+  const deleteFolderDialog = page.getByRole("dialog", { name: "Delete this empty folder?" });
+  await expect(deleteFolderDialog.getByText(/Files and nested folders are never deleted/)).toBeVisible();
+  await deleteFolderDialog.getByRole("button", { name: "Delete folder" }).click();
+  await expect(picker.getByRole("option", { name: "e2e-created" })).toHaveCount(0);
+  await expect(picker.getByText(/Deleted empty folder/)).toBeVisible();
+  await picker.getByRole("button", { name: "Cancel" }).click();
   await taskDialog.getByRole("button", { name: "Cancel" }).click();
 
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -293,6 +303,10 @@ test("remote path picker browses the server filesystem from nested forms", async
   await bucketBrowse.click();
   const hostPicker = page.getByRole("dialog", { name: "Storage bucket path" });
   await expect(hostPicker.getByText("Remote computer")).toBeVisible();
+  const suggestedFolderDialog = page.getByRole("dialog", { name: "New folder" });
+  if (await suggestedFolderDialog.isVisible()) {
+    await suggestedFolderDialog.getByRole("button", { name: "Cancel" }).click();
+  }
   await hostPicker.getByRole("button", { name: /Quick location/ }).click();
   const homeOption = page.getByRole("option", { name: "Home" });
   await expect(homeOption).toBeVisible();
@@ -300,6 +314,23 @@ test("remote path picker browses the server filesystem from nested forms", async
   await expect(homeOption).not.toBeVisible();
   await page.keyboard.press("Escape");
   await expect(hostPicker).not.toBeVisible();
+});
+
+
+test("remote path picker localizes every visible control", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("button", { name: "Switch language" }).click();
+  await page.getByRole("link", { name: "任务", exact: true }).click();
+  await page.getByRole("button", { name: "创建任务" }).click();
+  const taskDialog = page.getByRole("dialog", { name: "创建任务" });
+  await taskDialog.getByRole("button", { name: "在远程计算机中浏览输出目录" }).click();
+  const picker = page.getByRole("dialog", { name: "输出目录" });
+
+  await expect(picker.getByRole("button", { name: /项目目录.*快捷位置/ })).toBeVisible();
+  await expect(picker.getByRole("switch", { name: "显示隐藏项目" })).toBeVisible();
+  await expect(picker.getByRole("button", { name: "新建目录" })).toBeVisible();
+  await expect(picker.getByRole("button", { name: "选择目录" })).toBeVisible();
+  await expect(picker.getByText("Project", { exact: true })).toHaveCount(0);
 });
 
 
@@ -336,7 +367,16 @@ test("captures the remote path picker visual matrix", async ({ page }, testInfo)
   picker = page.getByRole("dialog", { name: "Output directory" });
   await expect(picker).toBeVisible();
   await capture("tasks__directory-picker__dark-emerald", 390, 844);
+  await picker.getByRole("button", { name: "New folder" }).click();
+  await expect(page.getByRole("dialog", { name: "New folder" })).toBeVisible();
+  await capture("tasks__directory-picker-create__dark-emerald", 390, 844);
+  await page.getByRole("dialog", { name: "New folder" }).getByRole("button", { name: "Cancel" }).click();
   await capture("tasks__directory-picker__dark-emerald", 320, 700);
+  const selectionBox = await picker.locator(".remote-path-selection").boundingBox();
+  const footerBox = await picker.locator('[data-slot="modal-footer"]').boundingBox();
+  expect(selectionBox).not.toBeNull();
+  expect(footerBox).not.toBeNull();
+  expect((selectionBox?.y ?? 0) + (selectionBox?.height ?? 0)).toBeLessThanOrEqual(footerBox?.y ?? 0);
   const [goButtonBox, refreshButtonBox] = await Promise.all([
     picker.getByRole("button", { name: "Go" }).boundingBox(),
     picker.getByRole("button", { name: "Refresh" }).boundingBox(),
@@ -382,6 +422,11 @@ test("captures the remote path picker visual matrix", async ({ page }, testInfo)
   await page.getByRole("button", { name: "Browse the remote computer for Storage bucket path" }).click();
   picker = page.getByRole("dialog", { name: "Storage bucket path" });
   await expect(picker.getByText("Remote computer")).toBeVisible();
+  const suggestedFolderDialog = page.getByRole("dialog", { name: "New folder" });
+  if (await suggestedFolderDialog.isVisible()) {
+    await suggestedFolderDialog.getByRole("button", { name: "Cancel" }).click();
+  }
+  await expect(picker.locator('[data-slot="breadcrumbs-item"]')).toHaveCount(5);
   await capture("configuration__host-picker__dark-emerald", 1440, 900);
 });
 

@@ -692,8 +692,36 @@
         "title": "FilesystemCreateDirectoryRequest",
         "type": "object"
       },
+      "FilesystemDeleteDirectoryRequest": {
+        "properties": {
+          "path": {
+            "maxLength": 4096,
+            "minLength": 1,
+            "title": "Path",
+            "type": "string"
+          },
+          "scope": {
+            "enum": [
+              "project",
+              "host"
+            ],
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scope",
+          "path"
+        ],
+        "title": "FilesystemDeleteDirectoryRequest",
+        "type": "object"
+      },
       "FilesystemEntryResponse": {
         "properties": {
+          "deletable": {
+            "title": "Deletable",
+            "type": "boolean"
+          },
           "is_symlink": {
             "title": "Is Symlink",
             "type": "boolean"
@@ -736,7 +764,8 @@
           "path",
           "kind",
           "is_symlink",
-          "navigable"
+          "navigable",
+          "deletable"
         ],
         "title": "FilesystemEntryResponse",
         "type": "object"
@@ -3042,6 +3071,38 @@
       }
     },
     "/api/v1/filesystem/directories": {
+      "delete": {
+        "operationId": "delete_directory_api_v1_filesystem_directories_delete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FilesystemDeleteDirectoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Directory",
+        "tags": [
+          "filesystem"
+        ]
+      },
       "post": {
         "operationId": "create_directory_api_v1_filesystem_directories_post",
         "requestBody": {

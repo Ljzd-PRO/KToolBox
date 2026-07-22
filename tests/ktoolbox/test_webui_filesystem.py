@@ -68,6 +68,8 @@ async def test_filesystem_browse_requires_session_and_lists_project_safely(tmp_p
         assert [entry["name"] for entry in data["entries"]] == ["资料", "alpha.txt", "Zulu.txt"]
         assert data["entries"][0]["kind"] == "directory"
         assert data["entries"][0]["navigable"] is True
+        assert data["entries"][0]["deletable"] is True
+        assert all(entry["deletable"] is False for entry in data["entries"] if entry["kind"] != "directory")
         assert all(entry["name"] != ".secret" for entry in data["entries"])
 
         hidden = await client.get("/api/v1/filesystem", params={"include_hidden": True})
@@ -118,6 +120,10 @@ async def test_filesystem_search_pagination_suggestions_and_host_locations(tmp_p
             "home",
             "root-0",
         }
+        assert (
+            next(location["label"] for location in host_view.json()["locations"] if location["id"] == "root-0")
+            == host.name
+        )
 
 
 @pytest.mark.asyncio
@@ -137,6 +143,7 @@ async def test_filesystem_create_directory_csrf_conflicts_and_validation(tmp_pat
         assert created.status_code == 201
         assert created.json()["name"] == "新目录"
         assert created.json()["kind"] == "directory"
+        assert created.json()["deletable"] is True
         assert (project / "新目录").is_dir()
 
         duplicate = await client.post(
@@ -145,6 +152,7 @@ async def test_filesystem_create_directory_csrf_conflicts_and_validation(tmp_pat
             json=payload,
         )
         assert duplicate.status_code == 409
+        assert duplicate.json()["detail"]["code"] == "already_exists"
 
         invalid = await client.post(
             "/api/v1/filesystem/directories",
@@ -153,6 +161,59 @@ async def test_filesystem_create_directory_csrf_conflicts_and_validation(tmp_pat
         )
         assert invalid.status_code == 422
         assert not (host / "escape").exists()
+
+
+@pytest.mark.asyncio
+async def test_filesystem_delete_directory_only_removes_empty_unprotected_folders(tmp_path: Path) -> None:
+    host = tmp_path / "host"
+    project = host / "project"
+    empty = project / "empty"
+    non_empty = project / "non-empty"
+    empty.mkdir(parents=True)
+    non_empty.mkdir()
+    (non_empty / "keep.txt").write_text("keep", encoding="utf-8")
+
+    async with filesystem_client(project, host) as (client, csrf):
+        payload = {"scope": "project", "path": str(empty)}
+        assert (await client.request("DELETE", "/api/v1/filesystem/directories", json=payload)).status_code == 403
+
+        deleted = await client.request(
+            "DELETE",
+            "/api/v1/filesystem/directories",
+            headers={CSRF_HEADER: csrf},
+            json=payload,
+        )
+        assert deleted.status_code == 204
+        assert not empty.exists()
+
+        missing = await client.request(
+            "DELETE",
+            "/api/v1/filesystem/directories",
+            headers={CSRF_HEADER: csrf},
+            json=payload,
+        )
+        assert missing.status_code == 404
+        assert missing.json()["detail"]["code"] == "directory_not_found"
+
+        occupied = await client.request(
+            "DELETE",
+            "/api/v1/filesystem/directories",
+            headers={CSRF_HEADER: csrf},
+            json={"scope": "project", "path": str(non_empty)},
+        )
+        assert occupied.status_code == 409
+        assert occupied.json()["detail"]["code"] == "directory_not_empty"
+        assert non_empty.is_dir()
+        assert (non_empty / "keep.txt").is_file()
+
+        protected = await client.request(
+            "DELETE",
+            "/api/v1/filesystem/directories",
+            headers={CSRF_HEADER: csrf},
+            json={"scope": "project", "path": str(project)},
+        )
+        assert protected.status_code == 403
+        assert protected.json()["detail"]["code"] == "protected_directory"
 
 
 @pytest.mark.asyncio
@@ -177,6 +238,7 @@ async def test_project_scope_rejects_parent_and_symlink_escape(tmp_path: Path) -
         link_entry = next(entry for entry in listing.json()["entries"] if entry["name"] == "outside-link")
         assert link_entry["is_symlink"] is True
         assert link_entry["navigable"] is False
+        assert link_entry["deletable"] is False
         assert link_entry["project_relative_path"] is None
 
 
@@ -194,13 +256,19 @@ async def test_filesystem_missing_parent_and_wrong_mode_are_sanitized(tmp_path: 
             params={"path": str(project / "missing" / "child")},
         )
         assert missing.status_code == 404
-        assert missing.json()["detail"] == "Parent directory was not found"
+        assert missing.json()["detail"] == {
+            "code": "parent_not_found",
+            "message": "Parent directory was not found",
+        }
         wrong_mode = await client.get(
             "/api/v1/filesystem",
             params={"path": str(file_path), "mode": "directory"},
         )
         assert wrong_mode.status_code == 422
-        assert wrong_mode.json()["detail"] == "Path is not a directory"
+        assert wrong_mode.json()["detail"] == {
+            "code": "not_directory",
+            "message": "Path is not a directory",
+        }
 
 
 def test_breadcrumb_helpers_cover_posix_windows_drives_and_unc() -> None:

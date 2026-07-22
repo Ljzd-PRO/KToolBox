@@ -505,12 +505,23 @@ code {
   }
 }
 
+@media (max-width: 359px), (max-height: 720px) {
+  .remote-path-empty-state {
+    padding: 0.75rem;
+  }
+
+  .remote-path-empty-hint {
+    display: none;
+  }
+}
+
 .field-label-icon {
   color: color-mix(in oklab, var(--accent) 42%, var(--muted) 58%);
 }
 
 .form-switch,
-.compact-switch {
+.compact-switch,
+.path-picker-hidden-switch {
   --switch-control-bg: var(--control-track-off);
   --switch-control-bg-hover: var(--control-track-off-hover);
   --switch-control-bg-pressed: var(--control-track-off-hover);
@@ -844,9 +855,18 @@ code {
   padding-inline: 0.75rem;
 }
 
+.path-picker-hidden-switch {
+  width: max-content;
+  max-width: 100%;
+}
+
 @media (max-width: 639px) {
   .remote-path-picker-body {
-    height: min(66dvh, 38rem);
+    height: min(72dvh, 40rem);
+  }
+
+  .path-picker-hidden-switch {
+    width: 100%;
   }
 }
 

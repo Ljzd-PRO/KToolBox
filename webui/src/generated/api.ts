@@ -208,7 +208,8 @@ export interface paths {
         put?: never;
         /** Create Directory */
         post: operations["create_directory_api_v1_filesystem_directories_post"];
-        delete?: never;
+        /** Delete Directory */
+        delete: operations["delete_directory_api_v1_filesystem_directories_delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -811,8 +812,20 @@ export interface components {
              */
             scope: "project" | "host";
         };
+        /** FilesystemDeleteDirectoryRequest */
+        FilesystemDeleteDirectoryRequest: {
+            /** Path */
+            path: string;
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "project" | "host";
+        };
         /** FilesystemEntryResponse */
         FilesystemEntryResponse: {
+            /** Deletable */
+            deletable: boolean;
             /** Is Symlink */
             is_symlink: boolean;
             /**
@@ -1876,6 +1889,37 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["FilesystemEntryResponse"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_directory_api_v1_filesystem_directories_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FilesystemDeleteDirectoryRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

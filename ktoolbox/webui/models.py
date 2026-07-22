@@ -74,6 +74,7 @@ class FilesystemEntryResponse(BaseModel):
     kind: Literal["directory", "file", "other"]
     is_symlink: bool
     navigable: bool
+    deletable: bool
 
 
 class FilesystemBrowseResponse(BaseModel):
@@ -96,6 +97,11 @@ class FilesystemCreateDirectoryRequest(BaseModel):
     scope: Literal["project", "host"]
     parent: str
     name: str = Field(min_length=1, max_length=255)
+
+
+class FilesystemDeleteDirectoryRequest(BaseModel):
+    scope: Literal["project", "host"]
+    path: str = Field(min_length=1, max_length=4096)
 
 
 class ConfigSchemaResponse(BaseModel):

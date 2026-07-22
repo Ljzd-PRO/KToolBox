@@ -71,7 +71,6 @@ describe("RemotePathField", () => {
         }));
       }
       return json(browserResponse({
-        suggestedName: "downloads",
         entries: [{
           name: "existing",
           path: "/project/existing",
@@ -79,6 +78,7 @@ describe("RemotePathField", () => {
           kind: "directory",
           is_symlink: false,
           navigable: true,
+          deletable: true,
         }],
       }));
     }));
@@ -151,6 +151,7 @@ describe("RemotePathField", () => {
           kind: "directory",
           is_symlink: false,
           navigable: true,
+          deletable: true,
         }, 201);
       }
       if (url.searchParams.get("path") === "/project/created") {
@@ -170,8 +171,9 @@ describe("RemotePathField", () => {
     await user.click(screen.getByRole("button", { name: "Browse the remote computer for Output" }));
     const dialog = await screen.findByRole("dialog", { name: "Output" });
     await user.click(within(dialog).getByRole("button", { name: "New folder" }));
-    await user.type(within(dialog).getByRole("textbox", { name: "Folder name" }), "created");
-    await user.click(within(dialog).getByRole("button", { name: "Add" }));
+    const createDialog = await screen.findByRole("dialog", { name: "New folder" });
+    await user.type(within(createDialog).getByRole("textbox", { name: "Folder name" }), "created");
+    await user.click(within(createDialog).getByRole("button", { name: "Create folder" }));
 
     await waitFor(() => expect(within(dialog).getByText("created")).toBeInTheDocument());
     const createCall = fetchMock.mock.calls.find(([input, init]) => String(input).endsWith("/filesystem/directories") && init?.method === "POST");
@@ -179,5 +181,46 @@ describe("RemotePathField", () => {
     expect(new Headers(createCall?.[1]?.headers).get("X-CSRF-Token")).toBe("csrf-token");
     expect(JSON.parse(String(createCall?.[1]?.body))).toEqual({ scope: "project", parent: "/project", name: "created" });
     expect(outerSubmit).not.toHaveBeenCalled();
+  });
+
+  it("deletes an empty directory only after explicit confirmation", async () => {
+    const user = userEvent.setup();
+    let deleted = false;
+    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = new URL(String(input), "http://testserver");
+      if (url.pathname.endsWith("/session")) {
+        return json({ authenticated: true, username: "owner", csrf_token: "csrf-token", created_at: "2026-07-22T00:00:00Z" });
+      }
+      if (url.pathname.endsWith("/filesystem/directories") && init?.method === "DELETE") {
+        deleted = true;
+        return new Response(null, { status: 204 });
+      }
+      return json(browserResponse({
+        entries: deleted ? [] : [{
+          name: "typo-folder",
+          path: "/project/typo-folder",
+          project_relative_path: "typo-folder",
+          kind: "directory",
+          is_symlink: false,
+          navigable: true,
+          deletable: true,
+        }],
+      }));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<AuthProvider><FieldHarness initial="" /></AuthProvider>);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+
+    await user.click(screen.getByRole("button", { name: "Browse the remote computer for Output" }));
+    const picker = await screen.findByRole("dialog", { name: "Output" });
+    await user.click(await within(picker).findByRole("button", { name: "Delete folder typo-folder" }));
+    const confirmation = await screen.findByRole("dialog", { name: "Delete this empty folder?" });
+    expect(within(confirmation).getByText(/Files and nested folders are never deleted/)).toBeVisible();
+    await user.click(within(confirmation).getByRole("button", { name: "Delete folder" }));
+
+    await waitFor(() => expect(within(picker).queryByRole("option", { name: /typo-folder/ })).not.toBeInTheDocument());
+    const deleteCall = fetchMock.mock.calls.find(([, init]) => init?.method === "DELETE");
+    expect(JSON.parse(String(deleteCall?.[1]?.body))).toEqual({ scope: "project", path: "/project/typo-folder" });
+    expect(new Headers(deleteCall?.[1]?.headers).get("X-CSRF-Token")).toBe("csrf-token");
   });
 });

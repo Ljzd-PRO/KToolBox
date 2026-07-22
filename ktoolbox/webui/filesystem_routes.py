@@ -19,6 +19,7 @@ from ktoolbox.webui.filesystem import (
 from ktoolbox.webui.models import (
     FilesystemBrowseResponse,
     FilesystemCreateDirectoryRequest,
+    FilesystemDeleteDirectoryRequest,
     FilesystemEntryResponse,
 )
 
@@ -63,6 +64,16 @@ def create_filesystem_router(browser: FilesystemBrowser) -> APIRouter:
         except FilesystemBrowserError as error:
             raise _http_error(error) from error
 
+    @router.delete("/directories", status_code=status.HTTP_204_NO_CONTENT)
+    async def delete_directory(
+        payload: FilesystemDeleteDirectoryRequest,
+        _: CsrfDependency,
+    ) -> None:
+        try:
+            await browser.delete_directory(scope=payload.scope, path=payload.path)
+        except FilesystemBrowserError as error:
+            raise _http_error(error) from error
+
     return router
 
 
@@ -77,4 +88,4 @@ def _http_error(error: FilesystemBrowserError) -> HTTPException:
         code = status.HTTP_422_UNPROCESSABLE_CONTENT
     else:
         code = status.HTTP_422_UNPROCESSABLE_CONTENT
-    return HTTPException(status_code=code, detail=str(error))
+    return HTTPException(status_code=code, detail={"code": error.code, "message": str(error)})

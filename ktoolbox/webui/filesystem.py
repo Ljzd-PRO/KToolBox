@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import errno
 import os
 from dataclasses import dataclass
 from pathlib import Path, PurePath, PurePosixPath, PureWindowsPath
@@ -19,6 +20,10 @@ FilesystemMode = Literal["directory", "file"]
 
 class FilesystemBrowserError(Exception):
     """A sanitized filesystem browser failure."""
+
+    def __init__(self, message: str, *, code: str = "filesystem_error") -> None:
+        super().__init__(message)
+        self.code = code
 
 
 class FilesystemForbiddenError(FilesystemBrowserError):
@@ -88,6 +93,14 @@ class FilesystemBrowser:
     ) -> FilesystemEntryResponse:
         return await asyncio.to_thread(self._create_directory, scope=scope, parent=parent, name=name)
 
+    async def delete_directory(
+        self,
+        *,
+        scope: FilesystemScope,
+        path: str,
+    ) -> None:
+        await asyncio.to_thread(self._delete_directory, scope=scope, path=path)
+
     def _browse(
         self,
         *,
@@ -137,24 +150,55 @@ class FilesystemBrowser:
         name: str,
     ) -> FilesystemEntryResponse:
         if not _valid_child_name(name):
-            raise FilesystemInvalidError("Directory name is invalid")
+            raise FilesystemInvalidError("Directory name is invalid", code="invalid_name")
         parent_path = self._requested_path(parent)
         self._ensure_allowed(parent_path, scope)
         try:
             if not parent_path.exists():
-                raise FilesystemNotFoundError("Parent directory was not found")
+                raise FilesystemNotFoundError("Parent directory was not found", code="parent_not_found")
             if not parent_path.is_dir():
-                raise FilesystemInvalidError("Parent path is not a directory")
+                raise FilesystemInvalidError("Parent path is not a directory", code="parent_not_directory")
             target = parent_path / name
             self._ensure_allowed(target, scope)
             target.mkdir()
         except FileExistsError as error:
-            raise FilesystemConflictError("A file or directory with that name already exists") from error
+            raise FilesystemConflictError(
+                "A file or directory with that name already exists",
+                code="already_exists",
+            ) from error
         except PermissionError as error:
-            raise FilesystemForbiddenError("Permission denied") from error
+            raise FilesystemForbiddenError("Permission denied", code="permission_denied") from error
         except OSError as error:
-            raise FilesystemInvalidError("Directory could not be created") from error
+            raise FilesystemInvalidError("Directory could not be created", code="create_failed") from error
         return self._entry(target, scope)
+
+    def _delete_directory(self, *, scope: FilesystemScope, path: str) -> None:
+        candidate = Path(path).expanduser()
+        if not candidate.is_absolute():
+            candidate = self.project_root / candidate
+        try:
+            if candidate.is_symlink():
+                raise FilesystemInvalidError("Symbolic links cannot be deleted", code="symlink_delete_forbidden")
+            target = candidate.resolve(strict=True)
+        except FileNotFoundError as error:
+            raise FilesystemNotFoundError("Directory was not found", code="directory_not_found") from error
+        except (OSError, RuntimeError) as error:
+            raise FilesystemInvalidError("Path is invalid", code="invalid_path") from error
+        self._ensure_allowed(target, scope)
+        if self._is_protected_directory(target):
+            raise FilesystemForbiddenError("This directory is protected", code="protected_directory")
+        if not target.is_dir():
+            raise FilesystemInvalidError("Path is not a directory", code="not_directory")
+        try:
+            target.rmdir()
+        except FileNotFoundError as error:
+            raise FilesystemNotFoundError("Directory was not found", code="directory_not_found") from error
+        except PermissionError as error:
+            raise FilesystemForbiddenError("Permission denied", code="permission_denied") from error
+        except OSError as error:
+            if error.errno in {errno.ENOTEMPTY, errno.EEXIST}:
+                raise FilesystemConflictError("Directory is not empty", code="directory_not_empty") from error
+            raise FilesystemInvalidError("Directory could not be deleted", code="delete_failed") from error
 
     def _requested_path(self, value: str | None) -> Path:
         if value is None or not value.strip():
@@ -165,7 +209,7 @@ class FilesystemBrowser:
         try:
             return expanded.resolve(strict=False)
         except (OSError, RuntimeError) as error:
-            raise FilesystemInvalidError("Path is invalid") from error
+            raise FilesystemInvalidError("Path is invalid", code="invalid_path") from error
 
     def _resolve_request(self, requested: Path, mode: FilesystemMode) -> _ResolvedRequest:
         try:
@@ -174,17 +218,17 @@ class FilesystemBrowser:
                     return _ResolvedRequest(requested, None)
                 if mode == "file" and requested.is_file():
                     return _ResolvedRequest(requested.parent, requested.name)
-                raise FilesystemInvalidError("Path is not a directory")
+                raise FilesystemInvalidError("Path is not a directory", code="not_directory")
             parent = requested.parent
             if not parent.exists():
-                raise FilesystemNotFoundError("Parent directory was not found")
+                raise FilesystemNotFoundError("Parent directory was not found", code="parent_not_found")
             if not parent.is_dir():
-                raise FilesystemInvalidError("Parent path is not a directory")
+                raise FilesystemInvalidError("Parent path is not a directory", code="parent_not_directory")
             return _ResolvedRequest(parent, requested.name or None)
         except PermissionError as error:
-            raise FilesystemForbiddenError("Permission denied") from error
+            raise FilesystemForbiddenError("Permission denied", code="permission_denied") from error
         except OSError as error:
-            raise FilesystemInvalidError("Path could not be inspected") from error
+            raise FilesystemInvalidError("Path could not be inspected", code="inspect_failed") from error
 
     def _entries(
         self,
@@ -196,11 +240,11 @@ class FilesystemBrowser:
         try:
             children = list(directory.iterdir())
         except FileNotFoundError as error:
-            raise FilesystemNotFoundError("Directory was not found") from error
+            raise FilesystemNotFoundError("Directory was not found", code="directory_not_found") from error
         except PermissionError as error:
-            raise FilesystemForbiddenError("Permission denied") from error
+            raise FilesystemForbiddenError("Permission denied", code="permission_denied") from error
         except OSError as error:
-            raise FilesystemInvalidError("Directory could not be read") from error
+            raise FilesystemInvalidError("Directory could not be read", code="read_failed") from error
         query = search.casefold().strip()
         entries = [
             self._entry(child, scope)
@@ -219,10 +263,12 @@ class FilesystemBrowser:
             else:
                 kind = "other"
             navigable = kind == "directory" and self._is_allowed(path, scope)
+            deletable = navigable and not is_symlink and not self._is_protected_directory(path)
         except (OSError, RuntimeError):
             is_symlink = False
             kind = "other"
             navigable = False
+            deletable = False
         return FilesystemEntryResponse(
             name=path.name,
             path=str(path),
@@ -230,6 +276,7 @@ class FilesystemBrowser:
             kind=kind,
             is_symlink=is_symlink,
             navigable=navigable,
+            deletable=deletable,
         )
 
     def _locations(self, scope: FilesystemScope) -> list[FilesystemLocationResponse]:
@@ -276,7 +323,14 @@ class FilesystemBrowser:
 
     def _ensure_allowed(self, path: Path, scope: FilesystemScope) -> None:
         if not self._is_allowed(path, scope):
-            raise FilesystemForbiddenError("Path is outside the allowed scope")
+            raise FilesystemForbiddenError("Path is outside the allowed scope", code="outside_scope")
+
+    def _is_protected_directory(self, path: Path) -> bool:
+        try:
+            resolved = path.resolve(strict=False)
+        except (OSError, RuntimeError):
+            return True
+        return resolved in {self.project_root, self.home, *self.host_roots}
 
 
 def path_breadcrumbs(
@@ -330,8 +384,10 @@ def _is_hidden(path: Path) -> bool:
 
 
 def _root_label(path: Path) -> str:
+    if path.parent != path:
+        return path.name or str(path)
     anchor = path.anchor.rstrip("/\\")
-    return anchor or str(path)
+    return anchor or path.anchor or str(path)
 
 
 def _system_roots() -> tuple[Path, ...]:

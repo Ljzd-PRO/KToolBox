@@ -39,7 +39,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Warn and atomically create a minimal `ktoolbox.toml` when the selected WebUI project does not have one yet.
 - Add rate-limited authentication with hashed opaque sessions, strict cookies, CSRF and Origin validation, security headers, redacted configuration snapshots, and a persistent project lock.
 - Add bilingual, responsive light/dark workflows for project overview, `.env`/`prod.env` and TOML editing, author roster, recursive blockers, Pawchive creator/post queries, revision inspection, site version, and task creation.
-- Add authenticated remote filesystem pickers to every filesystem-backed WebUI path field, with project/host scopes, breadcrumbs, search, hidden-item control, pagination, safe directory creation, and manual path entry.
+- Add authenticated remote filesystem pickers to every filesystem-backed WebUI path field, with localized project/host locations, breadcrumbs, search, a labelled hidden-item control, pagination, explicit directory creation, confirmed empty-directory deletion, and manual path entry.
 - Generate readable bilingual form labels and descriptions from Pydantic metadata and English/Chinese configuration docstrings; include source indicators, secret masking, typed and advanced editors, validation, diff preview, ETag conflict detection, and atomic writes.
 - Add a WAL-backed SQLite queue with concurrent scheduling, resource blocking and deduplication, immutable attempts, pause/resume/stop/edit/reorder/rerun/delete actions, restart recovery, SSE replay, aggregate/per-file speeds, ETA, and structured logs.
 - Add ownership-aware output cleanup previews that skip symbolic links and any pre-existing, shared, or modified files.
