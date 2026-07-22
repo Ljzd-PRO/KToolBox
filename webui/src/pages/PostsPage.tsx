@@ -1,4 +1,5 @@
 import { Alert, Button, Chip, Surface, Table, toast } from "@heroui/react";
+import type { SortDescriptor } from "@heroui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   IconChevronDown as ChevronDown,
@@ -15,7 +16,7 @@ import {
   IconUser as UserRound,
   IconX as X,
 } from "@tabler/icons-react";
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -27,14 +28,17 @@ import {
   FormSwitchField,
   FormSurface,
   IconButton,
+  MobileSortControls,
   NumberInput,
   PageHeader,
   PageLoading,
   SelectField,
+  SortableColumn,
 } from "../components/ui";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { formatDateTime } from "../lib/format";
+import { stableSort } from "../lib/sorting";
 import { downloadTaskTargetKey } from "../lib/taskPresentation";
 import type { DownloadTaskSpec, PawchivePost, PawchiveRevision, TaskRecord } from "../types";
 
@@ -57,6 +61,10 @@ export function PostsPage() {
   const [output, setOutput] = useState("downloads");
   const [dumpMetadata, setDumpMetadata] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: "published",
+    direction: "descending",
+  });
 
   const detailsQuery = useQuery({
     queryKey: ["post-details", selected?.service, selected?.user, selected?.id, selectedRevision],
@@ -147,6 +155,26 @@ export function PostsPage() {
       label: t("posts.revisionLabel", { id: revision.revision_id }),
     })),
   ];
+  const sortedResults = useMemo(
+    () => stableSort(
+      results,
+      sortDescriptor,
+      (post, column) => {
+        if (column === "post") return post.title || post.id;
+        if (column === "creator") return post.user;
+        if (column === "service") return post.service;
+        return post.published ? Date.parse(String(post.published)) : null;
+      },
+      i18n.resolvedLanguage ?? i18n.language,
+    ),
+    [i18n.language, i18n.resolvedLanguage, results, sortDescriptor],
+  );
+  const sortOptions = [
+    { value: "post", label: t("posts.post") },
+    { value: "creator", label: t("posts.creatorId") },
+    { value: "service", label: t("posts.service") },
+    { value: "published", label: t("posts.published") },
+  ];
 
   return (
     <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6">
@@ -178,17 +206,28 @@ export function PostsPage() {
         {!searched ? <EmptyPanel description={t("posts.searchHint")} title={t("posts.searchReady")} /> : null}
         {results.length ? (
           <>
+            <MobileSortControls
+              className="lg:hidden"
+              descendingByDefault={new Set(["published"])}
+              descriptor={sortDescriptor}
+              options={sortOptions}
+              onChange={(descriptor) => descriptor && setSortDescriptor(descriptor)}
+            />
             <DataTableFrame className="hidden lg:block">
-              <Table.Content aria-label={t("posts.results")}>
+              <Table.Content
+                aria-label={t("posts.results")}
+                sortDescriptor={sortDescriptor}
+                onSortChange={setSortDescriptor}
+              >
                     <Table.Header>
-                      <Table.Column isRowHeader>{t("posts.post")}</Table.Column>
-                      <Table.Column>{t("posts.creatorId")}</Table.Column>
-                      <Table.Column>{t("posts.service")}</Table.Column>
-                      <Table.Column>{t("posts.published")}</Table.Column>
+                      <SortableColumn id="post" isRowHeader>{t("posts.post")}</SortableColumn>
+                      <SortableColumn id="creator">{t("posts.creatorId")}</SortableColumn>
+                      <SortableColumn id="service">{t("posts.service")}</SortableColumn>
+                      <SortableColumn id="published">{t("posts.published")}</SortableColumn>
                       <Table.Column>{t("common.actions")}</Table.Column>
                     </Table.Header>
                     <Table.Body>
-                      {results.map((post) => (
+                      {sortedResults.map((post) => (
                         <Table.Row id={`${post.service}:${post.user}:${post.id}`} key={`${post.service}:${post.user}:${post.id}`}>
                           <Table.Cell><p className="max-w-md truncate font-medium">{post.title || `#${post.id}`}</p></Table.Cell>
                           <Table.Cell><code className="text-xs">{post.user}</code></Table.Cell>
@@ -201,7 +240,7 @@ export function PostsPage() {
               </Table.Content>
             </DataTableFrame>
             <div className="grid gap-3 lg:hidden">
-              {results.map((post) => (
+              {sortedResults.map((post) => (
                 <Surface className="data-mobile-card grid gap-3 rounded-lg border border-border p-4" key={`${post.service}:${post.user}:${post.id}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0"><p className="truncate font-medium">{post.title || `#${post.id}`}</p><p className="mt-1 text-xs text-muted">{post.service}:{post.user}</p></div>

@@ -5,12 +5,14 @@ import {
   Table,
   toast,
 } from "@heroui/react";
+import type { SortDescriptor } from "@heroui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   IconArrowDown as ArrowDown,
   IconArrowLeft as ArrowLeft,
   IconArrowUp as ArrowUp,
   IconEye as Eye,
+  IconFilter as Filter,
   IconPencil as Pencil,
   IconPlayerPause as Pause,
   IconPlayerPlay as Play,
@@ -19,9 +21,9 @@ import {
   IconTrash as Trash2,
   IconX as X,
 } from "@tabler/icons-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import { TaskEditor } from "../components/TaskEditor";
 import { TaskTarget } from "../components/TaskTarget";
@@ -30,15 +32,25 @@ import {
   DataTableFrame,
   EmptyPanel,
   FormCheckbox,
+  FormSurface,
   IconButton,
+  MobileSortControls,
   PageHeader,
   PageLoading,
   ProgressMeter,
+  SelectField,
+  SortableColumn,
   TaskStatusChip,
 } from "../components/ui";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { formatBytes, formatDateTime, formatDuration, taskPercent } from "../lib/format";
+import {
+  normalizeTableSort,
+  stableSort,
+  taskStatusRank,
+  taskTargetSortText,
+} from "../lib/sorting";
 import type {
   CreatorRosterItem,
   TaskAttempt,
@@ -55,20 +67,42 @@ const resumable = new Set<TaskStatus>(["paused", "stopped", "completed", "failed
 const editable = new Set<TaskStatus>(["queued", "blocked", "paused", "stopped", "completed", "failed", "interrupted"]);
 const deletable = new Set<TaskStatus>(["paused", "stopped", "completed", "failed", "interrupted"]);
 const speedVisible = new Set<TaskStatus>(["running", "pause_requested", "stop_requested"]);
+const descendingTaskColumns = new Set(["progress", "speed", "created"]);
+
+type TaskStatusFilter =
+  | "all"
+  | "active"
+  | "waiting"
+  | "paused"
+  | "completed"
+  | "failed"
+  | "stopped"
+  | "interrupted";
 
 export function TasksPage() {
   const { t } = useTranslation();
   const { taskId } = useParams();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { session } = useAuth();
   const queryClient = useQueryClient();
   const tasksQuery = useQuery({ queryKey: ["tasks"], queryFn: () => api<TaskRecord[]>("/tasks") });
   const creatorsQuery = useQuery({ queryKey: ["creators"], queryFn: () => api<CreatorRosterItem[]>("/creators") });
-  const [editor, setEditor] = useState<TaskRecord | "new" | null>(null);
+  const [editor, setEditor] = useState<TaskRecord | "new" | null>(() =>
+    searchParams.get("create") === "sync" ? "new" : null,
+  );
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState<TaskRecord | null>(null);
   const [deleteOutput, setDeleteOutput] = useState(false);
+  const statusFilter = taskStatusFilter(searchParams.get("status"));
   useTaskStream(queryClient);
+
+  useEffect(() => {
+    if (searchParams.get("create") !== "sync") return;
+    const next = new URLSearchParams(searchParams);
+    next.delete("create");
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const cleanupQuery = useQuery({
     queryKey: ["task-cleanup", removing?.id],
@@ -172,6 +206,13 @@ export function TasksPage() {
     reorder: (task, position) => void reorder(task, position),
   };
 
+  function changeStatusFilter(value: string) {
+    const next = new URLSearchParams(searchParams);
+    if (value === "all") next.delete("status");
+    else next.set("status", value);
+    setSearchParams(next, { replace: true });
+  }
+
   return (
     <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6">
       {taskId && selected ? (
@@ -183,7 +224,13 @@ export function TasksPage() {
           onBack={() => navigate("/tasks")}
         />
       ) : (
-        <TaskList tasks={tasks} handlers={handlers} onCreate={() => setEditor("new")} />
+        <TaskList
+          handlers={handlers}
+          statusFilter={statusFilter}
+          tasks={tasks}
+          onCreate={() => setEditor("new")}
+          onStatusFilterChange={changeStatusFilter}
+        />
       )}
 
       {editor ? (
@@ -243,8 +290,68 @@ type TaskHandlers = {
   reorder: (task: TaskRecord, position: number) => void;
 };
 
-function TaskList({ tasks, handlers, onCreate }: { tasks: TaskRecord[]; handlers: TaskHandlers; onCreate: () => void }) {
+function TaskList({
+  tasks,
+  handlers,
+  statusFilter,
+  onCreate,
+  onStatusFilterChange,
+}: {
+  tasks: TaskRecord[];
+  handlers: TaskHandlers;
+  statusFilter: TaskStatusFilter;
+  onCreate: () => void;
+  onStatusFilterChange: (value: string) => void;
+}) {
   const { t, i18n } = useTranslation();
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor | null>(null);
+  const filteredTasks = useMemo(
+    () => tasks.filter((task) => matchesTaskStatus(task.status, statusFilter)),
+    [statusFilter, tasks],
+  );
+  const visibleTasks = useMemo(() => {
+    if (!sortDescriptor) return [...filteredTasks].sort((left, right) => left.position - right.position);
+    return stableSort(
+      filteredTasks,
+      sortDescriptor,
+      (task, column) => {
+        if (column === "target") return taskTargetSortText(task);
+        if (column === "status") return taskStatusRank(task.status);
+        if (column === "progress") {
+          return taskPercent(
+            task.progress.processed_files,
+            task.progress.queued_files,
+            task.progress.transferred_bytes,
+            task.progress.total_bytes,
+          );
+        }
+        if (column === "speed") return taskSpeed(task);
+        if (column === "output") return task.spec.output;
+        return Date.parse(task.created_at);
+      },
+      i18n.resolvedLanguage ?? i18n.language,
+    );
+  }, [filteredTasks, i18n.language, i18n.resolvedLanguage, sortDescriptor]);
+  const reorderLocked = statusFilter !== "all" || sortDescriptor !== null;
+  const statusOptions = [
+    { value: "all", label: t("tasks.allStatuses") },
+    { value: "active", label: t("tasks.activeStatuses") },
+    { value: "waiting", label: t("tasks.waitingStatuses") },
+    { value: "paused", label: t("tasks.statuses.paused") },
+    { value: "completed", label: t("tasks.statuses.completed") },
+    { value: "failed", label: t("tasks.statuses.failed") },
+    { value: "stopped", label: t("tasks.statuses.stopped") },
+    { value: "interrupted", label: t("tasks.statuses.interrupted") },
+  ];
+  const sortOptions = [
+    { value: "queue", label: t("tasks.queueOrder") },
+    { value: "target", label: t("tasks.target") },
+    { value: "status", label: t("common.status") },
+    { value: "progress", label: t("tasks.progress") },
+    { value: "speed", label: t("tasks.totalSpeed") },
+    { value: "output", label: t("tasks.output") },
+    { value: "created", label: t("common.created") },
+  ];
   return (
     <>
       <PageHeader
@@ -252,21 +359,50 @@ function TaskList({ tasks, handlers, onCreate }: { tasks: TaskRecord[]; handlers
         title={t("tasks.title")}
         actions={<Button variant="primary" onPress={onCreate}><Plus aria-hidden="true" size={18} />{t("tasks.create")}</Button>}
       />
-      {!tasks.length ? <EmptyPanel title={t("tasks.empty")} /> : (
+      <FormSurface className="grid gap-3 p-3 xl:grid-cols-[minmax(0,16rem)_minmax(0,1fr)]">
+        <SelectField
+          icon={Filter}
+          label={t("tasks.statusFilter")}
+          options={statusOptions}
+          value={statusFilter}
+          onChange={onStatusFilterChange}
+        />
+        <MobileSortControls
+          className="xl:hidden"
+          defaultValue="queue"
+          descendingByDefault={descendingTaskColumns}
+          descriptor={sortDescriptor}
+          options={sortOptions}
+          onChange={setSortDescriptor}
+        />
+      </FormSurface>
+      {reorderLocked ? (
+        <Chip color="warning" size="sm" variant="soft">
+          {sortDescriptor ? t("tasks.sortedView") : t("tasks.filteredView")}
+        </Chip>
+      ) : null}
+      {!visibleTasks.length ? <EmptyPanel title={t("tasks.empty")} /> : (
         <>
           <DataTableFrame className="hidden xl:block">
-            <Table.Content aria-label={t("tasks.title")} className="task-table-content min-w-[940px]">
+            <Table.Content
+              aria-label={t("tasks.title")}
+              className="task-table-content min-w-[940px]"
+              sortDescriptor={sortDescriptor ?? undefined}
+              onSortChange={(next) => setSortDescriptor(
+                normalizeTableSort(sortDescriptor, next, descendingTaskColumns),
+              )}
+            >
               <Table.Header>
-                <Table.Column isRowHeader>{t("tasks.target")}</Table.Column>
-                <Table.Column>{t("common.status")}</Table.Column>
-                <Table.Column>{t("tasks.progress")}</Table.Column>
-                <Table.Column>{t("tasks.totalSpeed")}</Table.Column>
-                <Table.Column>{t("tasks.output")}</Table.Column>
-                <Table.Column>{t("common.created")}</Table.Column>
+                <SortableColumn id="target" isRowHeader>{t("tasks.target")}</SortableColumn>
+                <SortableColumn id="status">{t("common.status")}</SortableColumn>
+                <SortableColumn id="progress">{t("tasks.progress")}</SortableColumn>
+                <SortableColumn id="speed">{t("tasks.totalSpeed")}</SortableColumn>
+                <SortableColumn id="output">{t("tasks.output")}</SortableColumn>
+                <SortableColumn id="created">{t("common.created")}</SortableColumn>
                 <Table.Column>{t("common.actions")}</Table.Column>
               </Table.Header>
               <Table.Body>
-                {tasks.map((task, index) => (
+                {visibleTasks.map((task, index) => (
                   <Table.Row className="task-table-row" id={task.id} key={task.id}>
                     <Table.Cell className="w-56 min-w-56 max-w-56"><TaskTarget task={task} /></Table.Cell>
                     <Table.Cell className="min-w-24"><TaskStatusChip status={task.status} /></Table.Cell>
@@ -274,14 +410,14 @@ function TaskList({ tasks, handlers, onCreate }: { tasks: TaskRecord[]; handlers
                     <Table.Cell className="min-w-20 whitespace-nowrap text-sm font-medium tabular-nums">{formatBytes(taskSpeed(task), "/s")}</Table.Cell>
                     <Table.Cell><code className="block max-w-28 truncate text-xs text-muted" title={task.spec.output}>{task.spec.output}</code></Table.Cell>
                     <Table.Cell className="w-24 max-w-24 text-xs leading-relaxed text-muted"><TaskCreatedTime locale={i18n.language} value={task.created_at} /></Table.Cell>
-                    <Table.Cell className="w-[196px] min-w-[196px]"><TaskActions canMoveDown={index < tasks.length - 1} canMoveUp={index > 0} task={task} handlers={handlers} /></Table.Cell>
+                    <Table.Cell className="w-[196px] min-w-[196px]"><TaskActions canMoveDown={index < visibleTasks.length - 1} canMoveUp={index > 0} reorderLocked={reorderLocked} task={task} handlers={handlers} /></Table.Cell>
                   </Table.Row>
                 ))}
               </Table.Body>
             </Table.Content>
           </DataTableFrame>
           <div className="grid gap-3 xl:hidden">
-            {tasks.map((task, index) => (
+            {visibleTasks.map((task, index) => (
               <Surface className="data-mobile-card task-mobile-card grid gap-4 rounded-lg border border-border p-4" key={task.id}>
                 <div className="flex min-w-0 items-start gap-3">
                   <div className="min-w-0 flex-1"><TaskTarget task={task} /></div>
@@ -298,7 +434,7 @@ function TaskList({ tasks, handlers, onCreate }: { tasks: TaskRecord[]; handlers
                   <code className="truncate" title={task.spec.output}>{task.spec.output}</code>
                   <span>{formatDateTime(task.created_at, i18n.language)}</span>
                 </div>
-                <TaskActions mobile canMoveDown={index < tasks.length - 1} canMoveUp={index > 0} task={task} handlers={handlers} />
+                <TaskActions mobile canMoveDown={index < visibleTasks.length - 1} canMoveUp={index > 0} reorderLocked={reorderLocked} task={task} handlers={handlers} />
               </Surface>
             ))}
           </div>
@@ -343,12 +479,14 @@ function TaskActions({
   handlers,
   canMoveUp,
   canMoveDown,
+  reorderLocked,
   mobile = false,
 }: {
   task: TaskRecord;
   handlers: TaskHandlers;
   canMoveUp: boolean;
   canMoveDown: boolean;
+  reorderLocked: boolean;
   mobile?: boolean;
 }) {
   const { t } = useTranslation();
@@ -372,8 +510,8 @@ function TaskActions({
       />
       <IconButton icon={Square} isDisabled={!canStop} label={t("tasks.stop")} tooltip={canStop ? t("tasks.stop") : unavailable(t("tasks.stop"))} onPress={() => handlers.stop(task)} />
       <IconButton icon={Pencil} isDisabled={!canEdit} label={t("common.edit")} tooltip={canEdit ? t("common.edit") : unavailable(t("common.edit"))} onPress={() => handlers.edit(task)} />
-      <IconButton icon={ArrowUp} isDisabled={!canMoveUp} label={t("tasks.moveUp")} tooltip={canMoveUp ? t("tasks.moveUp") : t("tasks.firstInQueue")} onPress={() => handlers.reorder(task, Math.max(1, task.position - 1))} />
-      <IconButton icon={ArrowDown} isDisabled={!canMoveDown} label={t("tasks.moveDown")} tooltip={canMoveDown ? t("tasks.moveDown") : t("tasks.lastInQueue")} onPress={() => handlers.reorder(task, task.position + 1)} />
+      <IconButton icon={ArrowUp} isDisabled={reorderLocked || !canMoveUp} label={t("tasks.moveUp")} tooltip={reorderLocked ? t("tasks.filteredView") : canMoveUp ? t("tasks.moveUp") : t("tasks.firstInQueue")} onPress={() => handlers.reorder(task, Math.max(1, task.position - 1))} />
+      <IconButton icon={ArrowDown} isDisabled={reorderLocked || !canMoveDown} label={t("tasks.moveDown")} tooltip={reorderLocked ? t("tasks.filteredView") : canMoveDown ? t("tasks.moveDown") : t("tasks.lastInQueue")} onPress={() => handlers.reorder(task, task.position + 1)} />
       <IconButton className="text-danger" icon={Trash2} isDisabled={!canDelete} label={t("common.delete")} tooltip={canDelete ? t("common.delete") : unavailable(t("common.delete"))} onPress={() => handlers.remove(task)} />
     </div>
   );
@@ -473,6 +611,26 @@ function eventMessage(event: TaskEvent): string {
   if (typeof event.data.filename === "string") return event.data.filename;
   if (typeof event.data.status === "string") return event.data.status;
   return "";
+}
+
+function taskStatusFilter(value: string | null): TaskStatusFilter {
+  const filters: TaskStatusFilter[] = [
+    "active",
+    "waiting",
+    "paused",
+    "completed",
+    "failed",
+    "stopped",
+    "interrupted",
+  ];
+  return filters.includes(value as TaskStatusFilter) ? value as TaskStatusFilter : "all";
+}
+
+function matchesTaskStatus(status: TaskStatus, filter: TaskStatusFilter): boolean {
+  if (filter === "all") return true;
+  if (filter === "active") return ["running", "pause_requested", "stop_requested"].includes(status);
+  if (filter === "waiting") return ["queued", "blocked"].includes(status);
+  return status === filter;
 }
 
 function useTaskStream(queryClient: ReturnType<typeof useQueryClient>) {

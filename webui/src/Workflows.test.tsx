@@ -28,6 +28,29 @@ afterEach(() => {
 });
 
 describe("project workflows", () => {
+  it("navigates from overview statistics with a durable filter", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const path = String(input);
+        if (path.endsWith("/session")) return json(session);
+        if (path.endsWith("/project")) {
+          return json({ name: "Fixture", root: "/fixture", project_config: "/fixture/ktoolbox.toml", dotenv_files: [], version: "1.0.0" });
+        }
+        if (path.endsWith("/tasks")) return json([]);
+        if (path.endsWith("/creators")) return json([]);
+        throw new Error(`Unexpected request: ${path}`);
+      }),
+    );
+
+    render(<BrowserRouter><App /></BrowserRouter>);
+    await user.click(await screen.findByRole("link", { name: "Active tasks: 0" }));
+    expect(window.location.pathname).toBe("/tasks");
+    expect(window.location.search).toBe("?status=active");
+    expect(await screen.findByRole("button", { name: /Active/ })).toBeInTheDocument();
+  });
+
   it("renders the creator roster with readable labels", async () => {
     const user = userEvent.setup();
     window.history.replaceState({}, "", "/creators");
@@ -37,7 +60,7 @@ describe("project workflows", () => {
         const path = String(input);
         if (path.endsWith("/session")) return json(session);
         if (path.endsWith("/creators")) {
-          return json([{ service: "fanbox", creator_id: "42", alias: "Studio Sample", enabled: true }]);
+          return json([{ service: "fanbox", creator_id: "42", alias: null, enabled: true, name: "Studio Sample" }]);
         }
         throw new Error(`Unexpected request: ${path}`);
       }),
@@ -48,6 +71,7 @@ describe("project workflows", () => {
     expect(await screen.findByRole("heading", { name: "Creators" })).toBeInTheDocument();
     expect((await screen.findAllByText("Studio Sample")).length).toBeGreaterThan(0);
     expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual([
+      "Creator name",
       "Creator ID",
       "Platform",
       "Note",
@@ -81,7 +105,7 @@ describe("project workflows", () => {
         const path = String(input);
         if (path.endsWith("/session")) return json(session);
         if (path.endsWith("/creators")) {
-          return json([{ service: "fanbox", creator_id: "42", alias: "Studio Sample", enabled: true }]);
+          return json([{ service: "fanbox", creator_id: "42", alias: null, enabled: true, name: "Studio Sample" }]);
         }
         if (path.endsWith("/blockers")) {
           return json({

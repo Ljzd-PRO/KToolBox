@@ -28,6 +28,7 @@ import {
   cn,
   useOverlayState,
 } from "@heroui/react";
+import type { SortDescriptor } from "@heroui/react";
 import type { DateValue } from "@internationalized/date";
 import { DateRangePickerStateContext } from "react-aria-components";
 import {
@@ -39,6 +40,9 @@ import {
   IconCalendarOff as CalendarOff,
   IconMinus as Minus,
   IconPlus as Plus,
+  IconArrowsSort as ArrowsSort,
+  IconSortAscending as SortAscending,
+  IconSortDescending as SortDescending,
   IconSearch as Search,
   IconX as X,
   type TablerIcon,
@@ -79,6 +83,31 @@ export function DataTableFrame({ children, className }: { children: ReactNode; c
     <Table className={className} variant="secondary">
       <Table.ScrollContainer className="app-table-frame">{children}</Table.ScrollContainer>
     </Table>
+  );
+}
+
+export function SortableColumn({
+  id,
+  children,
+  className,
+  isRowHeader = false,
+}: {
+  id: string;
+  children: ReactNode;
+  className?: string;
+  isRowHeader?: boolean;
+}) {
+  return (
+    <Table.Column allowsSorting className={className} id={id} isRowHeader={isRowHeader}>
+      {({ sortDirection }) => (
+        <Table.SortableColumnHeader sortDirection={sortDirection}>
+          <span className="inline-flex items-center gap-1.5">
+            {children}
+            {!sortDirection ? <ArrowsSort aria-hidden="true" className="text-muted" size={14} /> : null}
+          </span>
+        </Table.SortableColumnHeader>
+      )}
+    </Table.Column>
   );
 }
 
@@ -1004,6 +1033,54 @@ export function SelectField({
         </ListBox>
       </Select.Popover>
     </Select>
+  );
+}
+
+export function MobileSortControls({
+  descriptor,
+  options,
+  defaultValue,
+  descendingByDefault,
+  onChange,
+  className,
+}: {
+  descriptor: SortDescriptor | null;
+  options: SelectOption[];
+  defaultValue?: string;
+  descendingByDefault?: ReadonlySet<string>;
+  onChange: (descriptor: SortDescriptor | null) => void;
+  className?: string;
+}) {
+  const { t } = useTranslation();
+  const value = descriptor ? String(descriptor.column) : defaultValue ?? "";
+  const direction = descriptor?.direction ?? "ascending";
+  const nextDirection = direction === "ascending" ? "descending" : "ascending";
+  return (
+    <div className={cn("mobile-sort-controls grid grid-cols-[minmax(0,1fr)_2.75rem] items-end gap-2", className)}>
+      <SelectField
+        icon={ArrowsSort}
+        label={t("common.sortBy")}
+        options={options}
+        value={value}
+        onChange={(column) => {
+          if (column === defaultValue) {
+            onChange(null);
+            return;
+          }
+          onChange({
+            column,
+            direction: descendingByDefault?.has(column) ? "descending" : "ascending",
+          });
+        }}
+      />
+      <IconButton
+        icon={direction === "ascending" ? SortAscending : SortDescending}
+        isDisabled={!descriptor}
+        label={t(`common.${nextDirection}`)}
+        tooltip={t("common.changeSortDirection", { direction: t(`common.${nextDirection}`) })}
+        onPress={() => descriptor && onChange({ ...descriptor, direction: nextDirection })}
+      />
+    </div>
   );
 }
 

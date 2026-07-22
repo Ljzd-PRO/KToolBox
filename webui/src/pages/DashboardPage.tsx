@@ -1,4 +1,5 @@
 import { Button, Chip, Surface, Table } from "@heroui/react";
+import type { SortDescriptor } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
 import {
   IconAddressBook as BookUser,
@@ -8,12 +9,21 @@ import {
   IconPackages as Boxes,
   IconPlayerPlay as Play,
 } from "@tabler/icons-react";
-import { useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { DataTableFrame, EmptyPanel, PageLoading, TaskStatusChip } from "../components/ui";
+import {
+  DataTableFrame,
+  EmptyPanel,
+  MobileSortControls,
+  PageLoading,
+  SortableColumn,
+  TaskStatusChip,
+} from "../components/ui";
 import { TaskTarget } from "../components/TaskTarget";
 import { api } from "../lib/api";
+import { stableSort, taskStatusRank, taskTargetSortText } from "../lib/sorting";
 import type { CreatorRosterItem, ProjectSummary, TaskRecord } from "../types";
 
 export function DashboardPage() {
@@ -22,35 +32,64 @@ export function DashboardPage() {
   const project = useQuery({ queryKey: ["project"], queryFn: () => api<ProjectSummary>("/project") });
   const tasks = useQuery({ queryKey: ["tasks"], queryFn: () => api<TaskRecord[]>("/tasks"), refetchInterval: 2000 });
   const creators = useQuery({ queryKey: ["creators"], queryFn: () => api<CreatorRosterItem[]>("/creators") });
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: "created",
+    direction: "descending",
+  });
 
-  if (project.isLoading || tasks.isLoading || creators.isLoading) return <PageLoading />;
-  const records = tasks.data ?? [];
+  const records = useMemo(() => tasks.data ?? [], [tasks.data]);
   const stats = [
     {
       label: t("overview.active"),
       value: records.filter((task) => ["running", "pause_requested", "stop_requested"].includes(task.status)).length,
       icon: Play,
       tone: "blue",
+      href: "/tasks?status=active",
     },
     {
       label: t("overview.queued"),
       value: records.filter((task) => ["queued", "blocked"].includes(task.status)).length,
       icon: Clock3,
       tone: "yellow",
+      href: "/tasks?status=waiting",
     },
     {
       label: t("overview.completed"),
       value: records.filter((task) => task.status === "completed").length,
       icon: CheckCircle2,
       tone: "green",
+      href: "/tasks?status=completed",
     },
     {
       label: t("overview.creators"),
       value: (creators.data ?? []).filter((creator) => creator.enabled).length,
       icon: BookUser,
       tone: "teal",
+      href: "/creators?status=enabled",
     },
   ];
+  const recentRecords = useMemo(() => {
+    const latest = [...records]
+      .sort((left, right) => Date.parse(right.created_at) - Date.parse(left.created_at))
+      .slice(0, 6);
+    return stableSort(
+      latest,
+      sortDescriptor,
+      (task, column) => {
+        if (column === "target") return taskTargetSortText(task);
+        if (column === "status") return taskStatusRank(task.status);
+        return Date.parse(task.created_at);
+      },
+      i18n.resolvedLanguage ?? i18n.language,
+    );
+  }, [i18n.language, i18n.resolvedLanguage, records, sortDescriptor]);
+  const sortOptions = [
+    { value: "target", label: t("tasks.target") },
+    { value: "status", label: t("common.status") },
+    { value: "created", label: t("common.created") },
+  ];
+
+  if (project.isLoading || tasks.isLoading || creators.isLoading) return <PageLoading />;
 
   return (
     <div className="grid gap-5">
@@ -74,16 +113,21 @@ export function DashboardPage() {
       </section>
 
       <section aria-label={t("overview.statistics")} className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {stats.map(({ label, value, icon: Icon, tone }) => (
-          <Surface className="stat-tile rounded-lg border border-border p-4" data-tone={tone} key={label}>
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <span className="text-sm font-medium text-muted">{label}</span>
-              <span className="stat-icon grid size-9 place-items-center rounded-lg" aria-hidden="true">
-                <Icon size={18} />
-              </span>
-            </div>
-            <div className="text-3xl font-semibold tabular-nums text-foreground">{value}</div>
-          </Surface>
+        {stats.map(({ label, value, icon: Icon, tone, href }) => (
+          <Link aria-label={`${label}: ${value}`} className="stat-link rounded-lg" key={label} to={href}>
+            <Surface className="stat-tile h-full rounded-lg border border-border p-4" data-tone={tone}>
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <span className="text-sm font-medium text-muted">{label}</span>
+                <span className="stat-icon grid size-9 place-items-center rounded-lg" aria-hidden="true">
+                  <Icon size={18} />
+                </span>
+              </div>
+              <div className="flex items-end justify-between gap-3">
+                <div className="text-3xl font-semibold tabular-nums text-foreground">{value}</div>
+                <ArrowRight aria-hidden="true" className="stat-arrow text-muted" size={17} />
+              </div>
+            </Surface>
+          </Link>
         ))}
       </section>
 
@@ -97,16 +141,27 @@ export function DashboardPage() {
         </div>
         {records.length ? (
           <>
+            <MobileSortControls
+              className="lg:hidden"
+              descendingByDefault={new Set(["created"])}
+              descriptor={sortDescriptor}
+              options={sortOptions}
+              onChange={(descriptor) => descriptor && setSortDescriptor(descriptor)}
+            />
             <DataTableFrame className="hidden lg:block">
-              <Table.Content aria-label={t("overview.recent")}>
+              <Table.Content
+                aria-label={t("overview.recent")}
+                sortDescriptor={sortDescriptor}
+                onSortChange={setSortDescriptor}
+              >
                   <Table.Header>
-                    <Table.Column isRowHeader>{t("tasks.target")}</Table.Column>
-                    <Table.Column>{t("common.status")}</Table.Column>
-                    <Table.Column>{t("common.created")}</Table.Column>
+                    <SortableColumn id="target" isRowHeader>{t("tasks.target")}</SortableColumn>
+                    <SortableColumn id="status">{t("common.status")}</SortableColumn>
+                    <SortableColumn id="created">{t("common.created")}</SortableColumn>
                     <Table.Column className="text-right">{t("common.actions")}</Table.Column>
                   </Table.Header>
                   <Table.Body>
-                    {records.slice(0, 6).map((task) => (
+                    {recentRecords.map((task) => (
                       <Table.Row key={task.id}>
                         <Table.Cell className="min-w-60"><TaskTarget task={task} /></Table.Cell>
                         <Table.Cell>
@@ -135,7 +190,7 @@ export function DashboardPage() {
               </Table.Content>
             </DataTableFrame>
             <div className="grid gap-3 lg:hidden">
-              {records.slice(0, 6).map((task) => (
+              {recentRecords.map((task) => (
                 <Surface className="grid gap-3 rounded-lg border border-border p-4" key={task.id}>
                   <div className="flex min-w-0 items-start justify-between gap-3">
                     <TaskTarget task={task} />

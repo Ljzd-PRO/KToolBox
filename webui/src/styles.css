@@ -352,6 +352,36 @@ code {
   color: var(--ktoolbox-teal);
 }
 
+.stat-link {
+  display: block;
+  color: inherit;
+  outline: none;
+}
+
+.stat-link .stat-tile {
+  transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+}
+
+.stat-link:hover .stat-tile {
+  border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
+  background: var(--surface-secondary);
+}
+
+.stat-link:focus-visible .stat-tile {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.stat-link .stat-arrow {
+  transition: transform 140ms ease, color 140ms ease;
+}
+
+.stat-link:hover .stat-arrow,
+.stat-link:focus-visible .stat-arrow {
+  color: var(--accent-strong);
+  transform: translateX(2px);
+}
+
 .app-table-frame {
   overflow: auto;
   border: 1px solid var(--border);
