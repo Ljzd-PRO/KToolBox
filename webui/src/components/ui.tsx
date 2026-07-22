@@ -1,12 +1,10 @@
 import {
   Autocomplete,
   Button,
-  Calendar,
   Checkbox,
   Chip,
   Description,
   DateField,
-  DatePicker,
   DateRangePicker,
   EmptyState,
   FieldError,
@@ -31,6 +29,7 @@ import {
   useOverlayState,
 } from "@heroui/react";
 import type { DateValue } from "@internationalized/date";
+import { DateRangePickerStateContext } from "react-aria-components";
 import {
   IconCheck as Check,
   IconChevronDown as ChevronDown,
@@ -45,6 +44,10 @@ import {
   type TablerIcon,
 } from "@tabler/icons-react";
 import {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
   useState,
   type ClipboardEvent,
   type KeyboardEvent,
@@ -478,15 +481,49 @@ export function OptionalDateRangeField({
   }
 
   return (
-    <div className="grid gap-1.5" data-invalid={Boolean(errorMessage) || undefined}>
+    <DateRangePicker className="grid gap-1.5" isInvalid={Boolean(errorMessage)}>
       <FieldLabel icon={icon} label={label} />
-      <div className="optional-date-range-control">
-        <DateBoundaryPicker label={startLabel} value={startValue} onChange={changeStart} />
-        <span aria-hidden="true" className="optional-date-range-separator">–</span>
-        <DateBoundaryPicker label={endLabel} value={endValue} onChange={changeEnd} />
-      </div>
+      <DateField.Group fullWidth variant="secondary">
+        <DateField.InputContainer>
+          <DateField.Input aria-label={startLabel} slot="start">
+            {(segment) => <DateField.Segment segment={segment} />}
+          </DateField.Input>
+          <DateRangePicker.RangeSeparator />
+          <DateField.Input aria-label={endLabel} slot="end">
+            {(segment) => <DateField.Segment segment={segment} />}
+          </DateField.Input>
+        </DateField.InputContainer>
+        <DateField.Suffix>
+          <DateRangePicker.Trigger aria-label={label}>
+            <DateRangePicker.TriggerIndicator />
+          </DateRangePicker.Trigger>
+        </DateField.Suffix>
+      </DateField.Group>
+      <PartialDateRangeStateBridge
+        endValue={endValue}
+        startValue={startValue}
+        onEndChange={changeEnd}
+        onStartChange={changeStart}
+      />
+      <DateRangePicker.Popover>
+        <RangeCalendar aria-label={label}>
+          <RangeCalendar.Header>
+            <RangeCalendar.NavButton slot="previous" />
+            <RangeCalendar.Heading />
+            <RangeCalendar.NavButton slot="next" />
+          </RangeCalendar.Header>
+          <RangeCalendar.Grid>
+            <RangeCalendar.GridHeader>
+              {(day) => <RangeCalendar.HeaderCell>{day}</RangeCalendar.HeaderCell>}
+            </RangeCalendar.GridHeader>
+            <RangeCalendar.GridBody>
+              {(date) => <RangeCalendar.Cell date={date} />}
+            </RangeCalendar.GridBody>
+          </RangeCalendar.Grid>
+        </RangeCalendar>
+      </DateRangePicker.Popover>
       {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
-      <div className="flex flex-wrap gap-x-5 gap-y-1">
+      <div className="optional-date-range-options">
         <FormCheckbox
           icon={CalendarOff}
           isSelected={startUnlimited}
@@ -500,51 +537,62 @@ export function OptionalDateRangeField({
           onChange={toggleEnd}
         />
       </div>
-      {errorMessage ? <p className="text-xs text-danger" role="alert">{errorMessage}</p> : null}
-    </div>
+      {errorMessage ? <FieldError>{errorMessage}</FieldError> : null}
+    </DateRangePicker>
   );
 }
 
-function DateBoundaryPicker({
-  label,
-  value,
-  onChange,
+function PartialDateRangeStateBridge({
+  startValue,
+  endValue,
+  onStartChange,
+  onEndChange,
 }: {
-  label: string;
-  value: DateValue | null;
-  onChange: (value: DateValue | null) => void;
+  startValue: DateValue | null;
+  endValue: DateValue | null;
+  onStartChange: (value: DateValue | null) => void;
+  onEndChange: (value: DateValue | null) => void;
 }) {
-  return (
-    <DatePicker aria-label={label} className="optional-date-boundary" value={value} onChange={onChange}>
-      <DateField.Group fullWidth className="optional-date-boundary-group" variant="secondary">
-        <DateField.Input>
-          {(segment) => <DateField.Segment segment={segment} />}
-        </DateField.Input>
-        <DateField.Suffix>
-          <DatePicker.Trigger aria-label={label}>
-            <DatePicker.TriggerIndicator />
-          </DatePicker.Trigger>
-        </DateField.Suffix>
-      </DateField.Group>
-      <DatePicker.Popover>
-        <Calendar aria-label={label}>
-          <Calendar.Header>
-            <Calendar.NavButton slot="previous" />
-            <Calendar.Heading />
-            <Calendar.NavButton slot="next" />
-          </Calendar.Header>
-          <Calendar.Grid>
-            <Calendar.GridHeader>
-              {(day) => <Calendar.HeaderCell>{day}</Calendar.HeaderCell>}
-            </Calendar.GridHeader>
-            <Calendar.GridBody>
-              {(date) => <Calendar.Cell date={date} />}
-            </Calendar.GridBody>
-          </Calendar.Grid>
-        </Calendar>
-      </DatePicker.Popover>
-    </DatePicker>
-  );
+  const state = useContext(DateRangePickerStateContext);
+  const previousExternal = useRef<{ start: string | null; end: string | null } | null>(null);
+  const synchronizing = useRef(false);
+  const desiredStart = dateValueKey(startValue);
+  const desiredEnd = dateValueKey(endValue);
+  const stateStart = dateValueKey(state?.value.start ?? null);
+  const stateEnd = dateValueKey(state?.value.end ?? null);
+
+  useLayoutEffect(() => {
+    if (!state) return;
+    const previous = previousExternal.current;
+    if (previous?.start === desiredStart && previous.end === desiredEnd) return;
+    previousExternal.current = { start: desiredStart, end: desiredEnd };
+    let changed = false;
+    if (stateStart !== desiredStart) {
+      state.setDateTime("start", startValue);
+      changed = true;
+    }
+    if (stateEnd !== desiredEnd) {
+      state.setDateTime("end", endValue);
+      changed = true;
+    }
+    synchronizing.current = changed;
+  }, [desiredEnd, desiredStart, endValue, startValue, state, stateEnd, stateStart]);
+
+  useEffect(() => {
+    if (!state) return;
+    if (synchronizing.current) {
+      synchronizing.current = false;
+      return;
+    }
+    if (stateStart !== desiredStart) onStartChange(state.value.start ?? null);
+    if (stateEnd !== desiredEnd) onEndChange(state.value.end ?? null);
+  }, [desiredEnd, desiredStart, onEndChange, onStartChange, state, stateEnd, stateStart]);
+
+  return null;
+}
+
+function dateValueKey(value: DateValue | null): string | null {
+  return value?.toString() ?? null;
 }
 
 export function PawchivePathField({

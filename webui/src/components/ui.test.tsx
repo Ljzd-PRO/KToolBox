@@ -192,8 +192,8 @@ describe("OptionalDateRangeField", () => {
     const user = userEvent.setup();
     render(<OptionalDateHarness />);
 
-    expect(screen.getByRole("group", { name: "Start date" })).toBeInTheDocument();
-    expect(screen.getByRole("group", { name: "End date" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Publication range" })).toBeInTheDocument();
+    expect(document.querySelectorAll('[data-slot="date-range-picker"]')).toHaveLength(1);
     expect(screen.getByRole("checkbox", { name: "No start date" })).not.toBeChecked();
     expect(screen.getByRole("checkbox", { name: "No end date" })).toBeChecked();
 

@@ -556,38 +556,10 @@ code {
   padding: 0.25rem 0.375rem !important;
 }
 
-.optional-date-range-control {
+.optional-date-range-options {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
-  overflow: hidden;
-  border: 1px solid var(--field-border);
-  border-radius: var(--field-radius);
-  background: var(--field-background);
-  box-shadow: var(--field-shadow);
-  transition: border-color 150ms ease, box-shadow 150ms ease;
-}
-
-.optional-date-range-control:focus-within {
-  border-color: var(--field-border-focus);
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--focus) 22%, transparent);
-}
-
-[data-invalid="true"] > .optional-date-range-control {
-  border-color: var(--color-field-border-invalid);
-}
-
-.optional-date-boundary,
-.optional-date-boundary-group {
-  min-width: 0;
-  width: 100%;
-}
-
-.optional-date-boundary-group {
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
+  grid-template-columns: repeat(2, minmax(0, max-content));
+  gap: 0.25rem 1rem;
 }
 
 .optional-date-range-separator {
@@ -691,6 +663,11 @@ code {
 .app-form-modal-container-wide {
   width: min(45rem, calc(100vw - 1.5rem)) !important;
   max-width: 45rem !important;
+}
+
+.app-form-modal-container-wide .app-modal-dialog {
+  width: 100%;
+  max-width: 45rem;
 }
 
 .app-form-modal-surface {
