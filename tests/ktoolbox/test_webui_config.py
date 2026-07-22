@@ -10,11 +10,23 @@ from pydantic import BaseModel
 
 import ktoolbox.webui.config_schema as config_schema_module
 import ktoolbox.webui.config_store as config_store_module
+from ktoolbox.api.generated import CreatorProfile
 from ktoolbox.configuration import Configuration, RuntimeContext
 from ktoolbox.webui.app import create_app
 from ktoolbox.webui.auth import CSRF_HEADER
 from ktoolbox.webui.config_schema import build_config_schema, missing_config_metadata
 from ktoolbox.webui.config_store import ConfigurationConflictError, ConfigurationFileError, DotenvFileStore
+
+
+class StaticCreatorClient:
+    async def __aenter__(self) -> StaticCreatorClient:
+        return self
+
+    async def __aexit__(self, *_args: object) -> None:
+        return None
+
+    async def get_creator_profile(self, service: str, creator_id: str) -> CreatorProfile:
+        return CreatorProfile(id=creator_id, service=service, name="API Example")
 
 
 @asynccontextmanager
@@ -28,7 +40,7 @@ async def configured_client(tmp_path: Path) -> AsyncIterator[tuple[httpx.AsyncCl
         webui={"username": "owner", "password": "secret"},
         downloader={"session_key": "file-cookie"},
     )
-    app = create_app(RuntimeContext(tmp_path, configuration))
+    app = create_app(RuntimeContext(tmp_path, configuration), creator_client_factory=StaticCreatorClient)
     async with app.router.lifespan_context(app):
         transport = httpx.ASGITransport(app=app, client=("127.0.0.1", 1234))
         async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
@@ -245,7 +257,7 @@ async def test_project_creator_and_blocker_endpoints(tmp_path: Path) -> None:
         duplicate = await client.post("/api/v1/creators", headers={CSRF_HEADER: csrf}, json=creator)
         assert duplicate.status_code == 422
         listed = await client.get("/api/v1/creators")
-        assert listed.json() == [creator]
+        assert listed.json() == [{**creator, "name": "API Example"}]
 
         updated = await client.put(
             "/api/v1/creators/fanbox/42",

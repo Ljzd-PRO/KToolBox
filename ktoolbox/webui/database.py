@@ -95,6 +95,14 @@ class WebUIDatabase:
                     UNIQUE(task_id, path)
                 );
 
+                CREATE TABLE IF NOT EXISTS creator_profile_cache (
+                    service TEXT NOT NULL COLLATE NOCASE,
+                    creator_id TEXT NOT NULL COLLATE NOCASE,
+                    name TEXT NOT NULL,
+                    fetched_at TEXT NOT NULL,
+                    PRIMARY KEY(service, creator_id)
+                );
+
                 CREATE INDEX IF NOT EXISTS task_events_cursor ON task_events(id);
                 CREATE INDEX IF NOT EXISTS tasks_queue ON tasks(status, position);
                 """
@@ -111,6 +119,10 @@ class WebUIDatabase:
             await connection.execute(
                 "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
                 (3, utc_now().isoformat()),
+            )
+            await connection.execute(
+                "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
+                (4, utc_now().isoformat()),
             )
             await connection.commit()
 

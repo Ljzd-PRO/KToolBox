@@ -296,7 +296,7 @@ async def test_task_presentation_database_migration_and_store_round_trip(tmp_pat
         versions = [int(row[0]) for row in await cursor.fetchall()]
         await cursor.close()
     assert "presentation_json" in columns
-    assert versions == [1, 2, 3]
+    assert versions == [1, 2, 3, 4]
 
     store = TaskStore(database)
     spec = DownloadTaskSpec(service="FanBox", creator_id="creator/id", post_id="42", output=tmp_path)

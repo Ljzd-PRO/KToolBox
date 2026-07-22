@@ -634,6 +634,22 @@ export interface components {
             /** Service */
             service: string;
         };
+        /** CreatorRosterItemResponse */
+        CreatorRosterItemResponse: {
+            /** Alias */
+            alias?: string | null;
+            /** Creator Id */
+            creator_id: string;
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            /** Name */
+            name?: string | null;
+            /** Service */
+            service: string;
+        };
         /** CreatorSummary */
         CreatorSummary: {
             /** Favorited */
@@ -1529,7 +1545,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CreatorReference"][];
+                    "application/json": components["schemas"]["CreatorRosterItemResponse"][];
                 };
             };
         };

@@ -13,6 +13,10 @@ export type CreatorReference = {
   enabled: boolean;
 };
 
+export type CreatorRosterItem = CreatorReference & {
+  name: string | null;
+};
+
 export type BlockerScope = {
   mode: "global" | "creators";
   creators: string[];

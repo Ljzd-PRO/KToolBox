@@ -12,6 +12,7 @@ from starlette.middleware.base import RequestResponseEndpoint
 
 from ktoolbox import __version__
 from ktoolbox.configuration import RuntimeContext
+from ktoolbox.project_config import ProjectConfigStore
 from ktoolbox.webui.auth import (
     SESSION_COOKIE,
     AuthService,
@@ -19,6 +20,7 @@ from ktoolbox.webui.auth import (
     require_csrf,
     require_session,
 )
+from ktoolbox.webui.creator_profiles import CreatorClientFactory, CreatorProfileCache, CreatorRosterService
 from ktoolbox.webui.database import WebUIDatabase, WebUISession
 from ktoolbox.webui.models import (
     HealthResponse,
@@ -35,7 +37,12 @@ from ktoolbox.webui.task_scheduler import TaskScheduler
 from ktoolbox.webui.task_store import TaskStore
 
 
-def create_app(context: RuntimeContext, *, task_executor: TaskExecutor | None = None) -> FastAPI:
+def create_app(
+    context: RuntimeContext,
+    *,
+    task_executor: TaskExecutor | None = None,
+    creator_client_factory: CreatorClientFactory | None = None,
+) -> FastAPI:
     database = WebUIDatabase(context.project_root / ".ktoolbox" / "webui.sqlite3")
     auth = AuthService(context.configuration.webui, database)
     task_store = TaskStore(database)
@@ -44,6 +51,11 @@ def create_app(context: RuntimeContext, *, task_executor: TaskExecutor | None = 
         task_store,
         max_concurrency=context.configuration.webui.max_active_tasks,
         executor=task_executor,
+    )
+    creator_roster = CreatorRosterService(
+        ProjectConfigStore(context.project_root / "ktoolbox.toml"),
+        CreatorProfileCache(database),
+        client_factory=creator_client_factory,
     )
     project_lock = ProjectProcessLock(context.project_root / ".ktoolbox" / "webui.lock")
 
@@ -71,7 +83,7 @@ def create_app(context: RuntimeContext, *, task_executor: TaskExecutor | None = 
     app.state.auth = auth
     app.state.task_store = task_store
     app.state.task_scheduler = task_scheduler
-    app.include_router(create_project_router(context.project_root))
+    app.include_router(create_project_router(context.project_root, creator_roster))
     app.include_router(create_pawchive_router())
     app.include_router(create_task_router(context.project_root))
 

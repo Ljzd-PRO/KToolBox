@@ -14,14 +14,14 @@ import { useTranslation } from "react-i18next";
 import { DataTableFrame, EmptyPanel, PageLoading, TaskStatusChip } from "../components/ui";
 import { TaskTarget } from "../components/TaskTarget";
 import { api } from "../lib/api";
-import type { CreatorReference, ProjectSummary, TaskRecord } from "../types";
+import type { CreatorRosterItem, ProjectSummary, TaskRecord } from "../types";
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const project = useQuery({ queryKey: ["project"], queryFn: () => api<ProjectSummary>("/project") });
   const tasks = useQuery({ queryKey: ["tasks"], queryFn: () => api<TaskRecord[]>("/tasks"), refetchInterval: 2000 });
-  const creators = useQuery({ queryKey: ["creators"], queryFn: () => api<CreatorReference[]>("/creators") });
+  const creators = useQuery({ queryKey: ["creators"], queryFn: () => api<CreatorRosterItem[]>("/creators") });
 
   if (project.isLoading || tasks.isLoading || creators.isLoading) return <PageLoading />;
   const records = tasks.data ?? [];

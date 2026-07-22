@@ -19,10 +19,12 @@ from ktoolbox.webui.config_store import (
     DotenvFileStore,
     content_revision,
 )
+from ktoolbox.webui.creator_profiles import CreatorRosterService
 from ktoolbox.webui.database import WebUISession
 from ktoolbox.webui.models import (
     BlockerListResponse,
     ConfigSchemaResponse,
+    CreatorRosterItemResponse,
     CreatorUpdateRequest,
     DotenvPatchRequest,
     ProjectDocumentResponse,
@@ -36,7 +38,7 @@ CsrfDependency = Annotated[WebUISession, Depends(require_csrf)]
 IfMatch = Annotated[str | None, Header(alias="If-Match")]
 
 
-def create_project_router(project_root: Path) -> APIRouter:
+def create_project_router(project_root: Path, creator_roster: CreatorRosterService) -> APIRouter:
     router = APIRouter(prefix="/api/v1")
     dotenv_store = DotenvFileStore(project_root)
     project_store = ProjectConfigStore(project_root / "ktoolbox.toml")
@@ -179,9 +181,9 @@ def create_project_router(project_root: Path) -> APIRouter:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error)) from error
         return ValidationResponse()
 
-    @router.get("/creators", response_model=list[CreatorReference])
-    async def list_creators(_: SessionDependency) -> list[CreatorReference]:
-        return project_store.load().creators
+    @router.get("/creators", response_model=list[CreatorRosterItemResponse])
+    async def list_creators(request: Request, _: SessionDependency) -> list[CreatorRosterItemResponse]:
+        return await creator_roster.list_creators(current_context(request).snapshot())
 
     @router.post("/creators", response_model=CreatorReference, status_code=status.HTTP_201_CREATED)
     async def add_creator(creator: CreatorReference, _: CsrfDependency) -> CreatorReference:
@@ -213,9 +215,11 @@ def create_project_router(project_root: Path) -> APIRouter:
     @router.delete("/creators/{service}/{creator_id}", response_model=CreatorReference)
     async def delete_creator(service: str, creator_id: str, _: CsrfDependency) -> CreatorReference:
         try:
-            return project_store.remove_creator(f"{service}:{creator_id}")
+            creator = project_store.remove_creator(f"{service}:{creator_id}")
         except ProjectConfigError as error:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+        await creator_roster.delete(service, creator_id)
+        return creator
 
     @router.get("/blockers", response_model=BlockerListResponse)
     async def list_blockers(_: SessionDependency) -> BlockerListResponse:

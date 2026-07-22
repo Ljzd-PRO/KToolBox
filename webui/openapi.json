@@ -269,6 +269,54 @@
         "title": "CreatorReference",
         "type": "object"
       },
+      "CreatorRosterItemResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "alias": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alias"
+          },
+          "creator_id": {
+            "minLength": 1,
+            "title": "Creator Id",
+            "type": "string"
+          },
+          "enabled": {
+            "default": true,
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "service": {
+            "minLength": 1,
+            "title": "Service",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service",
+          "creator_id"
+        ],
+        "title": "CreatorRosterItemResponse",
+        "type": "object"
+      },
       "CreatorSummary": {
         "additionalProperties": true,
         "properties": {
@@ -2389,7 +2437,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/CreatorReference"
+                    "$ref": "#/components/schemas/CreatorRosterItemResponse"
                   },
                   "title": "Response List Creators Api V1 Creators Get",
                   "type": "array"

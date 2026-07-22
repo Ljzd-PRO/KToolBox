@@ -7,7 +7,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 from ktoolbox.blocker.model import BlockerSpec
-from ktoolbox.project_config import ProjectConfiguration
+from ktoolbox.project_config import CreatorReference, ProjectConfiguration
 
 
 class LoginRequest(BaseModel):
@@ -84,6 +84,10 @@ class ProjectDocumentResponse(BaseModel):
 class CreatorUpdateRequest(BaseModel):
     alias: str | None = None
     enabled: bool = True
+
+
+class CreatorRosterItemResponse(CreatorReference):
+    name: str | None = None
 
 
 class BlockerListResponse(BaseModel):

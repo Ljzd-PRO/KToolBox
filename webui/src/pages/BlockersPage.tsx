@@ -41,7 +41,7 @@ import { useAuth } from "../lib/auth";
 import type {
   BlockerSpec,
   ConditionGroup,
-  CreatorReference,
+  CreatorRosterItem,
   FieldCondition,
 } from "../types";
 
@@ -80,7 +80,7 @@ export function BlockersPage() {
   });
   const creatorsQuery = useQuery({
     queryKey: ["creators"],
-    queryFn: () => api<CreatorReference[]>("/creators"),
+    queryFn: () => api<CreatorRosterItem[]>("/creators"),
   });
   const [editor, setEditor] = useState<BlockerSpec | null>(null);
   const [editorIndex, setEditorIndex] = useState<number | null>(null);

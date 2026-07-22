@@ -40,7 +40,7 @@ import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { formatBytes, formatDateTime, formatDuration, taskPercent } from "../lib/format";
 import type {
-  CreatorReference,
+  CreatorRosterItem,
   TaskAttempt,
   TaskCleanupPreview,
   TaskEvent,
@@ -63,7 +63,7 @@ export function TasksPage() {
   const { session } = useAuth();
   const queryClient = useQueryClient();
   const tasksQuery = useQuery({ queryKey: ["tasks"], queryFn: () => api<TaskRecord[]>("/tasks") });
-  const creatorsQuery = useQuery({ queryKey: ["creators"], queryFn: () => api<CreatorReference[]>("/creators") });
+  const creatorsQuery = useQuery({ queryKey: ["creators"], queryFn: () => api<CreatorRosterItem[]>("/creators") });
   const [editor, setEditor] = useState<TaskRecord | "new" | null>(null);
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState<TaskRecord | null>(null);

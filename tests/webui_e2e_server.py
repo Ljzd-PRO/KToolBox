@@ -9,7 +9,7 @@ from typing import Any, cast
 
 import httpx
 
-from ktoolbox.api.generated import CreatorSummary, Post, Revision
+from ktoolbox.api.generated import CreatorProfile, CreatorSummary, Post, Revision
 from ktoolbox.configuration import RuntimeContext
 from ktoolbox.reporting import ProgressReporter
 from ktoolbox.webui.app import create_app
@@ -25,7 +25,7 @@ PROJECT_ROOT.joinpath(".env").write_text(
 )
 PROJECT_ROOT.joinpath("ktoolbox.toml").write_text(
     'schema_version = 1\n\n[[creators]]\nservice = "fanbox"\ncreator_id = "demo-studio"\n'
-    'alias = "Demo Studio"\nenabled = true\n',
+    "enabled = true\n",
     encoding="utf-8",
 )
 
@@ -48,6 +48,9 @@ class FixtureClient(AbstractAsyncContextManager["FixtureClient"]):
                 updated=0,
             )
         ]
+
+    async def get_creator_profile(self, service: str, creator_id: str) -> CreatorProfile:
+        return CreatorProfile(id=creator_id, service=service, name="Demo Studio")
 
     async def list_creator_posts(self, service: str, creator_id: str, **_: object) -> list[Post]:
         return [
@@ -104,4 +107,8 @@ class FixtureExecutor:
 
 pawchive_module = cast(Any, import_module("ktoolbox.webui.pawchive_routes"))
 pawchive_module.create_pawchive_client = FixtureClient
-app = create_app(RuntimeContext.from_project(PROJECT_ROOT), task_executor=FixtureExecutor())
+app = create_app(
+    RuntimeContext.from_project(PROJECT_ROOT),
+    task_executor=FixtureExecutor(),
+    creator_client_factory=FixtureClient,
+)

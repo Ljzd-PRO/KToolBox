@@ -38,7 +38,7 @@ import {
 } from "../components/ui";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
-import type { CreatorReference, CreatorSummary } from "../types";
+import type { CreatorReference, CreatorRosterItem, CreatorSummary } from "../types";
 
 const blankCreator: CreatorReference = {
   service: "fanbox",
@@ -51,7 +51,7 @@ export function CreatorsPage() {
   const { t } = useTranslation();
   const { session } = useAuth();
   const queryClient = useQueryClient();
-  const roster = useQuery({ queryKey: ["creators"], queryFn: () => api<CreatorReference[]>("/creators") });
+  const roster = useQuery({ queryKey: ["creators"], queryFn: () => api<CreatorRosterItem[]>("/creators") });
   const [editor, setEditor] = useState<CreatorReference | null>(null);
   const [originalKey, setOriginalKey] = useState<string | null>(null);
   const [removing, setRemoving] = useState<CreatorReference | null>(null);
