@@ -47,6 +47,17 @@ async function signIn(page: Page) {
 
 test("authenticated shell is accessible in desktop and mobile themes", async ({ page }) => {
   await signIn(page);
+  const securityNotice = page.getByRole("button", { name: "Trusted networks only" });
+  await securityNotice.click();
+  const securityDialog = page.getByRole("dialog", { name: "Trusted networks only" });
+  await expect(securityDialog).toContainText(
+    "This session uses HTTP. Credentials and task data are not encrypted in transit.",
+  );
+  await expect(securityDialog).toContainText(
+    "Use HTTPS or bind the WebUI to 127.0.0.1 when the network is not fully trusted.",
+  );
+  await page.keyboard.press("Escape");
+  await expect(securityDialog).toBeHidden();
   const desktopScan = await new AxeBuilder({ page }).analyze();
   expect(desktopScan.violations).toEqual([]);
 
@@ -55,6 +66,9 @@ test("authenticated shell is accessible in desktop and mobile themes", async ({ 
   await page.getByRole("button", { name: "Use emerald accent" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme-color", "emerald");
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "Trusted networks only" }).click();
+  await expect(page.getByRole("dialog", { name: "Trusted networks only" })).toBeVisible();
+  await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Open navigation" }).click();
   await expect(page.getByRole("link", { name: "Tasks", exact: true })).toBeVisible();
   await page.waitForTimeout(600);

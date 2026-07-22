@@ -108,6 +108,7 @@ const resources = {
         primaryNavigation: "Primary navigation",
         securityTitle: "Trusted networks only",
         securityBody: "This session uses HTTP. Credentials and task data are not encrypted in transit.",
+        securityAdvice: "Use HTTPS or bind the WebUI to 127.0.0.1 when the network is not fully trusted.",
       },
       overview: {
         eyebrow: "Project workspace",
@@ -534,6 +535,7 @@ const resources = {
         primaryNavigation: "主导航",
         securityTitle: "仅在可信网络中使用",
         securityBody: "当前会话使用 HTTP，凭据和任务数据在传输过程中不会加密。",
+        securityAdvice: "网络并非完全可信时，请使用 HTTPS，或将 WebUI 仅绑定到 127.0.0.1。",
       },
       overview: {
         eyebrow: "项目工作台",

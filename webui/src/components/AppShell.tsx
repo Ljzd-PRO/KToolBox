@@ -1,4 +1,4 @@
-import { Button, Drawer, Surface, Tooltip, toast, useOverlayState } from "@heroui/react";
+import { Button, Drawer, Popover, Surface, Tooltip, toast, useOverlayState } from "@heroui/react";
 import {
   IconAdjustmentsHorizontal,
   IconAddressBook,
@@ -153,6 +153,51 @@ function ThemeControls({ compact = false }: { compact?: boolean }) {
   );
 }
 
+function SecurityNotice({ compact = false }: { compact?: boolean }) {
+  const { t } = useTranslation();
+
+  return (
+    <Popover>
+      <Button
+        isIconOnly={compact}
+        aria-label={compact ? t("shell.securityTitle") : undefined}
+        className={compact ? "size-11 min-w-11 shrink-0" : "h-11 max-w-56 justify-start"}
+        variant="outline"
+      >
+        <IconShieldLock
+          aria-hidden="true"
+          className="shrink-0 text-[var(--ktoolbox-yellow)]"
+          size={compact ? 18 : 17}
+          stroke={1.8}
+        />
+        {compact ? null : <span className="truncate">{t("shell.securityTitle")}</span>}
+      </Button>
+      <Popover.Content
+        className="w-80 max-w-[calc(100vw-2rem)] rounded-lg border border-border"
+        offset={10}
+        placement="bottom end"
+      >
+        <Popover.Arrow />
+        <Popover.Dialog className="flex items-start gap-3 p-4">
+          <span
+            aria-hidden="true"
+            className="grid size-9 shrink-0 place-items-center rounded-lg bg-warning-soft text-warning-soft-foreground"
+          >
+            <IconShieldLock size={18} stroke={1.8} />
+          </span>
+          <div className="grid min-w-0 gap-1.5">
+            <Popover.Heading className="text-sm font-semibold text-foreground">
+              {t("shell.securityTitle")}
+            </Popover.Heading>
+            <p className="text-sm leading-relaxed text-muted">{t("shell.securityBody")}</p>
+            <p className="text-sm leading-relaxed text-foreground">{t("shell.securityAdvice")}</p>
+          </div>
+        </Popover.Dialog>
+      </Popover.Content>
+    </Popover>
+  );
+}
+
 export function AppShell() {
   const { t } = useTranslation();
   const { session, logout } = useAuth();
@@ -176,35 +221,6 @@ export function AppShell() {
       toast.danger(t("shell.logout"), { description: errorText(error) });
     }
   }
-
-  const securityNotice = (
-    <Tooltip>
-      <Button className="h-11 max-w-56 justify-start" variant="outline">
-        <IconShieldLock aria-hidden="true" className="shrink-0 text-[var(--ktoolbox-yellow)]" size={17} stroke={1.8} />
-        <span className="truncate">{t("shell.securityTitle")}</span>
-      </Button>
-      <Tooltip.Content>{t("shell.securityBody")}</Tooltip.Content>
-    </Tooltip>
-  );
-
-  const compactSecurityNotice = (
-    <Tooltip>
-      <Button
-        isIconOnly
-        aria-label={t("shell.securityTitle")}
-        className="size-11 min-w-11 shrink-0"
-        variant="outline"
-      >
-        <IconShieldLock
-          aria-hidden="true"
-          className="text-[var(--ktoolbox-yellow)]"
-          size={18}
-          stroke={1.8}
-        />
-      </Button>
-      <Tooltip.Content>{t("shell.securityBody")}</Tooltip.Content>
-    </Tooltip>
-  );
 
   return (
     <div className="min-h-dvh bg-background text-foreground md:grid md:grid-cols-[240px_minmax(0,1fr)]">
@@ -241,9 +257,11 @@ export function AppShell() {
             </div>
             <div className="hidden min-w-0 items-center gap-2 xl:flex">
               <ThemeControls />
-              {securityNotice}
+              <SecurityNotice />
             </div>
-            <div className="xl:hidden">{compactSecurityNotice}</div>
+            <div className="xl:hidden">
+              <SecurityNotice compact />
+            </div>
             <IconButton icon={IconLanguage} label={t("shell.language")} onPress={() => void toggleLanguage()} />
             <div className="hidden sm:block xl:hidden">
               <IconButton
