@@ -54,7 +54,7 @@ Editable areas use a muted secondary surface with distinct field backgrounds. Fi
 
 The main areas are:
 
-- **Overview:** project path, queue health, active transfer totals, and recent tasks.
+- **Overview:** project path, queue health, active transfer totals, and recent tasks. Each statistic is a keyboard-accessible link to the corresponding filtered task or creator view.
 - **Tasks:** create, reorder, edit, pause, resume, stop, rerun, delete, and inspect synchronization or single-post downloads.
 - **Creators:** search Pawchive and add, annotate, enable, disable, or remove roster entries.
 - **Posts:** search without rendering remote media or expanded body text, inspect revisions, and create a download task.
@@ -68,7 +68,11 @@ The main areas are:
 
 Task creation uses two fixed tabs without overflow controls. Synchronization dates remain one official HeroUI range field in `year/month/day - year/month/day` form, while “No start date” and “No end date” independently clear either boundary. The post offset control advances in steps of 50. Title filters use removable HeroUI Chips created with a comma or Enter. Single-work downloads and new roster entries use independent HeroUI fields separated by code-styled Pawchive path fragments such as `/platform/user/creator/post/post`; the separators are never simulated inputs.
 
-Creator IDs lead both desktop rows and mobile entries. The optional roster note is shown separately and never replaces the identity. When editing an existing creator, its platform and creator ID remain visible but read-only because they identify the stored roster entry.
+Platform fields use a HeroUI ComboBox with Patreon, Pixiv, and Fanbox suggestions while still accepting any custom platform value. Compact enumerations use icon-enhanced HeroUI options; semantic colors are reserved for actual status, warning, and danger meanings.
+
+Creator rows lead with the profile name returned by Pawchive. Names are cached for 24 hours, stale values remain available when refresh fails, and the creator ID is the fallback when no profile has ever loaded. The optional roster note remains independent and empty by default. When editing an existing creator, its platform and creator ID remain visible but read-only because they identify the stored roster entry.
+
+Overview recent tasks, task queues, creator rosters, and post results support controlled HeroUI column sorting. Text uses locale-aware natural ordering, while counts, progress, speeds, states, and timestamps use their real values. Mobile cards expose the same sort field and direction. Task sorting changes presentation only, never scheduler order; queue movement is disabled with an explanation while a custom view sort is active.
 
 ## Configuration editing
 

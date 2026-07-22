@@ -45,6 +45,11 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Rebuild HeroUI form primitives with gray-off/blue-on switches, state-correct checkboxes, centered compact list controls, continuous modal surfaces, and direct icon actions for task, creator, and blocker rows.
 - Persist presentation-only task target snapshots so queues remain readable offline by post title and creator name without changing execution, deduplication, or resource locks.
 - Standardize Chinese product terminology as “作品”, “平台”, and “忽略规则”, including the overview heading and the sync-all-creators control.
+- Cache Pawchive profile names for creator presentation, with bounded refresh concurrency, stale-value fallback, and creator-ID fallback.
+- Add locale-aware controlled sorting to task, creator, post, and recent-task views without changing scheduler order.
+- Add filtered dashboard navigation and URL-persistent task and creator filters.
+- Replace free-form platform fields with HeroUI ComboBoxes that provide Patreon, Pixiv, and Fanbox suggestions while accepting custom platforms.
+- Enrich compact HeroUI choices with icons and restrained semantic tones, and refresh verified desktop/mobile screenshots after six-slice visual review.
 
 ## Testing and quality
 
