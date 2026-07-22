@@ -503,7 +503,7 @@ function ConditionEditor({
       {condition.operator !== "exists" ? (
         <ChipListField
           commitOnComma={condition.operator !== "regex"}
-          description={t("blockers.valuesHint")}
+          description={t(condition.operator === "regex" ? "blockers.regexValuesHint" : "blockers.valuesHint")}
           icon={Braces}
           label={t("blockers.values")}
           values={condition.values.filter(Boolean)}

@@ -94,6 +94,9 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   await expect(formActions).toBeVisible();
   await expect(formSurface.locator(".field-label-icon")).not.toHaveCount(0);
   await expect(formSurface.locator('[data-slot="switch-icon"]')).toHaveCount(0);
+  await expect(page.locator(".task-editor-tabs").getByRole("tab")).toHaveCount(2);
+  await expect(page.locator(".task-editor-tabs").locator('[data-slot="scroll-shadow"]')).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Scroll tabs right" })).toHaveCount(0);
 
   const switchContent = formSurface.locator('[data-slot="switch-content"]').filter({ hasText: "All enabled creators" });
   const switchControl = switchContent.locator('[data-slot="switch-control"]');
@@ -105,14 +108,38 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   expect(Math.abs((controlBox?.y ?? 0) - (labelBox?.y ?? 0))).toBeLessThan(2);
   expect(controlBox?.x ?? 0).toBeLessThan(labelBox?.x ?? 0);
 
-  const startDateCheckbox = formSurface.getByRole("checkbox", { name: "Apply start date" });
+  const startDateCheckbox = formSurface.getByRole("checkbox", { name: "No start date" });
   const startDateRoot = startDateCheckbox.locator('xpath=ancestor::*[@data-slot="checkbox"]');
-  await expect(startDateCheckbox).not.toBeChecked();
-  await expect(startDateRoot.locator('[data-slot="checkbox-indicator"]')).toHaveCount(0);
-  await startDateCheckbox.press("Space");
   await expect(startDateCheckbox).toBeChecked();
   await expect(startDateRoot.locator('[data-slot="checkbox-indicator"]')).toHaveCount(1);
   await startDateCheckbox.press("Space");
+  await expect(startDateCheckbox).not.toBeChecked();
+  await expect(startDateRoot.locator('[data-slot="checkbox-indicator"]')).toHaveCount(0);
+  await page.getByRole("dialog", { name: "Create task" }).getByRole("button", { name: "Create task" }).click();
+  await expect(page.getByRole("alert")).toContainText("Choose a start date");
+  await startDateCheckbox.press("Space");
+  await expect(page.getByRole("alert")).toHaveCount(0);
+
+  const requiredKeywords = formSurface.getByRole("textbox", { name: "Required title keywords" });
+  await requiredKeywords.pressSequentially("painting,painting，draft");
+  await requiredKeywords.press("Enter");
+  await expect(formSurface.getByRole("button", { name: "Remove painting" })).toHaveCount(1);
+  await expect(formSurface.getByRole("button", { name: "Remove draft" })).toHaveCount(1);
+  await formSurface.getByRole("button", { name: "Remove draft" }).click();
+  await expect(formSurface.getByRole("button", { name: "Remove draft" })).toHaveCount(0);
+
+  await page.getByRole("tab", { name: "Download post" }).click();
+  const postPath = formSurface.getByRole("group", { name: "Pawchive post path" });
+  const platformField = postPath.getByRole("textbox", { name: "Platform" });
+  const creatorIdField = postPath.getByRole("textbox", { name: "Creator ID" });
+  const postIdField = postPath.getByRole("textbox", { name: "Post ID" });
+  await expect(platformField).toHaveValue("fanbox");
+  await platformField.focus();
+  await page.keyboard.press("Tab");
+  await expect(creatorIdField).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(postIdField).toBeFocused();
+  await page.getByRole("tab", { name: "Sync creators" }).click();
 
   const [scrollBox, actionBox] = await Promise.all([formScroll.boundingBox(), formActions.boundingBox()]);
   expect(scrollBox).not.toBeNull();
@@ -130,6 +157,7 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   await page.setViewportSize({ width: 320, height: 700 });
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
   await expect(formSurface.getByText("All enabled creators", { exact: true })).toBeVisible();
+  await expect(formSurface.locator(".optional-date-range-separator")).toBeHidden();
   expect(await formActions.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
 
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -179,8 +207,15 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
   await page.getByRole("link", { name: "Creators" }).click();
 
   const creatorRow = page.getByRole("row").filter({ hasText: "Demo Studio" });
-  await expect(creatorRow.getByRole("button", { name: "Edit Demo Studio" })).toBeVisible();
-  await expect(creatorRow.getByRole("button", { name: "Remove Demo Studio" })).toBeVisible();
+  expect(await page.getByRole("columnheader").allTextContents()).toEqual([
+    "Creator ID",
+    "Platform",
+    "Note",
+    "Status",
+    "Actions",
+  ]);
+  await expect(creatorRow.getByRole("button", { name: "Edit fanbox:demo-studio" })).toBeVisible();
+  await expect(creatorRow.getByRole("button", { name: "Remove fanbox:demo-studio" })).toBeVisible();
   await expect(page.getByRole("button", { name: /Actions Demo Studio/ })).toHaveCount(0);
   const creatorSwitchCell = creatorRow.locator(".list-switch-cell");
   const creatorSwitchControl = creatorSwitchCell.locator('[data-slot="switch-control"]');
@@ -203,10 +238,25 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
   await disabledCreatorSwitch.press("Space");
   await expect(creatorRow.getByRole("switch", { name: "Enabled" })).toBeVisible();
 
+  await page.getByRole("button", { name: "Add creator" }).click();
+  const addCreatorDialog = page.getByRole("dialog", { name: "Add creator" });
+  await expect(addCreatorDialog.getByRole("group", { name: "Pawchive creator path" })).toBeVisible();
+  await expect(addCreatorDialog.getByRole("textbox", { name: "Platform" })).not.toHaveAttribute("readonly");
+  await expect(addCreatorDialog.getByRole("textbox", { name: "Creator ID" })).not.toHaveAttribute("readonly");
+  await expect(addCreatorDialog.getByRole("textbox", { name: "Note" })).toBeVisible();
+  await addCreatorDialog.getByRole("button", { name: "Cancel" }).click();
+
+  await creatorRow.getByRole("button", { name: "Edit fanbox:demo-studio" }).click();
+  const editCreatorDialog = page.getByRole("dialog", { name: "Edit creator" });
+  await expect(editCreatorDialog.getByRole("textbox", { name: "Platform" })).toHaveAttribute("readonly", "");
+  await expect(editCreatorDialog.getByRole("textbox", { name: "Creator ID" })).toHaveAttribute("readonly", "");
+  await editCreatorDialog.getByRole("button", { name: "Cancel" }).click();
+
   await page.getByRole("link", { name: "Blockers" }).click();
   await page.getByRole("button", { name: "Add blocker" }).click();
   await page.getByRole("textbox", { name: /Rule ID/ }).fill("daily-sharing");
-  await page.getByRole("textbox", { name: "Values" }).fill("fictional-daily");
+  await page.getByRole("textbox", { name: "Values" }).pressSequentially("fictional-daily,");
+  await expect(page.getByRole("button", { name: "Remove fictional-daily" })).toBeVisible();
   await page.getByRole("dialog", { name: "Add blocker" }).getByRole("button", { name: "Save" }).click();
 
   const blockerCard = page.getByRole("heading", { name: "daily-sharing" }).locator("xpath=ancestor::section");
@@ -238,6 +288,54 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
   expect(await tabsScroller.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
   await expect(page.getByRole("button", { name: "Scroll tabs right" })).not.toBeVisible();
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+});
+
+
+test("task form serializes one-sided dates and protects regular-expression commas", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("link", { name: "Tasks" }).click();
+  await page.getByRole("button", { name: "Create task" }).click();
+  const taskDialog = page.getByRole("dialog", { name: "Create task" });
+  const noStartDate = taskDialog.getByRole("checkbox", { name: "No start date" });
+  await noStartDate.press("Space");
+  await expect(noStartDate).not.toBeChecked();
+  await taskDialog.getByRole("group", { name: "Start date" }).getByRole("button").click();
+  const startCalendar = page.getByRole("application", { name: /Start date/ });
+  await startCalendar.getByRole("button", { name: "Friday, July 10, 2026" }).click();
+  await expect(noStartDate).not.toBeChecked();
+  await expect(taskDialog.getByRole("checkbox", { name: "No end date" })).toBeChecked();
+
+  const keywords = taskDialog.getByRole("textbox", { name: "Required title keywords" });
+  await keywords.pressSequentially("painting,painting，draft");
+  await keywords.press("Enter");
+  await taskDialog.getByRole("button", { name: "Remove draft" }).click();
+  await taskDialog.getByRole("textbox", { name: "Output directory" }).fill("dated-sync-output");
+
+  const requestPromise = page.waitForRequest((request) => request.method() === "POST" && request.url().endsWith("/api/v1/tasks"));
+  await taskDialog.getByRole("button", { name: "Create task" }).click();
+  const createRequest = await requestPromise;
+  expect(createRequest.postDataJSON()).toMatchObject({
+    spec: {
+      kind: "sync",
+      start_time: "2026-07-10T00:00:00",
+      end_time: null,
+      keywords: ["painting"],
+      output: "dated-sync-output",
+    },
+  });
+  await expect(page.getByRole("heading", { name: "Task details" })).toBeVisible();
+
+  await page.getByRole("link", { name: "Blockers" }).click();
+  await page.getByRole("button", { name: "Add blocker" }).click();
+  const blockerDialog = page.getByRole("dialog", { name: "Add blocker" });
+  await blockerDialog.getByRole("button", { name: /Contains Operator/ }).click();
+  await page.getByRole("option", { name: "Regular expression" }).click();
+  const regexValue = blockerDialog.getByRole("textbox", { name: "Values" });
+  await regexValue.pressSequentially("^foo,bar$");
+  await expect(regexValue).toHaveValue("^foo,bar$");
+  await regexValue.press("Enter");
+  await expect(blockerDialog.getByRole("button", { name: "Remove ^foo,bar$" })).toBeVisible();
+  await expect(blockerDialog).toContainText("Commas are preserved in regular expressions");
 });
 
 

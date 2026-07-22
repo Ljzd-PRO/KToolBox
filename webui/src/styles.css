@@ -651,11 +651,11 @@ code {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .optional-date-boundary + .optional-date-range-separator {
+  .optional-date-range-separator {
     display: none;
   }
 
-  .optional-date-boundary + .optional-date-range-separator + .optional-date-boundary {
+  .optional-date-boundary:last-child {
     border-top: 1px solid var(--field-border);
   }
 
