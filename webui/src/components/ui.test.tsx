@@ -1,6 +1,6 @@
 import { Table } from "@heroui/react";
 import { parseDate, type DateValue } from "@internationalized/date";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { IconCalendar as Calendar, IconSearch as Search, IconTags as Tags } from "@tabler/icons-react";
 import { useState } from "react";
@@ -202,6 +202,18 @@ describe("OptionalDateRangeField", () => {
 
     await user.click(screen.getByRole("checkbox", { name: "No end date" }));
     expect(screen.getByTestId("date-state")).toHaveTextContent("none|none|true|false");
+  });
+
+  it("commits one calendar date to the enabled boundary and closes the popover", async () => {
+    const user = userEvent.setup();
+    render(<OptionalDateHarness />);
+
+    await user.click(screen.getByRole("button", { name: /Publication range/ }));
+    const calendar = await screen.findByRole("application", { name: /Publication range/ });
+    await user.click(within(calendar).getByRole("button", { name: /July 12, 2026/ }));
+
+    expect(screen.getByTestId("date-state")).toHaveTextContent("2026-07-12|none|false|true");
+    await waitFor(() => expect(screen.queryByRole("application", { name: /Publication range/ })).not.toBeInTheDocument());
   });
 });
 

@@ -463,6 +463,8 @@ export function OptionalDateRangeField({
   errorMessage?: string;
   icon?: TablerIcon;
 }) {
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
   function changeStart(value: DateValue | null) {
     onStartChange(value);
     if (value) onStartUnlimitedChange(false);
@@ -483,8 +485,20 @@ export function OptionalDateRangeField({
     if (selected) onEndChange(null);
   }
 
+  function selectSingleBoundary(date: DateValue) {
+    if (!startUnlimited && !endUnlimited) return;
+    if (startUnlimited && !endUnlimited) changeEnd(date);
+    else changeStart(date);
+    window.requestAnimationFrame(() => setCalendarOpen(false));
+  }
+
   return (
-    <DateRangePicker className="grid gap-1.5" isInvalid={Boolean(errorMessage)}>
+    <DateRangePicker
+      className="grid gap-1.5"
+      isInvalid={Boolean(errorMessage)}
+      isOpen={calendarOpen}
+      onOpenChange={setCalendarOpen}
+    >
       <FieldLabel icon={icon} label={label} />
       <DateField.Group fullWidth variant="secondary">
         <DateField.InputContainer>
@@ -520,7 +534,7 @@ export function OptionalDateRangeField({
               {(day) => <RangeCalendar.HeaderCell>{day}</RangeCalendar.HeaderCell>}
             </RangeCalendar.GridHeader>
             <RangeCalendar.GridBody>
-              {(date) => <RangeCalendar.Cell date={date} />}
+              {(date) => <RangeCalendar.Cell date={date} onClick={() => selectSingleBoundary(date)} />}
             </RangeCalendar.GridBody>
           </RangeCalendar.Grid>
         </RangeCalendar>
@@ -540,7 +554,11 @@ export function OptionalDateRangeField({
           onChange={toggleEnd}
         />
       </div>
-      {errorMessage ? <FieldError>{errorMessage}</FieldError> : null}
+      {errorMessage ? (
+        <div role="alert">
+          <FieldError>{errorMessage}</FieldError>
+        </div>
+      ) : null}
     </DateRangePicker>
   );
 }
@@ -561,8 +579,11 @@ function PartialDateRangeStateBridge({
   const synchronizing = useRef(false);
   const desiredStart = dateValueKey(startValue);
   const desiredEnd = dateValueKey(endValue);
-  const stateStart = dateValueKey(state?.value.start ?? null);
-  const stateEnd = dateValueKey(state?.value.end ?? null);
+  const stateRange = state?.dateRange ?? state?.value;
+  const stateStartValue = stateRange?.start ?? null;
+  const stateEndValue = stateRange?.end ?? null;
+  const stateStart = dateValueKey(stateStartValue);
+  const stateEnd = dateValueKey(stateEndValue);
 
   useLayoutEffect(() => {
     if (!state) return;
@@ -587,9 +608,23 @@ function PartialDateRangeStateBridge({
       synchronizing.current = false;
       return;
     }
-    if (stateStart !== desiredStart) onStartChange(state.value.start ?? null);
-    if (stateEnd !== desiredEnd) onEndChange(state.value.end ?? null);
-  }, [desiredEnd, desiredStart, onEndChange, onStartChange, state, stateEnd, stateStart]);
+    const startChanged = stateStart !== desiredStart;
+    const endChanged = stateEnd !== desiredEnd;
+    if (!startChanged && !endChanged) return;
+
+    if (startChanged) onStartChange(stateStartValue);
+    if (endChanged) onEndChange(stateEndValue);
+  }, [
+    desiredEnd,
+    desiredStart,
+    onEndChange,
+    onStartChange,
+    state,
+    stateEnd,
+    stateEndValue,
+    stateStart,
+    stateStartValue,
+  ]);
 
   return null;
 }

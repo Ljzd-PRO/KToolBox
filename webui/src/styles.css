@@ -187,14 +187,12 @@
 }
 
 html {
-  min-width: 320px;
   min-height: 100%;
   background: var(--background);
 }
 
 body {
   margin: 0;
-  min-width: 320px;
   min-height: 100dvh;
   color: var(--text-secondary);
   background: var(--console-page);
@@ -558,8 +556,27 @@ code {
 
 .optional-date-range-options {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, max-content));
-  gap: 0.25rem 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.25rem 0.5rem;
+}
+
+.optional-date-range-options .form-checkbox {
+  padding-inline: 0.1875rem;
+}
+
+.optional-date-range-options [data-slot="checkbox-content"] {
+  gap: 0.5rem;
+}
+
+.optional-date-range-options .field-label {
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.optional-date-range-options .field-label-icon {
+  width: 0.8125rem;
+  height: 0.8125rem;
 }
 
 .pawchive-identity-fields {
@@ -593,7 +610,7 @@ code {
 @media (max-width: 767px) {
   .pawchive-identity-fields {
     display: grid;
-    grid-template-columns: 3.5rem minmax(0, 1fr);
+    grid-template-columns: max-content minmax(0, 1fr);
     align-items: end;
     gap: 0.75rem 0.5rem;
   }
@@ -609,7 +626,15 @@ code {
   }
 }
 
-@media (max-width: 359px) {
+@media (max-width: 379px) {
+  .stat-tile {
+    padding: 0.75rem;
+  }
+
+  .stat-tile > div:first-child {
+    gap: 0.5rem;
+  }
+
   .optional-date-range-options {
     grid-template-columns: minmax(0, 1fr);
   }
