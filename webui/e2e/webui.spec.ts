@@ -71,7 +71,7 @@ test("Chinese product terminology stays consistent across workflows", async ({ p
   await page.getByRole("link", { name: "任务" }).click();
   await page.getByRole("button", { name: "创建任务" }).click();
   await expect(page.getByRole("switch", { name: "同步所有已启用作者" })).toBeVisible();
-  await page.getByRole("button", { name: "取消" }).click();
+  await page.getByRole("dialog", { name: "创建任务" }).getByRole("button", { name: "取消" }).click();
 
   await page.getByRole("link", { name: "作品" }).click();
   await expect(page.getByRole("heading", { name: "作品", exact: true })).toBeVisible();
@@ -121,6 +121,7 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   await expect(page.getByRole("alert")).toHaveCount(0);
 
   const requiredKeywords = formSurface.getByRole("textbox", { name: "Required title keywords" });
+  await requiredKeywords.click();
   await requiredKeywords.pressSequentially("painting,painting，draft");
   await requiredKeywords.press("Enter");
   await expect(formSurface.getByRole("button", { name: "Remove painting" })).toHaveCount(1);
@@ -157,7 +158,8 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   await page.setViewportSize({ width: 320, height: 700 });
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
   await expect(formSurface.getByText("All enabled creators", { exact: true })).toBeVisible();
-  await expect(formSurface.locator(".optional-date-range-separator")).toBeHidden();
+  await expect(formSurface.getByRole("group", { name: "Publication date range" })).toBeVisible();
+  await expect(formSurface.locator(".optional-date-range-separator")).toHaveCount(0);
   expect(await formActions.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
 
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -198,6 +200,11 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   await expect(mobileActions).toHaveCount(7);
   const mobileActionBox = await mobileCard.locator(".task-action-grid").boundingBox();
   expect(mobileActionBox?.height ?? 0).toBeGreaterThan(80);
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await expect(page.locator(".app-table-frame:visible")).toHaveCount(0);
+  await expect(page.locator(".task-mobile-card:visible")).toBeVisible();
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
 });
 
@@ -285,7 +292,7 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
   expect(await saveBar.evaluate((element) => Boolean(element.closest(".form-surface")))).toBe(true);
   await page.setViewportSize({ width: 390, height: 844 });
   const tabsScroller = page.locator('[data-slot="scroll-shadow"]');
-  expect(await tabsScroller.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
+  await expect(tabsScroller).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Scroll tabs right" })).not.toBeVisible();
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
 });
@@ -299,13 +306,16 @@ test("task form serializes one-sided dates and protects regular-expression comma
   const noStartDate = taskDialog.getByRole("checkbox", { name: "No start date" });
   await noStartDate.press("Space");
   await expect(noStartDate).not.toBeChecked();
-  await taskDialog.getByRole("group", { name: "Start date" }).getByRole("button").click();
-  const startCalendar = page.getByRole("application", { name: /Start date/ });
+  await taskDialog.getByRole("group", { name: "Publication date range" }).getByRole("button").click();
+  const startCalendar = page.getByRole("application", { name: /Publication date range/ });
+  await expect(startCalendar.getByRole("heading")).toContainText("July 2026");
   await startCalendar.getByRole("button", { name: "Friday, July 10, 2026" }).click();
   await expect(noStartDate).not.toBeChecked();
   await expect(taskDialog.getByRole("checkbox", { name: "No end date" })).toBeChecked();
+  await expect(startCalendar).not.toBeVisible();
 
   const keywords = taskDialog.getByRole("textbox", { name: "Required title keywords" });
+  await keywords.click();
   await keywords.pressSequentially("painting,painting，draft");
   await keywords.press("Enter");
   await taskDialog.getByRole("button", { name: "Remove draft" }).click();
