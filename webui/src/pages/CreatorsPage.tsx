@@ -14,9 +14,8 @@ import {
   IconPlus as Plus,
   IconPower as Power,
   IconSearch as Search,
-  IconTag as Tag,
+  IconNotes as Notes,
   IconTrash as Trash2,
-  IconUser as UserRound,
   IconUserPlus as UserPlus,
   IconX as X,
 } from "@tabler/icons-react";
@@ -33,6 +32,7 @@ import {
   FormSwitchField,
   FormSurface,
   IconButton,
+  PawchivePathField,
   PageHeader,
   PageLoading,
 } from "../components/ui";
@@ -220,18 +220,18 @@ export function CreatorsPage() {
             <DataTableFrame className="hidden md:block">
               <Table.Content aria-label={t("creators.roster")}>
                     <Table.Header>
-                      <Table.Column isRowHeader>{t("creators.alias")}</Table.Column>
+                      <Table.Column isRowHeader>{t("creators.creatorId")}</Table.Column>
                       <Table.Column>{t("creators.service")}</Table.Column>
-                      <Table.Column>{t("creators.creatorId")}</Table.Column>
+                      <Table.Column>{t("creators.alias")}</Table.Column>
                       <Table.Column>{t("common.status")}</Table.Column>
                       <Table.Column className="text-right">{t("common.actions")}</Table.Column>
                     </Table.Header>
                     <Table.Body>
                       {creators.map((creator) => (
                         <Table.Row key={`${creator.service}:${creator.creator_id}`}>
-                          <Table.Cell className="font-medium">{creator.alias || creator.creator_id}</Table.Cell>
+                          <Table.Cell className="font-medium"><code className="text-xs">{creator.creator_id}</code></Table.Cell>
                           <Table.Cell>{creator.service}</Table.Cell>
-                          <Table.Cell><code className="text-xs">{creator.creator_id}</code></Table.Cell>
+                          <Table.Cell>{creator.alias || "—"}</Table.Cell>
                           <Table.Cell className="w-24 text-center">
                             <div className="list-switch-cell mx-auto flex w-20 items-center justify-center">
                               <CompactSwitch
@@ -254,10 +254,14 @@ export function CreatorsPage() {
                 <Surface className="data-mobile-card rounded-lg border border-border p-4" key={`${creator.service}:${creator.creator_id}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate font-medium">{creator.alias || creator.creator_id}</p>
-                      <p className="mt-1 break-all text-xs text-muted">{creator.service}:{creator.creator_id}</p>
+                      <p className="break-all font-medium"><code>{creator.creator_id}</code></p>
+                      <p className="mt-1 text-xs text-muted">{creator.service}</p>
                     </div>
                     <CreatorActions creator={creator} onEdit={() => openEdit(creator)} onRemove={() => setRemoving(creator)} />
+                  </div>
+                  <div className="mt-3 grid grid-cols-[auto_minmax(0,1fr)] gap-2 text-sm">
+                    <span className="text-muted">{t("creators.alias")}</span>
+                    <span className="min-w-0 break-words text-right">{creator.alias || "—"}</span>
                   </div>
                   <div className="mt-4 flex min-h-14 items-center justify-between gap-3 border-t border-border pt-3">
                     <div className="min-w-0">
@@ -292,25 +296,21 @@ export function CreatorsPage() {
       >
         {editor ? (
           <form className="grid gap-5" id="creator-form" onSubmit={saveCreator}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <FormField
-                icon={Cloud}
-                isRequired
-                label={t("creators.service")}
-                value={editor.service}
-                onChange={(service) => setEditor({ ...editor, service })}
-              />
-              <FormField
-                icon={UserRound}
-                isRequired
-                label={t("creators.creatorId")}
-                value={editor.creator_id}
-                onChange={(creator_id) => setEditor({ ...editor, creator_id })}
-              />
-            </div>
+            <PawchivePathField
+              creatorId={editor.creator_id}
+              creatorIdLabel={t("creators.creatorId")}
+              description={originalKey ? t("creators.identityLockedHint") : t("creators.identityHint")}
+              icon={Cloud}
+              isReadOnly={Boolean(originalKey)}
+              label={t("creators.identity")}
+              service={editor.service}
+              serviceLabel={t("creators.service")}
+              onCreatorIdChange={(creator_id) => setEditor({ ...editor, creator_id })}
+              onServiceChange={(service) => setEditor({ ...editor, service })}
+            />
             <FormField
               description={t("creators.aliasHint")}
-              icon={Tag}
+              icon={Notes}
               label={t("creators.alias")}
               value={editor.alias ?? ""}
               onChange={(alias) => setEditor({ ...editor, alias: alias || null })}
@@ -357,7 +357,7 @@ function CreatorActions({
   onRemove: () => void;
 }) {
   const { t } = useTranslation();
-  const name = creator.alias || creator.creator_id;
+  const name = `${creator.service}:${creator.creator_id}`;
   return (
     <div className="flex items-center justify-end gap-1">
       <IconButton icon={Pencil} label={`${t("common.edit")} ${name}`} onPress={onEdit} />

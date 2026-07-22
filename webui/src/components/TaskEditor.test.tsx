@@ -70,7 +70,7 @@ describe("TaskEditor", () => {
 
     await user.click(screen.getByRole("tab", { name: "Download post" }));
     expect(screen.getByText(/Download one specified post/)).toBeInTheDocument();
-    expect(screen.getByRole("textbox", { name: "Service" })).toHaveValue("fanbox");
+    expect(screen.getByRole("textbox", { name: "Platform" })).toHaveValue("fanbox");
     await user.type(screen.getByRole("textbox", { name: "Creator ID" }), "42");
     await user.type(screen.getByRole("textbox", { name: "Post ID" }), "99");
     await user.type(screen.getByRole("textbox", { name: "Revision ID" }), "3");

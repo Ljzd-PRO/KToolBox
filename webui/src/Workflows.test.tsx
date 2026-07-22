@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -28,6 +29,7 @@ afterEach(() => {
 
 describe("project workflows", () => {
   it("renders the creator roster with readable labels", async () => {
+    const user = userEvent.setup();
     window.history.replaceState({}, "", "/creators");
     vi.stubGlobal(
       "fetch",
@@ -45,11 +47,29 @@ describe("project workflows", () => {
 
     expect(await screen.findByRole("heading", { name: "Creators" })).toBeInTheDocument();
     expect((await screen.findAllByText("Studio Sample")).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual([
+      "Creator ID",
+      "Platform",
+      "Note",
+      "Status",
+      "Actions",
+    ]);
     expect(screen.getByRole("button", { name: "Add creator" })).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: "Edit Studio Sample" }).length).toBeGreaterThan(0);
-    expect(screen.getAllByRole("button", { name: "Remove Studio Sample" }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("button", { name: "Edit fanbox:42" }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("button", { name: "Remove fanbox:42" }).length).toBeGreaterThan(0);
     expect(screen.queryByRole("button", { name: /Actions Studio Sample/ })).not.toBeInTheDocument();
     expect(container.querySelector(".list-switch-cell")).toContainElement(screen.getAllByRole("switch")[0]);
+
+    await user.click(screen.getByRole("button", { name: "Add creator" }));
+    expect(screen.getByRole("group", { name: "Pawchive creator path" })).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Platform" })).not.toHaveAttribute("readonly");
+    expect(screen.getByRole("textbox", { name: "Creator ID" })).not.toHaveAttribute("readonly");
+    expect(screen.getByRole("textbox", { name: "Note" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Close" }));
+
+    await user.click(screen.getAllByRole("button", { name: "Edit fanbox:42" })[0]);
+    expect(screen.getByRole("textbox", { name: "Platform" })).toHaveAttribute("readonly");
+    expect(screen.getByRole("textbox", { name: "Creator ID" })).toHaveAttribute("readonly");
   });
 
   it("renders scoped blocker controls from project TOML", async () => {
