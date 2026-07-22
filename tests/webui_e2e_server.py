@@ -25,7 +25,11 @@ PROJECT_ROOT.joinpath(".env").write_text(
 )
 PROJECT_ROOT.joinpath("ktoolbox.toml").write_text(
     'schema_version = 1\n\n[[creators]]\nservice = "fanbox"\ncreator_id = "demo-studio"\n'
-    "enabled = true\n",
+    "enabled = true\n\n"
+    '[[creators]]\nservice = "patreon"\ncreator_id = "alpha-atelier"\n'
+    'alias = "Priority reference"\nenabled = true\n\n'
+    '[[creators]]\nservice = "pixiv"\ncreator_id = "studio-10"\n'
+    "enabled = false\n",
     encoding="utf-8",
 )
 
@@ -46,11 +50,32 @@ class FixtureClient(AbstractAsyncContextManager["FixtureClient"]):
                 favorited=0,
                 indexed=0,
                 updated=0,
-            )
+            ),
+            CreatorSummary(
+                id="alpha-atelier",
+                service="patreon",
+                name="Alpha Atelier",
+                favorited=0,
+                indexed=0,
+                updated=0,
+            ),
+            CreatorSummary(
+                id="studio-10",
+                service="pixiv",
+                name="第 10 工作室",
+                favorited=0,
+                indexed=0,
+                updated=0,
+            ),
         ]
 
     async def get_creator_profile(self, service: str, creator_id: str) -> CreatorProfile:
-        return CreatorProfile(id=creator_id, service=service, name="Demo Studio")
+        names = {
+            ("fanbox", "demo-studio"): "Demo Studio",
+            ("patreon", "alpha-atelier"): "Alpha Atelier",
+            ("pixiv", "studio-10"): "第 10 工作室",
+        }
+        return CreatorProfile(id=creator_id, service=service, name=names.get((service, creator_id), creator_id))
 
     async def list_creator_posts(self, service: str, creator_id: str, **_: object) -> list[Post]:
         return [

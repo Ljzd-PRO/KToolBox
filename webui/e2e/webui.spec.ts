@@ -54,11 +54,45 @@ test("authenticated shell is accessible in desktop and mobile themes", async ({ 
   await expect(page.locator("html")).toHaveAttribute("data-theme-color", "emerald");
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole("button", { name: "Open navigation" }).click();
-  await expect(page.getByRole("link", { name: "Tasks" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Tasks", exact: true })).toBeVisible();
   await page.waitForTimeout(600);
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
   const mobileScan = await new AxeBuilder({ page }).analyze();
   expect(mobileScan.violations).toEqual([]);
+});
+
+
+test("dashboard links, roster sorting, and platform suggestions work with real HeroUI controls", async ({ page }) => {
+  await signIn(page);
+
+  await page.getByRole("link", { name: /Active tasks/ }).click();
+  await expect(page).toHaveURL(/\/tasks\?status=active$/);
+  await expect(page.getByRole("heading", { name: "Tasks", exact: true })).toBeVisible();
+
+  await page.getByRole("link", { name: "Creators", exact: true }).click();
+  const table = page.locator(".app-table-frame");
+  await expect(table.getByText("Alpha Atelier", { exact: true })).toBeVisible();
+  await expect(table.getByText("第 10 工作室", { exact: true })).toBeVisible();
+
+  const creatorIdHeader = page.getByRole("columnheader", { name: /Creator ID/ });
+  await creatorIdHeader.click();
+  await creatorIdHeader.click();
+  const creatorRows = table.getByRole("row").filter({ has: page.getByRole("button", { name: /^Edit / }) });
+  await expect(creatorRows.first()).toContainText("studio-10");
+
+  await page.getByRole("button", { name: "Add creator" }).click();
+  const dialog = page.getByRole("dialog", { name: "Add creator" });
+  const platform = dialog.getByRole("combobox", { name: "Platform" });
+  await platform.click();
+  for (const option of ["Patreon", "Pixiv", "Fanbox"]) {
+    const item = page.getByRole("option", { name: option });
+    await expect(item).toBeVisible();
+    await expect(item.locator(".select-option-icon svg")).toHaveAttribute("aria-hidden", "true");
+  }
+  await platform.fill("custom-platform");
+  await expect(platform).toHaveValue("custom-platform");
+  await page.keyboard.press("Escape");
+  await dialog.getByRole("button", { name: "Cancel" }).click();
 });
 
 
@@ -68,16 +102,16 @@ test("Chinese product terminology stays consistent across workflows", async ({ p
   await expect(page.getByRole("heading", { name: "概览", exact: true })).toBeVisible();
   await expect(page.locator("body")).not.toContainText(legacyChineseTerms);
 
-  await page.getByRole("link", { name: "任务" }).click();
+  await page.getByRole("link", { name: "任务", exact: true }).click();
   await page.getByRole("button", { name: "创建任务" }).click();
   await expect(page.getByRole("switch", { name: "同步所有已启用作者" })).toBeVisible();
   await page.getByRole("dialog", { name: "创建任务" }).getByRole("button", { name: "取消" }).click();
 
-  await page.getByRole("link", { name: "作品" }).click();
+  await page.getByRole("link", { name: "作品", exact: true }).click();
   await expect(page.getByRole("heading", { name: "作品", exact: true })).toBeVisible();
-  await expect(page.getByRole("textbox", { name: "平台" })).toBeVisible();
+  await expect(page.getByRole("combobox", { name: "平台" })).toBeVisible();
 
-  await page.getByRole("link", { name: "忽略规则" }).click();
+  await page.getByRole("link", { name: "忽略规则", exact: true }).click();
   await expect(page.getByRole("heading", { name: "忽略规则", exact: true })).toBeVisible();
   await expect(page.locator("body")).not.toContainText(legacyChineseTerms);
 });
@@ -85,7 +119,7 @@ test("Chinese product terminology stays consistent across workflows", async ({ p
 
 test("HeroUI tables and forms preserve their visual hierarchy", async ({ page }) => {
   await signIn(page);
-  await page.getByRole("link", { name: "Tasks" }).click();
+  await page.getByRole("link", { name: "Tasks", exact: true }).click();
   await page.getByRole("button", { name: "Create task" }).click();
   const formSurface = page.locator(".app-form-modal-surface");
   const formScroll = page.locator(".app-form-modal-body");
@@ -131,7 +165,7 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
 
   await page.getByRole("tab", { name: "Download post" }).click();
   const postPath = formSurface.getByRole("group", { name: "Pawchive post path" });
-  const platformField = postPath.getByRole("textbox", { name: "Platform" });
+  const platformField = postPath.getByRole("combobox", { name: "Platform" });
   const creatorIdField = postPath.getByRole("textbox", { name: "Creator ID" });
   const postIdField = postPath.getByRole("textbox", { name: "Post ID" });
   await expect(platformField).toHaveValue("fanbox");
@@ -163,7 +197,7 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   expect(await formActions.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
 
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.getByLabel("Output directory").fill("visual-hierarchy-downloads");
+  await formSurface.getByRole("textbox", { name: /Output directory/ }).fill("visual-hierarchy-downloads");
   await page.getByRole("dialog", { name: "Create task" }).getByRole("button", { name: "Create task" }).click();
   await expect(page.getByRole("heading", { name: "Task details" })).toBeVisible();
   await page.getByRole("button", { name: "Back" }).click();
@@ -184,8 +218,8 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   await expect(tableFrame).toHaveCSS("border-top-width", "1px");
   expect(await tableFrame.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
 
-  await expect(tableFrame.getByText("1 creator", { exact: true })).toBeVisible();
-  await expect(tableFrame.getByText("Demo Studio", { exact: true })).toBeVisible();
+  await expect(tableFrame.getByText("2 creators", { exact: true })).toBeVisible();
+  await expect(tableFrame.getByText(/demo-studio/)).toBeVisible();
   const desktopActions = page.locator(".task-action-grid:visible button");
   await expect(desktopActions).toHaveCount(7);
   for (const label of ["Task details", "Stop", "Edit", "Move up", "Move down", "Delete"]) {
@@ -211,10 +245,11 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
 
 test("roster blockers and configuration keep controls aligned and visible", async ({ page }) => {
   await signIn(page);
-  await page.getByRole("link", { name: "Creators" }).click();
+  await page.getByRole("link", { name: "Creators", exact: true }).click();
 
   const creatorRow = page.getByRole("row").filter({ hasText: "Demo Studio" });
   expect(await page.getByRole("columnheader").allTextContents()).toEqual([
+    "Creator name",
     "Creator ID",
     "Platform",
     "Note",
@@ -248,19 +283,22 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
   await page.getByRole("button", { name: "Add creator" }).click();
   const addCreatorDialog = page.getByRole("dialog", { name: "Add creator" });
   await expect(addCreatorDialog.getByRole("group", { name: "Pawchive creator path" })).toBeVisible();
-  await expect(addCreatorDialog.getByRole("textbox", { name: "Platform" })).not.toHaveAttribute("readonly");
+  await expect(addCreatorDialog.getByRole("combobox", { name: "Platform" })).not.toHaveAttribute("readonly");
   await expect(addCreatorDialog.getByRole("textbox", { name: "Creator ID" })).not.toHaveAttribute("readonly");
   await expect(addCreatorDialog.getByRole("textbox", { name: "Note" })).toBeVisible();
   await addCreatorDialog.getByRole("button", { name: "Cancel" }).click();
 
   await creatorRow.getByRole("button", { name: "Edit fanbox:demo-studio" }).click();
   const editCreatorDialog = page.getByRole("dialog", { name: "Edit creator" });
-  await expect(editCreatorDialog.getByRole("textbox", { name: "Platform" })).toHaveAttribute("readonly", "");
+  await expect(editCreatorDialog.getByRole("combobox", { name: "Platform" })).toHaveAttribute("readonly", "");
   await expect(editCreatorDialog.getByRole("textbox", { name: "Creator ID" })).toHaveAttribute("readonly", "");
   await editCreatorDialog.getByRole("button", { name: "Cancel" }).click();
 
-  await page.getByRole("link", { name: "Blockers" }).click();
+  await page.getByRole("link", { name: "Blockers", exact: true }).click();
   await page.getByRole("button", { name: "Add blocker" }).click();
+  const blockerEditor = page.getByRole("dialog", { name: "Add blocker" });
+  await expect(blockerEditor.getByRole("textbox", { name: "Matcher type" })).toHaveValue("Field match");
+  await expect(blockerEditor.getByRole("button", { name: /Matcher type/ })).toHaveCount(0);
   await page.getByRole("textbox", { name: /Rule ID/ }).fill("daily-sharing");
   await page.getByRole("textbox", { name: "Values" }).pressSequentially("fictional-daily,");
   await expect(page.getByRole("button", { name: "Remove fictional-daily" })).toBeVisible();
@@ -286,7 +324,7 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
   await expect(page.getByRole("dialog", { name: "Remove this blocker?" })).toBeVisible();
   await page.getByRole("dialog", { name: "Remove this blocker?" }).getByRole("button", { name: "Cancel" }).click();
 
-  await page.getByRole("link", { name: "Configuration" }).click();
+  await page.getByRole("link", { name: "Configuration", exact: true }).click();
   const saveBar = page.locator(".config-save-bar");
   await expect(saveBar).toBeVisible();
   expect(await saveBar.evaluate((element) => Boolean(element.closest(".form-surface")))).toBe(true);
@@ -300,7 +338,7 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
 
 test("task form serializes one-sided dates and protects regular-expression commas", async ({ page }) => {
   await signIn(page);
-  await page.getByRole("link", { name: "Tasks" }).click();
+  await page.getByRole("link", { name: "Tasks", exact: true }).click();
   await page.getByRole("button", { name: "Create task" }).click();
   const taskDialog = page.getByRole("dialog", { name: "Create task" });
   const noStartDate = taskDialog.getByRole("checkbox", { name: "No start date" });
@@ -335,7 +373,7 @@ test("task form serializes one-sided dates and protects regular-expression comma
   });
   await expect(page.getByRole("heading", { name: "Task details" })).toBeVisible();
 
-  await page.getByRole("link", { name: "Blockers" }).click();
+  await page.getByRole("link", { name: "Blockers", exact: true }).click();
   await page.getByRole("button", { name: "Add blocker" }).click();
   const blockerDialog = page.getByRole("dialog", { name: "Add blocker" });
   await blockerDialog.getByRole("button", { name: /Contains Operator/ }).click();
@@ -351,7 +389,7 @@ test("task form serializes one-sided dates and protects regular-expression comma
 
 test("task lifecycle remains operable through pause resume and stop", async ({ page }) => {
   await signIn(page);
-  await page.getByRole("link", { name: "Tasks" }).click();
+  await page.getByRole("link", { name: "Tasks", exact: true }).click();
   await page.getByRole("button", { name: "Create task" }).click();
   await page.getByRole("dialog", { name: "Create task" }).getByRole("button", { name: "Create task" }).click();
   await expect(page.getByRole("heading", { name: "Task details" })).toBeVisible();
