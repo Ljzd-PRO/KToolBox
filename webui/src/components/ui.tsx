@@ -130,6 +130,7 @@ export function FormField({
   placeholder,
   icon,
   isReadOnly = false,
+  isDisabled = false,
 }: {
   label: string;
   description?: string;
@@ -143,11 +144,13 @@ export function FormField({
   placeholder?: string;
   icon?: TablerIcon;
   isReadOnly?: boolean;
+  isDisabled?: boolean;
 }) {
   return (
     <TextField.Root
       className="grid gap-1.5"
       fullWidth
+      isDisabled={isDisabled}
       isInvalid={isInvalid}
       isReadOnly={isReadOnly}
       isRequired={isRequired}

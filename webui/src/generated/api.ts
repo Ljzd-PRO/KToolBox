@@ -180,6 +180,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/filesystem": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Browse Filesystem */
+        get: operations["browse_filesystem_api_v1_filesystem_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/filesystem/directories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Directory */
+        post: operations["create_directory_api_v1_filesystem_directories_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -594,6 +628,7 @@ export interface components {
             label: string;
             /** Path */
             path: string;
+            path_selector?: components["schemas"]["PathSelectorResponse"] | null;
             /** Secret */
             secret: boolean;
             /** Section */
@@ -706,6 +741,87 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** FilesystemBreadcrumbResponse */
+        FilesystemBreadcrumbResponse: {
+            /** Label */
+            label: string;
+            /** Path */
+            path: string;
+        };
+        /** FilesystemBrowseResponse */
+        FilesystemBrowseResponse: {
+            /** Breadcrumbs */
+            breadcrumbs: components["schemas"]["FilesystemBreadcrumbResponse"][];
+            /** Entries */
+            entries: components["schemas"]["FilesystemEntryResponse"][];
+            /** Has More */
+            has_more: boolean;
+            /** Limit */
+            limit: number;
+            /** Locations */
+            locations: components["schemas"]["FilesystemLocationResponse"][];
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "directory" | "file";
+            /** Offset */
+            offset: number;
+            /** Parent */
+            parent?: string | null;
+            /** Path */
+            path: string;
+            /** Project Relative Path */
+            project_relative_path?: string | null;
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "project" | "host";
+            /** Separator */
+            separator: string;
+            /** Suggested Name */
+            suggested_name?: string | null;
+        };
+        /** FilesystemCreateDirectoryRequest */
+        FilesystemCreateDirectoryRequest: {
+            /** Name */
+            name: string;
+            /** Parent */
+            parent: string;
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "project" | "host";
+        };
+        /** FilesystemEntryResponse */
+        FilesystemEntryResponse: {
+            /** Is Symlink */
+            is_symlink: boolean;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "directory" | "file" | "other";
+            /** Name */
+            name: string;
+            /** Navigable */
+            navigable: boolean;
+            /** Path */
+            path: string;
+            /** Project Relative Path */
+            project_relative_path?: string | null;
+        };
+        /** FilesystemLocationResponse */
+        FilesystemLocationResponse: {
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            /** Path */
+            path: string;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -725,6 +841,24 @@ export interface components {
             password: string;
             /** Username */
             username: string;
+        };
+        /** PathSelectorResponse */
+        PathSelectorResponse: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "directory" | "file";
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "project" | "host";
+            /**
+             * Value Mode
+             * @enum {string}
+             */
+            value_mode: "absolute" | "project_relative";
         };
         /** Post */
         Post: {
@@ -1655,6 +1789,76 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    browse_filesystem_api_v1_filesystem_get: {
+        parameters: {
+            query?: {
+                scope?: "project" | "host";
+                mode?: "directory" | "file";
+                path?: string | null;
+                search?: string;
+                include_hidden?: boolean;
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FilesystemBrowseResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_directory_api_v1_filesystem_directories_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FilesystemCreateDirectoryRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FilesystemEntryResponse"];
                 };
             };
             /** @description Validation Error */

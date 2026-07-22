@@ -56,7 +56,14 @@ export type ConfigField = {
   secret: boolean;
   source: string;
   apply_mode: "next_task" | "restart";
+  path_selector?: PathSelector | null;
 };
+
+export type PathSelector = WebUIApiSchemas["PathSelectorResponse"];
+
+export type FilesystemBrowse = WebUIApiSchemas["FilesystemBrowseResponse"];
+
+export type FilesystemEntry = WebUIApiSchemas["FilesystemEntryResponse"];
 
 export type ConfigSchema = {
   locale: "en" | "zh-CN";

@@ -39,6 +39,7 @@ import {
   PasswordField,
   SelectField,
 } from "../components/ui";
+import { RemotePathField } from "../components/RemotePathField";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import type { ConfigField, ConfigSchema, ProjectDocument, TextDocument } from "../types";
@@ -379,7 +380,17 @@ function ConfigFieldEditor({
   const value = isPending ? pendingValue : serializeValue(field.value ?? field.default);
   const enumValues = schemaEnum(schema);
   const icon = configurationIcon(field, type);
-  const control = field.secret ? (
+  const control = field.path_selector ? (
+    <RemotePathField
+      description={field.description}
+      icon={icon}
+      isDisabled={disabled}
+      label={field.label}
+      selector={field.path_selector}
+      value={value ?? ""}
+      onChange={onChange}
+    />
+  ) : field.secret ? (
     <PasswordField
       description={field.description}
       icon={icon}
@@ -424,6 +435,7 @@ function ConfigFieldEditor({
     <FormField
       description={field.description}
       icon={icon}
+      isDisabled={disabled}
       label={field.label}
       value={value ?? ""}
       onChange={onChange}

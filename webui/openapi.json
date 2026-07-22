@@ -154,6 +154,16 @@
             "title": "Path",
             "type": "string"
           },
+          "path_selector": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PathSelectorResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "secret": {
             "title": "Secret",
             "type": "boolean"
@@ -479,6 +489,233 @@
         "title": "FileReference",
         "type": "object"
       },
+      "FilesystemBreadcrumbResponse": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "path"
+        ],
+        "title": "FilesystemBreadcrumbResponse",
+        "type": "object"
+      },
+      "FilesystemBrowseResponse": {
+        "properties": {
+          "breadcrumbs": {
+            "items": {
+              "$ref": "#/components/schemas/FilesystemBreadcrumbResponse"
+            },
+            "title": "Breadcrumbs",
+            "type": "array"
+          },
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/FilesystemEntryResponse"
+            },
+            "title": "Entries",
+            "type": "array"
+          },
+          "has_more": {
+            "title": "Has More",
+            "type": "boolean"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "locations": {
+            "items": {
+              "$ref": "#/components/schemas/FilesystemLocationResponse"
+            },
+            "title": "Locations",
+            "type": "array"
+          },
+          "mode": {
+            "enum": [
+              "directory",
+              "file"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "project_relative_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Relative Path"
+          },
+          "scope": {
+            "enum": [
+              "project",
+              "host"
+            ],
+            "title": "Scope",
+            "type": "string"
+          },
+          "separator": {
+            "title": "Separator",
+            "type": "string"
+          },
+          "suggested_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suggested Name"
+          }
+        },
+        "required": [
+          "scope",
+          "mode",
+          "path",
+          "separator",
+          "breadcrumbs",
+          "locations",
+          "entries",
+          "offset",
+          "limit",
+          "has_more"
+        ],
+        "title": "FilesystemBrowseResponse",
+        "type": "object"
+      },
+      "FilesystemCreateDirectoryRequest": {
+        "properties": {
+          "name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "parent": {
+            "title": "Parent",
+            "type": "string"
+          },
+          "scope": {
+            "enum": [
+              "project",
+              "host"
+            ],
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scope",
+          "parent",
+          "name"
+        ],
+        "title": "FilesystemCreateDirectoryRequest",
+        "type": "object"
+      },
+      "FilesystemEntryResponse": {
+        "properties": {
+          "is_symlink": {
+            "title": "Is Symlink",
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "directory",
+              "file",
+              "other"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "navigable": {
+            "title": "Navigable",
+            "type": "boolean"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "project_relative_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Relative Path"
+          }
+        },
+        "required": [
+          "name",
+          "path",
+          "kind",
+          "is_symlink",
+          "navigable"
+        ],
+        "title": "FilesystemEntryResponse",
+        "type": "object"
+      },
+      "FilesystemLocationResponse": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "path"
+        ],
+        "title": "FilesystemLocationResponse",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -523,6 +760,41 @@
           "password"
         ],
         "title": "LoginRequest",
+        "type": "object"
+      },
+      "PathSelectorResponse": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "directory",
+              "file"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "scope": {
+            "enum": [
+              "project",
+              "host"
+            ],
+            "title": "Scope",
+            "type": "string"
+          },
+          "value_mode": {
+            "enum": [
+              "absolute",
+              "project_relative"
+            ],
+            "title": "Value Mode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "scope",
+          "value_mode"
+        ],
+        "title": "PathSelectorResponse",
         "type": "object"
       },
       "Post": {
@@ -2597,6 +2869,168 @@
         "summary": "Event Stream",
         "tags": [
           "tasks"
+        ]
+      }
+    },
+    "/api/v1/filesystem": {
+      "get": {
+        "operationId": "browse_filesystem_api_v1_filesystem_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "scope",
+            "required": false,
+            "schema": {
+              "default": "project",
+              "enum": [
+                "project",
+                "host"
+              ],
+              "title": "Scope",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "mode",
+            "required": false,
+            "schema": {
+              "default": "directory",
+              "enum": [
+                "directory",
+                "file"
+              ],
+              "title": "Mode",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "path",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Path"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 256,
+              "title": "Search",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_hidden",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Include Hidden",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilesystemBrowseResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Browse Filesystem",
+        "tags": [
+          "filesystem"
+        ]
+      }
+    },
+    "/api/v1/filesystem/directories": {
+      "post": {
+        "operationId": "create_directory_api_v1_filesystem_directories_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FilesystemCreateDirectoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilesystemEntryResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Directory",
+        "tags": [
+          "filesystem"
         ]
       }
     },

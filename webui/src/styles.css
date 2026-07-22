@@ -686,6 +686,36 @@ code {
   background: var(--console-panel);
 }
 
+.remote-path-picker-container {
+  width: min(56rem, calc(100vw - 1.5rem)) !important;
+  max-width: 56rem !important;
+}
+
+.remote-path-picker-container .app-modal-dialog {
+  width: 100%;
+  max-width: 56rem;
+}
+
+.remote-path-picker-body {
+  height: min(68dvh, 42rem);
+  margin-inline: 0 !important;
+  background: var(--console-subtle);
+}
+
+.remote-path-entry {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.75rem;
+  padding-inline: 0.75rem;
+}
+
+@media (max-width: 639px) {
+  .remote-path-picker-body {
+    height: min(66dvh, 38rem);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
