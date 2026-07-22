@@ -23,6 +23,7 @@ import { useTranslation } from "react-i18next";
 
 import {
   AutocompleteField,
+  ChipListField,
   CompactSwitch,
   ConfirmModal,
   EmptyPanel,
@@ -48,7 +49,7 @@ const blankCondition = (): FieldCondition => ({
   kind: "field",
   field: "title",
   operator: "contains",
-  values: [""],
+  values: [],
   expected: true,
   case_sensitive: false,
   negate: false,
@@ -491,7 +492,7 @@ function ConditionEditor({
             onChange({
               ...condition,
               operator: operator as FieldCondition["operator"],
-              values: operator === "exists" ? [] : condition.values.length ? condition.values : [""],
+              values: operator === "exists" ? [] : condition.values,
             })
           }
         />
@@ -500,12 +501,13 @@ function ConditionEditor({
         </Button>
       </div>
       {condition.operator !== "exists" ? (
-        <FormField
+        <ChipListField
+          commitOnComma={condition.operator !== "regex"}
           description={t("blockers.valuesHint")}
           icon={Braces}
           label={t("blockers.values")}
-          value={condition.values.join(", ")}
-          onChange={(value) => onChange({ ...condition, values: value.split(",").map((item) => item.trim()) })}
+          values={condition.values.filter(Boolean)}
+          onChange={(values) => onChange({ ...condition, values })}
         />
       ) : null}
       <div className="flex flex-wrap items-center gap-5">

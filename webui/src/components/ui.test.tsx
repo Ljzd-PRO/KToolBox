@@ -17,6 +17,7 @@ import {
   FormSurface,
   FormSwitchField,
   OptionalDateRangeField,
+  PawchivePathField,
 } from "./ui";
 
 function ChipListHarness({ commitOnComma = true }: { commitOnComma?: boolean }) {
@@ -198,6 +199,44 @@ describe("OptionalDateRangeField", () => {
 
     await user.click(screen.getByRole("checkbox", { name: "No start date" }));
     expect(screen.getByTestId("date-state")).toHaveTextContent("none|none|true|true");
+
+    await user.click(screen.getByRole("checkbox", { name: "No end date" }));
+    expect(screen.getByTestId("date-state")).toHaveTextContent("none|none|true|false");
+  });
+});
+
+describe("PawchivePathField", () => {
+  it("composes accessible inputs into the real Pawchive path shape", async () => {
+    const user = userEvent.setup();
+    function Harness() {
+      const [service, setService] = useState("");
+      const [creatorId, setCreatorId] = useState("");
+      const [postId, setPostId] = useState("");
+      return (
+        <PawchivePathField
+          creatorId={creatorId}
+          creatorIdLabel="Creator ID"
+          label="Pawchive post path"
+          postId={postId}
+          postIdLabel="Post ID"
+          service={service}
+          serviceLabel="Service"
+          onCreatorIdChange={setCreatorId}
+          onPostIdChange={setPostId}
+          onServiceChange={setService}
+        />
+      );
+    }
+    render(<Harness />);
+
+    await user.type(screen.getByRole("textbox", { name: "Service" }), "fanbox");
+    await user.type(screen.getByRole("textbox", { name: "Creator ID" }), "42");
+    await user.type(screen.getByRole("textbox", { name: "Post ID" }), "99");
+
+    expect(screen.getByRole("group", { name: "Pawchive post path" })).toHaveTextContent("//user//post/");
+    expect(screen.getByRole("textbox", { name: "Service" })).toHaveValue("fanbox");
+    expect(screen.getByRole("textbox", { name: "Creator ID" })).toHaveValue("42");
+    expect(screen.getByRole("textbox", { name: "Post ID" })).toHaveValue("99");
   });
 });
 

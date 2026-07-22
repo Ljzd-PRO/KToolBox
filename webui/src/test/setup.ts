@@ -29,3 +29,8 @@ class ResizeObserverStub {
 }
 
 Object.defineProperty(window, "ResizeObserver", { configurable: true, value: ResizeObserverStub });
+
+Object.defineProperty(Element.prototype, "getAnimations", {
+  configurable: true,
+  value: () => [],
+});

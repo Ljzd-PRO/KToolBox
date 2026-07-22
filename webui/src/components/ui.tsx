@@ -500,7 +500,7 @@ export function OptionalDateRangeField({
           onChange={toggleEnd}
         />
       </div>
-      {errorMessage ? <FieldError>{errorMessage}</FieldError> : null}
+      {errorMessage ? <p className="text-xs text-danger" role="alert">{errorMessage}</p> : null}
     </div>
   );
 }
@@ -544,6 +544,109 @@ function DateBoundaryPicker({
         </Calendar>
       </DatePicker.Popover>
     </DatePicker>
+  );
+}
+
+export function PawchivePathField({
+  label,
+  description,
+  serviceLabel,
+  creatorIdLabel,
+  postIdLabel,
+  service,
+  creatorId,
+  postId,
+  onServiceChange,
+  onCreatorIdChange,
+  onPostIdChange,
+  isReadOnly = false,
+  icon,
+}: {
+  label: string;
+  description?: string;
+  serviceLabel: string;
+  creatorIdLabel: string;
+  postIdLabel?: string;
+  service: string;
+  creatorId: string;
+  postId?: string;
+  onServiceChange: (value: string) => void;
+  onCreatorIdChange: (value: string) => void;
+  onPostIdChange?: (value: string) => void;
+  isReadOnly?: boolean;
+  icon?: TablerIcon;
+}) {
+  return (
+    <div className="grid gap-1.5">
+      <FieldLabel icon={icon} label={label} />
+      <div
+        aria-label={label}
+        aria-readonly={isReadOnly || undefined}
+        className="pawchive-path-field"
+        data-readonly={isReadOnly || undefined}
+        role="group"
+      >
+        <PawchivePathSegment
+          label={serviceLabel}
+          readOnly={isReadOnly}
+          token="/"
+          value={service}
+          onChange={onServiceChange}
+        />
+        <PawchivePathSegment
+          label={creatorIdLabel}
+          readOnly={isReadOnly}
+          token="/user/"
+          value={creatorId}
+          onChange={onCreatorIdChange}
+        />
+        {postIdLabel !== undefined && onPostIdChange ? (
+          <PawchivePathSegment
+            label={postIdLabel}
+            readOnly={isReadOnly}
+            token="/post/"
+            value={postId ?? ""}
+            onChange={onPostIdChange}
+          />
+        ) : null}
+      </div>
+      {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
+    </div>
+  );
+}
+
+function PawchivePathSegment({
+  token,
+  label,
+  value,
+  onChange,
+  readOnly,
+}: {
+  token: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  readOnly: boolean;
+}) {
+  return (
+    <span className="pawchive-path-segment">
+      <code aria-hidden="true" className="pawchive-path-token">{token}</code>
+      <TextField.Root
+        aria-label={label}
+        className="pawchive-path-text-field"
+        isReadOnly={readOnly}
+        isRequired={!readOnly}
+        value={value}
+        onChange={onChange}
+      >
+        <Input
+          aria-label={label}
+          autoComplete="off"
+          className="pawchive-path-input"
+          placeholder={label}
+        />
+      </TextField.Root>
+    </span>
   );
 }
 

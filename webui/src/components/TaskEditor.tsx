@@ -6,7 +6,7 @@ import {
   IconCheck as Check,
   IconCloud as Cloud,
   IconDownload as Download,
-  IconFileText as FileText,
+  IconFilter as Filter,
   IconFilterX as FilterX,
   IconFingerprint as Fingerprint,
   IconFolder as FolderOutput,
@@ -18,23 +18,23 @@ import {
   IconPlus as Plus,
   IconRefresh as RefreshCw,
   IconTags as Tags,
-  IconUser as UserRound,
   IconUsersGroup as UsersRound,
   IconX as X,
 } from "@tabler/icons-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { parseDate } from "@internationalized/date";
+import { parseDate, type DateValue } from "@internationalized/date";
 
 import type { CreatorReference, DownloadTaskSpec, SyncTaskSpec, TaskRecord, TaskSpec } from "../types";
 import {
-  DateRangeInput,
-  type DateRangeValue,
+  ChipListField,
   FormCheckbox,
   FormField,
   FormModal,
   FormSwitchField,
   NumberInput,
+  OptionalDateRangeField,
+  PawchivePathField,
   SelectField,
 } from "./ui";
 
@@ -65,12 +65,13 @@ export function TaskEditor({
   const [mixPosts, setMixPosts] = useState(initialSync?.mix_posts === null || initialSync?.mix_posts === undefined ? "inherit" : String(initialSync.mix_posts));
   const [offset, setOffset] = useState(initialSync?.offset ?? 0);
   const [length, setLength] = useState(initialSync?.length?.toString() ?? "");
-  const [keywords, setKeywords] = useState((initialSync?.keywords ?? []).join(", "));
-  const [excludedKeywords, setExcludedKeywords] = useState((initialSync?.keywords_exclude ?? []).join(", "));
-  const initialRange = taskDateRange(initialSync);
-  const [dateRange, setDateRange] = useState<DateRangeValue | null>(initialRange);
-  const [useStart, setUseStart] = useState(Boolean(initialSync?.start_time));
-  const [useEnd, setUseEnd] = useState(Boolean(initialSync?.end_time));
+  const [keywords, setKeywords] = useState(initialSync?.keywords ?? []);
+  const [excludedKeywords, setExcludedKeywords] = useState(initialSync?.keywords_exclude ?? []);
+  const [startDate, setStartDate] = useState<DateValue | null>(taskDate(initialSync?.start_time));
+  const [endDate, setEndDate] = useState<DateValue | null>(taskDate(initialSync?.end_time));
+  const [startUnlimited, setStartUnlimited] = useState(!initialSync?.start_time);
+  const [endUnlimited, setEndUnlimited] = useState(!initialSync?.end_time);
+  const [dateError, setDateError] = useState<string | undefined>();
 
   const initialDownload = initial?.kind === "download" ? initial : undefined;
   const [downloadIdentity, setDownloadIdentity] = useState(initialDownload?.post ? "url" : "fields");
@@ -97,6 +98,9 @@ export function TaskEditor({
       await onSave(spec);
       return;
     }
+    const nextDateError = validateDates();
+    setDateError(nextDateError);
+    if (nextDateError) return;
     const selected = allEnabled
       ? []
       : creators.filter((creator) => selectedCreators.has(`${creator.service}:${creator.creator_id}`));
@@ -106,14 +110,21 @@ export function TaskEditor({
       output,
       save_creator_indices: saveIndices,
       mix_posts: mixPosts === "inherit" ? null : mixPosts === "true",
-      start_time: useStart && dateRange ? `${dateRange.start.toString()}T00:00:00` : null,
-      end_time: useEnd && dateRange ? `${dateRange.end.toString()}T23:59:59` : null,
+      start_time: startUnlimited || !startDate ? null : `${startDate.toString()}T00:00:00`,
+      end_time: endUnlimited || !endDate ? null : `${endDate.toString()}T23:59:59`,
       offset,
       length: length ? Number(length) : null,
-      keywords: splitList(keywords),
-      keywords_exclude: splitList(excludedKeywords),
+      keywords,
+      keywords_exclude: excludedKeywords,
     };
     await onSave(spec);
+  }
+
+  function validateDates(): string | undefined {
+    if (!startUnlimited && !startDate) return t("tasks.startDateRequired");
+    if (!endUnlimited && !endDate) return t("tasks.endDateRequired");
+    if (startDate && endDate && startDate.compare(endDate) > 0) return t("tasks.dateRangeInvalid");
+    return undefined;
   }
 
   function toggleCreator(key: string, selected: boolean) {
@@ -142,14 +153,13 @@ export function TaskEditor({
       onOpenChange={(open) => !open && onClose()}
     >
       <form className="grid gap-6" id="task-editor-form" onSubmit={submit}>
-        <Tabs selectedKey={kind} variant="secondary" onSelectionChange={(key) => setKind(String(key) as "sync" | "download")}>
-          <Tabs.ListContainer>
-            <Tabs.List aria-label={t("common.type")}>
-              <Tabs.Tab id="sync"><RefreshCw aria-hidden="true" size={16} />{t("common.sync")}<Tabs.Indicator /></Tabs.Tab>
-              <Tabs.Tab id="download"><Download aria-hidden="true" size={16} />{t("common.download")}<Tabs.Indicator /></Tabs.Tab>
-            </Tabs.List>
-          </Tabs.ListContainer>
+        <Tabs className="task-editor-tabs" selectedKey={kind} variant="secondary" onSelectionChange={(key) => setKind(String(key) as "sync" | "download")}>
+          <Tabs.List aria-label={t("common.type")}>
+            <Tabs.Tab id="sync"><RefreshCw aria-hidden="true" size={16} />{t("tasks.syncAuthor")}<Tabs.Indicator /></Tabs.Tab>
+            <Tabs.Tab id="download"><Download aria-hidden="true" size={16} />{t("tasks.downloadPost")}<Tabs.Indicator /></Tabs.Tab>
+          </Tabs.List>
           <Tabs.Panel className="grid gap-5 pt-5" id="sync">
+            <PanelIntroduction icon={RefreshCw} text={t("tasks.syncIntro")} />
             <section className="grid gap-3">
               <FormSwitchField
                 description={t("tasks.allEnabledHint")}
@@ -183,21 +193,41 @@ export function TaskEditor({
                 </Surface>
               ) : null}
             </section>
-            <DateRangeInput
+            <OptionalDateRangeField
               description={t("tasks.dateRangeHint")}
+              endLabel={t("tasks.endDate")}
+              endUnlimited={endUnlimited}
+              endUnlimitedLabel={t("tasks.noEndDate")}
+              endValue={endDate}
+              errorMessage={dateError}
               icon={CalendarRange}
               label={t("tasks.dateRange")}
-              value={dateRange}
-              onChange={setDateRange}
+              startLabel={t("tasks.startDate")}
+              startUnlimited={startUnlimited}
+              startUnlimitedLabel={t("tasks.noStartDate")}
+              startValue={startDate}
+              onEndChange={(value) => {
+                setDateError(undefined);
+                setEndDate(value);
+              }}
+              onEndUnlimitedChange={(selected) => {
+                setDateError(undefined);
+                setEndUnlimited(selected);
+              }}
+              onStartChange={(value) => {
+                setDateError(undefined);
+                setStartDate(value);
+              }}
+              onStartUnlimitedChange={(selected) => {
+                setDateError(undefined);
+                setStartUnlimited(selected);
+              }}
             />
-            <div className="flex flex-wrap gap-5">
-              <CheckOption label={t("tasks.useStart")} selected={useStart} onChange={setUseStart} />
-              <CheckOption label={t("tasks.useEnd")} selected={useEnd} onChange={setUseEnd} />
-            </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <NumberInput icon={ListStart} label={t("tasks.offset")} minValue={0} step={50} value={offset} onChange={setOffset} />
-              <FormField icon={ListFilter} label={t("tasks.limit")} type="number" value={length} onChange={setLength} />
+              <NumberInput description={t("tasks.offsetHint")} icon={ListStart} label={t("tasks.offset")} minValue={0} step={1} value={offset} onChange={setOffset} />
+              <FormField description={t("tasks.limitHint")} icon={ListFilter} label={t("tasks.limit")} type="number" value={length} onChange={setLength} />
               <SelectField
+                description={t("tasks.mixPostsHint")}
                 icon={Shuffle}
                 label={t("tasks.mixPosts")}
                 options={[
@@ -209,59 +239,83 @@ export function TaskEditor({
                 onChange={setMixPosts}
               />
             </div>
-            <FormField description={t("tasks.keywordHint")} icon={Tags} label={t("tasks.keywords")} value={keywords} onChange={setKeywords} />
-            <FormField description={t("tasks.keywordHint")} icon={FilterX} label={t("tasks.excludedKeywords")} value={excludedKeywords} onChange={setExcludedKeywords} />
-            <FormSwitchField icon={BookOpenCheck} isSelected={saveIndices} label={t("tasks.saveIndex")} onChange={setSaveIndices} />
+            <FormSwitchField description={t("tasks.saveIndexHint")} icon={BookOpenCheck} isSelected={saveIndices} label={t("tasks.saveIndex")} onChange={setSaveIndices} />
+            <section className="grid gap-4 border-t border-border pt-5">
+              <div className="flex items-start gap-2">
+                <Filter aria-hidden="true" className="mt-0.5 shrink-0 text-accent" size={18} />
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-foreground">{t("tasks.filterTitle")}</h3>
+                  <p className="mt-1 text-xs leading-relaxed text-muted">{t("tasks.filterDescription")}</p>
+                </div>
+              </div>
+              <ChipListField
+                description={t("tasks.keywordsHint")}
+                icon={Tags}
+                label={t("tasks.keywords")}
+                placeholder={t("tasks.keywordPlaceholder")}
+                values={keywords}
+                onChange={setKeywords}
+              />
+              <ChipListField
+                description={t("tasks.excludedKeywordsHint")}
+                icon={FilterX}
+                label={t("tasks.excludedKeywords")}
+                placeholder={t("tasks.keywordPlaceholder")}
+                values={excludedKeywords}
+                onChange={setExcludedKeywords}
+              />
+            </section>
           </Tabs.Panel>
           <Tabs.Panel className="grid gap-5 pt-5" id="download">
+            <PanelIntroduction icon={Download} text={t("tasks.downloadIntro")} />
             <SelectField
+              description={t("tasks.identityModeHint")}
               icon={Fingerprint}
               label={t("tasks.identityMode")}
               options={[
-                { value: "url", label: t("tasks.postUrl") },
+                { value: "url", label: t("tasks.identityUrl") },
                 { value: "fields", label: t("tasks.identityFields") },
               ]}
               value={downloadIdentity}
               onChange={setDownloadIdentity}
             />
             {downloadIdentity === "url" ? (
-              <FormField icon={Link} isRequired label={t("tasks.postUrl")} value={postUrl} onChange={setPostUrl} />
+              <FormField description={t("tasks.postUrlHint")} icon={Link} isRequired label={t("tasks.postUrl")} value={postUrl} onChange={setPostUrl} />
             ) : (
-              <div className="grid gap-4 sm:grid-cols-3">
-                <FormField icon={Cloud} isRequired label={t("posts.service")} value={service} onChange={setService} />
-                <FormField icon={UserRound} isRequired label={t("posts.creatorId")} value={creatorId} onChange={setCreatorId} />
-                <FormField icon={FileText} isRequired label={t("posts.postId")} value={postId} onChange={setPostId} />
-              </div>
+              <PawchivePathField
+                creatorId={creatorId}
+                creatorIdLabel={t("posts.creatorId")}
+                description={t("tasks.identityPathHint")}
+                icon={Cloud}
+                label={t("tasks.identityPath")}
+                postId={postId}
+                postIdLabel={t("posts.postId")}
+                service={service}
+                serviceLabel={t("posts.service")}
+                onCreatorIdChange={setCreatorId}
+                onPostIdChange={setPostId}
+                onServiceChange={setService}
+              />
             )}
-            <FormField icon={History} label={t("tasks.revision")} value={revisionId} onChange={setRevisionId} />
-            <FormSwitchField icon={FileJson} isSelected={dumpMetadata} label={t("tasks.dumpMetadata")} onChange={setDumpMetadata} />
+            <FormField description={t("tasks.revisionHint")} icon={History} label={t("tasks.revision")} value={revisionId} onChange={setRevisionId} />
+            <FormSwitchField description={t("tasks.dumpMetadataHint")} icon={FileJson} isSelected={dumpMetadata} label={t("tasks.dumpMetadata")} onChange={setDumpMetadata} />
           </Tabs.Panel>
         </Tabs>
-        <FormField icon={FolderOutput} isRequired label={t("tasks.output")} value={output} onChange={setOutput} />
+        <FormField description={t("tasks.outputHint")} icon={FolderOutput} isRequired label={t("tasks.output")} value={output} onChange={setOutput} />
       </form>
     </FormModal>
   );
 }
 
-function CheckOption({
-  label,
-  selected,
-  onChange,
-}: {
-  label: string;
-  selected: boolean;
-  onChange: (selected: boolean) => void;
-}) {
-  return <FormCheckbox isSelected={selected} label={label} onChange={onChange} />;
+function PanelIntroduction({ icon: Icon, text }: { icon: typeof RefreshCw; text: string }) {
+  return (
+    <div className="flex items-start gap-2 border-b border-border pb-4 text-sm leading-relaxed text-muted">
+      <Icon aria-hidden="true" className="mt-0.5 shrink-0 text-accent" size={18} />
+      <p>{text}</p>
+    </div>
+  );
 }
 
-function splitList(value: string): string[] {
-  return value.split(",").map((item) => item.trim()).filter(Boolean);
-}
-
-function taskDateRange(spec: SyncTaskSpec | undefined): DateRangeValue | null {
-  if (!spec?.start_time && !spec?.end_time) return null;
-  const start = parseDate((spec.start_time ?? spec.end_time ?? "").slice(0, 10));
-  const end = parseDate((spec.end_time ?? spec.start_time ?? "").slice(0, 10));
-  return { start, end };
+function taskDate(value: string | null | undefined): DateValue | null {
+  return value ? parseDate(value.slice(0, 10)) : null;
 }

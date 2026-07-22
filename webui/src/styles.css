@@ -425,6 +425,16 @@ code {
   box-shadow: 0 -1px 0 var(--border), 0 -8px 18px color-mix(in oklab, var(--background) 72%, transparent);
 }
 
+.task-editor-tabs > [data-slot="tabs-list"] {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.task-editor-tabs [data-slot="tabs-tab"] {
+  min-width: 0;
+}
+
 @media (max-width: 639px) {
   .app-modal-dialog {
     padding: 0 !important;
@@ -569,6 +579,73 @@ code {
   font-weight: 600;
 }
 
+.pawchive-path-field {
+  display: flex;
+  min-height: 2.75rem;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.25rem;
+  overflow: hidden;
+  padding: 0.375rem;
+  border: 1px solid var(--field-border);
+  border-radius: var(--field-radius);
+  background: var(--field-background);
+  box-shadow: var(--field-shadow);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.pawchive-path-field:focus-within {
+  border-color: var(--field-border-focus);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--focus) 22%, transparent);
+}
+
+.pawchive-path-field[data-readonly="true"] {
+  background: var(--surface-tertiary);
+  box-shadow: none;
+}
+
+.pawchive-path-segment {
+  display: flex;
+  min-width: 8rem;
+  flex: 1 1 9rem;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.pawchive-path-segment:nth-child(2),
+.pawchive-path-segment:nth-child(3) {
+  flex-grow: 1.2;
+}
+
+.pawchive-path-token {
+  display: inline-flex;
+  min-height: 2rem;
+  flex: none;
+  align-items: center;
+  border-radius: 0.25rem;
+  background: var(--default);
+  padding-inline: 0.375rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.pawchive-path-text-field {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.pawchive-path-input {
+  width: 100%;
+  min-width: 0;
+  min-height: 2rem;
+  border: 0 !important;
+  border-radius: 0.25rem !important;
+  background: transparent !important;
+  padding: 0.25rem 0.375rem !important;
+  box-shadow: none !important;
+}
+
 @media (max-width: 639px) {
   .optional-date-range-control {
     grid-template-columns: minmax(0, 1fr);
@@ -580,6 +657,11 @@ code {
 
   .optional-date-boundary + .optional-date-range-separator + .optional-date-boundary {
     border-top: 1px solid var(--field-border);
+  }
+
+  .pawchive-path-segment {
+    min-width: 100%;
+    flex-basis: 100%;
   }
 }
 
