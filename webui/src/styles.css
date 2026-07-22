@@ -562,94 +562,56 @@ code {
   gap: 0.25rem 1rem;
 }
 
-.optional-date-range-separator {
-  color: var(--muted);
-  font-weight: 600;
-}
-
-.pawchive-path-field {
+.pawchive-identity-fields {
   display: flex;
-  min-height: 2.75rem;
-  flex-wrap: wrap;
-  align-items: stretch;
-  gap: 0.25rem;
-  overflow: hidden;
-  padding: 0.375rem;
-  border: 1px solid var(--field-border);
-  border-radius: var(--field-radius);
-  background: var(--field-background);
-  box-shadow: var(--field-shadow);
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  min-width: 0;
+  align-items: flex-end;
+  gap: 0.5rem;
 }
 
-.pawchive-path-field:focus-within {
-  border-color: var(--field-border-focus);
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--focus) 22%, transparent);
-}
-
-.pawchive-path-field[data-readonly="true"] {
-  background: var(--surface-tertiary);
-  box-shadow: none;
-}
-
-.pawchive-path-segment {
-  display: flex;
-  min-width: 8rem;
-  flex: 1 1 9rem;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.pawchive-path-segment:nth-child(2),
-.pawchive-path-segment:nth-child(3) {
-  flex-grow: 1.2;
-}
-
-.pawchive-path-token {
+.pawchive-identity-token {
   display: inline-flex;
-  min-height: 2rem;
-  flex: none;
+  min-height: 2.75rem;
+  flex: 0 0 auto;
   align-items: center;
-  border-radius: 0.25rem;
-  background: var(--default);
-  padding-inline: 0.375rem;
+  justify-content: center;
   color: var(--muted);
   font-size: 0.75rem;
   font-weight: 600;
 }
 
-.pawchive-path-text-field {
+.pawchive-identity-input {
   min-width: 0;
-  flex: 1 1 auto;
+  flex: 1 1 10rem;
 }
 
-.pawchive-path-input {
-  width: 100%;
-  min-width: 0;
-  min-height: 2rem;
-  border: 0 !important;
-  border-radius: 0.25rem !important;
-  background: transparent !important;
-  padding: 0.25rem 0.375rem !important;
-  box-shadow: none !important;
+.pawchive-identity-platform {
+  flex-basis: 8rem;
+  max-width: 10rem;
 }
 
-@media (max-width: 639px) {
-  .optional-date-range-control {
+@media (max-width: 767px) {
+  .pawchive-identity-fields {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    align-items: end;
+    gap: 0.75rem 0.5rem;
+  }
+
+  .pawchive-identity-token {
+    justify-content: flex-end;
+  }
+
+  .pawchive-identity-input,
+  .pawchive-identity-platform {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+@media (max-width: 359px) {
+  .optional-date-range-options {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .optional-date-range-separator {
-    display: none;
-  }
-
-  .optional-date-boundary:last-child {
-    border-top: 1px solid var(--field-border);
-  }
-
-  .pawchive-path-segment {
-    min-width: 100%;
-    flex-basis: 100%;
   }
 }
 

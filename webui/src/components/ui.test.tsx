@@ -17,7 +17,7 @@ import {
   FormSurface,
   FormSwitchField,
   OptionalDateRangeField,
-  PawchivePathField,
+  PawchiveIdentityFields,
 } from "./ui";
 
 function ChipListHarness({ commitOnComma = true }: { commitOnComma?: boolean }) {
@@ -205,15 +205,15 @@ describe("OptionalDateRangeField", () => {
   });
 });
 
-describe("PawchivePathField", () => {
-  it("composes accessible inputs into the real Pawchive path shape", async () => {
+describe("PawchiveIdentityFields", () => {
+  it("uses independent accessible HeroUI fields with path separators", async () => {
     const user = userEvent.setup();
     function Harness() {
       const [service, setService] = useState("");
       const [creatorId, setCreatorId] = useState("");
       const [postId, setPostId] = useState("");
       return (
-        <PawchivePathField
+        <PawchiveIdentityFields
           creatorId={creatorId}
           creatorIdLabel="Creator ID"
           label="Pawchive post path"
@@ -233,7 +233,14 @@ describe("PawchivePathField", () => {
     await user.type(screen.getByRole("textbox", { name: "Creator ID" }), "42");
     await user.type(screen.getByRole("textbox", { name: "Post ID" }), "99");
 
-    expect(screen.getByRole("group", { name: "Pawchive post path" })).toHaveTextContent("//user//post/");
+    const group = screen.getByRole("group", { name: "Pawchive post path" });
+    expect(Array.from(group.querySelectorAll(".pawchive-identity-token"), (token) => token.textContent)).toEqual([
+      "/",
+      "/user/",
+      "/post/",
+    ]);
+    expect(group.querySelectorAll(".pawchive-identity-input")).toHaveLength(3);
+    expect(group).not.toHaveClass("pawchive-path-field");
     expect(screen.getByRole("textbox", { name: "Service" })).toHaveValue("fanbox");
     expect(screen.getByRole("textbox", { name: "Creator ID" })).toHaveValue("42");
     expect(screen.getByRole("textbox", { name: "Post ID" })).toHaveValue("99");

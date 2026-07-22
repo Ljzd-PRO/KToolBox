@@ -32,7 +32,7 @@ import {
   FormSwitchField,
   FormSurface,
   IconButton,
-  PawchivePathField,
+  PawchiveIdentityFields,
   PageHeader,
   PageLoading,
 } from "../components/ui";
@@ -296,7 +296,7 @@ export function CreatorsPage() {
       >
         {editor ? (
           <form className="grid gap-5" id="creator-form" onSubmit={saveCreator}>
-            <PawchivePathField
+            <PawchiveIdentityFields
               creatorId={editor.creator_id}
               creatorIdLabel={t("creators.creatorId")}
               description={originalKey ? t("creators.identityLockedHint") : t("creators.identityHint")}

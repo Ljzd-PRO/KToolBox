@@ -129,6 +129,7 @@ export function FormField({
   errorMessage,
   placeholder,
   icon,
+  isReadOnly = false,
 }: {
   label: string;
   description?: string;
@@ -141,12 +142,14 @@ export function FormField({
   errorMessage?: string;
   placeholder?: string;
   icon?: TablerIcon;
+  isReadOnly?: boolean;
 }) {
   return (
     <TextField.Root
       className="grid gap-1.5"
       fullWidth
       isInvalid={isInvalid}
+      isReadOnly={isReadOnly}
       isRequired={isRequired}
       type={type}
       value={value}
@@ -595,7 +598,7 @@ function dateValueKey(value: DateValue | null): string | null {
   return value?.toString() ?? null;
 }
 
-export function PawchivePathField({
+export function PawchiveIdentityFields({
   label,
   description,
   serviceLabel,
@@ -630,71 +633,47 @@ export function PawchivePathField({
       <div
         aria-label={label}
         aria-readonly={isReadOnly || undefined}
-        className="pawchive-path-field"
+        className="pawchive-identity-fields"
         data-readonly={isReadOnly || undefined}
         role="group"
       >
-        <PawchivePathSegment
-          label={serviceLabel}
-          readOnly={isReadOnly}
-          token="/"
-          value={service}
-          onChange={onServiceChange}
-        />
-        <PawchivePathSegment
-          label={creatorIdLabel}
-          readOnly={isReadOnly}
-          token="/user/"
-          value={creatorId}
-          onChange={onCreatorIdChange}
-        />
-        {postIdLabel !== undefined && onPostIdChange ? (
-          <PawchivePathSegment
-            label={postIdLabel}
-            readOnly={isReadOnly}
-            token="/post/"
-            value={postId ?? ""}
-            onChange={onPostIdChange}
+        <code aria-hidden="true" className="pawchive-identity-token">/</code>
+        <div className="pawchive-identity-input pawchive-identity-platform">
+          <FormField
+            isReadOnly={isReadOnly}
+            isRequired={!isReadOnly}
+            label={serviceLabel}
+            value={service}
+            onChange={onServiceChange}
           />
+        </div>
+        <code aria-hidden="true" className="pawchive-identity-token">/user/</code>
+        <div className="pawchive-identity-input">
+          <FormField
+            isReadOnly={isReadOnly}
+            isRequired={!isReadOnly}
+            label={creatorIdLabel}
+            value={creatorId}
+            onChange={onCreatorIdChange}
+          />
+        </div>
+        {postIdLabel !== undefined && onPostIdChange ? (
+          <>
+            <code aria-hidden="true" className="pawchive-identity-token">/post/</code>
+            <div className="pawchive-identity-input">
+              <FormField
+                isReadOnly={isReadOnly}
+                isRequired={!isReadOnly}
+                label={postIdLabel}
+                value={postId ?? ""}
+                onChange={onPostIdChange}
+              />
+            </div>
+          </>
         ) : null}
       </div>
       {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
     </div>
-  );
-}
-
-function PawchivePathSegment({
-  token,
-  label,
-  value,
-  onChange,
-  readOnly,
-}: {
-  token: string;
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  readOnly: boolean;
-}) {
-  return (
-    <span className="pawchive-path-segment">
-      <code aria-hidden="true" className="pawchive-path-token">{token}</code>
-      <TextField.Root
-        aria-label={label}
-        className="pawchive-path-text-field"
-        isReadOnly={readOnly}
-        isRequired={!readOnly}
-        value={value}
-        onChange={onChange}
-      >
-        <Input
-          aria-label={label}
-          autoComplete="off"
-          className="pawchive-path-input"
-          placeholder={label}
-        />
-      </TextField.Root>
-    </span>
   );
 }
 

@@ -34,7 +34,7 @@ import {
   FormSwitchField,
   NumberInput,
   OptionalDateRangeField,
-  PawchivePathField,
+  PawchiveIdentityFields,
   SelectField,
 } from "./ui";
 
@@ -283,7 +283,7 @@ export function TaskEditor({
             {downloadIdentity === "url" ? (
               <FormField description={t("tasks.postUrlHint")} icon={Link} isRequired label={t("tasks.postUrl")} value={postUrl} onChange={setPostUrl} />
             ) : (
-              <PawchivePathField
+              <PawchiveIdentityFields
                 creatorId={creatorId}
                 creatorIdLabel={t("posts.creatorId")}
                 description={t("tasks.identityPathHint")}
