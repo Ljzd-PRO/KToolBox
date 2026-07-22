@@ -1,5 +1,6 @@
 import { Spinner, ToastProvider } from "@heroui/react";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { I18nProvider } from "react-aria-components";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -46,14 +47,18 @@ function AuthenticatedApplication() {
 }
 
 export function App() {
+  const { i18n } = useTranslation();
+  const locale = i18n.language.startsWith("zh") ? "zh-CN" : "en-US";
   return (
-    <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <AuthenticatedApplication />
-          <ToastProvider placement="top" width={360} />
-        </AuthProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <I18nProvider locale={locale}>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <AuthenticatedApplication />
+            <ToastProvider placement="top" width={360} />
+          </AuthProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </I18nProvider>
   );
 }

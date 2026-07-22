@@ -405,7 +405,7 @@ function ConditionGroupEditor({
             onChange={(mode) => onChange({ ...group, mode: mode as "any" | "all" })}
           />
         </div>
-        <FormSwitchField icon={Ban} isSelected={group.negate} label={t("blockers.negate")} onChange={(negate) => onChange({ ...group, negate })} />
+        <FormSwitchField icon={Ban} isSelected={group.negate} label={t("blockers.negateGroup")} onChange={(negate) => onChange({ ...group, negate })} />
         {removable ? (
           <Button isIconOnly aria-label={t("common.remove")} variant="ghost" onPress={onRemove}>
             <Trash2 aria-hidden="true" size={17} />
@@ -523,7 +523,7 @@ function ConditionEditor({
         <FormCheckbox
           icon={Ban}
           isSelected={condition.negate}
-          label={t("blockers.negate")}
+          label={t("blockers.negateCondition")}
           onChange={(negate) => onChange({ ...condition, negate })}
         />
       </div>

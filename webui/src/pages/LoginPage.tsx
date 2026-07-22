@@ -1,21 +1,27 @@
 import { Alert, Button, toast } from "@heroui/react";
 import {
   IconKey as KeyRound,
+  IconLanguage,
   IconLock as LockKeyhole,
   IconLogin as LogIn,
+  IconMoon,
   IconShieldExclamation as ShieldAlert,
+  IconSun,
   IconUser as UserRound,
 } from "@tabler/icons-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 
-import { FormField, FormSurface, PasswordField } from "../components/ui";
+import { FormField, FormSurface, IconButton, PasswordField } from "../components/ui";
 import { errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
+import { toggleLanguage } from "../lib/i18n";
+import { useTheme } from "../lib/theme";
 
 export function LoginPage() {
   const { t } = useTranslation();
   const { login } = useAuth();
+  const theme = useTheme();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -35,13 +41,23 @@ export function LoginPage() {
   return (
     <main className="login-screen min-h-dvh bg-background px-4 py-8 text-foreground sm:px-8">
       <div className="mx-auto flex min-h-[calc(100dvh-4rem)] max-w-6xl flex-col justify-between gap-8">
-        <header className="flex items-center gap-3">
-          <span className="brand-mark grid size-10 place-items-center rounded-lg" aria-hidden="true">
-            <LockKeyhole size={20} strokeWidth={2} />
-          </span>
-          <div>
-            <div className="text-lg font-semibold">{t("brand")}</div>
-            <div className="text-xs text-muted">{t("subtitle")}</div>
+        <header className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="brand-mark grid size-10 shrink-0 place-items-center rounded-lg" aria-hidden="true">
+              <LockKeyhole size={20} strokeWidth={2} />
+            </span>
+            <div className="min-w-0">
+              <div className="truncate text-lg font-semibold">{t("brand")}</div>
+              <div className="truncate text-xs text-muted">{t("subtitle")}</div>
+            </div>
+          </div>
+          <div className="flex shrink-0 items-center gap-1">
+            <IconButton
+              icon={theme.effective === "dark" ? IconSun : IconMoon}
+              label={theme.effective === "dark" ? t("shell.themeLight") : t("shell.themeDark")}
+              onPress={theme.toggle}
+            />
+            <IconButton icon={IconLanguage} label={t("shell.language")} onPress={() => void toggleLanguage()} />
           </div>
         </header>
 

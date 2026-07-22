@@ -54,7 +54,7 @@ export function DashboardPage() {
 
   return (
     <div className="grid gap-5">
-      <section className="overview-heading flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+      <section className="overview-heading flex flex-col justify-between gap-3 lg:flex-row lg:items-center">
         <div className="flex min-w-0 items-center gap-2">
           <Chip color="accent" size="sm" variant="soft">
             {t("overview.eyebrow")}
@@ -97,7 +97,7 @@ export function DashboardPage() {
         </div>
         {records.length ? (
           <>
-            <DataTableFrame className="hidden md:block">
+            <DataTableFrame className="hidden lg:block">
               <Table.Content aria-label={t("overview.recent")}>
                   <Table.Header>
                     <Table.Column isRowHeader>{t("tasks.target")}</Table.Column>
@@ -134,7 +134,7 @@ export function DashboardPage() {
                   </Table.Body>
               </Table.Content>
             </DataTableFrame>
-            <div className="grid gap-3 md:hidden">
+            <div className="grid gap-3 lg:hidden">
               {records.slice(0, 6).map((task) => (
                 <Surface className="grid gap-3 rounded-lg border border-border p-4" key={task.id}>
                   <div className="flex min-w-0 items-start justify-between gap-3">

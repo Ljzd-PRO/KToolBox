@@ -4,15 +4,18 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 
 import { App } from "./App";
+import i18n from "./lib/i18n";
 
-afterEach(() => {
+afterEach(async () => {
   cleanup();
   vi.unstubAllGlobals();
   localStorage.clear();
+  await i18n.changeLanguage("en");
 });
 
 describe("App", () => {
   it("shows the real sign-in screen when no session exists", async () => {
+    const user = userEvent.setup();
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ detail: "not authenticated" }), {
         status: 401,
@@ -29,6 +32,10 @@ describe("App", () => {
 
     expect(await screen.findByRole("heading", { name: "Sign in to this project" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Sign in" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Use dark theme" }));
+    expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+    await user.click(screen.getByRole("button", { name: "Switch language" }));
+    expect(await screen.findByRole("heading", { name: "登录此同步项目" })).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith("/api/v1/session", expect.objectContaining({ credentials: "same-origin" }));
   });
 

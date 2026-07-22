@@ -73,6 +73,7 @@ describe("project workflows", () => {
   });
 
   it("renders scoped blocker controls from project TOML", async () => {
+    const user = userEvent.setup();
     window.history.replaceState({}, "", "/blockers");
     vi.stubGlobal(
       "fetch",
@@ -120,6 +121,10 @@ describe("project workflows", () => {
     expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Remove blocker" })).toBeInTheDocument();
     expect(container.querySelector(".list-switch-cell")).toContainElement(screen.getByRole("switch", { name: "Rule enabled" }));
+
+    await user.click(screen.getByRole("button", { name: "Edit" }));
+    expect(screen.getByRole("switch", { name: "Invert this group" })).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Invert this condition" })).toBeInTheDocument();
   });
 
   it("renders typed configuration labels and docstring descriptions", async () => {
@@ -174,5 +179,6 @@ describe("project workflows", () => {
     const saveBar = container.querySelector(".config-save-bar");
     expect(saveBar).toBeInTheDocument();
     expect(saveBar?.closest(".form-surface")).toBeInTheDocument();
+    expect(container.querySelector('[data-slot="scroll-shadow"]')).not.toBeInTheDocument();
   });
 });

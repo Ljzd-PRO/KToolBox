@@ -255,7 +255,7 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="mx-auto grid w-full max-w-7xl gap-5 p-4 sm:p-6 md:p-8">
+        <main className="mx-auto grid min-w-0 w-full max-w-7xl gap-5 p-4 sm:p-6 md:p-8">
           <Outlet />
         </main>
       </div>
