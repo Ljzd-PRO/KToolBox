@@ -9,7 +9,7 @@ KToolBox is an asynchronous command-line downloader, HeroUI project panel, and t
 - Resumes partial files and skips files that already exist.
 - Filters by date, title, filename pattern, and file size.
 - Controls cover, attachment, content image, metadata, and external-link output separately.
-- Provides a persistent, bilingual WebUI for project configuration, roster and blocker editing, Pawchive queries, and task lifecycle control.
+- Provides a persistent WebUI in seven languages for project configuration, roster and blocker editing, Pawchive queries, and task lifecycle control.
 - Exposes all 14 public Pawchive OpenAPI operations through validated Pydantic models.
 
 Account-authenticated favorites operations are intentionally not implemented. A downloader session key, when configured, is sent only to the file host.

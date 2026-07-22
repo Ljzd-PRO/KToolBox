@@ -9,7 +9,7 @@ KToolBox est un outil de téléchargement asynchrone en ligne de commande, un pa
 - Reprend les fichiers partiels et ignore ceux qui existent déjà.
 - Filtre par date, titre, motif de nom de fichier et taille.
 - Contrôle séparément les couvertures, pièces jointes, images du contenu, métadonnées et liens externes.
-- Fournit une WebUI persistante en anglais et en chinois simplifié pour configurer le projet, modifier la liste des créateurs et les règles d'exclusion, interroger Pawchive et contrôler le cycle de vie des tâches.
+- Fournit une WebUI persistante en sept langues pour configurer le projet, modifier la liste des créateurs et les règles d'exclusion, interroger Pawchive et contrôler le cycle de vie des tâches.
 - Expose les 14 opérations publiques d'OpenAPI Pawchive par l'intermédiaire de modèles Pydantic validés.
 
 Les opérations sur les favoris nécessitant l'authentification d'un compte ne sont volontairement pas mises en œuvre. Une clé de session du téléchargeur, lorsqu'elle est configurée, n'est envoyée qu'au serveur de fichiers.

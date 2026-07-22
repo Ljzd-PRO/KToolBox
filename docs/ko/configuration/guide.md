@@ -43,7 +43,7 @@ pipx install "ktoolbox[urwid]" --force
 ktoolbox config edit
 ```
 
-선택적 [WebUI](../webui.md)는 형식이 지정된 컨트롤을 통해 동일한 영어와 중국어 간체의 docstring 설명을 제공하며, 최종 값 출처 표시, 비밀 마스킹, 원시 dotenv/TOML 편집, 검증, 차이 미리 보기 및 ETag 충돌 보호를 제공합니다.
+선택적 [WebUI](../webui.md)는 7개 지원 언어 모두에서 현지화된 레이블과 설명을 형식 지정 컨트롤로 제공하며, 최종 값 출처 표시, 비밀 마스킹, 원시 dotenv/TOML 편집, 검증, 차이 미리 보기 및 ETag 충돌 보호를 제공합니다. 영어 설정 docstring은 계속 필드와 의미의 기준이며, 다른 언어 카탈로그는 전체 필드 경로 범위를 검사합니다.
 
 편집기를 열지 않고 프로젝트 파일을 확인하거나 검증합니다.
 

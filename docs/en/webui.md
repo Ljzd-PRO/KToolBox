@@ -48,7 +48,9 @@ The remote path picker runs with the filesystem permissions of the KToolBox proc
 
 ## Project workflows
 
-The interface follows the browser language on first use and supports persistent English/Chinese selection. Theme follows the operating system until light or dark mode is selected. Blue, emerald, violet, rose, and amber accent palettes are available; form switches stay blue when enabled so their state remains consistent across palettes. Desktop uses a compact sidebar; narrow screens use a Drawer.
+The interface follows the browser language on first use and supports persistent selection of Simplified Chinese, Traditional Chinese, English, Japanese, Korean, French, or Russian. Changing language also updates React Aria dates, number formatting, natural sorting, configuration metadata, validation, and known server errors. Theme follows the operating system until light or dark mode is selected. Blue, emerald, violet, rose, and amber accent palettes are available; form switches stay blue when enabled so their state remains consistent across palettes. Desktop uses a compact sidebar; narrow screens use a Drawer.
+
+![Seven-language selector](../assets/webui/23-language-menu-seven-locales.png)
 
 ![Light configuration editor](../assets/webui/09-configuration-light.png)
 
@@ -78,7 +80,7 @@ Overview recent tasks, task queues, creator rosters, and post results support co
 
 ## Configuration editing
 
-Form labels are explicit bilingual text, not Python identifiers. Field descriptions are extracted from the English and Chinese configuration-class `:ivar field:` docstrings, while Pydantic supplies types, defaults, ranges, and secret metadata.
+Form labels and descriptions are explicit localized text, not Python identifiers. English configuration-class `:ivar field:` docstrings remain the semantic field source; checked locale catalogs provide complete labels and explanations for all seven languages, while Pydantic supplies types, defaults, ranges, and secret metadata.
 
 The `.env` and `prod.env` tabs show each final effective value and a source Chip. Values overridden by the process environment are read-only. Secret values are masked by default. Advanced text editing displays an additional warning because it can expose secrets.
 
@@ -127,3 +129,11 @@ Deleting a task normally removes only its queue record, attempts, and logs. “D
 | `KTOOLBOX_WEBUI__SESSION_ABSOLUTE_HOURS` | `168` | Maximum session lifetime since login. |
 
 Back up `ktoolbox.toml`, local dotenv files, and `.ktoolbox/webui.sqlite3` together when task history matters. Do not copy the database while the WebUI is running.
+
+## Multilingual browser verification
+
+The seven locale catalogs are exercised on desktop and mobile in light and dark themes. Representative verified states are shown below; user content and filesystem paths remain in their original form.
+
+![French configuration on mobile](../assets/webui/24-configuration-mobile-fr.png)
+
+![Russian remote path picker on mobile](../assets/webui/25-path-picker-mobile-ru.png)

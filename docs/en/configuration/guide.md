@@ -43,7 +43,7 @@ pipx install "ktoolbox[urwid]" --force
 ktoolbox config edit
 ```
 
-The optional [WebUI](../webui.md) exposes the same bilingual docstring descriptions through typed controls, final-value source indicators, secret masking, raw dotenv/TOML editing, validation, diff preview, and ETag conflict protection.
+The optional [WebUI](../webui.md) exposes localized labels and descriptions in all seven supported languages through typed controls, final-value source indicators, secret masking, raw dotenv/TOML editing, validation, diff preview, and ETag conflict protection. English configuration docstrings remain the field and semantic source; the other locale catalogs are checked for complete path coverage.
 
 Inspect or validate the project file without opening the editor:
 

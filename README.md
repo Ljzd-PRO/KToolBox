@@ -26,7 +26,7 @@ KToolBox v1 uses Pawchive as its only supported backend. It provides typed acces
 - Customize directory structure, post names, file names, sequential names, and year/month grouping.
 - Save post metadata, creator indices, extracted content, content images, and matching external links.
 - Stream jobs from concurrent creator producers into one fair download pool with stable Rich progress, per-file speeds, and aggregate throughput.
-- Manage one synchronization project through a bilingual, responsive HeroUI panel with persistent tasks, live progress, configuration forms, roster and blocker editors, and light/dark themes.
+- Manage one synchronization project through a seven-language, responsive HeroUI panel with persistent tasks, live progress, configuration forms, roster and blocker editors, and light/dark themes.
 - Use a fully offline MockTransport-based test suite; accidental network access is blocked in tests.
 
 ## Requirements
@@ -118,6 +118,8 @@ ktoolbox webui /path/to/project
 ```
 
 ![KToolBox WebUI configuration](docs/assets/webui/09-configuration-light.png)
+
+The complete interface is available in Simplified Chinese, Traditional Chinese, English, Japanese, Korean, French, and Russian. First use follows the browser language; the language menu persists an explicit choice and updates dates, numbers, sorting, configuration descriptions, validation, and server error messages together.
 
 Task rows preserve readable post titles and creator names in an offline presentation snapshot. Desktop and mobile layouts expose details, lifecycle, editing, ordering, and deletion actions directly, while form switches use gray-off/blue-on tracks and checkboxes show an indicator only when selected.
 

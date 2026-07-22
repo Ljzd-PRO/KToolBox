@@ -48,7 +48,9 @@ Le sélecteur de chemin distant utilise les droits du processus KToolBox. Les ch
 
 ## Processus du projet
 
-L'interface suit la langue du navigateur lors de la première utilisation et conserve le choix entre l'anglais et le chinois simplifié. Le thème suit le système d'exploitation jusqu'au choix du mode clair ou sombre. Des accents bleu, émeraude, violet, rose et ambre sont proposés ; les interrupteurs activés restent bleus afin que leur état soit cohérent. L'ordinateur utilise une barre latérale compacte et les écrans étroits un Drawer.
+L'interface suit la langue du navigateur lors de la première utilisation et conserve le choix du chinois simplifié, du chinois traditionnel, de l'anglais, du japonais, du coréen, du français ou du russe. Changer de langue actualise aussi les dates React Aria, les formats numériques, le tri naturel, les métadonnées de configuration, la validation et les erreurs serveur connues. Le thème suit le système d'exploitation jusqu'au choix du mode clair ou sombre. Des accents bleu, émeraude, violet, rose et ambre sont proposés ; les interrupteurs activés restent bleus afin que leur état soit cohérent. L'ordinateur utilise une barre latérale compacte et les écrans étroits un Drawer.
+
+![Sélecteur des sept langues](../assets/webui/23-language-menu-seven-locales.png)
 
 ![Éditeur de configuration clair](../assets/webui/09-configuration-light.png)
 
@@ -74,7 +76,7 @@ L'identifiant du créateur est placé en premier dans les lignes de bureau comme
 
 ## Modification de la configuration
 
-Les libellés sont du texte explicite en anglais et en chinois simplifié, pas des identifiants Python. Les descriptions proviennent des chaînes `:ivar field:` des classes anglaises et chinoises ; Pydantic fournit les types, valeurs par défaut, plages et métadonnées secrètes.
+Les libellés et descriptions sont du texte explicitement localisé, pas des identifiants Python. Les docstrings `:ivar field:` de la classe anglaise restent la source sémantique des champs ; les catalogues dont la complétude est vérifiée fournissent tous les libellés et explications dans les sept langues. Pydantic fournit les types, valeurs par défaut, plages et métadonnées secrètes.
 
 Les onglets `.env` et `prod.env` affichent la valeur effective finale et une puce de provenance. Les valeurs remplacées par l'environnement du processus sont en lecture seule. Les secrets sont masqués par défaut. L'édition avancée du texte affiche un avertissement supplémentaire, car elle peut dévoiler des secrets.
 
@@ -123,3 +125,11 @@ Supprimer une tâche ne retire normalement que son enregistrement, ses tentative
 | `KTOOLBOX_WEBUI__SESSION_ABSOLUTE_HOURS` | `168` | Durée maximale depuis la connexion. |
 
 Sauvegardez ensemble `ktoolbox.toml`, les fichiers dotenv locaux et `.ktoolbox/webui.sqlite3` lorsque l'historique importe. Ne copiez pas la base pendant l'exécution de la WebUI.
+
+## Vérification multilingue dans le navigateur
+
+Les sept catalogues sont testés réellement sur ordinateur et mobile, en thèmes clair et sombre. Voici deux états représentatifs validés ; le contenu utilisateur et les chemins du système de fichiers conservent leur texte d'origine.
+
+![Configuration française sur mobile](../assets/webui/24-configuration-mobile-fr.png)
+
+![Sélecteur de chemin distant russe sur mobile](../assets/webui/25-path-picker-mobile-ru.png)

@@ -43,7 +43,7 @@ pipx install "ktoolbox[urwid]" --force
 ktoolbox config edit
 ```
 
-可选 [WebUI](../webui.md) 会在类型化控件中显示同一套双语 docstring 说明，并提供最终值来源、秘密遮蔽、dotenv/TOML 原文编辑、校验、差异预览和 ETag 冲突保护。
+可选 [WebUI](../webui.md) 会在类型化控件中显示七种语言的标签与说明，并提供最终值来源、秘密遮蔽、dotenv/TOML 原文编辑、校验、差异预览和 ETag 冲突保护。英文配置 docstring 仍是字段与语义来源，其余语言目录会接受完整字段路径检查。
 
 无需打开编辑器即可查看或校验项目文件：
 

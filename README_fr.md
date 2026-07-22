@@ -26,7 +26,7 @@ KToolBox v1 utilise Pawchive comme seul serveur pris en charge. Il fournit un ac
 - Personnaliser la structure des répertoires, le nom des publications et des fichiers, la numérotation séquentielle et le regroupement par année et par mois.
 - Enregistrer les métadonnées des publications, les index des créateurs, le contenu extrait, ses images et les liens externes correspondants.
 - Diffuser les tâches produites simultanément pour plusieurs créateurs vers un pool de téléchargement équitable, avec une progression Rich stable, la vitesse de chaque fichier et le débit global.
-- Gérer un projet de synchronisation dans un panneau HeroUI adaptatif en anglais et en chinois simplifié, avec des tâches persistantes, une progression en temps réel, des formulaires de configuration, des éditeurs de créateurs et de règles d'exclusion, ainsi que des thèmes clair et sombre.
+- Gérer un projet de synchronisation dans un panneau HeroUI adaptatif disponible en sept langues, avec des tâches persistantes, une progression en temps réel, des formulaires de configuration, des éditeurs de créateurs et de règles d'exclusion, ainsi que des thèmes clair et sombre.
 - Utiliser une suite de tests MockTransport entièrement hors ligne, qui bloque tout accès réseau accidentel.
 
 ## Prérequis
@@ -118,6 +118,8 @@ ktoolbox webui /path/to/project
 ```
 
 ![Configuration de la WebUI KToolBox](docs/assets/webui/09-configuration-light.png)
+
+Toute l'interface est disponible en chinois simplifié, chinois traditionnel, anglais, japonais, coréen, français et russe. La première visite suit la langue du navigateur ; un choix manuel est mémorisé et actualise ensemble les dates, les nombres, le tri, les descriptions de configuration, la validation et les erreurs du serveur.
 
 Les lignes de tâches conservent des titres de publication et des noms de créateur lisibles dans un instantané de présentation hors ligne. Les dispositions pour ordinateur et mobile donnent directement accès aux détails, au cycle de vie, à la modification, au classement et à la suppression. Les interrupteurs sont gris lorsqu'ils sont désactivés et bleus lorsqu'ils sont activés ; les cases à cocher n'affichent un indicateur que lorsqu'elles sont sélectionnées.
 
