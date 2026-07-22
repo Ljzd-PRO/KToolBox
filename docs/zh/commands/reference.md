@@ -1,6 +1,6 @@
 # 命令参考
 
-运行 `ktoolbox 命令 --help` 查看权威 Cyclopts 帮助。命令与选项使用连字符；隐藏兼容命令仍可解析旧下划线拼写。
+运行 `ktoolbox COMMAND --help` 查看权威 Cyclopts 帮助。命令与选项使用连字符；隐藏兼容命令仍可解析旧下划线拼写。
 
 ## 全局选项
 
@@ -9,7 +9,7 @@
 | `-h`、`--help` | 直接打印帮助，不启动分页器。 |
 | `--version` | 打印已安装的 KToolBox 版本。 |
 | `--install-completion` | 为检测到的 Shell 安装补全。 |
-| `--config 路径` | 选择项目文件。优先级为此选项、`KTOOLBOX_PROJECT_CONFIG`、`./ktoolbox.toml`。 |
+| `--config PATH` | 选择项目文件。优先级为此选项、`KTOOLBOX_PROJECT_CONFIG`、`./ktoolbox.toml`。 |
 | `--verbose` | 包含诊断日志。 |
 | `--quiet` | 隐藏进度与普通日志。 |
 | `--plain` | 强制稳定逐行进度；非 TTY 和 `NO_COLOR` 会自动使用。 |
@@ -22,12 +22,12 @@
 | 命令 | 用途 |
 | --- | --- |
 | `download` | 下载一篇作品或指定修订。 |
-| `sync [目标 ...]` | 同步显式作者；无目标时同步清单中全部已启用作者。 |
+| `sync [TARGET ...]` | 同步显式作者；无目标时同步清单中全部已启用作者。 |
 | `creator list/add/remove/enable/disable/search` | 管理作者清单或搜索 Pawchive 作者。 |
 | `post show/search` | 查看作品或搜索作者作品。 |
 | `config edit/example/validate/path` | 编辑或查看环境与项目配置。 |
 | `site-version` | 打印 Pawchive 应用版本。 |
-| `webui [项目目录]` | 为一个项目运行可选 HeroUI 面板。 |
+| `webui [PROJECT_DIR]` | 为一个项目运行可选 HeroUI 面板。 |
 
 ## `download`
 
@@ -47,11 +47,11 @@
 
 ## `sync`
 
-每个 `目标` 可以是 Pawchive 作者 URL、`service:id` 或清单别名。显式目标即使在清单中已禁用也会运行；无目标时运行全部已启用作者。
+每个 `TARGET` 可以是 Pawchive 作者 URL、`service:id` 或清单别名。显式目标即使在清单中已禁用也会运行；无目标时运行全部已启用作者。
 
 | 参数或选项 | 类型 | 默认值 | 含义 |
 | --- | --- | --- | --- |
-| `目标 ...` | 多个字符串 | 已启用清单 | 零个或多个作者。 |
+| `TARGET ...` | 多个字符串 | 已启用清单 | 零个或多个作者。 |
 | `--service` + `--creator-id` | 字符串 | 省略 | 添加一个显式作者；二者必须同时使用。 |
 | `-o`、`--output`、`--path` | 路径 | `.` | 输出根目录。 |
 | `--save-creator-indices` | 布尔值 | 禁用 | 作者生产成功后原子保存索引。 |
@@ -70,7 +70,7 @@
 | 命令 | 参数与选项 | 含义 |
 | --- | --- | --- |
 | `creator list` | `--json` | 以 Rich 表格或 JSON 列出清单。 |
-| `creator add TARGET` | `--alias 名称`、`--disabled` | 添加 URL 或 `service:id`。 |
+| `creator add TARGET` | `--alias NAME`、`--disabled` | 添加 URL 或 `service:id`。 |
 | `creator remove TARGET` | | 按别名、URL 或身份删除。 |
 | `creator enable TARGET` | | 启用已保存作者。 |
 | `creator disable TARGET` | | 禁用已保存作者。 |
@@ -100,7 +100,7 @@
 
 | 参数或选项 | 默认值 | 含义 |
 | --- | --- | --- |
-| `项目目录` | `.` | 此进程固定服务的同步项目。 |
+| `PROJECT_DIR` | `.` | 此进程固定服务的同步项目。 |
 | `--host` | `webui.host` | 覆盖监听接口。 |
 | `--port` | `webui.port` | 覆盖 TCP 端口。 |
 | `--no-open` | 禁用 | 不在默认浏览器中打开本机 URL。 |

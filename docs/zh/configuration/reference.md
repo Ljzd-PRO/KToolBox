@@ -1,6 +1,6 @@
 # 配置参考
 
-环境变量名称以 `KTOOLBOX_` 开头，嵌套模型字段使用 `__` 连接。表中标为路径、集合或列表的类型由 Pydantic 解析；dotenv 文件中的集合应使用 JSON 数组。
+环境变量名称以 `KTOOLBOX_` 开头，嵌套模型字段使用 `__` 连接。表中标为 `path`、`set` 或 `list` 的类型由 Pydantic 解析；dotenv 文件中的集合应使用 JSON 数组。
 
 ## 根配置
 

@@ -55,7 +55,7 @@ ktoolbox sync fanbox:123 --offset 10 --length 5
 ktoolbox sync fanbox:123 --start-time 2025-01-01 --end-time 2025-03-01
 ```
 
-作者目录固定为 `作者名 [service-creator_id]`。最多同时运行 `job.creator_concurrency` 个作者生产者，其有界队列通过公平轮转调度器进入同一个下载池；`job.count` 控制文件传输并发。首批任务生成后立即下载，无需等待全部作者加载完成。
+作者目录固定为 `Creator name [service-creator_id]`。最多同时运行 `job.creator_concurrency` 个作者生产者，其有界队列通过公平轮转调度器进入同一个下载池；`job.count` 控制文件传输并发。首批任务生成后立即下载，无需等待全部作者加载完成。
 
 单个作者失败不会丢弃其他作者已完成的内容。失败作者不会覆盖旧索引，命令会在打印汇总后以状态 `1` 退出。
 

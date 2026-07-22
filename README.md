@@ -7,9 +7,9 @@ An asynchronous CLI, HeroUI management panel, and Python client for downloading 
 [![PyPI](https://img.shields.io/pypi/v/ktoolbox?logo=python)](https://pypi.org/project/ktoolbox/)
 [![Python](https://img.shields.io/badge/Python-3.10--3.14-blue)](https://www.python.org/)
 [![License](https://img.shields.io/github/license/Ljzd-PRO/KToolBox)](LICENSE)
-[![Documentation](https://readthedocs.org/projects/ktoolbox/badge/?version=latest)](https://ktoolbox.readthedocs.io/)
+[![Documentation](https://readthedocs.org/projects/ktoolbox/badge/?version=latest)](https://ktoolbox.readthedocs.io/latest/)
 
-[English](README.md) | [中文](README_zh-CN.md)
+[English](README.md) | [简体中文](README_zh-CN.md) | [繁體中文](README_zh-Hant.md) | [Русский](README_ru.md) | [日本語](README_ja.md) | [한국어](README_ko.md) | [Français](README_fr.md)
 
 </div>
 

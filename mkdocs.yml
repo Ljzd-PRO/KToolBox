@@ -30,13 +30,14 @@ plugins:
   - search
   - i18n:
       docs_structure: folder
+      fallback_to_default: false
       languages:
         - locale: en
           default: true
           name: English
 
         - locale: zh
-          name: 中文（简体）
+          name: 简体中文
 
           nav_translations:
             Get Started: 开始
@@ -87,6 +88,271 @@ plugins:
                     data: 0
                     note: >-
                       感谢你的反馈，你可以前往我们 GitHub 仓库 Issues 或 Discussion 页面提交更多建议！
+
+        - locale: zh-Hant
+          name: 繁體中文
+
+          nav_translations:
+            Get Started: 開始使用
+            Welcome to KToolBox: 歡迎使用 KToolBox
+            About Pawchive: 關於 Pawchive
+            Migrating to v1: 遷移至 v1
+            More: 更多
+            Commands: 命令
+            WebUI: WebUI
+            Configuration: 設定
+            Guide: 指南
+            Reference: 參考
+            FAQ: 常見問題
+            API Documentation: API 文件
+
+          site_description: "KToolBox 文件"
+
+          theme:
+            palette:
+              - media: "(prefers-color-scheme)"
+                toggle:
+                  icon: material/brightness-auto
+                  name: 切換至深色模式
+              - media: "(prefers-color-scheme: light)"
+                scheme: default
+                toggle:
+                  icon: material/brightness-7
+                  name: 切換至系統偏好設定
+              - media: "(prefers-color-scheme: dark)"
+                scheme: slate
+                toggle:
+                  icon: material/brightness-4
+                  name: 切換至淺色模式
+          extra:
+            analytics:
+              provider: google
+              property: G-LLM6CEJEH3
+              feedback:
+                title: 這個頁面對你有幫助嗎？
+                ratings:
+                  - icon: material/emoticon-happy-outline
+                    name: 這個頁面有幫助
+                    data: 1
+                    note: >-
+                      感謝你的意見回饋！
+                  - icon: material/emoticon-sad-outline
+                    name: 這個頁面可以改進
+                    data: 0
+                    note: >-
+                      感謝你的意見回饋，你可以前往 GitHub 儲存庫的 Issues 或 Discussions 頁面提出更多建議！
+
+        - locale: ru
+          name: Русский
+
+          nav_translations:
+            Get Started: Начало работы
+            Welcome to KToolBox: Добро пожаловать в KToolBox
+            About Pawchive: О Pawchive
+            Migrating to v1: Переход на v1
+            More: Дополнительно
+            Commands: Команды
+            WebUI: WebUI
+            Configuration: Конфигурация
+            Guide: Руководство
+            Reference: Справочник
+            FAQ: Частые вопросы
+            API Documentation: Документация API
+
+          site_description: "Документация KToolBox"
+
+          theme:
+            palette:
+              - media: "(prefers-color-scheme)"
+                toggle:
+                  icon: material/brightness-auto
+                  name: Переключиться на тёмную тему
+              - media: "(prefers-color-scheme: light)"
+                scheme: default
+                toggle:
+                  icon: material/brightness-7
+                  name: Использовать системную тему
+              - media: "(prefers-color-scheme: dark)"
+                scheme: slate
+                toggle:
+                  icon: material/brightness-4
+                  name: Переключиться на светлую тему
+          extra:
+            analytics:
+              provider: google
+              property: G-LLM6CEJEH3
+              feedback:
+                title: Была ли эта страница полезна?
+                ratings:
+                  - icon: material/emoticon-happy-outline
+                    name: Страница была полезна
+                    data: 1
+                    note: >-
+                      Спасибо за отзыв!
+                  - icon: material/emoticon-sad-outline
+                    name: Страницу можно улучшить
+                    data: 0
+                    note: >-
+                      Спасибо за отзыв! Дополнительные предложения можно оставить в Issues или Discussions нашего репозитория GitHub.
+
+        - locale: ja
+          name: 日本語
+
+          nav_translations:
+            Get Started: はじめに
+            Welcome to KToolBox: KToolBox へようこそ
+            About Pawchive: Pawchive について
+            Migrating to v1: v1 への移行
+            More: その他
+            Commands: コマンド
+            WebUI: WebUI
+            Configuration: 設定
+            Guide: ガイド
+            Reference: リファレンス
+            FAQ: よくある質問
+            API Documentation: API ドキュメント
+
+          site_description: "KToolBox ドキュメント"
+
+          theme:
+            palette:
+              - media: "(prefers-color-scheme)"
+                toggle:
+                  icon: material/brightness-auto
+                  name: ダークモードに切り替え
+              - media: "(prefers-color-scheme: light)"
+                scheme: default
+                toggle:
+                  icon: material/brightness-7
+                  name: システム設定に切り替え
+              - media: "(prefers-color-scheme: dark)"
+                scheme: slate
+                toggle:
+                  icon: material/brightness-4
+                  name: ライトモードに切り替え
+          extra:
+            analytics:
+              provider: google
+              property: G-LLM6CEJEH3
+              feedback:
+                title: このページは役に立ちましたか？
+                ratings:
+                  - icon: material/emoticon-happy-outline
+                    name: このページは役に立った
+                    data: 1
+                    note: >-
+                      フィードバックありがとうございます！
+                  - icon: material/emoticon-sad-outline
+                    name: このページは改善できる
+                    data: 0
+                    note: >-
+                      フィードバックありがとうございます。GitHub リポジトリの Issues または Discussions で提案をお寄せください！
+
+        - locale: ko
+          name: 한국어
+
+          nav_translations:
+            Get Started: 시작하기
+            Welcome to KToolBox: KToolBox에 오신 것을 환영합니다
+            About Pawchive: Pawchive 소개
+            Migrating to v1: v1로 마이그레이션
+            More: 더 보기
+            Commands: 명령
+            WebUI: WebUI
+            Configuration: 설정
+            Guide: 가이드
+            Reference: 참조
+            FAQ: 자주 묻는 질문
+            API Documentation: API 문서
+
+          site_description: "KToolBox 문서"
+
+          theme:
+            palette:
+              - media: "(prefers-color-scheme)"
+                toggle:
+                  icon: material/brightness-auto
+                  name: 다크 모드로 전환
+              - media: "(prefers-color-scheme: light)"
+                scheme: default
+                toggle:
+                  icon: material/brightness-7
+                  name: 시스템 설정으로 전환
+              - media: "(prefers-color-scheme: dark)"
+                scheme: slate
+                toggle:
+                  icon: material/brightness-4
+                  name: 라이트 모드로 전환
+          extra:
+            analytics:
+              provider: google
+              property: G-LLM6CEJEH3
+              feedback:
+                title: 이 페이지가 도움이 되었나요?
+                ratings:
+                  - icon: material/emoticon-happy-outline
+                    name: 이 페이지가 도움이 됨
+                    data: 1
+                    note: >-
+                      의견을 보내 주셔서 감사합니다!
+                  - icon: material/emoticon-sad-outline
+                    name: 이 페이지를 개선할 수 있음
+                    data: 0
+                    note: >-
+                      의견을 보내 주셔서 감사합니다. GitHub 저장소의 Issues 또는 Discussions에서 제안해 주세요!
+
+        - locale: fr
+          name: Français
+
+          nav_translations:
+            Get Started: Bien démarrer
+            Welcome to KToolBox: Bienvenue dans KToolBox
+            About Pawchive: À propos de Pawchive
+            Migrating to v1: Migration vers v1
+            More: Plus d'informations
+            Commands: Commandes
+            WebUI: WebUI
+            Configuration: Configuration
+            Guide: Guide
+            Reference: Référence
+            FAQ: Questions fréquentes
+            API Documentation: Documentation de l'API
+
+          site_description: "Documentation de KToolBox"
+
+          theme:
+            palette:
+              - media: "(prefers-color-scheme)"
+                toggle:
+                  icon: material/brightness-auto
+                  name: Passer au mode sombre
+              - media: "(prefers-color-scheme: light)"
+                scheme: default
+                toggle:
+                  icon: material/brightness-7
+                  name: Utiliser le réglage du système
+              - media: "(prefers-color-scheme: dark)"
+                scheme: slate
+                toggle:
+                  icon: material/brightness-4
+                  name: Passer au mode clair
+          extra:
+            analytics:
+              provider: google
+              property: G-LLM6CEJEH3
+              feedback:
+                title: Cette page vous a-t-elle été utile ?
+                ratings:
+                  - icon: material/emoticon-happy-outline
+                    name: Cette page a été utile
+                    data: 1
+                    note: >-
+                      Merci pour votre avis !
+                  - icon: material/emoticon-sad-outline
+                    name: Cette page peut être améliorée
+                    data: 0
+                    note: >-
+                      Merci pour votre avis ! Vous pouvez proposer des améliorations dans les Issues ou Discussions de notre dépôt GitHub.
 
 theme:
   name: material
@@ -176,3 +442,10 @@ markdown_extensions:
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde
+
+# Shared assets live outside locale folders. With fallback disabled, the i18n
+# plugin omits them from each localized MkDocs file index even though the root
+# build publishes them for every locale. Repository tests validate these links.
+validation:
+  links:
+    not_found: ignore
