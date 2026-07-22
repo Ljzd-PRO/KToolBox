@@ -1,5 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { mkdir } from "node:fs/promises";
+import { join } from "node:path";
 
 const browserErrors = new WeakMap<Page, string[]>();
 const legacyChineseTerms = new RegExp([
@@ -163,7 +165,7 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   expect(await formActions.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
 
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.getByLabel("Output directory").fill("visual-hierarchy-downloads");
+  await page.getByRole("textbox", { name: "Output directory" }).fill("visual-hierarchy-downloads");
   await page.getByRole("dialog", { name: "Create task" }).getByRole("button", { name: "Create task" }).click();
   await expect(page.getByRole("heading", { name: "Task details" })).toBeVisible();
   await page.getByRole("button", { name: "Back" }).click();
@@ -206,6 +208,147 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   await expect(page.locator(".app-table-frame:visible")).toHaveCount(0);
   await expect(page.locator(".task-mobile-card:visible")).toBeVisible();
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+});
+
+
+test("remote path picker browses the server filesystem from nested forms", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("link", { name: "Tasks" }).click();
+  await page.getByRole("button", { name: "Create task" }).click();
+  const taskDialog = page.getByRole("dialog", { name: "Create task" });
+  const browseButton = taskDialog.getByRole("button", { name: "Browse the remote computer for Output directory" });
+  await browseButton.click();
+
+  const picker = page.getByRole("dialog", { name: "Output directory" });
+  await expect(picker).toBeVisible();
+  await expect(picker.getByText("Project files")).toBeVisible();
+  await expect(picker.getByRole("textbox", { name: "Remote path" })).toHaveValue(/[/\\]downloads$/);
+  await picker.getByRole("button", { name: "Parent directory" }).click();
+  await expect(picker.getByRole("option", { name: "downloads" })).toBeVisible();
+  await picker.getByRole("option", { name: "downloads" }).click();
+  await expect(picker.getByRole("textbox", { name: "Remote path" })).toHaveValue(/[/\\]downloads$/);
+  await picker.getByRole("button", { name: "Select directory" }).click();
+  await expect(taskDialog.getByRole("textbox", { name: "Output directory" })).toHaveValue(/[/\\]downloads$/);
+  await expect(browseButton).toBeFocused();
+
+  await browseButton.click();
+  await expect(picker).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(picker).not.toBeVisible();
+  await expect(taskDialog).toBeVisible();
+  await expect(browseButton).toBeFocused();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await browseButton.click();
+  await picker.getByRole("button", { name: "New folder" }).click();
+  await picker.getByRole("textbox", { name: "Folder name" }).fill("e2e-created");
+  await picker.getByRole("button", { name: "Add" }).click();
+  await expect(picker.getByRole("textbox", { name: "Remote path" })).toHaveValue(/[/\\]e2e-created$/);
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+  expect(await picker.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
+  const pickerScan = await new AxeBuilder({ page }).include(".remote-path-picker-container").analyze();
+  expect(pickerScan.violations).toEqual([]);
+  await picker.getByRole("button", { name: "Select directory" }).click();
+  await taskDialog.getByRole("button", { name: "Cancel" }).click();
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.getByRole("link", { name: "Configuration" }).click();
+  await page.getByRole("button", { name: /Configuration section/ }).click();
+  await page.getByRole("option", { name: "File downloads" }).click();
+  const bucketBrowse = page.getByRole("button", { name: "Browse the remote computer for Storage bucket path" });
+  await bucketBrowse.click();
+  const hostPicker = page.getByRole("dialog", { name: "Storage bucket path" });
+  await expect(hostPicker.getByText("Remote computer")).toBeVisible();
+  await hostPicker.getByRole("button", { name: /Quick location/ }).click();
+  const homeOption = page.getByRole("option", { name: "Home" });
+  await expect(homeOption).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(homeOption).not.toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(hostPicker).not.toBeVisible();
+});
+
+
+test("captures the remote path picker visual matrix", async ({ page }, testInfo) => {
+  const auditDirectory = process.env.KTOOLBOX_UI_AUDIT_DIR ?? testInfo.outputPath("ui-audit");
+  await mkdir(auditDirectory, { recursive: true });
+  async function capture(name: string, width: number, height: number) {
+    await page.setViewportSize({ width, height });
+    await page.waitForTimeout(500);
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+    await page.screenshot({ path: join(auditDirectory, `${name}__${width}x${height}.png`) });
+  }
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await signIn(page);
+  await page.getByRole("link", { name: "Tasks" }).click();
+  await page.getByRole("button", { name: "Create task" }).click();
+  let parentDialog = page.getByRole("dialog", { name: "Create task" });
+  await parentDialog.getByRole("button", { name: "Browse the remote computer for Output directory" }).click();
+  let picker = page.getByRole("dialog", { name: "Output directory" });
+  await expect(picker).toBeVisible();
+  await capture("tasks__directory-picker__light", 1440, 900);
+  await capture("tasks__directory-picker__light", 1024, 768);
+  await capture("tasks__directory-picker__light", 768, 1024);
+  await picker.getByRole("button", { name: "Cancel" }).click();
+  await parentDialog.getByRole("button", { name: "Cancel" }).click();
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.getByRole("button", { name: "Use dark theme" }).click();
+  await page.getByRole("button", { name: "Use emerald accent" }).click();
+  await page.getByRole("button", { name: "Create task" }).click();
+  parentDialog = page.getByRole("dialog", { name: "Create task" });
+  await parentDialog.getByRole("button", { name: "Browse the remote computer for Output directory" }).click();
+  picker = page.getByRole("dialog", { name: "Output directory" });
+  await expect(picker).toBeVisible();
+  await capture("tasks__directory-picker__dark-emerald", 390, 844);
+  await capture("tasks__directory-picker__dark-emerald", 320, 700);
+  const [goButtonBox, refreshButtonBox] = await Promise.all([
+    picker.getByRole("button", { name: "Go" }).boundingBox(),
+    picker.getByRole("button", { name: "Refresh" }).boundingBox(),
+  ]);
+  expect(goButtonBox).not.toBeNull();
+  expect(refreshButtonBox).not.toBeNull();
+  const controlsOverlap = Boolean(goButtonBox && refreshButtonBox)
+    && goButtonBox.x < refreshButtonBox.x + refreshButtonBox.width
+    && goButtonBox.x + goButtonBox.width > refreshButtonBox.x
+    && goButtonBox.y < refreshButtonBox.y + refreshButtonBox.height
+    && goButtonBox.y + goButtonBox.height > refreshButtonBox.y;
+  expect(controlsOverlap).toBe(false);
+  await picker.getByRole("button", { name: "Cancel" }).click();
+  await parentDialog.getByRole("button", { name: "Cancel" }).click();
+
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.getByRole("button", { name: "Use light theme" }).click();
+  await page.getByRole("link", { name: "Posts" }).click();
+  await page.getByRole("textbox", { name: "Creator ID" }).fill("demo-studio");
+  await page.getByRole("button", { name: "Search posts" }).click();
+  await page.getByRole("button", { name: "Post details" }).first().click();
+  parentDialog = page.getByRole("dialog", { name: "Fictional project study" });
+  await parentDialog.getByRole("button", { name: "Browse the remote computer for Output directory" }).click();
+  picker = page.getByRole("dialog", { name: "Output directory" });
+  await expect(picker).toBeVisible();
+  await capture("posts__directory-picker__light", 1024, 768);
+  await picker.getByRole("button", { name: "Cancel" }).click();
+  await parentDialog.getByText("Close", { exact: true }).click();
+
+  await page.getByRole("link", { name: "Configuration" }).click();
+  await page.getByRole("button", { name: /Configuration section/ }).click();
+  await page.getByRole("option", { name: "Download jobs" }).click();
+  await page.getByRole("button", { name: "Browse the remote computer for Content file" }).click();
+  picker = page.getByRole("dialog", { name: "Content file" });
+  await expect(picker.getByRole("textbox", { name: "File name" })).toHaveValue("content.txt");
+  await capture("configuration__file-picker__light", 768, 1024);
+  await picker.getByRole("button", { name: "Cancel" }).click();
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.getByRole("button", { name: "Use dark theme" }).click();
+  await page.getByRole("button", { name: /Configuration section/ }).click();
+  await page.getByRole("option", { name: "File downloads" }).click();
+  await page.getByRole("button", { name: "Browse the remote computer for Storage bucket path" }).click();
+  picker = page.getByRole("dialog", { name: "Storage bucket path" });
+  await expect(picker.getByText("Remote computer")).toBeVisible();
+  await capture("configuration__host-picker__dark-emerald", 1440, 900);
 });
 
 

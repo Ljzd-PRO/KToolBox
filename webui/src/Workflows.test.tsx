@@ -138,20 +138,52 @@ describe("project workflows", () => {
           return json({
             locale: "en",
             sections: { api: "Pawchive API" },
-            fields: [{
-              path: "api.timeout",
-              env_name: "KTOOLBOX_API__TIMEOUT",
-              section: "api",
-              label: "API request timeout",
-              description: "Pawchive API request timeout",
-              json_schema: { type: "number", minimum: 0 },
-              default: 5,
-              value: 5,
-              is_set: true,
-              secret: false,
-              source: "default",
-              apply_mode: "next_task",
-            }],
+            fields: [
+              {
+                path: "api.timeout",
+                env_name: "KTOOLBOX_API__TIMEOUT",
+                section: "api",
+                label: "API request timeout",
+                description: "Pawchive API request timeout",
+                json_schema: { type: "number", minimum: 0 },
+                default: 5,
+                value: 5,
+                is_set: true,
+                secret: false,
+                source: "default",
+                apply_mode: "next_task",
+              },
+              {
+                path: "downloader.bucket_path",
+                env_name: "KTOOLBOX_DOWNLOADER__BUCKET_PATH",
+                section: "api",
+                label: "Storage bucket path",
+                description: "Directory used for content-addressed files.",
+                json_schema: { type: "string", format: "path" },
+                default: "/srv/bucket",
+                value: "/srv/bucket",
+                is_set: true,
+                secret: false,
+                source: "default",
+                apply_mode: "next_task",
+                path_selector: { kind: "directory", scope: "host", value_mode: "absolute" },
+              },
+              {
+                path: "logger.path",
+                env_name: "KTOOLBOX_LOGGER__PATH",
+                section: "api",
+                label: "Log directory",
+                description: "Directory containing ktoolbox.log.",
+                json_schema: { anyOf: [{ type: "string", format: "path" }, { type: "null" }] },
+                default: null,
+                value: "/var/log/ktoolbox",
+                is_set: true,
+                secret: false,
+                source: "environment",
+                apply_mode: "next_task",
+                path_selector: { kind: "directory", scope: "host", value_mode: "absolute" },
+              },
+            ],
           });
         }
         if (path.includes("/config/dotenv/")) {
@@ -175,6 +207,8 @@ describe("project workflows", () => {
     expect(await screen.findByRole("heading", { name: "Configuration" })).toBeInTheDocument();
     expect(await screen.findByText("API request timeout")).toBeInTheDocument();
     expect(screen.getByText("Pawchive API request timeout")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Browse the remote computer for Storage bucket path" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Browse the remote computer for Log directory" })).toBeDisabled();
     expect(screen.queryByText("api.timeout")).not.toBeInTheDocument();
     const saveBar = container.querySelector(".config-save-bar");
     expect(saveBar).toBeInTheDocument();
