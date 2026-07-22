@@ -51,6 +51,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Add filtered dashboard navigation and URL-persistent task and creator filters.
 - Replace free-form platform fields with HeroUI ComboBoxes that provide Patreon, Pixiv, and Fanbox suggestions while accepting custom platforms.
 - Enrich compact HeroUI choices with icons and restrained semantic tones, and refresh verified desktop/mobile screenshots after six-slice visual review.
+- Normalize WebUI error responses with a readable `message`, sanitize validation details, and parse legacy nested error shapes without dumping JSON into toasts.
 
 ## Testing and quality
 
@@ -115,6 +116,7 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 重建 HeroUI 表单基础组件：开关关闭灰、开启蓝，复选框严格按状态显示标记，列表紧凑开关居中，弹窗表面连续，并为任务、作者和忽略规则条目直接展示图标操作。
 - 持久化仅用于展示的任务目标快照，使队列离线时仍可按作品标题和作者名识别，且不影响执行、去重或资源锁。
 - 统一使用“作品”“平台”“忽略规则”等中文产品术语，并将同步全部作者选项明确为“同步所有已启用作者”。
+- 统一 WebUI 错误响应的可读 `message`，清理校验详情中的输入数据，并兼容解析旧版嵌套错误，避免 Toast 直接显示 JSON。
 
 ## 测试与质量
 

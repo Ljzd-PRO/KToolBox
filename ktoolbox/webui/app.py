@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import RequestResponseEndpoint
@@ -22,6 +23,7 @@ from ktoolbox.webui.auth import (
 )
 from ktoolbox.webui.creator_profiles import CreatorClientFactory, CreatorProfileCache, CreatorRosterService
 from ktoolbox.webui.database import WebUIDatabase, WebUISession
+from ktoolbox.webui.error_responses import error_payload, validation_error_payload
 from ktoolbox.webui.filesystem import FilesystemBrowser
 from ktoolbox.webui.filesystem_routes import create_filesystem_router
 from ktoolbox.webui.models import (
@@ -170,11 +172,21 @@ def create_app(
 
     @app.exception_handler(ValueError)
     async def value_error_handler(_: Request, error: ValueError) -> JSONResponse:
-        return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, content={"detail": str(error)})
+        code = status.HTTP_422_UNPROCESSABLE_CONTENT
+        return JSONResponse(status_code=code, content=error_payload(str(error), code))
+
+    @app.exception_handler(RequestValidationError)
+    async def request_validation_error_handler(_: Request, error: RequestValidationError) -> JSONResponse:
+        code = status.HTTP_422_UNPROCESSABLE_CONTENT
+        return JSONResponse(status_code=code, content=validation_error_payload(error.errors(), code))
 
     @app.exception_handler(HTTPException)
     async def http_error_handler(_: Request, error: HTTPException) -> JSONResponse:
-        return JSONResponse(status_code=error.status_code, content={"detail": error.detail}, headers=error.headers)
+        return JSONResponse(
+            status_code=error.status_code,
+            content=error_payload(error.detail, error.status_code),
+            headers=error.headers,
+        )
 
     @app.get("/{path:path}", include_in_schema=False)
     async def frontend(path: str) -> FileResponse:

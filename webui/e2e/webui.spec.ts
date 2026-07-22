@@ -119,6 +119,35 @@ test("Chinese product terminology stays consistent across workflows", async ({ p
 });
 
 
+test("backend error objects render as readable toast messages", async ({ page }) => {
+  await signIn(page);
+  await page.route("**/api/v1/session/logout", async (route) => {
+    await route.fulfill({
+      status: 422,
+      contentType: "application/json",
+      body: JSON.stringify({
+        detail: [
+          { loc: ["body", "creator_id"], msg: "Field required", input: { creator_id: null } },
+          { loc: ["query", "offset"], msg: "Must be a multiple of 50", input: 1 },
+        ],
+      }),
+    });
+  });
+
+  await page.getByRole("button", { name: "Sign out" }).click();
+  const toast = page.getByText("creator id: Field required; offset: Must be a multiple of 50", { exact: true });
+  await expect(toast).toBeVisible();
+  const toastRoot = toast.locator("xpath=ancestor::*[@data-slot='toast']");
+  await page.waitForTimeout(600);
+  await expect(toastRoot).toBeInViewport({ ratio: 1 });
+  await expect(toastRoot).not.toContainText('"loc"');
+  await expect(toastRoot).not.toContainText("[object Object]");
+  const errors = browserErrors.get(page) ?? [];
+  expect(errors.filter((error) => !error.includes("status of 422 (Unprocessable Entity)"))).toEqual([]);
+  errors.length = 0;
+});
+
+
 test("HeroUI tables and forms preserve their visual hierarchy", async ({ page }) => {
   await signIn(page);
   await page.getByRole("link", { name: "Tasks", exact: true }).click();
