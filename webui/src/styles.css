@@ -494,6 +494,95 @@ code {
   border-color: transparent;
 }
 
+.chip-list-control {
+  display: flex;
+  min-height: 2.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem;
+}
+
+.chip-list-item {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.chip-list-item [data-slot="chip-label"] {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.chip-list-remove {
+  width: 1.5rem !important;
+  min-width: 1.5rem !important;
+  height: 1.5rem !important;
+  padding: 0 !important;
+  color: currentColor;
+}
+
+.chip-list-input {
+  min-width: 8rem;
+  min-height: 2rem;
+  flex: 1 1 10rem;
+  padding: 0.25rem 0.375rem !important;
+}
+
+.optional-date-range-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid var(--field-border);
+  border-radius: var(--field-radius);
+  background: var(--field-background);
+  box-shadow: var(--field-shadow);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.optional-date-range-control:focus-within {
+  border-color: var(--field-border-focus);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--focus) 22%, transparent);
+}
+
+[data-invalid="true"] > .optional-date-range-control {
+  border-color: var(--color-field-border-invalid);
+}
+
+.optional-date-boundary,
+.optional-date-boundary-group {
+  min-width: 0;
+  width: 100%;
+}
+
+.optional-date-boundary-group {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.optional-date-range-separator {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+@media (max-width: 639px) {
+  .optional-date-range-control {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .optional-date-boundary + .optional-date-range-separator {
+    display: none;
+  }
+
+  .optional-date-boundary + .optional-date-range-separator + .optional-date-boundary {
+    border-top: 1px solid var(--field-border);
+  }
+}
+
 .app-form-modal-body {
   min-height: 0;
   margin-inline: 0 !important;

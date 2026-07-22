@@ -1,9 +1,13 @@
 import { Table } from "@heroui/react";
-import { render, screen } from "@testing-library/react";
-import { IconSearch as Search } from "@tabler/icons-react";
+import { parseDate, type DateValue } from "@internationalized/date";
+import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { IconCalendar as Calendar, IconSearch as Search, IconTags as Tags } from "@tabler/icons-react";
+import { useState } from "react";
 import { describe, expect, it } from "vitest";
 
 import {
+  ChipListField,
   CompactSwitch,
   ConfirmModal,
   DataTableFrame,
@@ -12,7 +16,53 @@ import {
   FormModal,
   FormSurface,
   FormSwitchField,
+  OptionalDateRangeField,
 } from "./ui";
+
+function ChipListHarness({ commitOnComma = true }: { commitOnComma?: boolean }) {
+  const [values, setValues] = useState<string[]>([]);
+  return (
+    <ChipListField
+      commitOnComma={commitOnComma}
+      icon={Tags}
+      label="Keywords"
+      placeholder="Add keyword"
+      values={values}
+      onChange={setValues}
+    />
+  );
+}
+
+function OptionalDateHarness() {
+  const [start, setStart] = useState<DateValue | null>(parseDate("2026-07-10"));
+  const [end, setEnd] = useState<DateValue | null>(null);
+  const [startUnlimited, setStartUnlimited] = useState(false);
+  const [endUnlimited, setEndUnlimited] = useState(true);
+  return (
+    <>
+      <OptionalDateRangeField
+        description="Choose optional publication boundaries."
+        endLabel="End date"
+        endUnlimited={endUnlimited}
+        endUnlimitedLabel="No end date"
+        endValue={end}
+        icon={Calendar}
+        label="Publication range"
+        startLabel="Start date"
+        startUnlimited={startUnlimited}
+        startUnlimitedLabel="No start date"
+        startValue={start}
+        onEndChange={setEnd}
+        onEndUnlimitedChange={setEndUnlimited}
+        onStartChange={setStart}
+        onStartUnlimitedChange={setStartUnlimited}
+      />
+      <output data-testid="date-state">
+        {start?.toString() ?? "none"}|{end?.toString() ?? "none"}|{String(startUnlimited)}|{String(endUnlimited)}
+      </output>
+    </>
+  );
+}
 
 describe("DataTableFrame", () => {
   it("uses one bordered scroll container without a wrapping surface", () => {
@@ -86,6 +136,68 @@ describe("form selection controls", () => {
     expect(screen.getByRole("switch", { name: "Enable creator" })).toBeInTheDocument();
     expect(root).toHaveClass("compact-switch");
     expect(root).not.toHaveTextContent("Enable creator");
+  });
+});
+
+describe("ChipListField", () => {
+  it("commits comma and Enter delimited values, ignores duplicates, and supports removal", async () => {
+    const user = userEvent.setup();
+    render(<ChipListHarness />);
+    const input = screen.getByRole("textbox", { name: "Keywords" });
+
+    await user.type(input, "alpha,");
+    await user.type(input, "beta，");
+    await user.type(input, "gamma{Enter}");
+    await user.type(input, "alpha{Enter}");
+
+    expect(screen.getByText("alpha")).toBeInTheDocument();
+    expect(screen.getByText("beta")).toBeInTheDocument();
+    expect(screen.getByText("gamma")).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /Remove/ })).toHaveLength(3);
+
+    await user.click(screen.getByRole("button", { name: "Remove beta" }));
+    expect(screen.queryByText("beta")).not.toBeInTheDocument();
+    await user.click(input);
+    await user.keyboard("{Backspace}");
+    expect(screen.queryByText("gamma")).not.toBeInTheDocument();
+  });
+
+  it("splits pasted lists and does not commit Enter during IME composition", () => {
+    render(<ChipListHarness />);
+    const input = screen.getByRole("textbox", { name: "Keywords" });
+
+    fireEvent.paste(input, { clipboardData: { getData: () => "one,two，three\nfour" } });
+    expect(screen.getByText("one")).toBeInTheDocument();
+    expect(screen.getByText("four")).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: "composing" } });
+    fireEvent.keyDown(input, { key: "Enter", isComposing: true });
+    expect(screen.queryByText("composing")).not.toBeInTheDocument();
+    expect(input).toHaveValue("composing");
+  });
+
+  it("preserves commas when the field uses Enter-only commits", async () => {
+    const user = userEvent.setup();
+    render(<ChipListHarness commitOnComma={false} />);
+    const input = screen.getByRole("textbox", { name: "Keywords" });
+
+    await user.type(input, "^foo,bar${Enter}");
+    expect(screen.getByText("^foo,bar$")).toBeInTheDocument();
+  });
+});
+
+describe("OptionalDateRangeField", () => {
+  it("keeps boundaries independent and clears a date when unlimited is selected", async () => {
+    const user = userEvent.setup();
+    render(<OptionalDateHarness />);
+
+    expect(screen.getByRole("group", { name: "Start date" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "End date" })).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "No start date" })).not.toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "No end date" })).toBeChecked();
+
+    await user.click(screen.getByRole("checkbox", { name: "No start date" }));
+    expect(screen.getByTestId("date-state")).toHaveTextContent("none|none|true|true");
   });
 });
 

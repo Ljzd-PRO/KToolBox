@@ -1,10 +1,12 @@
 import {
   Autocomplete,
   Button,
+  Calendar,
   Checkbox,
   Chip,
   Description,
   DateField,
+  DatePicker,
   DateRangePicker,
   EmptyState,
   FieldError,
@@ -35,13 +37,19 @@ import {
   IconEye as Eye,
   IconEyeOff as EyeOff,
   IconInbox as Inbox,
+  IconCalendarOff as CalendarOff,
   IconMinus as Minus,
   IconPlus as Plus,
   IconSearch as Search,
   IconX as X,
   type TablerIcon,
 } from "@tabler/icons-react";
-import { useState, type ReactNode } from "react";
+import {
+  useState,
+  type ClipboardEvent,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import { useTranslation } from "react-i18next";
 
 import type { TaskStatus } from "../types";
@@ -310,6 +318,232 @@ export function DateRangeInput({
         </RangeCalendar>
       </DateRangePicker.Popover>
     </DateRangePicker>
+  );
+}
+
+export function ChipListField({
+  label,
+  description,
+  values,
+  onChange,
+  placeholder,
+  icon,
+  commitOnComma = true,
+}: {
+  label: string;
+  description?: string;
+  values: string[];
+  onChange: (values: string[]) => void;
+  placeholder?: string;
+  icon?: TablerIcon;
+  commitOnComma?: boolean;
+}) {
+  const { t } = useTranslation();
+  const [draft, setDraft] = useState("");
+
+  function appendValues(candidates: string[]) {
+    const next = [...values];
+    for (const candidate of candidates) {
+      const normalized = candidate.trim();
+      if (normalized && !next.includes(normalized)) next.push(normalized);
+    }
+    if (next.length !== values.length) onChange(next);
+  }
+
+  function commitDraft() {
+    appendValues([draft]);
+    setDraft("");
+  }
+
+  function updateDraft(next: string) {
+    if (!commitOnComma || !/[,，]/u.test(next)) {
+      setDraft(next);
+      return;
+    }
+    const parts = next.split(/[,，]/u);
+    const trailing = parts.pop() ?? "";
+    appendValues(parts);
+    setDraft(trailing);
+  }
+
+  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.nativeEvent.isComposing) return;
+    const isDelimiter = commitOnComma && (event.key === "," || event.key === "，");
+    if (event.key === "Enter" || isDelimiter) {
+      event.preventDefault();
+      commitDraft();
+      return;
+    }
+    if (event.key === "Backspace" && !draft && values.length) {
+      event.preventDefault();
+      onChange(values.slice(0, -1));
+    }
+  }
+
+  function handlePaste(event: ClipboardEvent<HTMLInputElement>) {
+    if (!commitOnComma) return;
+    const text = event.clipboardData.getData("text");
+    if (!/[,，\r\n]/u.test(text)) return;
+    event.preventDefault();
+    appendValues(text.split(/[,，\r\n]+/u));
+    setDraft("");
+  }
+
+  return (
+    <TextField.Root className="grid gap-1.5" fullWidth value={draft} onChange={updateDraft}>
+      <FieldLabel icon={icon} label={label} />
+      <InputGroup className="chip-list-control" fullWidth variant="secondary">
+        {values.map((value) => (
+          <Chip className="chip-list-item" color="accent" key={value} size="sm" variant="soft">
+            <Chip.Label>{value}</Chip.Label>
+            <Button
+              isIconOnly
+              aria-label={t("common.removeValue", { value })}
+              className="chip-list-remove"
+              size="sm"
+              type="button"
+              variant="ghost"
+              onPress={() => onChange(values.filter((item) => item !== value))}
+            >
+              <X aria-hidden="true" size={13} />
+            </Button>
+          </Chip>
+        ))}
+        <InputGroup.Input
+          className="chip-list-input"
+          placeholder={values.length ? undefined : placeholder}
+          onBlur={commitDraft}
+          onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
+        />
+      </InputGroup>
+      {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
+    </TextField.Root>
+  );
+}
+
+export function OptionalDateRangeField({
+  label,
+  description,
+  startLabel,
+  endLabel,
+  startUnlimitedLabel,
+  endUnlimitedLabel,
+  startValue,
+  endValue,
+  startUnlimited,
+  endUnlimited,
+  onStartChange,
+  onEndChange,
+  onStartUnlimitedChange,
+  onEndUnlimitedChange,
+  errorMessage,
+  icon,
+}: {
+  label: string;
+  description?: string;
+  startLabel: string;
+  endLabel: string;
+  startUnlimitedLabel: string;
+  endUnlimitedLabel: string;
+  startValue: DateValue | null;
+  endValue: DateValue | null;
+  startUnlimited: boolean;
+  endUnlimited: boolean;
+  onStartChange: (value: DateValue | null) => void;
+  onEndChange: (value: DateValue | null) => void;
+  onStartUnlimitedChange: (selected: boolean) => void;
+  onEndUnlimitedChange: (selected: boolean) => void;
+  errorMessage?: string;
+  icon?: TablerIcon;
+}) {
+  function changeStart(value: DateValue | null) {
+    onStartChange(value);
+    if (value) onStartUnlimitedChange(false);
+  }
+
+  function changeEnd(value: DateValue | null) {
+    onEndChange(value);
+    if (value) onEndUnlimitedChange(false);
+  }
+
+  function toggleStart(selected: boolean) {
+    onStartUnlimitedChange(selected);
+    if (selected) onStartChange(null);
+  }
+
+  function toggleEnd(selected: boolean) {
+    onEndUnlimitedChange(selected);
+    if (selected) onEndChange(null);
+  }
+
+  return (
+    <div className="grid gap-1.5" data-invalid={Boolean(errorMessage) || undefined}>
+      <FieldLabel icon={icon} label={label} />
+      <div className="optional-date-range-control">
+        <DateBoundaryPicker label={startLabel} value={startValue} onChange={changeStart} />
+        <span aria-hidden="true" className="optional-date-range-separator">–</span>
+        <DateBoundaryPicker label={endLabel} value={endValue} onChange={changeEnd} />
+      </div>
+      {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
+      <div className="flex flex-wrap gap-x-5 gap-y-1">
+        <FormCheckbox
+          icon={CalendarOff}
+          isSelected={startUnlimited}
+          label={startUnlimitedLabel}
+          onChange={toggleStart}
+        />
+        <FormCheckbox
+          icon={CalendarOff}
+          isSelected={endUnlimited}
+          label={endUnlimitedLabel}
+          onChange={toggleEnd}
+        />
+      </div>
+      {errorMessage ? <FieldError>{errorMessage}</FieldError> : null}
+    </div>
+  );
+}
+
+function DateBoundaryPicker({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: DateValue | null;
+  onChange: (value: DateValue | null) => void;
+}) {
+  return (
+    <DatePicker aria-label={label} className="optional-date-boundary" value={value} onChange={onChange}>
+      <DateField.Group fullWidth className="optional-date-boundary-group" variant="secondary">
+        <DateField.Input>
+          {(segment) => <DateField.Segment segment={segment} />}
+        </DateField.Input>
+        <DateField.Suffix>
+          <DatePicker.Trigger aria-label={label}>
+            <DatePicker.TriggerIndicator />
+          </DatePicker.Trigger>
+        </DateField.Suffix>
+      </DateField.Group>
+      <DatePicker.Popover>
+        <Calendar aria-label={label}>
+          <Calendar.Header>
+            <Calendar.NavButton slot="previous" />
+            <Calendar.Heading />
+            <Calendar.NavButton slot="next" />
+          </Calendar.Header>
+          <Calendar.Grid>
+            <Calendar.GridHeader>
+              {(day) => <Calendar.HeaderCell>{day}</Calendar.HeaderCell>}
+            </Calendar.GridHeader>
+            <Calendar.GridBody>
+              {(date) => <Calendar.Cell date={date} />}
+            </Calendar.GridBody>
+          </Calendar.Grid>
+        </Calendar>
+      </DatePicker.Popover>
+    </DatePicker>
   );
 }
 
