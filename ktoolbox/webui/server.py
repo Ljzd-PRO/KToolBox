@@ -1,16 +1,27 @@
 from __future__ import annotations
 
 import getpass
+import secrets
 import sys
 import threading
 import webbrowser
+from dataclasses import dataclass
 from pathlib import Path
 
 import anyio
 from argon2 import PasswordHasher
+from pydantic import SecretStr
 
 from ktoolbox.configuration import RuntimeContext, WebUIConfiguration, load_configuration
 from ktoolbox.project_config import ProjectConfigStore, ProjectConfiguration
+
+DEFAULT_WEBUI_USERNAME = "admin"
+
+
+@dataclass(frozen=True, slots=True)
+class GeneratedWebUICredentials:
+    username: str
+    password: str | None
 
 
 def generate_password_hash() -> str:
@@ -47,11 +58,14 @@ async def run_webui(
     webui = WebUIConfiguration.model_validate(
         {**configuration.webui.model_dump(), **updates},
     )
+    webui, generated_credentials = _prepare_webui_credentials(webui)
     configuration = configuration.model_copy(update={"webui": webui})
     context = RuntimeContext(project_root=root, configuration=configuration)
 
     local_host = "127.0.0.1" if webui.host in {"0.0.0.0", "::"} else webui.host
     url = f"http://{local_host}:{webui.port}"
+    if generated_credentials is not None:
+        _print_generated_credentials(generated_credentials)
     print(f"KToolBox WebUI: {url}")
     print("Security warning: HTTP traffic is unencrypted. Use only on a trusted network.")
     if webui.open_browser:
@@ -68,6 +82,44 @@ async def run_webui(
         )
     )
     await server.serve()
+
+
+def _prepare_webui_credentials(
+    configuration: WebUIConfiguration,
+) -> tuple[WebUIConfiguration, GeneratedWebUICredentials | None]:
+    updates: dict[str, object] = {}
+    username_was_defaulted = not configuration.username.strip()
+    if username_was_defaulted:
+        updates["username"] = DEFAULT_WEBUI_USERNAME
+
+    password_hash = configuration.password_hash.get_secret_value()
+    plaintext_password = configuration.password.get_secret_value()
+    generated_password: str | None = None
+    if not password_hash and not plaintext_password:
+        generated_password = secrets.token_urlsafe(24)
+        updates["password"] = SecretStr(generated_password)
+
+    if not updates:
+        return configuration, None
+
+    resolved = configuration.model_copy(update=updates)
+    return resolved, GeneratedWebUICredentials(
+        username=resolved.username,
+        password=generated_password,
+    )
+
+
+def _print_generated_credentials(credentials: GeneratedWebUICredentials) -> None:
+    if credentials.password is not None:
+        print("Generated WebUI credentials for this run:")
+        print(f"  Username: {credentials.username}")
+        print(f"  Password: {credentials.password}")
+    else:
+        print(f"WebUI username defaulted to {credentials.username!r} for this run.")
+    print(
+        "Configure KTOOLBOX_WEBUI__USERNAME and KTOOLBOX_WEBUI__PASSWORD_HASH "
+        "(preferred) or KTOOLBOX_WEBUI__PASSWORD to customize the account."
+    )
 
 
 def _project_root(project_dir: Path) -> Path:
