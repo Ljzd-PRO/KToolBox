@@ -178,7 +178,7 @@ export function PostsPage() {
         {!searched ? <EmptyPanel description={t("posts.searchHint")} title={t("posts.searchReady")} /> : null}
         {results.length ? (
           <>
-            <DataTableFrame className="hidden md:block">
+            <DataTableFrame className="hidden lg:block">
               <Table.Content aria-label={t("posts.results")}>
                     <Table.Header>
                       <Table.Column isRowHeader>{t("posts.post")}</Table.Column>
@@ -200,7 +200,7 @@ export function PostsPage() {
                     </Table.Body>
               </Table.Content>
             </DataTableFrame>
-            <div className="grid gap-3 md:hidden">
+            <div className="grid gap-3 lg:hidden">
               {results.map((post) => (
                 <Surface className="data-mobile-card grid gap-3 rounded-lg border border-border p-4" key={`${post.service}:${post.user}:${post.id}`}>
                   <div className="flex items-start justify-between gap-3">

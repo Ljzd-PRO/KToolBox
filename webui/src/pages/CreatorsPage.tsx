@@ -170,7 +170,7 @@ export function CreatorsPage() {
       <section className="grid gap-3">
         <h2 className="text-lg font-semibold">{t("creators.search")}</h2>
         <FormSurface className="p-3">
-          <form className="flex flex-col gap-2 sm:flex-row" onSubmit={searchCreators}>
+          <form className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2" onSubmit={searchCreators}>
             <SearchField
               aria-label={t("creators.search")}
               className="min-w-0 flex-1"
@@ -217,7 +217,7 @@ export function CreatorsPage() {
           <EmptyPanel title={t("creators.empty")} />
         ) : (
           <>
-            <DataTableFrame className="hidden md:block">
+            <DataTableFrame className="hidden lg:block">
               <Table.Content aria-label={t("creators.roster")}>
                     <Table.Header>
                       <Table.Column isRowHeader>{t("creators.creatorId")}</Table.Column>
@@ -249,7 +249,7 @@ export function CreatorsPage() {
                     </Table.Body>
               </Table.Content>
             </DataTableFrame>
-            <div className="grid gap-3 md:hidden">
+            <div className="grid gap-3 lg:hidden">
               {creators.map((creator) => (
                 <Surface className="data-mobile-card rounded-lg border border-border p-4" key={`${creator.service}:${creator.creator_id}`}>
                   <div className="flex items-start justify-between gap-3">
