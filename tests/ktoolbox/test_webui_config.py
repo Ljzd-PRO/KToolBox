@@ -66,6 +66,30 @@ def test_config_metadata_is_complete_bilingual_and_redacts_secrets(tmp_path: Pat
     assert next(field for field in chinese.fields if field.path == "job.count").label == "并发下载数"
     post_directory = next(field for field in chinese.fields if field.path == "job.post_dirname_format")
     assert post_directory.label == "作品目录格式"
+    selectors = {field.path: field.path_selector for field in english.fields if field.path_selector is not None}
+
+    def has_path_format(schema: object) -> bool:
+        if isinstance(schema, dict):
+            return schema.get("format") == "path" or any(has_path_format(value) for value in schema.values())
+        if isinstance(schema, list):
+            return any(has_path_format(value) for value in schema)
+        return False
+
+    assert {field.path for field in english.fields if has_path_format(field.json_schema)} == set(selectors)
+    assert selectors["downloader.bucket_path"].model_dump() == {
+        "kind": "directory",
+        "scope": "host",
+        "value_mode": "absolute",
+    }
+    assert selectors["logger.path"].model_dump() == {
+        "kind": "directory",
+        "scope": "host",
+        "value_mode": "absolute",
+    }
+    assert next(field for field in english.fields if field.path == "logger.path").label == "Log directory"
+    assert next(field for field in chinese.fields if field.path == "logger.path").label == "日志目录"
+    assert selectors["job.post_structure.content"].kind == "file"
+    assert selectors["job.post_structure.attachments"].value_mode == "project_relative"
     forbidden_terms = ("\u6295\u7a3f", "\u5e16\u5b50", "\u5c4f\u853d\u5668")
     assert not any(term in f"{field.label} {field.description}" for field in chinese.fields for term in forbidden_terms)
 

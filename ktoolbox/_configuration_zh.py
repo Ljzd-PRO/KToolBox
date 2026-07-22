@@ -163,7 +163,7 @@ class LoggerConfiguration(ktoolbox.configuration.LoggerConfiguration):
     """
     日志配置
 
-    :ivar path: 日志保存路径，``None`` 表示不输出日志文件
+    :ivar path: 保存 ``ktoolbox.log`` 的目录，``None`` 表示不输出日志文件
     :ivar level: 日志过滤级别
     :ivar rotation: 日志轮换周期
     """

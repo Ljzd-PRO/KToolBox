@@ -22,7 +22,7 @@ from ktoolbox.configuration import (
     PostStructureConfiguration,
     WebUIConfiguration,
 )
-from ktoolbox.webui.models import ConfigFieldResponse, ConfigSchemaResponse
+from ktoolbox.webui.models import ConfigFieldResponse, ConfigSchemaResponse, PathSelectorResponse
 
 Locale = Literal["en", "zh-CN"]
 
@@ -90,7 +90,7 @@ _LABELS: dict[str, tuple[str, str]] = {
     "job.download_attachments": ("Download attachments", "下载附件"),
     "job.min_file_size": ("Minimum file size", "最小文件大小"),
     "job.max_file_size": ("Maximum file size", "最大文件大小"),
-    "logger.path": ("Log file path", "日志文件路径"),
+    "logger.path": ("Log directory", "日志目录"),
     "logger.level": ("Log level", "日志级别"),
     "logger.rotation": ("Log rotation", "日志轮换"),
     "webui.host": ("WebUI listen address", "WebUI 监听地址"),
@@ -117,6 +117,20 @@ _SECTION_LABELS: dict[str, tuple[str, str]] = {
 }
 
 _SECRET_PATHS = {"downloader.session_key", "webui.password", "webui.password_hash"}
+_PATH_SELECTORS: dict[str, PathSelectorResponse] = {
+    "downloader.bucket_path": PathSelectorResponse(kind="directory", scope="host", value_mode="absolute"),
+    "logger.path": PathSelectorResponse(kind="directory", scope="host", value_mode="absolute"),
+    "job.post_structure.attachments": PathSelectorResponse(
+        kind="directory", scope="project", value_mode="project_relative"
+    ),
+    "job.post_structure.revisions": PathSelectorResponse(
+        kind="directory", scope="project", value_mode="project_relative"
+    ),
+    "job.post_structure.content": PathSelectorResponse(kind="file", scope="project", value_mode="project_relative"),
+    "job.post_structure.external_links": PathSelectorResponse(
+        kind="file", scope="project", value_mode="project_relative"
+    ),
+}
 _RESTART_PATHS = {
     "webui.host",
     "webui.port",
@@ -197,6 +211,7 @@ def _walk_model(
                 secret=secret,
                 source=_value_source(env_name, dotenv_sources),
                 apply_mode="restart" if path in _RESTART_PATHS else "next_task",
+                path_selector=_PATH_SELECTORS.get(path),
             )
         )
 

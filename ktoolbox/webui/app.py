@@ -20,6 +20,8 @@ from ktoolbox.webui.auth import (
     require_session,
 )
 from ktoolbox.webui.database import WebUIDatabase, WebUISession
+from ktoolbox.webui.filesystem import FilesystemBrowser
+from ktoolbox.webui.filesystem_routes import create_filesystem_router
 from ktoolbox.webui.models import (
     HealthResponse,
     LoginRequest,
@@ -35,7 +37,12 @@ from ktoolbox.webui.task_scheduler import TaskScheduler
 from ktoolbox.webui.task_store import TaskStore
 
 
-def create_app(context: RuntimeContext, *, task_executor: TaskExecutor | None = None) -> FastAPI:
+def create_app(
+    context: RuntimeContext,
+    *,
+    task_executor: TaskExecutor | None = None,
+    filesystem_browser: FilesystemBrowser | None = None,
+) -> FastAPI:
     database = WebUIDatabase(context.project_root / ".ktoolbox" / "webui.sqlite3")
     auth = AuthService(context.configuration.webui, database)
     task_store = TaskStore(database)
@@ -71,7 +78,10 @@ def create_app(context: RuntimeContext, *, task_executor: TaskExecutor | None = 
     app.state.auth = auth
     app.state.task_store = task_store
     app.state.task_scheduler = task_scheduler
+    browser = filesystem_browser or FilesystemBrowser(context.project_root)
+    app.state.filesystem_browser = browser
     app.include_router(create_project_router(context.project_root))
+    app.include_router(create_filesystem_router(browser))
     app.include_router(create_pawchive_router())
     app.include_router(create_task_router(context.project_root))
 

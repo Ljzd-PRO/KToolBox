@@ -325,7 +325,7 @@ class LoggerConfiguration(BaseModel):
     """
     Logger configuration
 
-    :ivar path: Path to save logs, ``None`` for disable log file output
+    :ivar path: Directory where ``ktoolbox.log`` is saved, ``None`` to disable log file output
     :ivar level: Log filter level
     :ivar rotation: Log rotation
     """
