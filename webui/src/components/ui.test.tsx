@@ -18,6 +18,8 @@ import {
   FormSwitchField,
   OptionalDateRangeField,
   PawchiveIdentityFields,
+  PlatformComboBox,
+  SelectField,
 } from "./ui";
 
 function ChipListHarness({ commitOnComma = true }: { commitOnComma?: boolean }) {
@@ -241,7 +243,7 @@ describe("PawchiveIdentityFields", () => {
     }
     render(<Harness />);
 
-    await user.type(screen.getByRole("textbox", { name: "Service" }), "fanbox");
+    await user.type(screen.getByRole("combobox", { name: "Service" }), "fanbox");
     await user.type(screen.getByRole("textbox", { name: "Creator ID" }), "42");
     await user.type(screen.getByRole("textbox", { name: "Post ID" }), "99");
 
@@ -253,9 +255,52 @@ describe("PawchiveIdentityFields", () => {
     ]);
     expect(group.querySelectorAll(".pawchive-identity-input")).toHaveLength(3);
     expect(group).not.toHaveClass("pawchive-path-field");
-    expect(screen.getByRole("textbox", { name: "Service" })).toHaveValue("fanbox");
+    expect(screen.getByRole("combobox", { name: "Service" })).toHaveValue("fanbox");
     expect(screen.getByRole("textbox", { name: "Creator ID" })).toHaveValue("42");
     expect(screen.getByRole("textbox", { name: "Post ID" })).toHaveValue("99");
+  });
+});
+
+describe("PlatformComboBox", () => {
+  it("offers known platforms while preserving custom values", async () => {
+    const user = userEvent.setup();
+    function Harness() {
+      const [value, setValue] = useState("");
+      return <PlatformComboBox label="Platform" value={value} onChange={setValue} />;
+    }
+    render(<Harness />);
+
+    const input = screen.getByRole("combobox", { name: "Platform" });
+    await user.click(input);
+    expect(await screen.findByRole("option", { name: "Patreon" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Pixiv" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Fanbox" })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("option", { name: "Pixiv" }));
+    expect(input).toHaveValue("pixiv");
+    await user.clear(input);
+    await user.type(input, "custom-platform");
+    expect(input).toHaveValue("custom-platform");
+  });
+});
+
+describe("rich select options", () => {
+  it("renders decorative icons and supporting descriptions without changing option labels", async () => {
+    const user = userEvent.setup();
+    render(
+      <SelectField
+        label="Scope"
+        options={[{ value: "global", label: "All creators", description: "Applies everywhere", icon: Search }]}
+        value="global"
+        onChange={() => undefined}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: /All creators/ }));
+    const option = await screen.findByRole("option");
+    expect(option).toHaveTextContent("All creators");
+    expect(option).toHaveTextContent("Applies everywhere");
+    expect(option.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
   });
 });
 

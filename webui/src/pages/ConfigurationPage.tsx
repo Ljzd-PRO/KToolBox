@@ -16,6 +16,7 @@ import {
   IconKey as KeyRound,
   IconLayoutNavbar as PanelTop,
   IconListCheck as ListTodo,
+  IconRocket as Rocket,
   IconSearch as Search,
   IconSettings as Settings2,
   IconShieldExclamation as ShieldAlert,
@@ -98,8 +99,12 @@ export function ConfigurationPage() {
   const changed = pending[destination];
   const changedFields = schema.fields.filter((field) => field.env_name in changed);
   const sectionOptions = [
-    { value: "all", label: t("configuration.allSections") },
-    ...Object.entries(schema.sections).map(([value, label]) => ({ value, label })),
+    { value: "all", label: t("configuration.allSections"), icon: Settings2 },
+    ...Object.entries(schema.sections).map(([value, label]) => ({
+      value,
+      label,
+      icon: configurationSectionIcon(value),
+    })),
   ];
   const normalizedFilter = filter.trim().toLocaleLowerCase();
   const visibleFields = schema.fields.filter(
@@ -227,8 +232,8 @@ export function ConfigurationPage() {
                 icon={FileText}
                 label={t("configuration.destination")}
                 options={[
-                  { value: "dotenv", label: t("configuration.environment") },
-                  { value: "production", label: t("configuration.production") },
+                  { value: "dotenv", label: t("configuration.environment"), icon: FileText },
+                  { value: "production", label: t("configuration.production"), icon: Rocket },
                 ]}
                 value={destination}
                 onChange={(value) => setDestination(value as DotenvName)}
@@ -298,9 +303,9 @@ export function ConfigurationPage() {
                 icon={FileCog}
                 label={t("configuration.file")}
                 options={[
-                  { value: "dotenv", label: t("configuration.environment") },
-                  { value: "production", label: t("configuration.production") },
-                  { value: "project", label: t("configuration.projectToml") },
+                  { value: "dotenv", label: t("configuration.environment"), icon: FileText },
+                  { value: "production", label: t("configuration.production"), icon: Rocket },
+                  { value: "project", label: t("configuration.projectToml"), icon: Braces },
                 ]}
                 value={rawName}
                 onChange={(value) => setRawName(value as RawName)}
@@ -460,6 +465,14 @@ function configurationIcon(field: ConfigField, type: string | undefined): Tabler
   if (section === "job") return ListTodo;
   if (section === "webui") return PanelTop;
   return TextCursorInput;
+}
+
+function configurationSectionIcon(section: string): TablerIcon {
+  if (section === "api") return Cloud;
+  if (section === "downloader") return Download;
+  if (section === "job") return ListTodo;
+  if (section === "webui") return PanelTop;
+  return Settings2;
 }
 
 function configurationSourceLabel(source: string, t: TFunction): string {

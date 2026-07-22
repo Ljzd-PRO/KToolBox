@@ -86,13 +86,14 @@ describe("project workflows", () => {
 
     await user.click(screen.getByRole("button", { name: "Add creator" }));
     expect(screen.getByRole("group", { name: "Pawchive creator path" })).toBeInTheDocument();
-    expect(screen.getByRole("textbox", { name: "Platform" })).not.toHaveAttribute("readonly");
+    expect(screen.getByText("/platform/user/creator ID", { selector: "code" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Platform" })).not.toHaveAttribute("readonly");
     expect(screen.getByRole("textbox", { name: "Creator ID" })).not.toHaveAttribute("readonly");
     expect(screen.getByRole("textbox", { name: "Note" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Close" }));
 
     await user.click(screen.getAllByRole("button", { name: "Edit fanbox:42" })[0]);
-    expect(screen.getByRole("textbox", { name: "Platform" })).toHaveAttribute("readonly");
+    expect(screen.getByRole("combobox", { name: "Platform" })).toHaveAttribute("readonly");
     expect(screen.getByRole("textbox", { name: "Creator ID" })).toHaveAttribute("readonly");
   });
 
@@ -147,6 +148,8 @@ describe("project workflows", () => {
     expect(container.querySelector(".list-switch-cell")).toContainElement(screen.getByRole("switch", { name: "Rule enabled" }));
 
     await user.click(screen.getByRole("button", { name: "Edit" }));
+    expect(screen.getByRole("textbox", { name: "Matcher type" })).toHaveValue("Field match");
+    expect(screen.queryByRole("button", { name: /Matcher type/ })).not.toBeInTheDocument();
     expect(screen.getByRole("switch", { name: "Invert this group" })).toBeInTheDocument();
     expect(screen.getByRole("checkbox", { name: "Invert this condition" })).toBeInTheDocument();
   });

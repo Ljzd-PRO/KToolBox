@@ -3,19 +3,31 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   IconArrowDown as ArrowDown,
   IconArrowUp as ArrowUp,
+  IconAlignLeft as AlignLeft,
   IconBan as Ban,
   IconBraces as Braces,
   IconCheck as Check,
+  IconCloud as Cloud,
   IconEqual as Equal,
+  IconFile as File,
+  IconFileText as FileText,
   IconFingerprint as Fingerprint,
   IconGitBranch as GitBranchPlus,
   IconLetterCase as CaseSensitive,
   IconListTree as ListTree,
+  IconListCheck as ListCheck,
+  IconListDetails as ListDetails,
+  IconHash as Hash,
+  IconPaperclip as Paperclip,
   IconPencil as Pencil,
   IconPlus as Plus,
   IconPower as Power,
+  IconRegex as Regex,
+  IconSearch as Search,
+  IconTags as Tags,
   IconTrash as Trash2,
   IconUsersGroup as UsersRound,
+  IconWorld as World,
   IconX as X,
 } from "@tabler/icons-react";
 import { useState, type FormEvent } from "react";
@@ -92,7 +104,9 @@ export function BlockersPage() {
   const blockers = blockersQuery.data?.blockers ?? [];
   const creatorOptions = (creatorsQuery.data ?? []).map((creator) => ({
     value: `${creator.service}:${creator.creator_id}`,
-    label: `${creator.alias || creator.creator_id} · ${creator.service}`,
+    label: creator.name || creator.creator_id,
+    description: `${creator.service}:${creator.creator_id}${creator.alias ? ` · ${creator.alias}` : ""}`,
+    icon: UsersRound,
   }));
 
   async function replaceBlockers(next: BlockerSpec[]) {
@@ -273,12 +287,12 @@ export function BlockersPage() {
                 value={editor.id}
                 onChange={(id) => setEditor({ ...editor, id })}
               />
-              <SelectField
+              <FormField
                 icon={Braces}
+                isReadOnly
                 label={t("blockers.type")}
-                options={[{ value: "field-match", label: t("blockers.fieldMatch") }]}
-                value={editor.type}
-                onChange={(type) => setEditor({ ...editor, type })}
+                value={t("blockers.fieldMatch")}
+                onChange={() => undefined}
               />
             </div>
             <FormSwitchField
@@ -292,8 +306,8 @@ export function BlockersPage() {
                 icon={UsersRound}
                 label={t("blockers.scope")}
                 options={[
-                  { value: "global", label: t("blockers.global") },
-                  { value: "creators", label: t("blockers.selectedCreators") },
+                  { value: "global", label: t("blockers.global"), icon: World },
+                  { value: "creators", label: t("blockers.selectedCreators"), icon: UsersRound },
                 ]}
                 value={editor.scope.mode}
                 onChange={(mode) => updateEditorScope(mode as "global" | "creators")}
@@ -398,8 +412,8 @@ function ConditionGroupEditor({
             icon={ListTree}
             label={t("blockers.mode")}
             options={[
-              { value: "any", label: t("blockers.any") },
-              { value: "all", label: t("blockers.all") },
+              { value: "any", label: t("blockers.any"), icon: ListDetails },
+              { value: "all", label: t("blockers.all"), icon: ListCheck },
             ]}
             value={group.mode}
             onChange={(mode) => onChange({ ...group, mode: mode as "any" | "all" })}
@@ -460,19 +474,19 @@ function ConditionEditor({
 }) {
   const { t } = useTranslation();
   const fieldOptions = [
-    { value: "title", label: t("blockers.fields.title") },
-    { value: "content", label: t("blockers.fields.content") },
-    { value: "tags[*]", label: t("blockers.fields.tags") },
-    { value: "file.name", label: t("blockers.fields.fileName") },
-    { value: "attachments[*].name", label: t("blockers.fields.attachmentName") },
-    { value: "id", label: t("blockers.fields.postId") },
-    { value: "service", label: t("blockers.fields.service") },
+    { value: "title", label: t("blockers.fields.title"), icon: FileText },
+    { value: "content", label: t("blockers.fields.content"), icon: AlignLeft },
+    { value: "tags[*]", label: t("blockers.fields.tags"), icon: Tags },
+    { value: "file.name", label: t("blockers.fields.fileName"), icon: File },
+    { value: "attachments[*].name", label: t("blockers.fields.attachmentName"), icon: Paperclip },
+    { value: "id", label: t("blockers.fields.postId"), icon: Hash },
+    { value: "service", label: t("blockers.fields.service"), icon: Cloud },
   ];
   const operatorOptions = [
-    { value: "contains", label: t("blockers.operators.contains") },
-    { value: "equals", label: t("blockers.operators.equals") },
-    { value: "regex", label: t("blockers.operators.regex") },
-    { value: "exists", label: t("blockers.operators.exists") },
+    { value: "contains", label: t("blockers.operators.contains"), icon: Search },
+    { value: "equals", label: t("blockers.operators.equals"), icon: Equal },
+    { value: "regex", label: t("blockers.operators.regex"), icon: Regex },
+    { value: "exists", label: t("blockers.operators.exists"), icon: ListCheck },
   ];
   return (
     <div className="grid gap-4 border-l-2 border-border pl-4">

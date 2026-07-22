@@ -1,6 +1,7 @@
 import { Button, Chip, Surface, Tabs } from "@heroui/react";
 import {
   IconArrowsShuffle as Shuffle,
+  IconAdjustments as Adjustments,
   IconBook2 as BookOpenCheck,
   IconCalendar as CalendarRange,
   IconCheck as Check,
@@ -18,14 +19,16 @@ import {
   IconPlus as Plus,
   IconRefresh as RefreshCw,
   IconTags as Tags,
+  IconToggleLeft as ToggleLeft,
+  IconToggleRight as ToggleRight,
   IconUsersGroup as UsersRound,
   IconX as X,
 } from "@tabler/icons-react";
 import { useState, type FormEvent } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { parseDate, type DateValue } from "@internationalized/date";
 
-import type { CreatorReference, DownloadTaskSpec, SyncTaskSpec, TaskRecord, TaskSpec } from "../types";
+import type { CreatorRosterItem, DownloadTaskSpec, SyncTaskSpec, TaskRecord, TaskSpec } from "../types";
 import {
   ChipListField,
   FormCheckbox,
@@ -45,7 +48,7 @@ export function TaskEditor({
   onClose,
   onSave,
 }: {
-  creators: CreatorReference[];
+  creators: CreatorRosterItem[];
   task?: TaskRecord;
   saving: boolean;
   onClose: () => void;
@@ -181,7 +184,7 @@ export function TaskEditor({
                         label={
                           <span className="flex min-w-0 items-center justify-between gap-3">
                             <span className="min-w-0">
-                              <span className="block truncate text-sm font-medium">{creator.alias || creator.creator_id}</span>
+                              <span className="block truncate text-sm font-medium">{creator.name || creator.creator_id}</span>
                               <span className="block truncate text-xs text-muted">{key}</span>
                             </span>
                             {!creator.enabled ? <Chip className="shrink-0" size="sm" variant="soft">{t("common.disabled")}</Chip> : null}
@@ -232,9 +235,9 @@ export function TaskEditor({
                 icon={Shuffle}
                 label={t("tasks.mixPosts")}
                 options={[
-                  { value: "inherit", label: t("tasks.useConfiguration") },
-                  { value: "true", label: t("common.enabled") },
-                  { value: "false", label: t("common.disabled") },
+                  { value: "inherit", label: t("tasks.useConfiguration"), icon: Adjustments },
+                  { value: "true", label: t("common.enabled"), icon: ToggleRight, tone: "success" },
+                  { value: "false", label: t("common.disabled"), icon: ToggleLeft },
                 ]}
                 value={mixPosts}
                 onChange={setMixPosts}
@@ -274,8 +277,8 @@ export function TaskEditor({
               icon={Fingerprint}
               label={t("tasks.identityMode")}
               options={[
-                { value: "url", label: t("tasks.identityUrl") },
-                { value: "fields", label: t("tasks.identityFields") },
+                { value: "url", label: t("tasks.identityUrl"), icon: Link },
+                { value: "fields", label: t("tasks.identityFields"), icon: Fingerprint },
               ]}
               value={downloadIdentity}
               onChange={setDownloadIdentity}
@@ -286,7 +289,12 @@ export function TaskEditor({
               <PawchiveIdentityFields
                 creatorId={creatorId}
                 creatorIdLabel={t("posts.creatorId")}
-                description={t("tasks.identityPathHint")}
+                description={
+                  <Trans
+                    components={{ code: <code className="inline-path-code" /> }}
+                    i18nKey="tasks.identityPathHint"
+                  />
+                }
                 icon={Cloud}
                 label={t("tasks.identityPath")}
                 postId={postId}

@@ -10,19 +10,22 @@ import type { SortDescriptor } from "@heroui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   IconCheck as Check,
+  IconCircleCheck as CircleCheck,
   IconCloud as Cloud,
   IconFilter as Filter,
   IconPencil as Pencil,
   IconPlus as Plus,
   IconPower as Power,
+  IconCircleOff as PowerOff,
   IconSearch as Search,
   IconNotes as Notes,
   IconTrash as Trash2,
   IconUserPlus as UserPlus,
+  IconUsersGroup as UsersRound,
   IconX as X,
 } from "@tabler/icons-react";
 import { useMemo, useState, type FormEvent } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 
 import {
@@ -188,9 +191,9 @@ export function CreatorsPage() {
   }
 
   const statusOptions = [
-    { value: "all", label: t("creators.allStatuses") },
-    { value: "enabled", label: t("common.enabled") },
-    { value: "disabled", label: t("common.disabled") },
+    { value: "all", label: t("creators.allStatuses"), icon: UsersRound },
+    { value: "enabled", label: t("common.enabled"), icon: CircleCheck, tone: "success" as const },
+    { value: "disabled", label: t("common.disabled"), icon: PowerOff },
   ];
   const sortOptions = [
     { value: "name", label: t("creators.creatorName") },
@@ -373,7 +376,16 @@ export function CreatorsPage() {
             <PawchiveIdentityFields
               creatorId={editor.creator_id}
               creatorIdLabel={t("creators.creatorId")}
-              description={originalKey ? t("creators.identityLockedHint") : t("creators.identityHint")}
+              description={
+                originalKey ? (
+                  t("creators.identityLockedHint")
+                ) : (
+                  <Trans
+                    components={{ code: <code className="inline-path-code" /> }}
+                    i18nKey="creators.identityHint"
+                  />
+                )
+              }
               icon={Cloud}
               isReadOnly={Boolean(originalKey)}
               label={t("creators.identity")}

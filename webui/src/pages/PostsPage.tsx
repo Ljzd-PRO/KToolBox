@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   IconChevronDown as ChevronDown,
   IconChevronUp as ChevronUp,
+  IconCircleCheck as CircleCheck,
   IconCloud as Cloud,
   IconDownload as Download,
   IconEye as Eye,
@@ -32,6 +33,7 @@ import {
   NumberInput,
   PageHeader,
   PageLoading,
+  PlatformComboBox,
   SelectField,
   SortableColumn,
 } from "../components/ui";
@@ -149,10 +151,11 @@ export function PostsPage() {
 
   const details = detailsQuery.data ?? selected;
   const revisionOptions = [
-    { value: "", label: t("posts.currentRevision") },
+    { value: "", label: t("posts.currentRevision"), icon: CircleCheck, tone: "success" as const },
     ...(revisionsQuery.data ?? []).map((revision) => ({
       value: String(revision.revision_id),
       label: t("posts.revisionLabel", { id: revision.revision_id }),
+      icon: History,
     })),
   ];
   const sortedResults = useMemo(
@@ -181,7 +184,7 @@ export function PostsPage() {
       <PageHeader description={t("posts.description")} title={t("posts.title")} />
       <FormSurface>
         <form className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" onSubmit={searchPosts}>
-          <FormField icon={Cloud} label={t("posts.service")} value={service} onChange={setService} />
+          <PlatformComboBox icon={Cloud} label={t("posts.service")} value={service} onChange={setService} />
           <FormField icon={UserRound} label={t("posts.creatorId")} value={creatorId} onChange={setCreatorId} />
           <FormField icon={UserRound} label={t("posts.creatorName")} value={creatorName} onChange={setCreatorName} />
           <NumberInput icon={ListStart} label={t("tasks.offset")} minValue={0} step={50} value={offset} onChange={setOffset} />

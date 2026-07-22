@@ -3,6 +3,7 @@ import {
   Button,
   Checkbox,
   Chip,
+  ComboBox,
   Description,
   DateField,
   DateRangePicker,
@@ -33,6 +34,8 @@ import type { DateValue } from "@internationalized/date";
 import { DateRangePickerStateContext } from "react-aria-components";
 import {
   IconCheck as Check,
+  IconBox as Box,
+  IconBrandPatreon as BrandPatreon,
   IconChevronDown as ChevronDown,
   IconEye as Eye,
   IconEyeOff as EyeOff,
@@ -40,6 +43,7 @@ import {
   IconCalendarOff as CalendarOff,
   IconMinus as Minus,
   IconPlus as Plus,
+  IconPalette as Palette,
   IconArrowsSort as ArrowsSort,
   IconSortAscending as SortAscending,
   IconSortDescending as SortDescending,
@@ -678,7 +682,7 @@ export function PawchiveIdentityFields({
   icon,
 }: {
   label: string;
-  description?: string;
+  description?: ReactNode;
   serviceLabel: string;
   creatorIdLabel: string;
   postIdLabel?: string;
@@ -703,7 +707,7 @@ export function PawchiveIdentityFields({
       >
         <code aria-hidden="true" className="pawchive-identity-token">/</code>
         <div className="pawchive-identity-input pawchive-identity-platform">
-          <FormField
+          <PlatformComboBox
             isReadOnly={isReadOnly}
             isRequired={!isReadOnly}
             label={serviceLabel}
@@ -984,7 +988,97 @@ export function FormCheckbox({
   );
 }
 
-export type SelectOption = { value: string; label: string };
+export type SelectOptionTone = "default" | "accent" | "success" | "warning" | "danger";
+
+export type SelectOption = {
+  value: string;
+  label: string;
+  description?: string;
+  icon?: TablerIcon;
+  tone?: SelectOptionTone;
+};
+
+function SelectOptionContent({ option, compact = false }: { option: SelectOption; compact?: boolean }) {
+  const Icon = option.icon;
+  return (
+    <span className={cn("select-option-content", compact && "select-option-content-compact")}>
+      {Icon ? (
+        <span className="select-option-icon" data-tone={option.tone ?? "default"}>
+          <Icon aria-hidden="true" size={16} stroke={1.8} />
+        </span>
+      ) : null}
+      <span className="min-w-0 flex-1">
+        <span className="select-option-label">{option.label}</span>
+        {!compact && option.description ? <span className="select-option-description">{option.description}</span> : null}
+      </span>
+    </span>
+  );
+}
+
+const platformOptions: SelectOption[] = [
+  { value: "patreon", label: "Patreon", icon: BrandPatreon },
+  { value: "pixiv", label: "Pixiv", icon: Palette },
+  { value: "fanbox", label: "Fanbox", icon: Box },
+];
+
+export function PlatformComboBox({
+  label,
+  value,
+  onChange,
+  description,
+  isReadOnly = false,
+  isRequired = false,
+  icon,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  description?: ReactNode;
+  isReadOnly?: boolean;
+  isRequired?: boolean;
+  icon?: TablerIcon;
+}) {
+  const { t } = useTranslation();
+  return (
+    <ComboBox
+      allowsCustomValue
+      allowsEmptyCollection
+      className="grid gap-1.5"
+      fullWidth
+      inputValue={value}
+      isReadOnly={isReadOnly}
+      isRequired={isRequired}
+      menuTrigger="focus"
+      selectedKey={platformOptions.some((option) => option.value === value) ? value : null}
+      variant="secondary"
+      onInputChange={onChange}
+      onSelectionChange={(key) => key != null && onChange(String(key))}
+    >
+      <FieldLabel icon={icon} label={label} />
+      <ComboBox.InputGroup>
+        <Input autoComplete="off" />
+        {!isReadOnly ? (
+          <ComboBox.Trigger aria-label={t("common.showOptions")}>
+            <ChevronDown aria-hidden="true" size={16} />
+          </ComboBox.Trigger>
+        ) : null}
+      </ComboBox.InputGroup>
+      {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
+      {!isReadOnly ? (
+        <ComboBox.Popover>
+          <ListBox aria-label={label} items={platformOptions}>
+            {(option) => (
+              <ListBox.Item id={option.value} textValue={option.label}>
+                <SelectOptionContent option={option} />
+                <ListBox.ItemIndicator />
+              </ListBox.Item>
+            )}
+          </ListBox>
+        </ComboBox.Popover>
+      ) : null}
+    </ComboBox>
+  );
+}
 
 export function SelectField({
   label,
@@ -1016,7 +1110,7 @@ export function SelectField({
     >
       <FieldLabel icon={icon} label={label} />
       <Select.Trigger>
-        <Select.Value>{selected?.label ?? label}</Select.Value>
+        <Select.Value>{selected ? <SelectOptionContent compact option={selected} /> : label}</Select.Value>
         <Select.Indicator>
           <ChevronDown aria-hidden="true" size={16} />
         </Select.Indicator>
@@ -1026,7 +1120,7 @@ export function SelectField({
         <ListBox aria-label={label}>
           {options.map((option) => (
             <ListBox.Item id={option.value} key={option.value} textValue={option.label}>
-              {option.label}
+              <SelectOptionContent option={option} />
               <ListBox.ItemIndicator />
             </ListBox.Item>
           ))}
@@ -1111,7 +1205,7 @@ export function AutocompleteField({
     >
       <FieldLabel icon={icon} label={label} />
       <Autocomplete.Trigger>
-        <Autocomplete.Value>{selected?.label ?? placeholder}</Autocomplete.Value>
+        <Autocomplete.Value>{selected ? <SelectOptionContent compact option={selected} /> : placeholder}</Autocomplete.Value>
         <Autocomplete.ClearButton aria-label={t("common.clearSelection")}>
           <X aria-hidden="true" size={15} />
         </Autocomplete.ClearButton>
@@ -1135,7 +1229,7 @@ export function AutocompleteField({
           <ListBox aria-label={label}>
             {options.map((option) => (
               <ListBox.Item id={option.value} key={option.value} textValue={option.label}>
-                {option.label}
+                <SelectOptionContent option={option} />
                 <ListBox.ItemIndicator />
               </ListBox.Item>
             ))}
