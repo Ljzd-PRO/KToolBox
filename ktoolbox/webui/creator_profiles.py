@@ -45,9 +45,7 @@ class CreatorProfileCache:
     async def load(self) -> dict[str, CachedCreatorProfile]:
         async with self.database.connect() as connection:
             connection.row_factory = aiosqlite.Row
-            cursor = await connection.execute(
-                "SELECT service, creator_id, name, fetched_at FROM creator_profile_cache"
-            )
+            cursor = await connection.execute("SELECT service, creator_id, name, fetched_at FROM creator_profile_cache")
             rows = await cursor.fetchall()
             await cursor.close()
         entries = (
@@ -118,11 +116,7 @@ class CreatorRosterService:
         return [
             CreatorRosterItemResponse(
                 **creator.model_dump(),
-                name=(
-                    entry.name
-                    if (entry := cached.get(_creator_key(creator.service, creator.creator_id)))
-                    else None
-                ),
+                name=(entry.name if (entry := cached.get(_creator_key(creator.service, creator.creator_id))) else None),
             )
             for creator in creators
         ]

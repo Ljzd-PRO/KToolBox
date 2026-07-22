@@ -50,9 +50,7 @@ async def test_creator_profile_cache_migration_is_idempotent(tmp_path: Path) -> 
     await database.initialize()
 
     async with database.connect() as connection:
-        migration = await connection.execute_fetchall(
-            "SELECT version FROM schema_migrations WHERE version = 4"
-        )
+        migration = await connection.execute_fetchall("SELECT version FROM schema_migrations WHERE version = 4")
         table = await connection.execute_fetchall(
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'creator_profile_cache'"
         )
@@ -77,9 +75,7 @@ async def test_roster_refreshes_profiles_with_bounded_concurrency_and_stale_fall
     await database.initialize()
     cache = CreatorProfileCache(database)
     await cache.store(CachedCreatorProfile("patreon", "fresh", "Fresh cache", now))
-    await cache.store(
-        CachedCreatorProfile("pixiv", "missing-stale", "Stale cache", now - timedelta(days=2))
-    )
+    await cache.store(CachedCreatorProfile("pixiv", "missing-stale", "Stale cache", now - timedelta(days=2)))
     TrackingCreatorClient.calls = []
     TrackingCreatorClient.maximum = 0
     service = CreatorRosterService(
