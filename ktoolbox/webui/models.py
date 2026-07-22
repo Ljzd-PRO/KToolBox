@@ -105,7 +105,7 @@ class FilesystemDeleteDirectoryRequest(BaseModel):
 
 
 class ConfigSchemaResponse(BaseModel):
-    locale: Literal["en", "zh-CN"]
+    locale: Literal["zh-CN", "zh-Hant", "en", "ja", "ko", "fr", "ru"]
     sections: dict[str, str]
     fields: list[ConfigFieldResponse]
 

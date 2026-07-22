@@ -219,8 +219,13 @@
           },
           "locale": {
             "enum": [
+              "zh-CN",
+              "zh-Hant",
               "en",
-              "zh-CN"
+              "ja",
+              "ko",
+              "fr",
+              "ru"
             ],
             "title": "Locale",
             "type": "string"
@@ -2696,8 +2701,13 @@
             "schema": {
               "default": "en",
               "enum": [
+                "zh-CN",
+                "zh-Hant",
                 "en",
-                "zh-CN"
+                "ja",
+                "ko",
+                "fr",
+                "ru"
               ],
               "title": "Locale",
               "type": "string"

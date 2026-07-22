@@ -70,7 +70,7 @@ export type FilesystemBrowse = WebUIApiSchemas["FilesystemBrowseResponse"];
 export type FilesystemEntry = WebUIApiSchemas["FilesystemEntryResponse"];
 
 export type ConfigSchema = {
-  locale: "en" | "zh-CN";
+  locale: "zh-CN" | "zh-Hant" | "en" | "ja" | "ko" | "fr" | "ru";
   sections: Record<string, string>;
   fields: ConfigField[];
 };

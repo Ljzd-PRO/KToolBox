@@ -43,6 +43,7 @@ import {
 import { RemotePathField } from "../components/RemotePathField";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
+import { currentLanguage } from "../lib/i18n";
 import type { ConfigField, ConfigSchema, ProjectDocument, TextDocument } from "../types";
 
 type DotenvName = "dotenv" | "production";
@@ -57,10 +58,10 @@ const sourceColors: Record<string, "default" | "accent" | "warning" | "success">
 };
 
 export function ConfigurationPage() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { session } = useAuth();
   const queryClient = useQueryClient();
-  const locale = i18n.language.startsWith("zh") ? "zh-CN" : "en";
+  const locale = currentLanguage();
   const schemaQuery = useQuery({
     queryKey: ["config-schema", locale],
     queryFn: () => api<ConfigSchema>(`/config/schema?locale=${locale}`),

@@ -22,9 +22,10 @@ from ktoolbox.configuration import (
     PostStructureConfiguration,
     WebUIConfiguration,
 )
+from ktoolbox.webui.config_locale_catalogs import CONFIG_LOCALE_CATALOGS
 from ktoolbox.webui.models import ConfigFieldResponse, ConfigSchemaResponse, PathSelectorResponse
 
-Locale = Literal["en", "zh-CN"]
+Locale = Literal["zh-CN", "zh-Hant", "en", "ja", "ko", "fr", "ru"]
 
 _MODEL_TRANSLATIONS: dict[type[BaseModel], type[BaseModel]] = {
     Configuration: configuration_zh.Configuration,
@@ -155,8 +156,7 @@ def build_config_schema(configuration: Configuration, project_root: Path, locale
         dotenv_sources,
         fields,
     )
-    label_index = 0 if locale == "en" else 1
-    sections = {key: labels[label_index] for key, labels in _SECTION_LABELS.items()}
+    sections = _localized_sections(locale)
     return ConfigSchemaResponse(locale=locale, sections=sections, fields=fields)
 
 
@@ -166,11 +166,15 @@ def missing_config_metadata() -> dict[str, list[str]]:
     _collect_descriptions(Configuration, "", "en", descriptions_en)
     _collect_descriptions(Configuration, "", "zh-CN", descriptions_zh)
     paths = set(_field_paths(Configuration))
-    return {
+    missing = {
         "labels": sorted(paths - _LABELS.keys()),
         "english_descriptions": sorted(paths - descriptions_en.keys()),
         "chinese_descriptions": sorted(paths - descriptions_zh.keys()),
     }
+    for locale, catalog in CONFIG_LOCALE_CATALOGS.items():
+        missing[f"{locale}_labels"] = sorted(paths - catalog["labels"].keys())
+        missing[f"{locale}_descriptions"] = sorted(paths - catalog["descriptions"].keys())
+    return missing
 
 
 def _walk_model(
@@ -191,7 +195,6 @@ def _walk_model(
         if nested_model is not None:
             _walk_model(nested_model, value, locale, dotenv_sources, result, path)
             continue
-        label_index = 0 if locale == "en" else 1
         env_name = f"KTOOLBOX_{path.replace('.', '__').upper()}"
         secret = path in _SECRET_PATHS
         serialized = None if secret else _serialize_value(field.annotation, value)
@@ -200,7 +203,7 @@ def _walk_model(
                 path=path,
                 env_name=env_name,
                 section=path.split(".", 1)[0] if "." in path else "general",
-                label=_LABELS[path][label_index],
+                label=_localized_label(path, locale),
                 description=descriptions[path],
                 json_schema=dict(property_schemas[name]),
                 default=None
@@ -222,6 +225,12 @@ def _collect_descriptions(
     locale: Locale,
     result: dict[str, str],
 ) -> None:
+    if locale not in ("en", "zh-CN"):
+        catalog = CONFIG_LOCALE_CATALOGS[locale]["descriptions"]
+        for path in _field_paths(model, prefix):
+            if description := catalog.get(path):
+                result[path] = description
+        return
     source_model = model if locale == "en" else _MODEL_TRANSLATIONS[model]
     descriptions = _parse_ivar_descriptions(inspect.getdoc(source_model) or "")
     for name, field in model.model_fields.items():
@@ -233,6 +242,19 @@ def _collect_descriptions(
             description = descriptions.get(name)
             if description:
                 result[path] = description
+
+
+def _localized_label(path: str, locale: Locale) -> str:
+    if locale in ("en", "zh-CN"):
+        return _LABELS[path][0 if locale == "en" else 1]
+    return CONFIG_LOCALE_CATALOGS[locale]["labels"][path]
+
+
+def _localized_sections(locale: Locale) -> dict[str, str]:
+    if locale in ("en", "zh-CN"):
+        index = 0 if locale == "en" else 1
+        return {key: labels[index] for key, labels in _SECTION_LABELS.items()}
+    return dict(CONFIG_LOCALE_CATALOGS[locale]["sections"])
 
 
 def _parse_ivar_descriptions(docstring: str) -> dict[str, str]:

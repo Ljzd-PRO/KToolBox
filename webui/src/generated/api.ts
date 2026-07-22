@@ -647,7 +647,7 @@ export interface components {
              * Locale
              * @enum {string}
              */
-            locale: "en" | "zh-CN";
+            locale: "zh-CN" | "zh-Hant" | "en" | "ja" | "ko" | "fr" | "ru";
             /** Sections */
             sections: {
                 [key: string]: string;
@@ -1649,7 +1649,7 @@ export interface operations {
     config_schema_api_v1_config_schema_get: {
         parameters: {
             query?: {
-                locale?: "en" | "zh-CN";
+                locale?: "zh-CN" | "zh-Hant" | "en" | "ja" | "ko" | "fr" | "ru";
             };
             header?: never;
             path?: never;

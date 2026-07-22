@@ -51,22 +51,23 @@ async def configured_client(tmp_path: Path) -> AsyncIterator[tuple[httpx.AsyncCl
             yield client, login.json()["csrf_token"]
 
 
-def test_config_metadata_is_complete_bilingual_and_redacts_secrets(tmp_path: Path) -> None:
-    assert missing_config_metadata() == {
-        "labels": [],
-        "english_descriptions": [],
-        "chinese_descriptions": [],
-    }
+def test_config_metadata_is_complete_in_all_languages_and_redacts_secrets(tmp_path: Path) -> None:
+    assert all(not missing for missing in missing_config_metadata().values())
     configuration = Configuration(
         _env_file=None,
         downloader={"session_key": "cookie"},
         webui={"username": "owner", "password": "secret"},
     )
-    english = build_config_schema(configuration, tmp_path, "en")
-    chinese = build_config_schema(configuration, tmp_path, "zh-CN")
-    assert len(english.fields) == len(chinese.fields) >= 60
+    schemas = {
+        locale: build_config_schema(configuration, tmp_path, locale)
+        for locale in ("zh-CN", "zh-Hant", "en", "ja", "ko", "fr", "ru")
+    }
+    english = schemas["en"]
+    chinese = schemas["zh-CN"]
+    assert {len(schema.fields) for schema in schemas.values()} == {len(english.fields)}
+    assert len(english.fields) >= 60
     assert all(field.label and "_" not in field.label for field in english.fields)
-    assert all(field.description for field in english.fields + chinese.fields)
+    assert all(field.label and field.description for schema in schemas.values() for field in schema.fields)
     secret = next(field for field in english.fields if field.path == "downloader.session_key")
     assert secret.secret is True
     assert secret.value is None
@@ -214,10 +215,13 @@ def test_dotenv_store_handles_temporary_file_creation_failure(tmp_path: Path, mo
 @pytest.mark.asyncio
 async def test_config_schema_and_dotenv_endpoints(tmp_path: Path) -> None:
     async with configured_client(tmp_path) as (client, csrf):
-        english = await client.get("/api/v1/config/schema?locale=en")
-        chinese = await client.get("/api/v1/config/schema?locale=zh-CN")
-        assert english.status_code == chinese.status_code == 200
-        assert english.json()["fields"][0]["label"] != chinese.json()["fields"][0]["label"]
+        localized = {
+            locale: await client.get(f"/api/v1/config/schema?locale={locale}")
+            for locale in ("zh-CN", "zh-Hant", "en", "ja", "ko", "fr", "ru")
+        }
+        assert all(response.status_code == 200 for response in localized.values())
+        first_labels = {response.json()["fields"][0]["label"] for response in localized.values()}
+        assert len(first_labels) == len(localized)
 
         document = await client.get("/api/v1/config/dotenv/dotenv")
         assert document.status_code == 200
