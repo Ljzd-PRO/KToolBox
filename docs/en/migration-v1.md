@@ -70,7 +70,7 @@ Move non-empty `KTOOLBOX_JOB__KEYWORDS_EXCLUDE` values to a global `field-match`
 
 ## Optional WebUI
 
-v1 adds a new HeroUI panel; it does not migrate or reuse the historical experimental `webui` branch. Install `ktoolbox[webui]`, select a project directory, and configure a new single account. A missing `ktoolbox.toml` is created automatically after a warning; no default credentials are created.
+v1 adds a new HeroUI panel; it does not migrate or reuse the historical experimental `webui` branch. Install `ktoolbox[webui]` and select a project directory. A missing `ktoolbox.toml` is created automatically after a warning. If no account is configured, each launch prints an `admin` username and a new random password; configure a single account when stable credentials are required.
 
 ```bash
 ktoolbox webui hash-password

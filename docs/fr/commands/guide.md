@@ -102,7 +102,7 @@ L'éditeur nécessite la dépendance facultative `urwid`. Il modifie les réglag
 
 ## Exécuter le panneau de projet facultatif
 
-Après avoir installé `ktoolbox[webui]` et configuré un compte, liez le panneau à un répertoire de projet. Un fichier `ktoolbox.toml` absent est créé automatiquement après un avertissement dans le terminal :
+Après avoir installé `ktoolbox[webui]`, liez le panneau à un répertoire de projet. Vous pouvez configurer un compte ou utiliser le nom `admin` et le mot de passe aléatoire affichés dans le terminal pour cette exécution. Un fichier `ktoolbox.toml` absent est créé automatiquement après un avertissement :
 
 ```bash
 ktoolbox webui . --host 127.0.0.1

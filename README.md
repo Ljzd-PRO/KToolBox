@@ -100,7 +100,7 @@ Downloaded files are skipped on later runs. Incomplete temporary files are resum
 
 ## WebUI
 
-The WebUI binds to one directory containing `ktoolbox.toml`. Configure a single account, preferably with an Argon2id hash:
+The WebUI binds to one directory containing `ktoolbox.toml`. It can start without account settings; each such launch prints the `admin` username and a new random password in the terminal. To keep stable custom credentials, configure a single account, preferably with an Argon2id hash:
 
 ```bash
 ktoolbox webui hash-password
@@ -123,7 +123,7 @@ Task rows preserve readable post titles and creator names in an offline presenta
 
 Creator profiles supply the primary roster name with a resilient 24-hour cache. Data tables support locale-aware sorting, dashboard statistics link to filtered views, and every platform field uses a HeroUI ComboBox with Patreon, Pixiv, and Fanbox suggestions plus custom values.
 
-The default `0.0.0.0:8789` listener is convenient on a trusted LAN, but HTTP does not protect credentials or project data in transit. Bind to `127.0.0.1` or put the service behind HTTPS for untrusted networks. There is no default account, and startup fails until valid credentials are configured. Filesystem-backed path fields can browse the computer running KToolBox; project fields stay inside the bound project, while the storage-bucket and log-directory fields use the server process's host permissions. Empty directories can only be removed through an explicit, non-recursive confirmation. See the [WebUI guide](https://ktoolbox.readthedocs.io/latest/webui/) for task lifecycle, security, and deployment details.
+The default `0.0.0.0:8789` listener is convenient on a trusted LAN, but HTTP does not protect credentials or project data in transit. Bind to `127.0.0.1` or put the service behind HTTPS for untrusted networks. When credentials are not configured, KToolBox generates credentials for the current process and prints them only in its terminal. Filesystem-backed path fields can browse the computer running KToolBox; project fields stay inside the bound project, while the storage-bucket and log-directory fields use the server process's host permissions. Empty directories can only be removed through an explicit, non-recursive confirmation. See the [WebUI guide](https://ktoolbox.readthedocs.io/latest/webui/) for task lifecycle, security, and deployment details.
 
 ## Configuration
 

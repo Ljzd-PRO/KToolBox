@@ -178,9 +178,9 @@ class WebUIConfiguration(ktoolbox.configuration.WebUIConfiguration):
     :ivar host: WebUI HTTP 服务监听的网络接口
     :ivar port: WebUI HTTP 服务监听的 TCP 端口
     :ivar open_browser: 启动后在默认浏览器中打开 WebUI
-    :ivar username: WebUI 单账户的用户名
+    :ivar username: WebUI 单账户的用户名；留空时启动过程使用 ``admin``
     :ivar password_hash: WebUI 账户首选的 Argon2id 密码哈希
-    :ivar password: 仅在未配置密码哈希时使用的明文兼容密码
+    :ivar password: 明文兼容密码；两种密码配置均留空时由启动过程随机生成
     :ivar max_active_tasks: 可同时运行的顶层同步或下载任务数量上限
     :ivar session_idle_hours: 会话自最近一次使用后的有效小时数
     :ivar session_absolute_hours: 会话自登录后的最长有效小时数

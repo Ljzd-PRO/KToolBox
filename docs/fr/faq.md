@@ -116,7 +116,7 @@ La progression Rich en direct n'est utilisée que dans un terminal interactif. E
 
 ## Pourquoi la WebUI refuse-t-elle de démarrer ?
 
-Installez `ktoolbox[webui]`, transmettez un répertoire de projet et configurez `KTOOLBOX_WEBUI__USERNAME` avec `KTOOLBOX_WEBUI__PASSWORD_HASH` ou `KTOOLBOX_WEBUI__PASSWORD`. Un fichier `ktoolbox.toml` absent est créé après un avertissement. Le hachage est préférable et doit être une valeur Argon2 valide. Le verrou du projet refuse également un second processus WebUI pour le même projet.
+Installez `ktoolbox[webui]` et transmettez un répertoire de projet. Les réglages du compte sont facultatifs : sans eux, le terminal affiche le nom `admin` et un mot de passe aléatoire pour cette exécution. Un hachage explicitement configuré doit rester une valeur Argon2 valide. Un fichier `ktoolbox.toml` absent est créé après un avertissement, tandis que le verrou refuse toujours un second processus WebUI pour le même projet.
 
 ## Est-il sûr d'exposer la WebUI sur mon réseau ?
 

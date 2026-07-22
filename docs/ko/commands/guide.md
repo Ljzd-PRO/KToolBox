@@ -102,7 +102,7 @@ ktoolbox site-version
 
 ## 선택적 프로젝트 패널 실행
 
-`ktoolbox[webui]`를 설치하고 계정을 설정한 후 패널을 프로젝트 디렉터리에 바인딩합니다. `ktoolbox.toml`이 없으면 터미널 경고 후 자동으로 생성됩니다.
+`ktoolbox[webui]`를 설치한 후 패널을 프로젝트 디렉터리에 바인딩합니다. 계정을 설정하거나 이번 실행에서 터미널에 출력되는 `admin`과 무작위 암호를 사용할 수 있습니다. `ktoolbox.toml`이 없으면 경고 후 자동 생성됩니다.
 
 ```bash
 ktoolbox webui . --host 127.0.0.1

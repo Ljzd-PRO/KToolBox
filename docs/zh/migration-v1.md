@@ -70,7 +70,7 @@ enabled = true
 
 ## 可选 WebUI
 
-v1 新增全新的 HeroUI 面板，不会迁移或复用历史实验性 `webui` 分支。请安装 `ktoolbox[webui]`，选择项目目录并配置一个新账户；缺少 `ktoolbox.toml` 时会在警告后自动创建，但项目不会创建默认凭据。
+v1 新增全新的 HeroUI 面板，不会迁移或复用历史实验性 `webui` 分支。请安装 `ktoolbox[webui]` 并选择项目目录；缺少 `ktoolbox.toml` 时会在警告后自动创建。未配置账户时，每次启动都会在终端输出 `admin` 用户名和新随机密码；需要固定凭据时再配置单账户即可。
 
 ```bash
 ktoolbox webui hash-password

@@ -116,7 +116,7 @@ Rich live progress is used only on an interactive terminal. It shows each active
 
 ## Why does the WebUI refuse to start?
 
-Install `ktoolbox[webui]`, pass a project directory, and configure `KTOOLBOX_WEBUI__USERNAME` plus `KTOOLBOX_WEBUI__PASSWORD_HASH` or `KTOOLBOX_WEBUI__PASSWORD`. A missing `ktoolbox.toml` is created automatically after a terminal warning. The hash is preferred and must be a valid Argon2 value. A second WebUI process for the same project is also rejected by the project lock.
+Install `ktoolbox[webui]` and pass a project directory. Account settings are optional: without them, startup prints the `admin` username and a random password for that run. A configured password hash must still be valid Argon2. A missing `ktoolbox.toml` is created automatically after a terminal warning, while a second WebUI process for the same project is rejected by the project lock.
 
 ## Is it safe to expose the WebUI on my network?
 

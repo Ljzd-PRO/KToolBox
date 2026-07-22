@@ -125,16 +125,16 @@ Les groupes utilisent `kind = "group"`, `mode = "any"` ou `"all"`, une liste `co
 
 ## `webui`
 
-Ces réglages ne sont nécessaires que lorsque `ktoolbox[webui]` est installé. Il n'existe aucun identifiant par défaut et le serveur refuse de démarrer sans nom d'utilisateur et l'une des formes de mot de passe.
+Ces réglages ne sont nécessaires que lorsque `ktoolbox[webui]` est installé et restent facultatifs au démarrage : un nom vide devient `admin` et, si les deux formes de mot de passe sont vides, le serveur génère un mot de passe aléatoire, affiche les identifiants effectifs dans le terminal et ne les conserve que pour ce processus.
 
 | Champ | Type | Valeur par défaut | Description |
 | --- | --- | --- | --- |
 | `host` | chaîne | `0.0.0.0` | Interface d'écoute HTTP. Préférez `127.0.0.1` hors d'un réseau local fiable. |
 | `port` | entier | `8789` | Port d'écoute HTTP, de 1 à 65535. |
 | `open_browser` | booléen | `True` | Ouvrir l'URL locale du panneau après le démarrage. |
-| `username` | chaîne | vide | Nom d'utilisateur requis du compte unique. |
-| `password_hash` | chaîne secrète | vide | Hachage Argon2id recommandé du mot de passe. |
-| `password` | chaîne secrète | vide | Solution de repli en clair, ignorée si `password_hash` est défini. |
+| `username` | chaîne | vide | Nom facultatif ; le démarrage utilise `admin` s'il est vide. |
+| `password_hash` | chaîne secrète | vide | Hachage Argon2id stable recommandé. |
+| `password` | chaîne secrète | vide | Repli en clair ; généré au démarrage si les deux formes sont vides. |
 | `max_active_tasks` | entier | `2` | Tâches de premier niveau simultanées, de 1 à 16. |
 | `session_idle_hours` | entier | `24` | Expiration de la session depuis la dernière utilisation. |
 | `session_absolute_hours` | entier | `168` | Durée de vie maximale depuis la connexion. |

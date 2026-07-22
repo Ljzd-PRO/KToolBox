@@ -96,7 +96,7 @@ Sans `--json`, les commandes de requête omettent volontairement le corps de la 
 
 ## `webui`
 
-Installez `ktoolbox[webui]` avant d'utiliser ces commandes. La commande par défaut accepte un répertoire de projet et crée un fichier `ktoolbox.toml` absent après un avertissement. Les identifiants valides d'un compte unique restent nécessaires.
+Installez `ktoolbox[webui]` avant d'utiliser ces commandes. La commande par défaut accepte un répertoire de projet et crée un fichier `ktoolbox.toml` absent après un avertissement. Sans compte configuré, le terminal affiche le nom `admin` et un mot de passe aléatoire pour ce processus ; les réglages WebUI permettent de définir des identifiants stables.
 
 | Argument ou option | Valeur par défaut | Signification |
 | --- | --- | --- |

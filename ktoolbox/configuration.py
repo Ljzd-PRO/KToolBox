@@ -342,9 +342,9 @@ class WebUIConfiguration(BaseModel):
     :ivar host: Interface used by the WebUI HTTP server
     :ivar port: TCP port used by the WebUI HTTP server
     :ivar open_browser: Open the WebUI in the default browser after startup
-    :ivar username: Username of the single WebUI account
+    :ivar username: Username of the single WebUI account; startup uses ``admin`` when empty
     :ivar password_hash: Preferred Argon2id password hash for the WebUI account
-    :ivar password: Plaintext compatibility password used only when no password hash is configured
+    :ivar password: Plaintext compatibility password; startup generates one when both password forms are empty
     :ivar max_active_tasks: Maximum number of top-level sync or download tasks running concurrently
     :ivar session_idle_hours: Session lifetime in hours since its most recent use
     :ivar session_absolute_hours: Maximum session lifetime in hours since login

@@ -70,7 +70,7 @@ enabled = true
 
 ## 선택적 WebUI
 
-v1은 새로운 HeroUI 패널을 추가하며 이전의 실험적 `webui` 브랜치를 마이그레이션하거나 재사용하지 않습니다. `ktoolbox[webui]`를 설치하고 프로젝트 디렉터리를 선택한 다음 새 단일 계정을 설정하세요. `ktoolbox.toml`이 없으면 경고 후 자동으로 생성되지만 기본 자격 증명은 만들지 않습니다.
+v1은 새로운 HeroUI 패널을 추가하며 이전 실험적 `webui` 브랜치를 마이그레이션하거나 재사용하지 않습니다. `ktoolbox[webui]`를 설치하고 프로젝트를 선택하세요. `ktoolbox.toml`은 경고 후 자동 생성됩니다. 계정이 없으면 시작마다 `admin`과 새 무작위 암호를 출력하며, 고정 자격 증명이 필요할 때 단일 계정을 설정합니다.
 
 ```bash
 ktoolbox webui hash-password

@@ -113,12 +113,7 @@ async def test_login_rate_limit_and_origin_check(tmp_path: Path) -> None:
 
 
 @pytest.mark.asyncio
-async def test_missing_or_invalid_credentials_fail_startup(tmp_path: Path) -> None:
-    missing = create_app(RuntimeContext(tmp_path, Configuration(_env_file=None)))
-    with pytest.raises(ValueError, match="USERNAME"):
-        async with missing.router.lifespan_context(missing):
-            pass
-
+async def test_invalid_password_hash_fails_startup(tmp_path: Path) -> None:
     invalid = create_app(
         RuntimeContext(
             tmp_path,
@@ -159,6 +154,13 @@ def test_rate_limiter_expires_old_attempts_and_client_identifier_falls_back(monk
 async def test_auth_service_rejects_missing_password_and_unknown_session(tmp_path: Path) -> None:
     database = WebUIDatabase(tmp_path / "auth.sqlite3")
     await database.initialize()
+    missing_username = AuthService(
+        Configuration(_env_file=None, webui={"password": "secret"}).webui,
+        database,
+    )
+    with pytest.raises(ValueError, match="USERNAME"):
+        missing_username.validate_configuration()
+
     service = AuthService(Configuration(_env_file=None, webui={"username": "owner"}).webui, database)
     with pytest.raises(ValueError, match="PASSWORD_HASH or KTOOLBOX_WEBUI__PASSWORD"):
         service.validate_configuration()

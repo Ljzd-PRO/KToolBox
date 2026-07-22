@@ -116,7 +116,7 @@ Rich 即時進度只用於互動式終端機。它會顯示每個作用中檔案
 
 ## 為什麼 WebUI 拒絕啟動？
 
-安裝 `ktoolbox[webui]`、傳入專案目錄，並設定 `KTOOLBOX_WEBUI__USERNAME` 加上 `KTOOLBOX_WEBUI__PASSWORD_HASH` 或 `KTOOLBOX_WEBUI__PASSWORD`。缺少 `ktoolbox.toml` 時會在終端機警告後自動建立。建議使用雜湊，且必須是有效的 Argon2 值。專案鎖也會拒絕同一專案的第二個 WebUI 處理程序。
+安裝 `ktoolbox[webui]` 並傳入專案目錄。帳號設定可留空，此時終端機會輸出本次執行使用的 `admin` 使用者名稱和隨機密碼。明確設定的密碼雜湊仍必須是有效的 Argon2 值。缺少 `ktoolbox.toml` 時會在終端機警告後自動建立；專案鎖仍會拒絕同一專案的第二個 WebUI 處理程序。
 
 ## 將 WebUI 暴露到網路上安全嗎？
 

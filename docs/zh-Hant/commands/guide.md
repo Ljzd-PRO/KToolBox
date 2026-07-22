@@ -102,7 +102,7 @@ ktoolbox site-version
 
 ## 執行可選的專案面板
 
-安裝 `ktoolbox[webui]` 並設定帳號後，將面板繫結到專案目錄。若缺少 `ktoolbox.toml`，在終端機警告後會自動建立：
+安裝 `ktoolbox[webui]` 後，將面板繫結到專案目錄。可以預先設定帳號，也可以使用本次執行時終端機輸出的 `admin` 使用者名稱和隨機密碼。若缺少 `ktoolbox.toml`，在終端機警告後會自動建立：
 
 ```bash
 ktoolbox webui . --host 127.0.0.1
