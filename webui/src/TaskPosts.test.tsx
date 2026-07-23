@@ -186,7 +186,7 @@ describe("task and post workflows", () => {
       expect(title.nextElementSibling).toHaveTextContent("Demo Studio · fanbox:42 · #99 · rev. 3");
     }
     expect(screen.getAllByText("Demo Studio · fanbox:42 · #99 · rev. 3")).toHaveLength(2);
-    expect(screen.getAllByText("2 creators")).toHaveLength(2);
+    expect(screen.getAllByTitle("Demo Studio among 2 creators")).toHaveLength(2);
     expect(screen.getAllByText("Demo Studio · Type Lab")).toHaveLength(2);
     expect(screen.getAllByText("0 B/s").length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByRole("button", { name: "Task details" }).length).toBeGreaterThanOrEqual(4);

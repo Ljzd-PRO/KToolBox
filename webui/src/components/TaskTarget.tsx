@@ -7,9 +7,16 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { failureMessage, primaryFailure } from "../lib/taskFailures";
-import type { TaskRecord, TaskSpec } from "../types";
+import { syncTaskCreatorNames } from "../lib/taskPresentation";
+import type { CreatorRosterItem, TaskRecord, TaskSpec } from "../types";
 
-export function TaskTarget({ task }: { task: TaskRecord }) {
+export function TaskTarget({
+  task,
+  creators = [],
+}: {
+  task: TaskRecord;
+  creators?: readonly CreatorRosterItem[];
+}) {
   const { t } = useTranslation();
   const failure = primaryFailure(task.failure);
   const failureText = failure
@@ -18,7 +25,7 @@ export function TaskTarget({ task }: { task: TaskRecord }) {
       ? task.error?.trim()
       : null;
   if (task.spec.kind === "sync") {
-    const names = task.spec.creators.map((creator) => creator.alias?.trim() || creator.creator_id);
+    const names = syncTaskCreatorNames(task, creators);
     const visibleNames = names.slice(0, 2);
     const hiddenCount = names.length - visibleNames.length;
     const summary = names.length
@@ -31,7 +38,7 @@ export function TaskTarget({ task }: { task: TaskRecord }) {
       <div className="task-target flex min-w-0 flex-1 items-start gap-3">
         <span className="task-kind-icon" data-kind="sync"><RefreshCw aria-hidden="true" size={18} /></span>
         <div className="min-w-0 flex-1">
-          <p className="task-target-title truncate text-sm font-semibold" title={t("tasks.creatorCount", { count: names.length })}>{t("tasks.creatorCount", { count: names.length })}</p>
+          <SyncTaskTitle names={names} />
           <div className="mt-1 flex min-w-0 items-center gap-2">
             <Chip className="shrink-0" size="sm" variant="soft">{t("common.sync")}</Chip>
             {roster ? (
@@ -70,6 +77,34 @@ export function TaskTarget({ task }: { task: TaskRecord }) {
         {failureText ? <FailureLine text={failureText} /> : null}
       </div>
     </div>
+  );
+}
+
+function SyncTaskTitle({ names }: { names: string[] }) {
+  const { t } = useTranslation();
+  if (!names.length) {
+    return (
+      <p className="task-target-title truncate text-sm font-semibold" title={t("tasks.noFrozenCreators")}>
+        {t("tasks.noFrozenCreators")}
+      </p>
+    );
+  }
+  if (names.length === 1) {
+    return (
+      <p className="task-target-title truncate text-sm font-semibold" title={names[0]}>
+        {names[0]}
+      </p>
+    );
+  }
+  const suffix = t("tasks.creatorGroupSuffix", { count: names.length });
+  return (
+    <p
+      className="task-target-title task-target-title-group flex min-w-0 items-baseline text-sm font-semibold"
+      title={`${names[0]} ${suffix}`}
+    >
+      <span className="min-w-0 truncate">{names[0]}</span>
+      <span className="shrink-0 whitespace-pre"> {suffix}</span>
+    </p>
   );
 }
 

@@ -317,6 +317,7 @@ export const en = {
     "unknownPost": "Post with unavailable ID",
     "creatorCount": "{{count}} creator",
     "creatorCount_other": "{{count}} creators",
+    "creatorGroupSuffix": "among {{count}} creators",
     "noFrozenCreators": "No frozen creators",
     "moreCreators": "+{{count}} more",
     "revisionShort": "rev. {{id}}",

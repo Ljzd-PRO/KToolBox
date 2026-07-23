@@ -279,6 +279,7 @@ export const ja = {
     unknownPost: "ID不明の作品",
     creatorCount: "{{count}}人のクリエイター",
     creatorCount_other: "{{count}}人のクリエイター",
+    creatorGroupSuffix: "など{{count}}人",
     noFrozenCreators: "固定されたクリエイターはいません",
     moreCreators: "ほか{{count}}人",
     revisionShort: "リビジョン{{id}}",

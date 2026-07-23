@@ -320,6 +320,7 @@ export const zhCN = {
     "unknownPost": "作品 ID 不可用",
     "creatorCount": "{{count}} 位作者",
     "creatorCount_other": "{{count}} 位作者",
+    "creatorGroupSuffix": "等 {{count}} 位作者",
     "noFrozenCreators": "没有固定作者",
     "moreCreators": "另有 {{count}} 位",
     "revisionShort": "修订 {{id}}",

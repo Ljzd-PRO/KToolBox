@@ -235,6 +235,7 @@ export function TasksPage() {
       {taskId && selected ? (
         <TaskDetails
           attempts={attemptsQuery.data ?? []}
+          creators={creatorsQuery.data ?? []}
           events={eventsQuery.data ?? []}
           task={selected}
           handlers={handlers}
@@ -242,6 +243,7 @@ export function TasksPage() {
         />
       ) : (
         <TaskList
+          creators={creatorsQuery.data ?? []}
           handlers={handlers}
           statusFilter={statusFilter}
           tasks={tasks}
@@ -309,12 +311,14 @@ type TaskHandlers = {
 
 function TaskList({
   tasks,
+  creators,
   handlers,
   statusFilter,
   onCreate,
   onStatusFilterChange,
 }: {
   tasks: TaskRecord[];
+  creators: CreatorRosterItem[];
   handlers: TaskHandlers;
   statusFilter: TaskStatusFilter;
   onCreate: () => void;
@@ -332,7 +336,7 @@ function TaskList({
       filteredTasks,
       sortDescriptor,
       (task, column) => {
-        if (column === "target") return taskTargetSortText(task);
+        if (column === "target") return taskTargetSortText(task, creators);
         if (column === "status") return taskStatusRank(task.status);
         if (column === "progress") {
           return taskPercent(
@@ -348,7 +352,7 @@ function TaskList({
       },
       i18n.resolvedLanguage ?? i18n.language,
     );
-  }, [filteredTasks, i18n.language, i18n.resolvedLanguage, sortDescriptor]);
+  }, [creators, filteredTasks, i18n.language, i18n.resolvedLanguage, sortDescriptor]);
   const reorderLocked = statusFilter !== "all" || sortDescriptor !== null;
   const statusOptions = [
     { value: "all", label: t("tasks.allStatuses"), icon: Filter },
@@ -421,7 +425,7 @@ function TaskList({
               <Table.Body>
                 {visibleTasks.map((task, index) => (
                   <Table.Row className="task-table-row" id={task.id} key={task.id}>
-                    <Table.Cell className="w-56 min-w-56 max-w-56"><TaskTarget task={task} /></Table.Cell>
+                    <Table.Cell className="w-56 min-w-56 max-w-56"><TaskTarget creators={creators} task={task} /></Table.Cell>
                     <Table.Cell className="min-w-24"><TaskStatusChip status={task.status} /></Table.Cell>
                     <Table.Cell className="min-w-28"><TaskProgressSummary task={task} /></Table.Cell>
                     <Table.Cell className="min-w-20 whitespace-nowrap text-sm font-medium tabular-nums">{formatBytes(taskSpeed(task), "/s")}</Table.Cell>
@@ -437,7 +441,7 @@ function TaskList({
             {visibleTasks.map((task, index) => (
               <Surface className="data-mobile-card task-mobile-card grid gap-4 rounded-lg border border-border p-4" key={task.id}>
                 <div className="flex min-w-0 items-start gap-3">
-                  <div className="min-w-0 flex-1"><TaskTarget task={task} /></div>
+                  <div className="min-w-0 flex-1"><TaskTarget creators={creators} task={task} /></div>
                   <div className="ml-auto shrink-0"><TaskStatusChip status={task.status} /></div>
                 </div>
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
@@ -536,12 +540,14 @@ function TaskActions({
 
 function TaskDetails({
   task,
+  creators,
   events,
   attempts,
   handlers,
   onBack,
 }: {
   task: TaskRecord;
+  creators: CreatorRosterItem[];
   events: TaskEvent[];
   attempts: TaskAttempt[];
   handlers: TaskHandlers;
@@ -566,7 +572,7 @@ function TaskDetails({
         }
       />
       <Surface className="flex flex-col justify-between gap-4 rounded-lg border border-border p-4 sm:flex-row sm:items-center">
-        <TaskTarget task={task} />
+        <TaskTarget creators={creators} task={task} />
         <div className="flex shrink-0 flex-wrap items-center gap-2"><TaskStatusChip status={task.status} /><Chip size="sm" variant="soft">{t("tasks.attempts", { count: attempts.length })}</Chip></div>
       </Surface>
       <TaskFailurePanel

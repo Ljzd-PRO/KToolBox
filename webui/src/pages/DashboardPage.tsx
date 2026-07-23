@@ -76,13 +76,13 @@ export function DashboardPage() {
       latest,
       sortDescriptor,
       (task, column) => {
-        if (column === "target") return taskTargetSortText(task);
+        if (column === "target") return taskTargetSortText(task, creators.data ?? []);
         if (column === "status") return taskStatusRank(task.status);
         return Date.parse(task.created_at);
       },
       i18n.resolvedLanguage ?? i18n.language,
     );
-  }, [i18n.language, i18n.resolvedLanguage, records, sortDescriptor]);
+  }, [creators.data, i18n.language, i18n.resolvedLanguage, records, sortDescriptor]);
   const sortOptions = [
     { value: "target", label: t("tasks.target") },
     { value: "status", label: t("common.status") },
@@ -163,7 +163,7 @@ export function DashboardPage() {
                   <Table.Body>
                     {recentRecords.map((task) => (
                       <Table.Row key={task.id}>
-                        <Table.Cell className="min-w-60"><TaskTarget task={task} /></Table.Cell>
+                        <Table.Cell className="min-w-60"><TaskTarget creators={creators.data} task={task} /></Table.Cell>
                         <Table.Cell>
                           <TaskStatusChip status={task.status} />
                         </Table.Cell>
@@ -193,7 +193,7 @@ export function DashboardPage() {
               {recentRecords.map((task) => (
                 <Surface className="grid gap-3 rounded-lg border border-border p-4" key={task.id}>
                   <div className="flex min-w-0 items-start justify-between gap-3">
-                    <TaskTarget task={task} />
+                    <TaskTarget creators={creators.data} task={task} />
                     <TaskStatusChip status={task.status} />
                   </div>
                   <div className="flex items-center justify-between gap-3 border-t border-border pt-3">

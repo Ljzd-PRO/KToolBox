@@ -448,11 +448,14 @@ code {
 }
 
 .task-mobile-card .task-target-title {
-  display: -webkit-box;
+  display: block;
   overflow: hidden;
-  white-space: normal;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-mobile-card .task-target-title-group {
+  display: flex;
 }
 
 .task-kind-icon {

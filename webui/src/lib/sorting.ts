@@ -1,6 +1,7 @@
 import type { SortDescriptor } from "@heroui/react";
 
-import type { TaskRecord, TaskStatus } from "../types";
+import { syncTaskCreatorNames } from "./taskPresentation";
+import type { CreatorRosterItem, TaskRecord, TaskStatus } from "../types";
 
 export type SortValue = boolean | number | string | null | undefined;
 
@@ -85,11 +86,12 @@ export function taskStatusRank(status: TaskStatus): number {
   return taskStatusOrder[status];
 }
 
-export function taskTargetSortText(task: TaskRecord): string {
+export function taskTargetSortText(
+  task: TaskRecord,
+  creators: readonly CreatorRosterItem[] = [],
+): string {
   if (task.spec.kind === "sync") {
-    return task.spec.creators
-      .map((creator) => creator.alias?.trim() || creator.creator_id)
-      .join(" ");
+    return syncTaskCreatorNames(task, creators).join(" ");
   }
   return [
     task.presentation?.title?.trim(),
