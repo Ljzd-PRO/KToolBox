@@ -155,11 +155,7 @@ class WebTaskReporter(NullProgressReporter):
                 {
                     "level": level,
                     "message": message,
-                    "failure_report": (
-                        failure_report.model_dump(mode="json")
-                        if failure_report is not None
-                        else None
-                    ),
+                    "failure_report": (failure_report.model_dump(mode="json") if failure_report is not None else None),
                 },
             )
         )
