@@ -27,6 +27,7 @@ from ktoolbox.api.utils import pawchive_client_scope
 from ktoolbox.blocker import BlockerContext, BlockerEngine
 from ktoolbox.blocker.engine import blocker_registry, legacy_keyword_blocker
 from ktoolbox.configuration import config
+from ktoolbox.failures import FailureStage, StagedFailure
 from ktoolbox.job import CreatorIndices, Job
 from ktoolbox.utils import extract_external_links, generate_msg
 
@@ -427,7 +428,10 @@ async def produce_jobs_from_creator(
         return action_error(error.error)
 
     if not selected_mix_posts and save_creator_indices:
-        await _write_creator_indices(service, creator_id, path, indexed_posts, indexed_paths)
+        try:
+            await _write_creator_indices(service, creator_id, path, indexed_posts, indexed_paths)
+        except OSError as error:
+            raise StagedFailure(FailureStage.index_write, error) from error
     logger.info(
         f"Creator {creator_id}: accepted {summary.accepted_posts} of {summary.fetched_posts} posts, "
         f"generated {summary.generated_jobs} jobs"

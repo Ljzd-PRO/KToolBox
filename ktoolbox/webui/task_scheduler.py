@@ -7,6 +7,13 @@ from pathlib import Path
 import anyio
 
 from ktoolbox.configuration import RuntimeContext
+from ktoolbox.failures import (
+    FailureStage,
+    TaskExecutionError,
+    TaskFailureReport,
+    classify_failure,
+    failure_report,
+)
 from ktoolbox.project_config import ProjectConfigStore
 from ktoolbox.utils import parse_webpage_url
 from ktoolbox.webui.task_executor import CoreTaskExecutor, TaskExecutionSnapshot, TaskExecutor
@@ -201,7 +208,15 @@ class TaskScheduler:
             attempt = await self.store.start_attempt(task, snapshot.redacted())
             task = await self.store.set_status(task.id, TaskStatus.running)
         except Exception as error:
-            await self.store.set_status(task.id, TaskStatus.failed, error=_error_text(error))
+            report = failure_report(
+                [classify_failure(error, stage=FailureStage.job_generation)],
+            )
+            await self.store.set_status(
+                task.id,
+                TaskStatus.failed,
+                error=report.summary,
+                failure=report,
+            )
             return
         runner = asyncio.create_task(
             self._execute(task, snapshot, attempt.id),
@@ -213,19 +228,33 @@ class TaskScheduler:
         reporter = WebTaskReporter(task.id, self.store)
         final_status = TaskStatus.completed
         error_text: str | None = None
+        failure: TaskFailureReport | None = None
         try:
             await self.executor(task, snapshot, reporter)
         except asyncio.CancelledError:
             running = self._running.get(task.id)
             final_status = running.requested_final_status if running is not None else TaskStatus.interrupted
+        except TaskExecutionError as error:
+            final_status = TaskStatus.failed
+            failure = error.report
+            error_text = failure.summary
+            reporter.log("error", error_text)
         except Exception as error:
             final_status = TaskStatus.failed
-            error_text = _error_text(error)
+            failure = failure_report(
+                [classify_failure(error, stage=FailureStage.job_generation)],
+            )
+            error_text = failure.summary
             reporter.log("error", error_text)
         finally:
             await reporter.close()
-            await self.store.finish_attempt(attempt_id, final_status, error_text)
-            await self.store.set_status(task.id, final_status, error=error_text)
+            await self.store.finish_attempt(attempt_id, final_status, error_text, failure)
+            await self.store.set_status(
+                task.id,
+                final_status,
+                error=error_text,
+                failure=failure,
+            )
             async with self._control_lock:
                 self._running.pop(task.id, None)
             self._wake.set()

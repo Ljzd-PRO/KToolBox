@@ -10,6 +10,7 @@ import httpx
 import pytest
 
 from ktoolbox.configuration import Configuration, RuntimeContext
+from ktoolbox.failures import FailureCode, FailureStage, generic_failure
 from ktoolbox.project_config import CreatorReference
 from ktoolbox.reporting import ProgressReporter
 from ktoolbox.webui.app import create_app
@@ -295,8 +296,13 @@ async def test_task_presentation_database_migration_and_store_round_trip(tmp_pat
         cursor = await connection.execute("SELECT version FROM schema_migrations ORDER BY version")
         versions = [int(row[0]) for row in await cursor.fetchall()]
         await cursor.close()
-    assert "presentation_json" in columns
-    assert versions == [1, 2, 3, 4]
+    assert {"presentation_json", "failure_json"} <= columns
+    async with database.connect() as connection:
+        cursor = await connection.execute("PRAGMA table_info(task_attempts)")
+        attempt_columns = {str(row[1]) for row in await cursor.fetchall()}
+        await cursor.close()
+    assert "failure_json" in attempt_columns
+    assert versions == [1, 2, 3, 4, 5, 6]
 
     store = TaskStore(database)
     spec = DownloadTaskSpec(service="FanBox", creator_id="creator/id", post_id="42", output=tmp_path)
@@ -387,6 +393,38 @@ async def test_web_reporter_persists_throttled_speed_progress(tmp_path: Path) ->
     settled = (await store.get(task.id)).progress
     assert settled.speed_bps == 0
     assert settled.eta_seconds == 0
+
+
+@pytest.mark.asyncio
+async def test_web_reporter_persists_structured_creator_and_file_failures(tmp_path: Path) -> None:
+    database = WebUIDatabase(tmp_path / "webui.sqlite3")
+    await database.initialize()
+    store = TaskStore(database)
+    task = await store.create(DownloadTaskSpec(service="fanbox", creator_id="one", post_id="42", output=tmp_path))
+    reporter = WebTaskReporter(task.id, store)
+    creator_failure = generic_failure(
+        stage=FailureStage.work_list,
+        message="Work list failed",
+        platform="fanbox",
+        creator_id="one",
+    )
+    file_failure = generic_failure(
+        stage=FailureStage.file_request,
+        message="File request failed",
+        file_name="sample.bin",
+    )
+
+    reporter.creator_started("fanbox:one")
+    reporter.creator_finished("fanbox:one", creator_failure.message, creator_failure)
+    reporter.download_started("one", "fanbox:one", "sample.bin", 100, 0)
+    reporter.download_finished("one", "failed", file_failure)
+    await reporter.close()
+
+    events = await store.events(task_id=task.id)
+    creator_event = next(event for event in events if event.event_type == "creator.finished")
+    download_event = next(event for event in events if event.event_type == "download.finished")
+    assert creator_event.data["failure"]["stage"] == FailureStage.work_list.value
+    assert download_event.data["failure"]["file_name"] == "sample.bin"
 
 
 @pytest.mark.asyncio
@@ -557,7 +595,12 @@ async def test_scheduler_records_snapshot_and_executor_failures(tmp_path: Path) 
     )
     await scheduler._dispatch_ready_tasks()
     failed = await wait_for_store_status(scheduler, store, task.id, TaskStatus.failed)
-    assert failed.error == "fixture executor failed"
+    assert failed.error == "Unexpected RuntimeError during job generation"
+    assert failed.failure is not None
+    assert failed.failure.items[0].code is FailureCode.unknown
+    assert failed.failure.items[0].stage is FailureStage.job_generation
+    attempts = await store.attempts(task.id)
+    assert attempts[0].failure == failed.failure
 
     broken_root = tmp_path / "broken"
     broken_root.mkdir()

@@ -9,4 +9,5 @@ _T = TypeVar("_T")
 
 class DownloaderRet(BaseRet[_T]):
     """Return data model of action call"""
-    pass
+
+    status_code: int | None = None

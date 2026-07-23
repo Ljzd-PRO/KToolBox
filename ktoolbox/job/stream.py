@@ -3,8 +3,10 @@ from __future__ import annotations
 import asyncio
 from collections import deque
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from itertools import count
+from pathlib import PurePosixPath
+from urllib.parse import urlsplit
 
 import httpx
 from loguru import logger
@@ -14,6 +16,14 @@ from ktoolbox.api.utils import get_file_url
 from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
 from ktoolbox.downloader.base import DownloaderRet
+from ktoolbox.failures import (
+    FailureCode,
+    FailureItem,
+    FailureStage,
+    classify_failure,
+    failure_from_http_status,
+    generic_failure,
+)
 from ktoolbox.job.model import Job
 from ktoolbox.reporting import NullProgressReporter, ProgressReporter, ReporterDownloadObserver
 
@@ -90,6 +100,7 @@ class DownloadSummary:
     completed: int = 0
     existed: int = 0
     failed: int = 0
+    failures: list[FailureItem] = field(default_factory=list)
 
     @property
     def successful(self) -> bool:
@@ -148,6 +159,8 @@ class DownloadWorkerPool:
             task_key = f"download-{next(self._task_ids)}"
             observer = ReporterDownloadObserver(self.reporter, task_key, queued.creator_key)
             status = "failed"
+            failure: FailureItem | None = None
+            filename = _job_filename(queued.job)
             try:
                 result = await self._download(queued, client, observer)
                 if result.code == RetCodeEnum.FileExisted:
@@ -160,15 +173,37 @@ class DownloadWorkerPool:
                         self.reporter.artifact_created(queued.job.path / result.data)
                 else:
                     summary.failed += 1
-                    logger.error(result.message)
+                    failure = (
+                        failure_from_http_status(
+                            result.status_code,
+                            stage=FailureStage.file_request,
+                            file_name=filename,
+                        )
+                        if result.status_code is not None
+                        else generic_failure(
+                            stage=FailureStage.file_request,
+                            message="The file download failed",
+                            code=FailureCode.download_failed,
+                            retryable=True,
+                            file_name=filename,
+                        )
+                    )
+                    summary.failures.append(failure)
+                    logger.error(failure.message)
             except asyncio.CancelledError:
                 status = "cancelled"
                 raise
             except Exception as error:
                 summary.failed += 1
-                logger.error(f"Download failed for {queued.job.alt_filename or queued.job.server_path}: {error}")
+                failure = classify_failure(
+                    error,
+                    stage=FailureStage.file_write if isinstance(error, OSError) else FailureStage.file_request,
+                    file_name=filename,
+                )
+                summary.failures.append(failure)
+                logger.error(failure.message)
             finally:
-                self.reporter.download_finished(task_key, status)
+                self.reporter.download_finished(task_key, status, failure)
                 queue.task_done(queued.creator_key)
 
 
@@ -187,3 +222,8 @@ async def _download_job(
         post=job.post,
     )
     return await downloader.run(progress=observer)
+
+
+def _job_filename(job: Job) -> str | None:
+    name = job.alt_filename or PurePosixPath(urlsplit(job.server_path).path).name
+    return name[:500] if name else None

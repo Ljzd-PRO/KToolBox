@@ -12,6 +12,7 @@ from ktoolbox.action.job import CreatorJobGeneration, produce_jobs_from_creator
 from ktoolbox.api.client import PawchiveClient
 from ktoolbox.blocker import BlockerEngine
 from ktoolbox.configuration import config
+from ktoolbox.failures import FailureItem, FailureStage, classify_failure, generic_failure
 from ktoolbox.job.model import Job
 from ktoolbox.job.stream import DownloadSummary, DownloadWorkerPool, FairJobQueue
 from ktoolbox.project_config import CreatorReference, ProjectConfigError, ProjectConfiguration, parse_creator_reference
@@ -37,6 +38,7 @@ class CreatorSyncResult:
     output: Path | None = None
     generation: CreatorJobGeneration | None = None
     error: str | None = None
+    failure: FailureItem | None = None
 
     @property
     def successful(self) -> bool:
@@ -132,6 +134,7 @@ class SyncCoordinator:
         semaphore: asyncio.Semaphore,
     ) -> CreatorSyncResult:
         result = CreatorSyncResult(creator=creator)
+        stage = FailureStage.creator_profile
         self.reporter.creator_started(creator.key)
         try:
             async with semaphore:
@@ -147,6 +150,7 @@ class SyncCoordinator:
                     await queue.put(creator.key, job)
                     self.reporter.job_queued(creator.key)
 
+                stage = FailureStage.job_generation
                 generation = await produce_jobs_from_creator(
                     creator.service,
                     creator.creator_id,
@@ -167,12 +171,33 @@ class SyncCoordinator:
                 if generation:
                     result.generation = generation.data
                 else:
-                    result.error = generation.message or "creator job generation failed"
+                    result.failure = (
+                        classify_failure(
+                            generation.exception,
+                            stage=stage,
+                            platform=creator.service,
+                            creator_id=creator.creator_id,
+                        )
+                        if generation.exception is not None
+                        else generic_failure(
+                            stage=stage,
+                            message="Creator task generation failed",
+                            platform=creator.service,
+                            creator_id=creator.creator_id,
+                        )
+                    )
+                    result.error = result.failure.message
         except asyncio.CancelledError:
             raise
         except Exception as error:
-            result.error = str(error)
+            result.failure = classify_failure(
+                error,
+                stage=stage,
+                platform=creator.service,
+                creator_id=creator.creator_id,
+            )
+            result.error = result.failure.message
         finally:
             await queue.close(creator.key)
-            self.reporter.creator_finished(creator.key, result.error)
+            self.reporter.creator_finished(creator.key, result.error, result.failure)
         return result

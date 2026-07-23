@@ -22,6 +22,8 @@ from rich.progress import (
 )
 from rich.table import Column
 
+from ktoolbox.failures import FailureItem
+
 
 class DownloadProgressObserver(Protocol):
     def start(self, filename: str, total: int | None, completed: int) -> None: ...
@@ -36,7 +38,12 @@ class ProgressReporter(Protocol):
 
     def creator_started(self, creator_key: str) -> None: ...
 
-    def creator_finished(self, creator_key: str, error: str | None = None) -> None: ...
+    def creator_finished(
+        self,
+        creator_key: str,
+        error: str | None = None,
+        failure: FailureItem | None = None,
+    ) -> None: ...
 
     def job_queued(self, creator_key: str) -> None: ...
 
@@ -51,7 +58,12 @@ class ProgressReporter(Protocol):
 
     def download_advanced(self, task_key: str, amount: int) -> None: ...
 
-    def download_finished(self, task_key: str, status: str) -> None: ...
+    def download_finished(
+        self,
+        task_key: str,
+        status: str,
+        failure: FailureItem | None = None,
+    ) -> None: ...
 
     def artifact_created(self, path: Path) -> None: ...
 
@@ -66,7 +78,12 @@ class NullProgressReporter:
     def creator_started(self, creator_key: str) -> None:
         return None
 
-    def creator_finished(self, creator_key: str, error: str | None = None) -> None:
+    def creator_finished(
+        self,
+        creator_key: str,
+        error: str | None = None,
+        failure: FailureItem | None = None,
+    ) -> None:
         return None
 
     def job_queued(self, creator_key: str) -> None:
@@ -85,7 +102,12 @@ class NullProgressReporter:
     def download_advanced(self, task_key: str, amount: int) -> None:
         return None
 
-    def download_finished(self, task_key: str, status: str) -> None:
+    def download_finished(
+        self,
+        task_key: str,
+        status: str,
+        failure: FailureItem | None = None,
+    ) -> None:
         return None
 
     def artifact_created(self, path: Path) -> None:
@@ -102,16 +124,29 @@ class PlainProgressReporter(NullProgressReporter):
         self.failed = 0
         self.existed = 0
 
-    def creator_finished(self, creator_key: str, error: str | None = None) -> None:
-        if error:
-            self.console.print(f"Creator {creator_key} failed: {error}")
+    def creator_finished(
+        self,
+        creator_key: str,
+        error: str | None = None,
+        failure: FailureItem | None = None,
+    ) -> None:
+        if error or failure:
+            self.console.print(f"Creator {creator_key} failed: {failure.message if failure else error}")
 
     def job_queued(self, creator_key: str) -> None:
         self.queued += 1
 
-    def download_finished(self, task_key: str, status: str) -> None:
+    def download_finished(
+        self,
+        task_key: str,
+        status: str,
+        failure: FailureItem | None = None,
+    ) -> None:
         if status == "failed":
             self.failed += 1
+            if failure:
+                subject = f" ({failure.file_name})" if failure.file_name else ""
+                self.console.print(f"Download failed{subject}: {failure.message}")
         elif status == "existed":
             self.existed += 1
         else:
@@ -196,12 +231,17 @@ class RichProgressReporter(NullProgressReporter):
                 status="preparing",
             )
 
-    def creator_finished(self, creator_key: str, error: str | None = None) -> None:
+    def creator_finished(
+        self,
+        creator_key: str,
+        error: str | None = None,
+        failure: FailureItem | None = None,
+    ) -> None:
         task_id = self._creator_tasks.pop(creator_key, None)
         if task_id is not None:
             self.creators.remove_task(task_id)
-        if error:
-            self.console.print(f"[red]Creator {creator_key} failed:[/red] {error}")
+        if error or failure:
+            self.console.print(f"[red]Creator {creator_key} failed:[/red] {failure.message if failure else error}")
 
     def job_queued(self, creator_key: str) -> None:
         task = self.overall.tasks[self._overall_task]
@@ -227,13 +267,21 @@ class RichProgressReporter(NullProgressReporter):
             self.downloads.advance(task_id, amount)
             self._refresh_transfer_speed()
 
-    def download_finished(self, task_key: str, status: str) -> None:
+    def download_finished(
+        self,
+        task_key: str,
+        status: str,
+        failure: FailureItem | None = None,
+    ) -> None:
         task_id = self._download_tasks.pop(task_key, None)
         if task_id is not None:
             self.downloads.remove_task(task_id)
             self._refresh_transfer_speed()
         if status == "failed":
             self._failed += 1
+            if failure:
+                subject = f" ({failure.file_name})" if failure.file_name else ""
+                self.console.print(f"[red]Download failed{subject}:[/red] {failure.message}")
         elif status == "existed":
             self._existed += 1
         self.overall.advance(self._overall_task)

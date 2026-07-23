@@ -60,6 +60,7 @@ class WebUIDatabase:
                     revision INTEGER NOT NULL DEFAULT 1,
                     progress_json TEXT NOT NULL DEFAULT '{}',
                     error TEXT,
+                    failure_json TEXT,
                     blocked_by TEXT,
                     created_at TEXT NOT NULL,
                     updated_at TEXT NOT NULL
@@ -75,6 +76,7 @@ class WebUIDatabase:
                     started_at TEXT NOT NULL,
                     finished_at TEXT,
                     error TEXT,
+                    failure_json TEXT,
                     UNIQUE(task_id, sequence)
                 );
 
@@ -140,6 +142,12 @@ class WebUIDatabase:
             await connection.execute(
                 "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
                 (5, utc_now().isoformat()),
+            )
+            await _ensure_column(connection, "tasks", "failure_json", "TEXT")
+            await _ensure_column(connection, "task_attempts", "failure_json", "TEXT")
+            await connection.execute(
+                "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
+                (6, utc_now().isoformat()),
             )
             await connection.commit()
 

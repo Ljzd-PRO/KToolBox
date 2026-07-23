@@ -7,6 +7,7 @@ from uuid import uuid4
 import aiosqlite
 import anyio
 
+from ktoolbox.failures import TaskFailureReport
 from ktoolbox.webui.database import WebUIDatabase, utc_now
 from ktoolbox.webui.task_models import (
     ACTIVE_TASK_STATUSES,
@@ -48,13 +49,17 @@ class TaskStore:
         values = [status.value for status in RUNNING_TASK_STATUSES]
         async with self.database.connect() as connection:
             cursor = await connection.execute(
-                f"UPDATE tasks SET status = ?, error = ?, updated_at = ? WHERE status IN ({placeholders})",
+                f"""
+                UPDATE tasks
+                SET status = ?, error = ?, failure_json = NULL, updated_at = ?
+                WHERE status IN ({placeholders})
+                """,
                 [TaskStatus.interrupted.value, "WebUI stopped while this task was running", now, *values],
             )
             await connection.execute(
                 f"""
                 UPDATE task_attempts
-                SET status = ?, error = ?, finished_at = ?
+                SET status = ?, error = ?, failure_json = NULL, finished_at = ?
                 WHERE finished_at IS NULL AND status IN ({placeholders})
                 """,
                 [TaskStatus.interrupted.value, "WebUI stopped while this task was running", now, *values],
@@ -137,6 +142,7 @@ class TaskStore:
         status: TaskStatus,
         *,
         error: str | None = None,
+        failure: TaskFailureReport | None = None,
         blocked_by: str | None = None,
     ) -> TaskRecord:
         now = utc_now().isoformat()
@@ -144,10 +150,10 @@ class TaskStore:
             cursor = await connection.execute(
                 """
                 UPDATE tasks
-                SET status = ?, error = ?, blocked_by = ?, updated_at = ?
+                SET status = ?, error = ?, failure_json = ?, blocked_by = ?, updated_at = ?
                 WHERE id = ?
                 """,
-                (status.value, error, blocked_by, now, task_id),
+                (status.value, error, _failure_json(failure), blocked_by, now, task_id),
             )
             await connection.commit()
             if cursor.rowcount == 0:
@@ -155,7 +161,12 @@ class TaskStore:
         await self.add_event(
             task_id,
             "task.status",
-            {"status": status.value, "error": error, "blocked_by": blocked_by},
+            {
+                "status": status.value,
+                "error": error,
+                "failure": failure.model_dump(mode="json") if failure else None,
+                "blocked_by": blocked_by,
+            },
         )
         return await self.get(task_id)
 
@@ -178,7 +189,7 @@ class TaskStore:
                 """
                 UPDATE tasks
                 SET kind = ?, spec_json = ?, presentation_json = ?, revision = revision + 1,
-                    updated_at = ?, error = NULL, blocked_by = NULL
+                    updated_at = ?, error = NULL, failure_json = NULL, blocked_by = NULL
                 WHERE id = ?
                 """,
                 (spec.kind, spec_json, _presentation_json(presentation), now, task_id),
@@ -212,7 +223,8 @@ class TaskStore:
             cursor = await connection.execute(
                 """
                 UPDATE tasks
-                SET status = ?, progress_json = ?, error = NULL, blocked_by = NULL, updated_at = ?
+                SET status = ?, progress_json = ?, error = NULL, failure_json = NULL,
+                    blocked_by = NULL, updated_at = ?
                 WHERE id = ?
                 """,
                 (TaskStatus.queued.value, TaskProgress().model_dump_json(), now, task_id),
@@ -268,13 +280,21 @@ class TaskStore:
             started_at=now,
         )
 
-    async def finish_attempt(self, attempt_id: int, status: TaskStatus, error: str | None = None) -> None:
+    async def finish_attempt(
+        self,
+        attempt_id: int,
+        status: TaskStatus,
+        error: str | None = None,
+        failure: TaskFailureReport | None = None,
+    ) -> None:
         async with self.database.connect() as connection:
             await connection.execute(
                 """
-                UPDATE task_attempts SET status = ?, error = ?, finished_at = ? WHERE id = ?
+                UPDATE task_attempts
+                SET status = ?, error = ?, failure_json = ?, finished_at = ?
+                WHERE id = ?
                 """,
-                (status.value, error, utc_now().isoformat(), attempt_id),
+                (status.value, error, _failure_json(failure), utc_now().isoformat(), attempt_id),
             )
             await connection.commit()
 
@@ -375,6 +395,10 @@ def _presentation_json(presentation: TaskPresentationSnapshot | None) -> str | N
     return presentation.model_dump_json() if presentation is not None else None
 
 
+def _failure_json(failure: TaskFailureReport | None) -> str | None:
+    return failure.model_dump_json() if failure is not None else None
+
+
 def _task_from_row(row: aiosqlite.Row) -> TaskRecord:
     return TaskRecord(
         id=row["id"],
@@ -390,6 +414,9 @@ def _task_from_row(row: aiosqlite.Row) -> TaskRecord:
         revision=row["revision"],
         progress=TaskProgress.model_validate_json(row["progress_json"]),
         error=row["error"],
+        failure=(
+            TaskFailureReport.model_validate_json(row["failure_json"]) if row["failure_json"] is not None else None
+        ),
         blocked_by=row["blocked_by"],
         created_at=row["created_at"],
         updated_at=row["updated_at"],
@@ -407,6 +434,9 @@ def _attempt_from_row(row: aiosqlite.Row) -> TaskAttempt:
         started_at=row["started_at"],
         finished_at=row["finished_at"],
         error=row["error"],
+        failure=(
+            TaskFailureReport.model_validate_json(row["failure_json"]) if row["failure_json"] is not None else None
+        ),
     )
 
 

@@ -1056,12 +1056,48 @@ export interface components {
              */
             dump_post_data: boolean;
         };
+        /**
+         * FailureCode
+         * @enum {string}
+         */
+        FailureCode: "network" | "timeout" | "rate_limited" | "http_error" | "response_incompatible" | "permission_denied" | "disk_full" | "download_failed" | "resource_not_found" | "unknown";
+        /**
+         * FailureItem
+         * @description A bounded, value-free diagnostic suitable for persistence and display.
+         */
+        FailureItem: {
+            code: components["schemas"]["FailureCode"];
+            stage: components["schemas"]["FailureStage"];
+            /** Message */
+            message: string;
+            /** Retryable */
+            retryable: boolean;
+            /** Platform */
+            platform?: string | null;
+            /** Creator Id */
+            creator_id?: string | null;
+            /** File Name */
+            file_name?: string | null;
+            /** Http Status */
+            http_status?: number | null;
+            /** Operation */
+            operation?: string | null;
+            /** Fields */
+            fields?: string[];
+        };
+        /**
+         * FailureStage
+         * @enum {string}
+         */
+        FailureStage: "creator_profile" | "work_list" | "work_detail" | "revisions" | "job_generation" | "file_request" | "file_write" | "index_write";
         /** FileReference */
         FileReference: {
             /** Name */
             name?: string | null;
             /** Path */
             path?: string | null;
+            /** Deferred */
+            deferred?: boolean | null;
         } & {
             [key: string]: unknown;
         };
@@ -1362,7 +1398,7 @@ export interface components {
             /** Captions */
             captions?: unknown[] | null;
             /** Tags */
-            tags?: unknown[] | null;
+            tags?: string | unknown[] | null;
             /** Origin */
             origin?: string | null;
             /** Preview State */
@@ -1466,7 +1502,7 @@ export interface components {
             /** Captions */
             captions?: unknown[] | null;
             /** Tags */
-            tags?: unknown[] | null;
+            tags?: string | unknown[] | null;
             /** Origin */
             origin?: string | null;
             /** Preview State */
@@ -1588,6 +1624,7 @@ export interface components {
             finished_at?: string | null;
             /** Error */
             error?: string | null;
+            failure?: components["schemas"]["TaskFailureReport"] | null;
         };
         /** TaskCleanupPreview */
         TaskCleanupPreview: {
@@ -1623,6 +1660,26 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /**
+         * TaskFailureReport
+         * @description Persisted task failure details with bounded diagnostic entries.
+         */
+        TaskFailureReport: {
+            /** Summary */
+            summary: string;
+            /**
+             * Creator Failures
+             * @default 0
+             */
+            creator_failures: number;
+            /**
+             * File Failures
+             * @default 0
+             */
+            file_failures: number;
+            /** Items */
+            items?: components["schemas"]["FailureItem"][];
         };
         /**
          * TaskPresentationSnapshot
@@ -1704,6 +1761,7 @@ export interface components {
             progress?: components["schemas"]["TaskProgress"];
             /** Error */
             error?: string | null;
+            failure?: components["schemas"]["TaskFailureReport"] | null;
             /** Blocked By */
             blocked_by?: string | null;
             /**

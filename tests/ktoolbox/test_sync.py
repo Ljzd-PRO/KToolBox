@@ -13,6 +13,7 @@ from ktoolbox.action.job import CreatorJobGeneration
 from ktoolbox.api.generated import CreatorProfile
 from ktoolbox.blocker import BlockerEngine
 from ktoolbox.downloader.base import DownloaderRet
+from ktoolbox.failures import FailureCode, FailureItem, FailureStage
 from ktoolbox.job.model import Job
 from ktoolbox.job.stream import DownloadWorkerPool, QueuedJob
 from ktoolbox.project_config import CreatorReference, ProjectConfigError, ProjectConfiguration
@@ -113,7 +114,10 @@ async def test_sync_coordinator_isolates_creator_failure(tmp_path: Path) -> None
 
     assert not summary.successful
     assert summary.downloads.completed == 1
-    assert [result.error for result in summary.creators] == ["API failed", None]
+    assert [result.error for result in summary.creators] == ["Creator task generation failed", None]
+    assert summary.creators[0].failure is not None
+    assert summary.creators[0].failure.code is FailureCode.unknown
+    assert summary.creators[0].failure.stage is FailureStage.job_generation
 
 
 async def test_sync_coordinator_rejects_empty_target_list() -> None:
@@ -140,7 +144,9 @@ async def test_sync_coordinator_captures_unexpected_creator_failure(tmp_path: Pa
     summary = await coordinator.run([creator("broken")], SyncOptions(output=tmp_path))
 
     assert not summary.successful
-    assert summary.creators[0].error == "profile failed"
+    assert summary.creators[0].error == "Unexpected RuntimeError during creator profile"
+    assert summary.creators[0].failure is not None
+    assert summary.creators[0].failure.stage is FailureStage.creator_profile
     assert summary.downloads.total == 0
 
 
@@ -165,7 +171,13 @@ async def test_sync_coordinator_cancellation_closes_producers_and_download_pool(
         def stop(self) -> None:
             self.stopped += 1
 
-        def creator_finished(self, creator_key: str, error: str | None = None) -> None:
+        def creator_finished(
+            self,
+            creator_key: str,
+            error: str | None = None,
+            failure: FailureItem | None = None,
+        ) -> None:
+            assert failure is None
             self.finished.append((creator_key, error))
 
     reporter = Reporter()

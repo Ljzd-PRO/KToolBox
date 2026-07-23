@@ -5,6 +5,7 @@ from collections import deque
 from pathlib import Path
 from time import monotonic
 
+from ktoolbox.failures import FailureItem
 from ktoolbox.reporting import NullProgressReporter
 from ktoolbox.webui.task_models import ActiveDownload, TaskProgress
 from ktoolbox.webui.task_store import TaskStore
@@ -41,12 +42,21 @@ class WebTaskReporter(NullProgressReporter):
             self.progress.active_creators.append(creator_key)
         self._emit("creator.started", {"creator": creator_key}, immediate=True)
 
-    def creator_finished(self, creator_key: str, error: str | None = None) -> None:
+    def creator_finished(
+        self,
+        creator_key: str,
+        error: str | None = None,
+        failure: FailureItem | None = None,
+    ) -> None:
         if creator_key in self.progress.active_creators:
             self.progress.active_creators.remove(creator_key)
         self._emit(
             "creator.finished",
-            {"creator": creator_key, "error": error},
+            {
+                "creator": creator_key,
+                "error": error,
+                "failure": failure.model_dump(mode="json") if failure else None,
+            },
             immediate=True,
         )
 
@@ -98,7 +108,12 @@ class WebTaskReporter(NullProgressReporter):
         self._refresh_eta()
         self._emit("download.progress", {"key": task_key})
 
-    def download_finished(self, task_key: str, status: str) -> None:
+    def download_finished(
+        self,
+        task_key: str,
+        status: str,
+        failure: FailureItem | None = None,
+    ) -> None:
         self.progress.active_downloads.pop(task_key, None)
         self._download_started_at.pop(task_key, None)
         self._download_bytes.pop(task_key, None)
@@ -114,7 +129,15 @@ class WebTaskReporter(NullProgressReporter):
         if not self.progress.active_downloads:
             self.progress.speed_bps = 0
             self.progress.eta_seconds = 0 if self.progress.total_bytes is not None else None
-        self._emit("download.finished", {"key": task_key, "status": status}, immediate=True)
+        self._emit(
+            "download.finished",
+            {
+                "key": task_key,
+                "status": status,
+                "failure": failure.model_dump(mode="json") if failure else None,
+            },
+            immediate=True,
+        )
 
     def artifact_created(self, path: Path) -> None:
         self._track(self.store.add_artifact(self.task_id, path))

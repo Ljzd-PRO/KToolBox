@@ -8,6 +8,7 @@ from urllib.parse import quote
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, field_validator, model_validator
 
+from ktoolbox.failures import TaskFailureReport
 from ktoolbox.project_config import CreatorReference
 from ktoolbox.utils import parse_webpage_url
 
@@ -182,6 +183,7 @@ class TaskRecord(BaseModel):
     revision: int
     progress: TaskProgress = Field(default_factory=TaskProgress)
     error: str | None = None
+    failure: TaskFailureReport | None = None
     blocked_by: str | None = None
     created_at: datetime
     updated_at: datetime
@@ -197,6 +199,7 @@ class TaskAttempt(BaseModel):
     started_at: datetime
     finished_at: datetime | None = None
     error: str | None = None
+    failure: TaskFailureReport | None = None
 
 
 class TaskEvent(BaseModel):

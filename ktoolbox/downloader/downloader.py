@@ -242,6 +242,7 @@ class Downloader:
                     return DownloaderRet(
                         code=RetCodeEnum.GeneralFailure,
                         message=generate_msg("Download failed", status_code=res.status_code, filename=save_filepath),
+                        status_code=res.status_code,
                     )
                 # Get filename for saving and check if file exists (Second-time duplicate file check)
                 # Priority order can be referenced from the constructor's documentation

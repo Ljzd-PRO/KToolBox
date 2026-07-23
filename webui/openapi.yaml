@@ -2479,6 +2479,91 @@ components:
       additionalProperties: false
       type: object
       title: DownloadTaskSpec
+    FailureCode:
+      type: string
+      enum:
+      - network
+      - timeout
+      - rate_limited
+      - http_error
+      - response_incompatible
+      - permission_denied
+      - disk_full
+      - download_failed
+      - resource_not_found
+      - unknown
+      title: FailureCode
+    FailureItem:
+      properties:
+        code:
+          $ref: '#/components/schemas/FailureCode'
+        stage:
+          $ref: '#/components/schemas/FailureStage'
+        message:
+          type: string
+          maxLength: 500
+          title: Message
+        retryable:
+          type: boolean
+          title: Retryable
+        platform:
+          anyOf:
+          - type: string
+            maxLength: 100
+          - type: 'null'
+          title: Platform
+        creator_id:
+          anyOf:
+          - type: string
+            maxLength: 200
+          - type: 'null'
+          title: Creator Id
+        file_name:
+          anyOf:
+          - type: string
+            maxLength: 500
+          - type: 'null'
+          title: File Name
+        http_status:
+          anyOf:
+          - type: integer
+            maximum: 599.0
+            minimum: 100.0
+          - type: 'null'
+          title: Http Status
+        operation:
+          anyOf:
+          - type: string
+            maxLength: 100
+          - type: 'null'
+          title: Operation
+        fields:
+          items:
+            type: string
+          type: array
+          maxItems: 20
+          title: Fields
+      additionalProperties: false
+      type: object
+      required:
+      - code
+      - stage
+      - message
+      - retryable
+      title: FailureItem
+      description: A bounded, value-free diagnostic suitable for persistence and display.
+    FailureStage:
+      type: string
+      enum:
+      - creator_profile
+      - work_list
+      - work_detail
+      - revisions
+      - job_generation
+      - file_request
+      - file_write
+      - index_write
+      title: FailureStage
     FileReference:
       properties:
         name:
@@ -2491,6 +2576,11 @@ components:
           - type: string
           - type: 'null'
           title: Path
+        deferred:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Deferred
       additionalProperties: true
       type: object
       title: FileReference
@@ -3061,6 +3151,7 @@ components:
           title: Captions
         tags:
           anyOf:
+          - type: string
           - items: {}
             type: array
           - type: 'null'
@@ -3267,6 +3358,7 @@ components:
           title: Captions
         tags:
           anyOf:
+          - type: string
           - items: {}
             type: array
           - type: 'null'
@@ -3486,6 +3578,10 @@ components:
           - type: string
           - type: 'null'
           title: Error
+        failure:
+          anyOf:
+          - $ref: '#/components/schemas/TaskFailureReport'
+          - type: 'null'
       type: object
       required:
       - id
@@ -3568,6 +3664,34 @@ components:
       - data
       - created_at
       title: TaskEvent
+    TaskFailureReport:
+      properties:
+        summary:
+          type: string
+          maxLength: 500
+          title: Summary
+        creator_failures:
+          type: integer
+          minimum: 0.0
+          title: Creator Failures
+          default: 0
+        file_failures:
+          type: integer
+          minimum: 0.0
+          title: File Failures
+          default: 0
+        items:
+          items:
+            $ref: '#/components/schemas/FailureItem'
+          type: array
+          maxItems: 100
+          title: Items
+      additionalProperties: false
+      type: object
+      required:
+      - summary
+      title: TaskFailureReport
+      description: Persisted task failure details with bounded diagnostic entries.
     TaskPresentationSnapshot:
       properties:
         target_key:
@@ -3685,6 +3809,10 @@ components:
           - type: string
           - type: 'null'
           title: Error
+        failure:
+          anyOf:
+          - $ref: '#/components/schemas/TaskFailureReport'
+          - type: 'null'
         blocked_by:
           anyOf:
           - type: string

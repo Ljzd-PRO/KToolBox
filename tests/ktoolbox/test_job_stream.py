@@ -8,6 +8,7 @@ import pytest
 
 from ktoolbox._enum import RetCodeEnum
 from ktoolbox.downloader.base import DownloaderRet
+from ktoolbox.failures import FailureCode, FailureItem, FailureStage
 from ktoolbox.job.model import Job
 from ktoolbox.job.stream import DownloadWorkerPool, FairJobQueue, QueuedJob
 from ktoolbox.reporting import NullProgressReporter, ReporterDownloadObserver
@@ -136,6 +137,12 @@ async def test_download_pool_classifies_results_and_exceptions(tmp_path: Path) -
     assert summary.completed == 1
     assert summary.existed == 1
     assert summary.failed == 2
+    assert [failure.code for failure in summary.failures] == [
+        FailureCode.download_failed,
+        FailureCode.unknown,
+    ]
+    assert [failure.file_name for failure in summary.failures] == ["failure", "exception"]
+    assert all(failure.stage is FailureStage.file_request for failure in summary.failures)
     assert not summary.successful
 
 
@@ -175,7 +182,13 @@ async def test_download_pool_cancels_workers_and_reports_cancelled_status(tmp_pa
         def __init__(self) -> None:
             self.finished: list[tuple[str, str]] = []
 
-        def download_finished(self, task_key: str, status: str) -> None:
+        def download_finished(
+            self,
+            task_key: str,
+            status: str,
+            failure: FailureItem | None = None,
+        ) -> None:
+            assert failure is None
             self.finished.append((task_key, status))
 
     reporter = Reporter()
@@ -191,6 +204,31 @@ async def test_download_pool_cancels_workers_and_reports_cancelled_status(tmp_pa
     with pytest.raises(asyncio.CancelledError):
         await task
     assert reporter.finished == [("download-1", "cancelled")]
+
+
+async def test_download_pool_classifies_http_and_disk_failures(tmp_path: Path) -> None:
+    queue = FairJobQueue(lane_size=2)
+    queue.register("fanbox:a")
+    for name in ("limited", "disk"):
+        await queue.put("fanbox:a", job(tmp_path, name))
+    await queue.close("fanbox:a")
+
+    async def download(queued: QueuedJob, client, observer) -> DownloaderRet[str]:
+        if queued.job.alt_filename == "limited":
+            return DownloaderRet(code=RetCodeEnum.GeneralFailure, status_code=429)
+        raise OSError(28, "No space left on device")
+
+    summary = await DownloadWorkerPool(1, download=download).run(queue)
+
+    assert [failure.code for failure in summary.failures] == [
+        FailureCode.rate_limited,
+        FailureCode.disk_full,
+    ]
+    assert [failure.stage for failure in summary.failures] == [
+        FailureStage.file_request,
+        FailureStage.file_write,
+    ]
+    assert [failure.retryable for failure in summary.failures] == [True, False]
 
 
 async def test_default_download_callable_builds_downloader_and_observer(tmp_path: Path) -> None:

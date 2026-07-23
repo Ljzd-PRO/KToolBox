@@ -10,6 +10,12 @@ from ktoolbox.api.generated import Post, Revision
 from ktoolbox.api.utils import create_pawchive_client
 from ktoolbox.blocker import BlockerEngine
 from ktoolbox.configuration import RuntimeContext
+from ktoolbox.failures import (
+    FailureStage,
+    TaskExecutionError,
+    classify_failure,
+    failure_report,
+)
 from ktoolbox.job import JobRunner
 from ktoolbox.project_config import ProjectConfiguration
 from ktoolbox.reporting import ProgressReporter
@@ -54,24 +60,31 @@ class CoreTaskExecutor:
     async def _download(self, spec: DownloadTaskSpec, reporter: ProgressReporter) -> None:
         from ktoolbox.configuration import config
 
-        service, creator_id, post_id, revision_id = self._download_identity(spec)
-        async with create_pawchive_client() as client:
-            post = await _requested_post(client, service, creator_id, post_id, revision_id)
-            post_path = spec.output / generate_post_path_name(post)
-            if revision_id is not None:
-                post_path = post_path / config.job.post_structure.revisions / revision_id
-            jobs = await create_job_from_post(
-                post,
-                post_path,
-                dump_post_data=spec.dump_post_data,
-                client=client,
-            )
-            if revision_id is None:
-                if config.job.include_revisions:
+        service: str | None = None
+        creator_id: str | None = None
+        stage = FailureStage.job_generation
+        try:
+            service, creator_id, post_id, revision_id = self._download_identity(spec)
+            stage = FailureStage.revisions if revision_id is not None else FailureStage.work_detail
+            async with create_pawchive_client() as client:
+                post = await _requested_post(client, service, creator_id, post_id, revision_id)
+                stage = FailureStage.job_generation
+                post_path = spec.output / generate_post_path_name(post)
+                if revision_id is not None:
+                    post_path = post_path / config.job.post_structure.revisions / revision_id
+                jobs = await create_job_from_post(
+                    post,
+                    post_path,
+                    dump_post_data=spec.dump_post_data,
+                    client=client,
+                )
+                if revision_id is None and config.job.include_revisions:
+                    stage = FailureStage.revisions
                     try:
                         revisions = await client.list_post_revisions(service, creator_id, post_id)
                     except PawchiveNotFoundError:
                         revisions = []
+                    stage = FailureStage.job_generation
                     for revision in revisions:
                         revision_path = (
                             post_path / config.job.post_structure.revisions / generate_post_path_name(revision)
@@ -84,9 +97,25 @@ class CoreTaskExecutor:
                                 client=client,
                             )
                         )
-        failed = await JobRunner(job_list=jobs, reporter=reporter).start()
-        if failed:
-            raise RuntimeError(f"{failed} file downloads failed")
+        except Exception as error:
+            item = classify_failure(
+                error,
+                stage=stage,
+                platform=service,
+                creator_id=creator_id,
+            )
+            raise TaskExecutionError(failure_report([item])) from error
+
+        runner = JobRunner(job_list=jobs, reporter=reporter)
+        await runner.start()
+        if runner.summary.failed:
+            raise TaskExecutionError(
+                failure_report(
+                    runner.summary.failures,
+                    file_failures=runner.summary.failed,
+                    summary=f"Download finished with {runner.summary.failed} file failures",
+                )
+            )
 
     async def _sync(
         self,
@@ -118,9 +147,18 @@ class CoreTaskExecutor:
             )
         if not summary.successful:
             creator_failures = sum(not result.successful for result in summary.creators)
-            raise RuntimeError(
-                f"synchronization finished with {creator_failures} creator failures "
-                f"and {summary.downloads.failed} file failures"
+            items = [result.failure for result in summary.creators if result.failure is not None]
+            items.extend(summary.downloads.failures)
+            raise TaskExecutionError(
+                failure_report(
+                    items,
+                    creator_failures=creator_failures,
+                    file_failures=summary.downloads.failed,
+                    summary=(
+                        f"Synchronization finished with {creator_failures} creator failures "
+                        f"and {summary.downloads.failed} file failures"
+                    ),
+                )
             )
 
     @staticmethod
