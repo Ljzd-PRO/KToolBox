@@ -746,3 +746,31 @@ test("task lifecycle remains operable through pause resume and stop", async ({ p
   await page.getByRole("button", { name: "Stop" }).click();
   await expect(page.getByText("Stopped", { exact: true })).toBeVisible();
 });
+
+
+test("failed tasks explain the stage, reason, and recovery action", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("link", { name: "Tasks", exact: true }).click();
+  await page.getByRole("button", { name: "Create task" }).click();
+  const dialog = page.getByRole("dialog", { name: "Create task" });
+  await dialog.getByRole("textbox", { name: "Output directory" }).fill("failure-fixture");
+  await dialog.getByRole("button", { name: "Create task" }).click();
+
+  await expect(page.getByText("Failed", { exact: true })).toBeVisible({ timeout: 10_000 });
+  const panel = page.getByRole("heading", { name: "Why this task failed" })
+    .locator('xpath=ancestor::*[@aria-labelledby="task-failure-title"]');
+  await expect(panel).toContainText("Pawchive returned data in an unsupported format.");
+  await expect(page.getByText("items.8.tags", { exact: false })).toBeVisible();
+  await expect(page.getByText(/Update KToolBox/)).toBeVisible();
+  await expect(page.getByText("Creator finished", { exact: true })).toBeVisible();
+  await expect(page.locator("body")).not.toContainText('"code": "response_incompatible"');
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect.poll(
+    () => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth),
+  ).toBe(0);
+  await expect(page.getByRole("heading", { name: "Why this task failed" })).toBeVisible();
+  await expect(page.locator("[data-live-announcer] [role='img']")).toHaveCount(0, { timeout: 8_000 });
+  const scan = await new AxeBuilder({ page }).analyze();
+  expect(scan.violations).toEqual([]);
+});

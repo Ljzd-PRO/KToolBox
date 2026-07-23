@@ -11,6 +11,13 @@ import httpx
 
 from ktoolbox.api.generated import CreatorProfile, CreatorSummary, Post, Revision
 from ktoolbox.configuration import RuntimeContext
+from ktoolbox.failures import (
+    FailureCode,
+    FailureStage,
+    TaskExecutionError,
+    failure_report,
+    generic_failure,
+)
 from ktoolbox.reporting import ProgressReporter
 from ktoolbox.webui.app import create_app
 from ktoolbox.webui.filesystem import FilesystemBrowser
@@ -116,6 +123,32 @@ class FixtureExecutor:
         _snapshot: TaskExecutionSnapshot,
         reporter: ProgressReporter,
     ) -> None:
+        if task.spec.output.name == "failure-fixture":
+            creator = "fanbox:demo-studio"
+            failure = generic_failure(
+                code=FailureCode.response_incompatible,
+                stage=FailureStage.work_list,
+                message="Pawchive returned data in an unsupported format",
+                platform="fanbox",
+                creator_id="demo-studio",
+            ).model_copy(
+                update={
+                    "operation": "list_creator_posts",
+                    "fields": ["items.8.tags"],
+                }
+            )
+            reporter.start()
+            reporter.creator_started(creator)
+            reporter.creator_finished(creator, failure.message, failure)
+            reporter.stop()
+            raise TaskExecutionError(
+                failure_report(
+                    [failure],
+                    creator_failures=1,
+                    summary="Synchronization finished with 1 creator failure and 0 file failures",
+                )
+            )
+
         transport = httpx.MockTransport(lambda __: httpx.Response(200, json={"fixture": True}))
         async with httpx.AsyncClient(transport=transport) as client:
             await client.get("https://fixture.invalid/metadata")

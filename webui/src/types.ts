@@ -135,6 +135,14 @@ export type TaskPresentationSnapshot = {
   creator_name?: string | null;
 };
 
+export type FailureCode = WebUIApiSchemas["FailureCode"];
+
+export type FailureStage = WebUIApiSchemas["FailureStage"];
+
+export type FailureItem = WebUIApiSchemas["FailureItem"];
+
+export type TaskFailureReport = WebUIApiSchemas["TaskFailureReport"];
+
 export type TaskCreateRequest = {
   spec: TaskSpec;
   presentation?: TaskPresentationSnapshot | null;
@@ -172,6 +180,7 @@ export type TaskRecord = {
   revision: number;
   progress: TaskProgress;
   error: string | null;
+  failure?: TaskFailureReport | null;
   blocked_by: string | null;
   created_at: string;
   updated_at: string;
@@ -195,6 +204,7 @@ export type TaskAttempt = {
   started_at: string;
   finished_at: string | null;
   error: string | null;
+  failure?: TaskFailureReport | null;
 };
 
 export type TaskArtifact = WebUIApiSchemas["TaskArtifact"];

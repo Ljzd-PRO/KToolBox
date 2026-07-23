@@ -60,6 +60,12 @@
   --semantic-success: #047857;
   --semantic-warning: #b45309;
   --semantic-danger: #dc2626;
+  --danger: #b91c1c;
+  --danger-hover: #991b1b;
+  --danger-foreground: #ffffff;
+  --danger-soft: rgb(185 28 28 / 0.1);
+  --danger-soft-foreground: #991b1b;
+  --danger-soft-hover: rgb(185 28 28 / 0.16);
 }
 
 :root[data-theme-color="emerald"] {
@@ -150,6 +156,12 @@
   --semantic-success: #34d399;
   --semantic-warning: #fbbf24;
   --semantic-danger: #fb7185;
+  --danger: #fb7185;
+  --danger-hover: #f43f5e;
+  --danger-foreground: #111827;
+  --danger-soft: rgb(251 113 133 / 0.14);
+  --danger-soft-foreground: #fda4af;
+  --danger-soft-hover: rgb(251 113 133 / 0.2);
 }
 
 :root[data-color-scheme="dark"][data-theme-color="emerald"] {

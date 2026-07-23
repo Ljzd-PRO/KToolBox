@@ -1,11 +1,22 @@
 import { Button, Chip, Tooltip } from "@heroui/react";
-import { IconDownload as Download, IconRefresh as RefreshCw } from "@tabler/icons-react";
+import {
+  IconAlertTriangle as AlertTriangle,
+  IconDownload as Download,
+  IconRefresh as RefreshCw,
+} from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 
+import { failureMessage, primaryFailure } from "../lib/taskFailures";
 import type { TaskRecord, TaskSpec } from "../types";
 
 export function TaskTarget({ task }: { task: TaskRecord }) {
   const { t } = useTranslation();
+  const failure = primaryFailure(task.failure);
+  const failureText = failure
+    ? failureMessage(t, failure)
+    : task.status === "failed"
+      ? task.error?.trim()
+      : null;
   if (task.spec.kind === "sync") {
     const names = task.spec.creators.map((creator) => creator.alias?.trim() || creator.creator_id);
     const visibleNames = names.slice(0, 2);
@@ -32,6 +43,7 @@ export function TaskTarget({ task }: { task: TaskRecord }) {
               </Tooltip>
             ) : <p className="truncate text-xs text-muted">{summary}</p>}
           </div>
+          {failureText ? <FailureLine text={failureText} /> : null}
         </div>
       </div>
     );
@@ -55,8 +67,18 @@ export function TaskTarget({ task }: { task: TaskRecord }) {
           <Chip className="shrink-0" color="accent" size="sm" variant="soft">{t("common.download")}</Chip>
           <p className="truncate text-xs text-muted" title={metadata}>{metadata}</p>
         </div>
+        {failureText ? <FailureLine text={failureText} /> : null}
       </div>
     </div>
+  );
+}
+
+function FailureLine({ text }: { text: string }) {
+  return (
+    <p className="mt-1.5 flex min-w-0 items-start gap-1.5 text-xs leading-5 text-danger" title={text}>
+      <AlertTriangle aria-hidden="true" className="mt-0.5 shrink-0" size={14} />
+      <span className="line-clamp-2">{text}</span>
+    </p>
   );
 }
 

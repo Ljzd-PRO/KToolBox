@@ -28,6 +28,95 @@ afterEach(() => {
 });
 
 describe("project workflows", () => {
+  it("explains structured task failures without exposing raw event JSON", async () => {
+    window.history.replaceState({}, "", "/tasks/task-failed");
+    const failure = {
+      code: "response_incompatible",
+      stage: "work_list",
+      message: "Response validation failed.",
+      retryable: false,
+      platform: "fanbox",
+      creator_id: "demo-studio",
+      file_name: null,
+      http_status: null,
+      operation: "list_creator_posts",
+      fields: ["items.8.tags"],
+    };
+    const task = {
+      id: "task-failed",
+      kind: "sync",
+      status: "failed",
+      spec: {
+        kind: "sync",
+        creators: [{ service: "fanbox", creator_id: "demo-studio", alias: null, enabled: true }],
+        output: "downloads",
+        save_creator_indices: true,
+        mix_posts: null,
+        start_time: null,
+        end_time: null,
+        offset: 0,
+        length: null,
+        keywords: [],
+        keywords_exclude: [],
+      },
+      presentation: null,
+      position: 1,
+      revision: 1,
+      progress: {
+        queued_files: 0,
+        processed_files: 0,
+        completed_files: 0,
+        existing_files: 0,
+        failed_files: 0,
+        transferred_bytes: 0,
+        total_bytes: null,
+        speed_bps: 0,
+        eta_seconds: null,
+        active_creators: [],
+        active_downloads: {},
+      },
+      error: "1 creator failed, 0 files failed.",
+      failure: {
+        summary: "1 creator failed, 0 files failed.",
+        creator_failures: 1,
+        file_failures: 0,
+        items: [failure],
+      },
+      blocked_by: null,
+      created_at: "2026-07-23T00:00:00Z",
+      updated_at: "2026-07-23T00:00:01Z",
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const path = String(input);
+        if (path.endsWith("/session")) return json(session);
+        if (path.endsWith("/tasks")) return json([task]);
+        if (path.endsWith("/creators")) return json([]);
+        if (path.includes("/tasks/task-failed/events")) {
+          return json([{
+            id: 1,
+            task_id: "task-failed",
+            event_type: "creator.finished",
+            data: { failure },
+            created_at: "2026-07-23T00:00:01Z",
+          }]);
+        }
+        if (path.endsWith("/tasks/task-failed/attempts")) return json([]);
+        throw new Error(`Unexpected request: ${path}`);
+      }),
+    );
+
+    render(<BrowserRouter><App /></BrowserRouter>);
+
+    expect(await screen.findByRole("heading", { name: "Why this task failed" })).toBeInTheDocument();
+    expect(screen.getAllByText("Pawchive returned data in an unsupported format.").length).toBeGreaterThan(0);
+    expect(screen.getByText("items.8.tags", { exact: false })).toBeInTheDocument();
+    expect(screen.getByText(/Update KToolBox/)).toBeInTheDocument();
+    expect(await screen.findByText("Creator finished")).toBeInTheDocument();
+    expect(screen.queryByText(/"code":/)).not.toBeInTheDocument();
+  });
+
   it("navigates from overview statistics with a durable filter", async () => {
     const user = userEvent.setup();
     vi.stubGlobal(

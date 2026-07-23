@@ -51,6 +51,15 @@ import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { formatBytes, formatDateTime, formatDuration, taskPercent } from "../lib/format";
 import {
+  eventLabel,
+  eventMessage,
+  failureAdvice,
+  failureMessage,
+  failureStageLabel,
+  failureSubject,
+  taskFailureItems,
+} from "../lib/taskFailures";
+import {
   normalizeTableSort,
   stableSort,
   taskStatusRank,
@@ -58,6 +67,8 @@ import {
 } from "../lib/sorting";
 import type {
   CreatorRosterItem,
+  FailureItem,
+  TaskFailureReport,
   TaskAttempt,
   TaskCleanupPreview,
   TaskEvent,
@@ -116,7 +127,7 @@ export function TasksPage() {
   });
   const eventsQuery = useQuery({
     queryKey: ["task-events", taskId],
-    queryFn: () => api<TaskEvent[]>(`/tasks/${taskId}/events?limit=300`),
+    queryFn: () => api<TaskEvent[]>(`/tasks/${taskId}/events?limit=200`),
     enabled: Boolean(taskId),
     refetchInterval: taskId ? 1500 : false,
   });
@@ -557,7 +568,10 @@ function TaskDetails({
         <TaskTarget task={task} />
         <div className="flex shrink-0 flex-wrap items-center gap-2"><TaskStatusChip status={task.status} /><Chip size="sm" variant="soft">{t("tasks.attempts", { count: attempts.length })}</Chip></div>
       </Surface>
-      {task.error ? <Surface className="rounded-lg border border-danger/40 p-4 text-sm text-danger">{task.error}</Surface> : null}
+      <TaskFailurePanel
+        fallback={task.error}
+        report={task.failure ?? attempts[attempts.length - 1]?.failure}
+      />
       <Surface className="grid gap-5 rounded-lg border border-border p-5">
         <ProgressMeter isIndeterminate={task.status === "running" && !progress.total_bytes && !progress.queued_files} label={t("tasks.progress")} value={percent} />
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -585,11 +599,19 @@ function TaskDetails({
       </div>
       <Surface className="grid gap-4 rounded-lg border border-border p-5">
         <div className="flex items-center justify-between gap-3"><h2 className="font-semibold">{t("tasks.logs")}</h2><Chip size="sm" variant="soft">{events.length}</Chip></div>
-        <div className="max-h-80 overflow-y-auto rounded-lg bg-default p-3 font-mono text-xs leading-6">
+        <div
+          aria-label={t("tasks.logs")}
+          className="max-h-80 overflow-y-auto rounded-lg bg-default p-3 font-mono text-xs leading-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          role="region"
+          tabIndex={0}
+        >
           {events.length ? events.map((event) => (
             <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 border-b border-border py-1 last:border-0" key={event.id}>
               <time className="text-muted">{formatDateTime(event.created_at, i18n.language)}</time>
-              <span className="min-w-0 break-words"><strong>{event.event_type}</strong> {eventMessage(event)}</span>
+              <span className="min-w-0 break-words">
+                <strong>{eventLabel(t, event.event_type)}</strong>{" "}
+                {eventMessage(t, event)}
+              </span>
             </div>
           )) : <p className="text-muted">{t("tasks.noLogs")}</p>}
         </div>
@@ -606,16 +628,123 @@ function Metric({ label, value }: { label: string; value: string }) {
   return <div className="min-w-0 rounded-lg bg-default p-4"><p className="text-xs text-muted">{label}</p><p className="mt-1 truncate font-semibold tabular-nums" title={value}>{value}</p></div>;
 }
 
-function taskSpeed(task: TaskRecord): number {
-  return speedVisible.has(task.status) ? task.progress.speed_bps : 0;
+function TaskFailurePanel({
+  report,
+  fallback,
+}: {
+  report: TaskFailureReport | null | undefined;
+  fallback: string | null;
+}) {
+  const { t } = useTranslation();
+  const items = taskFailureItems(report);
+  if (!report && !fallback) return null;
+
+  const creatorItems = items.filter((item) => item.creator_id && !item.file_name);
+  const fileItems = items.filter((item) => item.file_name);
+  const otherItems = items.filter((item) => !item.creator_id && !item.file_name);
+  const visibleFileItems = fileItems.slice(0, 20);
+  const hiddenFileCount = fileItems.length - visibleFileItems.length;
+
+  return (
+    <Surface
+      aria-labelledby="task-failure-title"
+      className="overflow-hidden rounded-lg border border-danger/40"
+    >
+      <div className="flex items-start gap-3 border-b border-danger/20 bg-danger/5 p-4">
+        <span className="grid size-9 shrink-0 place-items-center rounded-md bg-danger/10 text-danger">
+          <AlertTriangle aria-hidden="true" size={19} />
+        </span>
+        <div className="min-w-0">
+          <h2 className="font-semibold text-foreground" id="task-failure-title">
+            {t("tasks.failures.title")}
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-muted">
+            {report?.summary || fallback}
+          </p>
+          {report ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Chip color="danger" size="sm" variant="soft">
+                {t("tasks.failures.creatorCount", { count: report.creator_failures })}
+              </Chip>
+              <Chip color="danger" size="sm" variant="soft">
+                {t("tasks.failures.fileCount", { count: report.file_failures })}
+              </Chip>
+            </div>
+          ) : null}
+        </div>
+      </div>
+      {items.length ? (
+        <div className="divide-y divide-border">
+          <FailureGroup
+            items={creatorItems}
+            title={t("tasks.failures.creatorGroup")}
+          />
+          <FailureGroup
+            items={visibleFileItems}
+            title={t("tasks.failures.fileGroup")}
+          />
+          {hiddenFileCount > 0 ? (
+            <p className="px-4 pb-4 text-sm text-muted">
+              {t("tasks.failures.moreFiles", { count: hiddenFileCount })}
+            </p>
+          ) : null}
+          <FailureGroup
+            items={otherItems}
+            title={t("tasks.failures.otherGroup")}
+          />
+        </div>
+      ) : null}
+    </Surface>
+  );
 }
 
-function eventMessage(event: TaskEvent): string {
-  if (typeof event.data.message === "string") return event.data.message;
-  if (typeof event.data.creator === "string") return event.data.creator;
-  if (typeof event.data.filename === "string") return event.data.filename;
-  if (typeof event.data.status === "string") return event.data.status;
-  return "";
+function FailureGroup({ items, title }: { items: FailureItem[]; title: string }) {
+  if (!items.length) return null;
+  return (
+    <section className="grid gap-3 p-4">
+      <h3 className="text-xs font-semibold uppercase text-muted">{title}</h3>
+      <div className="divide-y divide-border">
+        {items.map((item, index) => (
+          <FailureRow item={item} key={`${item.stage}-${failureSubject(item) ?? "general"}-${index}`} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function FailureRow({ item }: { item: FailureItem }) {
+  const { t } = useTranslation();
+  const subject = failureSubject(item);
+  return (
+    <div className="grid gap-2 py-3 first:pt-0 last:pb-0 sm:grid-cols-[minmax(8rem,0.35fr)_minmax(0,1fr)] sm:gap-4">
+      <div className="min-w-0">
+        <Chip color="danger" size="sm" variant="soft">
+          {failureStageLabel(t, item.stage)}
+        </Chip>
+        {subject ? (
+          <p className="mt-2 truncate text-sm font-medium" title={subject}>{subject}</p>
+        ) : null}
+      </div>
+      <div className="min-w-0">
+        <p className="text-sm font-medium leading-6 text-foreground">{failureMessage(t, item)}</p>
+        {item.fields?.length ? (
+          <p className="mt-1 break-words font-mono text-xs text-muted">
+            {t("tasks.failures.fields", { fields: item.fields.join(", ") })}
+          </p>
+        ) : null}
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <Chip color={item.retryable ? "warning" : "default"} size="sm" variant="soft">
+            {item.retryable ? t("tasks.failures.retryable") : t("tasks.failures.notRetryable")}
+          </Chip>
+          <span className="text-xs leading-5 text-muted">{failureAdvice(t, item)}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function taskSpeed(task: TaskRecord): number {
+  return speedVisible.has(task.status) ? task.progress.speed_bps : 0;
 }
 
 function taskStatusFilter(value: string | null): TaskStatusFilter {
