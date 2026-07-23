@@ -11,6 +11,7 @@ from fastapi import HTTPException, Request
 
 import ktoolbox.webui.auth as auth_module
 from ktoolbox.configuration import Configuration, RuntimeContext
+from ktoolbox.exceptions import KToolBoxUserError
 from ktoolbox.webui.app import create_app
 from ktoolbox.webui.auth import CSRF_HEADER, AuthService, LoginRateLimiter, client_identifier
 from ktoolbox.webui.database import WebUIDatabase
@@ -123,7 +124,7 @@ async def test_invalid_password_hash_fails_startup(tmp_path: Path) -> None:
             ),
         )
     )
-    with pytest.raises(ValueError, match="valid Argon2"):
+    with pytest.raises(KToolBoxUserError, match="valid Argon2"):
         async with invalid.router.lifespan_context(invalid):
             pass
 
@@ -158,11 +159,11 @@ async def test_auth_service_rejects_missing_password_and_unknown_session(tmp_pat
         Configuration(_env_file=None, webui={"password": "secret"}).webui,
         database,
     )
-    with pytest.raises(ValueError, match="USERNAME"):
+    with pytest.raises(KToolBoxUserError, match="USERNAME"):
         missing_username.validate_configuration()
 
     service = AuthService(Configuration(_env_file=None, webui={"username": "owner"}).webui, database)
-    with pytest.raises(ValueError, match="PASSWORD_HASH or KTOOLBOX_WEBUI__PASSWORD"):
+    with pytest.raises(KToolBoxUserError, match="PASSWORD_HASH or KTOOLBOX_WEBUI__PASSWORD"):
         service.validate_configuration()
     assert service._credentials_match("owner", "anything") is False
     with pytest.raises(HTTPException, match="Session expired"):

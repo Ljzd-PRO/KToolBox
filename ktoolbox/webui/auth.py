@@ -13,6 +13,7 @@ from argon2.exceptions import InvalidHashError, VerificationError
 from fastapi import Depends, HTTPException, Request, status
 
 from ktoolbox.configuration import WebUIConfiguration
+from ktoolbox.exceptions import KToolBoxUserError
 from ktoolbox.webui.database import WebUIDatabase, WebUISession
 
 SESSION_COOKIE = "ktoolbox_session"
@@ -71,14 +72,23 @@ class AuthService:
 
     def validate_configuration(self) -> None:
         if not self.configuration.username.strip():
-            raise ValueError("KTOOLBOX_WEBUI__USERNAME must be configured")
+            raise KToolBoxUserError(
+                "KTOOLBOX_WEBUI__USERNAME must be configured",
+                label="Configuration error",
+            )
         if not self._password_hash and not self._plaintext_password:
-            raise ValueError("KTOOLBOX_WEBUI__PASSWORD_HASH or KTOOLBOX_WEBUI__PASSWORD must be configured")
+            raise KToolBoxUserError(
+                "KTOOLBOX_WEBUI__PASSWORD_HASH or KTOOLBOX_WEBUI__PASSWORD must be configured",
+                label="Configuration error",
+            )
         if self._password_hash:
             try:
                 self.password_hasher.check_needs_rehash(self._password_hash)
             except InvalidHashError as error:
-                raise ValueError("KTOOLBOX_WEBUI__PASSWORD_HASH is not a valid Argon2 hash") from error
+                raise KToolBoxUserError(
+                    "KTOOLBOX_WEBUI__PASSWORD_HASH is not a valid Argon2 hash",
+                    label="Configuration error",
+                ) from error
 
     async def login(self, username: str, password: str, client_key: str) -> LoginResult:
         key = f"login:{client_key}:{username.casefold()}"

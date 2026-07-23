@@ -53,6 +53,7 @@ app = App(
     help_format="rich",
     help_on_error=True,
     exit_on_error=False,
+    suppress_keyboard_interrupt=False,
     result_action="return_int_as_exit_code_else_zero",
     console=stdout,
     error_console=stderr,
@@ -479,32 +480,23 @@ async def webui_run(
     no_open: Annotated[bool, Parameter(negative=())] = False,
 ) -> int:
     """Run the WebUI for a project directory, creating ktoolbox.toml if needed."""
-    try:
-        from ktoolbox.webui.server import run_webui
+    from ktoolbox.webui.server import run_webui
 
-        await run_webui(
-            project_dir,
-            host=host,
-            port=port,
-            open_browser=False if no_open else None,
-        )
-    except KeyboardInterrupt:
-        stderr.print("[yellow]WebUI stopped by user.[/yellow]")
-        return 130
-    except (RuntimeError, ValueError) as error:
-        return _command_error("WebUI error", str(error), code=2)
+    await run_webui(
+        project_dir,
+        host=host,
+        port=port,
+        open_browser=False if no_open else None,
+    )
     return 0
 
 
 @webui_app.command(name="hash-password")
 def webui_hash_password() -> int:
     """Generate an Argon2id password hash using hidden terminal input."""
-    try:
-        from ktoolbox.webui.server import generate_password_hash
+    from ktoolbox.webui.server import generate_password_hash
 
-        password_hash = generate_password_hash()
-    except (RuntimeError, ValueError) as error:
-        return _command_error("Password error", str(error), code=2)
+    password_hash = generate_password_hash()
     stdout.print(password_hash, markup=False, highlight=False)
     return 0
 

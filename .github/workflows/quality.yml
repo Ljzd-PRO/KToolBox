@@ -39,11 +39,13 @@ jobs:
           ktoolbox/action/base.py
           ktoolbox/action/fetch.py
           ktoolbox/action/search.py
+          ktoolbox/__main__.py
           ktoolbox/_enum.py
           ktoolbox/cli.py
           ktoolbox/cli_app.py
           ktoolbox/configuration.py
           ktoolbox/downloader/downloader.py
+          ktoolbox/exceptions.py
           ktoolbox/job/runner.py
           ktoolbox/job/stream.py
           ktoolbox/project_config.py
@@ -63,11 +65,13 @@ jobs:
           ktoolbox/action/base.py
           ktoolbox/action/fetch.py
           ktoolbox/action/search.py
+          ktoolbox/__main__.py
           ktoolbox/_enum.py
           ktoolbox/cli.py
           ktoolbox/cli_app.py
           ktoolbox/configuration.py
           ktoolbox/downloader/downloader.py
+          ktoolbox/exceptions.py
           ktoolbox/job/runner.py
           ktoolbox/job/stream.py
           ktoolbox/project_config.py
@@ -82,12 +86,14 @@ jobs:
           ktoolbox/api/client.py
           ktoolbox/api/errors.py
           ktoolbox/api/parameters.py
+          ktoolbox/__main__.py
           ktoolbox/action/base.py
           ktoolbox/action/fetch.py
           ktoolbox/action/search.py
           ktoolbox/api/utils.py
           ktoolbox/cli.py
           ktoolbox/cli_app.py
+          ktoolbox/exceptions.py
           ktoolbox/blocker
           ktoolbox/job/stream.py
           ktoolbox/project_config.py

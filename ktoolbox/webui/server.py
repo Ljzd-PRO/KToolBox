@@ -13,6 +13,7 @@ from argon2 import PasswordHasher
 from pydantic import SecretStr
 
 from ktoolbox.configuration import RuntimeContext, WebUIConfiguration, load_configuration
+from ktoolbox.exceptions import KToolBoxUserError
 from ktoolbox.project_config import ProjectConfigStore, ProjectConfiguration
 
 DEFAULT_WEBUI_USERNAME = "admin"
@@ -25,12 +26,15 @@ class GeneratedWebUICredentials:
 
 
 def generate_password_hash() -> str:
-    password = getpass.getpass("WebUI password: ")
-    confirmation = getpass.getpass("Confirm password: ")
+    try:
+        password = getpass.getpass("WebUI password: ")
+        confirmation = getpass.getpass("Confirm password: ")
+    except EOFError as error:
+        raise KToolBoxUserError("password input was cancelled", label="Password error") from error
     if not password:
-        raise ValueError("password cannot be empty")
+        raise KToolBoxUserError("password cannot be empty", label="Password error")
     if password != confirmation:
-        raise ValueError("passwords do not match")
+        raise KToolBoxUserError("passwords do not match", label="Password error")
     return PasswordHasher().hash(password)
 
 
@@ -44,7 +48,10 @@ async def run_webui(
     try:
         import uvicorn
     except ModuleNotFoundError as error:
-        raise RuntimeError("install the WebUI dependencies with `pip install ktoolbox[webui]`") from error
+        raise KToolBoxUserError(
+            "install the WebUI dependencies with `pip install ktoolbox[webui]`",
+            label="WebUI error",
+        ) from error
 
     root = await anyio.to_thread.run_sync(_project_root, project_dir)
     configuration = await anyio.to_thread.run_sync(load_configuration, root)
@@ -62,6 +69,10 @@ async def run_webui(
     configuration = configuration.model_copy(update={"webui": webui})
     context = RuntimeContext(project_root=root, configuration=configuration)
 
+    from ktoolbox.webui.app import create_app
+
+    application = create_app(context)
+    application.state.auth.validate_configuration()
     local_host = "127.0.0.1" if webui.host in {"0.0.0.0", "::"} else webui.host
     url = f"http://{local_host}:{webui.port}"
     if generated_credentials is not None:
@@ -71,11 +82,9 @@ async def run_webui(
     if webui.open_browser:
         threading.Timer(1.0, webbrowser.open, args=(url,)).start()
 
-    from ktoolbox.webui.app import create_app
-
     server = uvicorn.Server(
         uvicorn.Config(
-            create_app(context),
+            application,
             host=webui.host,
             port=webui.port,
             access_log=False,
@@ -128,7 +137,10 @@ def _project_root(project_dir: Path) -> Path:
     if project_config.is_file():
         return root
     if project_config.exists():
-        raise ValueError(f"{project_config} is not a regular file")
+        raise KToolBoxUserError(
+            f"{project_config} is not a regular file",
+            label="Configuration error",
+        )
 
     ProjectConfigStore(project_config).save(ProjectConfiguration())
     print(

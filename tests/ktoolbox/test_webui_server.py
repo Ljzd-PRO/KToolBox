@@ -6,8 +6,15 @@ from pydantic import SecretStr
 
 import ktoolbox.webui.server as server_module
 from ktoolbox.configuration import Configuration, WebUIConfiguration
+from ktoolbox.exceptions import KToolBoxUserError
 from ktoolbox.project_config import ProjectConfigStore, ProjectConfiguration
-from ktoolbox.webui.server import DEFAULT_WEBUI_USERNAME, _prepare_webui_credentials, _project_root, run_webui
+from ktoolbox.webui.server import (
+    DEFAULT_WEBUI_USERNAME,
+    _prepare_webui_credentials,
+    _project_root,
+    generate_password_hash,
+    run_webui,
+)
 
 
 def test_prepare_webui_credentials_fills_only_missing_values(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -76,6 +83,24 @@ async def test_run_webui_prints_generated_credentials_and_configuration_hint(
     assert "KToolBox WebUI: http://127.0.0.1:9876" in output
 
 
+@pytest.mark.asyncio
+async def test_run_webui_rejects_an_invalid_password_hash_before_server_start(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        server_module,
+        "load_configuration",
+        lambda root: Configuration(
+            _env_file=None,
+            webui={"username": "owner", "password_hash": "not-an-argon-hash"},
+        ),
+    )
+
+    with pytest.raises(KToolBoxUserError, match="valid Argon2"):
+        await run_webui(tmp_path, open_browser=False)
+
+
 def test_project_root_creates_missing_configuration(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     project_root = tmp_path / "new-project"
 
@@ -103,5 +128,33 @@ def test_project_root_preserves_existing_configuration(
 def test_project_root_rejects_non_file_configuration(tmp_path: Path) -> None:
     (tmp_path / "ktoolbox.toml").mkdir()
 
-    with pytest.raises(ValueError, match="is not a regular file"):
+    with pytest.raises(KToolBoxUserError, match="is not a regular file"):
         _project_root(tmp_path)
+
+
+@pytest.mark.parametrize(
+    ("responses", "message"),
+    [
+        (["", ""], "password cannot be empty"),
+        (["first", "second"], "passwords do not match"),
+    ],
+)
+def test_password_hash_rejects_invalid_terminal_input(
+    responses: list[str],
+    message: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    answers = iter(responses)
+    monkeypatch.setattr(server_module.getpass, "getpass", lambda _prompt: next(answers))
+
+    with pytest.raises(KToolBoxUserError, match=message):
+        generate_password_hash()
+
+
+def test_password_hash_handles_closed_terminal_input(monkeypatch: pytest.MonkeyPatch) -> None:
+    def closed_terminal(_prompt: str) -> str:
+        raise EOFError
+
+    monkeypatch.setattr(server_module.getpass, "getpass", closed_terminal)
+    with pytest.raises(KToolBoxUserError, match="input was cancelled"):
+        generate_password_hash()

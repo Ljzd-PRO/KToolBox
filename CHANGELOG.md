@@ -33,6 +33,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Select a requested revision from the revision list instead of calling a nonexistent detail endpoint.
 - Retain resumable downloads, filters, progress reporting, metadata output, file-size limits, and optional hard-link bucket storage under the new models.
 - Preserve bounded structured creator and file failures across synchronization, download workers, CLI summaries, WebUI attempts, and task events.
+- Handle terminal interrupts and expected startup refusals at one global CLI boundary, with concise Loguru messages, stable exit codes, and no traceback or configuration input values.
 
 ## HeroUI WebUI
 
@@ -110,6 +111,7 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 从修订列表选择指定版本，不再请求不存在的单修订详情端点。
 - 在新模型下保留断点续传、筛选、进度、元数据输出、文件大小限制和可选硬链接存储桶。
 - 在同步、下载工作器、CLI 汇总、WebUI 尝试和任务事件间保留有界的结构化作者与文件失败信息。
+- 在统一 CLI 边界处理终端中断和可预期的启动拒绝，使用简洁 Loguru 消息和稳定退出码，且不输出 traceback 或配置输入值。
 
 ## HeroUI WebUI
 
