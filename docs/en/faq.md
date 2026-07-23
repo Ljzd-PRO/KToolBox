@@ -130,6 +130,10 @@ Queued tasks remain queued. Work that was running is marked `interrupted` rather
 
 Ordinary deletion removes only task history. Output deletion requires a preview and confirmation, then checks the task's artifact ownership records and file metadata. It skips pre-existing, modified, shared, non-regular, and symbolic-link paths.
 
+## How do I find the real reason a synchronization failed?
+
+Open the failed task and read **Why this task failed**. KToolBox identifies the creator or file, the failing stage, whether retrying can help, and a suggested action. A response-format incompatibility usually means Pawchive changed a field shape; update KToolBox and report the safe operation and field path shown in the panel. Network, timeout, and rate-limit failures may succeed on retry. The report is deliberately redacted and never includes an upstream response body, post title, cookie, or complete download URL.
+
 ## Is uvloop or winloop required?
 
 No. They are optional event-loop optimizations. Use `ktoolbox[uvloop]` on Linux/macOS or `ktoolbox[winloop]` on Windows. If neither is installed, KToolBox continues with Python's standard asyncio loop.

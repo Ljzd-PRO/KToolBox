@@ -108,6 +108,12 @@ The top-level queue runs two tasks by default (`KTOOLBOX_WEBUI__MAX_ACTIVE_TASKS
 
 Live events use SSE with reconnect support. REST task state remains authoritative. The detail view reports prepared creators, files, bytes, overall progress, aggregate and per-file speeds, ETA, skipped/failed counts, active items, and structured logs.
 
+Failed attempts persist a bounded, redacted diagnostic report instead of only a failure count. The task row shows the first useful cause; details group failures by creator and file and identify the stage, retryability, safe field paths, and a suggested recovery action. Upstream response bodies, post titles, cookies, and complete download URLs are never stored in this report. On narrow screens, the 64px workbar, 12px page spacing, and compact appearance Popover expose more useful content without shrinking form text below 16px. The MCP tool catalog uses collapsible HeroUI groups and automatically expands matching groups during search or permission filtering.
+
+![Structured task failure explanation](../assets/webui/26-task-failure-1440-light-zh.png)
+
+![Compact mobile appearance controls](../assets/webui/27-appearance-mobile-dark-zh.png)
+
 ![Live task progress](../assets/webui/14-task-running-1024-dark-zh.png)
 
 Pause is cooperative: active network streams close, completed files and resumable temporary files remain, and resume creates a new attempt. Stop keeps the task definition so it can be edited and rerun. A process restart marks formerly running work as `interrupted`; recovery is always explicit.

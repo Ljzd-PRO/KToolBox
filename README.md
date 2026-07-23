@@ -123,6 +123,8 @@ The complete interface is available in Simplified Chinese, Traditional Chinese, 
 
 Task rows preserve readable post titles and creator names in an offline presentation snapshot. Desktop and mobile layouts expose details, lifecycle, editing, ordering, and deletion actions directly, while form switches use gray-off/blue-on tracks and checkboxes show an indicator only when selected.
 
+Failed tasks retain a redacted, stage-specific report with the affected creator or file, retryability, safe field paths, and recovery guidance. The compact mobile shell uses a 64px workbar and 12px page spacing; its appearance controls move into a small Popover, and the MCP tool catalog collapses by category.
+
 Creator profiles supply the primary roster name with a resilient 24-hour cache. Data tables support locale-aware sorting, dashboard statistics link to filtered views, and every platform field uses a HeroUI ComboBox with Patreon, Pixiv, and Fanbox suggestions plus custom values.
 
 The default `0.0.0.0:8789` listener is convenient on a trusted LAN, but HTTP does not protect credentials or project data in transit. Bind to `127.0.0.1` or put the service behind HTTPS for untrusted networks. When credentials are not configured, KToolBox generates credentials for the current process and prints them only in its terminal. Filesystem-backed path fields can browse the computer running KToolBox; project fields stay inside the bound project, while the storage-bucket and log-directory fields use the server process's host permissions. Empty directories can only be removed through an explicit, non-recursive confirmation. See the [WebUI guide](https://ktoolbox.readthedocs.io/latest/webui/) for task lifecycle, security, and deployment details.

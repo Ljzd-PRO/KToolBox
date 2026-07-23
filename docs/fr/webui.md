@@ -104,6 +104,12 @@ La file principale exécute deux tâches par défaut (`KTOOLBOX_WEBUI__MAX_ACTIV
 
 Les événements en direct utilisent SSE avec reconnexion. L'état REST reste la référence. La vue détaillée indique les créateurs préparés, les fichiers, les octets, la progression totale, les vitesses globale et par fichier, l'heure estimée, les nombres ignorés/échoués, les éléments actifs et les journaux structurés.
 
+Chaque tentative en échec conserve un rapport de diagnostic borné et expurgé au lieu d'un simple compteur. La ligne de tâche affiche la première cause utile ; le détail regroupe les échecs par créateur et fichier et indique l'étape, la possibilité de réessayer, les chemins de champs sûrs et l'action recommandée. Le corps des réponses amont, les titres d'œuvres, les cookies et les URL complètes de téléchargement ne sont jamais enregistrés. Sur écran étroit, la barre de 64px, l'espacement de page de 12px et le Popover d'apparence compact affichent davantage de contenu sans réduire le texte des formulaires sous 16px. Le catalogue MCP utilise des groupes HeroUI repliables et développe automatiquement les groupes correspondant à une recherche ou à un filtre de permission.
+
+![Explication structurée d'un échec de tâche](../assets/webui/26-task-failure-1440-light-zh.png)
+
+![Contrôles d'apparence mobiles compacts](../assets/webui/27-appearance-mobile-dark-zh.png)
+
 ![Progression d'une tâche en direct](../assets/webui/14-task-running-1024-dark-zh.png)
 
 La pause est coopérative : les flux réseau actifs se ferment, les fichiers terminés et temporaires pouvant reprendre restent, et la reprise crée une nouvelle tentative. L'arrêt conserve la définition pour pouvoir la modifier et la relancer. Un redémarrage marque l'ancien travail actif `interrupted` ; la récupération est toujours explicite.

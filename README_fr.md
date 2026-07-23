@@ -123,6 +123,8 @@ Toute l'interface est disponible en chinois simplifié, chinois traditionnel, an
 
 Les lignes de tâches conservent des titres de publication et des noms de créateur lisibles dans un instantané de présentation hors ligne. Les dispositions pour ordinateur et mobile donnent directement accès aux détails, au cycle de vie, à la modification, au classement et à la suppression. Les interrupteurs sont gris lorsqu'ils sont désactivés et bleus lorsqu'ils sont activés ; les cases à cocher n'affichent un indicateur que lorsqu'elles sont sélectionnées.
 
+Une tâche en échec conserve un rapport expurgé par étape avec le créateur ou fichier concerné, la possibilité de réessayer, les chemins de champs sûrs et l'action recommandée. L'interface mobile compacte utilise une barre de 64px et un espacement de 12px, place l'apparence dans un petit Popover et replie le catalogue MCP par catégorie.
+
 L'écoute par défaut sur `0.0.0.0:8789` est pratique sur un réseau local de confiance, mais HTTP ne protège ni les identifiants ni les données du projet en transit. Sur un réseau non fiable, liez le service à `127.0.0.1` ou placez-le derrière un proxy inverse HTTPS. Il n'existe aucun compte par défaut et le démarrage échoue tant que des identifiants valides ne sont pas configurés. Consultez le [guide de la WebUI](https://ktoolbox.readthedocs.io/latest/fr/webui/) pour le cycle de vie des tâches, la sécurité et le déploiement.
 
 ## Configuration

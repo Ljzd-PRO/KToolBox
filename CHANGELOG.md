@@ -18,6 +18,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Add typed transport, HTTP, authentication, not-found, conflict, and response-validation exceptions.
 - Retry only transport errors, `429`, and `5xx`; do not follow redirects or retry ordinary `4xx` and validation failures.
 - Preserve the original Pawchive Schema, apply auditable compatibility overrides, validate the normalized OpenAPI document, and verify deterministic model generation in CI.
+- Accept the observed string-or-list `tags` representation and the optional attachment `deferred` flag without weakening validation for core identity fields.
 
 ## Core and CLI
 
@@ -31,6 +32,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Resolve creator names through profile requests and use the Pawchive post-list and direct post response shapes.
 - Select a requested revision from the revision list instead of calling a nonexistent detail endpoint.
 - Retain resumable downloads, filters, progress reporting, metadata output, file-size limits, and optional hard-link bucket storage under the new models.
+- Preserve bounded structured creator and file failures across synchronization, download workers, CLI summaries, WebUI attempts, and task events.
 
 ## HeroUI WebUI
 
@@ -53,6 +55,8 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Enrich compact HeroUI choices with icons and restrained semantic tones, and refresh verified desktop/mobile screenshots after six-slice visual review.
 - Normalize WebUI error responses with a readable `message`, sanitize validation details, and parse legacy nested error shapes without dumping JSON into toasts.
 - Add browser-language detection, a persistent HeroUI language menu, locale-aware dates/numbers/sorting, translated validation and structured API errors, and seven-language configuration Schema metadata.
+- Explain failed tasks with localized stages, retryability, safe field paths, and recovery guidance instead of a failure count alone.
+- Increase mobile information density with a 64px workbar, 12px page spacing, a compact appearance Popover, and collapsible HeroUI MCP tool groups.
 
 ## Testing and quality
 
@@ -61,6 +65,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Enforce 100% line and branch coverage for the handwritten API layer and WebUI authentication/configuration/scheduler core, plus at least 85% for the full project.
 - Add Vitest/Testing Library and offline Playwright tests for routes, task lifecycle, desktop/mobile layouts, light/dark themes, and Axe accessibility checks.
 - Add browser geometry checks and verified screenshots for single-frame tables, continuous modal actions, centered list switches, responsive tabs, readable task targets, and selected-only checkbox indicators.
+- Add an eight-page mobile visual matrix with route-ready capture conditions and validated horizontal/vertical six-slice review evidence.
 - Add Ruff, Mypy, warnings-as-errors, Python and TypeScript OpenAPI generation checks, Node 24 lockfile builds, wheel/PyInstaller asset checks, `compileall`, package builds, and strict seven-language documentation builds.
 
 ## Fixes
@@ -68,6 +73,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Accept the timestamp shape returned by Pawchive while retaining validated datetime models.
 - Make local bucket capability checks use real temporary paths and clean up hard-link probes.
 - Strip query strings from bucket paths, deduplicate size filtering, and account for existing temporary bytes when validating resumed transfers.
+- Preserve the React MCP page on direct `GET /mcp` refreshes while routing protocol methods to the Streamable HTTP endpoint.
 
 ---
 
@@ -89,6 +95,7 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 新增传输、HTTP、认证、未找到、冲突和响应校验类型化异常。
 - 只重试传输错误、`429` 和 `5xx`；不跟随重定向，也不重试普通 `4xx` 与校验失败。
 - 保留 Pawchive 原始 Schema，以可审查覆盖修正规范，校验规范化 OpenAPI，并在 CI 中验证模型生成结果确定一致。
+- 兼容实际观察到的字符串或列表 `tags` 形态及可选附件 `deferred` 标记，同时保持核心身份字段严格校验。
 
 ## 核心与 CLI
 
@@ -102,6 +109,7 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 通过 Profile 获取作者名，使用 Pawchive 作品列表及直接作品响应结构。
 - 从修订列表选择指定版本，不再请求不存在的单修订详情端点。
 - 在新模型下保留断点续传、筛选、进度、元数据输出、文件大小限制和可选硬链接存储桶。
+- 在同步、下载工作器、CLI 汇总、WebUI 尝试和任务事件间保留有界的结构化作者与文件失败信息。
 
 ## HeroUI WebUI
 
@@ -119,6 +127,8 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 统一使用“作品”“平台”“忽略规则”等中文产品术语，并将同步全部作者选项明确为“同步所有已启用作者”。
 - 统一 WebUI 错误响应的可读 `message`，清理校验详情中的输入数据，并兼容解析旧版嵌套错误，避免 Toast 直接显示 JSON。
 - 新增浏览器语言识别、持久化 HeroUI 语言菜单、本地化日期/数字/排序、翻译后的校验与结构化 API 错误，以及七语言配置 Schema 元数据。
+- 使用本地化失败阶段、重试性、安全字段路径和恢复建议解释任务失败，不再只显示失败数量。
+- 通过 64px 顶栏、12px 页面间距、紧凑外观 Popover 及可折叠 HeroUI MCP 工具组提高移动端信息密度。
 
 ## 测试与质量
 
@@ -127,6 +137,7 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 手写 API 层及 WebUI 认证/配置/调度核心强制 100% 行与分支覆盖率，全项目覆盖率不低于 85%。
 - 加入 Vitest/Testing Library 和离线 Playwright 测试，覆盖路由、任务生命周期、桌面/移动布局、深浅主题与 Axe 无障碍检查。
 - 新增浏览器几何检查与实拍截图，覆盖单层表格、连续弹窗操作栏、列表开关居中、响应式标签页、可读任务目标及仅在选中时显示的复选框标记。
+- 新增八页面移动端视觉矩阵、路由就绪后截图条件，以及通过校验的横纵六切片审查证据。
 - 加入 Ruff、Mypy、警告即错误、Python 与 TypeScript OpenAPI 生成一致性检查、Node 24 锁文件构建、wheel/PyInstaller 资源检查、`compileall`、包构建和七语言文档严格构建。
 
 ## 修复
@@ -134,5 +145,6 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 接受 Pawchive 实际返回的时间戳格式，同时保留经过校验的日期时间模型。
 - 本地存储桶能力检测改用真实临时路径，并正确清理硬链接探针。
 - 存储桶路径移除查询字符串，文件大小筛选去重，并在续传大小校验中计入已有临时字节。
+- 浏览器直接 `GET /mcp` 刷新时继续返回 React MCP 页面，协议方法则正确转交 Streamable HTTP 端点。
 
 **Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.24.0...v1.0.0

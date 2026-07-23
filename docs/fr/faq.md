@@ -130,6 +130,10 @@ Les tâches en attente le restent. Le travail en cours est marqué `interrupted`
 
 Une suppression ordinaire ne retire que l'historique. La suppression des sorties exige un aperçu et une confirmation, puis vérifie les enregistrements de propriété et les métadonnées. Les fichiers préexistants, modifiés, partagés, non ordinaires et les liens symboliques sont ignorés.
 
+## Comment connaître la cause réelle d'un échec de synchronisation ?
+
+Ouvrez la tâche en échec et consultez **Pourquoi cette tâche a échoué**. KToolBox indique le créateur ou le fichier concerné, l'étape, l'utilité d'une nouvelle tentative et l'action recommandée. Une incompatibilité de réponse signifie généralement que Pawchive a modifié la forme d'un champ : mettez KToolBox à jour puis signalez l'opération sûre et le chemin de champ affichés. Les erreurs réseau, de délai ou de limitation peuvent réussir après une nouvelle tentative. Le rapport est expurgé et ne contient jamais le corps d'une réponse amont, un titre d'œuvre, un cookie ou une URL complète de téléchargement.
+
 ## uvloop ou winloop est-il nécessaire ?
 
 Non. Ce sont des optimisations facultatives de la boucle d'événements. Utilisez `ktoolbox[uvloop]` sous Linux/macOS ou `ktoolbox[winloop]` sous Windows. Sans eux, KToolBox continue avec la boucle asyncio standard de Python.
