@@ -55,6 +55,7 @@ import { useTranslation } from "react-i18next";
 
 import { api, ApiError, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
+import { useRealtime } from "../lib/realtime";
 import type { FilesystemBrowse, FilesystemEntry, PathSelector } from "../types";
 import { ConfirmModal, FormModal } from "./ui";
 
@@ -181,6 +182,7 @@ export function RemotePathPicker({
 }) {
   const { t } = useTranslation();
   const auth = useAuth(false);
+  const realtime = useRealtime(false);
   const state = useOverlayState({ isOpen: open, onOpenChange: (next) => !next && onCancel() });
   const [data, setData] = useState<FilesystemBrowse | null>(null);
   const dataRef = useRef<FilesystemBrowse | null>(null);
@@ -280,6 +282,11 @@ export function RemotePathPicker({
     }, 350);
     return () => window.clearTimeout(timer);
   }, [includeHidden, load, open, search]);
+
+  useEffect(() => {
+    if (!open || !dataRef.current || !realtime?.filesystemRevision) return;
+    void load({ path: dataRef.current.path, search, includeHidden });
+  }, [includeHidden, load, open, realtime?.filesystemRevision, search]);
 
   const selectedValue = useMemo(() => {
     if (!data) return null;

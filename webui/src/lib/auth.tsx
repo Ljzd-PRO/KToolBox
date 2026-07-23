@@ -8,6 +8,7 @@ type AuthContextValue = {
   loading: boolean;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  invalidateSession: () => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -54,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         setSession(null);
       },
+      invalidateSession: () => setSession(null),
     }),
     [loading, session],
   );

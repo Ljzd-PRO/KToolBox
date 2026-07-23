@@ -198,6 +198,8 @@ export type TaskEvent = {
   id: number;
   task_id: string | null;
   event_type: string;
+  resource?: string | null;
+  resource_id?: string | null;
   data: Record<string, unknown>;
   created_at: string;
 };

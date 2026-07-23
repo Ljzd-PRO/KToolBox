@@ -8,6 +8,7 @@ import { AppShell } from "./components/AppShell";
 import { AuthProvider, useAuth } from "./lib/auth";
 import { normalizeLanguage, reactAriaLocale } from "./lib/i18n";
 import { queryClient } from "./lib/query";
+import { RealtimeProvider } from "./lib/realtime";
 import { ThemeProvider } from "./lib/theme";
 import { DashboardPage } from "./pages/DashboardPage";
 import { BlockersPage } from "./pages/BlockersPage";
@@ -33,19 +34,21 @@ function AuthenticatedApplication() {
     return <LoginPage />;
   }
   return (
-    <Routes>
-      <Route element={<AppShell />}>
-        <Route index element={<DashboardPage />} />
-        <Route element={<TasksPage />} path="tasks/:taskId?" />
-        <Route element={<CreatorsPage />} path="creators" />
-        <Route element={<PostsPage />} path="posts" />
-        <Route element={<BlockersPage />} path="blockers" />
-        <Route element={<ConfigurationPage />} path="configuration" />
-        <Route element={<MCPPage />} path="mcp" />
-        <Route element={<SystemPage />} path="system" />
-        <Route element={<Navigate replace to="/" />} path="*" />
-      </Route>
-    </Routes>
+    <RealtimeProvider>
+      <Routes>
+        <Route element={<AppShell />}>
+          <Route index element={<DashboardPage />} />
+          <Route element={<TasksPage />} path="tasks/:taskId?" />
+          <Route element={<CreatorsPage />} path="creators" />
+          <Route element={<PostsPage />} path="posts" />
+          <Route element={<BlockersPage />} path="blockers" />
+          <Route element={<ConfigurationPage />} path="configuration" />
+          <Route element={<MCPPage />} path="mcp" />
+          <Route element={<SystemPage />} path="system" />
+          <Route element={<Navigate replace to="/" />} path="*" />
+        </Route>
+      </Routes>
+    </RealtimeProvider>
   );
 }
 

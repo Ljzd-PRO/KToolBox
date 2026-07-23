@@ -27,7 +27,7 @@ import {
   IconTrash as Trash2,
   IconX as X,
 } from "@tabler/icons-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
@@ -113,8 +113,6 @@ export function TasksPage() {
   const [removing, setRemoving] = useState<TaskRecord | null>(null);
   const [deleteOutput, setDeleteOutput] = useState(false);
   const statusFilter = taskStatusFilter(searchParams.get("status"));
-  useTaskStream(queryClient);
-
   useEffect(() => {
     if (searchParams.get("create") !== "sync") return;
     const next = new URLSearchParams(searchParams);
@@ -131,7 +129,6 @@ export function TasksPage() {
     queryKey: ["task-events", taskId],
     queryFn: () => api<TaskEvent[]>(`/tasks/${taskId}/events?limit=200`),
     enabled: Boolean(taskId),
-    refetchInterval: taskId ? 1500 : false,
   });
   const attemptsQuery = useQuery({
     queryKey: ["task-attempts", taskId],
@@ -810,25 +807,4 @@ function matchesTaskStatus(status: TaskStatus, filter: TaskStatusFilter): boolea
   if (filter === "active") return ["running", "pause_requested", "stop_requested"].includes(status);
   if (filter === "waiting") return ["queued", "blocked"].includes(status);
   return status === filter;
-}
-
-function useTaskStream(queryClient: ReturnType<typeof useQueryClient>) {
-  const refreshTimer = useRef<number | null>(null);
-  useEffect(() => {
-    if (typeof EventSource === "undefined") return undefined;
-    const source = new EventSource("/api/v1/events");
-    const refresh = () => {
-      if (refreshTimer.current !== null) return;
-      refreshTimer.current = window.setTimeout(() => {
-        refreshTimer.current = null;
-        void queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      }, 150);
-    };
-    const eventTypes = ["task.created", "task.status", "task.updated", "task.reordered", "task.progress", "task.log", "creator.started", "creator.finished", "job.queued", "download.started", "download.progress", "download.finished"];
-    for (const type of eventTypes) source.addEventListener(type, refresh);
-    return () => {
-      source.close();
-      if (refreshTimer.current !== null) window.clearTimeout(refreshTimer.current);
-    };
-  }, [queryClient]);
 }

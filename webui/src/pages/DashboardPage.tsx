@@ -30,7 +30,7 @@ export function DashboardPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const project = useQuery({ queryKey: ["project"], queryFn: () => api<ProjectSummary>("/project") });
-  const tasks = useQuery({ queryKey: ["tasks"], queryFn: () => api<TaskRecord[]>("/tasks"), refetchInterval: 2000 });
+  const tasks = useQuery({ queryKey: ["tasks"], queryFn: () => api<TaskRecord[]>("/tasks") });
   const creators = useQuery({ queryKey: ["creators"], queryFn: () => api<CreatorRosterItem[]>("/creators") });
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "created",
