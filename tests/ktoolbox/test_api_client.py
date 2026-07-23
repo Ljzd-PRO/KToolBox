@@ -35,7 +35,8 @@ POST_DATA = {
     "user": "creator",
     "service": "fanbox",
     "title": "Example",
-    "attachments": [],
+    "tags": "single-tag",
+    "attachments": [{"name": "file", "path": "/hash", "deferred": True}],
 }
 
 
@@ -110,6 +111,8 @@ async def test_all_fourteen_public_operations_and_request_contract() -> None:
 
     assert isinstance(creators[0], CreatorSummary)
     assert isinstance(recent[0], Post)
+    assert recent[0].tags == "single-tag"
+    assert recent[0].attachments and recent[0].attachments[0].deferred is True
     assert isinstance(profile, CreatorProfile)
     assert isinstance(creator_posts[0], Post)
     assert isinstance(announcements[0], Announcement)
@@ -260,12 +263,28 @@ async def test_invalid_json_and_model_are_validation_errors() -> None:
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http_client:
         client = PawchiveClient(base_url=BASE_URL, http_client=http_client, max_retries=0)
-        for _ in range(2):
-            with pytest.raises(PawchiveResponseValidationError) as caught:
-                await client.get_post("fanbox", "creator", "post")
-            assert caught.value.operation == "get_post"
-            assert caught.value.response.status_code == 200
-            assert isinstance(caught.value.cause, ValueError)
+        with pytest.raises(PawchiveResponseValidationError) as invalid_json:
+            await client.get_post("fanbox", "creator", "post")
+        with pytest.raises(PawchiveResponseValidationError) as invalid_model:
+            await client.get_post("fanbox", "creator", "post")
+
+    assert invalid_json.value.operation == "get_post"
+    assert invalid_json.value.response.status_code == 200
+    assert invalid_json.value.issues[0].path == "$"
+    assert invalid_json.value.issues[0].error_type == "invalid_json"
+    assert invalid_model.value.issues[0].path == "$.id"
+    assert invalid_model.value.issues[0].error_type == "missing"
+    assert "{}" not in str(invalid_model.value)
+
+
+def test_observed_post_metadata_variants_are_explicit_model_fields() -> None:
+    string_tags = Post.model_validate(POST_DATA)
+    list_tags = Post.model_validate(POST_DATA | {"tags": ["one", {"name": "two"}]})
+
+    assert string_tags.tags == "single-tag"
+    assert list_tags.tags == ["one", {"name": "two"}]
+    assert string_tags.attachments and string_tags.attachments[0].deferred is True
+    assert string_tags.attachments[0].model_extra == {}
 
 
 @pytest.mark.asyncio

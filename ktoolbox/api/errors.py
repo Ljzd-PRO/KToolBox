@@ -1,6 +1,45 @@
 from __future__ import annotations
 
+import re
+from dataclasses import dataclass
+from typing import Any
+
 import httpx
+from pydantic import ValidationError
+
+_SAFE_FIELD_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,63}$")
+
+
+@dataclass(frozen=True, slots=True)
+class ResponseValidationIssue:
+    """A response validation issue that contains no upstream values."""
+
+    path: str
+    error_type: str
+
+
+def _safe_validation_path(location: tuple[Any, ...]) -> str:
+    path = "$"
+    for segment in location:
+        if isinstance(segment, int):
+            path += f"[{segment}]"
+        elif isinstance(segment, str) and _SAFE_FIELD_NAME.fullmatch(segment):
+            path += f".{segment}"
+        else:
+            path += ".field"
+    return path
+
+
+def _validation_issues(cause: Exception) -> tuple[ResponseValidationIssue, ...]:
+    if not isinstance(cause, ValidationError):
+        return (ResponseValidationIssue(path="$", error_type="invalid_json"),)
+    return tuple(
+        ResponseValidationIssue(
+            path=_safe_validation_path(tuple(error.get("loc", ()))),
+            error_type=str(error.get("type", "validation_error")),
+        )
+        for error in cause.errors(include_url=False, include_context=False, include_input=False)
+    )
 
 
 class PawchiveError(Exception):
@@ -49,4 +88,7 @@ class PawchiveResponseValidationError(PawchiveError):
         self.operation = operation
         self.response = response
         self.cause = cause
-        super().__init__(f"Pawchive returned an invalid response for {operation}")
+        self.issues = _validation_issues(cause)
+        detail = ", ".join(f"{issue.path}: {issue.error_type}" for issue in self.issues[:3])
+        suffix = f" ({detail})" if detail else ""
+        super().__init__(f"Pawchive returned an invalid response for {operation}{suffix}")

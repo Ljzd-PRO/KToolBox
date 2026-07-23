@@ -9,6 +9,7 @@ from .errors import (
     PawchiveNotFoundError,
     PawchiveResponseValidationError,
     PawchiveTransportError,
+    ResponseValidationIssue,
 )
 from .generated import (
     Announcement,
@@ -40,5 +41,6 @@ __all__ = [
     "PawchiveTransportError",
     "Post",
     "ResponseDrift",
+    "ResponseValidationIssue",
     "Revision",
 ]

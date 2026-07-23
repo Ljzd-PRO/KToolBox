@@ -22,6 +22,7 @@ class FileReference(BaseModel):
     )
     name: str | None = None
     path: str | None = None
+    deferred: bool | None = None
 
 
 class CreatorSummary(BaseModel):
@@ -75,7 +76,7 @@ class Post(BaseModel):
     attachments: list[FileReference] | None = None
     poll: dict[str, Any] | None = None
     captions: list[Any] | None = None
-    tags: list[Any] | None = None
+    tags: str | list[Any] | None = None
     origin: str | None = None
     preview_state: str | None = None
     has_full: bool | None = None

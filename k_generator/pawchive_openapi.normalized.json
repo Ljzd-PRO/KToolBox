@@ -1083,6 +1083,10 @@
           "path": {
             "type": "string",
             "nullable": true
+          },
+          "deferred": {
+            "type": "boolean",
+            "nullable": true
           }
         }
       },
@@ -1273,9 +1277,16 @@
             "items": {}
           },
           "tags": {
-            "type": "array",
-            "nullable": true,
-            "items": {}
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {}
+              }
+            ],
+            "nullable": true
           },
           "origin": {
             "type": "string",
@@ -1685,6 +1696,7 @@
     "The top-level contact object belongs under info.contact.",
     "Post detail returns a Post directly rather than a post/props wrapper.",
     "Post, creator profile, and comment responses contain named fields absent from the raw schema.",
+    "Post tags may be returned as either a string or an array, and file references may include a deferred flag.",
     "The app_version response is arbitrary text and is not guaranteed to be a 40-character hash.",
     "Unknown response fields are retained by generated models for drift reporting."
   ]
