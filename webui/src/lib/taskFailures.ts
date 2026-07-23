@@ -74,6 +74,20 @@ export function taskFailureItems(report: TaskFailureReport | null | undefined): 
   return report?.items ?? [];
 }
 
+export function failureSummary(
+  t: TFunction,
+  report: TaskFailureReport | null | undefined,
+  fallback?: string | null,
+): string {
+  if (report) {
+    return t("tasks.failures.summary", {
+      creatorCount: report.creator_failures,
+      fileCount: report.file_failures,
+    });
+  }
+  return fallback?.trim() || t("tasks.failures.codes.unknown");
+}
+
 export function primaryFailure(
   report: TaskFailureReport | null | undefined,
 ): FailureItem | null {
@@ -85,6 +99,14 @@ export function eventLabel(t: TFunction, eventType: string): string {
 }
 
 export function eventMessage(t: TFunction, event: TaskEvent): string {
+  const report = parseFailureReport(event.data.failure_report);
+  if (report) {
+    return failureSummary(
+      t,
+      report,
+      typeof event.data.message === "string" ? event.data.message : null,
+    );
+  }
   const failure = parseFailureItem(event.data.failure);
   const subject = failure ? failureSubject(failure) : null;
   if (failure) {
@@ -102,6 +124,28 @@ export function eventMessage(t: TFunction, event: TaskEvent): string {
     });
   }
   return "";
+}
+
+export function parseFailureReport(value: unknown): TaskFailureReport | null {
+  if (!isRecord(value)) return null;
+  if (
+    typeof value.summary !== "string"
+    || !isNonNegativeInteger(value.creator_failures)
+    || !isNonNegativeInteger(value.file_failures)
+    || !Array.isArray(value.items)
+  ) {
+    return null;
+  }
+  const items = value.items
+    .slice(0, 100)
+    .map(parseFailureItem)
+    .filter((item): item is FailureItem => item !== null);
+  return {
+    summary: value.summary,
+    creator_failures: value.creator_failures,
+    file_failures: value.file_failures,
+    items,
+  };
 }
 
 export function parseFailureItem(value: unknown): FailureItem | null {
@@ -131,4 +175,8 @@ function optionalString(value: unknown): string | null {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isNonNegativeInteger(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0;
 }

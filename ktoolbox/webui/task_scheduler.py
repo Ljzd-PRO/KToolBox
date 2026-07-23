@@ -238,14 +238,14 @@ class TaskScheduler:
             final_status = TaskStatus.failed
             failure = error.report
             error_text = failure.summary
-            reporter.log("error", error_text)
+            reporter.log("error", error_text, failure)
         except Exception as error:
             final_status = TaskStatus.failed
             failure = failure_report(
                 [classify_failure(error, stage=FailureStage.job_generation)],
             )
             error_text = failure.summary
-            reporter.log("error", error_text)
+            reporter.log("error", error_text, failure)
         finally:
             await reporter.close()
             await self.store.finish_attempt(attempt_id, final_status, error_text, failure)

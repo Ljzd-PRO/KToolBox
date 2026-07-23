@@ -99,6 +99,22 @@ export const en = {
       "rose": "Use rose accent",
       "amber": "Use amber accent"
     },
+    "themeSettings": "Change appearance",
+    "themeCurrent": "{{color}} · {{mode}}",
+    "themeColorsLabel": "Accent color",
+    "themeModeLabel": "Color scheme",
+    "themeColorNames": {
+      "blue": "Blue",
+      "emerald": "Emerald",
+      "violet": "Violet",
+      "rose": "Rose",
+      "amber": "Amber"
+    },
+    "themeModeNames": {
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
+    },
     "language": "Switch language",
     "logout": "Sign out",
     "primaryNavigation": "Primary navigation",
@@ -335,6 +351,7 @@ export const en = {
     "noLogs": "No task events yet",
     "failures": {
       "title": "Why this task failed",
+      "summary": "Creator failures: {{creatorCount}}; file failures: {{fileCount}}.",
       "creatorCount": "{{count}} creator failures",
       "fileCount": "{{count}} file failures",
       "creatorGroup": "Creators",

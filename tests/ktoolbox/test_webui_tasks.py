@@ -601,6 +601,9 @@ async def test_scheduler_records_snapshot_and_executor_failures(tmp_path: Path) 
     assert failed.failure.items[0].stage is FailureStage.job_generation
     attempts = await store.attempts(task.id)
     assert attempts[0].failure == failed.failure
+    events = await store.events(task_id=task.id)
+    error_event = next(event for event in events if event.event_type == "task.log")
+    assert error_event.data["failure_report"] == failed.failure.model_dump(mode="json")
 
     broken_root = tmp_path / "broken"
     broken_root.mkdir()

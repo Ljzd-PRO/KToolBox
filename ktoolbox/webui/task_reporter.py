@@ -5,7 +5,7 @@ from collections import deque
 from pathlib import Path
 from time import monotonic
 
-from ktoolbox.failures import FailureItem
+from ktoolbox.failures import FailureItem, TaskFailureReport
 from ktoolbox.reporting import NullProgressReporter
 from ktoolbox.webui.task_models import ActiveDownload, TaskProgress
 from ktoolbox.webui.task_store import TaskStore
@@ -142,12 +142,25 @@ class WebTaskReporter(NullProgressReporter):
     def artifact_created(self, path: Path) -> None:
         self._track(self.store.add_artifact(self.task_id, path))
 
-    def log(self, level: str, message: str) -> None:
+    def log(
+        self,
+        level: str,
+        message: str,
+        failure_report: TaskFailureReport | None = None,
+    ) -> None:
         self._track(
             self.store.add_event(
                 self.task_id,
                 "task.log",
-                {"level": level, "message": message},
+                {
+                    "level": level,
+                    "message": message,
+                    "failure_report": (
+                        failure_report.model_dump(mode="json")
+                        if failure_report is not None
+                        else None
+                    ),
+                },
             )
         )
 

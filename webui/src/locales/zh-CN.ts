@@ -102,6 +102,22 @@ export const zhCN = {
       "rose": "切换为玫红主题",
       "amber": "切换为琥珀主题"
     },
+    "themeSettings": "调整外观",
+    "themeCurrent": "{{color}} · {{mode}}",
+    "themeColorsLabel": "主题色",
+    "themeModeLabel": "明暗模式",
+    "themeColorNames": {
+      "blue": "蓝色",
+      "emerald": "绿色",
+      "violet": "紫色",
+      "rose": "玫红",
+      "amber": "琥珀"
+    },
+    "themeModeNames": {
+      "system": "跟随系统",
+      "light": "浅色",
+      "dark": "深色"
+    },
     "language": "切换语言",
     "logout": "退出登录",
     "primaryNavigation": "主导航",
@@ -338,6 +354,7 @@ export const zhCN = {
     "noLogs": "尚无任务事件",
     "failures": {
       "title": "任务失败原因",
+      "summary": "作者失败 {{creatorCount}} 个，文件失败 {{fileCount}} 个。",
       "creatorCount": "{{count}} 个作者失败",
       "fileCount": "{{count}} 个文件失败",
       "creatorGroup": "作者",

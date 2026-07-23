@@ -48,10 +48,19 @@ const navigation: NavigationItem[] = [
 
 const themeColors: ThemeColor[] = ["blue", "emerald", "violet", "rose", "amber"];
 
-function Navigation({ onSelect }: { onSelect?: () => void }) {
+function Navigation({
+  compact = false,
+  onSelect,
+}: {
+  compact?: boolean;
+  onSelect?: () => void;
+}) {
   const { t } = useTranslation();
   return (
-    <nav aria-label={t("shell.primaryNavigation")} className="grid gap-1">
+    <nav
+      aria-label={t("shell.primaryNavigation")}
+      className={`grid ${compact ? "gap-0.5" : "gap-1"}`}
+    >
       {navigation.map(({ key, path, icon: Icon }) => (
         <NavLink
           className={({ isActive }) =>
@@ -70,12 +79,15 @@ function Navigation({ onSelect }: { onSelect?: () => void }) {
   );
 }
 
-function Brand({ version }: { version?: string }) {
+function Brand({ version, compact = false }: { version?: string; compact?: boolean }) {
   const { t } = useTranslation();
   return (
     <div className="flex min-w-0 items-center gap-3">
-      <span className="brand-mark grid size-16 shrink-0 place-items-center rounded-lg" aria-hidden="true">
-        <IconTool size={30} stroke={1.8} />
+      <span
+        className={`brand-mark grid shrink-0 place-items-center rounded-lg ${compact ? "size-12" : "size-16"}`}
+        aria-hidden="true"
+      >
+        <IconTool size={compact ? 24 : 30} stroke={1.8} />
       </span>
       <div className="grid min-w-0 gap-0.5">
         <div className="truncate text-lg font-bold leading-tight text-foreground">{t("brand")}</div>
@@ -90,7 +102,7 @@ function Brand({ version }: { version?: string }) {
   );
 }
 
-function ThemeControls({ compact = false }: { compact?: boolean }) {
+function ThemeControls() {
   const { t } = useTranslation();
   const theme = useTheme();
   const modes = [
@@ -101,7 +113,7 @@ function ThemeControls({ compact = false }: { compact?: boolean }) {
   return (
     <Surface
       aria-label={t("shell.theme")}
-      className={`theme-control min-h-11 rounded-lg ${compact ? "grid w-full justify-items-center gap-1 p-2" : "flex items-center gap-1 p-1"}`}
+      className="theme-control flex min-h-11 items-center gap-1 rounded-lg p-1"
       role="group"
     >
       <div className="flex items-center gap-1">
@@ -131,7 +143,7 @@ function ThemeControls({ compact = false }: { compact?: boolean }) {
           );
         })}
       </div>
-      <span aria-hidden="true" className={compact ? "h-px w-full bg-border" : "mx-1 h-6 w-px bg-border"} />
+      <span aria-hidden="true" className="mx-1 h-6 w-px bg-border" />
       <div className="flex items-center gap-1">
         {modes.map(({ value, icon: Icon, label }) => (
           <Tooltip key={value}>
@@ -151,6 +163,84 @@ function ThemeControls({ compact = false }: { compact?: boolean }) {
         ))}
       </div>
     </Surface>
+  );
+}
+
+function CompactAppearanceControl() {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const modes = [
+    { value: "system" as const, icon: IconDeviceDesktop },
+    { value: "light" as const, icon: IconSun },
+    { value: "dark" as const, icon: IconMoon },
+  ];
+  const summary = t("shell.themeCurrent", {
+    color: t(`shell.themeColorNames.${theme.color}`),
+    mode: t(`shell.themeModeNames.${theme.mode}`),
+  });
+  return (
+    <div className="flex min-h-11 items-center justify-between gap-3">
+      <div className="min-w-0">
+        <p className="text-sm font-semibold text-foreground">{t("shell.theme")}</p>
+        <p className="truncate text-xs text-muted">{summary}</p>
+      </div>
+      <Popover>
+        <Button
+          isIconOnly
+          aria-label={t("shell.themeSettings")}
+          className="size-11 min-w-11 shrink-0"
+          variant="outline"
+        >
+          <IconPalette aria-hidden="true" size={19} stroke={1.8} />
+        </Button>
+        <Popover.Content
+          className="w-64 max-w-[calc(100vw-1.5rem)] rounded-lg border border-border"
+          offset={10}
+          placement="top end"
+        >
+          <Popover.Arrow />
+          <Popover.Dialog className="grid gap-3 p-3">
+            <Popover.Heading className="font-semibold text-foreground">
+              {t("shell.theme")}
+            </Popover.Heading>
+            <div aria-label={t("shell.themeColorsLabel")} className="grid grid-cols-5 gap-0.5" role="group">
+              {themeColors.map((color) => (
+                <Button
+                  isIconOnly
+                  aria-label={t(`shell.themeColors.${color}`)}
+                  aria-pressed={theme.color === color}
+                  className="size-11 min-w-11 rounded-lg"
+                  key={color}
+                  variant="ghost"
+                  onPress={() => theme.setColor(color)}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="theme-swatch size-4 rounded-full"
+                    data-color={color}
+                    data-selected={theme.color === color}
+                  />
+                </Button>
+              ))}
+            </div>
+            <div aria-label={t("shell.themeModeLabel")} className="grid grid-cols-3 gap-1" role="group">
+              {modes.map(({ value, icon: Icon }) => (
+                <Button
+                  aria-pressed={theme.mode === value}
+                  className="min-w-0 px-2 text-xs"
+                  key={value}
+                  variant={theme.mode === value ? "secondary" : "ghost"}
+                  onPress={() => theme.setMode(value)}
+                >
+                  <Icon aria-hidden="true" className="shrink-0" size={16} stroke={1.8} />
+                  <span className="truncate">{t(`shell.themeModeNames.${value}`)}</span>
+                </Button>
+              ))}
+            </div>
+          </Popover.Dialog>
+        </Popover.Content>
+      </Popover>
+    </div>
   );
 }
 
@@ -246,10 +336,10 @@ export function AppShell() {
 
       <div className="min-w-0">
         <header className="shell-workbar sticky top-0 z-30 border-b border-border">
-          <div className="mx-auto flex min-h-20 w-full max-w-7xl items-center gap-3 px-4 pl-20 sm:px-6 sm:pl-20 md:px-8 md:pl-8">
+          <div className="app-workbar-inner mx-auto flex min-h-20 w-full max-w-7xl items-center gap-3 px-4 pl-20 sm:px-6 sm:pl-20 md:px-8 md:pl-8">
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-semibold text-[var(--accent-strong)]">{t("brand")}</p>
-              <h1 className="mt-1 flex min-w-0 items-center gap-2 text-xl font-bold leading-tight text-foreground sm:text-2xl max-[420px]:gap-0">
+              <h1 className="mt-1 flex min-w-0 items-center gap-2 text-lg font-bold leading-tight text-foreground sm:text-2xl max-[420px]:gap-0">
                 <span className="page-title-icon grid size-9 shrink-0 place-items-center rounded-lg max-[420px]:hidden">
                   <ActiveIcon aria-hidden="true" size={21} stroke={1.8} />
                 </span>
@@ -274,7 +364,7 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="mx-auto grid min-w-0 w-full max-w-7xl gap-5 p-4 sm:p-6 md:p-8">
+        <main className="app-main mx-auto grid min-w-0 w-full max-w-7xl gap-5 p-3 sm:p-6 md:p-8">
           <Outlet />
         </main>
       </div>
@@ -282,14 +372,14 @@ export function AppShell() {
       <Drawer state={drawer}>
         <Drawer.Trigger
           aria-label={t("shell.menu")}
-          className="mobile-menu-button fixed left-4 top-[calc(env(safe-area-inset-top)+1rem)] z-40 grid size-12 min-w-12 place-items-center rounded-full p-0 leading-none md:hidden"
+          className="mobile-menu-button fixed left-3 top-[calc(env(safe-area-inset-top)+0.625rem)] z-40 grid size-11 min-w-11 place-items-center rounded-full p-0 leading-none md:hidden"
         >
           <IconMenu2 aria-hidden="true" size={22} stroke={1.9} />
         </Drawer.Trigger>
         <Drawer.Backdrop variant="blur">
           <Drawer.Content placement="left">
             <Drawer.Dialog className="w-[82vw] max-w-80 p-0">
-              <Drawer.Header className="border-b border-border px-4 py-4">
+              <Drawer.Header className="border-b border-border px-3 py-3">
                 <div className="flex items-center justify-between gap-3">
                   <Drawer.Heading className="text-base font-semibold text-foreground">{t("shell.navigation")}</Drawer.Heading>
                   <Drawer.CloseTrigger
@@ -300,12 +390,12 @@ export function AppShell() {
                   </Drawer.CloseTrigger>
                 </div>
               </Drawer.Header>
-              <Drawer.Body className="grid min-h-0 content-start gap-5 p-4">
-                <Brand />
-                <Navigation onSelect={drawer.close} />
+              <Drawer.Body className="grid min-h-0 content-start gap-2 p-3">
+                <Brand compact />
+                <Navigation compact onSelect={drawer.close} />
               </Drawer.Body>
-              <div className="grid gap-3 border-t border-border p-4">
-                <ThemeControls compact />
+              <div className="grid gap-3 border-t border-border p-3">
+                <CompactAppearanceControl />
                 <LanguageSelector compact={false} />
                 <div className="flex min-w-0 items-center gap-2 px-2 text-xs font-medium text-muted">
                   <IconShieldLock aria-hidden="true" className="shrink-0 text-[var(--ktoolbox-teal)]" size={16} stroke={1.8} />

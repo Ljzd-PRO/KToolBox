@@ -205,12 +205,16 @@ async def test_mcp_metadata_and_openapi_download_are_authenticated(tmp_path: Pat
             status_response = await client.get("/api/v1/mcp/status")
             tools_response = await client.get("/api/v1/mcp/tools")
             schema_response = await client.get("/api/v1/openapi.yaml")
+            page_response = await client.get("/mcp", headers={"Accept": "text/html"})
             assert status_response.status_code == 200
             assert status_response.json()["endpoint_path"] == "/mcp"
             assert status_response.json()["tool_count"] == len(tools_response.json())
             assert schema_response.status_code == 200
             assert schema_response.headers["content-type"].startswith("application/yaml")
             assert "x-ktoolbox-mcp:" in schema_response.text
+            assert page_response.status_code == 200
+            assert page_response.headers["content-type"].startswith("text/html")
+            assert '<div id="root"></div>' in page_response.text
 
             created = await _create_token(client, csrf, permission="manage")
             async with _mcp_session(app, str(created["token"])) as session:

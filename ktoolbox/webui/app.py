@@ -112,9 +112,16 @@ def create_app(
     if assets_root.is_dir():
         app.mount("/assets", StaticFiles(directory=assets_root), name="webui-assets")
 
+    @app.get("/mcp", include_in_schema=False)
+    async def mcp_frontend() -> FileResponse:
+        index = static_root / "index.html"
+        if not index.is_file():
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not found")
+        return FileResponse(index, headers={"Cache-Control": "no-cache"})
+
     @app.middleware("http")
     async def security_headers(request: Request, call_next: RequestResponseEndpoint) -> Response:
-        if request.scope["path"] == "/mcp":
+        if request.scope["path"] == "/mcp" and request.method != "GET":
             request.scope["path"] = "/mcp/"
         response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"

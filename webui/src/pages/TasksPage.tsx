@@ -55,6 +55,7 @@ import {
   eventMessage,
   failureAdvice,
   failureMessage,
+  failureSummary,
   failureStageLabel,
   failureSubject,
   taskFailureItems,
@@ -659,7 +660,7 @@ function TaskFailurePanel({
             {t("tasks.failures.title")}
           </h2>
           <p className="mt-1 text-sm leading-6 text-muted">
-            {report?.summary || fallback}
+            {failureSummary(t, report, fallback)}
           </p>
           {report ? (
             <div className="mt-3 flex flex-wrap gap-2">

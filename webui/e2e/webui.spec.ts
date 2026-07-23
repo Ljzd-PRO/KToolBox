@@ -77,6 +77,25 @@ test("authenticated shell is accessible in desktop and mobile themes", async ({ 
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Open navigation" }).click();
   await expect(page.getByRole("link", { name: "Tasks", exact: true })).toBeVisible();
+  const menuButton = page.getByRole("button", { name: "Open navigation" });
+  const menuSize = await menuButton.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { width: style.width, height: style.height };
+  });
+  const workbarBox = await page.locator(".app-workbar-inner").boundingBox();
+  expect(menuSize).toEqual({ width: "44px", height: "44px" });
+  expect(workbarBox?.height).toBe(64);
+  expect(await page.locator(".app-main").evaluate((element) => getComputedStyle(element).paddingLeft)).toBe("12px");
+
+  await page.getByRole("button", { name: "Change appearance" }).click();
+  const appearance = page.getByRole("dialog").filter({ has: page.getByRole("heading", { name: "Theme" }) });
+  await expect(appearance.getByRole("group", { name: "Accent color" })).toBeVisible();
+  await expect(appearance.getByRole("group", { name: "Color scheme" })).toBeVisible();
+  await appearance.getByRole("button", { name: "Use rose accent" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme-color", "rose");
+  await appearance.getByRole("button", { name: "System" }).click();
+  await expect.poll(() => page.evaluate(() => localStorage.getItem("ktoolbox-theme"))).toBe("system");
+  await page.keyboard.press("Escape");
   await page.waitForTimeout(600);
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
   const mobileScan = await new AxeBuilder({ page }).analyze();
@@ -170,6 +189,8 @@ test("backend error objects render as readable toast messages", async ({ page })
 test("MCP connection page issues one-time tokens and exposes safe client configurations", async ({ page }) => {
   await signIn(page);
   await page.getByRole("link", { name: "MCP", exact: true }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "MCP", exact: true })).toBeVisible();
+  await page.reload();
   await expect(page.getByRole("heading", { level: 1, name: "MCP", exact: true })).toBeVisible();
   await expect(page.getByText("Streamable HTTP", { exact: true })).toBeVisible();
   await expect(page.getByText("http://127.0.0.1:8792/mcp", { exact: true })).toBeVisible();
@@ -759,6 +780,8 @@ test("failed tasks explain the stage, reason, and recovery action", async ({ pag
   await expect(page.getByText("Failed", { exact: true })).toBeVisible({ timeout: 10_000 });
   const panel = page.getByRole("heading", { name: "Why this task failed" })
     .locator('xpath=ancestor::*[@aria-labelledby="task-failure-title"]');
+  await expect(panel).toContainText("Creator failures: 1; file failures: 0.");
+  await expect(panel).not.toContainText("Synchronization finished");
   await expect(panel).toContainText("Pawchive returned data in an unsupported format.");
   await expect(page.getByText("items.8.tags", { exact: false })).toBeVisible();
   await expect(page.getByText(/Update KToolBox/)).toBeVisible();

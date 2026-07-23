@@ -60,6 +60,9 @@
   --semantic-success: #047857;
   --semantic-warning: #b45309;
   --semantic-danger: #dc2626;
+  --mobile-page-space: 0.75rem;
+  --mobile-section-space: 1rem;
+  --mobile-surface-space: 0.75rem;
   --danger: #b91c1c;
   --danger-hover: #991b1b;
   --danger-foreground: #ffffff;
@@ -765,6 +768,36 @@ code {
 }
 
 @media (max-width: 767px) {
+  .app-workbar-inner {
+    min-height: 4rem;
+    padding-inline: var(--mobile-page-space);
+    padding-left: 4rem;
+  }
+
+  .app-main {
+    gap: var(--mobile-section-space);
+    padding: var(--mobile-page-space);
+  }
+
+  .app-main > .grid,
+  .app-main > .grid > .grid {
+    gap: var(--mobile-section-space);
+  }
+
+  .app-main [data-slot="surface"].p-4,
+  .app-main [data-slot="surface"].p-5 {
+    padding: var(--mobile-surface-space);
+  }
+
+  .app-main [data-slot="empty-state"] {
+    min-height: 10rem;
+    padding: 1rem;
+  }
+
+  .task-table-row {
+    min-height: 5rem;
+  }
+
   .pawchive-identity-fields {
     display: grid;
     grid-template-columns: max-content minmax(0, 1fr);
