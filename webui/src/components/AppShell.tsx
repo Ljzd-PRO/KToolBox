@@ -170,9 +170,9 @@ function CompactAppearanceControl() {
   const { t } = useTranslation();
   const theme = useTheme();
   const modes = [
-    { value: "system" as const, icon: IconDeviceDesktop },
-    { value: "light" as const, icon: IconSun },
-    { value: "dark" as const, icon: IconMoon },
+    { value: "system" as const, icon: IconDeviceDesktop, label: t("shell.themeSystem") },
+    { value: "light" as const, icon: IconSun, label: t("shell.themeLight") },
+    { value: "dark" as const, icon: IconMoon, label: t("shell.themeDark") },
   ];
   const summary = t("shell.themeCurrent", {
     color: t(`shell.themeColorNames.${theme.color}`),
@@ -194,16 +194,20 @@ function CompactAppearanceControl() {
           <IconPalette aria-hidden="true" size={19} stroke={1.8} />
         </Button>
         <Popover.Content
-          className="w-64 max-w-[calc(100vw-1.5rem)] rounded-lg border border-border"
+          className="compact-theme-popover w-60 max-w-[calc(100vw-1.5rem)] rounded-lg border border-border"
           offset={10}
           placement="top end"
         >
           <Popover.Arrow />
-          <Popover.Dialog className="grid gap-3 p-3">
+          <Popover.Dialog className="grid gap-2 p-2.5">
             <Popover.Heading className="font-semibold text-foreground">
               {t("shell.theme")}
             </Popover.Heading>
-            <div aria-label={t("shell.themeColorsLabel")} className="grid grid-cols-5 gap-0.5" role="group">
+            <div
+              aria-label={t("shell.themeColorsLabel")}
+              className="compact-theme-color-grid grid grid-cols-5 gap-0"
+              role="group"
+            >
               {themeColors.map((color) => (
                 <Button
                   isIconOnly
@@ -223,18 +227,25 @@ function CompactAppearanceControl() {
                 </Button>
               ))}
             </div>
-            <div aria-label={t("shell.themeModeLabel")} className="grid grid-cols-3 gap-1" role="group">
-              {modes.map(({ value, icon: Icon }) => (
-                <Button
-                  aria-pressed={theme.mode === value}
-                  className="min-w-0 px-2 text-xs"
-                  key={value}
-                  variant={theme.mode === value ? "secondary" : "ghost"}
-                  onPress={() => theme.setMode(value)}
-                >
-                  <Icon aria-hidden="true" className="shrink-0" size={16} stroke={1.8} />
-                  <span className="truncate">{t(`shell.themeModeNames.${value}`)}</span>
-                </Button>
+            <div
+              aria-label={t("shell.themeModeLabel")}
+              className="compact-theme-mode-grid grid grid-cols-3 justify-items-center gap-1"
+              role="group"
+            >
+              {modes.map(({ value, icon: Icon, label }) => (
+                <Tooltip key={value}>
+                  <Button
+                    isIconOnly
+                    aria-label={label}
+                    aria-pressed={theme.mode === value}
+                    className="size-11 min-w-11 rounded-lg"
+                    variant={theme.mode === value ? "secondary" : "ghost"}
+                    onPress={() => theme.setMode(value)}
+                  >
+                    <Icon aria-hidden="true" size={18} stroke={1.8} />
+                  </Button>
+                  <Tooltip.Content>{label}</Tooltip.Content>
+                </Tooltip>
               ))}
             </div>
           </Popover.Dialog>

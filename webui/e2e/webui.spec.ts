@@ -91,9 +91,17 @@ test("authenticated shell is accessible in desktop and mobile themes", async ({ 
   const appearance = page.getByRole("dialog").filter({ has: page.getByRole("heading", { name: "Theme" }) });
   await expect(appearance.getByRole("group", { name: "Accent color" })).toBeVisible();
   await expect(appearance.getByRole("group", { name: "Color scheme" })).toBeVisible();
+  await expect(page.locator(".compact-theme-popover")).toHaveCSS("width", "240px");
+  for (const label of ["Follow system theme", "Use light theme", "Use dark theme"]) {
+    const modeButton = appearance.getByRole("button", { name: label, exact: true });
+    await expect(modeButton).toBeVisible();
+    await expect(modeButton).toHaveText("");
+    await expect(modeButton).toHaveCSS("width", "44px");
+    await expect(modeButton).toHaveCSS("height", "44px");
+  }
   await appearance.getByRole("button", { name: "Use rose accent" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme-color", "rose");
-  await appearance.getByRole("button", { name: "System" }).click();
+  await appearance.getByRole("button", { name: "Follow system theme", exact: true }).click();
   await expect.poll(() => page.evaluate(() => localStorage.getItem("ktoolbox-theme"))).toBe("system");
   await page.keyboard.press("Escape");
   await page.waitForTimeout(600);
