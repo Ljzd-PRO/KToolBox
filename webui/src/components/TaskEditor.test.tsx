@@ -71,6 +71,8 @@ describe("TaskEditor", () => {
     renderEditor({ onSave });
 
     await user.click(screen.getByRole("tab", { name: "Download post" }));
+    await user.click(screen.getByRole("button", { name: /Parse post URL/ }));
+    await user.click(await screen.findByRole("option", { name: "Enter platform and IDs" }));
     expect(screen.getByText(/Download one specified post/)).toBeInTheDocument();
     expect(screen.getByText("/platform/user/creator ID/post/post ID", { selector: "code" })).toBeInTheDocument();
     expect(
@@ -96,6 +98,65 @@ describe("TaskEditor", () => {
       output: "downloads",
       dump_post_data: true,
     });
+  });
+
+  it("defaults new downloads to URL parsing while preserving manual fields for existing tasks", async () => {
+    const user = userEvent.setup();
+    const { unmount } = render(
+      <TaskEditor
+        creators={[]}
+        saving={false}
+        onClose={() => undefined}
+        onSave={noopSave}
+      />,
+    );
+
+    await user.click(screen.getByRole("tab", { name: "Download post" }));
+    expect(screen.getByRole("button", { name: /Parse post URL/ })).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Pawchive post URL" })).toBeInTheDocument();
+    expect(screen.queryByRole("combobox", { name: "Platform" })).not.toBeInTheDocument();
+    unmount();
+
+    const manualTask: TaskRecord = {
+      id: "task-download",
+      kind: "download",
+      status: "queued",
+      spec: {
+        kind: "download",
+        post: null,
+        service: "fanbox",
+        creator_id: "42",
+        post_id: "99",
+        revision_id: null,
+        output: "downloads",
+        dump_post_data: true,
+      },
+      presentation: null,
+      position: 1,
+      revision: 0,
+      progress: {
+        queued_files: 0,
+        processed_files: 0,
+        completed_files: 0,
+        existing_files: 0,
+        failed_files: 0,
+        transferred_bytes: 0,
+        total_bytes: null,
+        speed_bps: 0,
+        eta_seconds: null,
+        active_creators: [],
+        active_downloads: {},
+      },
+      error: null,
+      blocked_by: null,
+      created_at: "2026-07-23T00:00:00Z",
+      updated_at: "2026-07-23T00:00:00Z",
+    };
+    renderEditor({ task: manualTask });
+
+    expect(screen.getByRole("button", { name: /Enter platform and IDs/ })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Platform" })).toHaveValue("fanbox");
+    expect(screen.queryByRole("textbox", { name: "Pawchive post URL" })).not.toBeInTheDocument();
   });
 
   it("preserves a single existing date boundary while editing", async () => {

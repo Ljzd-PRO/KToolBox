@@ -79,7 +79,9 @@ export function TaskEditor({
   const [dateError, setDateError] = useState<string | undefined>();
 
   const initialDownload = initial?.kind === "download" ? initial : undefined;
-  const [downloadIdentity, setDownloadIdentity] = useState(initialDownload?.post ? "url" : "fields");
+  const [downloadIdentity, setDownloadIdentity] = useState<"url" | "fields">(
+    initialDownload ? (initialDownload.post ? "url" : "fields") : "url",
+  );
   const [postUrl, setPostUrl] = useState(initialDownload?.post ?? "");
   const [service, setService] = useState(initialDownload?.service ?? "fanbox");
   const [creatorId, setCreatorId] = useState(initialDownload?.creator_id ?? "");
@@ -283,7 +285,7 @@ export function TaskEditor({
                 { value: "fields", label: t("tasks.identityFields"), icon: Fingerprint },
               ]}
               value={downloadIdentity}
-              onChange={setDownloadIdentity}
+              onChange={(value) => setDownloadIdentity(value === "fields" ? "fields" : "url")}
             />
             {downloadIdentity === "url" ? (
               <FormField description={t("tasks.postUrlHint")} icon={Link} isRequired label={t("tasks.postUrl")} value={postUrl} onChange={setPostUrl} />
