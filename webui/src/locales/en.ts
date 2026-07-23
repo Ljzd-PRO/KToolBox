@@ -570,6 +570,31 @@ export const en = {
       "get_work": "Read bounded metadata for one Pawchive work; content is omitted unless explicitly requested."
     }
   },
+  "realtime": {
+    "title": "Live updates",
+    "description": "Automatically keep local project data in sync across open KToolBox pages.",
+    "status": "Connection status",
+    "statuses": {
+      "connecting": "Connecting",
+      "connected": "Connected",
+      "reconnecting": "Reconnecting",
+      "fallback": "Fallback refresh",
+      "offline": "Offline"
+    },
+    "modeLive": "Server-sent events",
+    "modeFallback": "10-second fallback refresh",
+    "lastUpdate": "Last update",
+    "neverUpdated": "No update received yet",
+    "refreshNow": "Refresh now",
+    "reconnect": "Reconnect",
+    "degraded": "Live updates are unavailable",
+    "degradedDescription": "KToolBox is using fallback refresh until the live connection recovers.",
+    "restored": "Live updates restored",
+    "externalChangeTitle": "Data changed elsewhere",
+    "externalChangeDescription": "Your unsaved changes were preserved to prevent them from being overwritten.",
+    "reload": "Reload data",
+    "keepEditing": "Keep editing"
+  },
   "system": {
     "title": "System",
     "description": "Project paths, application versions, and runtime status.",

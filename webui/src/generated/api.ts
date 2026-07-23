@@ -1651,6 +1651,10 @@ export interface components {
             task_id?: string | null;
             /** Event Type */
             event_type: string;
+            /** Resource */
+            resource?: string | null;
+            /** Resource Id */
+            resource_id?: string | null;
             /** Data */
             data: {
                 [key: string]: unknown;
@@ -2990,7 +2994,7 @@ export interface operations {
     event_stream: {
         parameters: {
             query?: {
-                after?: number;
+                after?: number | null;
             };
             header?: {
                 "last-event-id"?: string | null;

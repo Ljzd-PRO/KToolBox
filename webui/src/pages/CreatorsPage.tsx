@@ -45,8 +45,10 @@ import {
   SelectField,
   SortableColumn,
 } from "../components/ui";
+import { ExternalChangeAlert } from "../components/ExternalChangeAlert";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
+import { useRealtime } from "../lib/realtime";
 import { stableSort } from "../lib/sorting";
 import type { CreatorReference, CreatorRosterItem, CreatorSummary } from "../types";
 
@@ -62,6 +64,8 @@ type CreatorStatusFilter = "all" | "enabled" | "disabled";
 export function CreatorsPage() {
   const { t, i18n } = useTranslation();
   const { session } = useAuth();
+  const realtime = useRealtime(false);
+  const creatorRevision = realtime?.revisions.creators ?? 0;
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const roster = useQuery({ queryKey: ["creators"], queryFn: () => api<CreatorRosterItem[]>("/creators") });
@@ -70,6 +74,10 @@ export function CreatorsPage() {
     direction: "ascending",
   });
   const [editor, setEditor] = useState<CreatorReference | null>(null);
+  const [editorOriginal, setEditorOriginal] = useState<CreatorReference | null>(null);
+  const [editorRevisionBaseline, setEditorRevisionBaseline] = useState(
+    creatorRevision,
+  );
   const [originalKey, setOriginalKey] = useState<string | null>(null);
   const [removing, setRemoving] = useState<CreatorReference | null>(null);
   const [saving, setSaving] = useState(false);
@@ -101,21 +109,24 @@ export function CreatorsPage() {
 
   function openNew(prefill?: CreatorSummary) {
     setOriginalKey(null);
-    setEditor(
-      prefill
-        ? {
-            service: prefill.service,
-            creator_id: prefill.id,
-            alias: null,
-            enabled: true,
-          }
-        : { ...blankCreator },
-    );
+    const value = prefill
+      ? {
+          service: prefill.service,
+          creator_id: prefill.id,
+          alias: null,
+          enabled: true,
+        }
+      : { ...blankCreator };
+    setEditor(value);
+    setEditorOriginal(value);
+    setEditorRevisionBaseline(creatorRevision);
   }
 
   function openEdit(creator: CreatorReference) {
     setOriginalKey(`${creator.service}/${creator.creator_id}`);
     setEditor({ ...creator });
+    setEditorOriginal({ ...creator });
+    setEditorRevisionBaseline(creatorRevision);
   }
 
   async function saveCreator(event: FormEvent<HTMLFormElement>) {
@@ -373,6 +384,18 @@ export function CreatorsPage() {
       >
         {editor ? (
           <form className="grid gap-5" id="creator-form" onSubmit={saveCreator}>
+            <ExternalChangeAlert
+              visible={Boolean(
+                originalKey &&
+                  editorOriginal &&
+                  JSON.stringify(editor) !== JSON.stringify(editorOriginal) &&
+                  creatorRevision > editorRevisionBaseline,
+              )}
+              onKeepEditing={() =>
+                setEditorRevisionBaseline(creatorRevision)
+              }
+              onReload={() => setEditor(null)}
+            />
             <PawchiveIdentityFields
               creatorId={editor.creator_id}
               creatorIdLabel={t("creators.creatorId")}

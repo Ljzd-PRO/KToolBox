@@ -573,6 +573,31 @@ export const zhCN = {
       "get_work": "读取一个 Pawchive 作品的有限元数据；仅在明确请求时返回受限正文。"
     }
   },
+  "realtime": {
+    "title": "实时更新",
+    "description": "自动同步各个 KToolBox 页面中的本地项目数据。",
+    "status": "连接状态",
+    "statuses": {
+      "connecting": "正在连接",
+      "connected": "已连接",
+      "reconnecting": "正在重新连接",
+      "fallback": "降级刷新",
+      "offline": "已离线"
+    },
+    "modeLive": "服务器发送事件",
+    "modeFallback": "每 10 秒降级刷新",
+    "lastUpdate": "最后更新时间",
+    "neverUpdated": "尚未收到更新",
+    "refreshNow": "立即刷新",
+    "reconnect": "重新连接",
+    "degraded": "实时更新暂不可用",
+    "degradedDescription": "实时连接恢复前，KToolBox 将使用降级刷新。",
+    "restored": "实时更新已恢复",
+    "externalChangeTitle": "数据已在其他位置更新",
+    "externalChangeDescription": "为避免覆盖，当前未保存的修改已保留。",
+    "reload": "重新加载数据",
+    "keepEditing": "继续编辑"
+  },
   "system": {
     "title": "系统",
     "description": "查看项目路径、应用版本与运行状态。",

@@ -1,3 +1,4 @@
+import { toast } from "@heroui/react";
 import { useQueryClient, type QueryClient } from "@tanstack/react-query";
 import {
   createContext,
@@ -9,6 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useTranslation } from "react-i18next";
 
 import { api, ApiError } from "./api";
 import { useAuth } from "./auth";
@@ -28,10 +30,20 @@ export type RealtimeStatus =
   | "fallback"
   | "offline";
 
+export type RealtimeResource =
+  | "tasks"
+  | "creators"
+  | "blockers"
+  | "configuration"
+  | "mcp"
+  | "filesystem";
+
 type RealtimeContextValue = {
   status: RealtimeStatus;
   lastSignalAt: number | null;
   filesystemRevision: number;
+  revisions: Record<RealtimeResource, number>;
+  taskDefinitionRevisions: Record<string, number>;
   refreshNow: () => void;
   reconnect: () => void;
 };
@@ -87,12 +99,24 @@ const taskStatuses = new Set<TaskStatus>([
   "interrupted",
 ]);
 
+const initialRevisions: Record<RealtimeResource, number> = {
+  tasks: 0,
+  creators: 0,
+  blockers: 0,
+  configuration: 0,
+  mcp: 0,
+  filesystem: 0,
+};
+
 export function RealtimeProvider({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { invalidateSession } = useAuth();
   const [status, setStatus] = useState<RealtimeStatus>("connecting");
   const [lastSignalAt, setLastSignalAt] = useState<number | null>(null);
   const [filesystemRevision, setFilesystemRevision] = useState(0);
+  const [revisions, setRevisions] = useState(initialRevisions);
+  const [taskDefinitionRevisions, setTaskDefinitionRevisions] = useState<Record<string, number>>({});
   const [generation, setGeneration] = useState(0);
   const statusRef = useRef(status);
   const lastSignalRef = useRef<number | null>(null);
@@ -100,6 +124,9 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   const pendingRootsRef = useRef(new Set<string>());
   const pendingTimerRef = useRef<number | null>(null);
   const hiddenDirtyRef = useRef(false);
+  const connectedOnceRef = useRef(false);
+  const degradedSinceRef = useRef<number | null>(null);
+  const degradedNoticeShownRef = useRef(false);
 
   useEffect(() => {
     statusRef.current = status;
@@ -144,6 +171,25 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   const reconnect = useCallback(() => {
     setStatus(navigator.onLine ? "connecting" : "offline");
     setGeneration((current) => current + 1);
+  }, []);
+
+  const bumpResource = useCallback((resource: RealtimeResource) => {
+    setRevisions((current) => ({ ...current, [resource]: current[resource] + 1 }));
+    if (resource === "filesystem") setFilesystemRevision((current) => current + 1);
+  }, []);
+
+  const bumpAllResources = useCallback(() => {
+    setRevisions((current) => Object.fromEntries(
+      Object.entries(current).map(([resource, value]) => [resource, value + 1]),
+    ) as Record<RealtimeResource, number>);
+    setFilesystemRevision((current) => current + 1);
+  }, []);
+
+  const bumpTaskDefinition = useCallback((taskId: string) => {
+    setTaskDefinitionRevisions((current) => ({
+      ...current,
+      [taskId]: (current[taskId] ?? 0) + 1,
+    }));
   }, []);
 
   useEffect(() => {
@@ -201,21 +247,28 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       const event = parseEvent(message.data);
       if (!event || event.id <= latestEventIdRef.current) return;
       latestEventIdRef.current = event.id;
-      applyRealtimeEvent(queryClient, event, queueRefresh, () => {
-        setFilesystemRevision((current) => current + 1);
-      });
+      applyRealtimeEvent(
+        queryClient,
+        event,
+        queueRefresh,
+        bumpResource,
+        bumpTaskDefinition,
+      );
     };
     const connect = () => {
       if (!active || !navigator.onLine) {
         setStatus("offline");
         return;
       }
-      source = new EventSource("/api/v1/events");
+      const cursor = latestEventIdRef.current;
+      source = new EventSource(cursor > 0 ? `/api/v1/events?after=${cursor}` : "/api/v1/events");
       source.onopen = () => {
         if (!active) return;
         clearFallbackTimer();
         markSignal();
         setStatus("connected");
+        if (connectedOnceRef.current) bumpAllResources();
+        connectedOnceRef.current = true;
         refreshNow();
       };
       source.onerror = () => {
@@ -261,7 +314,16 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("offline", handleOffline);
       window.removeEventListener("online", handleOnline);
     };
-  }, [generation, invalidateSession, queryClient, queueRefresh, refreshNow]);
+  }, [
+    bumpAllResources,
+    bumpResource,
+    bumpTaskDefinition,
+    generation,
+    invalidateSession,
+    queryClient,
+    queueRefresh,
+    refreshNow,
+  ]);
 
   useEffect(() => {
     if (status === "connected" || status === "connecting") return undefined;
@@ -289,9 +351,51 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
     };
   }, [refreshNow]);
 
+  useEffect(() => {
+    let timer: number | null = null;
+    if (status === "connected") {
+      if (degradedNoticeShownRef.current) {
+        toast.success(t("realtime.restored"));
+      }
+      degradedSinceRef.current = null;
+      degradedNoticeShownRef.current = false;
+      return undefined;
+    }
+    if (status === "connecting") return undefined;
+    const startedAt = degradedSinceRef.current ?? Date.now();
+    degradedSinceRef.current = startedAt;
+    const remaining = Math.max(0, 5000 - (Date.now() - startedAt));
+    timer = window.setTimeout(() => {
+      if (statusRef.current === "connected" || degradedNoticeShownRef.current) return;
+      degradedNoticeShownRef.current = true;
+      toast.warning(t("realtime.degraded"), {
+        description: t("realtime.degradedDescription"),
+      });
+    }, remaining);
+    return () => {
+      if (timer !== null) window.clearTimeout(timer);
+    };
+  }, [status, t]);
+
   const value = useMemo<RealtimeContextValue>(
-    () => ({ status, lastSignalAt, filesystemRevision, refreshNow, reconnect }),
-    [filesystemRevision, lastSignalAt, reconnect, refreshNow, status],
+    () => ({
+      status,
+      lastSignalAt,
+      filesystemRevision,
+      revisions,
+      taskDefinitionRevisions,
+      refreshNow,
+      reconnect,
+    }),
+    [
+      filesystemRevision,
+      lastSignalAt,
+      reconnect,
+      refreshNow,
+      revisions,
+      status,
+      taskDefinitionRevisions,
+    ],
   );
   return <RealtimeContext.Provider value={value}>{children}</RealtimeContext.Provider>;
 }
@@ -309,23 +413,37 @@ function applyRealtimeEvent(
   queryClient: QueryClient,
   event: TaskEvent,
   queueRefresh: (...roots: string[]) => void,
-  notifyFilesystem: () => void,
+  notifyResource: (resource: RealtimeResource) => void,
+  notifyTaskDefinition: (taskId: string) => void,
 ) {
   if (event.task_id) appendTaskEvent(queryClient, event);
   if (event.resource === "task" || event.task_id || event.event_type.startsWith("task.")) {
     applyTaskEvent(queryClient, event, queueRefresh);
+    const taskId = event.task_id ?? event.resource_id;
+    if (
+      taskId &&
+      (event.event_type === "task.updated" || event.event_type === "task.deleted")
+    ) {
+      notifyTaskDefinition(taskId);
+    }
     return;
   }
-  if (event.event_type === "creators.changed" || event.event_type === "creator_profile.changed") {
+  if (event.event_type === "creators.changed") {
     queueRefresh("creators", "config-document");
+    notifyResource("creators");
+  } else if (event.event_type === "creator_profile.changed") {
+    queueRefresh("creators");
   } else if (event.event_type === "blockers.changed") {
     queueRefresh("blockers", "config-document");
+    notifyResource("blockers");
   } else if (event.event_type === "configuration.changed") {
     queueRefresh("config-schema", "config-document", "project", "creators", "blockers");
+    notifyResource("configuration");
   } else if (event.event_type === "mcp.tokens.changed") {
     queueRefresh("mcp");
+    notifyResource("mcp");
   } else if (event.event_type === "filesystem.changed") {
-    notifyFilesystem();
+    notifyResource("filesystem");
   }
 }
 

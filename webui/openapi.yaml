@@ -1553,9 +1553,10 @@ paths:
         in: query
         required: false
         schema:
-          type: integer
-          minimum: 0
-          default: 0
+          anyOf:
+          - type: integer
+            minimum: 0
+          - type: 'null'
           title: After
       - name: last-event-id
         in: header
@@ -3649,6 +3650,16 @@ components:
         event_type:
           type: string
           title: Event Type
+        resource:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resource
+        resource_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resource Id
         data:
           additionalProperties: true
           type: object

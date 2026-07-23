@@ -16,6 +16,7 @@ import {
   IconShieldLock,
   IconSun,
   IconTool,
+  IconWifiOff,
   IconX,
   type TablerIcon,
 } from "@tabler/icons-react";
@@ -25,6 +26,7 @@ import { useTranslation } from "react-i18next";
 
 import { errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
+import { useRealtime } from "../lib/realtime";
 import { useTheme, type ThemeColor } from "../lib/theme";
 import { LanguageSelector } from "./LanguageSelector";
 import { IconButton } from "./ui";
@@ -300,6 +302,29 @@ function SecurityNotice({ compact = false }: { compact?: boolean }) {
   );
 }
 
+function RealtimeStatusControl() {
+  const { t } = useTranslation();
+  const realtime = useRealtime();
+  if (realtime.status === "connected" || realtime.status === "connecting") return null;
+
+  return (
+    <Tooltip>
+      <Button
+        isIconOnly
+        aria-label={`${t(`realtime.statuses.${realtime.status}`)}. ${t("realtime.reconnect")}`}
+        className="size-11 min-w-11 shrink-0 text-warning"
+        variant="outline"
+        onPress={realtime.reconnect}
+      >
+        <IconWifiOff aria-hidden="true" size={18} stroke={1.8} />
+      </Button>
+      <Tooltip.Content>
+        {t(`realtime.statuses.${realtime.status}`)} · {t("realtime.reconnect")}
+      </Tooltip.Content>
+    </Tooltip>
+  );
+}
+
 export function AppShell() {
   const { t } = useTranslation();
   const { session, logout } = useAuth();
@@ -361,6 +386,7 @@ export function AppShell() {
               <ThemeControls />
               <SecurityNotice />
             </div>
+            <RealtimeStatusControl />
             <div className="xl:hidden">
               <SecurityNotice compact />
             </div>

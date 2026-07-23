@@ -48,8 +48,10 @@ import {
   PageLoading,
   SelectField,
 } from "../components/ui";
+import { ExternalChangeAlert } from "../components/ExternalChangeAlert";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
+import { useRealtime } from "../lib/realtime";
 import type {
   BlockerSpec,
   ConditionGroup,
@@ -85,6 +87,8 @@ const blankBlocker = (): BlockerSpec => ({
 export function BlockersPage() {
   const { t } = useTranslation();
   const { session } = useAuth();
+  const realtime = useRealtime(false);
+  const blockerRevision = realtime?.revisions.blockers ?? 0;
   const queryClient = useQueryClient();
   const blockersQuery = useQuery({
     queryKey: ["blockers"],
@@ -95,6 +99,10 @@ export function BlockersPage() {
     queryFn: () => api<CreatorRosterItem[]>("/creators"),
   });
   const [editor, setEditor] = useState<BlockerSpec | null>(null);
+  const [editorOriginal, setEditorOriginal] = useState<BlockerSpec | null>(null);
+  const [editorRevisionBaseline, setEditorRevisionBaseline] = useState(
+    blockerRevision,
+  );
   const [editorIndex, setEditorIndex] = useState<number | null>(null);
   const [scopeCandidate, setScopeCandidate] = useState("");
   const [saving, setSaving] = useState(false);
@@ -129,7 +137,10 @@ export function BlockersPage() {
   }
 
   function openEditor(blocker?: BlockerSpec, index?: number) {
-    setEditor(blocker ? structuredClone(blocker) : blankBlocker());
+    const value = blocker ? structuredClone(blocker) : blankBlocker();
+    setEditor(value);
+    setEditorOriginal(structuredClone(value));
+    setEditorRevisionBaseline(blockerRevision);
     setEditorIndex(index ?? null);
     setScopeCandidate("");
   }
@@ -279,6 +290,17 @@ export function BlockersPage() {
       >
         {editor ? (
           <form className="grid gap-6" id="blocker-form" onSubmit={submitEditor}>
+            <ExternalChangeAlert
+              visible={Boolean(
+                editorOriginal &&
+                  JSON.stringify(editor) !== JSON.stringify(editorOriginal) &&
+                  blockerRevision > editorRevisionBaseline,
+              )}
+              onKeepEditing={() =>
+                setEditorRevisionBaseline(blockerRevision)
+              }
+              onReload={() => setEditor(null)}
+            />
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField
                 icon={Fingerprint}

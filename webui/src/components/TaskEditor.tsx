@@ -30,6 +30,8 @@ import { parseDate, type DateValue } from "@internationalized/date";
 
 import type { CreatorRosterItem, DownloadTaskSpec, SyncTaskSpec, TaskRecord, TaskSpec } from "../types";
 import { TASK_OUTPUT_PATH_SELECTOR } from "../lib/pathSelectors";
+import { useRealtime } from "../lib/realtime";
+import { ExternalChangeAlert } from "./ExternalChangeAlert";
 import { RemotePathField } from "./RemotePathField";
 import {
   ChipListField,
@@ -57,7 +59,14 @@ export function TaskEditor({
   onSave: (spec: TaskSpec) => Promise<void>;
 }) {
   const { t } = useTranslation();
+  const realtime = useRealtime(false);
   const initial = task?.spec;
+  const [taskRevisionBaseline, setTaskRevisionBaseline] = useState(
+    task ? (realtime?.taskDefinitionRevisions[task.id] ?? 0) : 0,
+  );
+  const [connectionRevisionBaseline, setConnectionRevisionBaseline] = useState(
+    realtime?.revisions.tasks ?? 0,
+  );
   const [kind, setKind] = useState<"sync" | "download">(initial?.kind ?? "sync");
   const [output, setOutput] = useState(initial?.output ?? "downloads");
 
@@ -91,8 +100,17 @@ export function TaskEditor({
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (kind === "sync") {
+      const nextDateError = validateDates();
+      setDateError(nextDateError);
+      if (nextDateError) return;
+    }
+    await onSave(buildSpec());
+  }
+
+  function buildSpec(): TaskSpec {
     if (kind === "download") {
-      const spec: DownloadTaskSpec = {
+      return {
         kind,
         post: downloadIdentity === "url" ? postUrl.trim() : null,
         service: downloadIdentity === "fields" ? service.trim() : null,
@@ -101,17 +119,21 @@ export function TaskEditor({
         revision_id: revisionId.trim() || null,
         output,
         dump_post_data: dumpMetadata,
-      };
-      await onSave(spec);
-      return;
+      } satisfies DownloadTaskSpec;
     }
-    const nextDateError = validateDates();
-    setDateError(nextDateError);
-    if (nextDateError) return;
     const selected = allEnabled
       ? []
-      : creators.filter((creator) => selectedCreators.has(`${creator.service}:${creator.creator_id}`));
-    const spec: SyncTaskSpec = {
+      : creators
+          .filter((creator) =>
+            selectedCreators.has(`${creator.service}:${creator.creator_id}`),
+          )
+          .map(({ service, creator_id, alias, enabled }) => ({
+            service,
+            creator_id,
+            alias,
+            enabled,
+          }));
+    return {
       kind,
       creators: selected,
       output,
@@ -123,8 +145,7 @@ export function TaskEditor({
       length: length ? Number(length) : null,
       keywords,
       keywords_exclude: excludedKeywords,
-    };
-    await onSave(spec);
+    } satisfies SyncTaskSpec;
   }
 
   function validateDates(): string | undefined {
@@ -142,6 +163,16 @@ export function TaskEditor({
       return next;
     });
   }
+
+  const taskRevision = task ? (realtime?.taskDefinitionRevisions[task.id] ?? 0) : 0;
+  const connectionRevision = realtime?.revisions.tasks ?? 0;
+  const dirty = Boolean(task && JSON.stringify(buildSpec()) !== JSON.stringify(task.spec));
+  const externallyChanged = Boolean(
+    task &&
+      dirty &&
+      (taskRevision > taskRevisionBaseline ||
+        connectionRevision > connectionRevisionBaseline),
+  );
 
   return (
     <FormModal
@@ -161,6 +192,14 @@ export function TaskEditor({
       onOpenChange={(open) => !open && onClose()}
     >
       <form className="grid gap-6" id="task-editor-form" onSubmit={submit}>
+        <ExternalChangeAlert
+          visible={externallyChanged}
+          onKeepEditing={() => {
+            setTaskRevisionBaseline(taskRevision);
+            setConnectionRevisionBaseline(connectionRevision);
+          }}
+          onReload={onClose}
+        />
         <Tabs className="task-editor-tabs" selectedKey={kind} variant="secondary" onSelectionChange={(key) => setKind(String(key) as "sync" | "download")}>
           <Tabs.List aria-label={t("common.type")}>
             <Tabs.Tab id="sync"><RefreshCw aria-hidden="true" size={16} />{t("tasks.syncAuthor")}<Tabs.Indicator /></Tabs.Tab>

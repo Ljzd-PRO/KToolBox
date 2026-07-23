@@ -102,6 +102,11 @@ function Probe() {
       <output aria-label="bytes">{tasks.data?.[0]?.progress.transferred_bytes ?? -1}</output>
       <output aria-label="creators">{creators.data?.length ?? -1}</output>
       <output aria-label="events">{events.data?.length ?? -1}</output>
+      <output aria-label="creator-revision">{realtime.revisions.creators}</output>
+      <output aria-label="filesystem-revision">{realtime.filesystemRevision}</output>
+      <output aria-label="task-revision">
+        {realtime.taskDefinitionRevisions["task-1"] ?? 0}
+      </output>
     </>
   );
 }
@@ -171,18 +176,63 @@ describe("RealtimeProvider", () => {
       source.emit("download.progress", taskEvent(1, "download.progress", {
         progress: { ...progress, transferred_bytes: 90 },
       }));
+      source.emit("creator_profile.changed", {
+        ...taskEvent(2, "creator_profile.changed", {}),
+        task_id: null,
+        resource: "creator_profile",
+        resource_id: "fanbox:creator",
+      });
       source.emit("creators.changed", {
-        ...taskEvent(2, "creators.changed", {}),
+        ...taskEvent(3, "creators.changed", {}),
         task_id: null,
         resource: "creator",
         resource_id: "fanbox:creator",
       });
+      source.emit("task.updated", taskEvent(4, "task.updated", {}));
+      source.emit("filesystem.changed", {
+        ...taskEvent(5, "filesystem.changed", {}),
+        task_id: null,
+        resource: "filesystem",
+        resource_id: "downloads",
+      });
     });
-    expect(screen.getByLabelText("events")).toHaveTextContent("1");
+    expect(screen.getByLabelText("events")).toHaveTextContent("2");
+    expect(screen.getByLabelText("creator-revision")).toHaveTextContent("1");
+    expect(screen.getByLabelText("task-revision")).toHaveTextContent("1");
+    expect(screen.getByLabelText("filesystem-revision")).toHaveTextContent("2");
     await waitFor(() => expect(creatorRequests).toBeGreaterThan(initialCreatorRequests));
 
     rendered.unmount();
     expect(source.closed).toBe(true);
+  });
+
+  it("enters fallback after a sustained disconnect and recovers on the same stream", async () => {
+    render(
+      <QueryClientProvider client={client}>
+        <AuthProvider>
+          <Authenticated>
+            <Probe />
+          </Authenticated>
+        </AuthProvider>
+      </QueryClientProvider>,
+    );
+
+    await waitFor(() => expect(FakeEventSource.instances).toHaveLength(1));
+    const source = FakeEventSource.instances[0];
+    act(() => source.open());
+    expect(await screen.findByLabelText("connection")).toHaveTextContent("connected");
+
+    vi.useFakeTimers();
+    act(() => source.onerror?.(new Event("error")));
+    expect(screen.getByLabelText("connection")).toHaveTextContent("reconnecting");
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5000);
+    });
+    expect(screen.getByLabelText("connection")).toHaveTextContent("fallback");
+
+    act(() => source.open());
+    expect(screen.getByLabelText("connection")).toHaveTextContent("connected");
+    vi.useRealTimers();
   });
 });
 

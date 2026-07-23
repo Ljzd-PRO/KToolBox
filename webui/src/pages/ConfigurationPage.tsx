@@ -40,10 +40,12 @@ import {
   PasswordField,
   SelectField,
 } from "../components/ui";
+import { ExternalChangeAlert } from "../components/ExternalChangeAlert";
 import { RemotePathField } from "../components/RemotePathField";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { currentLanguage } from "../lib/i18n";
+import { useRealtime } from "../lib/realtime";
 import type { ConfigField, ConfigSchema, ProjectDocument, TextDocument } from "../types";
 
 type DotenvName = "dotenv" | "production";
@@ -60,6 +62,8 @@ const sourceColors: Record<string, "default" | "accent" | "warning" | "success">
 export function ConfigurationPage() {
   const { t } = useTranslation();
   const { session } = useAuth();
+  const realtime = useRealtime(false);
+  const configurationRevision = realtime?.revisions.configuration ?? 0;
   const queryClient = useQueryClient();
   const locale = currentLanguage();
   const schemaQuery = useQuery({
@@ -86,6 +90,12 @@ export function ConfigurationPage() {
   const [saving, setSaving] = useState(false);
   const [rawName, setRawName] = useState<RawName>("dotenv");
   const [rawDrafts, setRawDrafts] = useState<Partial<Record<RawName, string>>>({});
+  const [structuredRevisionBaseline, setStructuredRevisionBaseline] = useState(
+    configurationRevision,
+  );
+  const [rawRevisionBaselines, setRawRevisionBaselines] = useState<
+    Partial<Record<RawName, number>>
+  >({});
 
   const documents = useMemo(
     () => ({ dotenv: dotenvQuery.data, production: productionQuery.data, project: projectQuery.data }),
@@ -115,8 +125,23 @@ export function ConfigurationPage() {
       (!normalizedFilter ||
         `${field.label} ${field.description} ${field.env_name}`.toLocaleLowerCase().includes(normalizedFilter)),
   );
+  const hasStructuredDraft = Object.values(pending).some(
+    (values) => Object.keys(values).length > 0,
+  );
+  const rawContent = rawDrafts[rawName] ?? documents[rawName]?.content ?? "";
+  const hasRawDraft = rawContent !== (documents[rawName]?.content ?? "");
+  const structuredExternalChange =
+    hasStructuredDraft &&
+    configurationRevision > structuredRevisionBaseline;
+  const rawExternalChange =
+    hasRawDraft &&
+    configurationRevision >
+      (rawRevisionBaselines[rawName] ?? configurationRevision);
 
   function updateField(field: ConfigField, value: string | null) {
+    if (!hasStructuredDraft) {
+      setStructuredRevisionBaseline(configurationRevision);
+    }
     setPending((current) => ({
       ...current,
       [destination]: { ...current[destination], [field.env_name]: value },
@@ -142,6 +167,7 @@ export function ConfigurationPage() {
         headers: { "If-Match": documents[destination]?.revision ?? "" },
       });
       setPending((current) => ({ ...current, [destination]: {} }));
+      setStructuredRevisionBaseline(configurationRevision);
       setReviewing(false);
       await refreshConfiguration();
       toast.success(t("configuration.saved"));
@@ -183,6 +209,10 @@ export function ConfigurationPage() {
         headers: { "If-Match": documents[rawName]?.revision ?? "" },
       });
       setRawDrafts((current) => ({ ...current, [rawName]: document.content }));
+      setRawRevisionBaselines((current) => ({
+        ...current,
+        [rawName]: configurationRevision,
+      }));
       await refreshConfiguration();
       toast.success(t("configuration.saved"));
     } catch (error) {
@@ -229,6 +259,17 @@ export function ConfigurationPage() {
 
         <Tabs.Panel className="min-w-0 pt-5" id="structured">
           <div className="grid gap-5">
+            <ExternalChangeAlert
+              visible={structuredExternalChange}
+              onKeepEditing={() =>
+                setStructuredRevisionBaseline(configurationRevision)
+              }
+              onReload={() => {
+                setPending({ dotenv: {}, production: {} });
+                setStructuredRevisionBaseline(configurationRevision);
+                void refreshConfiguration();
+              }}
+            />
             <FormSurface className="grid gap-4 lg:grid-cols-[minmax(0,220px)_minmax(0,260px)_1fr]">
               <SelectField
                 icon={FileText}
@@ -293,6 +334,27 @@ export function ConfigurationPage() {
 
         <Tabs.Panel className="min-w-0 pt-5" id="advanced">
           <div className="grid gap-4">
+            <ExternalChangeAlert
+              visible={rawExternalChange}
+              onKeepEditing={() =>
+                setRawRevisionBaselines((current) => ({
+                  ...current,
+                  [rawName]: configurationRevision,
+                }))
+              }
+              onReload={() => {
+                setRawDrafts((current) => {
+                  const next = { ...current };
+                  delete next[rawName];
+                  return next;
+                });
+                setRawRevisionBaselines((current) => ({
+                  ...current,
+                  [rawName]: configurationRevision,
+                }));
+                void refreshConfiguration();
+              }}
+            />
             <Alert status="warning">
               <Alert.Indicator><ShieldAlert aria-hidden="true" size={19} /></Alert.Indicator>
               <Alert.Content>
@@ -317,8 +379,16 @@ export function ConfigurationPage() {
                 icon={Braces}
                 label={rawName === "project" ? "ktoolbox.toml" : rawName === "dotenv" ? ".env" : "prod.env"}
                 rows={22}
-                value={rawDrafts[rawName] ?? documents[rawName]?.content ?? ""}
-                onChange={(content) => setRawDrafts((current) => ({ ...current, [rawName]: content }))}
+                value={rawContent}
+                onChange={(content) => {
+                  if (!hasRawDraft) {
+                    setRawRevisionBaselines((current) => ({
+                      ...current,
+                      [rawName]: configurationRevision,
+                    }));
+                  }
+                  setRawDrafts((current) => ({ ...current, [rawName]: content }));
+                }}
               />
               <div className="flex flex-wrap justify-end gap-2">
                 <Button variant="outline" onPress={() => void validateRaw()}>
