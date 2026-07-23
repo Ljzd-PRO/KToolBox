@@ -1,0 +1,3174 @@
+openapi: 3.1.0
+info:
+  title: KToolBox WebUI API
+  description: Authenticated REST API for the KToolBox WebUI. Selected operations also define the curated MCP tool surface
+    through x-ktoolbox-mcp metadata.
+  version: 1.0.0
+  license:
+    name: BSD-3-Clause
+    identifier: BSD-3-Clause
+paths:
+  /api/v1/config/schema:
+    get:
+      summary: Get configuration schema
+      operationId: config_schema
+      parameters:
+      - name: locale
+        in: query
+        required: false
+        schema:
+          enum:
+          - zh-CN
+          - zh-Hant
+          - en
+          - ja
+          - ko
+          - fr
+          - ru
+          type: string
+          default: en
+          title: Locale
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigSchemaResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Return localized field metadata and redacted effective values for the project configuration.
+      tags:
+      - configuration
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: config_schema
+        scope: mcp:read
+        safety: read
+        openWorld: false
+  /api/v1/config/dotenv/{name}:
+    get:
+      summary: Read an environment file
+      operationId: get_dotenv
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          enum:
+          - dotenv
+          - production
+          type: string
+          title: Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextDocumentResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Read the raw project .env or prod.env document together with its revision.
+      tags:
+      - configuration
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: get_dotenv
+        scope: null
+        safety: null
+        openWorld: false
+    put:
+      summary: Replace an environment file
+      operationId: replace_dotenv
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          enum:
+          - dotenv
+          - production
+          type: string
+          title: Name
+      - name: If-Match
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: If-Match
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TextDocumentUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextDocumentResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Atomically replace the raw project .env or prod.env document after an ETag check.
+      tags:
+      - configuration
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: replace_dotenv
+        scope: null
+        safety: null
+        openWorld: false
+    patch:
+      summary: Patch environment values
+      operationId: patch_dotenv
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          enum:
+          - dotenv
+          - production
+          type: string
+          title: Name
+      - name: If-Match
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: If-Match
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DotenvPatchRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextDocumentResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Atomically update selected values in .env or prod.env after an ETag check.
+      tags:
+      - configuration
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: patch_dotenv
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/config/dotenv/{name}/validate:
+    post:
+      summary: Validate an environment file
+      operationId: validate_dotenv
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          enum:
+          - dotenv
+          - production
+          type: string
+          title: Name
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TextDocumentUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Validate environment-file text without saving it.
+      tags:
+      - configuration
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: validate_dotenv
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/config/example:
+    get:
+      summary: Download example configuration
+      operationId: example_configuration
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: string
+      description: Render and download a documented example environment file.
+      tags:
+      - configuration
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: example_configuration
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/config/project:
+    get:
+      summary: Read project configuration
+      operationId: get_project_config
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDocumentResponse'
+      description: Read the raw ktoolbox.toml document and its parsed project configuration.
+      tags:
+      - configuration
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: get_project_config
+        scope: null
+        safety: null
+        openWorld: false
+    put:
+      summary: Replace project configuration
+      operationId: replace_project_config
+      parameters:
+      - name: If-Match
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: If-Match
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TextDocumentUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDocumentResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Atomically replace ktoolbox.toml after validation and an ETag check.
+      tags:
+      - configuration
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: replace_project_config
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/config/project/validate:
+    post:
+      summary: Validate project configuration
+      operationId: validate_project_config
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TextDocumentUpdate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Validate ktoolbox.toml text without saving it.
+      tags:
+      - configuration
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: validate_project_config
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/creators:
+    get:
+      summary: List configured creators
+      operationId: list_creators
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/CreatorRosterItemResponse'
+                type: array
+                title: Response List Creators
+      description: List the project creator roster with cached Pawchive presentation names.
+      tags:
+      - creators
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: list_creators
+        scope: mcp:read
+        safety: read
+        openWorld: false
+    post:
+      summary: Add a creator
+      operationId: add_creator
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatorReference'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatorReference'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Add a creator identity to the project roster.
+      tags:
+      - creators
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: add_creator
+        scope: mcp:write
+        safety: write
+        openWorld: false
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+  /api/v1/creators/{service}/{creator_id}:
+    put:
+      summary: Update a creator
+      operationId: update_creator
+      parameters:
+      - name: service
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Service
+      - name: creator_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Creator Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatorUpdateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatorReference'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Update the note and enabled state of a configured creator.
+      tags:
+      - creators
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: update_creator
+        scope: mcp:write
+        safety: write
+        openWorld: false
+    delete:
+      summary: Remove a creator
+      operationId: delete_creator
+      parameters:
+      - name: service
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Service
+      - name: creator_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Creator Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatorReference'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Remove a creator from the project roster and clear its cached presentation profile.
+      tags:
+      - creators
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: delete_creator
+        scope: mcp:write
+        safety: destructive
+        openWorld: false
+  /api/v1/blockers:
+    get:
+      summary: List ignore rules
+      operationId: list_blockers
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockerListResponse'
+      description: Return the ordered project ignore-rule definitions.
+      tags:
+      - ignore-rules
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: list_blockers
+        scope: mcp:read
+        safety: read
+        openWorld: false
+    put:
+      summary: Replace ignore rules
+      operationId: replace_blockers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/BlockerSpec'
+              type: array
+              title: Blockers
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockerListResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Validate and replace the complete ordered ignore-rule collection.
+      tags:
+      - ignore-rules
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: replace_blockers
+        scope: mcp:write
+        safety: destructive
+        openWorld: false
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+  /api/v1/filesystem:
+    get:
+      tags:
+      - filesystem
+      summary: Browse files and directories
+      operationId: browse_filesystem
+      parameters:
+      - name: scope
+        in: query
+        required: false
+        schema:
+          enum:
+          - project
+          - host
+          type: string
+          default: project
+          title: Scope
+      - name: mode
+        in: query
+        required: false
+        schema:
+          enum:
+          - directory
+          - file
+          type: string
+          default: directory
+          title: Mode
+      - name: path
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Path
+      - name: search
+        in: query
+        required: false
+        schema:
+          type: string
+          maxLength: 256
+          default: ''
+          title: Search
+      - name: include_hidden
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Include Hidden
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+          title: Offset
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 200
+          minimum: 1
+          default: 100
+          title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesystemBrowseResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Browse a project or host filesystem location for the WebUI path picker.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: browse_filesystem
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/filesystem/directories:
+    post:
+      tags:
+      - filesystem
+      summary: Create a directory
+      operationId: create_directory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FilesystemCreateDirectoryRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesystemEntryResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Create a directory through the WebUI path picker.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: create_directory
+        scope: null
+        safety: null
+        openWorld: false
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+    delete:
+      tags:
+      - filesystem
+      summary: Delete an empty directory
+      operationId: delete_directory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FilesystemDeleteDirectoryRequest'
+        required: true
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Delete an empty directory through the WebUI path picker.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: delete_directory
+        scope: null
+        safety: null
+        openWorld: false
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+  /api/v1/pawchive/creators:
+    get:
+      summary: Search Pawchive creators
+      operationId: creators
+      parameters:
+      - name: creator_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Creator Id
+      - name: name
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - name: service
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Service
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreatorSummary'
+                title: Response Creators
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Search Pawchive for creators using an ID, name, or platform filter.
+      tags:
+      - pawchive
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: search_creators
+        scope: mcp:read
+        safety: read
+        openWorld: true
+  /api/v1/pawchive/posts:
+    get:
+      summary: Search Pawchive works
+      operationId: posts
+      parameters:
+      - name: creator_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Creator Id
+      - name: name
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - name: service
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Service
+      - name: query
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Query
+      - name: offset
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Offset
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+                title: Response Posts
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Search Pawchive for works using creator identity and text filters.
+      tags:
+      - pawchive
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: search_works
+        scope: mcp:read
+        safety: read
+        openWorld: true
+  /api/v1/pawchive/posts/{service}/{creator_id}/{post_id}:
+    get:
+      summary: Get a Pawchive work
+      operationId: post_details
+      parameters:
+      - name: service
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Service
+      - name: creator_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Creator Id
+      - name: post_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Post Id
+      - name: revision_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Revision Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/Post'
+                - $ref: '#/components/schemas/Revision'
+                title: Response Post Details
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Return one Pawchive work or a selected historical revision.
+      tags:
+      - pawchive
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: get_work
+        scope: mcp:read
+        safety: read
+        openWorld: true
+  /api/v1/pawchive/posts/{service}/{creator_id}/{post_id}/revisions:
+    get:
+      summary: List work revisions
+      operationId: post_revisions
+      parameters:
+      - name: service
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Service
+      - name: creator_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Creator Id
+      - name: post_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Post Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Revision'
+                title: Response Post Revisions
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Return the known historical revisions for one Pawchive work.
+      tags:
+      - pawchive
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: list_work_revisions
+        scope: mcp:read
+        safety: read
+        openWorld: true
+  /api/v1/pawchive/site-version:
+    get:
+      summary: Get Pawchive version
+      operationId: site_version
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiteVersionResponse'
+      description: Return the version reported by the configured Pawchive service.
+      tags:
+      - pawchive
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: get_pawchive_version
+        scope: mcp:read
+        safety: read
+        openWorld: true
+  /api/v1/tasks:
+    get:
+      tags:
+      - tasks
+      summary: List tasks
+      operationId: list_tasks
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/TaskRecord'
+                type: array
+                title: Response List Tasks
+      description: Return the persistent task queue in scheduling order.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: list_tasks
+        scope: mcp:read
+        safety: read
+        openWorld: false
+    post:
+      tags:
+      - tasks
+      summary: Create a task
+      operationId: create_task
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskRecord'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Create and enqueue a sync-author or download-work task.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: create_task
+        scope: mcp:write
+        safety: write
+        openWorld: false
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+  /api/v1/tasks/{task_id}:
+    get:
+      tags:
+      - tasks
+      summary: Get a task
+      operationId: get_task
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Task Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskRecord'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Return one persistent task with its current progress and presentation snapshot.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: get_task
+        scope: mcp:read
+        safety: read
+        openWorld: false
+    patch:
+      tags:
+      - tasks
+      summary: Update a task
+      operationId: update_task
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Task Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskUpdateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskRecord'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Update the editable definition of a non-running task.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: update_task
+        scope: mcp:write
+        safety: write
+        openWorld: false
+    delete:
+      tags:
+      - tasks
+      summary: Delete a task
+      operationId: delete_task
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Task Id
+      - name: delete_output
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Delete Output
+      - name: confirmation
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Confirmation
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskCleanupPreview'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Delete a task record and optionally its verified output artifacts.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: delete_task
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/tasks/{task_id}/reorder:
+    post:
+      tags:
+      - tasks
+      summary: Reorder a task
+      operationId: reorder_task
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Task Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskReorderRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskRecord'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Move a non-running task to another queue position.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: reorder_task
+        scope: mcp:write
+        safety: write
+        openWorld: false
+  /api/v1/tasks/{task_id}/pause:
+    post:
+      tags:
+      - tasks
+      summary: Pause a task
+      operationId: pause_task
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Task Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskRecord'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Request cooperative pause for a running task.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: pause_task
+        scope: mcp:write
+        safety: write
+        openWorld: false
+  /api/v1/tasks/{task_id}/stop:
+    post:
+      tags:
+      - tasks
+      summary: Stop a task
+      operationId: stop_task
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Task Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskRecord'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Request cooperative stop for an active task.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: stop_task
+        scope: mcp:write
+        safety: write
+        openWorld: false
+  /api/v1/tasks/{task_id}/resume:
+    post:
+      tags:
+      - tasks
+      summary: Resume a task
+      operationId: resume_task
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Task Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskRecord'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Resume a paused, stopped, interrupted, or failed task as a new attempt.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: resume_task
+        scope: mcp:write
+        safety: write
+        openWorld: false
+  /api/v1/tasks/{task_id}/attempts:
+    get:
+      tags:
+      - tasks
+      summary: List task attempts
+      operationId: task_attempts
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Task Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskAttempt'
+                title: Response Task Attempts
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Return the immutable execution attempts recorded for one task.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: task_attempts
+        scope: mcp:read
+        safety: read
+        openWorld: false
+  /api/v1/tasks/{task_id}/events:
+    get:
+      tags:
+      - tasks
+      summary: List task events
+      operationId: task_events
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Task Id
+      - name: after
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+          title: After
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 200
+          minimum: 1
+          default: 200
+          title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskEvent'
+                title: Response Task Events
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Return at most 200 task progress and log events after a cursor.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: task_events
+        scope: mcp:read
+        safety: read
+        openWorld: false
+  /api/v1/tasks/{task_id}/cleanup-preview:
+    get:
+      tags:
+      - tasks
+      summary: Preview task cleanup
+      operationId: cleanup_preview
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Task Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskCleanupPreview'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Preview artifacts that may be removed with a task without changing files.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: cleanup_preview
+        scope: mcp:read
+        safety: read
+        openWorld: false
+  /api/v1/events:
+    get:
+      tags:
+      - tasks
+      summary: Stream task events
+      operationId: event_stream
+      parameters:
+      - name: after
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+          title: After
+      - name: last-event-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last-Event-Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Stream task and progress events to the browser using server-sent events.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: event_stream
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/health:
+    get:
+      summary: Check service health
+      operationId: health
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+      description: Return a minimal process health response.
+      tags:
+      - system
+      security: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: health
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/session/login:
+    post:
+      summary: Log in
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Authenticate the configured WebUI account and create a browser session.
+      tags:
+      - session
+      security: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: login
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/session:
+    get:
+      summary: Get current session
+      operationId: current_session
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+      description: Return the authenticated WebUI browser session.
+      tags:
+      - session
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: current_session
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/session/logout:
+    post:
+      summary: Log out
+      operationId: logout
+      responses:
+        '204':
+          description: Successful Response
+      description: Revoke the current WebUI browser session.
+      tags:
+      - session
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: logout
+        scope: null
+        safety: null
+        openWorld: false
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+  /api/v1/project:
+    get:
+      summary: Get project summary
+      operationId: project
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectSummaryResponse'
+      description: Return the active project root, configuration files, and KToolBox version.
+      tags:
+      - project
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: get_project_summary
+        scope: mcp:read
+        safety: read
+        openWorld: false
+components:
+  schemas:
+    ActiveDownload:
+      properties:
+        creator_key:
+          type: string
+          title: Creator Key
+        filename:
+          type: string
+          title: Filename
+        total:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Total
+        completed:
+          type: integer
+          title: Completed
+          default: 0
+        speed_bps:
+          type: number
+          title: Speed Bps
+          default: 0
+      type: object
+      required:
+      - creator_key
+      - filename
+      title: ActiveDownload
+    BlockerListResponse:
+      properties:
+        blockers:
+          items:
+            $ref: '#/components/schemas/BlockerSpec'
+          type: array
+          title: Blockers
+      type: object
+      required:
+      - blockers
+      title: BlockerListResponse
+    BlockerScope:
+      properties:
+        mode:
+          type: string
+          enum:
+          - global
+          - creators
+          title: Mode
+          default: global
+        creators:
+          items:
+            type: string
+          type: array
+          title: Creators
+      additionalProperties: false
+      type: object
+      title: BlockerScope
+      description: Select whether a blocker applies globally or to named creators.
+    BlockerSpec:
+      properties:
+        id:
+          type: string
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9_.-]*$
+          title: Id
+        type:
+          type: string
+          minLength: 1
+          title: Type
+          default: field-match
+        enabled:
+          type: boolean
+          title: Enabled
+          default: true
+        scope:
+          $ref: '#/components/schemas/BlockerScope'
+        options:
+          additionalProperties: true
+          type: object
+          title: Options
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      title: BlockerSpec
+      description: Serializable definition used by the blocker registry.
+    ConfigFieldResponse:
+      properties:
+        path:
+          type: string
+          title: Path
+        env_name:
+          type: string
+          title: Env Name
+        section:
+          type: string
+          title: Section
+        label:
+          type: string
+          title: Label
+        description:
+          type: string
+          title: Description
+        json_schema:
+          additionalProperties: true
+          type: object
+          title: Json Schema
+        default:
+          title: Default
+        value:
+          title: Value
+        is_set:
+          type: boolean
+          title: Is Set
+        secret:
+          type: boolean
+          title: Secret
+        source:
+          anyOf:
+          - type: string
+            enum:
+            - default
+            - .env
+            - prod.env
+            - environment
+          - type: string
+          title: Source
+        apply_mode:
+          type: string
+          enum:
+          - next_task
+          - restart
+          title: Apply Mode
+        path_selector:
+          anyOf:
+          - $ref: '#/components/schemas/PathSelectorResponse'
+          - type: 'null'
+      type: object
+      required:
+      - path
+      - env_name
+      - section
+      - label
+      - description
+      - json_schema
+      - is_set
+      - secret
+      - source
+      - apply_mode
+      title: ConfigFieldResponse
+    ConfigSchemaResponse:
+      properties:
+        locale:
+          type: string
+          enum:
+          - zh-CN
+          - zh-Hant
+          - en
+          - ja
+          - ko
+          - fr
+          - ru
+          title: Locale
+        sections:
+          additionalProperties:
+            type: string
+          type: object
+          title: Sections
+        fields:
+          items:
+            $ref: '#/components/schemas/ConfigFieldResponse'
+          type: array
+          title: Fields
+      type: object
+      required:
+      - locale
+      - sections
+      - fields
+      title: ConfigSchemaResponse
+    CreatorReference:
+      properties:
+        service:
+          type: string
+          minLength: 1
+          title: Service
+        creator_id:
+          type: string
+          minLength: 1
+          title: Creator Id
+        alias:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Alias
+        enabled:
+          type: boolean
+          title: Enabled
+          default: true
+      additionalProperties: false
+      type: object
+      required:
+      - service
+      - creator_id
+      title: CreatorReference
+      description: A stable Pawchive creator identity stored in the project roster.
+    CreatorRosterItemResponse:
+      properties:
+        service:
+          type: string
+          minLength: 1
+          title: Service
+        creator_id:
+          type: string
+          minLength: 1
+          title: Creator Id
+        alias:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Alias
+        enabled:
+          type: boolean
+          title: Enabled
+          default: true
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      additionalProperties: false
+      type: object
+      required:
+      - service
+      - creator_id
+      title: CreatorRosterItemResponse
+    CreatorSummary:
+      properties:
+        favorited:
+          type: integer
+          title: Favorited
+        id:
+          type: string
+          minLength: 1
+          title: Id
+        indexed:
+          anyOf:
+          - type: number
+          - type: string
+            format: date-time
+          title: Indexed
+        name:
+          type: string
+          title: Name
+        service:
+          type: string
+          minLength: 1
+          title: Service
+        updated:
+          anyOf:
+          - type: number
+          - type: string
+            format: date-time
+          title: Updated
+      additionalProperties: true
+      type: object
+      required:
+      - favorited
+      - id
+      - indexed
+      - name
+      - service
+      - updated
+      title: CreatorSummary
+    CreatorUpdateRequest:
+      properties:
+        alias:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Alias
+        enabled:
+          type: boolean
+          title: Enabled
+          default: true
+      type: object
+      title: CreatorUpdateRequest
+    DotenvPatchRequest:
+      properties:
+        values:
+          additionalProperties:
+            anyOf:
+            - type: string
+            - type: 'null'
+          type: object
+          title: Values
+      type: object
+      required:
+      - values
+      title: DotenvPatchRequest
+    DownloadTaskSpec:
+      properties:
+        kind:
+          type: string
+          const: download
+          title: Kind
+          default: download
+        post:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Post
+        service:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Service
+        creator_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Creator Id
+        post_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Post Id
+        revision_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Revision Id
+        output:
+          type: string
+          format: path
+          title: Output
+          default: .
+        dump_post_data:
+          type: boolean
+          title: Dump Post Data
+          default: true
+      additionalProperties: false
+      type: object
+      title: DownloadTaskSpec
+    FileReference:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        path:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Path
+      additionalProperties: true
+      type: object
+      title: FileReference
+    FilesystemBreadcrumbResponse:
+      properties:
+        label:
+          type: string
+          title: Label
+        path:
+          type: string
+          title: Path
+      type: object
+      required:
+      - label
+      - path
+      title: FilesystemBreadcrumbResponse
+    FilesystemBrowseResponse:
+      properties:
+        scope:
+          type: string
+          enum:
+          - project
+          - host
+          title: Scope
+        mode:
+          type: string
+          enum:
+          - directory
+          - file
+          title: Mode
+        path:
+          type: string
+          title: Path
+        project_relative_path:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Project Relative Path
+        parent:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Parent
+        separator:
+          type: string
+          title: Separator
+        breadcrumbs:
+          items:
+            $ref: '#/components/schemas/FilesystemBreadcrumbResponse'
+          type: array
+          title: Breadcrumbs
+        locations:
+          items:
+            $ref: '#/components/schemas/FilesystemLocationResponse'
+          type: array
+          title: Locations
+        entries:
+          items:
+            $ref: '#/components/schemas/FilesystemEntryResponse'
+          type: array
+          title: Entries
+        suggested_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Suggested Name
+        offset:
+          type: integer
+          title: Offset
+        limit:
+          type: integer
+          title: Limit
+        has_more:
+          type: boolean
+          title: Has More
+      type: object
+      required:
+      - scope
+      - mode
+      - path
+      - separator
+      - breadcrumbs
+      - locations
+      - entries
+      - offset
+      - limit
+      - has_more
+      title: FilesystemBrowseResponse
+    FilesystemCreateDirectoryRequest:
+      properties:
+        scope:
+          type: string
+          enum:
+          - project
+          - host
+          title: Scope
+        parent:
+          type: string
+          title: Parent
+        name:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Name
+      type: object
+      required:
+      - scope
+      - parent
+      - name
+      title: FilesystemCreateDirectoryRequest
+    FilesystemDeleteDirectoryRequest:
+      properties:
+        scope:
+          type: string
+          enum:
+          - project
+          - host
+          title: Scope
+        path:
+          type: string
+          maxLength: 4096
+          minLength: 1
+          title: Path
+      type: object
+      required:
+      - scope
+      - path
+      title: FilesystemDeleteDirectoryRequest
+    FilesystemEntryResponse:
+      properties:
+        name:
+          type: string
+          title: Name
+        path:
+          type: string
+          title: Path
+        project_relative_path:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Project Relative Path
+        kind:
+          type: string
+          enum:
+          - directory
+          - file
+          - other
+          title: Kind
+        is_symlink:
+          type: boolean
+          title: Is Symlink
+        navigable:
+          type: boolean
+          title: Navigable
+        deletable:
+          type: boolean
+          title: Deletable
+      type: object
+      required:
+      - name
+      - path
+      - kind
+      - is_symlink
+      - navigable
+      - deletable
+      title: FilesystemEntryResponse
+    FilesystemLocationResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        label:
+          type: string
+          title: Label
+        path:
+          type: string
+          title: Path
+      type: object
+      required:
+      - id
+      - label
+      - path
+      title: FilesystemLocationResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    HealthResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+          default: ok
+      type: object
+      title: HealthResponse
+    LoginRequest:
+      properties:
+        username:
+          type: string
+          maxLength: 256
+          minLength: 1
+          title: Username
+        password:
+          type: string
+          maxLength: 4096
+          minLength: 1
+          title: Password
+      type: object
+      required:
+      - username
+      - password
+      title: LoginRequest
+    PathSelectorResponse:
+      properties:
+        kind:
+          type: string
+          enum:
+          - directory
+          - file
+          title: Kind
+        scope:
+          type: string
+          enum:
+          - project
+          - host
+          title: Scope
+        value_mode:
+          type: string
+          enum:
+          - absolute
+          - project_relative
+          title: Value Mode
+      type: object
+      required:
+      - kind
+      - scope
+      - value_mode
+      title: PathSelectorResponse
+    Post:
+      properties:
+        id:
+          type: string
+          minLength: 1
+          title: Id
+        user:
+          type: string
+          minLength: 1
+          title: User
+        service:
+          type: string
+          minLength: 1
+          title: Service
+        title:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+        content:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Content
+        substring:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Substring
+        embed:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Embed
+        shared_file:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Shared File
+        added:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Added
+        published:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Published
+        edited:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Edited
+        file:
+          anyOf:
+          - $ref: '#/components/schemas/FileReference'
+          - type: 'null'
+        attachments:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/FileReference'
+            type: array
+          - type: 'null'
+          title: Attachments
+        poll:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Poll
+        captions:
+          anyOf:
+          - items: {}
+            type: array
+          - type: 'null'
+          title: Captions
+        tags:
+          anyOf:
+          - items: {}
+            type: array
+          - type: 'null'
+          title: Tags
+        origin:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Origin
+        preview_state:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Preview State
+        has_full:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Full
+        preview_attempts:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Preview Attempts
+        detail_fetched:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Detail Fetched
+        import_size_cap_gb:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Import Size Cap Gb
+        next:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next
+        prev:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Prev
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - user
+      - service
+      title: Post
+    ProjectConfiguration:
+      properties:
+        schema_version:
+          type: integer
+          const: 1
+          title: Schema Version
+          default: 1
+        creators:
+          items:
+            $ref: '#/components/schemas/CreatorReference'
+          type: array
+          title: Creators
+        blockers:
+          items:
+            $ref: '#/components/schemas/BlockerSpec'
+          type: array
+          title: Blockers
+      additionalProperties: false
+      type: object
+      title: ProjectConfiguration
+      description: Versioned project-local configuration.
+    ProjectDocumentResponse:
+      properties:
+        path:
+          type: string
+          format: path
+          title: Path
+        content:
+          type: string
+          title: Content
+        revision:
+          type: string
+          title: Revision
+        configuration:
+          $ref: '#/components/schemas/ProjectConfiguration'
+      type: object
+      required:
+      - path
+      - content
+      - revision
+      - configuration
+      title: ProjectDocumentResponse
+    ProjectSummaryResponse:
+      properties:
+        name:
+          type: string
+          title: Name
+        root:
+          type: string
+          format: path
+          title: Root
+        project_config:
+          type: string
+          format: path
+          title: Project Config
+        dotenv_files:
+          items:
+            type: string
+            format: path
+          type: array
+          title: Dotenv Files
+        version:
+          type: string
+          title: Version
+      type: object
+      required:
+      - name
+      - root
+      - project_config
+      - dotenv_files
+      - version
+      title: ProjectSummaryResponse
+    Revision:
+      properties:
+        id:
+          type: string
+          minLength: 1
+          title: Id
+        user:
+          type: string
+          minLength: 1
+          title: User
+        service:
+          type: string
+          minLength: 1
+          title: Service
+        title:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+        content:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Content
+        substring:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Substring
+        embed:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Embed
+        shared_file:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Shared File
+        added:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Added
+        published:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Published
+        edited:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Edited
+        file:
+          anyOf:
+          - $ref: '#/components/schemas/FileReference'
+          - type: 'null'
+        attachments:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/FileReference'
+            type: array
+          - type: 'null'
+          title: Attachments
+        poll:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Poll
+        captions:
+          anyOf:
+          - items: {}
+            type: array
+          - type: 'null'
+          title: Captions
+        tags:
+          anyOf:
+          - items: {}
+            type: array
+          - type: 'null'
+          title: Tags
+        origin:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Origin
+        preview_state:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Preview State
+        has_full:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Full
+        preview_attempts:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Preview Attempts
+        detail_fetched:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Detail Fetched
+        import_size_cap_gb:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Import Size Cap Gb
+        next:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next
+        prev:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Prev
+        revision_id:
+          type: integer
+          title: Revision Id
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - user
+      - service
+      - revision_id
+      title: Revision
+    SessionResponse:
+      properties:
+        authenticated:
+          type: boolean
+          title: Authenticated
+          default: true
+        username:
+          type: string
+          title: Username
+        csrf_token:
+          type: string
+          title: Csrf Token
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - username
+      - csrf_token
+      - created_at
+      title: SessionResponse
+    SiteVersionResponse:
+      properties:
+        version:
+          type: string
+          title: Version
+      type: object
+      required:
+      - version
+      title: SiteVersionResponse
+    SyncTaskSpec:
+      properties:
+        kind:
+          type: string
+          const: sync
+          title: Kind
+          default: sync
+        creators:
+          items:
+            $ref: '#/components/schemas/CreatorReference'
+          type: array
+          title: Creators
+        output:
+          type: string
+          format: path
+          title: Output
+          default: .
+        save_creator_indices:
+          type: boolean
+          title: Save Creator Indices
+          default: false
+        mix_posts:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Mix Posts
+        start_time:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Start Time
+        end_time:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: End Time
+        offset:
+          type: integer
+          minimum: 0.0
+          title: Offset
+          default: 0
+        length:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Length
+        keywords:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+          title: Keywords
+        keywords_exclude:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+          title: Keywords Exclude
+      additionalProperties: false
+      type: object
+      title: SyncTaskSpec
+    TaskArtifact:
+      properties:
+        path:
+          type: string
+          format: path
+          title: Path
+        size:
+          type: integer
+          title: Size
+        mtime_ns:
+          type: integer
+          title: Mtime Ns
+        removable:
+          type: boolean
+          title: Removable
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+      type: object
+      required:
+      - path
+      - size
+      - mtime_ns
+      - removable
+      title: TaskArtifact
+    TaskAttempt:
+      properties:
+        id:
+          type: integer
+          title: Id
+        task_id:
+          type: string
+          title: Task Id
+        sequence:
+          type: integer
+          title: Sequence
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        spec:
+          oneOf:
+          - $ref: '#/components/schemas/DownloadTaskSpec'
+          - $ref: '#/components/schemas/SyncTaskSpec'
+          title: Spec
+          discriminator:
+            propertyName: kind
+            mapping:
+              download: '#/components/schemas/DownloadTaskSpec'
+              sync: '#/components/schemas/SyncTaskSpec'
+        configuration:
+          additionalProperties: true
+          type: object
+          title: Configuration
+        started_at:
+          type: string
+          format: date-time
+          title: Started At
+        finished_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Finished At
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+      type: object
+      required:
+      - id
+      - task_id
+      - sequence
+      - status
+      - spec
+      - configuration
+      - started_at
+      title: TaskAttempt
+    TaskCleanupPreview:
+      properties:
+        task_id:
+          type: string
+          title: Task Id
+        artifacts:
+          items:
+            $ref: '#/components/schemas/TaskArtifact'
+          type: array
+          title: Artifacts
+        removable_files:
+          type: integer
+          title: Removable Files
+        removable_bytes:
+          type: integer
+          title: Removable Bytes
+      type: object
+      required:
+      - task_id
+      - artifacts
+      - removable_files
+      - removable_bytes
+      title: TaskCleanupPreview
+    TaskCreateRequest:
+      properties:
+        spec:
+          oneOf:
+          - $ref: '#/components/schemas/DownloadTaskSpec'
+          - $ref: '#/components/schemas/SyncTaskSpec'
+          title: Spec
+          discriminator:
+            propertyName: kind
+            mapping:
+              download: '#/components/schemas/DownloadTaskSpec'
+              sync: '#/components/schemas/SyncTaskSpec'
+        presentation:
+          anyOf:
+          - $ref: '#/components/schemas/TaskPresentationSnapshot'
+          - type: 'null'
+      additionalProperties: false
+      type: object
+      required:
+      - spec
+      title: TaskCreateRequest
+    TaskEvent:
+      properties:
+        id:
+          type: integer
+          title: Id
+        task_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Task Id
+        event_type:
+          type: string
+          title: Event Type
+        data:
+          additionalProperties: true
+          type: object
+          title: Data
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - event_type
+      - data
+      - created_at
+      title: TaskEvent
+    TaskPresentationSnapshot:
+      properties:
+        target_key:
+          type: string
+          maxLength: 1024
+          minLength: 1
+          title: Target Key
+        title:
+          anyOf:
+          - type: string
+            maxLength: 500
+          - type: 'null'
+          title: Title
+        creator_name:
+          anyOf:
+          - type: string
+            maxLength: 200
+          - type: 'null'
+          title: Creator Name
+      additionalProperties: false
+      type: object
+      required:
+      - target_key
+      title: TaskPresentationSnapshot
+      description: Non-executable labels captured when a task is created from Pawchive data.
+    TaskProgress:
+      properties:
+        queued_files:
+          type: integer
+          title: Queued Files
+          default: 0
+        processed_files:
+          type: integer
+          title: Processed Files
+          default: 0
+        completed_files:
+          type: integer
+          title: Completed Files
+          default: 0
+        existing_files:
+          type: integer
+          title: Existing Files
+          default: 0
+        failed_files:
+          type: integer
+          title: Failed Files
+          default: 0
+        transferred_bytes:
+          type: integer
+          title: Transferred Bytes
+          default: 0
+        total_bytes:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Total Bytes
+        speed_bps:
+          type: number
+          title: Speed Bps
+          default: 0
+        eta_seconds:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Eta Seconds
+        active_creators:
+          items:
+            type: string
+          type: array
+          title: Active Creators
+        active_downloads:
+          additionalProperties:
+            $ref: '#/components/schemas/ActiveDownload'
+          type: object
+          title: Active Downloads
+      type: object
+      title: TaskProgress
+    TaskRecord:
+      properties:
+        id:
+          type: string
+          title: Id
+        kind:
+          type: string
+          enum:
+          - download
+          - sync
+          title: Kind
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        spec:
+          oneOf:
+          - $ref: '#/components/schemas/DownloadTaskSpec'
+          - $ref: '#/components/schemas/SyncTaskSpec'
+          title: Spec
+          discriminator:
+            propertyName: kind
+            mapping:
+              download: '#/components/schemas/DownloadTaskSpec'
+              sync: '#/components/schemas/SyncTaskSpec'
+        presentation:
+          anyOf:
+          - $ref: '#/components/schemas/TaskPresentationSnapshot'
+          - type: 'null'
+        position:
+          type: integer
+          title: Position
+        revision:
+          type: integer
+          title: Revision
+        progress:
+          $ref: '#/components/schemas/TaskProgress'
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+        blocked_by:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Blocked By
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - kind
+      - status
+      - spec
+      - position
+      - revision
+      - created_at
+      - updated_at
+      title: TaskRecord
+    TaskReorderRequest:
+      properties:
+        position:
+          type: integer
+          minimum: 1.0
+          title: Position
+      type: object
+      required:
+      - position
+      title: TaskReorderRequest
+    TaskStatus:
+      type: string
+      enum:
+      - queued
+      - blocked
+      - running
+      - pause_requested
+      - paused
+      - stop_requested
+      - stopped
+      - completed
+      - failed
+      - interrupted
+      title: TaskStatus
+    TaskUpdateRequest:
+      properties:
+        spec:
+          oneOf:
+          - $ref: '#/components/schemas/DownloadTaskSpec'
+          - $ref: '#/components/schemas/SyncTaskSpec'
+          title: Spec
+          discriminator:
+            propertyName: kind
+            mapping:
+              download: '#/components/schemas/DownloadTaskSpec'
+              sync: '#/components/schemas/SyncTaskSpec'
+        presentation:
+          anyOf:
+          - $ref: '#/components/schemas/TaskPresentationSnapshot'
+          - type: 'null'
+      type: object
+      required:
+      - spec
+      title: TaskUpdateRequest
+    TextDocumentResponse:
+      properties:
+        name:
+          type: string
+          title: Name
+        path:
+          type: string
+          format: path
+          title: Path
+        content:
+          type: string
+          title: Content
+        revision:
+          type: string
+          title: Revision
+      type: object
+      required:
+      - name
+      - path
+      - content
+      - revision
+      title: TextDocumentResponse
+    TextDocumentUpdate:
+      properties:
+        content:
+          type: string
+          title: Content
+      type: object
+      required:
+      - content
+      title: TextDocumentUpdate
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    ValidationResponse:
+      properties:
+        valid:
+          type: boolean
+          title: Valid
+          default: true
+      type: object
+      title: ValidationResponse
+  securitySchemes:
+    WebUISession:
+      type: apiKey
+      in: cookie
+      name: ktoolbox_session
+      description: Opaque browser session created by the login operation.
+tags:
+- name: session
+  description: Browser account sessions.
+- name: project
+  description: Active project information.
+- name: configuration
+  description: Typed and raw project configuration.
+- name: creators
+  description: Configured creator roster.
+- name: ignore-rules
+  description: Ordered work ignore rules.
+- name: tasks
+  description: Persistent task queue and execution history.
+- name: pawchive
+  description: Public Pawchive search and work data.
+- name: filesystem
+  description: WebUI filesystem path picker.
+- name: system
+  description: Service status.

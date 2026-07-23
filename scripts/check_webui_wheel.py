@@ -17,6 +17,7 @@ def main() -> int:
         "ktoolbox/webui/static/index.html",
         "ktoolbox/webui/app.py",
         "ktoolbox/webui/server.py",
+        "webui/openapi.yaml",
     }
     missing = required - names
     if missing:

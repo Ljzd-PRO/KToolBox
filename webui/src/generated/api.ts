@@ -4,17 +4,19 @@
  */
 
 export interface paths {
-    "/api/v1/blockers": {
+    "/api/v1/config/schema": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** List Blockers */
-        get: operations["list_blockers_api_v1_blockers_get"];
-        /** Replace Blockers */
-        put: operations["replace_blockers_api_v1_blockers_put"];
+        /**
+         * Get configuration schema
+         * @description Return localized field metadata and redacted effective values for the project configuration.
+         */
+        get: operations["config_schema"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -29,16 +31,25 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get Dotenv */
-        get: operations["get_dotenv_api_v1_config_dotenv__name__get"];
-        /** Replace Dotenv */
-        put: operations["replace_dotenv_api_v1_config_dotenv__name__put"];
+        /**
+         * Read an environment file
+         * @description Read the raw project .env or prod.env document together with its revision.
+         */
+        get: operations["get_dotenv"];
+        /**
+         * Replace an environment file
+         * @description Atomically replace the raw project .env or prod.env document after an ETag check.
+         */
+        put: operations["replace_dotenv"];
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** Patch Dotenv */
-        patch: operations["patch_dotenv_api_v1_config_dotenv__name__patch"];
+        /**
+         * Patch environment values
+         * @description Atomically update selected values in .env or prod.env after an ETag check.
+         */
+        patch: operations["patch_dotenv"];
         trace?: never;
     };
     "/api/v1/config/dotenv/{name}/validate": {
@@ -50,8 +61,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Validate Dotenv */
-        post: operations["validate_dotenv_api_v1_config_dotenv__name__validate_post"];
+        /**
+         * Validate an environment file
+         * @description Validate environment-file text without saving it.
+         */
+        post: operations["validate_dotenv"];
         delete?: never;
         options?: never;
         head?: never;
@@ -65,8 +79,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Example Configuration */
-        get: operations["example_configuration_api_v1_config_example_get"];
+        /**
+         * Download example configuration
+         * @description Render and download a documented example environment file.
+         */
+        get: operations["example_configuration"];
         put?: never;
         post?: never;
         delete?: never;
@@ -82,10 +99,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get Project Config */
-        get: operations["get_project_config_api_v1_config_project_get"];
-        /** Replace Project Config */
-        put: operations["replace_project_config_api_v1_config_project_put"];
+        /**
+         * Read project configuration
+         * @description Read the raw ktoolbox.toml document and its parsed project configuration.
+         */
+        get: operations["get_project_config"];
+        /**
+         * Replace project configuration
+         * @description Atomically replace ktoolbox.toml after validation and an ETag check.
+         */
+        put: operations["replace_project_config"];
         post?: never;
         delete?: never;
         options?: never;
@@ -102,25 +125,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Validate Project Config */
-        post: operations["validate_project_config_api_v1_config_project_validate_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/config/schema": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Config Schema */
-        get: operations["config_schema_api_v1_config_schema_get"];
-        put?: never;
-        post?: never;
+        /**
+         * Validate project configuration
+         * @description Validate ktoolbox.toml text without saving it.
+         */
+        post: operations["validate_project_config"];
         delete?: never;
         options?: never;
         head?: never;
@@ -134,11 +143,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List Creators */
-        get: operations["list_creators_api_v1_creators_get"];
+        /**
+         * List configured creators
+         * @description List the project creator roster with cached Pawchive presentation names.
+         */
+        get: operations["list_creators"];
         put?: never;
-        /** Add Creator */
-        post: operations["add_creator_api_v1_creators_post"];
+        /**
+         * Add a creator
+         * @description Add a creator identity to the project roster.
+         */
+        post: operations["add_creator"];
         delete?: never;
         options?: never;
         head?: never;
@@ -153,26 +168,39 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Update Creator */
-        put: operations["update_creator_api_v1_creators__service___creator_id__put"];
+        /**
+         * Update a creator
+         * @description Update the note and enabled state of a configured creator.
+         */
+        put: operations["update_creator"];
         post?: never;
-        /** Delete Creator */
-        delete: operations["delete_creator_api_v1_creators__service___creator_id__delete"];
+        /**
+         * Remove a creator
+         * @description Remove a creator from the project roster and clear its cached presentation profile.
+         */
+        delete: operations["delete_creator"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/events": {
+    "/api/v1/blockers": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Event Stream */
-        get: operations["event_stream_api_v1_events_get"];
-        put?: never;
+        /**
+         * List ignore rules
+         * @description Return the ordered project ignore-rule definitions.
+         */
+        get: operations["list_blockers"];
+        /**
+         * Replace ignore rules
+         * @description Validate and replace the complete ordered ignore-rule collection.
+         */
+        put: operations["replace_blockers"];
         post?: never;
         delete?: never;
         options?: never;
@@ -187,8 +215,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Browse Filesystem */
-        get: operations["browse_filesystem_api_v1_filesystem_get"];
+        /**
+         * Browse files and directories
+         * @description Browse a project or host filesystem location for the WebUI path picker.
+         */
+        get: operations["browse_filesystem"];
         put?: never;
         post?: never;
         delete?: never;
@@ -206,27 +237,16 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create Directory */
-        post: operations["create_directory_api_v1_filesystem_directories_post"];
-        /** Delete Directory */
-        delete: operations["delete_directory_api_v1_filesystem_directories_delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/health": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Health */
-        get: operations["health_api_v1_health_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
+        /**
+         * Create a directory
+         * @description Create a directory through the WebUI path picker.
+         */
+        post: operations["create_directory"];
+        /**
+         * Delete an empty directory
+         * @description Delete an empty directory through the WebUI path picker.
+         */
+        delete: operations["delete_directory"];
         options?: never;
         head?: never;
         patch?: never;
@@ -239,8 +259,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Creators */
-        get: operations["creators_api_v1_pawchive_creators_get"];
+        /**
+         * Search Pawchive creators
+         * @description Search Pawchive for creators using an ID, name, or platform filter.
+         */
+        get: operations["creators"];
         put?: never;
         post?: never;
         delete?: never;
@@ -256,8 +279,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Posts */
-        get: operations["posts_api_v1_pawchive_posts_get"];
+        /**
+         * Search Pawchive works
+         * @description Search Pawchive for works using creator identity and text filters.
+         */
+        get: operations["posts"];
         put?: never;
         post?: never;
         delete?: never;
@@ -273,8 +299,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Post Details */
-        get: operations["post_details_api_v1_pawchive_posts__service___creator_id___post_id__get"];
+        /**
+         * Get a Pawchive work
+         * @description Return one Pawchive work or a selected historical revision.
+         */
+        get: operations["post_details"];
         put?: never;
         post?: never;
         delete?: never;
@@ -290,8 +319,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Post Revisions */
-        get: operations["post_revisions_api_v1_pawchive_posts__service___creator_id___post_id__revisions_get"];
+        /**
+         * List work revisions
+         * @description Return the known historical revisions for one Pawchive work.
+         */
+        get: operations["post_revisions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -307,8 +339,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Site Version */
-        get: operations["site_version_api_v1_pawchive_site_version_get"];
+        /**
+         * Get Pawchive version
+         * @description Return the version reported by the configured Pawchive service.
+         */
+        get: operations["site_version"];
         put?: never;
         post?: never;
         delete?: never;
@@ -317,15 +352,150 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/project": {
+    "/api/v1/tasks": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Project */
-        get: operations["project_api_v1_project_get"];
+        /**
+         * List tasks
+         * @description Return the persistent task queue in scheduling order.
+         */
+        get: operations["list_tasks"];
+        put?: never;
+        /**
+         * Create a task
+         * @description Create and enqueue a sync-author or download-work task.
+         */
+        post: operations["create_task"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a task
+         * @description Return one persistent task with its current progress and presentation snapshot.
+         */
+        get: operations["get_task"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a task
+         * @description Delete a task record and optionally its verified output artifacts.
+         */
+        delete: operations["delete_task"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a task
+         * @description Update the editable definition of a non-running task.
+         */
+        patch: operations["update_task"];
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reorder a task
+         * @description Move a non-running task to another queue position.
+         */
+        post: operations["reorder_task"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pause a task
+         * @description Request cooperative pause for a running task.
+         */
+        post: operations["pause_task"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/stop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stop a task
+         * @description Request cooperative stop for an active task.
+         */
+        post: operations["stop_task"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resume a task
+         * @description Resume a paused, stopped, interrupted, or failed task as a new attempt.
+         */
+        post: operations["resume_task"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/attempts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List task attempts
+         * @description Return the immutable execution attempts recorded for one task.
+         */
+        get: operations["task_attempts"];
         put?: never;
         post?: never;
         delete?: never;
@@ -334,15 +504,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/session": {
+    "/api/v1/tasks/{task_id}/events": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Current Session */
-        get: operations["current_session_api_v1_session_get"];
+        /**
+         * List task events
+         * @description Return at most 200 task progress and log events after a cursor.
+         */
+        get: operations["task_events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/cleanup-preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Preview task cleanup
+         * @description Preview artifacts that may be removed with a task without changing files.
+         */
+        get: operations["cleanup_preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stream task events
+         * @description Stream task and progress events to the browser using server-sent events.
+         */
+        get: operations["event_stream"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Check service health
+         * @description Return a minimal process health response.
+         */
+        get: operations["health"];
         put?: never;
         post?: never;
         delete?: never;
@@ -360,8 +593,31 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Login */
-        post: operations["login_api_v1_session_login_post"];
+        /**
+         * Log in
+         * @description Authenticate the configured WebUI account and create a browser session.
+         */
+        post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get current session
+         * @description Return the authenticated WebUI browser session.
+         */
+        get: operations["current_session"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -377,164 +633,31 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Logout */
-        post: operations["logout_api_v1_session_logout_post"];
+        /**
+         * Log out
+         * @description Revoke the current WebUI browser session.
+         */
+        post: operations["logout"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/tasks": {
+    "/api/v1/project": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** List Tasks */
-        get: operations["list_tasks_api_v1_tasks_get"];
-        put?: never;
-        /** Create Task */
-        post: operations["create_task_api_v1_tasks_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/tasks/{task_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Task */
-        get: operations["get_task_api_v1_tasks__task_id__get"];
+        /**
+         * Get project summary
+         * @description Return the active project root, configuration files, and KToolBox version.
+         */
+        get: operations["project"];
         put?: never;
         post?: never;
-        /** Delete Task */
-        delete: operations["delete_task_api_v1_tasks__task_id__delete"];
-        options?: never;
-        head?: never;
-        /** Update Task */
-        patch: operations["update_task_api_v1_tasks__task_id__patch"];
-        trace?: never;
-    };
-    "/api/v1/tasks/{task_id}/attempts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Task Attempts */
-        get: operations["task_attempts_api_v1_tasks__task_id__attempts_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/tasks/{task_id}/cleanup-preview": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Cleanup Preview */
-        get: operations["cleanup_preview_api_v1_tasks__task_id__cleanup_preview_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/tasks/{task_id}/events": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Task Events */
-        get: operations["task_events_api_v1_tasks__task_id__events_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/tasks/{task_id}/pause": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Pause Task */
-        post: operations["pause_task_api_v1_tasks__task_id__pause_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/tasks/{task_id}/reorder": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Reorder Task */
-        post: operations["reorder_task_api_v1_tasks__task_id__reorder_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/tasks/{task_id}/resume": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Resume Task */
-        post: operations["resume_task_api_v1_tasks__task_id__resume_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/tasks/{task_id}/stop": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Stop Task */
-        post: operations["stop_task_api_v1_tasks__task_id__stop_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -547,22 +670,22 @@ export interface components {
     schemas: {
         /** ActiveDownload */
         ActiveDownload: {
+            /** Creator Key */
+            creator_key: string;
+            /** Filename */
+            filename: string;
+            /** Total */
+            total?: number | null;
             /**
              * Completed
              * @default 0
              */
             completed: number;
-            /** Creator Key */
-            creator_key: string;
-            /** Filename */
-            filename: string;
             /**
              * Speed Bps
              * @default 0
              */
             speed_bps: number;
-            /** Total */
-            total?: number | null;
         };
         /** BlockerListResponse */
         BlockerListResponse: {
@@ -574,75 +697,73 @@ export interface components {
          * @description Select whether a blocker applies globally or to named creators.
          */
         BlockerScope: {
-            /** Creators */
-            creators?: string[];
             /**
              * Mode
              * @default global
              * @enum {string}
              */
             mode: "global" | "creators";
+            /** Creators */
+            creators?: string[];
         };
         /**
          * BlockerSpec
          * @description Serializable definition used by the blocker registry.
          */
         BlockerSpec: {
-            /**
-             * Enabled
-             * @default true
-             */
-            enabled: boolean;
             /** Id */
             id: string;
-            /** Options */
-            options?: {
-                [key: string]: unknown;
-            };
-            scope?: components["schemas"]["BlockerScope"];
             /**
              * Type
              * @default field-match
              */
             type: string;
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            scope?: components["schemas"]["BlockerScope"];
+            /** Options */
+            options?: {
+                [key: string]: unknown;
+            };
         };
         /** ConfigFieldResponse */
         ConfigFieldResponse: {
+            /** Path */
+            path: string;
+            /** Env Name */
+            env_name: string;
+            /** Section */
+            section: string;
+            /** Label */
+            label: string;
+            /** Description */
+            description: string;
+            /** Json Schema */
+            json_schema: {
+                [key: string]: unknown;
+            };
+            /** Default */
+            default?: unknown;
+            /** Value */
+            value?: unknown;
+            /** Is Set */
+            is_set: boolean;
+            /** Secret */
+            secret: boolean;
+            /** Source */
+            source: ("default" | ".env" | "prod.env" | "environment") | string;
             /**
              * Apply Mode
              * @enum {string}
              */
             apply_mode: "next_task" | "restart";
-            /** Default */
-            default?: unknown;
-            /** Description */
-            description: string;
-            /** Env Name */
-            env_name: string;
-            /** Is Set */
-            is_set: boolean;
-            /** Json Schema */
-            json_schema: {
-                [key: string]: unknown;
-            };
-            /** Label */
-            label: string;
-            /** Path */
-            path: string;
             path_selector?: components["schemas"]["PathSelectorResponse"] | null;
-            /** Secret */
-            secret: boolean;
-            /** Section */
-            section: string;
-            /** Source */
-            source: ("default" | ".env" | "prod.env" | "environment") | string;
-            /** Value */
-            value?: unknown;
         };
         /** ConfigSchemaResponse */
         ConfigSchemaResponse: {
-            /** Fields */
-            fields: components["schemas"]["ConfigFieldResponse"][];
             /**
              * Locale
              * @enum {string}
@@ -652,30 +773,34 @@ export interface components {
             sections: {
                 [key: string]: string;
             };
+            /** Fields */
+            fields: components["schemas"]["ConfigFieldResponse"][];
         };
         /**
          * CreatorReference
          * @description A stable Pawchive creator identity stored in the project roster.
          */
         CreatorReference: {
-            /** Alias */
-            alias?: string | null;
+            /** Service */
+            service: string;
             /** Creator Id */
             creator_id: string;
+            /** Alias */
+            alias?: string | null;
             /**
              * Enabled
              * @default true
              */
             enabled: boolean;
-            /** Service */
-            service: string;
         };
         /** CreatorRosterItemResponse */
         CreatorRosterItemResponse: {
-            /** Alias */
-            alias?: string | null;
+            /** Service */
+            service: string;
             /** Creator Id */
             creator_id: string;
+            /** Alias */
+            alias?: string | null;
             /**
              * Enabled
              * @default true
@@ -683,8 +808,6 @@ export interface components {
             enabled: boolean;
             /** Name */
             name?: string | null;
-            /** Service */
-            service: string;
         };
         /** CreatorSummary */
         CreatorSummary: {
@@ -722,32 +845,32 @@ export interface components {
         };
         /** DownloadTaskSpec */
         DownloadTaskSpec: {
-            /** Creator Id */
-            creator_id?: string | null;
-            /**
-             * Dump Post Data
-             * @default true
-             */
-            dump_post_data: boolean;
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
             kind: "download";
+            /** Post */
+            post?: string | null;
+            /** Service */
+            service?: string | null;
+            /** Creator Id */
+            creator_id?: string | null;
+            /** Post Id */
+            post_id?: string | null;
+            /** Revision Id */
+            revision_id?: string | null;
             /**
              * Output
              * Format: path
              * @default .
              */
             output: string;
-            /** Post */
-            post?: string | null;
-            /** Post Id */
-            post_id?: string | null;
-            /** Revision Id */
-            revision_id?: string | null;
-            /** Service */
-            service?: string | null;
+            /**
+             * Dump Post Data
+             * @default true
+             */
+            dump_post_data: boolean;
         };
         /** FileReference */
         FileReference: {
@@ -767,80 +890,80 @@ export interface components {
         };
         /** FilesystemBrowseResponse */
         FilesystemBrowseResponse: {
-            /** Breadcrumbs */
-            breadcrumbs: components["schemas"]["FilesystemBreadcrumbResponse"][];
-            /** Entries */
-            entries: components["schemas"]["FilesystemEntryResponse"][];
-            /** Has More */
-            has_more: boolean;
-            /** Limit */
-            limit: number;
-            /** Locations */
-            locations: components["schemas"]["FilesystemLocationResponse"][];
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "project" | "host";
             /**
              * Mode
              * @enum {string}
              */
             mode: "directory" | "file";
-            /** Offset */
-            offset: number;
-            /** Parent */
-            parent?: string | null;
             /** Path */
             path: string;
             /** Project Relative Path */
             project_relative_path?: string | null;
-            /**
-             * Scope
-             * @enum {string}
-             */
-            scope: "project" | "host";
+            /** Parent */
+            parent?: string | null;
             /** Separator */
             separator: string;
+            /** Breadcrumbs */
+            breadcrumbs: components["schemas"]["FilesystemBreadcrumbResponse"][];
+            /** Locations */
+            locations: components["schemas"]["FilesystemLocationResponse"][];
+            /** Entries */
+            entries: components["schemas"]["FilesystemEntryResponse"][];
             /** Suggested Name */
             suggested_name?: string | null;
+            /** Offset */
+            offset: number;
+            /** Limit */
+            limit: number;
+            /** Has More */
+            has_more: boolean;
         };
         /** FilesystemCreateDirectoryRequest */
         FilesystemCreateDirectoryRequest: {
-            /** Name */
-            name: string;
-            /** Parent */
-            parent: string;
             /**
              * Scope
              * @enum {string}
              */
             scope: "project" | "host";
+            /** Parent */
+            parent: string;
+            /** Name */
+            name: string;
         };
         /** FilesystemDeleteDirectoryRequest */
         FilesystemDeleteDirectoryRequest: {
-            /** Path */
-            path: string;
             /**
              * Scope
              * @enum {string}
              */
             scope: "project" | "host";
+            /** Path */
+            path: string;
         };
         /** FilesystemEntryResponse */
         FilesystemEntryResponse: {
-            /** Deletable */
-            deletable: boolean;
-            /** Is Symlink */
-            is_symlink: boolean;
+            /** Name */
+            name: string;
+            /** Path */
+            path: string;
+            /** Project Relative Path */
+            project_relative_path?: string | null;
             /**
              * Kind
              * @enum {string}
              */
             kind: "directory" | "file" | "other";
-            /** Name */
-            name: string;
+            /** Is Symlink */
+            is_symlink: boolean;
             /** Navigable */
             navigable: boolean;
-            /** Path */
-            path: string;
-            /** Project Relative Path */
-            project_relative_path?: string | null;
+            /** Deletable */
+            deletable: boolean;
         };
         /** FilesystemLocationResponse */
         FilesystemLocationResponse: {
@@ -866,10 +989,10 @@ export interface components {
         };
         /** LoginRequest */
         LoginRequest: {
-            /** Password */
-            password: string;
             /** Username */
             username: string;
+            /** Password */
+            password: string;
         };
         /** PathSelectorResponse */
         PathSelectorResponse: {
@@ -891,57 +1014,57 @@ export interface components {
         };
         /** Post */
         Post: {
-            /** Added */
-            added?: string | null;
-            /** Attachments */
-            attachments?: components["schemas"]["FileReference"][] | null;
-            /** Captions */
-            captions?: unknown[] | null;
+            /** Id */
+            id: string;
+            /** User */
+            user: string;
+            /** Service */
+            service: string;
+            /** Title */
+            title?: string | null;
             /** Content */
             content?: string | null;
-            /** Detail Fetched */
-            detail_fetched?: boolean | null;
-            /** Edited */
-            edited?: string | null;
+            /** Substring */
+            substring?: string | null;
             /** Embed */
             embed?: {
                 [key: string]: unknown;
             } | null;
+            /** Shared File */
+            shared_file?: boolean | null;
+            /** Added */
+            added?: string | null;
+            /** Published */
+            published?: string | null;
+            /** Edited */
+            edited?: string | null;
             file?: components["schemas"]["FileReference"] | null;
-            /** Has Full */
-            has_full?: boolean | null;
-            /** Id */
-            id: string;
-            /** Import Size Cap Gb */
-            import_size_cap_gb?: number | null;
-            /** Next */
-            next?: string | null;
-            /** Origin */
-            origin?: string | null;
+            /** Attachments */
+            attachments?: components["schemas"]["FileReference"][] | null;
             /** Poll */
             poll?: {
                 [key: string]: unknown;
             } | null;
-            /** Prev */
-            prev?: string | null;
-            /** Preview Attempts */
-            preview_attempts?: number | null;
-            /** Preview State */
-            preview_state?: string | null;
-            /** Published */
-            published?: string | null;
-            /** Service */
-            service: string;
-            /** Shared File */
-            shared_file?: boolean | null;
-            /** Substring */
-            substring?: string | null;
+            /** Captions */
+            captions?: unknown[] | null;
             /** Tags */
             tags?: unknown[] | null;
-            /** Title */
-            title?: string | null;
-            /** User */
-            user: string;
+            /** Origin */
+            origin?: string | null;
+            /** Preview State */
+            preview_state?: string | null;
+            /** Has Full */
+            has_full?: boolean | null;
+            /** Preview Attempts */
+            preview_attempts?: number | null;
+            /** Detail Fetched */
+            detail_fetched?: boolean | null;
+            /** Import Size Cap Gb */
+            import_size_cap_gb?: number | null;
+            /** Next */
+            next?: string | null;
+            /** Prev */
+            prev?: string | null;
         } & {
             [key: string]: unknown;
         };
@@ -950,104 +1073,104 @@ export interface components {
          * @description Versioned project-local configuration.
          */
         ProjectConfiguration: {
-            /** Blockers */
-            blockers?: components["schemas"]["BlockerSpec"][];
-            /** Creators */
-            creators?: components["schemas"]["CreatorReference"][];
             /**
              * Schema Version
              * @default 1
              * @constant
              */
             schema_version: 1;
+            /** Creators */
+            creators?: components["schemas"]["CreatorReference"][];
+            /** Blockers */
+            blockers?: components["schemas"]["BlockerSpec"][];
         };
         /** ProjectDocumentResponse */
         ProjectDocumentResponse: {
-            configuration: components["schemas"]["ProjectConfiguration"];
-            /** Content */
-            content: string;
             /**
              * Path
              * Format: path
              */
             path: string;
+            /** Content */
+            content: string;
             /** Revision */
             revision: string;
+            configuration: components["schemas"]["ProjectConfiguration"];
         };
         /** ProjectSummaryResponse */
         ProjectSummaryResponse: {
-            /** Dotenv Files */
-            dotenv_files: string[];
             /** Name */
             name: string;
-            /**
-             * Project Config
-             * Format: path
-             */
-            project_config: string;
             /**
              * Root
              * Format: path
              */
             root: string;
+            /**
+             * Project Config
+             * Format: path
+             */
+            project_config: string;
+            /** Dotenv Files */
+            dotenv_files: string[];
             /** Version */
             version: string;
         };
         /** Revision */
         Revision: {
-            /** Added */
-            added?: string | null;
-            /** Attachments */
-            attachments?: components["schemas"]["FileReference"][] | null;
-            /** Captions */
-            captions?: unknown[] | null;
+            /** Id */
+            id: string;
+            /** User */
+            user: string;
+            /** Service */
+            service: string;
+            /** Title */
+            title?: string | null;
             /** Content */
             content?: string | null;
-            /** Detail Fetched */
-            detail_fetched?: boolean | null;
-            /** Edited */
-            edited?: string | null;
+            /** Substring */
+            substring?: string | null;
             /** Embed */
             embed?: {
                 [key: string]: unknown;
             } | null;
+            /** Shared File */
+            shared_file?: boolean | null;
+            /** Added */
+            added?: string | null;
+            /** Published */
+            published?: string | null;
+            /** Edited */
+            edited?: string | null;
             file?: components["schemas"]["FileReference"] | null;
-            /** Has Full */
-            has_full?: boolean | null;
-            /** Id */
-            id: string;
-            /** Import Size Cap Gb */
-            import_size_cap_gb?: number | null;
-            /** Next */
-            next?: string | null;
-            /** Origin */
-            origin?: string | null;
+            /** Attachments */
+            attachments?: components["schemas"]["FileReference"][] | null;
             /** Poll */
             poll?: {
                 [key: string]: unknown;
             } | null;
-            /** Prev */
-            prev?: string | null;
-            /** Preview Attempts */
-            preview_attempts?: number | null;
-            /** Preview State */
-            preview_state?: string | null;
-            /** Published */
-            published?: string | null;
-            /** Revision Id */
-            revision_id: number;
-            /** Service */
-            service: string;
-            /** Shared File */
-            shared_file?: boolean | null;
-            /** Substring */
-            substring?: string | null;
+            /** Captions */
+            captions?: unknown[] | null;
             /** Tags */
             tags?: unknown[] | null;
-            /** Title */
-            title?: string | null;
-            /** User */
-            user: string;
+            /** Origin */
+            origin?: string | null;
+            /** Preview State */
+            preview_state?: string | null;
+            /** Has Full */
+            has_full?: boolean | null;
+            /** Preview Attempts */
+            preview_attempts?: number | null;
+            /** Detail Fetched */
+            detail_fetched?: boolean | null;
+            /** Import Size Cap Gb */
+            import_size_cap_gb?: number | null;
+            /** Next */
+            next?: string | null;
+            /** Prev */
+            prev?: string | null;
+            /** Revision Id */
+            revision_id: number;
         } & {
             [key: string]: unknown;
         };
@@ -1058,15 +1181,15 @@ export interface components {
              * @default true
              */
             authenticated: boolean;
+            /** Username */
+            username: string;
+            /** Csrf Token */
+            csrf_token: string;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
-            /** Csrf Token */
-            csrf_token: string;
-            /** Username */
-            username: string;
         };
         /** SiteVersionResponse */
         SiteVersionResponse: {
@@ -1075,28 +1198,13 @@ export interface components {
         };
         /** SyncTaskSpec */
         SyncTaskSpec: {
-            /** Creators */
-            creators?: components["schemas"]["CreatorReference"][];
-            /** End Time */
-            end_time?: string | null;
-            /** Keywords */
-            keywords?: string[];
-            /** Keywords Exclude */
-            keywords_exclude?: string[];
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
             kind: "sync";
-            /** Length */
-            length?: number | null;
-            /** Mix Posts */
-            mix_posts?: boolean | null;
-            /**
-             * Offset
-             * @default 0
-             */
-            offset: number;
+            /** Creators */
+            creators?: components["schemas"]["CreatorReference"][];
             /**
              * Output
              * Format: path
@@ -1108,112 +1216,129 @@ export interface components {
              * @default false
              */
             save_creator_indices: boolean;
+            /** Mix Posts */
+            mix_posts?: boolean | null;
             /** Start Time */
             start_time?: string | null;
+            /** End Time */
+            end_time?: string | null;
+            /**
+             * Offset
+             * @default 0
+             */
+            offset: number;
+            /** Length */
+            length?: number | null;
+            /** Keywords */
+            keywords?: string[];
+            /** Keywords Exclude */
+            keywords_exclude?: string[];
         };
         /** TaskArtifact */
         TaskArtifact: {
-            /** Mtime Ns */
-            mtime_ns: number;
             /**
              * Path
              * Format: path
              */
             path: string;
-            /** Reason */
-            reason?: string | null;
-            /** Removable */
-            removable: boolean;
             /** Size */
             size: number;
+            /** Mtime Ns */
+            mtime_ns: number;
+            /** Removable */
+            removable: boolean;
+            /** Reason */
+            reason?: string | null;
         };
         /** TaskAttempt */
         TaskAttempt: {
+            /** Id */
+            id: number;
+            /** Task Id */
+            task_id: string;
+            /** Sequence */
+            sequence: number;
+            status: components["schemas"]["TaskStatus"];
+            /** Spec */
+            spec: components["schemas"]["DownloadTaskSpec"] | components["schemas"]["SyncTaskSpec"];
             /** Configuration */
             configuration: {
                 [key: string]: unknown;
             };
-            /** Error */
-            error?: string | null;
-            /** Finished At */
-            finished_at?: string | null;
-            /** Id */
-            id: number;
-            /** Sequence */
-            sequence: number;
-            /** Spec */
-            spec: components["schemas"]["DownloadTaskSpec"] | components["schemas"]["SyncTaskSpec"];
             /**
              * Started At
              * Format: date-time
              */
             started_at: string;
-            status: components["schemas"]["TaskStatus"];
-            /** Task Id */
-            task_id: string;
+            /** Finished At */
+            finished_at?: string | null;
+            /** Error */
+            error?: string | null;
         };
         /** TaskCleanupPreview */
         TaskCleanupPreview: {
-            /** Artifacts */
-            artifacts: components["schemas"]["TaskArtifact"][];
-            /** Removable Bytes */
-            removable_bytes: number;
-            /** Removable Files */
-            removable_files: number;
             /** Task Id */
             task_id: string;
+            /** Artifacts */
+            artifacts: components["schemas"]["TaskArtifact"][];
+            /** Removable Files */
+            removable_files: number;
+            /** Removable Bytes */
+            removable_bytes: number;
         };
         /** TaskCreateRequest */
         TaskCreateRequest: {
-            presentation?: components["schemas"]["TaskPresentationSnapshot"] | null;
             /** Spec */
             spec: components["schemas"]["DownloadTaskSpec"] | components["schemas"]["SyncTaskSpec"];
+            presentation?: components["schemas"]["TaskPresentationSnapshot"] | null;
         };
         /** TaskEvent */
         TaskEvent: {
+            /** Id */
+            id: number;
+            /** Task Id */
+            task_id?: string | null;
+            /** Event Type */
+            event_type: string;
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
-            /** Data */
-            data: {
-                [key: string]: unknown;
-            };
-            /** Event Type */
-            event_type: string;
-            /** Id */
-            id: number;
-            /** Task Id */
-            task_id?: string | null;
         };
         /**
          * TaskPresentationSnapshot
          * @description Non-executable labels captured when a task is created from Pawchive data.
          */
         TaskPresentationSnapshot: {
-            /** Creator Name */
-            creator_name?: string | null;
             /** Target Key */
             target_key: string;
             /** Title */
             title?: string | null;
+            /** Creator Name */
+            creator_name?: string | null;
         };
         /** TaskProgress */
         TaskProgress: {
-            /** Active Creators */
-            active_creators?: string[];
-            /** Active Downloads */
-            active_downloads?: {
-                [key: string]: components["schemas"]["ActiveDownload"];
-            };
+            /**
+             * Queued Files
+             * @default 0
+             */
+            queued_files: number;
+            /**
+             * Processed Files
+             * @default 0
+             */
+            processed_files: number;
             /**
              * Completed Files
              * @default 0
              */
             completed_files: number;
-            /** Eta Seconds */
-            eta_seconds?: number | null;
             /**
              * Existing Files
              * @default 0
@@ -1225,39 +1350,28 @@ export interface components {
              */
             failed_files: number;
             /**
-             * Processed Files
+             * Transferred Bytes
              * @default 0
              */
-            processed_files: number;
-            /**
-             * Queued Files
-             * @default 0
-             */
-            queued_files: number;
+            transferred_bytes: number;
+            /** Total Bytes */
+            total_bytes?: number | null;
             /**
              * Speed Bps
              * @default 0
              */
             speed_bps: number;
-            /** Total Bytes */
-            total_bytes?: number | null;
-            /**
-             * Transferred Bytes
-             * @default 0
-             */
-            transferred_bytes: number;
+            /** Eta Seconds */
+            eta_seconds?: number | null;
+            /** Active Creators */
+            active_creators?: string[];
+            /** Active Downloads */
+            active_downloads?: {
+                [key: string]: components["schemas"]["ActiveDownload"];
+            };
         };
         /** TaskRecord */
         TaskRecord: {
-            /** Blocked By */
-            blocked_by?: string | null;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /** Error */
-            error?: string | null;
             /** Id */
             id: string;
             /**
@@ -1265,15 +1379,24 @@ export interface components {
              * @enum {string}
              */
             kind: "download" | "sync";
-            /** Position */
-            position: number;
-            presentation?: components["schemas"]["TaskPresentationSnapshot"] | null;
-            progress?: components["schemas"]["TaskProgress"];
-            /** Revision */
-            revision: number;
+            status: components["schemas"]["TaskStatus"];
             /** Spec */
             spec: components["schemas"]["DownloadTaskSpec"] | components["schemas"]["SyncTaskSpec"];
-            status: components["schemas"]["TaskStatus"];
+            presentation?: components["schemas"]["TaskPresentationSnapshot"] | null;
+            /** Position */
+            position: number;
+            /** Revision */
+            revision: number;
+            progress?: components["schemas"]["TaskProgress"];
+            /** Error */
+            error?: string | null;
+            /** Blocked By */
+            blocked_by?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
             /**
              * Updated At
              * Format: date-time
@@ -1292,14 +1415,12 @@ export interface components {
         TaskStatus: "queued" | "blocked" | "running" | "pause_requested" | "paused" | "stop_requested" | "stopped" | "completed" | "failed" | "interrupted";
         /** TaskUpdateRequest */
         TaskUpdateRequest: {
-            presentation?: components["schemas"]["TaskPresentationSnapshot"] | null;
             /** Spec */
             spec: components["schemas"]["DownloadTaskSpec"] | components["schemas"]["SyncTaskSpec"];
+            presentation?: components["schemas"]["TaskPresentationSnapshot"] | null;
         };
         /** TextDocumentResponse */
         TextDocumentResponse: {
-            /** Content */
-            content: string;
             /** Name */
             name: string;
             /**
@@ -1307,6 +1428,8 @@ export interface components {
              * Format: path
              */
             path: string;
+            /** Content */
+            content: string;
             /** Revision */
             revision: string;
         };
@@ -1317,16 +1440,16 @@ export interface components {
         };
         /** ValidationError */
         ValidationError: {
-            /** Context */
-            ctx?: Record<string, never>;
-            /** Input */
-            input?: unknown;
             /** Location */
             loc: (string | number)[];
             /** Message */
             msg: string;
             /** Error Type */
             type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
         };
         /** ValidationResponse */
         ValidationResponse: {
@@ -1345,9 +1468,11 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    list_blockers_api_v1_blockers_get: {
+    config_schema: {
         parameters: {
-            query?: never;
+            query?: {
+                locale?: "zh-CN" | "zh-Hant" | "en" | "ja" | "ko" | "fr" | "ru";
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1360,31 +1485,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["BlockerListResponse"];
-                };
-            };
-        };
-    };
-    replace_blockers_api_v1_blockers_put: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BlockerSpec"][];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BlockerListResponse"];
+                    "application/json": components["schemas"]["ConfigSchemaResponse"];
                 };
             };
             /** @description Validation Error */
@@ -1398,7 +1499,7 @@ export interface operations {
             };
         };
     };
-    get_dotenv_api_v1_config_dotenv__name__get: {
+    get_dotenv: {
         parameters: {
             query?: never;
             header?: never;
@@ -1429,11 +1530,13 @@ export interface operations {
             };
         };
     };
-    replace_dotenv_api_v1_config_dotenv__name__put: {
+    replace_dotenv: {
         parameters: {
             query?: never;
-            header?: {
+            header: {
                 "If-Match"?: string | null;
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
             };
             path: {
                 name: "dotenv" | "production";
@@ -1466,11 +1569,13 @@ export interface operations {
             };
         };
     };
-    patch_dotenv_api_v1_config_dotenv__name__patch: {
+    patch_dotenv: {
         parameters: {
             query?: never;
-            header?: {
+            header: {
                 "If-Match"?: string | null;
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
             };
             path: {
                 name: "dotenv" | "production";
@@ -1503,7 +1608,7 @@ export interface operations {
             };
         };
     };
-    validate_dotenv_api_v1_config_dotenv__name__validate_post: {
+    validate_dotenv: {
         parameters: {
             query?: never;
             header?: never;
@@ -1538,7 +1643,7 @@ export interface operations {
             };
         };
     };
-    example_configuration_api_v1_config_example_get: {
+    example_configuration: {
         parameters: {
             query?: never;
             header?: never;
@@ -1558,7 +1663,7 @@ export interface operations {
             };
         };
     };
-    get_project_config_api_v1_config_project_get: {
+    get_project_config: {
         parameters: {
             query?: never;
             header?: never;
@@ -1578,11 +1683,13 @@ export interface operations {
             };
         };
     };
-    replace_project_config_api_v1_config_project_put: {
+    replace_project_config: {
         parameters: {
             query?: never;
-            header?: {
+            header: {
                 "If-Match"?: string | null;
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
             };
             path?: never;
             cookie?: never;
@@ -1613,7 +1720,7 @@ export interface operations {
             };
         };
     };
-    validate_project_config_api_v1_config_project_validate_post: {
+    validate_project_config: {
         parameters: {
             query?: never;
             header?: never;
@@ -1646,38 +1753,7 @@ export interface operations {
             };
         };
     };
-    config_schema_api_v1_config_schema_get: {
-        parameters: {
-            query?: {
-                locale?: "zh-CN" | "zh-Hant" | "en" | "ja" | "ko" | "fr" | "ru";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ConfigSchemaResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_creators_api_v1_creators_get: {
+    list_creators: {
         parameters: {
             query?: never;
             header?: never;
@@ -1697,10 +1773,13 @@ export interface operations {
             };
         };
     };
-    add_creator_api_v1_creators_post: {
+    add_creator: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1730,10 +1809,13 @@ export interface operations {
             };
         };
     };
-    update_creator_api_v1_creators__service___creator_id__put: {
+    update_creator: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
             path: {
                 service: string;
                 creator_id: string;
@@ -1766,10 +1848,13 @@ export interface operations {
             };
         };
     };
-    delete_creator_api_v1_creators__service___creator_id__delete: {
+    delete_creator: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
             path: {
                 service: string;
                 creator_id: string;
@@ -1798,14 +1883,10 @@ export interface operations {
             };
         };
     };
-    event_stream_api_v1_events_get: {
+    list_blockers: {
         parameters: {
-            query?: {
-                after?: number;
-            };
-            header?: {
-                "last-event-id"?: string | null;
-            };
+            query?: never;
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -1817,7 +1898,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["BlockerListResponse"];
+                };
+            };
+        };
+    };
+    replace_blockers: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BlockerSpec"][];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BlockerListResponse"];
                 };
             };
             /** @description Validation Error */
@@ -1831,7 +1939,7 @@ export interface operations {
             };
         };
     };
-    browse_filesystem_api_v1_filesystem_get: {
+    browse_filesystem: {
         parameters: {
             query?: {
                 scope?: "project" | "host";
@@ -1868,10 +1976,13 @@ export interface operations {
             };
         };
     };
-    create_directory_api_v1_filesystem_directories_post: {
+    create_directory: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1901,10 +2012,13 @@ export interface operations {
             };
         };
     };
-    delete_directory_api_v1_filesystem_directories_delete: {
+    delete_directory: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1932,27 +2046,7 @@ export interface operations {
             };
         };
     };
-    health_api_v1_health_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HealthResponse"];
-                };
-            };
-        };
-    };
-    creators_api_v1_pawchive_creators_get: {
+    creators: {
         parameters: {
             query?: {
                 creator_id?: string | null;
@@ -1985,7 +2079,7 @@ export interface operations {
             };
         };
     };
-    posts_api_v1_pawchive_posts_get: {
+    posts: {
         parameters: {
             query?: {
                 creator_id?: string | null;
@@ -2020,7 +2114,7 @@ export interface operations {
             };
         };
     };
-    post_details_api_v1_pawchive_posts__service___creator_id___post_id__get: {
+    post_details: {
         parameters: {
             query?: {
                 revision_id?: string | null;
@@ -2055,7 +2149,7 @@ export interface operations {
             };
         };
     };
-    post_revisions_api_v1_pawchive_posts__service___creator_id___post_id__revisions_get: {
+    post_revisions: {
         parameters: {
             query?: never;
             header?: never;
@@ -2088,7 +2182,7 @@ export interface operations {
             };
         };
     };
-    site_version_api_v1_pawchive_site_version_get: {
+    site_version: {
         parameters: {
             query?: never;
             header?: never;
@@ -2108,98 +2202,7 @@ export interface operations {
             };
         };
     };
-    project_api_v1_project_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProjectSummaryResponse"];
-                };
-            };
-        };
-    };
-    current_session_api_v1_session_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SessionResponse"];
-                };
-            };
-        };
-    };
-    login_api_v1_session_login_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LoginRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SessionResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    logout_api_v1_session_logout_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    list_tasks_api_v1_tasks_get: {
+    list_tasks: {
         parameters: {
             query?: never;
             header?: never;
@@ -2219,10 +2222,13 @@ export interface operations {
             };
         };
     };
-    create_task_api_v1_tasks_post: {
+    create_task: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2252,7 +2258,7 @@ export interface operations {
             };
         };
     };
-    get_task_api_v1_tasks__task_id__get: {
+    get_task: {
         parameters: {
             query?: never;
             header?: never;
@@ -2283,13 +2289,16 @@ export interface operations {
             };
         };
     };
-    delete_task_api_v1_tasks__task_id__delete: {
+    delete_task: {
         parameters: {
             query?: {
                 delete_output?: boolean;
                 confirmation?: string | null;
             };
-            header?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
             path: {
                 task_id: string;
             };
@@ -2317,10 +2326,13 @@ export interface operations {
             };
         };
     };
-    update_task_api_v1_tasks__task_id__patch: {
+    update_task: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
             path: {
                 task_id: string;
             };
@@ -2352,7 +2364,147 @@ export interface operations {
             };
         };
     };
-    task_attempts_api_v1_tasks__task_id__attempts_get: {
+    reorder_task: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskReorderRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskRecord"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pause_task: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskRecord"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stop_task: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskRecord"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resume_task: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskRecord"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    task_attempts: {
         parameters: {
             query?: never;
             header?: never;
@@ -2383,38 +2535,7 @@ export interface operations {
             };
         };
     };
-    cleanup_preview_api_v1_tasks__task_id__cleanup_preview_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                task_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TaskCleanupPreview"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    task_events_api_v1_tasks__task_id__events_get: {
+    task_events: {
         parameters: {
             query?: {
                 after?: number;
@@ -2448,7 +2569,7 @@ export interface operations {
             };
         };
     };
-    pause_task_api_v1_tasks__task_id__pause_post: {
+    cleanup_preview: {
         parameters: {
             query?: never;
             header?: never;
@@ -2465,7 +2586,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TaskRecord"];
+                    "application/json": components["schemas"]["TaskCleanupPreview"];
                 };
             };
             /** @description Validation Error */
@@ -2479,18 +2600,69 @@ export interface operations {
             };
         };
     };
-    reorder_task_api_v1_tasks__task_id__reorder_post: {
+    event_stream: {
+        parameters: {
+            query?: {
+                after?: number;
+            };
+            header?: {
+                "last-event-id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    health: {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                task_id: string;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HealthResponse"];
+                };
             };
+        };
+    };
+    login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["TaskReorderRequest"];
+                "application/json": components["schemas"]["LoginRequest"];
             };
         };
         responses: {
@@ -2500,7 +2672,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TaskRecord"];
+                    "application/json": components["schemas"]["SessionResponse"];
                 };
             };
             /** @description Validation Error */
@@ -2514,13 +2686,11 @@ export interface operations {
             };
         };
     };
-    resume_task_api_v1_tasks__task_id__resume_post: {
+    current_session: {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                task_id: string;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -2531,27 +2701,37 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TaskRecord"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["SessionResponse"];
                 };
             };
         };
     };
-    stop_task_api_v1_tasks__task_id__stop_post: {
+    logout: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    project: {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                task_id: string;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -2562,16 +2742,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TaskRecord"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ProjectSummaryResponse"];
                 };
             };
         };

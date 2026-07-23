@@ -1,20 +1,24 @@
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
+
+from openapi_spec_validator import validate
 
 from ktoolbox.configuration import RuntimeContext
 from ktoolbox.webui.app import create_app
+from ktoolbox.webui.openapi_contract import dump_openapi_yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "webui" / "openapi.json"
+OUTPUT = ROOT / "webui" / "openapi.yaml"
 
 
 def render_openapi() -> str:
     """Render the FastAPI contract in a stable, reviewable form."""
     app = create_app(RuntimeContext.from_project(ROOT))
-    return json.dumps(app.openapi(), ensure_ascii=True, indent=2, sort_keys=True) + "\n"
+    schema = app.openapi()
+    validate(schema)
+    return dump_openapi_yaml(schema)
 
 
 def main() -> int:

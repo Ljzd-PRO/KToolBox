@@ -2,6 +2,7 @@
 
 import pkg_resources
 import sys
+from pathlib import Path
 from PyInstaller.utils.hooks import collect_submodules
 
 template_dir = pkg_resources.resource_filename('settings_doc', 'templates')
@@ -14,6 +15,7 @@ a = Analysis(
     datas=[
         (template_dir + '/*', 'settings_doc/templates'),
         (webui_static_dir, 'ktoolbox/webui/static'),
+        (str(Path('webui/openapi.yaml').resolve()), 'webui'),
     ],
     hiddenimports=(['winloop._noop'] if sys.platform == 'win32' else []) + collect_submodules('ktoolbox.webui'),
     hookspath=[],

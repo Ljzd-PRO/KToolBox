@@ -32,6 +32,7 @@ from ktoolbox.webui.models import (
     ProjectSummaryResponse,
     SessionResponse,
 )
+from ktoolbox.webui.openapi_contract import build_openapi_schema, stable_operation_id
 from ktoolbox.webui.pawchive_routes import create_pawchive_router
 from ktoolbox.webui.project_lock import ProjectProcessLock
 from ktoolbox.webui.project_routes import create_project_router
@@ -82,7 +83,9 @@ def create_app(
         docs_url=None,
         redoc_url=None,
         lifespan=lifespan,
+        generate_unique_id_function=stable_operation_id,
     )
+    app.openapi = lambda: build_openapi_schema(app)  # type: ignore[method-assign]
     app.state.runtime_context = context
     app.state.database = database
     app.state.auth = auth

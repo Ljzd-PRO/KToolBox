@@ -9,8 +9,8 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
-    "generate:api": "poetry run python ../scripts/export_webui_openapi.py && openapi-typescript openapi.json -o src/generated/api.ts",
-    "check:api": "npm run generate:api && git diff --exit-code -- openapi.json src/generated/api.ts",
+    "generate:api": "poetry run python ../scripts/export_webui_openapi.py && openapi-typescript openapi.yaml -o src/generated/api.ts",
+    "check:api": "npm run generate:api && git diff --exit-code -- openapi.yaml src/generated/api.ts",
     "typecheck": "tsc -b --pretty false",
     "lint": "eslint .",
     "test": "vitest run",

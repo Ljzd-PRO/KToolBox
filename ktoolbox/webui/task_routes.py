@@ -141,7 +141,7 @@ def create_task_router(project_root: Path) -> APIRouter:
         _: Annotated[WebUISession, Depends(require_session)],
         store: Annotated[TaskStore, Depends(task_store)],
         after: Annotated[int, Query(ge=0)] = 0,
-        limit: Annotated[int, Query(ge=1, le=1000)] = 200,
+        limit: Annotated[int, Query(ge=1, le=200)] = 200,
     ) -> list[TaskEvent]:
         await _task_or_404(store, task_id)
         return await store.events(after=after, task_id=task_id, limit=limit)
