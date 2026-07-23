@@ -167,6 +167,51 @@ test("backend error objects render as readable toast messages", async ({ page })
   errors.length = 0;
 });
 
+test("MCP connection page issues one-time tokens and exposes safe client configurations", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("link", { name: "MCP", exact: true }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "MCP", exact: true })).toBeVisible();
+  await expect(page.getByText("Streamable HTTP", { exact: true })).toBeVisible();
+  await expect(page.getByText("http://127.0.0.1:8792/mcp", { exact: true })).toBeVisible();
+  await expect(page.locator("code").filter({ hasText: "config_schema" })).toBeVisible();
+
+  await page.getByRole("tab", { name: "Codex", exact: true }).click();
+  await expect(page.getByText('bearer_token_env_var = "KTOOLBOX_MCP_TOKEN"', { exact: false })).toBeVisible();
+  await page.getByRole("tab", { name: "VS Code", exact: true }).click();
+  await expect(page.getByText('"password": true', { exact: false })).toBeVisible();
+
+  await page.getByRole("button", { name: "New access token", exact: true }).click();
+  const createDialog = page.getByRole("dialog", { name: "Create access token", exact: true });
+  await createDialog.getByLabel("Token name").fill("Playwright MCP");
+  await createDialog.getByLabel("Confirm account password").fill("fixture-password");
+  await createDialog.getByRole("button").filter({ hasText: "30 days" }).click();
+  await page.getByRole("option", { name: "Never expires", exact: true }).click();
+  await expect(createDialog.getByText("This token remains valid until you revoke it manually.", { exact: false })).toBeVisible();
+  await createDialog.getByRole("button", { name: "Create access token", exact: true }).click();
+
+  const secretDialog = page.getByRole("dialog", { name: "Save this token now", exact: true });
+  const secret = secretDialog.locator("code");
+  await expect(secret).toContainText("ktmcp_");
+  const secretValue = await secret.textContent();
+  expect(secretValue).toMatch(/^ktmcp_/);
+  await secretDialog.getByRole("button", { name: "Confirm", exact: true }).click();
+  await expect(page.getByText(secretValue ?? "", { exact: true })).toHaveCount(0);
+
+  const tokenRow = page.getByRole("row").filter({ hasText: "Playwright MCP" });
+  await tokenRow.getByRole("button", { name: "Revoke", exact: true }).click();
+  const revokeDialog = page.getByRole("dialog", { name: "Revoke this access token?", exact: true });
+  await expect(revokeDialog).toContainText("Playwright MCP");
+  await revokeDialog.getByRole("button", { name: "Revoke", exact: true }).click();
+  await expect(tokenRow.getByText("Revoked", { exact: true })).toBeVisible();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+  await expect(page.getByRole("button", { name: "New access token", exact: true })).toBeVisible();
+  await expect(page.locator("[data-live-announcer] [role='img']")).toHaveCount(0, { timeout: 8_000 });
+  const accessibility = await new AxeBuilder({ page }).analyze();
+  expect(accessibility.violations).toEqual([]);
+});
+
 
 test("HeroUI tables and forms preserve their visual hierarchy", async ({ page }) => {
   await signIn(page);

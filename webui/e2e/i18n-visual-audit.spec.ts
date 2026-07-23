@@ -5,13 +5,13 @@ import { join } from "node:path";
 const auditDirectory = process.env.KTOOLBOX_I18N_AUDIT_DIR;
 
 const locales = [
-  { code: "zh-CN", create: "创建任务", heading: "概览" },
-  { code: "zh-Hant", create: "建立工作", heading: "概覽" },
-  { code: "en", create: "Create task", heading: "Overview" },
-  { code: "ja", create: "タスクを作成", heading: "概要" },
-  { code: "ko", create: "작업 만들기", heading: "개요" },
-  { code: "fr", create: "Créer une tâche", heading: "Aperçu" },
-  { code: "ru", create: "Создать задачу", heading: "Обзор" },
+  { code: "zh-CN", create: "创建任务", heading: "概览", mcpToken: "新建访问令牌" },
+  { code: "zh-Hant", create: "建立工作", heading: "概覽", mcpToken: "新增存取權杖" },
+  { code: "en", create: "Create task", heading: "Overview", mcpToken: "New access token" },
+  { code: "ja", create: "タスクを作成", heading: "概要", mcpToken: "アクセストークンを作成" },
+  { code: "ko", create: "작업 만들기", heading: "개요", mcpToken: "새 액세스 토큰" },
+  { code: "fr", create: "Créer une tâche", heading: "Aperçu", mcpToken: "Nouveau jeton d’accès" },
+  { code: "ru", create: "Создать задачу", heading: "Обзор", mcpToken: "Новый токен доступа" },
 ] as const;
 
 const routes = [
@@ -21,6 +21,7 @@ const routes = [
   ["posts", "/posts"],
   ["blockers", "/blockers"],
   ["configuration", "/configuration"],
+  ["mcp", "/mcp"],
   ["system", "/system"],
 ] as const;
 
@@ -112,6 +113,13 @@ test("captures the seven-language responsive theme matrix", async ({ page }) => 
     const languageName = `shell__language-menu__${locale.code}__1024x768__light-emerald`;
     await capture(page, languageName, false);
     manifest.push({ kind: "overlay", locale: locale.code, page: "shell", route: "/tasks", theme: "light", viewport: "1024x768", fullPage: false, file: `${languageName}.png` });
+    await page.keyboard.press("Escape");
+
+    await page.goto("/mcp");
+    await page.getByRole("button", { name: locale.mcpToken, exact: true }).click();
+    const tokenName = `mcp__token-modal__${locale.code}__1024x768__light-emerald`;
+    await capture(page, tokenName, false);
+    manifest.push({ kind: "overlay", locale: locale.code, page: "mcp", route: "/mcp", theme: "light", viewport: "1024x768", fullPage: false, file: `${tokenName}.png` });
     await page.keyboard.press("Escape");
 
     await page.setViewportSize({ width: 390, height: 844 });

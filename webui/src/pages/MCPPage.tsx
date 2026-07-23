@@ -439,7 +439,13 @@ export function MCPPage() {
                       {t("mcp.copyConfiguration")}
                     </Button>
                   </div>
-                  <pre className="max-h-96 overflow-auto p-4 text-xs leading-6"><code>{mcpClientConfiguration(key, endpoint)}</code></pre>
+                  <pre
+                    aria-label={t(`mcp.clients.${key}`)}
+                    className="max-h-96 overflow-auto p-4 text-xs leading-6 outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    tabIndex={0}
+                  >
+                    <code>{mcpClientConfiguration(key, endpoint)}</code>
+                  </pre>
                 </div>
               </Tabs.Panel>
             ))}
