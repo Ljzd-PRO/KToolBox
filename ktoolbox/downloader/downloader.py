@@ -1,7 +1,7 @@
 import asyncio
 from asyncio import CancelledError, Lock
 from collections.abc import Awaitable, Callable
-from functools import cached_property
+from functools import cached_property, partial
 from pathlib import Path
 from typing import Any
 from urllib.parse import unquote, urlparse
@@ -169,7 +169,7 @@ class Downloader:
             wait=wait_fixed(config.downloader.retry_interval),
             retry=retry_if_result(lambda result: not result and result.code != RetCodeEnum.FileExisted)
             | retry_if_exception(lambda error: isinstance(error, httpx.HTTPError)),
-            before_sleep=self._before_retry,
+            before_sleep=partial(self._before_retry, progress=progress),
             reraise=True,
         )
         return await retrying(
@@ -179,8 +179,20 @@ class Downloader:
             progress=progress,
         )
 
-    def _before_retry(self, state: RetryCallState) -> None:
+    def _before_retry(
+        self,
+        state: RetryCallState,
+        *,
+        progress: DownloadProgressObserver | None,
+    ) -> None:
         outcome = state.outcome
+        status_code: int | None = None
+        if outcome is not None:
+            if outcome.failed:
+                response = getattr(outcome.exception(), "response", None)
+                status_code = getattr(response, "status_code", None)
+            else:
+                status_code = outcome.result().status_code
         logger.warning(
             generate_msg(
                 f"Retrying ({state.attempt_number})",
@@ -192,6 +204,8 @@ class Downloader:
                 url=self.url,
             )
         )
+        if progress is not None:
+            progress.retry(max(state.attempt_number - 1, 0), status_code)
 
     async def _run_once(
         self,

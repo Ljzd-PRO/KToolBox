@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -69,6 +69,15 @@ describe("task and post workflows", () => {
             speed_bps: 1024,
           },
         },
+        waiting_retries: Object.fromEntries(Array.from({ length: 12 }, (_, index) => [
+          `retry-${index}`,
+          {
+            creator_key: index ? "fanbox:42" : "patreon:84",
+            filename: `retry-fixture-${String(index + 1).padStart(2, "0")}.bin`,
+            retry_count: index ? 0 : 2,
+            status_code: index ? 503 : 429,
+          },
+        ])),
       },
       error: null,
       blocked_by: null,
@@ -93,6 +102,12 @@ describe("task and post workflows", () => {
     expect(screen.getByText("Fictional fixture")).toBeInTheDocument();
     expect(screen.getByText("2.00 KiB/s")).toBeInTheDocument();
     expect(screen.getByText("a-very-long-but-safe-fixture-name.zip")).toBeInTheDocument();
+    const retryRegion = screen.getByRole("region", { name: "Waiting to retry" });
+    expect(retryRegion).toHaveClass("max-h-64", "overflow-y-auto");
+    expect(within(retryRegion).getByText("retry-fixture-01.bin")).toBeInTheDocument();
+    expect(within(retryRegion).getByText("Retries completed: 2")).toBeInTheDocument();
+    expect(within(retryRegion).getByText("HTTP 429")).toBeInTheDocument();
+    expect(within(retryRegion).getByText("retry-fixture-12.bin")).toBeInTheDocument();
     expect(await screen.findByText(/fixture ready/)).toBeInTheDocument();
   });
 

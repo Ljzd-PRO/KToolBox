@@ -30,6 +30,8 @@ class DownloadProgressObserver(Protocol):
 
     def advance(self, amount: int) -> None: ...
 
+    def retry(self, retry_count: int, status_code: int | None) -> None: ...
+
 
 class ProgressReporter(Protocol):
     def start(self) -> None: ...
@@ -57,6 +59,15 @@ class ProgressReporter(Protocol):
     ) -> None: ...
 
     def download_advanced(self, task_key: str, amount: int) -> None: ...
+
+    def download_retrying(
+        self,
+        task_key: str,
+        creator_key: str,
+        filename: str,
+        retry_count: int,
+        status_code: int | None,
+    ) -> None: ...
 
     def download_finished(
         self,
@@ -102,6 +113,16 @@ class NullProgressReporter:
     def download_advanced(self, task_key: str, amount: int) -> None:
         return None
 
+    def download_retrying(
+        self,
+        task_key: str,
+        creator_key: str,
+        filename: str,
+        retry_count: int,
+        status_code: int | None,
+    ) -> None:
+        return None
+
     def download_finished(
         self,
         task_key: str,
@@ -135,6 +156,17 @@ class PlainProgressReporter(NullProgressReporter):
 
     def job_queued(self, creator_key: str) -> None:
         self.queued += 1
+
+    def download_retrying(
+        self,
+        task_key: str,
+        creator_key: str,
+        filename: str,
+        retry_count: int,
+        status_code: int | None,
+    ) -> None:
+        status = f"HTTP {status_code}" if status_code is not None else "transport error"
+        self.console.print(f"Waiting to retry {filename} ({retry_count} retries completed, {status}).")
 
     def download_finished(
         self,
@@ -267,6 +299,24 @@ class RichProgressReporter(NullProgressReporter):
             self.downloads.advance(task_id, amount)
             self._refresh_transfer_speed()
 
+    def download_retrying(
+        self,
+        task_key: str,
+        creator_key: str,
+        filename: str,
+        retry_count: int,
+        status_code: int | None,
+    ) -> None:
+        task_id = self._download_tasks.pop(task_key, None)
+        if task_id is not None:
+            self.downloads.remove_task(task_id)
+            self._refresh_transfer_speed()
+        status = f"HTTP {status_code}" if status_code is not None else "transport error"
+        self.console.print(
+            f"[yellow]Waiting to retry {filename}[/yellow] "
+            f"({retry_count} retries completed, {status})."
+        )
+
     def download_finished(
         self,
         task_key: str,
@@ -305,12 +355,23 @@ class ReporterDownloadObserver:
     reporter: ProgressReporter
     task_key: str
     creator_key: str
+    filename: str
 
     def start(self, filename: str, total: int | None, completed: int) -> None:
+        self.filename = filename
         self.reporter.download_started(self.task_key, self.creator_key, filename, total, completed)
 
     def advance(self, amount: int) -> None:
         self.reporter.download_advanced(self.task_key, amount)
+
+    def retry(self, retry_count: int, status_code: int | None) -> None:
+        self.reporter.download_retrying(
+            self.task_key,
+            self.creator_key,
+            self.filename,
+            retry_count,
+            status_code,
+        )
 
 
 def create_progress_reporter(

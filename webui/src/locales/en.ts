@@ -328,6 +328,8 @@ export const en = {
     "files": "Files",
     "activeCreators": "Active creators",
     "activeDownloads": "Active downloads",
+    "waitingRetries": "Waiting to retry",
+    "retryCount": "Retries completed: {{count}}",
     "logs": "Activity log",
     "pause": "Pause",
     "resume": "Resume",
@@ -407,6 +409,7 @@ export const en = {
       "job.queued": "File queued",
       "download.started": "Download started",
       "download.progress": "Download progress",
+      "download.retrying": "Waiting to retry",
       "download.finished": "Download finished"
     },
     "statuses": {

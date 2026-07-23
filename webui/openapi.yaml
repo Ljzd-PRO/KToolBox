@@ -3767,6 +3767,11 @@ components:
             $ref: '#/components/schemas/ActiveDownload'
           type: object
           title: Active Downloads
+        waiting_retries:
+          additionalProperties:
+            $ref: '#/components/schemas/WaitingRetry'
+          type: object
+          title: Waiting Retries
       type: object
       title: TaskProgress
     TaskRecord:
@@ -3946,6 +3951,31 @@ components:
           default: true
       type: object
       title: ValidationResponse
+    WaitingRetry:
+      properties:
+        creator_key:
+          type: string
+          title: Creator Key
+        filename:
+          type: string
+          title: Filename
+        retry_count:
+          type: integer
+          minimum: 0.0
+          title: Retry Count
+        status_code:
+          anyOf:
+          - type: integer
+            maximum: 599.0
+            minimum: 100.0
+          - type: 'null'
+          title: Status Code
+      type: object
+      required:
+      - creator_key
+      - filename
+      - retry_count
+      title: WaitingRetry
   securitySchemes:
     WebUISession:
       type: apiKey

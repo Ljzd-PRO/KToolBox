@@ -331,6 +331,8 @@ export const zhCN = {
     "files": "文件",
     "activeCreators": "活动作者",
     "activeDownloads": "活动下载",
+    "waitingRetries": "等待重试",
+    "retryCount": "已重试次数：{{count}}",
     "logs": "活动日志",
     "pause": "暂停",
     "resume": "恢复",
@@ -410,6 +412,7 @@ export const zhCN = {
       "job.queued": "文件已入队",
       "download.started": "开始下载",
       "download.progress": "下载进度",
+      "download.retrying": "等待重试",
       "download.finished": "下载结束"
     },
     "statuses": {

@@ -157,10 +157,15 @@ class DownloadWorkerPool:
         while queued := await queue.get():
             summary.total += 1
             task_key = f"download-{next(self._task_ids)}"
-            observer = ReporterDownloadObserver(self.reporter, task_key, queued.creator_key)
             status = "failed"
             failure: FailureItem | None = None
             filename = _job_filename(queued.job)
+            observer = ReporterDownloadObserver(
+                self.reporter,
+                task_key,
+                queued.creator_key,
+                filename or "unknown",
+            )
             try:
                 result = await self._download(queued, client, observer)
                 if result.code == RetCodeEnum.FileExisted:

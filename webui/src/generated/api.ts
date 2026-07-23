@@ -1740,6 +1740,10 @@ export interface components {
             active_downloads?: {
                 [key: string]: components["schemas"]["ActiveDownload"];
             };
+            /** Waiting Retries */
+            waiting_retries?: {
+                [key: string]: components["schemas"]["WaitingRetry"];
+            };
         };
         /** TaskRecord */
         TaskRecord: {
@@ -1830,6 +1834,17 @@ export interface components {
              * @default true
              */
             valid: boolean;
+        };
+        /** WaitingRetry */
+        WaitingRetry: {
+            /** Creator Key */
+            creator_key: string;
+            /** Filename */
+            filename: string;
+            /** Retry Count */
+            retry_count: number;
+            /** Status Code */
+            status_code?: number | null;
         };
     };
     responses: never;

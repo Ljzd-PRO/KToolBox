@@ -7,7 +7,7 @@ from time import monotonic
 
 from ktoolbox.failures import FailureItem, TaskFailureReport
 from ktoolbox.reporting import NullProgressReporter
-from ktoolbox.webui.task_models import ActiveDownload, TaskProgress
+from ktoolbox.webui.task_models import ActiveDownload, TaskProgress, WaitingRetry
 from ktoolbox.webui.task_store import TaskStore
 
 
@@ -22,6 +22,7 @@ class WebTaskReporter(NullProgressReporter):
         self._loop = asyncio.get_running_loop()
         self._started_at = monotonic()
         self._download_started_at: dict[str, float] = {}
+        self._download_attempt_started_bytes: dict[str, int] = {}
         self._download_bytes: dict[str, int] = {}
         self._speed_samples: deque[tuple[float, int]] = deque()
         self._known_total = 0
@@ -73,14 +74,19 @@ class WebTaskReporter(NullProgressReporter):
         completed: int,
     ) -> None:
         now = monotonic()
+        first_start = task_key not in self._download_bytes
+        previous_completed = self._download_bytes.get(task_key, 0)
         self._download_started_at[task_key] = now
+        self._download_attempt_started_bytes[task_key] = completed
         self._download_bytes[task_key] = completed
-        self.progress.transferred_bytes += completed
-        if total is None:
-            self._has_unknown_total = True
-        else:
-            self._known_total += total
-        self.progress.total_bytes = None if self._has_unknown_total else self._known_total
+        self.progress.transferred_bytes += max(completed - previous_completed, 0)
+        if first_start:
+            if total is None:
+                self._has_unknown_total = True
+            else:
+                self._known_total += total
+            self.progress.total_bytes = None if self._has_unknown_total else self._known_total
+        self.progress.waiting_retries.pop(task_key, None)
         self.progress.active_downloads[task_key] = ActiveDownload(
             creator_key=creator_key,
             filename=filename,
@@ -103,10 +109,44 @@ class WebTaskReporter(NullProgressReporter):
         self.progress.transferred_bytes += amount
         self._download_bytes[task_key] = active.completed
         elapsed = max(now - self._download_started_at[task_key], 0.001)
-        active.speed_bps = active.completed / elapsed
+        active.speed_bps = (
+            active.completed - self._download_attempt_started_bytes.get(task_key, 0)
+        ) / elapsed
         self._record_speed(now)
         self._refresh_eta()
         self._emit("download.progress", {"key": task_key})
+
+    def download_retrying(
+        self,
+        task_key: str,
+        creator_key: str,
+        filename: str,
+        retry_count: int,
+        status_code: int | None,
+    ) -> None:
+        self.progress.active_downloads.pop(task_key, None)
+        self._download_started_at.pop(task_key, None)
+        self._download_attempt_started_bytes.pop(task_key, None)
+        self.progress.waiting_retries[task_key] = WaitingRetry(
+            creator_key=creator_key,
+            filename=filename,
+            retry_count=retry_count,
+            status_code=status_code,
+        )
+        if not self.progress.active_downloads:
+            self.progress.speed_bps = 0
+            self.progress.eta_seconds = None
+        self._emit(
+            "download.retrying",
+            {
+                "key": task_key,
+                "creator": creator_key,
+                "filename": filename,
+                "retry_count": retry_count,
+                "status_code": status_code,
+            },
+            immediate=True,
+        )
 
     def download_finished(
         self,
@@ -115,7 +155,9 @@ class WebTaskReporter(NullProgressReporter):
         failure: FailureItem | None = None,
     ) -> None:
         self.progress.active_downloads.pop(task_key, None)
+        self.progress.waiting_retries.pop(task_key, None)
         self._download_started_at.pop(task_key, None)
+        self._download_attempt_started_bytes.pop(task_key, None)
         self._download_bytes.pop(task_key, None)
         self.progress.processed_files += 1
         if status == "completed":

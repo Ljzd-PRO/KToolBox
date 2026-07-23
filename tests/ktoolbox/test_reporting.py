@@ -51,6 +51,7 @@ def test_null_and_empty_plain_reporters_are_silent() -> None:
     null.job_queued("fanbox:1")
     null.download_started("one", "fanbox:1", "one.bin", None, 0)
     null.download_advanced("one", 1)
+    null.download_retrying("one", "fanbox:1", "one.bin", 0, 503)
     null.download_finished("one", "completed")
     null.creator_finished("fanbox:1")
     null.artifact_created(Path("artifact.bin"))
@@ -70,9 +71,10 @@ def test_rich_reporter_tracks_dynamic_tasks_and_log_output() -> None:
     reporter.start()
     reporter.creator_started("fanbox:1")
     reporter.job_queued("fanbox:1")
-    observer = ReporterDownloadObserver(reporter, "download-1", "fanbox:1")
+    observer = ReporterDownloadObserver(reporter, "download-1", "fanbox:1", "fixture.bin")
     observer.start("a-very-long-filename-that-must-be-truncated-cleanly.bin", 10, 2)
     observer.advance(8)
+    observer.retry(0, 503)
     console.print("log line above progress")
     reporter.download_finished("download-1", "completed")
     reporter.creator_finished("fanbox:1")
@@ -80,6 +82,7 @@ def test_rich_reporter_tracks_dynamic_tasks_and_log_output() -> None:
 
     rendered = output.getvalue()
     assert "log line above progress" in rendered
+    assert "Waiting to retry a-very-long-filename-that-must-be-truncated-cleanly.bin" in rendered
     assert "Files" in rendered
     assert reporter.overall.tasks[0].completed == 1
 
@@ -101,6 +104,15 @@ def test_rich_reporter_keeps_long_download_descriptions_on_one_line() -> None:
     rendered_lines = [line for line in output.getvalue().splitlines() if line]
     assert len(rendered_lines) == 1
     assert "…" in rendered_lines[0]
+
+
+def test_plain_reporter_describes_waiting_retry() -> None:
+    output = StringIO()
+    reporter = PlainProgressReporter(Console(file=output, color_system=None))
+
+    reporter.download_retrying("one", "fanbox:1", "sample.bin", 2, 429)
+
+    assert "sample.bin (2 retries completed, HTTP 429)" in output.getvalue()
 
 
 def test_rich_reporter_sums_active_download_speeds() -> None:

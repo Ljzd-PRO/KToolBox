@@ -156,6 +156,13 @@ export type ActiveDownload = {
   speed_bps: number;
 };
 
+export type WaitingRetry = {
+  creator_key: string;
+  filename: string;
+  retry_count: number;
+  status_code: number | null;
+};
+
 export type TaskProgress = {
   queued_files: number;
   processed_files: number;
@@ -168,6 +175,7 @@ export type TaskProgress = {
   eta_seconds: number | null;
   active_creators: string[];
   active_downloads: Record<string, ActiveDownload>;
+  waiting_retries?: Record<string, WaitingRetry>;
 };
 
 export type TaskRecord = {

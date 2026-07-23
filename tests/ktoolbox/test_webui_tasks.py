@@ -396,6 +396,45 @@ async def test_web_reporter_persists_throttled_speed_progress(tmp_path: Path) ->
 
 
 @pytest.mark.asyncio
+async def test_web_reporter_persists_waiting_retries_without_double_counting(tmp_path: Path) -> None:
+    database = WebUIDatabase(tmp_path / "webui.sqlite3")
+    await database.initialize()
+    store = TaskStore(database)
+    task = await store.create(DownloadTaskSpec(service="fanbox", creator_id="one", post_id="42", output=tmp_path))
+    reporter = WebTaskReporter(task.id, store, flush_interval=0.01)
+
+    reporter.download_started("one", "fanbox:one", "sample.bin", 100, 0)
+    reporter.download_advanced("one", 25)
+    reporter.download_retrying("one", "fanbox:one", "sample.bin", 0, 503)
+    await asyncio.sleep(0.03)
+
+    waiting = (await store.get(task.id)).progress
+    assert waiting.active_downloads == {}
+    assert waiting.waiting_retries["one"].filename == "sample.bin"
+    assert waiting.waiting_retries["one"].retry_count == 0
+    assert waiting.waiting_retries["one"].status_code == 503
+    assert waiting.transferred_bytes == 25
+
+    reporter.download_started("one", "fanbox:one", "sample.bin", 100, 25)
+    reporter.download_advanced("one", 25)
+    assert reporter.progress.waiting_retries == {}
+    assert reporter.progress.transferred_bytes == 50
+    reporter.download_retrying("one", "fanbox:one", "sample.bin", 1, None)
+    reporter.download_finished("one", "failed")
+    await reporter.close()
+
+    settled = (await store.get(task.id)).progress
+    assert settled.waiting_retries == {}
+    retry_events = [
+        event for event in await store.events(task_id=task.id) if event.event_type == "download.retrying"
+    ]
+    assert [(event.data["retry_count"], event.data["status_code"]) for event in retry_events] == [
+        (0, 503),
+        (1, None),
+    ]
+
+
+@pytest.mark.asyncio
 async def test_web_reporter_persists_structured_creator_and_file_failures(tmp_path: Path) -> None:
     database = WebUIDatabase(tmp_path / "webui.sqlite3")
     await database.initialize()

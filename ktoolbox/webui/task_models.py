@@ -159,6 +159,13 @@ class ActiveDownload(BaseModel):
     speed_bps: float = 0
 
 
+class WaitingRetry(BaseModel):
+    creator_key: str
+    filename: str
+    retry_count: int = Field(ge=0)
+    status_code: int | None = Field(default=None, ge=100, le=599)
+
+
 class TaskProgress(BaseModel):
     queued_files: int = 0
     processed_files: int = 0
@@ -171,6 +178,7 @@ class TaskProgress(BaseModel):
     eta_seconds: float | None = None
     active_creators: list[str] = Field(default_factory=list)
     active_downloads: dict[str, ActiveDownload] = Field(default_factory=dict)
+    waiting_retries: dict[str, WaitingRetry] = Field(default_factory=dict)
 
 
 class TaskRecord(BaseModel):

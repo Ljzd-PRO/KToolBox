@@ -23,6 +23,7 @@ import {
   IconPlayerStop as Square,
   IconPlugConnectedX as Interrupted,
   IconPlus as Plus,
+  IconRefresh as Refresh,
   IconTrash as Trash2,
   IconX as X,
 } from "@tabler/icons-react";
@@ -556,6 +557,7 @@ function TaskDetails({
   const { t, i18n } = useTranslation();
   const progress = task.progress;
   const percent = taskPercent(progress.processed_files, progress.queued_files, progress.transferred_bytes, progress.total_bytes);
+  const waitingRetries = Object.entries(progress.waiting_retries ?? {});
   return (
     <>
       <PageHeader
@@ -588,7 +590,7 @@ function TaskDetails({
           <Metric label={t("tasks.eta")} value={formatDuration(progress.eta_seconds)} />
         </div>
       </Surface>
-      <div className="grid gap-5 xl:grid-cols-2">
+      <div className="grid items-stretch gap-5 lg:grid-cols-3">
         <Surface className="grid content-start gap-4 rounded-lg border border-border p-5">
           <div className="flex items-center justify-between gap-3"><h2 className="font-semibold">{t("tasks.activeCreators")}</h2><Chip size="sm" variant="soft">{progress.active_creators.length}</Chip></div>
           {progress.active_creators.length ? <div className="flex flex-wrap gap-2">{progress.active_creators.map((creator) => <Chip color="accent" key={creator} size="sm" variant="soft">{creator}</Chip>)}</div> : <p className="text-sm text-muted">{t("common.none")}</p>}
@@ -602,6 +604,42 @@ function TaskDetails({
             </div>
           ))}
           {!Object.keys(progress.active_downloads).length ? <p className="text-sm text-muted">{t("common.none")}</p> : null}
+        </Surface>
+        <Surface className="grid min-h-0 content-start gap-4 rounded-lg border border-border p-5">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="flex min-w-0 items-center gap-2 font-semibold">
+              <Refresh aria-hidden="true" className="shrink-0 text-warning" size={18} />
+              <span className="truncate">{t("tasks.waitingRetries")}</span>
+            </h2>
+            <Chip color={waitingRetries.length ? "warning" : "default"} size="sm" variant="soft">{waitingRetries.length}</Chip>
+          </div>
+          {waitingRetries.length ? (
+            <div
+              aria-label={t("tasks.waitingRetries")}
+              className="max-h-64 min-h-0 overflow-y-auto overscroll-contain pe-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              role="region"
+              tabIndex={0}
+            >
+              {waitingRetries.map(([key, retry]) => (
+                <div className="grid gap-2 border-b border-border py-3 first:pt-0 last:border-0 last:pb-0" key={key}>
+                  <p className="truncate text-sm font-medium" title={retry.filename}>{retry.filename}</p>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="min-w-0 truncate text-xs text-muted" title={retry.creator_key}>{retry.creator_key}</span>
+                    <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+                      <Chip size="sm" variant="soft">{t("tasks.retryCount", { count: retry.retry_count })}</Chip>
+                      <Chip
+                        color={retry.status_code !== null && retry.status_code >= 500 ? "danger" : retry.status_code !== null ? "warning" : "default"}
+                        size="sm"
+                        variant="soft"
+                      >
+                        {retry.status_code !== null ? `HTTP ${retry.status_code}` : "HTTP —"}
+                      </Chip>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : <p className="text-sm text-muted">{t("common.none")}</p>}
         </Surface>
       </div>
       <Surface className="grid gap-4 rounded-lg border border-border p-5">

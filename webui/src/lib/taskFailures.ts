@@ -115,6 +115,11 @@ export function eventMessage(t: TFunction, event: TaskEvent): string {
       reason: failureMessage(t, failure),
     });
   }
+  if (event.event_type === "download.retrying" && typeof event.data.filename === "string") {
+    const retryCount = typeof event.data.retry_count === "number" ? event.data.retry_count : 0;
+    const status = typeof event.data.status_code === "number" ? `HTTP ${event.data.status_code}` : "HTTP —";
+    return `${event.data.filename} · ${t("tasks.retryCount", { count: retryCount })} · ${status}`;
+  }
   if (typeof event.data.message === "string") return event.data.message;
   if (typeof event.data.creator === "string") return event.data.creator;
   if (typeof event.data.filename === "string") return event.data.filename;

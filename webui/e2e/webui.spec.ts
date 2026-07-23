@@ -841,3 +841,30 @@ test("failed tasks explain the stage, reason, and recovery action", async ({ pag
   const scan = await new AxeBuilder({ page }).analyze();
   expect(scan.violations).toEqual([]);
 });
+
+
+test("task details keep a long retry queue inside its own scroll region", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("link", { name: "Tasks", exact: true }).click();
+  await page.getByRole("button", { name: "Create task" }).click();
+  const dialog = page.getByRole("dialog", { name: "Create task" });
+  await dialog.getByRole("textbox", { name: "Output directory" }).fill("retry-fixture");
+  await dialog.getByRole("button", { name: "Create task" }).click();
+
+  const retryRegion = page.getByRole("region", { name: "Waiting to retry" });
+  await expect(retryRegion).toBeVisible({ timeout: 10_000 });
+  await expect(retryRegion.getByText("fictional-retry-file-01.zip")).toBeVisible();
+  await expect(retryRegion.getByText("Retries completed: 0").first()).toBeVisible();
+  await expect(retryRegion.getByText("HTTP 429").first()).toBeVisible();
+  await expect.poll(() => retryRegion.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
+  await retryRegion.evaluate((element) => element.scrollTo({ top: element.scrollHeight }));
+  await expect(retryRegion.getByText("fictional-retry-file-18.zip")).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await retryRegion.scrollIntoViewIfNeeded();
+  await expect.poll(
+    () => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth),
+  ).toBe(0);
+  await expect(page.locator("[data-live-announcer] [role='img']")).toHaveCount(0, { timeout: 8_000 });
+  const scan = await new AxeBuilder({ page }).analyze();
+  expect(scan.violations).toEqual([]);
+});

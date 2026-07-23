@@ -20,6 +20,7 @@ class RecordingProgress:
     def __init__(self) -> None:
         self.started: tuple[str, int | None, int] | None = None
         self.updates: list[int] = []
+        self.retries: list[tuple[int, int | None]] = []
         self.instances.append(self)
 
     def start(self, filename: str, total: int | None, completed: int) -> None:
@@ -27,6 +28,9 @@ class RecordingProgress:
 
     def advance(self, size: int) -> None:
         self.updates.append(size)
+
+    def retry(self, retry_count: int, status_code: int | None) -> None:
+        self.retries.append((retry_count, status_code))
 
 
 async def run_once(downloader: Downloader, **kwargs: object):
@@ -228,6 +232,34 @@ async def test_unexpected_status_is_failure_and_restores_original_url(tmp_path: 
         result = await run_once(downloader)
     assert result.code == RetCodeEnum.GeneralFailure
     assert downloader.url == "https://files.example.test/file.bin"
+
+
+@pytest.mark.asyncio
+async def test_retry_reports_completed_retries_and_http_status(tmp_path: Path) -> None:
+    config.downloader.retry_times = 2
+    config.downloader.retry_interval = 0
+    config.downloader.tps_limit = 10_000
+    requests = 0
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal requests
+        requests += 1
+        if requests == 1:
+            return partial_response(request, status=503)
+        return partial_response(request, headers={"Content-Range": "bytes 0-3/4"})
+
+    progress = RecordingProgress()
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        downloader = Downloader(
+            "https://files.example.test/file.bin",
+            tmp_path,
+            client,
+            server_path="/file.bin",
+        )
+        result = await downloader.run(progress=progress)
+
+    assert result.code == RetCodeEnum.Success
+    assert progress.retries == [(0, 503)]
 
 
 @pytest.mark.asyncio

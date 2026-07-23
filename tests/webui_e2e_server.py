@@ -149,6 +149,27 @@ class FixtureExecutor:
                 )
             )
 
+        if task.spec.output.name == "retry-fixture":
+            creator = "fanbox:retry-demo"
+            reporter.start()
+            reporter.creator_started(creator)
+            for index in range(18):
+                task_key = f"retry-{index}"
+                reporter.job_queued(creator)
+                reporter.download_retrying(
+                    task_key,
+                    creator,
+                    f"fictional-retry-file-{index + 1:02d}.zip",
+                    index % 4,
+                    (429, 500, 503, None)[index % 4],
+                )
+            await asyncio.sleep(30)
+            for index in range(18):
+                reporter.download_finished(f"retry-{index}", "completed")
+            reporter.creator_finished(creator)
+            reporter.stop()
+            return
+
         transport = httpx.MockTransport(lambda __: httpx.Response(200, json={"fixture": True}))
         async with httpx.AsyncClient(transport=transport) as client:
             await client.get("https://fixture.invalid/metadata")
