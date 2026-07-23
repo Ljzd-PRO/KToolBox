@@ -194,6 +194,7 @@ test("MCP connection page issues one-time tokens and exposes safe client configu
   await expect(page.getByRole("heading", { level: 1, name: "MCP", exact: true })).toBeVisible();
   await expect(page.getByText("Streamable HTTP", { exact: true })).toBeVisible();
   await expect(page.getByText("http://127.0.0.1:8792/mcp", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: /Configuration.*2/ }).click();
   await expect(page.locator("code").filter({ hasText: "config_schema" })).toBeVisible();
 
   await page.getByRole("tab", { name: "Codex", exact: true }).click();
@@ -505,6 +506,39 @@ for (const locale of localeCases) {
     expect(scan.violations).toEqual([]);
   });
 }
+
+test("captures the complete mobile page density matrix", async ({ page }, testInfo) => {
+  const auditDirectory = process.env.KTOOLBOX_UI_AUDIT_DIR ?? testInfo.outputPath("mobile-density-audit");
+  const routes = [
+    ["overview", "/", "Create sync task"],
+    ["tasks", "/tasks", "Create task"],
+    ["creators", "/creators", "Add creator"],
+    ["posts", "/posts", "Search posts"],
+    ["blockers", "/blockers", "Add blocker"],
+    ["configuration", "/configuration", "Structured settings"],
+    ["mcp", "/mcp", "New access token"],
+    ["system", "/system", "Check Pawchive"],
+  ] as const;
+
+  await mkdir(auditDirectory, { recursive: true });
+  await signIn(page);
+  await page.getByRole("button", { name: "Use dark theme" }).click();
+  await page.getByRole("button", { name: "Use rose accent" }).click();
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  for (const [name, path, readyName] of routes) {
+    await page.goto(path);
+    await expect(page.locator("h1")).toBeVisible();
+    await expect(page.getByText(readyName, { exact: true }).first()).toBeVisible();
+    await expect.poll(
+      () => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth),
+    ).toBe(0);
+    await page.screenshot({
+      fullPage: true,
+      path: join(auditDirectory, `${name}__390x844__dark-rose__default.png`),
+    });
+  }
+});
 
 
 test("captures the remote path picker visual matrix", async ({ page }, testInfo) => {

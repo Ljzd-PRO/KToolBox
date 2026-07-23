@@ -59,7 +59,7 @@ describe("MCP page", () => {
             endpoint_path: "/mcp",
             openapi_path: "/api/v1/openapi.yaml",
             transport: "streamable-http",
-            tool_count: 1,
+            tool_count: 2,
           });
         }
         if (path.endsWith("/mcp/tokens")) return json([token()]);
@@ -70,6 +70,15 @@ describe("MCP page", () => {
               operation_id: "list_tasks",
               description: "Backend description",
               category: "tasks",
+              scope: "mcp:read",
+              safety: "read",
+              open_world: false,
+            },
+            {
+              name: "get_project_summary",
+              operation_id: "project",
+              description: "Project summary backend description",
+              category: "project",
               scope: "mcp:read",
               safety: "read",
               open_world: false,
@@ -85,8 +94,10 @@ describe("MCP page", () => {
     expect(await screen.findByRole("heading", { name: "MCP" })).toBeInTheDocument();
     expect((await screen.findAllByText("Codex desktop")).length).toBeGreaterThan(0);
     expect(screen.getAllByText(`${window.location.origin}/mcp`).length).toBeGreaterThan(0);
-    expect(screen.getByText("List persistent tasks and their current states.")).toBeInTheDocument();
+    expect(screen.getByText("List persistent tasks and their current states.")).not.toBeVisible();
     expect(screen.queryByText("Backend description")).not.toBeInTheDocument();
+    await user.type(screen.getByRole("searchbox", { name: "Search tools" }), "list_tasks");
+    expect(await screen.findByText("List persistent tasks and their current states.")).toBeInTheDocument();
 
     await user.click(screen.getByRole("tab", { name: "Codex" }));
     expect(screen.getByText(/bearer_token_env_var = "KTOOLBOX_MCP_TOKEN"/)).toBeInTheDocument();

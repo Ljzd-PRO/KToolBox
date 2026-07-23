@@ -1,4 +1,5 @@
 import {
+  Accordion,
   Button,
   Chip,
   SearchField,
@@ -166,6 +167,7 @@ export function MCPPage() {
     }
     return [...groups.entries()].sort(([left], [right]) => left.localeCompare(right));
   }, [visibleTools]);
+  const expandToolGroups = Boolean(toolSearch.trim()) || scopeFilter !== "all" || toolGroups.length === 1;
 
   if (status.isLoading || tokens.isLoading || tools.isLoading) return <PageLoading />;
 
@@ -478,41 +480,60 @@ export function MCPPage() {
             onChange={(value) => setScopeFilter(value as ToolScopeFilter)}
           />
         </FormSurface>
-        {!toolGroups.length ? <EmptyPanel title={t("mcp.noTools")} /> : toolGroups.map(([category, categoryTools]) => (
-          <div className="grid min-w-0 gap-2" key={category}>
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold">{t(`mcp.categories.${category}`, { defaultValue: category })}</h3>
-              <Chip size="sm" variant="soft">{categoryTools.length}</Chip>
-            </div>
-            <div className="grid gap-2">
-              {categoryTools.map((tool) => (
-                <Surface className="grid min-w-0 gap-3 rounded-lg border border-border p-4 md:grid-cols-[minmax(12rem,0.8fr)_minmax(0,1.4fr)_auto] md:items-center" key={tool.name}>
-                  <div className="min-w-0">
-                    <code className="break-all text-sm font-semibold text-[var(--accent-strong)]">{tool.name}</code>
-                    <p className="mt-1 text-xs text-muted">{tool.operation_id}</p>
-                  </div>
-                  <p className="text-sm leading-relaxed text-muted">
-                    {t(`mcp.toolDescriptions.${tool.name}`, { defaultValue: tool.description })}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5 md:max-w-44 md:justify-end">
-                    <Chip color={tool.scope === "mcp:write" ? "warning" : "accent"} size="sm" variant="soft">
-                      {t(tool.scope === "mcp:write" ? "mcp.permissions.manage" : "mcp.permissions.read")}
-                    </Chip>
-                    <Chip color={safetyColor(tool.safety)} size="sm" variant="soft">
-                      {t(`mcp.safety.${tool.safety}`)}
-                    </Chip>
-                    {tool.open_world ? (
-                      <Chip color="warning" size="sm" variant="soft">
-                        <IconWorld aria-hidden="true" size={13} />
-                        {t("mcp.openWorld")}
-                      </Chip>
-                    ) : null}
-                  </div>
-                </Surface>
-              ))}
-            </div>
-          </div>
-        ))}
+        {!toolGroups.length ? <EmptyPanel title={t("mcp.noTools")} /> : (
+          <Accordion allowsMultipleExpanded className="min-w-0" hideSeparator={false}>
+            {toolGroups.map(([category, categoryTools]) => (
+              <Accordion.Item
+                defaultExpanded={expandToolGroups}
+                id={category}
+                key={`${category}:${expandToolGroups ? "expanded" : "collapsed"}`}
+              >
+                <Accordion.Heading>
+                  <Accordion.Trigger>
+                    <span className="flex min-w-0 flex-1 items-center gap-2 text-left">
+                      <span className="truncate text-sm font-semibold">
+                        {t(`mcp.categories.${category}`, { defaultValue: category })}
+                      </span>
+                      <Chip size="sm" variant="soft">{categoryTools.length}</Chip>
+                    </span>
+                    <Accordion.Indicator />
+                  </Accordion.Trigger>
+                </Accordion.Heading>
+                <Accordion.Panel>
+                  <Accordion.Body>
+                    <div className="grid gap-2 pb-2">
+                      {categoryTools.map((tool) => (
+                        <Surface className="grid min-w-0 gap-3 rounded-lg border border-border p-4 md:grid-cols-[minmax(12rem,0.8fr)_minmax(0,1.4fr)_auto] md:items-center" key={tool.name}>
+                          <div className="min-w-0">
+                            <code className="break-all text-sm font-semibold text-[var(--accent-strong)]">{tool.name}</code>
+                            <p className="mt-1 text-xs text-muted">{tool.operation_id}</p>
+                          </div>
+                          <p className="text-sm leading-relaxed text-muted">
+                            {t(`mcp.toolDescriptions.${tool.name}`, { defaultValue: tool.description })}
+                          </p>
+                          <div className="flex flex-wrap gap-1.5 md:max-w-44 md:justify-end">
+                            <Chip color={tool.scope === "mcp:write" ? "warning" : "accent"} size="sm" variant="soft">
+                              {t(tool.scope === "mcp:write" ? "mcp.permissions.manage" : "mcp.permissions.read")}
+                            </Chip>
+                            <Chip color={safetyColor(tool.safety)} size="sm" variant="soft">
+                              {t(`mcp.safety.${tool.safety}`)}
+                            </Chip>
+                            {tool.open_world ? (
+                              <Chip color="warning" size="sm" variant="soft">
+                                <IconWorld aria-hidden="true" size={13} />
+                                {t("mcp.openWorld")}
+                              </Chip>
+                            ) : null}
+                          </div>
+                        </Surface>
+                      ))}
+                    </div>
+                  </Accordion.Body>
+                </Accordion.Panel>
+              </Accordion.Item>
+            ))}
+          </Accordion>
+        )}
       </section>
 
       <FormModal
