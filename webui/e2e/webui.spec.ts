@@ -357,17 +357,21 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   await expect(tableFrame).toHaveCSS("border-top-width", "1px");
   expect(await tableFrame.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
 
-  await expect(tableFrame.getByText("2 creators", { exact: true })).toBeVisible();
-  await expect(tableFrame.getByText(/demo-studio/)).toBeVisible();
-  const desktopActions = page.locator(".task-action-grid:visible button");
+  const creatorSummary = tableFrame.getByText(/among \d+ creators/).first();
+  await expect(creatorSummary).toBeVisible();
+  await expect(tableFrame.getByText(/Demo Studio/).first()).toBeVisible();
+  const desktopTaskRow = creatorSummary.locator("xpath=ancestor::*[@role='row'][1]");
+  const desktopActions = desktopTaskRow.locator(".task-action-grid button");
   await expect(desktopActions).toHaveCount(7);
   for (const label of ["Task details", "Stop", "Edit", "Move up", "Move down", "Delete"]) {
-    await expect(page.getByRole("button", { name: label })).toBeVisible();
+    await expect(desktopTaskRow.getByRole("button", { name: label })).toBeVisible();
   }
   await expect(page.getByRole("button", { name: "Actions" })).toHaveCount(0);
 
   await page.setViewportSize({ width: 390, height: 844 });
-  const mobileCard = page.locator(".task-mobile-card:visible");
+  const mobileCard = page.locator(".task-mobile-card:visible").filter({
+    hasText: /among \d+ creators/,
+  });
   await expect(mobileCard).toBeVisible();
   const mobileActions = mobileCard.locator(".task-action-grid button");
   await expect(mobileActions).toHaveCount(7);
@@ -711,7 +715,9 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
   await expect(page.getByRole("button", { name: "Remove fictional-daily" })).toBeVisible();
   await page.getByRole("dialog", { name: "Add blocker" }).getByRole("button", { name: "Save" }).click();
 
-  const blockerCard = page.getByRole("heading", { name: "daily-sharing" }).locator("xpath=ancestor::section");
+  const blockerCard = page.locator(".data-list-card").filter({
+    has: page.getByRole("heading", { name: "daily-sharing" }),
+  });
   await expect(blockerCard.getByRole("button", { name: "Edit" })).toBeVisible();
   await expect(blockerCard.getByRole("button", { name: "Remove blocker" })).toBeVisible();
   const blockerSwitchCell = blockerCard.locator(".list-switch-cell");
