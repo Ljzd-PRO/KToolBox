@@ -230,6 +230,8 @@ async def test_config_schema_and_dotenv_endpoints(tmp_path: Path) -> None:
         assert document.status_code == 200
         revision = document.json()["revision"]
         assert document.headers["etag"] == f'"{revision}"'
+        event_store = client._transport.app.state.event_store  # type: ignore[attr-defined]
+        assert await event_store.events() == []
 
         missing_precondition = await client.patch(
             "/api/v1/config/dotenv/dotenv",
@@ -237,6 +239,7 @@ async def test_config_schema_and_dotenv_endpoints(tmp_path: Path) -> None:
             json={"values": {"KTOOLBOX_JOB__COUNT": "7"}},
         )
         assert missing_precondition.status_code == 428
+        assert await event_store.events() == []
 
         updated = await client.patch(
             "/api/v1/config/dotenv/dotenv",
@@ -245,6 +248,10 @@ async def test_config_schema_and_dotenv_endpoints(tmp_path: Path) -> None:
         )
         assert updated.status_code == 200
         assert "KTOOLBOX_JOB__COUNT=7" in updated.json()["content"]
+        configuration_events = await event_store.events()
+        assert len(configuration_events) == 1
+        assert configuration_events[0].event_type == "configuration.changed"
+        assert configuration_events[0].resource_id == "dotenv"
 
         stale = await client.put(
             "/api/v1/config/dotenv/dotenv",
@@ -252,6 +259,7 @@ async def test_config_schema_and_dotenv_endpoints(tmp_path: Path) -> None:
             json={"content": "KTOOLBOX_JOB__COUNT=8\n"},
         )
         assert stale.status_code == 409
+        assert len(await event_store.events()) == 1
 
         refreshed_schema = await client.get("/api/v1/config/schema")
         count = next(field for field in refreshed_schema.json()["fields"] if field["path"] == "job.count")
@@ -340,6 +348,8 @@ async def test_raw_project_update_requires_current_revision_and_valid_toml(tmp_p
     async with configured_client(tmp_path) as (client, csrf):
         project = await client.get("/api/v1/config/project")
         etag = project.headers["etag"]
+        event_store = client._transport.app.state.event_store  # type: ignore[attr-defined]
+        assert await event_store.events() == []
         content = project.json()["content"] + "\n# retained\n"
         updated = await client.put(
             "/api/v1/config/project",
@@ -348,6 +358,10 @@ async def test_raw_project_update_requires_current_revision_and_valid_toml(tmp_p
         )
         assert updated.status_code == 200
         assert "# retained" in updated.json()["content"]
+        configuration_events = await event_store.events()
+        assert len(configuration_events) == 1
+        assert configuration_events[0].event_type == "configuration.changed"
+        assert configuration_events[0].resource_id == "project"
         assert (
             await client.put(
                 "/api/v1/config/project",
@@ -355,6 +369,7 @@ async def test_raw_project_update_requires_current_revision_and_valid_toml(tmp_p
                 json={"content": content},
             )
         ).status_code == 409
+        assert len(await event_store.events()) == 1
 
         current = await client.get("/api/v1/config/project")
         invalid = await client.put(
@@ -363,6 +378,7 @@ async def test_raw_project_update_requires_current_revision_and_valid_toml(tmp_p
             json={"content": "not = [valid"},
         )
         assert invalid.status_code == 422
+        assert len(await event_store.events()) == 1
 
         valid = await client.post("/api/v1/config/project/validate", json={"content": current.json()["content"]})
         assert valid.json() == {"valid": True}

@@ -76,7 +76,7 @@ def create_project_router(
         _: SessionDependency,
     ) -> TextDocumentResponse:
         document = dotenv_store.read(name)
-        await config_monitor.publish_change(name, document.revision, source="webui")
+        config_monitor.acknowledge(name, document.revision)
         response.headers["ETag"] = f'"{document.revision}"'
         return _document_response(document)
 
@@ -118,6 +118,7 @@ def create_project_router(
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error)) from error
         reload_context(request, context)
         document = dotenv_store.read(name)
+        await config_monitor.publish_change(name, document.revision, source="webui")
         response.headers["ETag"] = f'"{document.revision}"'
         return _document_response(document)
 
@@ -145,7 +146,7 @@ def create_project_router(
     async def get_project_config(response: Response, _: SessionDependency) -> ProjectDocumentResponse:
         content = project_store.load_text()
         revision = content_revision(content)
-        await config_monitor.publish_change("project", revision, source="webui")
+        config_monitor.acknowledge("project", revision)
         response.headers["ETag"] = f'"{revision}"'
         return ProjectDocumentResponse(
             path=project_store.path,
@@ -172,6 +173,7 @@ def create_project_router(
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error)) from error
         content = project_store.load_text()
         revision = content_revision(content)
+        await config_monitor.publish_change("project", revision, source="webui")
         response.headers["ETag"] = f'"{revision}"'
         return ProjectDocumentResponse(
             path=project_store.path,
