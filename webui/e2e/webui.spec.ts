@@ -44,6 +44,11 @@ async function signIn(page: Page) {
   errors.length = 0;
 }
 
+async function waitForToastAnnouncements(page: Page) {
+  await expect(page.locator("[data-slot='toast']")).toHaveCount(0, { timeout: 10_000 });
+  await expect(page.locator("[data-live-announcer] [role='img']")).toHaveCount(0, { timeout: 10_000 });
+}
+
 async function selectLanguage(page: Page, nativeName: string) {
   const trigger = page.locator('[data-slot="dropdown-trigger"]').first();
   await trigger.click();
@@ -237,7 +242,7 @@ test("MCP connection page issues one-time tokens and exposes safe client configu
   await page.setViewportSize({ width: 390, height: 844 });
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
   await expect(page.getByRole("button", { name: "New access token", exact: true })).toBeVisible();
-  await expect(page.locator("[data-live-announcer] [role='img']")).toHaveCount(0, { timeout: 8_000 });
+  await waitForToastAnnouncements(page);
   const accessibility = await new AxeBuilder({ page }).analyze();
   expect(accessibility.violations).toEqual([]);
 });
@@ -362,11 +367,25 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   await expect(tableFrame.getByText(/Demo Studio/).first()).toBeVisible();
   const desktopTaskRow = creatorSummary.locator("xpath=ancestor::*[@role='row'][1]");
   const desktopActions = desktopTaskRow.locator(".task-action-grid button");
-  await expect(desktopActions).toHaveCount(7);
-  for (const label of ["Task details", "Stop", "Edit", "Move up", "Move down", "Delete"]) {
+  await expect(desktopActions).toHaveCount(4);
+  for (const label of ["Stop", "Edit", "Delete"]) {
     await expect(desktopTaskRow.getByRole("button", { name: label })).toBeVisible();
   }
+  await expect(desktopTaskRow.getByRole("button", { name: "Move up" })).toHaveCount(0);
+  await expect(desktopTaskRow.getByRole("button", { name: "Move down" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Actions" })).toHaveCount(0);
+  await desktopTaskRow.getByRole("rowheader").click();
+  await expect(page.getByRole("heading", { name: "Task details" })).toBeVisible();
+  await page.getByRole("button", { name: "Back" }).click();
+
+  const selectedTask = page.getByRole("checkbox", { name: /Select Demo Studio/ }).first();
+  await page.locator('[data-slot="checkbox"]').filter({ has: selectedTask }).click();
+  await expect(page.getByRole("region", { name: "Batch actions" })).toBeVisible();
+  const batchAuditDirectory = process.env.KTOOLBOX_BATCH_AUDIT_DIR;
+  if (batchAuditDirectory) {
+    await mkdir(batchAuditDirectory, { recursive: true });
+    await page.screenshot({ fullPage: true, path: join(batchAuditDirectory, "tasks-desktop-light.png") });
+  }
 
   await page.setViewportSize({ width: 390, height: 844 });
   const mobileCard = page.locator(".task-mobile-card:visible").filter({
@@ -374,10 +393,15 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   });
   await expect(mobileCard).toBeVisible();
   const mobileActions = mobileCard.locator(".task-action-grid button");
-  await expect(mobileActions).toHaveCount(7);
+  await expect(mobileActions).toHaveCount(4);
   const mobileActionBox = await mobileCard.locator(".task-action-grid").boundingBox();
-  expect(mobileActionBox?.height ?? 0).toBeGreaterThan(80);
+  expect(mobileActionBox?.height ?? 0).toBeGreaterThanOrEqual(44);
+  expect(mobileActionBox?.height ?? 0).toBeLessThan(72);
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+  if (batchAuditDirectory) {
+    await page.screenshot({ fullPage: true, path: join(batchAuditDirectory, "tasks-mobile-light.png") });
+  }
+  await page.getByRole("button", { name: "Clear selection" }).click();
 
   await page.setViewportSize({ width: 768, height: 1024 });
   await expect(page.locator(".app-table-frame:visible")).toHaveCount(0);
@@ -660,6 +684,7 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
 
   const creatorRow = page.getByRole("row").filter({ hasText: "Demo Studio" });
   expect(await page.getByRole("columnheader").allTextContents()).toEqual([
+    "",
     "Creator name",
     "Creator ID",
     "Platform",
@@ -688,7 +713,17 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
   const offTrack = await creatorSwitchControl.evaluate((element) => getComputedStyle(element).backgroundColor);
   const fieldSurface = await page.locator("main input").first().evaluate((element) => getComputedStyle(element).backgroundColor);
   expect(offTrack).not.toBe(fieldSurface);
-  await disabledCreatorSwitch.press("Space");
+  const creatorSelection = page.getByRole("checkbox", { name: "Select Demo Studio" }).first();
+  await page.locator('[data-slot="checkbox"]').filter({ has: creatorSelection }).click();
+  const batchAuditDirectory = process.env.KTOOLBOX_BATCH_AUDIT_DIR;
+  if (batchAuditDirectory) {
+    await mkdir(batchAuditDirectory, { recursive: true });
+    await page.screenshot({ fullPage: true, path: join(batchAuditDirectory, "creators-desktop-light.png") });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.screenshot({ fullPage: true, path: join(batchAuditDirectory, "creators-mobile-light.png") });
+    await page.setViewportSize({ width: 1440, height: 900 });
+  }
+  await page.getByRole("button", { name: "Enable 1" }).click();
   await expect(creatorRow.getByRole("switch", { name: "Enabled" })).toBeVisible();
 
   await page.getByRole("button", { name: "Add creator" }).click();
@@ -843,7 +878,7 @@ test("failed tasks explain the stage, reason, and recovery action", async ({ pag
     () => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth),
   ).toBe(0);
   await expect(page.getByRole("heading", { name: "Why this task failed" })).toBeVisible();
-  await expect(page.locator("[data-live-announcer] [role='img']")).toHaveCount(0, { timeout: 8_000 });
+  await waitForToastAnnouncements(page);
   const scan = await new AxeBuilder({ page }).analyze();
   expect(scan.violations).toEqual([]);
 });
@@ -870,7 +905,7 @@ test("task details keep a long retry queue inside its own scroll region", async 
   await expect.poll(
     () => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth),
   ).toBe(0);
-  await expect(page.locator("[data-live-announcer] [role='img']")).toHaveCount(0, { timeout: 8_000 });
+  await waitForToastAnnouncements(page);
   const scan = await new AxeBuilder({ page }).analyze();
   expect(scan.violations).toEqual([]);
 });

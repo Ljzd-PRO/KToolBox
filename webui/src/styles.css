@@ -423,8 +423,18 @@ code {
   background: color-mix(in oklab, var(--surface) 92%, var(--accent) 8%);
 }
 
+.app-table-frame [data-slot="table-row"].is-selected {
+  background: color-mix(in oklab, var(--surface) 88%, var(--accent) 12%);
+}
+
+.app-table-frame [data-slot="table-row"][data-focus-visible] {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
 .task-table-row {
   min-height: 5.75rem;
+  cursor: pointer;
 }
 
 .task-table-content [data-slot="table-column"],
@@ -433,7 +443,23 @@ code {
 }
 
 .task-mobile-card {
+  position: relative;
   box-shadow: 0 1px 2px color-mix(in oklab, black 7%, transparent);
+}
+
+.task-card-link {
+  border-radius: var(--radius);
+}
+
+.task-card-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.data-mobile-card.is-selected,
+.task-mobile-card.is-selected {
+  border-color: color-mix(in oklab, var(--border) 45%, var(--accent) 55%);
+  box-shadow: 0 0 0 2px var(--focus-ring);
 }
 
 .data-mobile-card,
@@ -581,6 +607,36 @@ code {
 .form-checkbox[data-selected="true"] .checkbox__control,
 .form-checkbox[data-indeterminate="true"] .checkbox__control {
   border-color: transparent;
+}
+
+.selection-checkbox {
+  display: inline-flex;
+  min-width: 44px;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 0.625rem;
+}
+
+.selection-checkbox-labeled {
+  justify-content: flex-start;
+}
+
+.selection-checkbox .checkbox__control {
+  height: 1.125rem;
+  width: 1.125rem;
+  border-color: var(--control-border);
+  background: var(--control-surface);
+}
+
+.selection-checkbox[data-selected="true"] .checkbox__control,
+.selection-checkbox[data-indeterminate="true"] .checkbox__control {
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.batch-action-bar {
+  box-shadow: 0 1px 2px color-mix(in oklab, black 5%, transparent);
 }
 
 .chip-list-control {
@@ -799,6 +855,34 @@ code {
 
   .task-table-row {
     min-height: 5rem;
+  }
+
+  .batch-action-bar {
+    align-items: stretch;
+  }
+
+  .batch-action-buttons {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .batch-action-buttons > button {
+    width: 100%;
+  }
+
+  .batch-clear-button {
+    min-width: 44px;
+    padding-inline: 0;
+  }
+
+  .batch-clear-label {
+    position: absolute;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   .pawchive-identity-fields {

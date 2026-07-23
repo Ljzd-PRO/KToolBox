@@ -8,14 +8,11 @@ import {
 import type { SortDescriptor } from "@heroui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  IconArrowDown as ArrowDown,
   IconArrowLeft as ArrowLeft,
-  IconArrowUp as ArrowUp,
   IconActivity as Activity,
   IconAlertTriangle as AlertTriangle,
   IconCircleCheck as CircleCheck,
   IconClock as Clock,
-  IconEye as Eye,
   IconFilter as Filter,
   IconPencil as Pencil,
   IconPlayerPause as Pause,
@@ -34,6 +31,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { TaskEditor } from "../components/TaskEditor";
 import { TaskTarget } from "../components/TaskTarget";
 import {
+  BatchActionBar,
   ConfirmModal,
   DataTableFrame,
   EmptyPanel,
@@ -44,6 +42,7 @@ import {
   PageHeader,
   PageLoading,
   ProgressMeter,
+  SelectionCheckbox,
   SelectField,
   SortableColumn,
   TaskStatusChip,
@@ -110,7 +109,8 @@ export function TasksPage() {
     searchParams.get("create") === "sync" ? "new" : null,
   );
   const [saving, setSaving] = useState(false);
-  const [removing, setRemoving] = useState<TaskRecord | null>(null);
+  const [removing, setRemoving] = useState<TaskRecord[]>([]);
+  const [deleting, setDeleting] = useState(false);
   const [deleteOutput, setDeleteOutput] = useState(false);
   const statusFilter = taskStatusFilter(searchParams.get("status"));
   useEffect(() => {
@@ -121,9 +121,9 @@ export function TasksPage() {
   }, [searchParams, setSearchParams]);
 
   const cleanupQuery = useQuery({
-    queryKey: ["task-cleanup", removing?.id],
-    queryFn: () => api<TaskCleanupPreview>(`/tasks/${removing?.id}/cleanup-preview`),
-    enabled: Boolean(removing),
+    queryKey: ["task-cleanup", removing[0]?.id],
+    queryFn: () => api<TaskCleanupPreview>(`/tasks/${removing[0]?.id}/cleanup-preview`),
+    enabled: removing.length === 1,
   });
   const eventsQuery = useQuery({
     queryKey: ["task-events", taskId],
@@ -175,36 +175,74 @@ export function TasksPage() {
     }
   }
 
-  async function reorder(task: TaskRecord, position: number) {
-    if (!session) return;
-    try {
-      await api<TaskRecord>(`/tasks/${task.id}/reorder`, {
-        method: "POST",
-        body: { position },
-        csrfToken: session.csrf_token,
-      });
-      await queryClient.invalidateQueries({ queryKey: ["tasks"] });
-    } catch (error) {
-      toast.danger(t("common.error"), { description: errorText(error) });
+  async function batchTaskAction(tasksToUpdate: TaskRecord[], action: "pause" | "resume" | "stop") {
+    if (!session) return [];
+    const succeeded: string[] = [];
+    const errors: unknown[] = [];
+    for (const task of tasksToUpdate) {
+      try {
+        await api<TaskRecord>(`/tasks/${task.id}/${action}`, {
+          method: "POST",
+          csrfToken: session.csrf_token,
+        });
+        succeeded.push(task.id);
+      } catch (error) {
+        errors.push(error);
+      }
     }
+    await queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    const actionLabel = t(`tasks.${action}`);
+    if (errors.length) {
+      toast.danger(t("tasks.batchPartial", {
+        action: actionLabel,
+        succeeded: succeeded.length,
+        failed: errors.length,
+      }), { description: errorText(errors[0]) });
+    } else {
+      toast.success(t("tasks.batchCompleted", { action: actionLabel, count: succeeded.length }));
+    }
+    return succeeded;
   }
 
-  async function deleteTask() {
-    if (!session || !removing) return;
-    const parameters = new URLSearchParams({ delete_output: String(deleteOutput) });
-    if (deleteOutput) parameters.set("confirmation", removing.id);
+  async function deleteTasks() {
+    if (!session || !removing.length) return;
+    setDeleting(true);
     try {
-      await api<TaskCleanupPreview>(`/tasks/${removing.id}?${parameters.toString()}`, {
-        method: "DELETE",
-        csrfToken: session.csrf_token,
-      });
-      if (taskId === removing.id) navigate("/tasks");
-      setRemoving(null);
+      const batch = removing.length > 1;
+      const succeeded: string[] = [];
+      const failed: TaskRecord[] = [];
+      const errors: unknown[] = [];
+      for (const task of removing) {
+        const shouldDeleteOutput = !batch && deleteOutput;
+        const parameters = new URLSearchParams({ delete_output: String(shouldDeleteOutput) });
+        if (shouldDeleteOutput) parameters.set("confirmation", task.id);
+        try {
+          await api<TaskCleanupPreview>(`/tasks/${task.id}?${parameters.toString()}`, {
+            method: "DELETE",
+            csrfToken: session.csrf_token,
+          });
+          succeeded.push(task.id);
+        } catch (error) {
+          failed.push(task);
+          errors.push(error);
+        }
+      }
+      if (taskId && succeeded.includes(taskId)) navigate("/tasks");
+      setRemoving(failed);
       setDeleteOutput(false);
       await queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success(t("tasks.deleted"));
-    } catch (error) {
-      toast.danger(t("common.error"), { description: errorText(error) });
+      if (errors.length) {
+        toast.danger(t("tasks.batchDeletePartial", {
+          succeeded: succeeded.length,
+          failed: errors.length,
+        }), { description: errorText(errors[0]) });
+      } else if (batch) {
+        toast.success(t("tasks.batchDeleted", { count: succeeded.length }));
+      } else {
+        toast.success(t("tasks.deleted"));
+      }
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -213,12 +251,16 @@ export function TasksPage() {
     edit: setEditor,
     remove: (task) => {
       setDeleteOutput(false);
-      setRemoving(task);
+      setRemoving([task]);
+    },
+    removeMany: (tasksToRemove) => {
+      setDeleteOutput(false);
+      setRemoving(tasksToRemove);
     },
     pause: (task) => void taskAction(task, "pause"),
     resume: (task) => void taskAction(task, "resume"),
     stop: (task) => void taskAction(task, "stop"),
-    reorder: (task, position) => void reorder(task, position),
+    batchAction: batchTaskAction,
   };
 
   function changeStatusFilter(value: string) {
@@ -264,33 +306,43 @@ export function TasksPage() {
       <ConfirmModal
         actions={
           <>
-            <Button variant="ghost" onPress={() => setRemoving(null)}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
-            <Button variant="danger" onPress={() => void deleteTask()}>
+            <Button variant="ghost" onPress={() => setRemoving([])}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
+            <Button isPending={deleting} variant="danger" onPress={() => void deleteTasks()}>
               <Trash2 aria-hidden="true" size={17} />
               {t("common.delete")}
             </Button>
           </>
         }
-        open={removing !== null}
-        title={t("tasks.cleanupTitle")}
-        onOpenChange={(open) => !open && setRemoving(null)}
+        open={removing.length > 0}
+        title={removing.length > 1 ? t("tasks.batchDeleteTitle", { count: removing.length }) : t("tasks.cleanupTitle")}
+        onOpenChange={(open) => !open && setRemoving([])}
       >
         <div className="grid gap-4">
-          <p className="text-sm leading-relaxed text-muted">{t("tasks.cleanupBody")}</p>
-          {cleanupQuery.isLoading ? <PageLoading /> : (
-            <Surface className="grid gap-2 rounded-lg border border-border p-4">
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-sm text-muted">{t("tasks.removable")}</span>
-                <strong>{cleanupQuery.data?.removable_files ?? 0}</strong>
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-sm text-muted">{t("tasks.outputSize")}</span>
-                <strong>{formatBytes(cleanupQuery.data?.removable_bytes)}</strong>
-              </div>
-            </Surface>
-          )}
-          <FormCheckbox isSelected={deleteOutput} label={t("tasks.deleteOutput")} onChange={setDeleteOutput} />
-          {deleteOutput ? <p className="break-all text-xs text-danger">{t("tasks.deleteConfirmation", { id: removing?.id })}</p> : null}
+          <p className="text-sm leading-relaxed text-muted">
+            {removing.length > 1 ? t("tasks.batchDeleteBody", { count: removing.length }) : t("tasks.cleanupBody")}
+          </p>
+          {removing.length === 1 ? (
+            <>
+              {cleanupQuery.isLoading ? <PageLoading /> : (
+                <Surface className="grid gap-2 rounded-lg border border-border p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm text-muted">{t("tasks.removable")}</span>
+                    <strong>{cleanupQuery.data?.removable_files ?? 0}</strong>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm text-muted">{t("tasks.outputSize")}</span>
+                    <strong>{formatBytes(cleanupQuery.data?.removable_bytes)}</strong>
+                  </div>
+                </Surface>
+              )}
+              <FormCheckbox isSelected={deleteOutput} label={t("tasks.deleteOutput")} onChange={setDeleteOutput} />
+              {deleteOutput ? (
+                <p className="break-all text-xs text-danger">
+                  {t("tasks.deleteConfirmation", { id: removing[0]?.id })}
+                </p>
+              ) : null}
+            </>
+          ) : null}
         </div>
       </ConfirmModal>
     </div>
@@ -304,7 +356,11 @@ type TaskHandlers = {
   pause: (task: TaskRecord) => void;
   resume: (task: TaskRecord) => void;
   stop: (task: TaskRecord) => void;
-  reorder: (task: TaskRecord, position: number) => void;
+  removeMany: (tasks: TaskRecord[]) => void;
+  batchAction: (
+    tasks: TaskRecord[],
+    action: "pause" | "resume" | "stop",
+  ) => Promise<string[]>;
 };
 
 function TaskList({
@@ -324,6 +380,8 @@ function TaskList({
 }) {
   const { t, i18n } = useTranslation();
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [batchBusy, setBatchBusy] = useState<"pause" | "resume" | "stop" | null>(null);
   const filteredTasks = useMemo(
     () => tasks.filter((task) => matchesTaskStatus(task.status, statusFilter)),
     [statusFilter, tasks],
@@ -351,7 +409,12 @@ function TaskList({
       i18n.resolvedLanguage ?? i18n.language,
     );
   }, [creators, filteredTasks, i18n.language, i18n.resolvedLanguage, sortDescriptor]);
-  const reorderLocked = statusFilter !== "all" || sortDescriptor !== null;
+  const selectedTasks = visibleTasks.filter((task) => selectedIds.has(task.id));
+  const allVisibleSelected = visibleTasks.length > 0 && selectedTasks.length === visibleTasks.length;
+  const pauseCandidates = selectedTasks.filter((task) => pausable.has(task.status));
+  const resumeCandidates = selectedTasks.filter((task) => resumable.has(task.status));
+  const stopCandidates = selectedTasks.filter((task) => stoppable.has(task.status));
+  const deleteCandidates = selectedTasks.filter((task) => deletable.has(task.status));
   const statusOptions = [
     { value: "all", label: t("tasks.allStatuses"), icon: Filter },
     { value: "active", label: t("tasks.activeStatuses"), icon: Activity, tone: "accent" as const },
@@ -371,6 +434,35 @@ function TaskList({
     { value: "output", label: t("tasks.output") },
     { value: "created", label: t("common.created") },
   ];
+
+  function setTaskSelected(taskId: string, selected: boolean) {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (selected) next.add(taskId);
+      else next.delete(taskId);
+      return next;
+    });
+  }
+
+  function selectAllVisible(selected: boolean) {
+    setSelectedIds(selected ? new Set(visibleTasks.map((task) => task.id)) : new Set());
+  }
+
+  async function runBatch(action: "pause" | "resume" | "stop", candidates: TaskRecord[]) {
+    if (!candidates.length) return;
+    setBatchBusy(action);
+    try {
+      const succeeded = await handlers.batchAction(candidates, action);
+      setSelectedIds((current) => {
+        const next = new Set(current);
+        succeeded.forEach((id) => next.delete(id));
+        return next;
+      });
+    } finally {
+      setBatchBusy(null);
+    }
+  }
+
   return (
     <>
       <PageHeader
@@ -395,10 +487,54 @@ function TaskList({
           onChange={setSortDescriptor}
         />
       </FormSurface>
-      {reorderLocked ? (
-        <Chip color="warning" size="sm" variant="soft">
-          {sortDescriptor ? t("tasks.sortedView") : t("tasks.filteredView")}
-        </Chip>
+      {selectedTasks.length ? (
+        <BatchActionBar
+          allVisibleSelected={allVisibleSelected}
+          partiallySelected={!allVisibleSelected}
+          selectedCount={selectedTasks.length}
+          onClear={() => setSelectedIds(new Set())}
+          onSelectAll={selectAllVisible}
+        >
+          <Button
+            isDisabled={!pauseCandidates.length || batchBusy !== null}
+            isPending={batchBusy === "pause"}
+            size="sm"
+            variant="outline"
+            onPress={() => void runBatch("pause", pauseCandidates)}
+          >
+            <Pause aria-hidden="true" size={16} />
+            {t("tasks.batchPause", { count: pauseCandidates.length })}
+          </Button>
+          <Button
+            isDisabled={!resumeCandidates.length || batchBusy !== null}
+            isPending={batchBusy === "resume"}
+            size="sm"
+            variant="outline"
+            onPress={() => void runBatch("resume", resumeCandidates)}
+          >
+            <Play aria-hidden="true" size={16} />
+            {t("tasks.batchResume", { count: resumeCandidates.length })}
+          </Button>
+          <Button
+            isDisabled={!stopCandidates.length || batchBusy !== null}
+            isPending={batchBusy === "stop"}
+            size="sm"
+            variant="outline"
+            onPress={() => void runBatch("stop", stopCandidates)}
+          >
+            <Square aria-hidden="true" size={16} />
+            {t("tasks.batchStop", { count: stopCandidates.length })}
+          </Button>
+          <Button
+            isDisabled={!deleteCandidates.length || batchBusy !== null}
+            size="sm"
+            variant="danger-soft"
+            onPress={() => handlers.removeMany(deleteCandidates)}
+          >
+            <Trash2 aria-hidden="true" size={16} />
+            {t("tasks.batchDelete", { count: deleteCandidates.length })}
+          </Button>
+        </BatchActionBar>
       ) : null}
       {!visibleTasks.length ? <EmptyPanel title={t("tasks.empty")} /> : (
         <>
@@ -407,11 +543,23 @@ function TaskList({
               aria-label={t("tasks.title")}
               className="task-table-content min-w-[940px]"
               sortDescriptor={sortDescriptor ?? undefined}
+              onRowAction={(key) => {
+                const task = visibleTasks.find((item) => item.id === String(key));
+                if (task) handlers.details(task);
+              }}
               onSortChange={(next) => setSortDescriptor(
                 normalizeTableSort(sortDescriptor, next, descendingTaskColumns),
               )}
             >
               <Table.Header>
+                <Table.Column aria-label={t("common.select")} className="w-12">
+                  <SelectionCheckbox
+                    isIndeterminate={selectedTasks.length > 0 && !allVisibleSelected}
+                    isSelected={allVisibleSelected}
+                    label={t("common.selectAllVisible")}
+                    onChange={selectAllVisible}
+                  />
+                </Table.Column>
                 <SortableColumn id="target" isRowHeader>{t("tasks.target")}</SortableColumn>
                 <SortableColumn id="status">{t("common.status")}</SortableColumn>
                 <SortableColumn id="progress">{t("tasks.progress")}</SortableColumn>
@@ -421,39 +569,59 @@ function TaskList({
                 <Table.Column>{t("common.actions")}</Table.Column>
               </Table.Header>
               <Table.Body>
-                {visibleTasks.map((task, index) => (
-                  <Table.Row className="task-table-row" id={task.id} key={task.id}>
-                    <Table.Cell className="w-56 min-w-56 max-w-56"><TaskTarget creators={creators} task={task} /></Table.Cell>
+                {visibleTasks.map((task) => (
+                  <Table.Row className={`task-table-row${selectedIds.has(task.id) ? " is-selected" : ""}`} id={task.id} key={task.id}>
+                    <Table.Cell className="w-12">
+                      <SelectionCheckbox
+                        isSelected={selectedIds.has(task.id)}
+                        label={t("tasks.selectTask", { target: taskTargetSortText(task, creators) })}
+                        onChange={(selected) => setTaskSelected(task.id, selected)}
+                      />
+                    </Table.Cell>
+                    <Table.Cell className="w-72 min-w-72 max-w-72"><TaskTarget creators={creators} task={task} /></Table.Cell>
                     <Table.Cell className="min-w-24"><TaskStatusChip status={task.status} /></Table.Cell>
                     <Table.Cell className="min-w-28"><TaskProgressSummary task={task} /></Table.Cell>
                     <Table.Cell className="min-w-20 whitespace-nowrap text-sm font-medium tabular-nums">{formatBytes(taskSpeed(task), "/s")}</Table.Cell>
                     <Table.Cell><code className="block max-w-28 truncate text-xs text-muted" title={task.spec.output}>{task.spec.output}</code></Table.Cell>
                     <Table.Cell className="w-24 max-w-24 text-xs leading-relaxed text-muted"><TaskCreatedTime locale={i18n.language} value={task.created_at} /></Table.Cell>
-                    <Table.Cell className="w-[196px] min-w-[196px]"><TaskActions canMoveDown={index < visibleTasks.length - 1} canMoveUp={index > 0} reorderLocked={reorderLocked} task={task} handlers={handlers} /></Table.Cell>
+                    <Table.Cell className="w-[196px] min-w-[196px]"><TaskActions task={task} handlers={handlers} /></Table.Cell>
                   </Table.Row>
                 ))}
               </Table.Body>
             </Table.Content>
           </DataTableFrame>
           <div className="grid gap-3 xl:hidden">
-            {visibleTasks.map((task, index) => (
-              <Surface className="data-mobile-card task-mobile-card grid gap-4 rounded-lg border border-border p-4" key={task.id}>
-                <div className="flex min-w-0 items-start gap-3">
+            {visibleTasks.map((task) => (
+              <Surface className={`data-mobile-card task-mobile-card grid gap-4 rounded-lg border border-border p-4${selectedIds.has(task.id) ? " is-selected" : ""}`} key={task.id}>
+                <button
+                  aria-label={t("tasks.openDetails", { target: taskTargetSortText(task, creators) })}
+                  className="task-card-link absolute inset-0 z-0 appearance-none border-0 bg-transparent p-0"
+                  type="button"
+                  onClick={() => handlers.details(task)}
+                />
+                <div className="pointer-events-none relative z-[1] flex min-w-0 items-start gap-3">
+                  <div className="pointer-events-auto shrink-0">
+                    <SelectionCheckbox
+                      isSelected={selectedIds.has(task.id)}
+                      label={t("tasks.selectTask", { target: taskTargetSortText(task, creators) })}
+                      onChange={(selected) => setTaskSelected(task.id, selected)}
+                    />
+                  </div>
                   <div className="min-w-0 flex-1"><TaskTarget creators={creators} task={task} /></div>
-                  <div className="ml-auto shrink-0"><TaskStatusChip status={task.status} /></div>
                 </div>
-                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
+                <div className="pointer-events-none relative z-[1] grid grid-cols-[auto_minmax(0,1fr)_auto] items-end gap-3">
+                  <TaskStatusChip status={task.status} />
                   <TaskProgressSummary task={task} />
                   <div className="text-right">
                     <p className="text-xs text-muted">{t("tasks.totalSpeed")}</p>
                     <strong className="text-sm tabular-nums text-foreground">{formatBytes(taskSpeed(task), "/s")}</strong>
                   </div>
                 </div>
-                <div className="grid gap-1 border-t border-border pt-3 text-xs text-muted">
+                <div className="pointer-events-none relative z-[1] grid gap-1 border-t border-border pt-3 text-xs text-muted">
                   <code className="truncate" title={task.spec.output}>{task.spec.output}</code>
                   <span>{formatDateTime(task.created_at, i18n.language)}</span>
                 </div>
-                <TaskActions mobile canMoveDown={index < visibleTasks.length - 1} canMoveUp={index > 0} reorderLocked={reorderLocked} task={task} handlers={handlers} />
+                <TaskActions mobile task={task} handlers={handlers} />
               </Surface>
             ))}
           </div>
@@ -496,16 +664,10 @@ function TaskCreatedTime({ value, locale }: { value: string; locale: string }) {
 function TaskActions({
   task,
   handlers,
-  canMoveUp,
-  canMoveDown,
-  reorderLocked,
   mobile = false,
 }: {
   task: TaskRecord;
   handlers: TaskHandlers;
-  canMoveUp: boolean;
-  canMoveDown: boolean;
-  reorderLocked: boolean;
   mobile?: boolean;
 }) {
   const { t } = useTranslation();
@@ -518,8 +680,7 @@ function TaskActions({
   const unavailable = (action: string) => t("tasks.actionUnavailable", { action, status });
   const lifecycleAction = canResume ? t("tasks.resume") : t("tasks.pause");
   return (
-    <div className={mobile ? "task-action-grid grid grid-cols-4 justify-items-center gap-1 border-t border-border pt-3" : "task-action-grid grid w-[188px] grid-cols-4 justify-items-center gap-1"}>
-      <IconButton icon={Eye} label={t("tasks.details")} onPress={() => handlers.details(task)} />
+    <div className={mobile ? "task-action-grid pointer-events-auto relative z-[2] grid grid-cols-4 justify-items-center gap-1 border-t border-border pt-3" : "task-action-grid grid w-[188px] grid-cols-4 justify-items-center gap-1"}>
       <IconButton
         icon={canResume ? Play : Pause}
         isDisabled={!canPause && !canResume}
@@ -529,8 +690,6 @@ function TaskActions({
       />
       <IconButton icon={Square} isDisabled={!canStop} label={t("tasks.stop")} tooltip={canStop ? t("tasks.stop") : unavailable(t("tasks.stop"))} onPress={() => handlers.stop(task)} />
       <IconButton icon={Pencil} isDisabled={!canEdit} label={t("common.edit")} tooltip={canEdit ? t("common.edit") : unavailable(t("common.edit"))} onPress={() => handlers.edit(task)} />
-      <IconButton icon={ArrowUp} isDisabled={reorderLocked || !canMoveUp} label={t("tasks.moveUp")} tooltip={reorderLocked ? t("tasks.filteredView") : canMoveUp ? t("tasks.moveUp") : t("tasks.firstInQueue")} onPress={() => handlers.reorder(task, Math.max(1, task.position - 1))} />
-      <IconButton icon={ArrowDown} isDisabled={reorderLocked || !canMoveDown} label={t("tasks.moveDown")} tooltip={reorderLocked ? t("tasks.filteredView") : canMoveDown ? t("tasks.moveDown") : t("tasks.lastInQueue")} onPress={() => handlers.reorder(task, task.position + 1)} />
       <IconButton className="text-danger" icon={Trash2} isDisabled={!canDelete} label={t("common.delete")} tooltip={canDelete ? t("common.delete") : unavailable(t("common.delete"))} onPress={() => handlers.remove(task)} />
     </div>
   );

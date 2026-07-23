@@ -90,6 +90,89 @@ export function DataTableFrame({ children, className }: { children: ReactNode; c
   );
 }
 
+export function SelectionCheckbox({
+  label,
+  isSelected,
+  onChange,
+  isIndeterminate = false,
+  showLabel = false,
+  className,
+}: {
+  label: string;
+  isSelected: boolean;
+  onChange: (selected: boolean) => void;
+  isIndeterminate?: boolean;
+  showLabel?: boolean;
+  className?: string;
+}) {
+  return (
+    <Checkbox
+      aria-label={label}
+      className={cn("selection-checkbox min-h-11", showLabel && "selection-checkbox-labeled", className)}
+      isIndeterminate={isIndeterminate}
+      isSelected={isSelected}
+      slot={null}
+      variant="secondary"
+      onChange={onChange}
+    >
+      <Checkbox.Content className="items-center gap-2">
+        <Checkbox.Control className="shrink-0">
+          {isSelected || isIndeterminate ? (
+            <Checkbox.Indicator>
+              {isIndeterminate ? <Minus aria-hidden="true" size={12} /> : <Check aria-hidden="true" size={12} />}
+            </Checkbox.Indicator>
+          ) : null}
+        </Checkbox.Control>
+        {showLabel ? <span className="text-sm font-medium">{label}</span> : null}
+      </Checkbox.Content>
+    </Checkbox>
+  );
+}
+
+export function BatchActionBar({
+  selectedCount,
+  allVisibleSelected,
+  partiallySelected,
+  onSelectAll,
+  onClear,
+  children,
+}: {
+  selectedCount: number;
+  allVisibleSelected: boolean;
+  partiallySelected: boolean;
+  onSelectAll: (selected: boolean) => void;
+  onClear: () => void;
+  children: ReactNode;
+}) {
+  const { t } = useTranslation();
+  return (
+    <Surface
+      aria-label={t("common.batchActions")}
+      className="batch-action-bar flex flex-wrap items-center gap-2 rounded-lg border border-border px-3 py-2"
+      role="region"
+      variant="secondary"
+    >
+      <SelectionCheckbox
+        isIndeterminate={partiallySelected}
+        isSelected={allVisibleSelected}
+        label={t("common.selectAllVisible")}
+        showLabel
+        onChange={onSelectAll}
+      />
+      <Chip color="accent" size="sm" variant="soft">
+        {t("common.selectedCount", { count: selectedCount })}
+      </Chip>
+      <Button aria-label={t("common.clearSelection")} className="batch-clear-button" size="sm" variant="ghost" onPress={onClear}>
+        <X aria-hidden="true" size={16} />
+        <span className="batch-clear-label">{t("common.clearSelection")}</span>
+      </Button>
+      <div className="batch-action-buttons ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
+        {children}
+      </div>
+    </Surface>
+  );
+}
+
 export function SortableColumn({
   id,
   children,

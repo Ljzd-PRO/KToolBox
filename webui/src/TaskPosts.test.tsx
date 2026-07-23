@@ -111,7 +111,8 @@ describe("task and post workflows", () => {
     expect(await screen.findByText(/fixture ready/)).toBeInTheDocument();
   });
 
-  it("shows recognizable task targets with every queue action directly available", async () => {
+  it("opens task rows and exposes compatible batch actions without queue reordering", async () => {
+    const user = userEvent.setup();
     window.history.replaceState({}, "", "/tasks");
     const progress = {
       queued_files: 4,
@@ -183,13 +184,19 @@ describe("task and post workflows", () => {
         updated_at: "2026-07-21T00:03:00Z",
       },
     ];
-    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const path = String(input);
       if (path.endsWith("/session")) return json(session);
       if (path.endsWith("/tasks")) return json(tasks);
       if (path.endsWith("/creators")) return json([]);
+      if (path.endsWith("/tasks/download-task/pause") && init?.method === "POST") {
+        return json({ ...tasks[0], status: "paused" });
+      }
+      if (path.includes("/tasks/download-task/events")) return json([]);
+      if (path.endsWith("/tasks/download-task/attempts")) return json([]);
       throw new Error(`Unexpected request: ${path}`);
-    }));
+    });
+    vi.stubGlobal("fetch", fetchMock);
 
     render(<BrowserRouter><App /></BrowserRouter>);
 
@@ -204,17 +211,27 @@ describe("task and post workflows", () => {
     expect(screen.getAllByTitle("Demo Studio among 2 creators")).toHaveLength(2);
     expect(screen.getAllByText("Demo Studio · Type Lab")).toHaveLength(2);
     expect(screen.getAllByText("0 B/s").length).toBeGreaterThanOrEqual(2);
-    expect(screen.getAllByRole("button", { name: "Task details" }).length).toBeGreaterThanOrEqual(4);
+    expect(screen.getAllByRole("button", { name: /Open details for/ })).toHaveLength(2);
     expect(screen.getAllByRole("button", { name: "Pause" }).length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByRole("button", { name: "Resume" }).length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByRole("button", { name: "Stop" }).length).toBeGreaterThanOrEqual(4);
     expect(screen.getAllByRole("button", { name: "Edit" }).length).toBeGreaterThanOrEqual(4);
-    expect(screen.getAllByRole("button", { name: "Move up" }).length).toBeGreaterThanOrEqual(4);
-    expect(screen.getAllByRole("button", { name: "Move down" }).length).toBeGreaterThanOrEqual(4);
     expect(screen.getAllByRole("button", { name: "Delete" }).length).toBeGreaterThanOrEqual(4);
-    expect(screen.getAllByRole("button", { name: "Move up" }).some((button) => button.getAttribute("aria-disabled") === "true")).toBe(true);
+    expect(screen.queryByRole("button", { name: "Move up" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Move down" })).not.toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: "Delete" }).some((button) => button.getAttribute("aria-disabled") === "true")).toBe(true);
     expect(screen.queryByRole("button", { name: "Actions" })).not.toBeInTheDocument();
+
+    await user.click(screen.getAllByRole("checkbox", { name: /Select Fictional cover study/ })[0]);
+    await user.click(screen.getByRole("button", { name: "Pause 1" }));
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("/tasks/download-task/pause"),
+      expect.objectContaining({ method: "POST" }),
+    );
+
+    await user.click(screen.getByRole("rowheader", { name: /Fictional cover study/ }));
+    expect(await screen.findByRole("heading", { name: "Task details" })).toBeInTheDocument();
+    expect(window.location.pathname).toBe("/tasks/download-task");
   });
 
   it("creates a download with a presentation snapshot without requesting remote media", async () => {

@@ -29,6 +29,7 @@ import { Trans, useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 
 import {
+  BatchActionBar,
   CompactSwitch,
   ConfirmModal,
   DataTableFrame,
@@ -42,6 +43,7 @@ import {
   PawchiveIdentityFields,
   PageHeader,
   PageLoading,
+  SelectionCheckbox,
   SelectField,
   SortableColumn,
 } from "../components/ui";
@@ -79,7 +81,10 @@ export function CreatorsPage() {
     creatorRevision,
   );
   const [originalKey, setOriginalKey] = useState<string | null>(null);
-  const [removing, setRemoving] = useState<CreatorReference | null>(null);
+  const [removing, setRemoving] = useState<CreatorReference[]>([]);
+  const [deleting, setDeleting] = useState(false);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [batchBusy, setBatchBusy] = useState<"enable" | "disable" | null>(null);
   const [saving, setSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searching, setSearching] = useState(false);
@@ -104,8 +109,12 @@ export function CreatorsPage() {
       i18n.resolvedLanguage ?? i18n.language,
     );
   }, [i18n.language, i18n.resolvedLanguage, roster.data, sortDescriptor, statusFilter]);
-
   if (roster.isLoading) return <PageLoading />;
+
+  const selectedCreators = creators.filter((creator) => selectedKeys.has(creatorKey(creator)));
+  const allVisibleSelected = creators.length > 0 && selectedCreators.length === creators.length;
+  const enableCandidates = selectedCreators.filter((creator) => !creator.enabled);
+  const disableCandidates = selectedCreators.filter((creator) => creator.enabled);
 
   function openNew(prefill?: CreatorSummary) {
     setOriginalKey(null);
@@ -158,32 +167,100 @@ export function CreatorsPage() {
     }
   }
 
+  async function updateCreatorState(creator: CreatorReference, enabled: boolean) {
+    if (!session) throw new Error("Session unavailable");
+    await api<CreatorReference>(`/creators/${creator.service}/${creator.creator_id}`, {
+      method: "PUT",
+      body: { alias: creator.alias, enabled },
+      csrfToken: session.csrf_token,
+    });
+  }
+
   async function setEnabled(creator: CreatorReference, enabled: boolean) {
-    if (!session) return;
     try {
-      await api<CreatorReference>(`/creators/${creator.service}/${creator.creator_id}`, {
-        method: "PUT",
-        body: { alias: creator.alias, enabled },
-        csrfToken: session.csrf_token,
-      });
+      await updateCreatorState(creator, enabled);
       await queryClient.invalidateQueries({ queryKey: ["creators"] });
     } catch (error) {
       toast.danger(t("common.error"), { description: errorText(error) });
     }
   }
 
-  async function removeCreator() {
-    if (!removing || !session) return;
+  async function batchSetEnabled(enabled: boolean) {
+    if (!session) return;
+    const candidates = enabled ? enableCandidates : disableCandidates;
+    if (!candidates.length) return;
+    setBatchBusy(enabled ? "enable" : "disable");
     try {
-      await api<CreatorReference>(`/creators/${removing.service}/${removing.creator_id}`, {
-        method: "DELETE",
-        csrfToken: session.csrf_token,
-      });
-      setRemoving(null);
-      toast.success(t("creators.removed"));
+      const succeeded: string[] = [];
+      const errors: unknown[] = [];
+      for (const creator of candidates) {
+        try {
+          await updateCreatorState(creator, enabled);
+          succeeded.push(creatorKey(creator));
+        } catch (error) {
+          errors.push(error);
+        }
+      }
       await queryClient.invalidateQueries({ queryKey: ["creators"] });
-    } catch (error) {
-      toast.danger(t("common.error"), { description: errorText(error) });
+      setSelectedKeys((current) => {
+        const next = new Set(current);
+        succeeded.forEach((key) => next.delete(key));
+        return next;
+      });
+      const action = enabled ? t("creators.batchEnableAction") : t("creators.batchDisableAction");
+      if (errors.length) {
+        toast.danger(t("creators.batchPartial", {
+          action,
+          succeeded: succeeded.length,
+          failed: errors.length,
+        }), { description: errorText(errors[0]) });
+      } else {
+        toast.success(t("creators.batchCompleted", { action, count: succeeded.length }));
+      }
+    } finally {
+      setBatchBusy(null);
+    }
+  }
+
+  async function removeCreators() {
+    if (!removing.length || !session) return;
+    setDeleting(true);
+    try {
+      const batch = removing.length > 1;
+      const succeeded: string[] = [];
+      const failed: CreatorReference[] = [];
+      const errors: unknown[] = [];
+      for (const creator of removing) {
+        try {
+          await api<CreatorReference>(`/creators/${creator.service}/${creator.creator_id}`, {
+            method: "DELETE",
+            csrfToken: session.csrf_token,
+          });
+          succeeded.push(creatorKey(creator));
+        } catch (error) {
+          failed.push(creator);
+          errors.push(error);
+        }
+      }
+      setRemoving(failed);
+      setSelectedKeys((current) => {
+        const next = new Set(current);
+        succeeded.forEach((key) => next.delete(key));
+        return next;
+      });
+      await queryClient.invalidateQueries({ queryKey: ["creators"] });
+      if (errors.length) {
+        toast.danger(t("creators.batchRemovePartial", {
+          succeeded: succeeded.length,
+          failed: errors.length,
+        }), { description: errorText(errors[0]) });
+      } else if (batch) {
+        toast.success(t("creators.batchRemoved", { count: succeeded.length }));
+      } else {
+        toast.success(t("creators.removed"));
+      }
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -219,6 +296,20 @@ export function CreatorsPage() {
     if (value === "all") next.delete("status");
     else next.set("status", value);
     setSearchParams(next, { replace: true });
+  }
+
+  function setCreatorSelected(creator: CreatorReference, selected: boolean) {
+    const key = creatorKey(creator);
+    setSelectedKeys((current) => {
+      const next = new Set(current);
+      if (selected) next.add(key);
+      else next.delete(key);
+      return next;
+    });
+  }
+
+  function selectAllVisible(selected: boolean) {
+    setSelectedKeys(selected ? new Set(creators.map(creatorKey)) : new Set());
   }
 
   return (
@@ -295,6 +386,45 @@ export function CreatorsPage() {
             onChange={(descriptor) => descriptor && setSortDescriptor(descriptor)}
           />
         </FormSurface>
+        {selectedCreators.length ? (
+          <BatchActionBar
+            allVisibleSelected={allVisibleSelected}
+            partiallySelected={!allVisibleSelected}
+            selectedCount={selectedCreators.length}
+            onClear={() => setSelectedKeys(new Set())}
+            onSelectAll={selectAllVisible}
+          >
+            <Button
+              isDisabled={!enableCandidates.length || batchBusy !== null}
+              isPending={batchBusy === "enable"}
+              size="sm"
+              variant="outline"
+              onPress={() => void batchSetEnabled(true)}
+            >
+              <CircleCheck aria-hidden="true" size={16} />
+              {t("creators.batchEnable", { count: enableCandidates.length })}
+            </Button>
+            <Button
+              isDisabled={!disableCandidates.length || batchBusy !== null}
+              isPending={batchBusy === "disable"}
+              size="sm"
+              variant="outline"
+              onPress={() => void batchSetEnabled(false)}
+            >
+              <PowerOff aria-hidden="true" size={16} />
+              {t("creators.batchDisable", { count: disableCandidates.length })}
+            </Button>
+            <Button
+              isDisabled={batchBusy !== null}
+              size="sm"
+              variant="danger-soft"
+              onPress={() => setRemoving(selectedCreators)}
+            >
+              <Trash2 aria-hidden="true" size={16} />
+              {t("creators.batchRemove", { count: selectedCreators.length })}
+            </Button>
+          </BatchActionBar>
+        ) : null}
         {!creators.length ? (
           <EmptyPanel title={t("creators.empty")} />
         ) : (
@@ -306,6 +436,14 @@ export function CreatorsPage() {
                 onSortChange={setSortDescriptor}
               >
                     <Table.Header>
+                      <Table.Column aria-label={t("common.select")} className="w-12">
+                        <SelectionCheckbox
+                          isIndeterminate={selectedCreators.length > 0 && !allVisibleSelected}
+                          isSelected={allVisibleSelected}
+                          label={t("common.selectAllVisible")}
+                          onChange={selectAllVisible}
+                        />
+                      </Table.Column>
                       <SortableColumn id="name" isRowHeader>{t("creators.creatorName")}</SortableColumn>
                       <SortableColumn id="creator_id">{t("creators.creatorId")}</SortableColumn>
                       <SortableColumn id="service">{t("creators.service")}</SortableColumn>
@@ -315,7 +453,14 @@ export function CreatorsPage() {
                     </Table.Header>
                     <Table.Body>
                       {creators.map((creator) => (
-                        <Table.Row key={`${creator.service}:${creator.creator_id}`}>
+                        <Table.Row className={selectedKeys.has(creatorKey(creator)) ? "is-selected" : ""} key={creatorKey(creator)}>
+                          <Table.Cell className="w-12">
+                            <SelectionCheckbox
+                              isSelected={selectedKeys.has(creatorKey(creator))}
+                              label={t("creators.selectCreator", { name: creator.name || creator.creator_id })}
+                              onChange={(selected) => setCreatorSelected(creator, selected)}
+                            />
+                          </Table.Cell>
                           <Table.Cell className="font-medium">{creator.name || creator.creator_id}</Table.Cell>
                           <Table.Cell className="font-medium"><code className="text-xs">{creator.creator_id}</code></Table.Cell>
                           <Table.Cell>{creator.service}</Table.Cell>
@@ -330,7 +475,7 @@ export function CreatorsPage() {
                             </div>
                           </Table.Cell>
                           <Table.Cell className="text-right">
-                            <CreatorActions creator={creator} onEdit={() => openEdit(creator)} onRemove={() => setRemoving(creator)} />
+                            <CreatorActions creator={creator} onEdit={() => openEdit(creator)} onRemove={() => setRemoving([creator])} />
                           </Table.Cell>
                         </Table.Row>
                       ))}
@@ -339,13 +484,19 @@ export function CreatorsPage() {
             </DataTableFrame>
             <div className="grid gap-3 lg:hidden">
               {creators.map((creator) => (
-                <Surface className="data-mobile-card rounded-lg border border-border p-4" key={`${creator.service}:${creator.creator_id}`}>
+                <Surface className={`data-mobile-card rounded-lg border border-border p-4${selectedKeys.has(creatorKey(creator)) ? " is-selected" : ""}`} key={creatorKey(creator)}>
                   <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
+                    <SelectionCheckbox
+                      className="-ml-2 shrink-0"
+                      isSelected={selectedKeys.has(creatorKey(creator))}
+                      label={t("creators.selectCreator", { name: creator.name || creator.creator_id })}
+                      onChange={(selected) => setCreatorSelected(creator, selected)}
+                    />
+                    <div className="min-w-0 flex-1">
                       <p className="break-words font-medium">{creator.name || creator.creator_id}</p>
                       <p className="mt-1 break-all text-xs text-muted"><code>{creator.service}:{creator.creator_id}</code></p>
                     </div>
-                    <CreatorActions creator={creator} onEdit={() => openEdit(creator)} onRemove={() => setRemoving(creator)} />
+                    <CreatorActions creator={creator} onEdit={() => openEdit(creator)} onRemove={() => setRemoving([creator])} />
                   </div>
                   <div className="mt-3 grid grid-cols-[auto_minmax(0,1fr)] gap-2 text-sm">
                     <span className="text-muted">{t("creators.alias")}</span>
@@ -438,19 +589,21 @@ export function CreatorsPage() {
       <ConfirmModal
         actions={
           <>
-            <Button variant="ghost" onPress={() => setRemoving(null)}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
-            <Button variant="danger" onPress={() => void removeCreator()}>
+            <Button variant="ghost" onPress={() => setRemoving([])}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
+            <Button isPending={deleting} variant="danger" onPress={() => void removeCreators()}>
               <Trash2 aria-hidden="true" size={17} />
               {t("common.remove")}
             </Button>
           </>
         }
-        open={removing !== null}
+        open={removing.length > 0}
         size="md"
-        title={t("creators.removeTitle")}
-        onOpenChange={(open) => !open && setRemoving(null)}
+        title={removing.length > 1 ? t("creators.batchRemoveTitle", { count: removing.length }) : t("creators.removeTitle")}
+        onOpenChange={(open) => !open && setRemoving([])}
       >
-        <p className="text-sm leading-relaxed text-muted">{t("creators.removeBody")}</p>
+        <p className="text-sm leading-relaxed text-muted">
+          {removing.length > 1 ? t("creators.batchRemoveBody", { count: removing.length }) : t("creators.removeBody")}
+        </p>
       </ConfirmModal>
     </div>
   );
@@ -458,6 +611,10 @@ export function CreatorsPage() {
 
 function creatorStatusFilter(value: string | null): CreatorStatusFilter {
   return value === "enabled" || value === "disabled" ? value : "all";
+}
+
+function creatorKey(creator: CreatorReference) {
+  return `${creator.service}:${creator.creator_id}`;
 }
 
 
