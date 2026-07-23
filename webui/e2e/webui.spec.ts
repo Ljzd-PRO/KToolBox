@@ -381,7 +381,7 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
 
   await page.setViewportSize({ width: 768, height: 1024 });
   await expect(page.locator(".app-table-frame:visible")).toHaveCount(0);
-  await expect(page.locator(".task-mobile-card:visible")).toBeVisible();
+  await expect(mobileCard).toBeVisible();
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
 });
 

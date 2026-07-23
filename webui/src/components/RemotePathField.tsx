@@ -188,6 +188,7 @@ export function RemotePathPicker({
   const dataRef = useRef<FilesystemBrowse | null>(null);
   const requestRef = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
+  const localFilesystemMutationRef = useRef(false);
   const [address, setAddress] = useState(initialValue);
   const [search, setSearch] = useState("");
   const [includeHidden, setIncludeHidden] = useState(false);
@@ -285,6 +286,7 @@ export function RemotePathPicker({
 
   useEffect(() => {
     if (!open || !dataRef.current || !realtime?.filesystemRevision) return;
+    if (localFilesystemMutationRef.current) return;
     void load({ path: dataRef.current.path, search, includeHidden });
   }, [includeHidden, load, open, realtime?.filesystemRevision, search]);
 
@@ -330,6 +332,7 @@ export function RemotePathPicker({
       setCreateError(t("pathPicker.sessionRequired"));
       return;
     }
+    localFilesystemMutationRef.current = true;
     setCreatingFolder(true);
     setCreateError(null);
     try {
@@ -346,6 +349,7 @@ export function RemotePathPicker({
     } catch (requestError) {
       setCreateError(filesystemErrorText(requestError, t));
     } finally {
+      localFilesystemMutationRef.current = false;
       setCreatingFolder(false);
     }
   }
@@ -357,6 +361,7 @@ export function RemotePathPicker({
       setDeleteError(t("pathPicker.sessionRequired"));
       return;
     }
+    localFilesystemMutationRef.current = true;
     setDeletingFolder(true);
     setDeleteError(null);
     try {
@@ -372,6 +377,7 @@ export function RemotePathPicker({
     } catch (requestError) {
       setDeleteError(filesystemErrorText(requestError, t));
     } finally {
+      localFilesystemMutationRef.current = false;
       setDeletingFolder(false);
     }
   }
