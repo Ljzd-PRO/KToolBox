@@ -458,6 +458,7 @@ export const ja = {
     status: "接続状態",
     statuses: { connecting: "接続中", connected: "接続済み", reconnecting: "再接続中", fallback: "代替更新", offline: "オフライン" },
     modeLive: "Server-Sent Events",
+    mode: "更新方法",
     modeFallback: "10 秒ごとの代替更新",
     lastUpdate: "最終更新",
     neverUpdated: "更新はまだありません",

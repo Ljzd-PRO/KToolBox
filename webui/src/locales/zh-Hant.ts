@@ -82,7 +82,7 @@ export const zhHant = {
   realtime: {
     title: "即時更新", description: "自動同步各個 KToolBox 頁面中的本機專案資料。", status: "連線狀態",
     statuses: { connecting: "正在連線", connected: "已連線", reconnecting: "正在重新連線", fallback: "降級重新整理", offline: "已離線" },
-    modeLive: "伺服器傳送事件", modeFallback: "每 10 秒降級重新整理", lastUpdate: "最後更新時間", neverUpdated: "尚未收到更新", refreshNow: "立即重新整理", reconnect: "重新連線",
+    mode: "更新方式", modeLive: "伺服器傳送事件", modeFallback: "每 10 秒降級重新整理", lastUpdate: "最後更新時間", neverUpdated: "尚未收到更新", refreshNow: "立即重新整理", reconnect: "重新連線",
     degraded: "即時更新暫時無法使用", degradedDescription: "即時連線恢復前，KToolBox 將使用降級重新整理。", restored: "即時更新已恢復",
     externalChangeTitle: "資料已在其他位置更新", externalChangeDescription: "為避免覆寫，目前未儲存的修改已保留。", reload: "重新載入資料", keepEditing: "繼續編輯",
   },

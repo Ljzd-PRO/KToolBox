@@ -582,6 +582,7 @@ export const en = {
       "offline": "Offline"
     },
     "modeLive": "Server-sent events",
+    "mode": "Update method",
     "modeFallback": "10-second fallback refresh",
     "lastUpdate": "Last update",
     "neverUpdated": "No update received yet",

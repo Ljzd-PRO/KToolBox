@@ -91,7 +91,7 @@ export const fr = {
   realtime: {
     title: "Mises à jour en direct", description: "Synchronise automatiquement les données locales du projet entre les pages KToolBox ouvertes.", status: "État de la connexion",
     statuses: { connecting: "Connexion", connected: "Connecté", reconnecting: "Reconnexion", fallback: "Actualisation de secours", offline: "Hors ligne" },
-    modeLive: "Événements envoyés par le serveur", modeFallback: "Actualisation de secours toutes les 10 secondes", lastUpdate: "Dernière mise à jour", neverUpdated: "Aucune mise à jour reçue", refreshNow: "Actualiser maintenant", reconnect: "Reconnecter",
+    mode: "Mode de mise à jour", modeLive: "Événements envoyés par le serveur", modeFallback: "Actualisation de secours toutes les 10 secondes", lastUpdate: "Dernière mise à jour", neverUpdated: "Aucune mise à jour reçue", refreshNow: "Actualiser maintenant", reconnect: "Reconnecter",
     degraded: "Les mises à jour en direct sont indisponibles", degradedDescription: "KToolBox utilise l’actualisation de secours jusqu’au rétablissement de la connexion.", restored: "Mises à jour en direct rétablies",
     externalChangeTitle: "Les données ont été modifiées ailleurs", externalChangeDescription: "Vos modifications non enregistrées ont été conservées pour éviter leur remplacement.", reload: "Recharger les données", keepEditing: "Continuer la modification",
   },

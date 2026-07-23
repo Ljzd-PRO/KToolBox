@@ -101,7 +101,7 @@ export function SystemPage() {
         </div>
         <div className="grid gap-3 border-t border-border pt-4 sm:grid-cols-2">
           <div>
-            <p className="text-xs font-medium text-muted">{t("realtime.modeLive")}</p>
+            <p className="text-xs font-medium text-muted">{t("realtime.mode")}</p>
             <p className="mt-1 text-sm text-foreground">
               {realtime.status === "fallback"
                 ? t("realtime.modeFallback")

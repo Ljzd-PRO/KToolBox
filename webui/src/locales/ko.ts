@@ -137,7 +137,7 @@ export const ko = {
   realtime: {
     title: "실시간 업데이트", description: "열린 KToolBox 페이지의 로컬 프로젝트 데이터를 자동으로 동기화합니다.", status: "연결 상태",
     statuses: { connecting: "연결 중", connected: "연결됨", reconnecting: "다시 연결 중", fallback: "대체 새로 고침", offline: "오프라인" },
-    modeLive: "서버 전송 이벤트", modeFallback: "10초 대체 새로 고침", lastUpdate: "마지막 업데이트", neverUpdated: "아직 업데이트가 없습니다", refreshNow: "지금 새로 고침", reconnect: "다시 연결",
+    mode: "업데이트 방식", modeLive: "서버 전송 이벤트", modeFallback: "10초 대체 새로 고침", lastUpdate: "마지막 업데이트", neverUpdated: "아직 업데이트가 없습니다", refreshNow: "지금 새로 고침", reconnect: "다시 연결",
     degraded: "실시간 업데이트를 사용할 수 없습니다", degradedDescription: "연결이 복구될 때까지 KToolBox가 대체 새로 고침을 사용합니다.", restored: "실시간 업데이트가 복구되었습니다",
     externalChangeTitle: "다른 곳에서 데이터가 변경되었습니다", externalChangeDescription: "덮어쓰지 않도록 저장하지 않은 변경 사항을 유지했습니다.", reload: "데이터 다시 불러오기", keepEditing: "계속 편집",
   },

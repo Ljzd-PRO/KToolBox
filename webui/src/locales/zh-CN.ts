@@ -585,6 +585,7 @@ export const zhCN = {
       "offline": "已离线"
     },
     "modeLive": "服务器发送事件",
+    "mode": "更新方式",
     "modeFallback": "每 10 秒降级刷新",
     "lastUpdate": "最后更新时间",
     "neverUpdated": "尚未收到更新",
