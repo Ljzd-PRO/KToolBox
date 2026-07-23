@@ -103,8 +103,21 @@ class WebUIDatabase:
                     PRIMARY KEY(service, creator_id)
                 );
 
+                CREATE TABLE IF NOT EXISTS mcp_tokens (
+                    id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    username TEXT NOT NULL,
+                    token_hash TEXT NOT NULL UNIQUE,
+                    scopes_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    expires_at TEXT,
+                    last_used_at TEXT,
+                    revoked_at TEXT
+                );
+
                 CREATE INDEX IF NOT EXISTS task_events_cursor ON task_events(id);
                 CREATE INDEX IF NOT EXISTS tasks_queue ON tasks(status, position);
+                CREATE INDEX IF NOT EXISTS mcp_tokens_owner ON mcp_tokens(username, created_at);
                 """
             )
             await connection.execute(
@@ -123,6 +136,10 @@ class WebUIDatabase:
             await connection.execute(
                 "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
                 (4, utc_now().isoformat()),
+            )
+            await connection.execute(
+                "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
+                (5, utc_now().isoformat()),
             )
             await connection.commit()
 

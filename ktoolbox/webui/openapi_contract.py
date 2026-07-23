@@ -163,7 +163,6 @@ OPERATIONS: dict[str, OperationMetadata] = {
         "Get a Pawchive work",
         "Return one Pawchive work or a selected historical revision.",
         "pawchive",
-        mcp=_read("get_work", open_world=True),
     ),
     "post_revisions": OperationMetadata(
         "List work revisions",
@@ -289,6 +288,64 @@ OPERATIONS: dict[str, OperationMetadata] = {
         "project",
         mcp=_read("get_project_summary"),
     ),
+    "download_openapi": OperationMetadata(
+        "Download WebUI OpenAPI",
+        "Download the canonical YAML contract for the authenticated WebUI REST API.",
+        "mcp",
+    ),
+    "mcp_status": OperationMetadata(
+        "Get MCP status",
+        "Return the in-process MCP endpoint, transport, and curated tool count.",
+        "mcp",
+    ),
+    "list_mcp_tools": OperationMetadata(
+        "List MCP tools",
+        "Return the curated MCP tool catalog shown in the WebUI.",
+        "mcp",
+    ),
+    "list_mcp_tokens": OperationMetadata(
+        "List MCP tokens",
+        "List MCP token metadata without returning token secrets.",
+        "mcp",
+    ),
+    "create_mcp_token": OperationMetadata(
+        "Create an MCP token",
+        "Confirm the WebUI account password and create a one-time MCP bearer token.",
+        "mcp",
+        csrf=True,
+    ),
+    "revoke_mcp_token": OperationMetadata(
+        "Revoke an MCP token",
+        "Immediately revoke an MCP bearer token owned by the current WebUI account.",
+        "mcp",
+        csrf=True,
+    ),
+    "browse_project_files": OperationMetadata(
+        "Browse project files",
+        "Browse visible files and directories below the active project root without following paths outside it.",
+        "project",
+        mcp=_read(),
+    ),
+    "patch_mcp_configuration": OperationMetadata(
+        "Patch safe configuration fields",
+        "Update validated non-secret environment configuration fields by their documented field paths.",
+        "configuration",
+        csrf=True,
+        mcp=_write(),
+    ),
+    "delete_task_record": OperationMetadata(
+        "Delete a task record",
+        "Delete an inactive task record and its logs while always preserving downloaded output files.",
+        "tasks",
+        csrf=True,
+        mcp=_write(destructive=True),
+    ),
+    "get_mcp_work": OperationMetadata(
+        "Get a bounded Pawchive work",
+        "Return one Pawchive work with content omitted by default and explicitly capped when requested.",
+        "pawchive",
+        mcp=_read("get_work", open_world=True),
+    ),
 }
 
 
@@ -363,8 +420,28 @@ def build_openapi_schema(app: FastAPI) -> dict[str, Any]:
         {"name": "pawchive", "description": "Public Pawchive search and work data."},
         {"name": "filesystem", "description": "WebUI filesystem path picker."},
         {"name": "system", "description": "Service status."},
+        {"name": "mcp", "description": "MCP status, connection metadata, and access tokens."},
     ]
     return schema
+
+
+def mcp_tool_catalog() -> list[dict[str, Any]]:
+    result: list[dict[str, Any]] = []
+    for operation_id, metadata in OPERATIONS.items():
+        if not metadata.mcp.enabled:
+            continue
+        result.append(
+            {
+                "name": metadata.mcp.name or operation_id,
+                "operation_id": operation_id,
+                "description": metadata.description,
+                "category": metadata.tag,
+                "scope": metadata.mcp.scope,
+                "safety": metadata.mcp.safety,
+                "open_world": metadata.mcp.open_world,
+            }
+        )
+    return result
 
 
 class _NoAliasDumper(yaml.SafeDumper):  # type: ignore[misc]

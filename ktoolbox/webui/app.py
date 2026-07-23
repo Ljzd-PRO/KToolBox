@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import secrets
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -9,6 +10,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from fastmcp.utilities.lifespan import combine_lifespans
 from starlette.middleware.base import RequestResponseEndpoint
 
 from ktoolbox import __version__
@@ -26,6 +28,9 @@ from ktoolbox.webui.database import WebUIDatabase, WebUISession
 from ktoolbox.webui.error_responses import error_payload, validation_error_payload
 from ktoolbox.webui.filesystem import FilesystemBrowser
 from ktoolbox.webui.filesystem_routes import create_filesystem_router
+from ktoolbox.webui.mcp_routes import create_mcp_router
+from ktoolbox.webui.mcp_server import create_mcp_server
+from ktoolbox.webui.mcp_tokens import MCPTokenStore
 from ktoolbox.webui.models import (
     HealthResponse,
     LoginRequest,
@@ -50,7 +55,9 @@ def create_app(
     filesystem_browser: FilesystemBrowser | None = None,
 ) -> FastAPI:
     database = WebUIDatabase(context.project_root / ".ktoolbox" / "webui.sqlite3")
-    auth = AuthService(context.configuration.webui, database)
+    internal_token = f"mcp-internal-{secrets.token_urlsafe(36)}"
+    auth = AuthService(context.configuration.webui, database, internal_token=internal_token)
+    mcp_token_store = MCPTokenStore(database)
     task_store = TaskStore(database)
     task_scheduler = TaskScheduler(
         context,
@@ -89,6 +96,7 @@ def create_app(
     app.state.runtime_context = context
     app.state.database = database
     app.state.auth = auth
+    app.state.mcp_token_store = mcp_token_store
     app.state.task_store = task_store
     app.state.task_scheduler = task_scheduler
     browser = filesystem_browser or FilesystemBrowser(context.project_root)
@@ -97,6 +105,7 @@ def create_app(
     app.include_router(create_filesystem_router(browser))
     app.include_router(create_pawchive_router())
     app.include_router(create_task_router(context.project_root))
+    app.include_router(create_mcp_router())
 
     static_root = Path(__file__).parent / "static"
     assets_root = static_root / "assets"
@@ -105,6 +114,8 @@ def create_app(
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next: RequestResponseEndpoint) -> Response:
+        if request.scope["path"] == "/mcp":
+            request.scope["path"] = "/mcp/"
         response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
@@ -190,6 +201,12 @@ def create_app(
             content=error_payload(error.detail, error.status_code),
             headers=error.headers,
         )
+
+    mcp = create_mcp_server(app, mcp_token_store, internal_token)
+    mcp_app = mcp.http_app(path="/", json_response=True, stateless_http=True)
+    app.state.mcp = mcp
+    app.router.lifespan_context = combine_lifespans(lifespan, mcp_app.lifespan)
+    app.mount("/mcp", mcp_app, name="mcp")
 
     @app.get("/{path:path}", include_in_schema=False)
     async def frontend(path: str) -> FileResponse:

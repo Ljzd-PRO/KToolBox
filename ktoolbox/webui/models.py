@@ -151,3 +151,52 @@ class BlockerListResponse(BaseModel):
 
 class SiteVersionResponse(BaseModel):
     version: str
+
+
+class MCPTokenCreateRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    password: str = Field(min_length=1, max_length=4096)
+    permission: Literal["read", "manage"]
+    expires_in_days: Literal[7, 30, 90, 365] | None = None
+
+
+class MCPTokenResponse(BaseModel):
+    id: str
+    name: str
+    username: str
+    permission: Literal["read", "manage"]
+    scopes: list[str]
+    created_at: datetime
+    expires_at: datetime | None
+    last_used_at: datetime | None
+    revoked_at: datetime | None
+    active: bool
+
+
+class MCPTokenCreatedResponse(MCPTokenResponse):
+    token: str
+
+
+class MCPStatusResponse(BaseModel):
+    running: bool = True
+    endpoint_path: str = "/mcp"
+    openapi_path: str = "/api/v1/openapi.yaml"
+    transport: Literal["streamable-http"] = "streamable-http"
+    tool_count: int
+
+
+class MCPToolResponse(BaseModel):
+    name: str
+    operation_id: str
+    description: str
+    category: str
+    scope: Literal["mcp:read", "mcp:write"]
+    safety: Literal["read", "write", "destructive"]
+    open_world: bool
+
+
+MCPConfigValue = str | int | float | bool | list[str] | None
+
+
+class MCPConfigurationPatchRequest(BaseModel):
+    values: dict[str, MCPConfigValue] = Field(min_length=1)

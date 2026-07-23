@@ -88,27 +88,7 @@ def create_pawchive_router() -> APIRouter:
         _: SessionDependency,
         revision_id: str | None = None,
     ) -> Post | Revision:
-        context = runtime(request)
-        try:
-            with context.activate():
-                async with create_pawchive_client() as client:
-                    if revision_id is None:
-                        return await client.get_post(service, creator_id, post_id)
-                    revisions = await client.list_post_revisions(service, creator_id, post_id)
-            revision = next((item for item in revisions if str(item.revision_id) == revision_id), None)
-            if revision is None:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail={"code": "revision_not_found", "message": "revision not found"},
-                )
-            return revision
-        except PawchiveNotFoundError as error:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={"code": "resource_not_found", "message": str(error)},
-            ) from error
-        except (PawchiveError, ValidationError) as error:
-            raise upstream_error(str(error)) from error
+        return await fetch_post(runtime(request), service, creator_id, post_id, revision_id)
 
     @router.get("/posts/{service}/{creator_id}/{post_id}/revisions", response_model=list[Revision])
     async def post_revisions(
@@ -143,3 +123,35 @@ def create_pawchive_router() -> APIRouter:
         return SiteVersionResponse(version=version)
 
     return router
+
+
+async def fetch_post(
+    context: RuntimeContext,
+    service: str,
+    creator_id: str,
+    post_id: str,
+    revision_id: str | None = None,
+) -> Post | Revision:
+    try:
+        with context.activate():
+            async with create_pawchive_client() as client:
+                if revision_id is None:
+                    return await client.get_post(service, creator_id, post_id)
+                revisions = await client.list_post_revisions(service, creator_id, post_id)
+        revision = next((item for item in revisions if str(item.revision_id) == revision_id), None)
+        if revision is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={"code": "revision_not_found", "message": "revision not found"},
+            )
+        return revision
+    except PawchiveNotFoundError as error:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"code": "resource_not_found", "message": str(error)},
+        ) from error
+    except (PawchiveError, ValidationError) as error:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail={"code": "upstream_error", "message": str(error)},
+        ) from error

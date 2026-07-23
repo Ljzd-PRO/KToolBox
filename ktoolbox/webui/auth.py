@@ -5,7 +5,7 @@ import secrets
 import time
 from collections import defaultdict, deque
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Annotated, cast
 
 from argon2 import PasswordHasher
@@ -61,11 +61,13 @@ class AuthService:
         *,
         password_hasher: PasswordHasher | None = None,
         rate_limiter: LoginRateLimiter | None = None,
+        internal_token: str | None = None,
     ) -> None:
         self.configuration = configuration
         self.database = database
         self.password_hasher = password_hasher or PasswordHasher()
         self.rate_limiter = rate_limiter or LoginRateLimiter()
+        self.internal_token = internal_token
 
     def validate_configuration(self) -> None:
         if not self.configuration.username.strip():
@@ -79,7 +81,7 @@ class AuthService:
                 raise ValueError("KTOOLBOX_WEBUI__PASSWORD_HASH is not a valid Argon2 hash") from error
 
     async def login(self, username: str, password: str, client_key: str) -> LoginResult:
-        key = f"{client_key}:{username.casefold()}"
+        key = f"login:{client_key}:{username.casefold()}"
         self.rate_limiter.check(key)
         if not self._credentials_match(username, password):
             self.rate_limiter.failure(key)
@@ -89,6 +91,14 @@ class AuthService:
         csrf_token = secrets.token_urlsafe(24)
         session = await self.database.create_session(token, self.configuration.username, csrf_token)
         return LoginResult(token, session)
+
+    def confirm_password(self, password: str, client_key: str) -> None:
+        key = f"mcp-token:{client_key}:{self.configuration.username.casefold()}"
+        self.rate_limiter.check(key)
+        if not self._credentials_match(self.configuration.username, password):
+            self.rate_limiter.failure(key)
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid username or password")
+        self.rate_limiter.success(key)
 
     async def session(self, token: str | None) -> WebUISession:
         if not token:
@@ -107,12 +117,21 @@ class AuthService:
             await self.database.delete_session(token)
 
     def verify_csrf(self, request: Request, session: WebUISession) -> None:
+        if self.is_internal_request(request):
+            return
         supplied = request.headers.get(CSRF_HEADER, "")
         if not supplied or not hmac.compare_digest(supplied, session.csrf_token):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid CSRF token")
         origin = request.headers.get("origin")
         if origin and origin.rstrip("/") != str(request.base_url).rstrip("/"):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cross-origin request rejected")
+
+    def is_internal_request(self, request: Request) -> bool:
+        if not self.internal_token:
+            return False
+        supplied = request.headers.get("authorization", "")
+        expected = f"Bearer {self.internal_token}"
+        return hmac.compare_digest(supplied, expected)
 
     @property
     def _password_hash(self) -> str:
@@ -144,7 +163,11 @@ def auth_service(request: Request) -> AuthService:
 
 
 async def require_session(request: Request) -> WebUISession:
-    return await auth_service(request).session(request.cookies.get(SESSION_COOKIE))
+    service = auth_service(request)
+    if service.is_internal_request(request):
+        now = datetime.now(timezone.utc)
+        return WebUISession(service.configuration.username, "", now, now)
+    return await service.session(request.cookies.get(SESSION_COOKIE))
 
 
 async def require_csrf(

@@ -564,6 +564,190 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/openapi.yaml": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download WebUI OpenAPI
+         * @description Download the canonical YAML contract for the authenticated WebUI REST API.
+         */
+        get: operations["download_openapi"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/mcp/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get MCP status
+         * @description Return the in-process MCP endpoint, transport, and curated tool count.
+         */
+        get: operations["mcp_status"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/mcp/tools": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List MCP tools
+         * @description Return the curated MCP tool catalog shown in the WebUI.
+         */
+        get: operations["list_mcp_tools"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/mcp/tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List MCP tokens
+         * @description List MCP token metadata without returning token secrets.
+         */
+        get: operations["list_mcp_tokens"];
+        put?: never;
+        /**
+         * Create an MCP token
+         * @description Confirm the WebUI account password and create a one-time MCP bearer token.
+         */
+        post: operations["create_mcp_token"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/mcp/tokens/{token_id}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Revoke an MCP token
+         * @description Immediately revoke an MCP bearer token owned by the current WebUI account.
+         */
+        post: operations["revoke_mcp_token"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/mcp/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Browse project files
+         * @description Browse visible files and directories below the active project root without following paths outside it.
+         */
+        get: operations["browse_project_files"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/mcp/config/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Patch safe configuration fields
+         * @description Update validated non-secret environment configuration fields by their documented field paths.
+         */
+        patch: operations["patch_mcp_configuration"];
+        trace?: never;
+    };
+    "/api/v1/mcp/tasks/{task_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete a task record
+         * @description Delete an inactive task record and its logs while always preserving downloaded output files.
+         */
+        delete: operations["delete_task_record"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/mcp/pawchive/posts/{service}/{creator_id}/{post_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a bounded Pawchive work
+         * @description Return one Pawchive work with content omitted by default and explicitly capped when requested.
+         */
+        get: operations["get_mcp_work"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -993,6 +1177,136 @@ export interface components {
             username: string;
             /** Password */
             password: string;
+        };
+        /** MCPConfigurationPatchRequest */
+        MCPConfigurationPatchRequest: {
+            /** Values */
+            values: {
+                [key: string]: string | number | boolean | string[] | null;
+            };
+        };
+        /** MCPStatusResponse */
+        MCPStatusResponse: {
+            /**
+             * Running
+             * @default true
+             */
+            running: boolean;
+            /**
+             * Endpoint Path
+             * @default /mcp
+             */
+            endpoint_path: string;
+            /**
+             * Openapi Path
+             * @default /api/v1/openapi.yaml
+             */
+            openapi_path: string;
+            /**
+             * Transport
+             * @default streamable-http
+             * @constant
+             */
+            transport: "streamable-http";
+            /** Tool Count */
+            tool_count: number;
+        };
+        /** MCPTokenCreateRequest */
+        MCPTokenCreateRequest: {
+            /** Name */
+            name: string;
+            /** Password */
+            password: string;
+            /**
+             * Permission
+             * @enum {string}
+             */
+            permission: "read" | "manage";
+            /** Expires In Days */
+            expires_in_days?: (7 | 30 | 90 | 365) | null;
+        };
+        /** MCPTokenCreatedResponse */
+        MCPTokenCreatedResponse: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Username */
+            username: string;
+            /**
+             * Permission
+             * @enum {string}
+             */
+            permission: "read" | "manage";
+            /** Scopes */
+            scopes: string[];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Expires At */
+            expires_at: string | null;
+            /** Last Used At */
+            last_used_at: string | null;
+            /** Revoked At */
+            revoked_at: string | null;
+            /** Active */
+            active: boolean;
+            /** Token */
+            token: string;
+        };
+        /** MCPTokenResponse */
+        MCPTokenResponse: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Username */
+            username: string;
+            /**
+             * Permission
+             * @enum {string}
+             */
+            permission: "read" | "manage";
+            /** Scopes */
+            scopes: string[];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Expires At */
+            expires_at: string | null;
+            /** Last Used At */
+            last_used_at: string | null;
+            /** Revoked At */
+            revoked_at: string | null;
+            /** Active */
+            active: boolean;
+        };
+        /** MCPToolResponse */
+        MCPToolResponse: {
+            /** Name */
+            name: string;
+            /** Operation Id */
+            operation_id: string;
+            /** Description */
+            description: string;
+            /** Category */
+            category: string;
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "mcp:read" | "mcp:write";
+            /**
+             * Safety
+             * @enum {string}
+             */
+            safety: "read" | "write" | "destructive";
+            /** Open World */
+            open_world: boolean;
         };
         /** PathSelectorResponse */
         PathSelectorResponse: {
@@ -2620,6 +2934,300 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_openapi: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    mcp_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MCPStatusResponse"];
+                };
+            };
+        };
+    };
+    list_mcp_tools: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MCPToolResponse"][];
+                };
+            };
+        };
+    };
+    list_mcp_tokens: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MCPTokenResponse"][];
+                };
+            };
+        };
+    };
+    create_mcp_token: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MCPTokenCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MCPTokenCreatedResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_mcp_token: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                token_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MCPTokenResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    browse_project_files: {
+        parameters: {
+            query?: {
+                mode?: "directory" | "file";
+                path?: string | null;
+                search?: string;
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FilesystemBrowseResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    patch_mcp_configuration: {
+        parameters: {
+            query?: {
+                locale?: "zh-CN" | "zh-Hant" | "en" | "ja" | "ko" | "fr" | "ru";
+            };
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                name: "dotenv" | "production";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MCPConfigurationPatchRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfigSchemaResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_task_record: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskCleanupPreview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_mcp_work: {
+        parameters: {
+            query?: {
+                revision_id?: string | null;
+                include_content?: boolean;
+                content_limit?: number;
+            };
+            header?: never;
+            path: {
+                service: string;
+                creator_id: string;
+                post_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Post"] | components["schemas"]["Revision"];
                 };
             };
             /** @description Validation Error */

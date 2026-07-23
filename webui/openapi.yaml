@@ -959,11 +959,11 @@ paths:
       security:
       - WebUISession: []
       x-ktoolbox-mcp:
-        enabled: true
-        name: get_work
-        scope: mcp:read
-        safety: read
-        openWorld: true
+        enabled: false
+        name: post_details
+        scope: null
+        safety: null
+        openWorld: false
   /api/v1/pawchive/posts/{service}/{creator_id}/{post_id}/revisions:
     get:
       summary: List work revisions
@@ -1586,6 +1586,433 @@ paths:
         scope: null
         safety: null
         openWorld: false
+  /api/v1/openapi.yaml:
+    get:
+      tags:
+      - mcp
+      summary: Download WebUI OpenAPI
+      operationId: download_openapi
+      responses:
+        '200':
+          description: Successful Response
+      description: Download the canonical YAML contract for the authenticated WebUI REST API.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: download_openapi
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/mcp/status:
+    get:
+      tags:
+      - mcp
+      summary: Get MCP status
+      operationId: mcp_status
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MCPStatusResponse'
+      description: Return the in-process MCP endpoint, transport, and curated tool count.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: mcp_status
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/mcp/tools:
+    get:
+      tags:
+      - mcp
+      summary: List MCP tools
+      operationId: list_mcp_tools
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/MCPToolResponse'
+                type: array
+                title: Response List Mcp Tools
+      description: Return the curated MCP tool catalog shown in the WebUI.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: list_mcp_tools
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/mcp/tokens:
+    get:
+      tags:
+      - mcp
+      summary: List MCP tokens
+      operationId: list_mcp_tokens
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/MCPTokenResponse'
+                type: array
+                title: Response List Mcp Tokens
+      description: List MCP token metadata without returning token secrets.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: list_mcp_tokens
+        scope: null
+        safety: null
+        openWorld: false
+    post:
+      tags:
+      - mcp
+      summary: Create an MCP token
+      operationId: create_mcp_token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MCPTokenCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MCPTokenCreatedResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Confirm the WebUI account password and create a one-time MCP bearer token.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: create_mcp_token
+        scope: null
+        safety: null
+        openWorld: false
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+  /api/v1/mcp/tokens/{token_id}/revoke:
+    post:
+      tags:
+      - mcp
+      summary: Revoke an MCP token
+      operationId: revoke_mcp_token
+      parameters:
+      - name: token_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Token Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MCPTokenResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Immediately revoke an MCP bearer token owned by the current WebUI account.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: revoke_mcp_token
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/mcp/files:
+    get:
+      tags:
+      - project
+      summary: Browse project files
+      operationId: browse_project_files
+      parameters:
+      - name: mode
+        in: query
+        required: false
+        schema:
+          enum:
+          - directory
+          - file
+          type: string
+          default: directory
+          title: Mode
+      - name: path
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Path
+      - name: search
+        in: query
+        required: false
+        schema:
+          type: string
+          maxLength: 256
+          default: ''
+          title: Search
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+          title: Offset
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 200
+          minimum: 1
+          default: 100
+          title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesystemBrowseResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Browse visible files and directories below the active project root without following paths outside it.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: browse_project_files
+        scope: mcp:read
+        safety: read
+        openWorld: false
+  /api/v1/mcp/config/{name}:
+    patch:
+      tags:
+      - configuration
+      summary: Patch safe configuration fields
+      operationId: patch_mcp_configuration
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          enum:
+          - dotenv
+          - production
+          type: string
+          title: Name
+      - name: locale
+        in: query
+        required: false
+        schema:
+          enum:
+          - zh-CN
+          - zh-Hant
+          - en
+          - ja
+          - ko
+          - fr
+          - ru
+          type: string
+          default: en
+          title: Locale
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MCPConfigurationPatchRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigSchemaResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Update validated non-secret environment configuration fields by their documented field paths.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: patch_mcp_configuration
+        scope: mcp:write
+        safety: write
+        openWorld: false
+  /api/v1/mcp/tasks/{task_id}:
+    delete:
+      tags:
+      - tasks
+      summary: Delete a task record
+      operationId: delete_task_record
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Task Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskCleanupPreview'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Delete an inactive task record and its logs while always preserving downloaded output files.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: delete_task_record
+        scope: mcp:write
+        safety: destructive
+        openWorld: false
+  /api/v1/mcp/pawchive/posts/{service}/{creator_id}/{post_id}:
+    get:
+      tags:
+      - pawchive
+      summary: Get a bounded Pawchive work
+      operationId: get_mcp_work
+      parameters:
+      - name: service
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Service
+      - name: creator_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Creator Id
+      - name: post_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Post Id
+      - name: revision_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Revision Id
+      - name: include_content
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Include Content
+      - name: content_limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 20000
+          minimum: 1
+          default: 12000
+          title: Content Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/Post'
+                - $ref: '#/components/schemas/Revision'
+                title: Response Get Mcp Work
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Return one Pawchive work with content omitted by default and explicitly capped when requested.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: get_work
+        scope: mcp:read
+        safety: read
+        openWorld: true
   /api/v1/health:
     get:
       summary: Check service health
@@ -2281,6 +2708,250 @@ components:
       - username
       - password
       title: LoginRequest
+    MCPConfigurationPatchRequest:
+      properties:
+        values:
+          additionalProperties:
+            anyOf:
+            - type: string
+            - type: integer
+            - type: number
+            - type: boolean
+            - items:
+                type: string
+              type: array
+            - type: 'null'
+          type: object
+          minProperties: 1
+          title: Values
+      type: object
+      required:
+      - values
+      title: MCPConfigurationPatchRequest
+    MCPStatusResponse:
+      properties:
+        running:
+          type: boolean
+          title: Running
+          default: true
+        endpoint_path:
+          type: string
+          title: Endpoint Path
+          default: /mcp
+        openapi_path:
+          type: string
+          title: Openapi Path
+          default: /api/v1/openapi.yaml
+        transport:
+          type: string
+          const: streamable-http
+          title: Transport
+          default: streamable-http
+        tool_count:
+          type: integer
+          title: Tool Count
+      type: object
+      required:
+      - tool_count
+      title: MCPStatusResponse
+    MCPTokenCreateRequest:
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          minLength: 1
+          title: Name
+        password:
+          type: string
+          maxLength: 4096
+          minLength: 1
+          title: Password
+        permission:
+          type: string
+          enum:
+          - read
+          - manage
+          title: Permission
+        expires_in_days:
+          anyOf:
+          - type: integer
+            enum:
+            - 7
+            - 30
+            - 90
+            - 365
+          - type: 'null'
+          title: Expires In Days
+      type: object
+      required:
+      - name
+      - password
+      - permission
+      title: MCPTokenCreateRequest
+    MCPTokenCreatedResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        name:
+          type: string
+          title: Name
+        username:
+          type: string
+          title: Username
+        permission:
+          type: string
+          enum:
+          - read
+          - manage
+          title: Permission
+        scopes:
+          items:
+            type: string
+          type: array
+          title: Scopes
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        expires_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Expires At
+        last_used_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Last Used At
+        revoked_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Revoked At
+        active:
+          type: boolean
+          title: Active
+        token:
+          type: string
+          title: Token
+      type: object
+      required:
+      - id
+      - name
+      - username
+      - permission
+      - scopes
+      - created_at
+      - expires_at
+      - last_used_at
+      - revoked_at
+      - active
+      - token
+      title: MCPTokenCreatedResponse
+    MCPTokenResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        name:
+          type: string
+          title: Name
+        username:
+          type: string
+          title: Username
+        permission:
+          type: string
+          enum:
+          - read
+          - manage
+          title: Permission
+        scopes:
+          items:
+            type: string
+          type: array
+          title: Scopes
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        expires_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Expires At
+        last_used_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Last Used At
+        revoked_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Revoked At
+        active:
+          type: boolean
+          title: Active
+      type: object
+      required:
+      - id
+      - name
+      - username
+      - permission
+      - scopes
+      - created_at
+      - expires_at
+      - last_used_at
+      - revoked_at
+      - active
+      title: MCPTokenResponse
+    MCPToolResponse:
+      properties:
+        name:
+          type: string
+          title: Name
+        operation_id:
+          type: string
+          title: Operation Id
+        description:
+          type: string
+          title: Description
+        category:
+          type: string
+          title: Category
+        scope:
+          type: string
+          enum:
+          - mcp:read
+          - mcp:write
+          title: Scope
+        safety:
+          type: string
+          enum:
+          - read
+          - write
+          - destructive
+          title: Safety
+        open_world:
+          type: boolean
+          title: Open World
+      type: object
+      required:
+      - name
+      - operation_id
+      - description
+      - category
+      - scope
+      - safety
+      - open_world
+      title: MCPToolResponse
     PathSelectorResponse:
       properties:
         kind:
@@ -3172,3 +3843,5 @@ tags:
   description: WebUI filesystem path picker.
 - name: system
   description: Service status.
+- name: mcp
+  description: MCP status, connection metadata, and access tokens.
