@@ -16,6 +16,7 @@ from ktoolbox.api.utils import create_pawchive_client
 from ktoolbox.configuration import RuntimeContext
 from ktoolbox.project_config import CreatorReference, ProjectConfigStore
 from ktoolbox.webui.database import WebUIDatabase, utc_now
+from ktoolbox.webui.event_store import WebUIEventStore
 from ktoolbox.webui.models import CreatorRosterItemResponse
 
 
@@ -39,8 +40,9 @@ class CachedCreatorProfile:
 
 
 class CreatorProfileCache:
-    def __init__(self, database: WebUIDatabase) -> None:
+    def __init__(self, database: WebUIDatabase, events: WebUIEventStore | None = None) -> None:
         self.database = database
+        self.events = events
 
     async def load(self) -> dict[str, CachedCreatorProfile]:
         async with self.database.connect() as connection:
@@ -61,6 +63,12 @@ class CreatorProfileCache:
 
     async def store(self, entry: CachedCreatorProfile) -> None:
         async with self.database.connect() as connection:
+            cursor = await connection.execute(
+                "SELECT name FROM creator_profile_cache WHERE service = ? AND creator_id = ?",
+                (entry.service, entry.creator_id),
+            )
+            row = await cursor.fetchone()
+            await cursor.close()
             await connection.execute(
                 """
                 INSERT INTO creator_profile_cache(service, creator_id, name, fetched_at)
@@ -72,6 +80,13 @@ class CreatorProfileCache:
                 (entry.service, entry.creator_id, entry.name, entry.fetched_at.isoformat()),
             )
             await connection.commit()
+        if self.events is not None and (row is None or str(row[0]) != entry.name):
+            await self.events.publish(
+                "creator_profile.changed",
+                {"action": "updated"},
+                resource="creator_profile",
+                resource_id=f"{entry.service}:{entry.creator_id}",
+            )
 
     async def delete(self, service: str, creator_id: str) -> None:
         async with self.database.connect() as connection:

@@ -23,6 +23,7 @@ from ktoolbox.webui.auth import (
     require_csrf,
     require_session,
 )
+from ktoolbox.webui.config_monitor import ConfigurationChangeMonitor
 from ktoolbox.webui.creator_profiles import CreatorClientFactory, CreatorProfileCache, CreatorRosterService
 from ktoolbox.webui.database import WebUIDatabase, WebUISession
 from ktoolbox.webui.error_responses import error_payload, validation_error_payload
@@ -58,8 +59,8 @@ def create_app(
     database = WebUIDatabase(context.project_root / ".ktoolbox" / "webui.sqlite3")
     internal_token = f"mcp-internal-{secrets.token_urlsafe(36)}"
     auth = AuthService(context.configuration.webui, database, internal_token=internal_token)
-    mcp_token_store = MCPTokenStore(database)
     event_store = WebUIEventStore(database)
+    mcp_token_store = MCPTokenStore(database, event_store)
     task_store = TaskStore(database, event_store)
     task_scheduler = TaskScheduler(
         context,
@@ -69,10 +70,15 @@ def create_app(
     )
     creator_roster = CreatorRosterService(
         ProjectConfigStore(context.project_root / "ktoolbox.toml"),
-        CreatorProfileCache(database),
+        CreatorProfileCache(database, event_store),
         client_factory=creator_client_factory,
     )
     project_lock = ProjectProcessLock(context.project_root / ".ktoolbox" / "webui.lock")
+    config_monitor = ConfigurationChangeMonitor(
+        context.project_root,
+        event_store,
+        lambda updated: setattr(app.state, "runtime_context", updated),
+    )
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
@@ -80,10 +86,12 @@ def create_app(
         await project_lock.acquire()
         try:
             await database.initialize()
+            await config_monitor.start()
             await task_scheduler.start()
             yield
         finally:
             await task_scheduler.stop()
+            await config_monitor.stop()
             await project_lock.release()
 
     app = FastAPI(
@@ -102,10 +110,11 @@ def create_app(
     app.state.event_store = event_store
     app.state.task_store = task_store
     app.state.task_scheduler = task_scheduler
+    app.state.config_monitor = config_monitor
     browser = filesystem_browser or FilesystemBrowser(context.project_root)
     app.state.filesystem_browser = browser
-    app.include_router(create_project_router(context.project_root, creator_roster))
-    app.include_router(create_filesystem_router(browser))
+    app.include_router(create_project_router(context.project_root, creator_roster, event_store, config_monitor))
+    app.include_router(create_filesystem_router(browser, event_store))
     app.include_router(create_pawchive_router())
     app.include_router(create_task_router(context.project_root))
     app.include_router(create_mcp_router())

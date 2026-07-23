@@ -14,8 +14,11 @@ from ktoolbox.api.generated import CreatorProfile
 from ktoolbox.configuration import Configuration, RuntimeContext
 from ktoolbox.webui.app import create_app
 from ktoolbox.webui.auth import CSRF_HEADER
+from ktoolbox.webui.config_monitor import ConfigurationChangeMonitor
 from ktoolbox.webui.config_schema import build_config_schema, missing_config_metadata
 from ktoolbox.webui.config_store import ConfigurationConflictError, ConfigurationFileError, DotenvFileStore
+from ktoolbox.webui.database import WebUIDatabase
+from ktoolbox.webui.event_store import WebUIEventStore
 
 
 class StaticCreatorClient:
@@ -325,6 +328,11 @@ async def test_project_creator_and_blocker_endpoints(tmp_path: Path) -> None:
         deleted = await client.delete("/api/v1/creators/fanbox/42", headers={CSRF_HEADER: csrf})
         assert deleted.status_code == 200
         assert (await client.delete("/api/v1/creators/fanbox/42", headers={CSRF_HEADER: csrf})).status_code == 404
+        events = await client._transport.app.state.event_store.events()  # type: ignore[attr-defined]
+        event_types = [event.event_type for event in events]
+        assert event_types.count("creators.changed") == 3
+        assert event_types.count("blockers.changed") == 1
+        assert "creator_profile.changed" in event_types
 
 
 @pytest.mark.asyncio
@@ -360,3 +368,31 @@ async def test_raw_project_update_requires_current_revision_and_valid_toml(tmp_p
         assert valid.json() == {"valid": True}
         invalid_validation = await client.post("/api/v1/config/project/validate", json={"content": "not = [valid"})
         assert invalid_validation.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_configuration_monitor_publishes_only_changed_external_documents(tmp_path: Path) -> None:
+    (tmp_path / "ktoolbox.toml").write_text("schema_version = 1\n", encoding="utf-8")
+    database = WebUIDatabase(tmp_path / "webui.sqlite3")
+    await database.initialize()
+    events = WebUIEventStore(database)
+    contexts: list[RuntimeContext] = []
+    monitor = ConfigurationChangeMonitor(tmp_path, events, contexts.append, interval=60)
+    await monitor.start()
+    try:
+        await monitor.check_once()
+        assert await events.events() == []
+
+        (tmp_path / ".env").write_text("KTOOLBOX_JOB__COUNT=7\n", encoding="utf-8")
+        await monitor.check_once()
+        records = await events.events()
+        assert [(record.event_type, record.resource_id) for record in records] == [
+            ("configuration.changed", "dotenv")
+        ]
+        assert records[0].data["source"] == "external"
+        assert contexts[-1].configuration.job.count == 7
+
+        await monitor.check_once()
+        assert len(await events.events()) == 1
+    finally:
+        await monitor.stop()

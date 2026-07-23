@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response,
 from ktoolbox.api.generated import Post, Revision
 from ktoolbox.configuration import RuntimeContext
 from ktoolbox.webui.auth import AuthService, client_identifier, require_csrf, require_session
+from ktoolbox.webui.config_monitor import ConfigurationChangeMonitor
 from ktoolbox.webui.config_schema import Locale, build_config_schema
 from ktoolbox.webui.config_store import ConfigurationFileError, DotenvFileStore
 from ktoolbox.webui.database import WebUISession
@@ -134,6 +135,8 @@ def create_mcp_router() -> APIRouter:
         except ConfigurationFileError as error:
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from error
         request.app.state.runtime_context = updated_context
+        document = store.read(name)
+        await _config_monitor(request).publish_change(name, document.revision, source="mcp")
         return build_config_schema(updated_context.configuration, context.project_root, locale)
 
     @router.delete("/mcp/tasks/{task_id}", response_model=TaskCleanupPreview)
@@ -189,6 +192,10 @@ def _runtime(request: Request) -> RuntimeContext:
 
 def _task_store(request: Request) -> TaskStore:
     return cast(TaskStore, request.app.state.task_store)
+
+
+def _config_monitor(request: Request) -> ConfigurationChangeMonitor:
+    return cast(ConfigurationChangeMonitor, request.app.state.config_monitor)
 
 
 def _token_response(record: MCPTokenRecord) -> MCPTokenResponse:

@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from ktoolbox.webui.auth import require_csrf, require_session
 from ktoolbox.webui.database import WebUISession
+from ktoolbox.webui.event_store import WebUIEventStore
 from ktoolbox.webui.filesystem import (
     FilesystemBrowser,
     FilesystemBrowserError,
@@ -27,7 +28,7 @@ SessionDependency = Annotated[WebUISession, Depends(require_session)]
 CsrfDependency = Annotated[WebUISession, Depends(require_csrf)]
 
 
-def create_filesystem_router(browser: FilesystemBrowser) -> APIRouter:
+def create_filesystem_router(browser: FilesystemBrowser, events: WebUIEventStore) -> APIRouter:
     router = APIRouter(prefix="/api/v1/filesystem", tags=["filesystem"])
 
     @router.get("", response_model=FilesystemBrowseResponse)
@@ -60,9 +61,16 @@ def create_filesystem_router(browser: FilesystemBrowser) -> APIRouter:
         _: CsrfDependency,
     ) -> FilesystemEntryResponse:
         try:
-            return await browser.create_directory(scope=payload.scope, parent=payload.parent, name=payload.name)
+            entry = await browser.create_directory(scope=payload.scope, parent=payload.parent, name=payload.name)
         except FilesystemBrowserError as error:
             raise _http_error(error) from error
+        await events.publish(
+            "filesystem.changed",
+            {"action": "created", "scope": payload.scope, "parent": payload.parent},
+            resource="filesystem",
+            resource_id=entry.path,
+        )
+        return entry
 
     @router.delete("/directories", status_code=status.HTTP_204_NO_CONTENT)
     async def delete_directory(
@@ -73,6 +81,12 @@ def create_filesystem_router(browser: FilesystemBrowser) -> APIRouter:
             await browser.delete_directory(scope=payload.scope, path=payload.path)
         except FilesystemBrowserError as error:
             raise _http_error(error) from error
+        await events.publish(
+            "filesystem.changed",
+            {"action": "deleted", "scope": payload.scope},
+            resource="filesystem",
+            resource_id=payload.path,
+        )
 
     return router
 

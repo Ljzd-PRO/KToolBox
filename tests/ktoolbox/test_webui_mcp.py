@@ -122,6 +122,9 @@ async def test_password_issued_tokens_are_hashed_listed_and_revoked(tmp_path: Pa
             assert revoked.status_code == 200
             assert revoked.json()["active"] is False
             assert await app.state.mcp_token_store.verify(raw_token) is None
+            events = await app.state.event_store.events()
+            token_events = [event.data["action"] for event in events if event.event_type == "mcp.tokens.changed"]
+            assert token_events == ["created", "revoked"]
 
 
 @pytest.mark.asyncio
@@ -150,6 +153,15 @@ async def test_read_token_filters_write_tools_and_revocation_stops_protocol_acce
 
             tokens = await client.get("/api/v1/mcp/tokens")
             assert tokens.json()[0]["last_used_at"] is not None
+            token_events = [
+                event for event in await app.state.event_store.events() if event.event_type == "mcp.tokens.changed"
+            ]
+            assert [event.data["action"] for event in token_events] == ["created", "used"]
+            assert await app.state.mcp_token_store.verify(token) is not None
+            token_events = [
+                event for event in await app.state.event_store.events() if event.event_type == "mcp.tokens.changed"
+            ]
+            assert [event.data["action"] for event in token_events] == ["created", "used"]
             await client.post(
                 f"/api/v1/mcp/tokens/{created['id']}/revoke",
                 headers={"X-CSRF-Token": csrf, "Origin": "http://test"},

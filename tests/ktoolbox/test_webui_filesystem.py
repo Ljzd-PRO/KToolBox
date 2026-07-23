@@ -161,6 +161,10 @@ async def test_filesystem_create_directory_csrf_conflicts_and_validation(tmp_pat
         )
         assert invalid.status_code == 422
         assert not (host / "escape").exists()
+        events = await client._transport.app.state.event_store.events()  # type: ignore[attr-defined]
+        filesystem_events = [event for event in events if event.event_type == "filesystem.changed"]
+        assert len(filesystem_events) == 1
+        assert filesystem_events[0].data["action"] == "created"
 
 
 @pytest.mark.asyncio
@@ -214,6 +218,10 @@ async def test_filesystem_delete_directory_only_removes_empty_unprotected_folder
         )
         assert protected.status_code == 403
         assert protected.json()["detail"]["code"] == "protected_directory"
+        events = await client._transport.app.state.event_store.events()  # type: ignore[attr-defined]
+        filesystem_events = [event for event in events if event.event_type == "filesystem.changed"]
+        assert len(filesystem_events) == 1
+        assert filesystem_events[0].data["action"] == "deleted"
 
 
 @pytest.mark.asyncio

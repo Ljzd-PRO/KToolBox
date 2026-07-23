@@ -10,6 +10,7 @@ from typing import Literal
 import aiosqlite
 
 from ktoolbox.webui.database import WebUIDatabase, token_digest, utc_now
+from ktoolbox.webui.event_store import WebUIEventStore
 
 READ_SCOPE = "mcp:read"
 WRITE_SCOPE = "mcp:write"
@@ -42,8 +43,9 @@ class CreatedMCPToken:
 
 
 class MCPTokenStore:
-    def __init__(self, database: WebUIDatabase) -> None:
+    def __init__(self, database: WebUIDatabase, events: WebUIEventStore | None = None) -> None:
         self.database = database
+        self.events = events
 
     async def create(
         self,
@@ -85,6 +87,13 @@ class MCPTokenStore:
                 ),
             )
             await connection.commit()
+        if self.events is not None:
+            await self.events.publish(
+                "mcp.tokens.changed",
+                {"action": "created"},
+                resource="mcp_token",
+                resource_id=record.id,
+            )
         return CreatedMCPToken(raw_token, record)
 
     async def list(self, username: str) -> list[MCPTokenRecord]:
@@ -119,7 +128,15 @@ class MCPTokenStore:
             row = await cursor.fetchone()
             await cursor.close()
             await connection.commit()
-        return _record(row) if row is not None else None
+        record = _record(row) if row is not None else None
+        if record is not None and self.events is not None:
+            await self.events.publish(
+                "mcp.tokens.changed",
+                {"action": "revoked"},
+                resource="mcp_token",
+                resource_id=record.id,
+            )
+        return record
 
     async def verify(self, token: str) -> MCPTokenRecord | None:
         now = utc_now()
@@ -140,11 +157,20 @@ class MCPTokenStore:
             record = _record(row)
             if not record.active:
                 return None
-            await connection.execute(
-                "UPDATE mcp_tokens SET last_used_at = ? WHERE id = ?",
-                (now.isoformat(), record.id),
+            should_update = record.last_used_at is None or now - record.last_used_at >= timedelta(minutes=1)
+            if should_update:
+                await connection.execute(
+                    "UPDATE mcp_tokens SET last_used_at = ? WHERE id = ?",
+                    (now.isoformat(), record.id),
+                )
+                await connection.commit()
+        if should_update and self.events is not None:
+            await self.events.publish(
+                "mcp.tokens.changed",
+                {"action": "used"},
+                resource="mcp_token",
+                resource_id=record.id,
             )
-            await connection.commit()
         return MCPTokenRecord(
             id=record.id,
             name=record.name,
@@ -152,7 +178,7 @@ class MCPTokenStore:
             scopes=record.scopes,
             created_at=record.created_at,
             expires_at=record.expires_at,
-            last_used_at=now,
+            last_used_at=now if should_update else record.last_used_at,
             revoked_at=record.revoked_at,
         )
 

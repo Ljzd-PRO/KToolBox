@@ -11,6 +11,7 @@ from ktoolbox.blocker.model import BlockerSpec
 from ktoolbox.configuration import RuntimeContext
 from ktoolbox.project_config import CreatorReference, ProjectConfigError, ProjectConfigStore, ProjectConfiguration
 from ktoolbox.webui.auth import require_csrf, require_session
+from ktoolbox.webui.config_monitor import ConfigurationChangeMonitor
 from ktoolbox.webui.config_schema import Locale, build_config_schema
 from ktoolbox.webui.config_store import (
     ConfigurationConflictError,
@@ -21,6 +22,7 @@ from ktoolbox.webui.config_store import (
 )
 from ktoolbox.webui.creator_profiles import CreatorRosterService
 from ktoolbox.webui.database import WebUISession
+from ktoolbox.webui.event_store import WebUIEventStore
 from ktoolbox.webui.models import (
     BlockerListResponse,
     ConfigSchemaResponse,
@@ -38,7 +40,12 @@ CsrfDependency = Annotated[WebUISession, Depends(require_csrf)]
 IfMatch = Annotated[str | None, Header(alias="If-Match")]
 
 
-def create_project_router(project_root: Path, creator_roster: CreatorRosterService) -> APIRouter:
+def create_project_router(
+    project_root: Path,
+    creator_roster: CreatorRosterService,
+    events: WebUIEventStore,
+    config_monitor: ConfigurationChangeMonitor,
+) -> APIRouter:
     router = APIRouter(prefix="/api/v1")
     dotenv_store = DotenvFileStore(project_root)
     project_store = ProjectConfigStore(project_root / "ktoolbox.toml")
@@ -69,6 +76,7 @@ def create_project_router(project_root: Path, creator_roster: CreatorRosterServi
         _: SessionDependency,
     ) -> TextDocumentResponse:
         document = dotenv_store.read(name)
+        await config_monitor.publish_change(name, document.revision, source="webui")
         response.headers["ETag"] = f'"{document.revision}"'
         return _document_response(document)
 
@@ -89,6 +97,7 @@ def create_project_router(project_root: Path, creator_roster: CreatorRosterServi
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error)) from error
         reload_context(request, context)
         document = dotenv_store.read(name)
+        await config_monitor.publish_change(name, document.revision, source="webui")
         response.headers["ETag"] = f'"{document.revision}"'
         return _document_response(document)
 
@@ -136,6 +145,7 @@ def create_project_router(project_root: Path, creator_roster: CreatorRosterServi
     async def get_project_config(response: Response, _: SessionDependency) -> ProjectDocumentResponse:
         content = project_store.load_text()
         revision = content_revision(content)
+        await config_monitor.publish_change("project", revision, source="webui")
         response.headers["ETag"] = f'"{revision}"'
         return ProjectDocumentResponse(
             path=project_store.path,
@@ -191,6 +201,14 @@ def create_project_router(project_root: Path, creator_roster: CreatorRosterServi
             project_store.add_creator(creator)
         except ProjectConfigError as error:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error)) from error
+        revision = content_revision(project_store.load_text())
+        config_monitor.acknowledge("project", revision)
+        await events.publish(
+            "creators.changed",
+            {"action": "created", "revision": revision},
+            resource="creator",
+            resource_id=f"{creator.service}:{creator.creator_id}",
+        )
         return creator
 
     @router.put("/creators/{service}/{creator_id}", response_model=CreatorReference)
@@ -210,6 +228,14 @@ def create_project_router(project_root: Path, creator_roster: CreatorRosterServi
             project_store.save(ProjectConfiguration.model_validate(configuration.model_dump()))
         except (ProjectConfigError, ValueError) as error:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error)) from error
+        revision = content_revision(project_store.load_text())
+        config_monitor.acknowledge("project", revision)
+        await events.publish(
+            "creators.changed",
+            {"action": "updated", "revision": revision},
+            resource="creator",
+            resource_id=f"{creator.service}:{creator.creator_id}",
+        )
         return creator
 
     @router.delete("/creators/{service}/{creator_id}", response_model=CreatorReference)
@@ -219,6 +245,14 @@ def create_project_router(project_root: Path, creator_roster: CreatorRosterServi
         except ProjectConfigError as error:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
         await creator_roster.delete(service, creator_id)
+        revision = content_revision(project_store.load_text())
+        config_monitor.acknowledge("project", revision)
+        await events.publish(
+            "creators.changed",
+            {"action": "deleted", "revision": revision},
+            resource="creator",
+            resource_id=f"{service}:{creator_id}",
+        )
         return creator
 
     @router.get("/blockers", response_model=BlockerListResponse)
@@ -234,6 +268,13 @@ def create_project_router(project_root: Path, creator_roster: CreatorRosterServi
             project_store.save(configuration)
         except (ProjectConfigError, ValueError) as error:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error)) from error
+        revision = content_revision(project_store.load_text())
+        config_monitor.acknowledge("project", revision)
+        await events.publish(
+            "blockers.changed",
+            {"revision": revision},
+            resource="blocker",
+        )
         return BlockerListResponse(blockers=configuration.blockers)
 
     return router
