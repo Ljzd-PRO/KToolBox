@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from io import StringIO
+from pathlib import Path
 
 from rich.console import Console
 
+from ktoolbox.failures import FailureCode, FailureItem, FailureStage
 from ktoolbox.reporting import (
     NullProgressReporter,
     PlainProgressReporter,
@@ -13,22 +15,33 @@ from ktoolbox.reporting import (
 )
 
 
+def failure_item(*, file_name: str | None = None) -> FailureItem:
+    return FailureItem(
+        code=FailureCode.download_failed,
+        stage=FailureStage.file_request,
+        message="The file request failed",
+        retryable=True,
+        file_name=file_name,
+    )
+
+
 def test_plain_reporter_emits_stable_summary_and_failures() -> None:
     output = StringIO()
     reporter = PlainProgressReporter(Console(file=output, color_system=None))
     reporter.start()
     reporter.creator_started("fanbox:1")
     reporter.creator_finished("fanbox:1", "API failed")
-    for _ in range(3):
+    for _ in range(4):
         reporter.job_queued("fanbox:1")
     reporter.download_finished("one", "completed")
     reporter.download_finished("two", "existed")
-    reporter.download_finished("three", "failed")
+    reporter.download_finished("three", "failed", failure_item())
+    reporter.download_finished("four", "failed")
     reporter.stop()
 
     rendered = output.getvalue()
     assert "Creator fanbox:1 failed: API failed" in rendered
-    assert "1 downloaded, 1 existing, 1 failed" in rendered
+    assert "1 downloaded, 1 existing, 2 failed" in rendered
 
 
 def test_null_and_empty_plain_reporters_are_silent() -> None:
@@ -40,6 +53,7 @@ def test_null_and_empty_plain_reporters_are_silent() -> None:
     null.download_advanced("one", 1)
     null.download_finished("one", "completed")
     null.creator_finished("fanbox:1")
+    null.artifact_created(Path("artifact.bin"))
     null.stop()
 
     output = StringIO()
@@ -122,13 +136,15 @@ def test_rich_reporter_handles_idempotence_failures_and_missing_tasks() -> None:
     reporter.creator_finished("fanbox:1", "API failed")
     reporter.creator_finished("fanbox:missing")
     reporter.download_advanced("missing", 1)
-    reporter.download_finished("missing-failed", "failed")
+    reporter.download_finished("missing-failed", "failed", failure_item(file_name="failed.bin"))
+    reporter.download_finished("missing-failed-without-detail", "failed")
     reporter.download_finished("missing-existing", "existed")
     reporter.stop()
     reporter.stop()
 
     assert "Creator fanbox:1 failed: API failed" in output.getvalue()
-    assert reporter.overall.tasks[0].completed == 2
+    assert "Download failed (failed.bin):" in output.getvalue()
+    assert reporter.overall.tasks[0].completed == 3
 
 
 def test_reporter_factory_selects_quiet_plain_and_rich(monkeypatch) -> None:
