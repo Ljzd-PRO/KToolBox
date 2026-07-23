@@ -404,26 +404,6 @@ export interface paths {
         patch: operations["update_task"];
         trace?: never;
     };
-    "/api/v1/tasks/{task_id}/reorder": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Reorder a task
-         * @description Move a non-running task to another queue position.
-         */
-        post: operations["reorder_task"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/tasks/{task_id}/pause": {
         parameters: {
             query?: never;
@@ -1783,11 +1763,6 @@ export interface components {
              */
             updated_at: string;
         };
-        /** TaskReorderRequest */
-        TaskReorderRequest: {
-            /** Position */
-            position: number;
-        };
         /**
          * TaskStatus
          * @enum {string}
@@ -2732,44 +2707,6 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["TaskUpdateRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TaskRecord"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    reorder_task: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description CSRF token returned by the current browser session. */
-                "X-CSRF-Token": string;
-            };
-            path: {
-                task_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TaskReorderRequest"];
             };
         };
         responses: {

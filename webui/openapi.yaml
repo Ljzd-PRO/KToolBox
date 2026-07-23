@@ -1240,54 +1240,6 @@ paths:
         scope: null
         safety: null
         openWorld: false
-  /api/v1/tasks/{task_id}/reorder:
-    post:
-      tags:
-      - tasks
-      summary: Reorder a task
-      operationId: reorder_task
-      parameters:
-      - name: task_id
-        in: path
-        required: true
-        schema:
-          type: string
-          title: Task Id
-      - name: X-CSRF-Token
-        in: header
-        required: true
-        description: CSRF token returned by the current browser session.
-        schema:
-          type: string
-          minLength: 1
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TaskReorderRequest'
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TaskRecord'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-      description: Move a non-running task to another queue position.
-      security:
-      - WebUISession: []
-      x-ktoolbox-mcp:
-        enabled: true
-        name: reorder_task
-        scope: mcp:write
-        safety: write
-        openWorld: false
   /api/v1/tasks/{task_id}/pause:
     post:
       tags:
@@ -3853,16 +3805,6 @@ components:
       - created_at
       - updated_at
       title: TaskRecord
-    TaskReorderRequest:
-      properties:
-        position:
-          type: integer
-          minimum: 1.0
-          title: Position
-      type: object
-      required:
-      - position
-      title: TaskReorderRequest
     TaskStatus:
       type: string
       enum:

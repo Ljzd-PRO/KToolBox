@@ -24,7 +24,6 @@ from ktoolbox.webui.task_models import (
     TaskEvent,
     TaskPresentationSnapshot,
     TaskRecord,
-    TaskReorderRequest,
     TaskSpec,
     TaskUpdateRequest,
     task_target_key,
@@ -97,15 +96,6 @@ def create_task_router(project_root: Path) -> APIRouter:
         current = await _task_or_404(store, task_id)
         presentation = _updated_presentation(current, spec, payload)
         return await _state_action(scheduler.update(task_id, spec, presentation))
-
-    @router.post("/tasks/{task_id}/reorder", response_model=TaskRecord)
-    async def reorder_task(
-        task_id: str,
-        payload: TaskReorderRequest,
-        _: Annotated[WebUISession, Depends(require_csrf)],
-        scheduler: Annotated[TaskScheduler, Depends(task_scheduler)],
-    ) -> TaskRecord:
-        return await _state_action(scheduler.reorder(task_id, payload.position))
 
     @router.post("/tasks/{task_id}/pause", response_model=TaskRecord)
     async def pause_task(

@@ -591,7 +591,6 @@ async def test_scheduler_control_methods_and_validation(tmp_path: Path) -> None:
         DownloadTaskSpec(service="fanbox", creator_id="one", post_id="43", output=tmp_path / "one"),
     )
     assert updated.revision == task.revision + 1
-    assert (await scheduler.reorder(task.id, 9)).position == 9
     assert (await scheduler.pause(task.id)).status is TaskStatus.paused
     assert (await scheduler.stop_task(task.id)).status is TaskStatus.stopped
     assert (await scheduler.resume(task.id)).status is TaskStatus.queued
@@ -603,9 +602,6 @@ async def test_scheduler_control_methods_and_validation(tmp_path: Path) -> None:
         await scheduler.pause(task.id)
     with pytest.raises(InvalidTaskStateError, match="cannot be stopped"):
         await scheduler.stop_task(task.id)
-    await store.set_status(task.id, TaskStatus.running)
-    with pytest.raises(InvalidTaskStateError, match="before reordering"):
-        await scheduler.reorder(task.id, 1)
     await scheduler.stop()
 
 

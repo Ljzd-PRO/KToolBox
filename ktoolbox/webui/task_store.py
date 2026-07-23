@@ -200,17 +200,6 @@ class TaskStore:
         await self.add_event(task_id, "task.updated", {"kind": spec.kind})
         return await self.get(task_id)
 
-    async def reorder(self, task_id: str, position: int) -> TaskRecord:
-        await self.get(task_id)
-        async with self.database.connect() as connection:
-            await connection.execute(
-                "UPDATE tasks SET position = ?, updated_at = ? WHERE id = ?",
-                (position, utc_now().isoformat(), task_id),
-            )
-            await connection.commit()
-        await self.add_event(task_id, "task.reordered", {"position": position})
-        return await self.get(task_id)
-
     async def update_progress(self, task_id: str, progress: TaskProgress) -> None:
         async with self.database.connect() as connection:
             await connection.execute(

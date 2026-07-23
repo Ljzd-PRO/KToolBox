@@ -18,7 +18,6 @@ from ktoolbox.project_config import ProjectConfigStore
 from ktoolbox.utils import parse_webpage_url
 from ktoolbox.webui.task_executor import CoreTaskExecutor, TaskExecutionSnapshot, TaskExecutor
 from ktoolbox.webui.task_models import (
-    RUNNING_TASK_STATUSES,
     SyncTaskSpec,
     TaskPresentationSnapshot,
     TaskRecord,
@@ -113,15 +112,6 @@ class TaskScheduler:
     ) -> TaskRecord:
         async with self._control_lock:
             task = await self.store.update_spec(task_id, spec, presentation)
-        self._wake.set()
-        return task
-
-    async def reorder(self, task_id: str, position: int) -> TaskRecord:
-        async with self._control_lock:
-            task = await self.store.get(task_id)
-            if task.status in RUNNING_TASK_STATUSES:
-                raise InvalidTaskStateError("pause or stop a running task before reordering it")
-            task = await self.store.reorder(task_id, position)
         self._wake.set()
         return task
 

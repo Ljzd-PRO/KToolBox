@@ -54,7 +54,6 @@ const eventTypes = [
   "task.created",
   "task.status",
   "task.updated",
-  "task.reordered",
   "task.deleted",
   "task.progress",
   "task.log",
@@ -487,7 +486,7 @@ function applyTaskEvent(
       }),
     );
   }
-  if (["task.created", "task.updated", "task.reordered"].includes(event.event_type)) {
+  if (["task.created", "task.updated"].includes(event.event_type)) {
     queueRefresh("tasks");
   }
   if (event.event_type === "task.status") queueRefresh("task-attempts");

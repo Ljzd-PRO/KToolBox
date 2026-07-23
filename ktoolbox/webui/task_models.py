@@ -240,10 +240,6 @@ class TaskUpdateRequest(BaseModel):
     presentation: TaskPresentationSnapshot | None = None
 
 
-class TaskReorderRequest(BaseModel):
-    position: int = Field(ge=1)
-
-
 class TaskDeleteRequest(BaseModel):
     delete_output: bool = False
     confirmation: str | None = None

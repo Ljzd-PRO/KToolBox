@@ -208,13 +208,6 @@ OPERATIONS: dict[str, OperationMetadata] = {
         "tasks",
         csrf=True,
     ),
-    "reorder_task": OperationMetadata(
-        "Reorder a task",
-        "Move a non-running task to another queue position.",
-        "tasks",
-        csrf=True,
-        mcp=_write(),
-    ),
     "pause_task": OperationMetadata(
         "Pause a task",
         "Request cooperative pause for a running task.",
