@@ -59,8 +59,8 @@ Les zones modifiables utilisent une surface secondaire discrète avec des arriè
 Les zones principales sont :
 
 - **Vue d'ensemble :** chemin du projet, état de la file, totaux des transferts actifs et tâches récentes.
-- **Tâches :** créer, classer, modifier, mettre en pause, reprendre, arrêter, relancer, supprimer et examiner des synchronisations ou téléchargements uniques.
-- **Créateurs :** rechercher dans Pawchive et ajouter, modifier la note, activer, désactiver ou retirer des entrées.
+- **Tâches :** créer, modifier, mettre en pause, reprendre, arrêter, relancer, supprimer et examiner des synchronisations ou téléchargements uniques. Un clic sur une ligne ouvre les détails et la sélection multiple permet les actions groupées compatibles.
+- **Créateurs :** rechercher dans Pawchive et ajouter, modifier la note, activer, désactiver ou retirer des entrées, y compris par actions groupées.
 - **Publications :** rechercher sans afficher les médias distants ni le corps développé, examiner les révisions et créer une tâche de téléchargement.
 - **Règles d'exclusion :** ordonner et limiter `field-match`, composer des groupes `any`/`all` imbriqués et des conditions de contenu, égalité, expression régulière et existence.
 - **Configuration :** modifier `.env`, `prod.env` et `ktoolbox.toml` dans des formulaires typés ou des vues de texte avancées.

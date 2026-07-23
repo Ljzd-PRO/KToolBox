@@ -59,8 +59,8 @@ Editable areas use a muted secondary surface with distinct field backgrounds. Fi
 The main areas are:
 
 - **Overview:** project path, queue health, active transfer totals, and recent tasks. Each statistic is a keyboard-accessible link to the corresponding filtered task or creator view.
-- **Tasks:** create, reorder, edit, pause, resume, stop, rerun, delete, and inspect synchronization or single-post downloads.
-- **Creators:** search Pawchive and add, annotate, enable, disable, or remove roster entries.
+- **Tasks:** create, edit, pause, resume, stop, rerun, delete, and inspect synchronization or single-work downloads. Select multiple rows for compatible bulk actions; clicking a row opens its details.
+- **Creators:** search Pawchive and add, annotate, enable, disable, or remove roster entries, including bulk enable, disable, and removal.
 - **Posts:** search without rendering remote media or expanded body text, inspect revisions, and create a download task.
 - **Blockers:** order and scope `field-match` blockers and compose nested `any`/`all`, contains, equals, regular expression, and existence conditions.
 - **Configuration:** edit `.env`, `prod.env`, and `ktoolbox.toml` through typed forms or advanced text views.
@@ -76,7 +76,7 @@ Platform fields use a HeroUI ComboBox with Patreon, Pixiv, and Fanbox suggestion
 
 Creator rows lead with the profile name returned by Pawchive. Names are cached for 24 hours, stale values remain available when refresh fails, and the creator ID is the fallback when no profile has ever loaded. The optional roster note remains independent and empty by default. When editing an existing creator, its platform and creator ID remain visible but read-only because they identify the stored roster entry.
 
-Overview recent tasks, task queues, creator rosters, and post results support controlled HeroUI column sorting. Text uses locale-aware natural ordering, while counts, progress, speeds, states, and timestamps use their real values. Mobile cards expose the same sort field and direction. Task sorting changes presentation only, never scheduler order; queue movement is disabled with an explanation while a custom view sort is active.
+Overview recent tasks, task queues, creator rosters, and post results support controlled HeroUI column sorting. Text uses locale-aware natural ordering, while counts, progress, speeds, states, and timestamps use their real values. Mobile cards expose the same sort field and direction. Task sorting changes presentation only and never changes scheduler order.
 
 ## Configuration editing
 
