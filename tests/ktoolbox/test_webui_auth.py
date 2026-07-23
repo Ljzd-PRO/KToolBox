@@ -168,3 +168,24 @@ async def test_auth_service_rejects_missing_password_and_unknown_session(tmp_pat
     with pytest.raises(HTTPException, match="Session expired"):
         await service.session("unknown-token")
     await service.logout(None)
+
+    request_scope = {
+        "type": "http",
+        "method": "POST",
+        "path": "/api/v1/internal",
+        "headers": [(b"authorization", b"Bearer internal-secret")],
+        "query_string": b"",
+        "scheme": "http",
+        "server": ("testserver", 80),
+        "client": ("127.0.0.1", 1234),
+    }
+    request = Request(request_scope)
+    assert service.is_internal_request(request) is False
+
+    internal_service = AuthService(
+        Configuration(_env_file=None, webui={"username": "owner", "password": "secret"}).webui,
+        database,
+        internal_token="internal-secret",
+    )
+    session = await database.create_session("session-token", "owner", "csrf-token")
+    internal_service.verify_csrf(request, session)

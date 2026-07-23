@@ -10,7 +10,7 @@ import httpx
 import pytest
 
 from ktoolbox.configuration import Configuration, RuntimeContext
-from ktoolbox.failures import FailureCode, FailureStage, generic_failure
+from ktoolbox.failures import FailureCode, FailureStage, TaskExecutionError, failure_report, generic_failure
 from ktoolbox.project_config import CreatorReference
 from ktoolbox.reporting import ProgressReporter
 from ktoolbox.webui.app import create_app
@@ -604,6 +604,39 @@ async def test_scheduler_records_snapshot_and_executor_failures(tmp_path: Path) 
     events = await store.events(task_id=task.id)
     error_event = next(event for event in events if event.event_type == "task.log")
     assert error_event.data["failure_report"] == failed.failure.model_dump(mode="json")
+
+    structured = failure_report(
+        [
+            generic_failure(
+                stage=FailureStage.work_list,
+                message="Pawchive returned data in an unsupported format",
+                code=FailureCode.response_incompatible,
+                platform="fanbox",
+                creator_id="one",
+            )
+        ],
+        creator_failures=1,
+    )
+
+    class StructuredFailingExecutor:
+        async def __call__(self, *_args, **_kwargs) -> None:
+            raise TaskExecutionError(structured)
+
+    structured_root = tmp_path / "structured"
+    structured_root.mkdir()
+    scheduler, store = await scheduler_parts(structured_root, StructuredFailingExecutor())
+    task = await store.create(
+        DownloadTaskSpec(
+            service="fanbox",
+            creator_id="one",
+            post_id="42",
+            output=structured_root / "one",
+        )
+    )
+    await scheduler._dispatch_ready_tasks()
+    failed = await wait_for_store_status(scheduler, store, task.id, TaskStatus.failed)
+    assert failed.failure == structured
+    assert failed.error == structured.summary
 
     broken_root = tmp_path / "broken"
     broken_root.mkdir()

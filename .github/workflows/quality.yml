@@ -139,6 +139,7 @@ jobs:
           poetry run pytest
           tests/ktoolbox/test_webui_auth.py
           tests/ktoolbox/test_webui_config.py
+          tests/ktoolbox/test_webui_mcp.py
           tests/ktoolbox/test_webui_tasks.py
           --cov=ktoolbox.webui.auth
           --cov=ktoolbox.webui.config_schema

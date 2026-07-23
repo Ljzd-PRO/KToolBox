@@ -228,8 +228,7 @@ def _collect_descriptions(
     if locale not in ("en", "zh-CN"):
         catalog = CONFIG_LOCALE_CATALOGS[locale]["descriptions"]
         for path in _field_paths(model, prefix):
-            if description := catalog.get(path):
-                result[path] = description
+            result[path] = catalog[path]
         return
     source_model = model if locale == "en" else _MODEL_TRANSLATIONS[model]
     descriptions = _parse_ivar_descriptions(inspect.getdoc(source_model) or "")
