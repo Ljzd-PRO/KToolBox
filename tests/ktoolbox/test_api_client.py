@@ -16,6 +16,7 @@ from ktoolbox.api.errors import (
     PawchiveNotFoundError,
     PawchiveResponseValidationError,
     PawchiveTransportError,
+    _safe_validation_path,
 )
 from ktoolbox.api.generated import (
     Announcement,
@@ -285,6 +286,11 @@ def test_observed_post_metadata_variants_are_explicit_model_fields() -> None:
     assert list_tags.tags == ["one", {"name": "two"}]
     assert string_tags.attachments and string_tags.attachments[0].deferred is True
     assert string_tags.attachments[0].model_extra == {}
+
+
+def test_response_validation_paths_hide_untrusted_segments() -> None:
+    assert _safe_validation_path(("attachments", 2, "name")) == "$.attachments[2].name"
+    assert _safe_validation_path(("unsafe-field",)) == "$.field"
 
 
 @pytest.mark.asyncio
