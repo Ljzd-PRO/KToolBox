@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from collections.abc import AsyncIterator, Coroutine
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Annotated, Any, cast
 
@@ -12,6 +14,7 @@ from ktoolbox.project_config import ProjectConfigError, ProjectConfigStore
 from ktoolbox.utils import parse_webpage_url
 from ktoolbox.webui.auth import require_csrf, require_session
 from ktoolbox.webui.database import WebUISession
+from ktoolbox.webui.event_store import WebUIEventStore
 from ktoolbox.webui.task_models import (
     DownloadTaskSpec,
     SyncTaskSpec,
@@ -42,6 +45,10 @@ def task_store(request: Request) -> TaskStore:
 
 def task_scheduler(request: Request) -> TaskScheduler:
     return cast(TaskScheduler, request.app.state.task_scheduler)
+
+
+def event_store(request: Request) -> WebUIEventStore:
+    return cast(WebUIEventStore, request.app.state.event_store)
 
 
 def create_task_router(project_root: Path) -> APIRouter:
@@ -181,32 +188,36 @@ def create_task_router(project_root: Path) -> APIRouter:
     async def event_stream(
         request: Request,
         _: Annotated[WebUISession, Depends(require_session)],
-        store: Annotated[TaskStore, Depends(task_store)],
+        events_store: Annotated[WebUIEventStore, Depends(event_store)],
         last_event_id: Annotated[str | None, Header()] = None,
-        after: Annotated[int, Query(ge=0)] = 0,
+        after: Annotated[int | None, Query(ge=0)] = None,
     ) -> StreamingResponse:
         try:
-            cursor = max(after, int(last_event_id or 0))
+            if last_event_id is not None:
+                cursor = max(after or 0, int(last_event_id))
+            elif after is not None:
+                cursor = after
+            else:
+                cursor = await events_store.latest_id()
         except ValueError as error:
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "invalid Last-Event-ID") from error
 
         async def events() -> AsyncIterator[str]:
             nonlocal cursor
-            idle_polls = 0
+            yield "retry: 3000\n\n"
             while not await request.is_disconnected():
-                records = await store.events(after=cursor)
+                records = await events_store.wait_for_events(after=cursor, timeout=15.0)
                 if records:
-                    idle_polls = 0
                     for record in records:
                         cursor = record.id
                         payload = record.model_dump_json()
                         yield f"id: {record.id}\nevent: {record.event_type}\ndata: {payload}\n\n"
                 else:
-                    idle_polls += 1
-                    if idle_polls >= 30:
-                        idle_polls = 0
-                        yield ": keepalive\n\n"
-                await asyncio.sleep(0.5)
+                    payload = json.dumps(
+                        {"timestamp": datetime.now(timezone.utc).isoformat()},
+                        separators=(",", ":"),
+                    )
+                    yield f"event: heartbeat\ndata: {payload}\n\n"
 
         return StreamingResponse(events(), media_type="text/event-stream")
 

@@ -9,6 +9,7 @@ import anyio
 
 from ktoolbox.failures import TaskFailureReport
 from ktoolbox.webui.database import WebUIDatabase, utc_now
+from ktoolbox.webui.event_store import WebUIEventStore
 from ktoolbox.webui.task_models import (
     ACTIVE_TASK_STATUSES,
     RUNNING_TASK_STATUSES,
@@ -40,8 +41,9 @@ class InvalidTaskStateError(ValueError):
 
 
 class TaskStore:
-    def __init__(self, database: WebUIDatabase) -> None:
+    def __init__(self, database: WebUIDatabase, event_store: WebUIEventStore | None = None) -> None:
         self.database = database
+        self.event_store = event_store or WebUIEventStore(database)
 
     async def recover_interrupted(self) -> int:
         now = utc_now().isoformat()
@@ -311,32 +313,16 @@ class TaskStore:
         return [_attempt_from_row(row) for row in rows]
 
     async def add_event(self, task_id: str | None, event_type: str, data: dict[str, object]) -> TaskEvent:
-        now = utc_now()
-        async with self.database.connect() as connection:
-            cursor = await connection.execute(
-                "INSERT INTO task_events(task_id, event_type, data_json, created_at) VALUES (?, ?, ?, ?)",
-                (task_id, event_type, json.dumps(data, ensure_ascii=False), now.isoformat()),
-            )
-            await connection.commit()
-            event_id = cursor.lastrowid
-        if event_id is None:
-            raise RuntimeError("failed to persist task event")
-        return TaskEvent(id=event_id, task_id=task_id, event_type=event_type, data=data, created_at=now)
+        return await self.event_store.publish(
+            event_type,
+            data,
+            task_id=task_id,
+            resource="task",
+            resource_id=task_id,
+        )
 
     async def events(self, *, after: int = 0, task_id: str | None = None, limit: int = 200) -> list[TaskEvent]:
-        query = "SELECT * FROM task_events WHERE id > ?"
-        parameters: list[object] = [after]
-        if task_id is not None:
-            query += " AND task_id = ?"
-            parameters.append(task_id)
-        query += " ORDER BY id LIMIT ?"
-        parameters.append(limit)
-        async with self.database.connect() as connection:
-            connection.row_factory = aiosqlite.Row
-            cursor = await connection.execute(query, parameters)
-            rows = await cursor.fetchall()
-            await cursor.close()
-        return [_event_from_row(row) for row in rows]
+        return await self.event_store.events(after=after, task_id=task_id, limit=limit)
 
     async def add_artifact(self, task_id: str, path: Path) -> None:
         artifact = await anyio.to_thread.run_sync(_capture_artifact, path)
@@ -384,6 +370,12 @@ class TaskStore:
             await connection.execute("PRAGMA foreign_keys=ON")
             await connection.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
             await connection.commit()
+        await self.event_store.publish(
+            "task.deleted",
+            {"task_id": task_id},
+            resource="task",
+            resource_id=task_id,
+        )
         return preview
 
 
@@ -437,16 +429,6 @@ def _attempt_from_row(row: aiosqlite.Row) -> TaskAttempt:
         failure=(
             TaskFailureReport.model_validate_json(row["failure_json"]) if row["failure_json"] is not None else None
         ),
-    )
-
-
-def _event_from_row(row: aiosqlite.Row) -> TaskEvent:
-    return TaskEvent(
-        id=row["id"],
-        task_id=row["task_id"],
-        event_type=row["event_type"],
-        data=json.loads(row["data_json"]),
-        created_at=row["created_at"],
     )
 
 

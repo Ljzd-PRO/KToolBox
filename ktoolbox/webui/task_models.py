@@ -214,6 +214,8 @@ class TaskEvent(BaseModel):
     id: int
     task_id: str | None = None
     event_type: str
+    resource: str | None = None
+    resource_id: str | None = None
     data: dict[str, object]
     created_at: datetime
 

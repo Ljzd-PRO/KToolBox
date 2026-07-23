@@ -16,6 +16,7 @@ from ktoolbox.reporting import ProgressReporter
 from ktoolbox.webui.app import create_app
 from ktoolbox.webui.auth import CSRF_HEADER
 from ktoolbox.webui.database import WebUIDatabase
+from ktoolbox.webui.event_store import WebUIEventStore
 from ktoolbox.webui.project_lock import ProjectAlreadyRunningError
 from ktoolbox.webui.task_executor import TaskExecutionSnapshot
 from ktoolbox.webui.task_models import (
@@ -302,7 +303,7 @@ async def test_task_presentation_database_migration_and_store_round_trip(tmp_pat
         attempt_columns = {str(row[1]) for row in await cursor.fetchall()}
         await cursor.close()
     assert "failure_json" in attempt_columns
-    assert versions == [1, 2, 3, 4, 5, 6]
+    assert versions == [1, 2, 3, 4, 5, 6, 7]
 
     store = TaskStore(database)
     spec = DownloadTaskSpec(service="FanBox", creator_id="creator/id", post_id="42", output=tmp_path)
@@ -314,6 +315,57 @@ async def test_task_presentation_database_migration_and_store_round_trip(tmp_pat
     )
     task = await store.create(spec, presentation)
     assert task.presentation == presentation
+
+
+@pytest.mark.asyncio
+async def test_webui_event_store_wakes_subscribers_and_redacts_sensitive_values(tmp_path: Path) -> None:
+    database = WebUIDatabase(tmp_path / "webui.sqlite3")
+    await database.initialize()
+    events = WebUIEventStore(database)
+    waiting = asyncio.create_task(events.wait_for_events(after=0, timeout=1))
+    await asyncio.sleep(0)
+
+    published = await events.publish(
+        "configuration.changed",
+        {
+            "name": "dotenv",
+            "password": "never-store-this",
+            "nested": {"token": "never-store-this-either", "safe": "value"},
+        },
+        resource="configuration",
+        resource_id="dotenv",
+    )
+    records = await waiting
+
+    assert [record.id for record in records] == [published.id]
+    assert records[0].resource == "configuration"
+    assert records[0].resource_id == "dotenv"
+    assert records[0].data == {
+        "name": "dotenv",
+        "password": "[redacted]",
+        "nested": {"token": "[redacted]", "safe": "value"},
+    }
+
+
+@pytest.mark.asyncio
+async def test_task_deletion_publishes_a_surviving_global_event(tmp_path: Path) -> None:
+    database = WebUIDatabase(tmp_path / "webui.sqlite3")
+    await database.initialize()
+    events = WebUIEventStore(database)
+    store = TaskStore(database, events)
+    task = await store.create(
+        DownloadTaskSpec(service="fanbox", creator_id="one", post_id="42", output=tmp_path)
+    )
+    await store.set_status(task.id, TaskStatus.stopped)
+    before_delete = await events.latest_id()
+
+    await store.delete(task.id)
+
+    records = await events.events(after=before_delete)
+    assert len(records) == 1
+    assert records[0].event_type == "task.deleted"
+    assert records[0].task_id is None
+    assert records[0].resource_id == task.id
 
 
 @pytest.mark.asyncio

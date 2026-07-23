@@ -84,6 +84,8 @@ class WebUIDatabase:
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     task_id TEXT REFERENCES tasks(id) ON DELETE CASCADE,
                     event_type TEXT NOT NULL,
+                    resource TEXT,
+                    resource_id TEXT,
                     data_json TEXT NOT NULL,
                     created_at TEXT NOT NULL
                 );
@@ -148,6 +150,12 @@ class WebUIDatabase:
             await connection.execute(
                 "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
                 (6, utc_now().isoformat()),
+            )
+            await _ensure_column(connection, "task_events", "resource", "TEXT")
+            await _ensure_column(connection, "task_events", "resource_id", "TEXT")
+            await connection.execute(
+                "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
+                (7, utc_now().isoformat()),
             )
             await connection.commit()
 

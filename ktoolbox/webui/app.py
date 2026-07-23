@@ -26,6 +26,7 @@ from ktoolbox.webui.auth import (
 from ktoolbox.webui.creator_profiles import CreatorClientFactory, CreatorProfileCache, CreatorRosterService
 from ktoolbox.webui.database import WebUIDatabase, WebUISession
 from ktoolbox.webui.error_responses import error_payload, validation_error_payload
+from ktoolbox.webui.event_store import WebUIEventStore
 from ktoolbox.webui.filesystem import FilesystemBrowser
 from ktoolbox.webui.filesystem_routes import create_filesystem_router
 from ktoolbox.webui.mcp_routes import create_mcp_router
@@ -58,7 +59,8 @@ def create_app(
     internal_token = f"mcp-internal-{secrets.token_urlsafe(36)}"
     auth = AuthService(context.configuration.webui, database, internal_token=internal_token)
     mcp_token_store = MCPTokenStore(database)
-    task_store = TaskStore(database)
+    event_store = WebUIEventStore(database)
+    task_store = TaskStore(database, event_store)
     task_scheduler = TaskScheduler(
         context,
         task_store,
@@ -97,6 +99,7 @@ def create_app(
     app.state.database = database
     app.state.auth = auth
     app.state.mcp_token_store = mcp_token_store
+    app.state.event_store = event_store
     app.state.task_store = task_store
     app.state.task_scheduler = task_scheduler
     browser = filesystem_browser or FilesystemBrowser(context.project_root)
