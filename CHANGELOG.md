@@ -45,6 +45,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Add authenticated remote filesystem pickers to every filesystem-backed WebUI path field, with localized project/host locations, breadcrumbs, search, a labelled hidden-item control, pagination, explicit directory creation, confirmed empty-directory deletion, and manual path entry.
 - Generate readable form labels and descriptions in Simplified Chinese, Traditional Chinese, English, Japanese, Korean, French, and Russian from checked locale catalogs, Pydantic metadata, and English configuration docstrings; include source indicators, secret masking, typed and advanced editors, validation, diff preview, ETag conflict detection, and atomic writes.
 - Add a WAL-backed SQLite queue with concurrent scheduling, resource blocking and deduplication, immutable attempts, pause/resume/stop/edit/reorder/rerun/delete actions, restart recovery, SSE replay, aggregate/per-file speeds, ETA, and structured logs.
+- Add one authenticated global SSE connection for task, roster, blocker, configuration, MCP-token, and filesystem refresh across tabs, with cursor recovery, heartbeats, 10-second local-only fallback polling, draft protection, and live status controls.
 - Add ownership-aware output cleanup previews that skip symbolic links and any pre-existing, shared, or modified files.
 - Rebuild HeroUI form primitives with gray-off/blue-on switches, state-correct checkboxes, centered compact list controls, continuous modal surfaces, and direct icon actions for task, creator, and blocker rows.
 - Persist presentation-only task target snapshots so queues remain readable offline by post title and creator name without changing execution, deduplication, or resource locks.
@@ -123,6 +124,7 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 为 WebUI 中全部基于文件系统的路径字段新增需认证的远程路径选择器，支持项目/主机作用域、面包屑、搜索、隐藏项控制、分页、安全创建目录及手动输入路径。
 - 从经过完整性检查的语言目录、Pydantic 元数据及英文配置 docstring 生成简体中文、繁体中文、英语、日语、韩语、法语和俄语标签与说明，提供来源标记、秘密遮蔽、类型化与高级编辑、校验、差异预览、ETag 冲突检测和原子写入。
 - 新增 WAL SQLite 队列，支持并发调度、资源阻塞与去重、不可变尝试、暂停/恢复/停止/编辑/排序/重跑/删除、重启恢复、SSE 续接、总速度/单文件速度、ETA 和结构化日志。
+- 新增单一认证全局 SSE 连接，在标签页之间自动刷新任务、作者、忽略规则、配置、MCP 令牌和文件系统，支持游标续接、心跳、每 10 秒仅本地降级轮询、草稿保护和实时状态控制。
 - 新增基于输出归属的删除预览，跳过符号链接及任何既存、共享或已修改文件。
 - 重建 HeroUI 表单基础组件：开关关闭灰、开启蓝，复选框严格按状态显示标记，列表紧凑开关居中，弹窗表面连续，并为任务、作者和忽略规则条目直接展示图标操作。
 - 持久化仅用于展示的任务目标快照，使队列离线时仍可按作品标题和作者名识别，且不影响执行、去重或资源锁。

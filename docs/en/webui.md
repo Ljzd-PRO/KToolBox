@@ -120,6 +120,14 @@ Pause is cooperative: active network streams close, completed files and resumabl
 
 Deleting a task normally removes only its queue record, attempts, and logs. “Delete outputs” first produces a file and byte-count preview. Confirmation removes only unchanged, regular files recorded as created by that task; symbolic links, pre-existing files, modified files, and shared files are never followed or removed.
 
+## Automatic refresh
+
+One authenticated SSE connection keeps tasks, creators, ignore rules, configuration, MCP tokens, and open remote-directory views synchronized across browser tabs. Structural changes normally appear within one second, while task progress updates the local query cache directly instead of repeatedly downloading the complete task list.
+
+If the live connection is unavailable for more than five seconds, the WebUI shows a compact warning and refreshes local project queries every 10 seconds. It stops fallback polling and refreshes once as soon as SSE recovers. Pawchive searches, work details, and version checks remain on demand and are never requested by the fallback loop.
+
+The System page reports the current update method and last signal time and provides explicit refresh and reconnect actions. When another tab or MCP client changes data while a form contains unsaved edits, KToolBox preserves the draft and asks whether to reload the new data or continue editing; the normal ETag and state-conflict checks still apply when saving.
+
 ## WebUI environment reference
 
 | Variable | Default | Meaning |

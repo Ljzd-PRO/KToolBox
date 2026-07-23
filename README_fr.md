@@ -125,6 +125,8 @@ Les lignes de tâches conservent des titres de publication et des noms de créat
 
 Une tâche en échec conserve un rapport expurgé par étape avec le créateur ou fichier concerné, la possibilité de réessayer, les chemins de champs sûrs et l'action recommandée. L'interface mobile compacte utilise une barre de 64px et un espacement de 12px, place l'apparence dans un petit Popover et replie le catalogue MCP par catégorie.
 
+Après la connexion, une seule connexion SSE synchronise automatiquement les tâches, créateurs, règles d'exclusion, configurations, jetons MCP et répertoires distants ouverts entre les onglets. En cas de coupure, seules les données locales sont actualisées toutes les 10 secondes, sans interroger les recherches Pawchive ni les détails d'œuvres ; les brouillons non enregistrés restent protégés des mises à jour externes.
+
 L'écoute par défaut sur `0.0.0.0:8789` est pratique sur un réseau local de confiance, mais HTTP ne protège ni les identifiants ni les données du projet en transit. Sur un réseau non fiable, liez le service à `127.0.0.1` ou placez-le derrière un proxy inverse HTTPS. Il n'existe aucun compte par défaut et le démarrage échoue tant que des identifiants valides ne sont pas configurés. Consultez le [guide de la WebUI](https://ktoolbox.readthedocs.io/latest/fr/webui/) pour le cycle de vie des tâches, la sécurité et le déploiement.
 
 ## Configuration

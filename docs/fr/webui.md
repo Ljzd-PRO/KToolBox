@@ -116,6 +116,14 @@ La pause est coopérative : les flux réseau actifs se ferment, les fichiers ter
 
 Supprimer une tâche ne retire normalement que son enregistrement, ses tentatives et ses journaux. « Supprimer les sorties » présente d'abord le nombre de fichiers et d'octets. La confirmation ne retire que les fichiers ordinaires inchangés enregistrés comme créés par cette tâche ; les liens symboliques et les fichiers préexistants, modifiés ou partagés ne sont ni suivis ni retirés.
 
+## Actualisation automatique
+
+Après la connexion, une seule connexion SSE synchronise les tâches, créateurs, règles d'exclusion, configurations, jetons MCP et répertoires distants ouverts entre les onglets du navigateur. Les changements structurels apparaissent normalement en moins d'une seconde ; la progression des tâches met directement à jour le cache local sans retélécharger toute la liste.
+
+Si la connexion en direct reste indisponible plus de cinq secondes, la WebUI affiche un avertissement compact et actualise les données locales du projet toutes les 10 secondes. Dès le rétablissement de SSE, elle arrête ce mode de secours et effectue une actualisation unique. Les recherches Pawchive, détails d'œuvres et vérifications de version restent à la demande et ne sont jamais lancés par le mode de secours.
+
+La page Système indique la méthode d'actualisation et l'heure du dernier signal, avec des actions d'actualisation et de reconnexion. Si un autre onglet ou client MCP modifie les données pendant qu'un formulaire contient des changements non enregistrés, KToolBox conserve le brouillon et propose de recharger ou de poursuivre l'édition ; les contrôles ETag et d'état restent actifs lors de l'enregistrement.
+
 ## Référence de l'environnement WebUI
 
 | Variable | Valeur par défaut | Signification |

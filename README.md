@@ -127,6 +127,8 @@ Failed tasks retain a redacted, stage-specific report with the affected creator 
 
 Creator profiles supply the primary roster name with a resilient 24-hour cache. Data tables support locale-aware sorting, dashboard statistics link to filtered views, and every platform field uses a HeroUI ComboBox with Patreon, Pixiv, and Fanbox suggestions plus custom values.
 
+One authenticated SSE connection automatically synchronizes tasks, creators, ignore rules, configuration, MCP tokens, and open remote directories across tabs. A connection outage switches local data to 10-second fallback refresh without polling Pawchive searches or work details, and unsaved form drafts are protected from external updates.
+
 The default `0.0.0.0:8789` listener is convenient on a trusted LAN, but HTTP does not protect credentials or project data in transit. Bind to `127.0.0.1` or put the service behind HTTPS for untrusted networks. When credentials are not configured, KToolBox generates credentials for the current process and prints them only in its terminal. Filesystem-backed path fields can browse the computer running KToolBox; project fields stay inside the bound project, while the storage-bucket and log-directory fields use the server process's host permissions. Empty directories can only be removed through an explicit, non-recursive confirmation. See the [WebUI guide](https://ktoolbox.readthedocs.io/latest/webui/) for task lifecycle, security, and deployment details.
 
 ## Configuration
