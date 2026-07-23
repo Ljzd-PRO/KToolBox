@@ -11,6 +11,7 @@ import {
   IconMoon,
   IconPackages,
   IconPalette,
+  IconPlugConnected,
   IconSettingsCog,
   IconShieldLock,
   IconSun,
@@ -41,6 +42,7 @@ const navigation: NavigationItem[] = [
   { key: "posts", path: "/posts", icon: IconFileSearch },
   { key: "blockers", path: "/blockers", icon: IconBan },
   { key: "configuration", path: "/configuration", icon: IconSettingsCog },
+  { key: "mcp", path: "/mcp", icon: IconPlugConnected },
   { key: "system", path: "/system", icon: IconAdjustmentsHorizontal },
 ];
 

@@ -6,6 +6,16 @@ export type Session = WebUIApiSchemas["SessionResponse"];
 
 export type ProjectSummary = WebUIApiSchemas["ProjectSummaryResponse"];
 
+export type MCPStatus = WebUIApiSchemas["MCPStatusResponse"];
+
+export type MCPToken = WebUIApiSchemas["MCPTokenResponse"];
+
+export type MCPTokenCreateRequest = WebUIApiSchemas["MCPTokenCreateRequest"];
+
+export type MCPTokenCreated = WebUIApiSchemas["MCPTokenCreatedResponse"];
+
+export type MCPTool = WebUIApiSchemas["MCPToolResponse"];
+
 export type CreatorReference = {
   service: string;
   creator_id: string;

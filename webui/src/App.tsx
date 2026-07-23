@@ -14,6 +14,7 @@ import { BlockersPage } from "./pages/BlockersPage";
 import { CreatorsPage } from "./pages/CreatorsPage";
 import { ConfigurationPage } from "./pages/ConfigurationPage";
 import { LoginPage } from "./pages/LoginPage";
+import { MCPPage } from "./pages/MCPPage";
 import { PostsPage } from "./pages/PostsPage";
 import { SystemPage } from "./pages/SystemPage";
 import { TasksPage } from "./pages/TasksPage";
@@ -40,6 +41,7 @@ function AuthenticatedApplication() {
         <Route element={<PostsPage />} path="posts" />
         <Route element={<BlockersPage />} path="blockers" />
         <Route element={<ConfigurationPage />} path="configuration" />
+        <Route element={<MCPPage />} path="mcp" />
         <Route element={<SystemPage />} path="system" />
         <Route element={<Navigate replace to="/" />} path="*" />
       </Route>
