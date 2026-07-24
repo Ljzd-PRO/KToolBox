@@ -136,6 +136,8 @@ test("dashboard links, roster sorting, and platform suggestions work with real H
 
   await page.getByRole("button", { name: "Add creator" }).click();
   const dialog = page.getByRole("dialog", { name: "Add creator" });
+  await dialog.getByRole("button", { name: /Parse creator URL/ }).click();
+  await page.getByRole("option", { name: "Enter platform and creator ID" }).click();
   const platform = dialog.getByRole("combobox", { name: "Platform" });
   await platform.click();
   for (const option of ["Patreon", "Pixiv", "Fanbox"]) {
@@ -742,9 +744,27 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
   await expect(page.getByRole("button", { name: "Enable 1" })).toHaveClass(/action-tone-enable/);
   await page.getByRole("button", { name: "Enable 1" }).click();
   await expect(creatorRow.getByRole("switch", { name: "Enabled" })).toBeVisible();
+  await waitForToastAnnouncements(page);
 
   await page.getByRole("button", { name: "Add creator" }).click();
   const addCreatorDialog = page.getByRole("dialog", { name: "Add creator" });
+  await expect(addCreatorDialog.getByRole("button", { name: /Parse creator URL/ })).toBeVisible();
+  await expect(addCreatorDialog.getByRole("textbox", { name: "Pawchive creator URL" })).toBeVisible();
+  await addCreatorDialog.getByRole("textbox", { name: "Pawchive creator URL" }).fill(
+    "https://pawchive.pw/fanbox/user/example-creator",
+  );
+  const creatorUrlAuditDirectory = process.env.KTOOLBOX_CREATOR_URL_AUDIT_DIR;
+  if (creatorUrlAuditDirectory) {
+    await mkdir(creatorUrlAuditDirectory, { recursive: true });
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: join(creatorUrlAuditDirectory, "creator-url-desktop-light.png") });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: join(creatorUrlAuditDirectory, "creator-url-mobile-light.png") });
+    await page.setViewportSize({ width: 1440, height: 900 });
+  }
+  await addCreatorDialog.getByRole("button", { name: /Parse creator URL/ }).click();
+  await page.getByRole("option", { name: "Enter platform and creator ID" }).click();
   await expect(addCreatorDialog.getByRole("group", { name: "Pawchive creator path" })).toBeVisible();
   await expect(addCreatorDialog.getByRole("combobox", { name: "Platform" })).not.toHaveAttribute("readonly");
   await expect(addCreatorDialog.getByRole("textbox", { name: "Creator ID" })).not.toHaveAttribute("readonly");

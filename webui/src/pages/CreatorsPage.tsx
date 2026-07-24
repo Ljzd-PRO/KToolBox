@@ -14,6 +14,7 @@ import {
   IconCloud as Cloud,
   IconFilter as Filter,
   IconFingerprint as Fingerprint,
+  IconLink as Link,
   IconPencil as Pencil,
   IconPlus as Plus,
   IconPower as Power,
@@ -56,6 +57,7 @@ import {
 import { ExternalChangeAlert } from "../components/ExternalChangeAlert";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
+import { parsePawchiveCreatorUrl } from "../lib/pawchive";
 import { useRealtime } from "../lib/realtime";
 import { stableSort } from "../lib/sorting";
 import type { CreatorReference, CreatorRosterItem, CreatorSummary } from "../types";
@@ -68,6 +70,7 @@ const blankCreator: CreatorReference = {
 };
 
 type CreatorStatusFilter = "all" | "enabled" | "disabled";
+type CreatorIdentityMode = "url" | "fields";
 
 export function CreatorsPage() {
   const { t, i18n } = useTranslation();
@@ -86,6 +89,9 @@ export function CreatorsPage() {
   const [editorRevisionBaseline, setEditorRevisionBaseline] = useState(
     creatorRevision,
   );
+  const [creatorIdentityMode, setCreatorIdentityMode] = useState<CreatorIdentityMode>("url");
+  const [creatorUrl, setCreatorUrl] = useState("");
+  const [creatorUrlError, setCreatorUrlError] = useState<string>();
   const [originalKey, setOriginalKey] = useState<string | null>(null);
   const [removing, setRemoving] = useState<CreatorReference[]>([]);
   const [deleting, setDeleting] = useState(false);
@@ -124,6 +130,9 @@ export function CreatorsPage() {
 
   function openNew(prefill?: CreatorSummary) {
     setOriginalKey(null);
+    setCreatorIdentityMode(prefill ? "fields" : "url");
+    setCreatorUrl("");
+    setCreatorUrlError(undefined);
     const value = prefill
       ? {
           service: prefill.service,
@@ -139,6 +148,9 @@ export function CreatorsPage() {
 
   function openEdit(creator: CreatorReference) {
     setOriginalKey(`${creator.service}/${creator.creator_id}`);
+    setCreatorIdentityMode("fields");
+    setCreatorUrl("");
+    setCreatorUrlError(undefined);
     setEditor({ ...creator });
     setEditorOriginal({ ...creator });
     setEditorRevisionBaseline(creatorRevision);
@@ -147,19 +159,32 @@ export function CreatorsPage() {
   async function saveCreator(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!editor || !session) return;
+    let creator = editor;
+    if (!originalKey && creatorIdentityMode === "url") {
+      const identity = parsePawchiveCreatorUrl(creatorUrl);
+      if (!identity) {
+        setCreatorUrlError(t("creators.creatorUrlInvalid"));
+        return;
+      }
+      creator = {
+        ...editor,
+        service: identity.service,
+        creator_id: identity.creatorId,
+      };
+    }
     setSaving(true);
     try {
       if (originalKey) {
         await api<CreatorReference>(`/creators/${originalKey}`, {
           method: "PUT",
-          body: { alias: editor.alias || null, enabled: editor.enabled },
+          body: { alias: creator.alias || null, enabled: creator.enabled },
           csrfToken: session.csrf_token,
         });
         toast.success(t("creators.updated"));
       } else {
         await api<CreatorReference>("/creators", {
           method: "POST",
-          body: editor,
+          body: creator,
           csrfToken: session.csrf_token,
         });
         toast.success(t("creators.added"));
@@ -564,27 +589,59 @@ export function CreatorsPage() {
               }
               onReload={() => setEditor(null)}
             />
-            <PawchiveIdentityFields
-              creatorId={editor.creator_id}
-              creatorIdLabel={t("creators.creatorId")}
-              description={
-                originalKey ? (
-                  t("creators.identityLockedHint")
-                ) : (
-                  <Trans
-                    components={{ code: <code className="inline-path-code" /> }}
-                    i18nKey="creators.identityHint"
-                  />
-                )
-              }
-              icon={Cloud}
-              isReadOnly={Boolean(originalKey)}
-              label={t("creators.identity")}
-              service={editor.service}
-              serviceLabel={t("creators.service")}
-              onCreatorIdChange={(creator_id) => setEditor({ ...editor, creator_id })}
-              onServiceChange={(service) => setEditor({ ...editor, service })}
-            />
+            {!originalKey ? (
+              <SelectField
+                description={t("creators.identityModeHint")}
+                icon={Fingerprint}
+                label={t("creators.identityMode")}
+                options={[
+                  { value: "url", label: t("creators.identityUrl"), icon: Link },
+                  { value: "fields", label: t("creators.identityFields"), icon: Fingerprint },
+                ]}
+                value={creatorIdentityMode}
+                onChange={(value) => {
+                  setCreatorUrlError(undefined);
+                  setCreatorIdentityMode(value === "fields" ? "fields" : "url");
+                }}
+              />
+            ) : null}
+            {!originalKey && creatorIdentityMode === "url" ? (
+              <FormField
+                description={t("creators.creatorUrlHint")}
+                errorMessage={creatorUrlError}
+                icon={Link}
+                isInvalid={Boolean(creatorUrlError)}
+                isRequired
+                label={t("creators.creatorUrl")}
+                value={creatorUrl}
+                onChange={(value) => {
+                  setCreatorUrl(value);
+                  setCreatorUrlError(undefined);
+                }}
+              />
+            ) : (
+              <PawchiveIdentityFields
+                creatorId={editor.creator_id}
+                creatorIdLabel={t("creators.creatorId")}
+                description={
+                  originalKey ? (
+                    t("creators.identityLockedHint")
+                  ) : (
+                    <Trans
+                      components={{ code: <code className="inline-path-code" /> }}
+                      i18nKey="creators.identityHint"
+                    />
+                  )
+                }
+                icon={Cloud}
+                isReadOnly={Boolean(originalKey)}
+                label={t("creators.identity")}
+                service={editor.service}
+                serviceLabel={t("creators.service")}
+                onCreatorIdChange={(creator_id) => setEditor({ ...editor, creator_id })}
+                onServiceChange={(service) => setEditor({ ...editor, service })}
+              />
+            )}
             <FormField
               description={t("creators.aliasHint")}
               icon={Notes}

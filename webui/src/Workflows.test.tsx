@@ -147,6 +147,9 @@ describe("project workflows", () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const path = String(input);
       if (path.endsWith("/session")) return json(session);
+      if (path.endsWith("/creators") && init?.method === "POST") {
+        return json({ service: "patreon", creator_id: "new-creator", alias: "Reference", enabled: true });
+      }
       if (path.endsWith("/creators")) {
         return json([{ service: "fanbox", creator_id: "42", alias: null, enabled: creatorEnabled, name: "Studio Sample" }]);
       }
@@ -191,6 +194,26 @@ describe("project workflows", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "Add creator" }));
+    expect(screen.getByRole("button", { name: /Parse creator URL/ })).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Pawchive creator URL" })).toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Pawchive creator path" })).not.toBeInTheDocument();
+    await user.type(screen.getByRole("textbox", { name: "Pawchive creator URL" }), "https://pawchive.pw/patreon/user/new-creator");
+    await user.type(screen.getByRole("textbox", { name: "Note" }), "Reference");
+    await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Save" }));
+    const createRequest = fetchMock.mock.calls.find(([path, options]) =>
+      String(path).endsWith("/creators") && options?.method === "POST"
+    );
+    expect(createRequest).toBeDefined();
+    expect(JSON.parse(String(createRequest?.[1]?.body))).toEqual({
+      service: "patreon",
+      creator_id: "new-creator",
+      alias: "Reference",
+      enabled: true,
+    });
+
+    await user.click(screen.getByRole("button", { name: "Add creator" }));
+    await user.click(screen.getByRole("button", { name: /Parse creator URL/ }));
+    await user.click(await screen.findByRole("option", { name: "Enter platform and creator ID" }));
     expect(screen.getByRole("group", { name: "Pawchive creator path" })).toBeInTheDocument();
     expect(screen.getByText("/platform/user/creator ID", { selector: "code" })).toBeInTheDocument();
     expect(screen.getByRole("combobox", { name: "Platform" })).not.toHaveAttribute("readonly");
