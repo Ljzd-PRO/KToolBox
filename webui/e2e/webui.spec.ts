@@ -880,14 +880,89 @@ test("task lifecycle remains operable through pause resume and stop", async ({ p
   await expect(page.getByRole("heading", { name: "Task details" })).toBeVisible();
   await expect(page.getByText("Running", { exact: true })).toBeVisible();
   await expect(page.getByTitle(/KiB\/s|MiB\/s/)).toBeVisible();
+  const liveCards = page.locator(".task-live-card");
+  await expect(liveCards).toHaveCount(3);
+  const liveCardBoxesBefore = await liveCards.evaluateAll((elements) =>
+    elements.map((element) => {
+      const box = element.getBoundingClientRect();
+      return { height: box.height, width: box.width };
+    }),
+  );
 
   await page.getByRole("button", { name: "Pause" }).click();
   await expect(page.getByText("Paused", { exact: true })).toBeVisible();
   await expect(page.getByText("0 B/s", { exact: true })).toBeVisible();
+  const liveCardBoxesAfter = await liveCards.evaluateAll((elements) =>
+    elements.map((element) => {
+      const box = element.getBoundingClientRect();
+      return { height: box.height, width: box.width };
+    }),
+  );
+  expect(liveCardBoxesAfter).toEqual(liveCardBoxesBefore);
   await page.getByRole("button", { name: "Resume" }).click();
   await expect(page.getByText("Running", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Stop" }).click();
   await expect(page.getByText("Stopped", { exact: true })).toBeVisible();
+});
+
+
+test("live download changes do not shift task details or zero an active task", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("link", { name: "Tasks", exact: true }).click();
+  await page.getByRole("button", { name: "Create task" }).click();
+  const dialog = page.getByRole("dialog", { name: "Create task" });
+  await dialog.getByRole("textbox", { name: "Output directory" }).fill("live-layout-fixture");
+  await dialog.getByRole("button", { name: "Create task" }).click();
+  await expect(page.getByRole("heading", { name: "Task details" })).toBeVisible();
+  await expect(page.getByText("Running", { exact: true })).toBeVisible();
+
+  const activeDownloads = page.getByRole("region", { name: "Active downloads" });
+  await expect(activeDownloads.getByText("fictional-active-file-01.zip")).toBeVisible({ timeout: 10_000 });
+  await expect(activeDownloads.getByText("fictional-active-file-08.zip")).toBeVisible();
+  await expect(page.getByTitle(/KiB\/s|MiB\/s/)).toBeVisible();
+  const liveCards = page.locator(".task-live-card");
+  await expect(liveCards).toHaveCount(3);
+  const boxesBefore = await liveCards.evaluateAll((elements) =>
+    elements.map((element) => {
+      const box = element.getBoundingClientRect();
+      return { height: box.height, width: box.width, x: box.x, y: box.y };
+    }),
+  );
+
+  await expect(activeDownloads.getByText("fictional-active-file-01.zip")).toBeHidden({ timeout: 12_000 });
+  await expect(activeDownloads.getByText("fictional-active-file-08.zip")).toBeVisible();
+  await expect(page.getByText("Running", { exact: true })).toBeVisible();
+  await expect(page.getByTitle(/KiB\/s|MiB\/s/)).toBeVisible();
+  const boxesAfter = await liveCards.evaluateAll((elements) =>
+    elements.map((element) => {
+      const box = element.getBoundingClientRect();
+      return { height: box.height, width: box.width, x: box.x, y: box.y };
+    }),
+  );
+  expect(boxesAfter).toEqual(boxesBefore);
+
+  await page.getByRole("button", { name: "Stop" }).click();
+  await expect(page.getByText("Stopped", { exact: true })).toBeVisible();
+});
+
+
+test("completed task details keep edit and delete without offering resume", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("link", { name: "Tasks", exact: true }).click();
+  await page.getByRole("button", { name: "Create task" }).click();
+  await page.getByRole("dialog", { name: "Create task" }).getByRole("button", { name: "Create task" }).click();
+  await expect(page.getByRole("heading", { name: "Task details" })).toBeVisible();
+  await expect(page.getByText("Completed", { exact: true })).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole("button", { name: "Resume" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Edit" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Delete" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Edit" }).click();
+  await expect(page.getByRole("dialog", { name: "Edit task" })).toBeVisible();
+  await page.getByRole("dialog", { name: "Edit task" }).getByRole("button", { name: "Cancel" }).click();
+  await page.getByRole("button", { name: "Delete" }).click();
+  await expect(page.getByRole("dialog", { name: "Delete task" })).toBeVisible();
+  await page.getByRole("dialog", { name: "Delete task" }).getByRole("button", { name: "Cancel" }).click();
 });
 
 
@@ -939,6 +1014,9 @@ test("task details keep a long retry queue inside its own scroll region", async 
   await expect(retryRegion.getByText("fictional-retry-file-18.zip")).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
   await retryRegion.scrollIntoViewIfNeeded();
+  const eventRow = page.locator(".task-event-row").first();
+  await expect(eventRow).toBeVisible();
+  await expect.poll(() => eventRow.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length)).toBe(1);
   await expect.poll(
     () => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth),
   ).toBe(0);

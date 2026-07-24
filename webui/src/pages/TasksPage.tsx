@@ -788,6 +788,8 @@ function TaskDetails({
             {pausable.has(task.status) ? <Button className="semantic-action-button action-tone-pause" variant="outline" onPress={() => handlers.pause(task)}><Pause aria-hidden="true" size={17} />{t("tasks.pause")}</Button> : null}
             {resumable.has(task.status) ? <Button className="semantic-action-button action-tone-resume" variant="outline" onPress={() => handlers.resume(task)}><Play aria-hidden="true" size={17} />{t("tasks.resume")}</Button> : null}
             {stoppable.has(task.status) ? <Button className="semantic-action-button action-tone-stop" variant="outline" onPress={() => handlers.stop(task)}><Square aria-hidden="true" size={17} />{t("tasks.stop")}</Button> : null}
+            {editable.has(task.status) ? <Button variant="outline" onPress={() => handlers.edit(task)}><Pencil aria-hidden="true" size={17} />{t("common.edit")}</Button> : null}
+            {deletable.has(task.status) ? <Button className="text-danger" variant="outline" onPress={() => handlers.remove(task)}><Trash2 aria-hidden="true" size={17} />{t("common.delete")}</Button> : null}
           </div>
         }
       />
@@ -912,7 +914,7 @@ function TaskDetails({
           tabIndex={0}
         >
           {events.length ? events.map((event) => (
-            <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 border-b border-border py-1 last:border-0" key={event.id}>
+            <div className="task-event-row grid grid-cols-1 gap-0.5 border-b border-border py-1.5 last:border-0 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-3 sm:py-1" key={event.id}>
               <time className="text-muted">{formatDateTime(event.created_at, i18n.language)}</time>
               <span className="min-w-0 break-words">
                 <strong>{eventLabel(t, event.event_type)}</strong>{" "}
@@ -922,10 +924,6 @@ function TaskDetails({
           )) : <p className="text-muted">{t("tasks.noLogs")}</p>}
         </div>
       </Surface>
-      <div className="flex flex-wrap justify-end gap-2">
-        {editable.has(task.status) ? <Button variant="outline" onPress={() => handlers.edit(task)}><Pencil aria-hidden="true" size={17} />{t("common.edit")}</Button> : null}
-        {deletable.has(task.status) ? <Button variant="danger" onPress={() => handlers.remove(task)}><Trash2 aria-hidden="true" size={17} />{t("common.delete")}</Button> : null}
-      </div>
     </>
   );
 }

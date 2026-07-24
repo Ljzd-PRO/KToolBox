@@ -170,6 +170,36 @@ class FixtureExecutor:
             reporter.stop()
             return
 
+        if task.spec.output.name == "live-layout-fixture":
+            creators = ["fanbox:demo-studio", "patreon:alpha-atelier"]
+            reporter.start()
+            for creator in creators:
+                reporter.creator_started(creator)
+            for index in range(8):
+                creator = creators[index % len(creators)]
+                reporter.job_queued(creator)
+                reporter.download_started(
+                    f"live-{index}",
+                    creator,
+                    f"fictional-active-file-{index + 1:02d}.zip",
+                    1024 * 1024 if index < 4 else 2 * 1024 * 1024,
+                    0,
+                )
+            for step in range(64):
+                await asyncio.sleep(0.25)
+                for index in range(4 if step >= 32 else 8):
+                    task_index = index + 4 if step >= 32 else index
+                    reporter.download_advanced(f"live-{task_index}", 32 * 1024)
+                if step == 31:
+                    for index in range(4):
+                        reporter.download_finished(f"live-{index}", "completed")
+            for index in range(4, 8):
+                reporter.download_finished(f"live-{index}", "completed")
+            for creator in creators:
+                reporter.creator_finished(creator)
+            reporter.stop()
+            return
+
         transport = httpx.MockTransport(lambda __: httpx.Response(200, json={"fixture": True}))
         async with httpx.AsyncClient(transport=transport) as client:
             await client.get("https://fixture.invalid/metadata")
