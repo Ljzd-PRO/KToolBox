@@ -113,10 +113,12 @@ function SyncTaskTitle({
     );
   }
   const suffix = t("tasks.creatorGroupSuffix", { count: names.length });
+  const compactSuffix = t("tasks.moreCreators", { count: names.length - 1 });
   const content = (
     <>
-      <span className="min-w-0 truncate">{names[0]}</span>
-      <span className="shrink-0 whitespace-pre"> {suffix}</span>
+      <span className="min-w-0 flex-1 truncate">{names[0]}</span>
+      <span className="shrink-0 whitespace-pre max-[379px]:hidden"> {suffix}</span>
+      <span className="hidden shrink-0 whitespace-pre max-[379px]:inline"> {compactSuffix}</span>
     </>
   );
   const title = `${names[0]} ${suffix}`;
@@ -124,7 +126,7 @@ function SyncTaskTitle({
     return (
       <button
         aria-label={t("tasks.openDetails", { target: title })}
-        className="task-target-link task-target-title task-target-title-group flex min-w-0 items-baseline rounded-sm text-left text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        className="task-target-link task-target-title task-target-title-group flex w-full min-w-0 max-w-full items-baseline overflow-hidden rounded-sm text-left text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         title={title}
         type="button"
         onClick={onOpen}
@@ -135,7 +137,7 @@ function SyncTaskTitle({
   }
   return (
     <p
-      className="task-target-title task-target-title-group flex min-w-0 items-baseline text-sm font-semibold"
+      className="task-target-title task-target-title-group flex w-full min-w-0 max-w-full items-baseline overflow-hidden text-sm font-semibold"
       title={title}
     >
       {content}

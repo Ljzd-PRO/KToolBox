@@ -274,10 +274,7 @@ async def _repair_terminal_progress(connection: aiosqlite.Connection) -> None:
         progress.waiting_retries.clear()
         progress.speed_bps = 0
         progress.eta_seconds = (
-            0
-            if TaskStatus(raw_status) is TaskStatus.completed
-            and progress.total_bytes is not None
-            else None
+            0 if TaskStatus(raw_status) is TaskStatus.completed and progress.total_bytes is not None else None
         )
         await connection.execute(
             "UPDATE tasks SET progress_json = ? WHERE id = ?",

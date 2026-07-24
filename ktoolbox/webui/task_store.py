@@ -81,7 +81,7 @@ class TaskStore:
                 """,
                 values,
             )
-            interrupted_tasks = await cursor.fetchall()
+            interrupted_tasks = list(await cursor.fetchall())
             await cursor.close()
             for task_id, progress_json in interrupted_tasks:
                 finalized_progress = _finalized_progress(
@@ -414,11 +414,7 @@ class TaskStore:
         limit: int = 200,
     ) -> list[TaskEvent]:
         event_types = (
-            _ACTIVITY_EVENT_TYPES
-            if view == "activity"
-            else _TRANSFER_EVENT_TYPES
-            if view == "transfers"
-            else None
+            _ACTIVITY_EVENT_TYPES if view == "activity" else _TRANSFER_EVENT_TYPES if view == "transfers" else None
         )
         return await self.event_store.events(
             after=after,
@@ -499,11 +495,7 @@ def _finalized_progress(progress: TaskProgress, status: TaskStatus) -> TaskProgr
     progress.active_downloads.clear()
     progress.waiting_retries.clear()
     progress.speed_bps = 0
-    progress.eta_seconds = (
-        0
-        if status is TaskStatus.completed and progress.total_bytes is not None
-        else None
-    )
+    progress.eta_seconds = 0 if status is TaskStatus.completed and progress.total_bytes is not None else None
     return progress
 
 

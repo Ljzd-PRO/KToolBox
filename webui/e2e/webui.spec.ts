@@ -378,7 +378,7 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   await expect(desktopTaskRow.getByRole("button", { name: "Move up" })).toHaveCount(0);
   await expect(desktopTaskRow.getByRole("button", { name: "Move down" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Actions" })).toHaveCount(0);
-  await desktopTaskRow.getByRole("rowheader").click();
+  await desktopTaskRow.getByRole("button", { name: /Open details for/ }).click();
   await expect(page.getByRole("heading", { name: "Task details" })).toBeVisible();
   await page.getByRole("button", { name: "Back" }).click();
 

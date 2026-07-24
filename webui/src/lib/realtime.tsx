@@ -506,7 +506,7 @@ function applyTaskEvent(
   if (["task.created", "task.updated"].includes(event.event_type)) {
     queueRefresh("tasks");
   }
-  if (event.event_type === "task.status") queueRefresh("task-attempts");
+  if (event.event_type === "task.status") queueRefresh("tasks", "task-attempts");
 }
 
 function appendTaskEvent(queryClient: QueryClient, event: TaskEvent) {

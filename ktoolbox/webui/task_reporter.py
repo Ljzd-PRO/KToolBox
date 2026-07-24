@@ -152,9 +152,7 @@ class WebTaskReporter(NullProgressReporter):
         self.progress.transferred_bytes += amount
         self._download_bytes[task_key] = active.completed
         elapsed = max(now - self._download_started_at[task_key], 0.001)
-        active.speed_bps = (
-            active.completed - self._download_attempt_started_bytes.get(task_key, 0)
-        ) / elapsed
+        active.speed_bps = (active.completed - self._download_attempt_started_bytes.get(task_key, 0)) / elapsed
         self._record_speed(now)
         self._refresh_eta()
         self._emit("download.progress", {"key": task_key})
@@ -199,30 +197,14 @@ class WebTaskReporter(NullProgressReporter):
         now = monotonic()
         active = self.progress.active_downloads.get(task_key)
         waiting = self.progress.waiting_retries.get(task_key)
-        creator_key = (
-            active.creator_key
-            if active is not None
-            else waiting.creator_key
-            if waiting is not None
-            else None
-        )
-        filename = (
-            active.filename
-            if active is not None
-            else waiting.filename
-            if waiting is not None
-            else None
-        )
+        creator_key = active.creator_key if active is not None else waiting.creator_key if waiting is not None else None
+        filename = active.filename if active is not None else waiting.filename if waiting is not None else None
         completed = active.completed if active is not None else self._download_bytes.get(task_key, 0)
         total = active.total if active is not None else None
         started_at = self._download_started_at.get(task_key)
         elapsed = max(now - started_at, 0.001) if started_at is not None else None
         attempt_start = self._download_attempt_started_bytes.get(task_key, completed)
-        average_speed = (
-            max(completed - attempt_start, 0) / elapsed
-            if elapsed is not None
-            else None
-        )
+        average_speed = max(completed - attempt_start, 0) / elapsed if elapsed is not None else None
         self.progress.active_downloads.pop(task_key, None)
         self.progress.waiting_retries.pop(task_key, None)
         self._download_started_at.pop(task_key, None)
@@ -271,11 +253,7 @@ class WebTaskReporter(NullProgressReporter):
             {
                 "level": level,
                 "message": message,
-                "failure_report": (
-                    failure_report.model_dump(mode="json")
-                    if failure_report is not None
-                    else None
-                ),
+                "failure_report": (failure_report.model_dump(mode="json") if failure_report is not None else None),
             },
             immediate=True,
         )

@@ -1,6 +1,17 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 
+html,
+body,
+#root {
+  max-width: 100%;
+}
+
+html,
+body {
+  overflow-x: clip;
+}
+
 :root {
   color-scheme: light;
   font-family:

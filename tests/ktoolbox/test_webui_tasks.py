@@ -356,9 +356,7 @@ async def test_task_deletion_publishes_a_surviving_global_event(tmp_path: Path) 
     await database.initialize()
     events = WebUIEventStore(database)
     store = TaskStore(database, events)
-    task = await store.create(
-        DownloadTaskSpec(service="fanbox", creator_id="one", post_id="42", output=tmp_path)
-    )
+    task = await store.create(DownloadTaskSpec(service="fanbox", creator_id="one", post_id="42", output=tmp_path))
     await store.set_status(task.id, TaskStatus.stopped)
     before_delete = await events.latest_id()
 
@@ -633,9 +631,7 @@ async def test_web_reporter_persists_waiting_retries_without_double_counting(tmp
 
     settled = (await store.get(task.id)).progress
     assert settled.waiting_retries == {}
-    retry_events = [
-        event for event in await store.events(task_id=task.id) if event.event_type == "download.retrying"
-    ]
+    retry_events = [event for event in await store.events(task_id=task.id) if event.event_type == "download.retrying"]
     assert [(event.data["retry_count"], event.data["status_code"]) for event in retry_events] == [
         (0, 503),
         (1, None),
