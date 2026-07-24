@@ -111,7 +111,7 @@ describe("task and post workflows", () => {
     expect(await screen.findByText(/fixture ready/)).toBeInTheDocument();
   });
 
-  it("opens task rows and exposes compatible batch actions without queue reordering", async () => {
+  it("opens only task targets and exposes valid lifecycle actions", async () => {
     const user = userEvent.setup();
     window.history.replaceState({}, "", "/tasks");
     const progress = {
@@ -212,12 +212,11 @@ describe("task and post workflows", () => {
     expect(screen.getAllByText("Demo Studio · Type Lab")).toHaveLength(2);
     expect(screen.getAllByText("0 B/s").length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByRole("columnheader").slice(1).every((header) => header.querySelector(".table-column-icon"))).toBe(true);
-    expect(screen.getAllByRole("button", { name: /Open details for/ })).toHaveLength(2);
+    expect(screen.getAllByRole("button", { name: /Open details for/ })).toHaveLength(4);
     expect(screen.getAllByRole("button", { name: "Pause" }).length).toBeGreaterThanOrEqual(2);
-    expect(screen.getAllByRole("button", { name: "Resume" }).length).toBeGreaterThanOrEqual(2);
+    expect(screen.queryByRole("button", { name: "Resume" })).not.toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: "Stop" }).length).toBeGreaterThanOrEqual(4);
     expect(screen.getAllByRole("button", { name: "Pause" }).every((button) => button.classList.contains("action-tone-pause"))).toBe(true);
-    expect(screen.getAllByRole("button", { name: "Resume" }).every((button) => button.classList.contains("action-tone-resume"))).toBe(true);
     expect(screen.getAllByRole("button", { name: "Stop" }).every((button) => button.classList.contains("action-tone-stop"))).toBe(true);
     expect(screen.getAllByRole("button", { name: "Edit" }).length).toBeGreaterThanOrEqual(4);
     expect(screen.getAllByRole("button", { name: "Delete" }).length).toBeGreaterThanOrEqual(4);
@@ -233,7 +232,13 @@ describe("task and post workflows", () => {
       expect.objectContaining({ method: "POST" }),
     );
 
-    await user.click(screen.getByRole("rowheader", { name: /Fictional cover study/ }));
+    const disabledDelete = screen.getAllByRole("button", { name: "Delete" })
+      .find((button) => button.getAttribute("aria-disabled") === "true");
+    expect(disabledDelete).toBeDefined();
+    await user.click(disabledDelete!);
+    expect(window.location.pathname).toBe("/tasks");
+
+    await user.click(screen.getAllByRole("button", { name: /Open details for Fictional cover study/ })[0]);
     expect(await screen.findByRole("heading", { name: "Task details" })).toBeInTheDocument();
     expect(window.location.pathname).toBe("/tasks/download-task");
   });

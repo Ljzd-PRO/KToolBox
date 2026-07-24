@@ -6,6 +6,7 @@ import {
   IconArrowRight as ArrowRight,
   IconCircleCheck as CheckCircle2,
   IconClock as Clock3,
+  IconGauge as Gauge,
   IconPackages as Boxes,
   IconPlayerPlay as Play,
 } from "@tabler/icons-react";
@@ -23,7 +24,9 @@ import {
 } from "../components/ui";
 import { TaskTarget } from "../components/TaskTarget";
 import { api } from "../lib/api";
+import { formatBytes } from "../lib/format";
 import { stableSort, taskStatusRank, taskTargetSortText } from "../lib/sorting";
+import { totalDownloadSpeed } from "../lib/taskMetrics";
 import type { CreatorRosterItem, ProjectSummary, TaskRecord } from "../types";
 
 export function DashboardPage() {
@@ -66,6 +69,13 @@ export function DashboardPage() {
       icon: BookUser,
       tone: "teal",
       href: "/creators?status=enabled",
+    },
+    {
+      label: t("tasks.totalSpeed"),
+      value: formatBytes(totalDownloadSpeed(records), "/s"),
+      icon: Gauge,
+      tone: "blue",
+      href: "/tasks?status=active",
     },
   ];
   const recentRecords = useMemo(() => {
@@ -112,7 +122,7 @@ export function DashboardPage() {
         </div>
       </section>
 
-      <section aria-label={t("overview.statistics")} className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section aria-label={t("overview.statistics")} className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
         {stats.map(({ label, value, icon: Icon, tone, href }) => (
           <Link aria-label={`${label}: ${value}`} className="stat-link rounded-lg" key={label} to={href}>
             <Surface className="stat-tile h-full rounded-lg border border-border p-4" data-tone={tone}>
@@ -152,18 +162,24 @@ export function DashboardPage() {
               <Table.Content
                 aria-label={t("overview.recent")}
                 sortDescriptor={sortDescriptor}
+                onRowAction={(key) => navigate(`/tasks/${String(key)}`)}
                 onSortChange={setSortDescriptor}
               >
                   <Table.Header>
                     <SortableColumn id="target" isRowHeader>{t("tasks.target")}</SortableColumn>
                     <SortableColumn id="status">{t("common.status")}</SortableColumn>
                     <SortableColumn id="created">{t("common.created")}</SortableColumn>
-                    <Table.Column className="text-right">{t("common.actions")}</Table.Column>
                   </Table.Header>
                   <Table.Body>
                     {recentRecords.map((task) => (
-                      <Table.Row key={task.id}>
-                        <Table.Cell className="min-w-60"><TaskTarget creators={creators.data} task={task} /></Table.Cell>
+                      <Table.Row className="cursor-pointer" id={task.id} key={task.id}>
+                        <Table.Cell className="min-w-60">
+                          <TaskTarget
+                            creators={creators.data}
+                            showRosterTooltip={false}
+                            task={task}
+                          />
+                        </Table.Cell>
                         <Table.Cell>
                           <TaskStatusChip status={task.status} />
                         </Table.Cell>
@@ -173,17 +189,6 @@ export function DashboardPage() {
                             timeStyle: "short",
                           }).format(new Date(task.created_at))}
                         </Table.Cell>
-                        <Table.Cell className="text-right">
-                          <Button
-                            aria-label={t("overview.openTasks")}
-                            isIconOnly
-                            size="sm"
-                            variant="ghost"
-                            onPress={() => navigate(`/tasks/${task.id}`)}
-                          >
-                            <ArrowRight aria-hidden="true" size={16} />
-                          </Button>
-                        </Table.Cell>
                       </Table.Row>
                     ))}
                   </Table.Body>
@@ -191,18 +196,22 @@ export function DashboardPage() {
             </DataTableFrame>
             <div className="grid gap-3 lg:hidden">
               {recentRecords.map((task) => (
-                <Surface className="grid gap-3 rounded-lg border border-border p-4" key={task.id}>
-                  <div className="flex min-w-0 items-start justify-between gap-3">
-                    <TaskTarget creators={creators.data} task={task} />
-                    <TaskStatusChip status={task.status} />
-                  </div>
-                  <div className="flex items-center justify-between gap-3 border-t border-border pt-3">
-                    <time className="text-xs text-muted">{new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "medium", timeStyle: "short" }).format(new Date(task.created_at))}</time>
-                    <Button isIconOnly aria-label={t("tasks.details")} size="sm" variant="ghost" onPress={() => navigate(`/tasks/${task.id}`)}>
-                      <ArrowRight aria-hidden="true" size={16} />
-                    </Button>
-                  </div>
-                </Surface>
+                <Link
+                  aria-label={t("tasks.openDetails", { target: taskTargetSortText(task, creators.data ?? []) })}
+                  className="block rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                  key={task.id}
+                  to={`/tasks/${task.id}`}
+                >
+                  <Surface className="grid gap-3 rounded-lg border border-border p-4">
+                    <div className="flex min-w-0 items-start justify-between gap-3">
+                      <TaskTarget creators={creators.data} showRosterTooltip={false} task={task} />
+                      <TaskStatusChip status={task.status} />
+                    </div>
+                    <time className="border-t border-border pt-3 text-xs text-muted">
+                      {new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "medium", timeStyle: "short" }).format(new Date(task.created_at))}
+                    </time>
+                  </Surface>
+                </Link>
               ))}
             </div>
           </>

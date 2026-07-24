@@ -27,11 +27,19 @@ class _ArtifactWrite:
 class WebTaskReporter(NullProgressReporter):
     """Translate synchronous core progress callbacks into persisted WebUI events."""
 
-    def __init__(self, task_id: str, store: TaskStore, *, flush_interval: float = 0.2) -> None:
+    def __init__(
+        self,
+        task_id: str,
+        store: TaskStore,
+        *,
+        flush_interval: float = 0.2,
+        idle_speed_grace: float = 1.5,
+    ) -> None:
         self.task_id = task_id
         self.store = store
         self.progress = TaskProgress()
         self.flush_interval = flush_interval
+        self.idle_speed_grace = idle_speed_grace
         self._loop = asyncio.get_running_loop()
         self._started_at = monotonic()
         self._download_started_at: dict[str, float] = {}
@@ -47,6 +55,7 @@ class WebTaskReporter(NullProgressReporter):
         )
         self._write_errors: list[BaseException] = []
         self._closed = False
+        self._idle_speed_clear: asyncio.Task[object] | None = None
         self._delayed_flush: asyncio.Task[object] | None = None
         self._delayed_event_type = "task.progress"
         self._delayed_event_data: dict[str, object] = {}
@@ -93,6 +102,7 @@ class WebTaskReporter(NullProgressReporter):
         completed: int,
     ) -> None:
         now = monotonic()
+        self._cancel_idle_speed_clear()
         first_start = task_key not in self._download_bytes
         previous_completed = self._download_bytes.get(task_key, 0)
         self._download_started_at[task_key] = now
@@ -153,8 +163,7 @@ class WebTaskReporter(NullProgressReporter):
             status_code=status_code,
         )
         if not self.progress.active_downloads:
-            self.progress.speed_bps = 0
-            self.progress.eta_seconds = None
+            self._schedule_idle_speed_clear()
         self._emit(
             "download.retrying",
             {
@@ -188,8 +197,7 @@ class WebTaskReporter(NullProgressReporter):
         self._record_speed(monotonic())
         self._refresh_eta()
         if not self.progress.active_downloads:
-            self.progress.speed_bps = 0
-            self.progress.eta_seconds = 0 if self.progress.total_bytes is not None else None
+            self._schedule_idle_speed_clear()
         self._emit(
             "download.finished",
             {
@@ -227,11 +235,17 @@ class WebTaskReporter(NullProgressReporter):
         if self._closed:
             return
         self._closed = True
+        if self._idle_speed_clear is not None:
+            self._idle_speed_clear.cancel()
+            await asyncio.gather(self._idle_speed_clear, return_exceptions=True)
+            self._idle_speed_clear = None
         if self._delayed_flush is not None:
             self._delayed_flush.cancel()
             await asyncio.gather(self._delayed_flush, return_exceptions=True)
             self._delayed_flush = None
             self._enqueue_progress(self._delayed_event_type, self._delayed_event_data)
+        self.progress.speed_bps = 0
+        self.progress.eta_seconds = 0 if self.progress.total_bytes is not None else None
         self._enqueue_progress("task.progress", {"phase": "settled"})
         await self._writes.join()
         self._writes.put_nowait(None)
@@ -257,6 +271,24 @@ class WebTaskReporter(NullProgressReporter):
             return
         remaining = max(total - self.progress.transferred_bytes, 0)
         self.progress.eta_seconds = remaining / self.progress.speed_bps
+
+    def _schedule_idle_speed_clear(self) -> None:
+        self._cancel_idle_speed_clear()
+        self._idle_speed_clear = self._loop.create_task(self._clear_idle_speed_later())
+
+    def _cancel_idle_speed_clear(self) -> None:
+        if self._idle_speed_clear is not None and not self._idle_speed_clear.done():
+            self._idle_speed_clear.cancel()
+        self._idle_speed_clear = None
+
+    async def _clear_idle_speed_later(self) -> None:
+        await asyncio.sleep(self.idle_speed_grace)
+        self._idle_speed_clear = None
+        if self._closed or self.progress.active_downloads:
+            return
+        self.progress.speed_bps = 0
+        self.progress.eta_seconds = None
+        self._emit("task.progress", {"phase": "idle"}, immediate=True)
 
     def _emit(self, event_type: str, data: dict[str, object], *, immediate: bool = False) -> None:
         if immediate:

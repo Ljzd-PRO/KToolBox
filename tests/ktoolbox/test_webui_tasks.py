@@ -449,6 +449,42 @@ async def test_web_reporter_persists_throttled_speed_progress(tmp_path: Path) ->
 
 
 @pytest.mark.asyncio
+async def test_web_reporter_keeps_speed_during_short_file_handoffs(tmp_path: Path) -> None:
+    database = WebUIDatabase(tmp_path / "webui.sqlite3")
+    await database.initialize()
+    store = TaskStore(database)
+    task = await store.create(
+        DownloadTaskSpec(
+            service="fanbox",
+            creator_id="one",
+            post_id="42",
+            output=tmp_path,
+        )
+    )
+    reporter = WebTaskReporter(
+        task.id,
+        store,
+        flush_interval=0.005,
+        idle_speed_grace=0.03,
+    )
+    reporter.download_started("one", "fanbox:one", "one.bin", 100, 0)
+    reporter.download_advanced("one", 50)
+    reporter.download_finished("one", "completed")
+    assert reporter.progress.speed_bps > 0
+
+    await asyncio.sleep(0.01)
+    reporter.download_started("two", "fanbox:one", "two.bin", 100, 0)
+    reporter.download_advanced("two", 25)
+    await asyncio.sleep(0.04)
+    assert reporter.progress.speed_bps > 0
+
+    reporter.download_finished("two", "completed")
+    await asyncio.sleep(0.04)
+    assert reporter.progress.speed_bps == 0
+    await reporter.close()
+
+
+@pytest.mark.asyncio
 async def test_web_reporter_persists_progress_snapshots_in_callback_order(tmp_path: Path) -> None:
     database = WebUIDatabase(tmp_path / "webui.sqlite3")
     await database.initialize()
@@ -703,6 +739,8 @@ async def test_scheduler_control_methods_and_validation(tmp_path: Path) -> None:
         await scheduler.pause(task.id)
     with pytest.raises(InvalidTaskStateError, match="cannot be stopped"):
         await scheduler.stop_task(task.id)
+    with pytest.raises(InvalidTaskStateError, match="cannot be resumed"):
+        await scheduler.resume(task.id)
     await scheduler.stop()
 
 

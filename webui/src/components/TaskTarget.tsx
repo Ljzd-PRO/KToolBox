@@ -13,9 +13,13 @@ import type { CreatorRosterItem, TaskRecord, TaskSpec } from "../types";
 export function TaskTarget({
   task,
   creators = [],
+  onOpen,
+  showRosterTooltip = true,
 }: {
   task: TaskRecord;
   creators?: readonly CreatorRosterItem[];
+  onOpen?: () => void;
+  showRosterTooltip?: boolean;
 }) {
   const { t } = useTranslation();
   const failure = primaryFailure(task.failure);
@@ -38,13 +42,13 @@ export function TaskTarget({
       <div className="task-target flex min-w-0 flex-1 items-start gap-3">
         <span className="task-kind-icon" data-kind="sync"><RefreshCw aria-hidden="true" size={18} /></span>
         <div className="min-w-0 flex-1">
-          <SyncTaskTitle names={names} />
+          <SyncTaskTitle names={names} onOpen={onOpen} />
           <div className="mt-1 flex min-w-0 items-center gap-2">
             <Chip className="shrink-0" size="sm" variant="soft">
               <RefreshCw aria-hidden="true" size={13} stroke={2} />
               {t("common.sync")}
             </Chip>
-            {roster ? (
+            {showRosterTooltip && roster ? (
               <Tooltip>
                 <Button className="h-auto min-h-0 w-full min-w-0 justify-start p-0 text-left text-xs font-normal text-muted" size="sm" variant="ghost">
                   <span className="min-w-0 truncate">{summary}</span>
@@ -72,7 +76,7 @@ export function TaskTarget({
     <div className="task-target flex min-w-0 flex-1 items-start gap-3">
       <span className="task-kind-icon" data-kind="download"><Download aria-hidden="true" size={18} /></span>
       <div className="min-w-0 flex-1">
-        <p className="task-target-title truncate text-sm font-semibold" title={title}>{title}</p>
+        <TargetTitle onOpen={onOpen} title={title}>{title}</TargetTitle>
         <div className="mt-1 flex min-w-0 items-center gap-2">
           <Chip className="shrink-0" color="accent" size="sm" variant="soft">
             <Download aria-hidden="true" size={13} stroke={2} />
@@ -86,30 +90,85 @@ export function TaskTarget({
   );
 }
 
-function SyncTaskTitle({ names }: { names: string[] }) {
+function SyncTaskTitle({
+  names,
+  onOpen,
+}: {
+  names: string[];
+  onOpen?: () => void;
+}) {
   const { t } = useTranslation();
   if (!names.length) {
     return (
-      <p className="task-target-title truncate text-sm font-semibold" title={t("tasks.noFrozenCreators")}>
+      <TargetTitle onOpen={onOpen} title={t("tasks.noFrozenCreators")}>
         {t("tasks.noFrozenCreators")}
-      </p>
+      </TargetTitle>
     );
   }
   if (names.length === 1) {
     return (
-      <p className="task-target-title truncate text-sm font-semibold" title={names[0]}>
+      <TargetTitle onOpen={onOpen} title={names[0]}>
         {names[0]}
-      </p>
+      </TargetTitle>
     );
   }
   const suffix = t("tasks.creatorGroupSuffix", { count: names.length });
+  const content = (
+    <>
+      <span className="min-w-0 truncate">{names[0]}</span>
+      <span className="shrink-0 whitespace-pre"> {suffix}</span>
+    </>
+  );
+  const title = `${names[0]} ${suffix}`;
+  if (onOpen) {
+    return (
+      <button
+        aria-label={t("tasks.openDetails", { target: title })}
+        className="task-target-link task-target-title task-target-title-group flex min-w-0 items-baseline rounded-sm text-left text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        title={title}
+        type="button"
+        onClick={onOpen}
+      >
+        {content}
+      </button>
+    );
+  }
   return (
     <p
       className="task-target-title task-target-title-group flex min-w-0 items-baseline text-sm font-semibold"
-      title={`${names[0]} ${suffix}`}
+      title={title}
     >
-      <span className="min-w-0 truncate">{names[0]}</span>
-      <span className="shrink-0 whitespace-pre"> {suffix}</span>
+      {content}
+    </p>
+  );
+}
+
+function TargetTitle({
+  children,
+  onOpen,
+  title,
+}: {
+  children: string;
+  onOpen?: () => void;
+  title: string;
+}) {
+  const { t } = useTranslation();
+  if (onOpen) {
+    return (
+      <button
+        aria-label={t("tasks.openDetails", { target: title })}
+        className="task-target-link task-target-title block max-w-full truncate rounded-sm text-left text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        title={title}
+        type="button"
+        onClick={onOpen}
+      >
+        {children}
+      </button>
+    );
+  }
+  return (
+    <p className="task-target-title truncate text-sm font-semibold" title={title}>
+      {children}
     </p>
   );
 }

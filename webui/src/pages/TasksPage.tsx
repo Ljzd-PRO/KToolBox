@@ -74,6 +74,10 @@ import {
   taskStatusRank,
   taskTargetSortText,
 } from "../lib/sorting";
+import {
+  taskDownloadSpeed,
+  totalDownloadSpeed,
+} from "../lib/taskMetrics";
 import type {
   CreatorRosterItem,
   FailureItem,
@@ -88,10 +92,9 @@ import type {
 
 const pausable = new Set<TaskStatus>(["queued", "blocked", "running"]);
 const stoppable = new Set<TaskStatus>(["queued", "blocked", "running", "paused"]);
-const resumable = new Set<TaskStatus>(["paused", "stopped", "completed", "failed", "interrupted"]);
+const resumable = new Set<TaskStatus>(["paused", "stopped", "failed", "interrupted"]);
 const editable = new Set<TaskStatus>(["queued", "blocked", "paused", "stopped", "completed", "failed", "interrupted"]);
 const deletable = new Set<TaskStatus>(["paused", "stopped", "completed", "failed", "interrupted"]);
-const speedVisible = new Set<TaskStatus>(["running", "pause_requested", "stop_requested"]);
 const descendingTaskColumns = new Set(["progress", "speed", "created"]);
 
 type TaskStatusFilter =
@@ -410,7 +413,7 @@ function TaskList({
             task.progress.total_bytes,
           );
         }
-        if (column === "speed") return taskSpeed(task);
+        if (column === "speed") return taskDownloadSpeed(task);
         if (column === "output") return task.spec.output;
         return Date.parse(task.created_at);
       },
@@ -423,6 +426,10 @@ function TaskList({
   const resumeCandidates = selectedTasks.filter((task) => resumable.has(task.status));
   const stopCandidates = selectedTasks.filter((task) => stoppable.has(task.status));
   const deleteCandidates = selectedTasks.filter((task) => deletable.has(task.status));
+  const globalSpeed = totalDownloadSpeed(tasks);
+  const activeTaskCount = tasks.filter((task) =>
+    ["running", "pause_requested", "stop_requested"].includes(task.status)
+  ).length;
   const statusOptions = [
     { value: "all", label: t("tasks.allStatuses"), icon: Filter },
     { value: "active", label: t("tasks.activeStatuses"), icon: Activity, tone: "accent" as const },
@@ -478,6 +485,22 @@ function TaskList({
         title={t("tasks.title")}
         actions={<Button variant="primary" onPress={onCreate}><Plus aria-hidden="true" size={18} />{t("tasks.create")}</Button>}
       />
+      <Surface className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border px-4 py-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-[var(--accent-soft)] text-accent">
+            <Gauge aria-hidden="true" size={18} />
+          </span>
+          <div className="min-w-0">
+            <p className="text-xs font-medium text-muted">{t("tasks.totalSpeed")}</p>
+            <strong className="block text-xl font-semibold tabular-nums text-foreground">
+              {formatBytes(globalSpeed, "/s")}
+            </strong>
+          </div>
+        </div>
+        <Chip color={activeTaskCount ? "accent" : "default"} size="sm" variant="soft">
+          {t("overview.active")}: {activeTaskCount}
+        </Chip>
+      </Surface>
       <FormSurface className="grid gap-3 p-3 xl:grid-cols-[minmax(0,16rem)_minmax(0,1fr)]">
         <SelectField
           icon={Filter}
@@ -554,10 +577,6 @@ function TaskList({
               aria-label={t("tasks.title")}
               className="task-table-content min-w-[940px]"
               sortDescriptor={sortDescriptor ?? undefined}
-              onRowAction={(key) => {
-                const task = visibleTasks.find((item) => item.id === String(key));
-                if (task) handlers.details(task);
-              }}
               onSortChange={(next) => setSortDescriptor(
                 normalizeTableSort(sortDescriptor, next, descendingTaskColumns),
               )}
@@ -589,11 +608,17 @@ function TaskList({
                         onChange={(selected) => setTaskSelected(task.id, selected)}
                       />
                     </Table.Cell>
-                    <Table.Cell className="w-72 min-w-72 max-w-72"><TaskTarget creators={creators} task={task} /></Table.Cell>
+                    <Table.Cell className="w-72 min-w-72 max-w-72">
+                      <TaskTarget
+                        creators={creators}
+                        task={task}
+                        onOpen={() => handlers.details(task)}
+                      />
+                    </Table.Cell>
                     <Table.Cell className="min-w-24"><TaskStatusChip status={task.status} /></Table.Cell>
                     <Table.Cell className="min-w-28"><TaskProgressSummary task={task} /></Table.Cell>
                     <Table.Cell className="min-w-20 whitespace-nowrap text-sm font-medium tabular-nums">
-                      <span className="data-cell-label"><Gauge aria-hidden="true" className="data-cell-icon" size={15} />{formatBytes(taskSpeed(task), "/s")}</span>
+                      <span className="data-cell-label"><Gauge aria-hidden="true" className="data-cell-icon" size={15} />{formatBytes(taskDownloadSpeed(task), "/s")}</span>
                     </Table.Cell>
                     <Table.Cell>
                       <span className="data-cell-label max-w-32">
@@ -613,31 +638,31 @@ function TaskList({
           <div className="grid gap-3 xl:hidden">
             {visibleTasks.map((task) => (
               <Surface className={`data-mobile-card task-mobile-card grid gap-4 rounded-lg border border-border p-4${selectedIds.has(task.id) ? " is-selected" : ""}`} key={task.id}>
-                <button
-                  aria-label={t("tasks.openDetails", { target: taskTargetSortText(task, creators) })}
-                  className="task-card-link absolute inset-0 z-0 appearance-none border-0 bg-transparent p-0"
-                  type="button"
-                  onClick={() => handlers.details(task)}
-                />
-                <div className="pointer-events-none relative z-[1] flex min-w-0 items-start gap-3">
-                  <div className="pointer-events-auto shrink-0">
+                <div className="flex min-w-0 items-start gap-3">
+                  <div className="shrink-0">
                     <SelectionCheckbox
                       isSelected={selectedIds.has(task.id)}
                       label={t("tasks.selectTask", { target: taskTargetSortText(task, creators) })}
                       onChange={(selected) => setTaskSelected(task.id, selected)}
                     />
                   </div>
-                  <div className="min-w-0 flex-1"><TaskTarget creators={creators} task={task} /></div>
+                  <div className="min-w-0 flex-1">
+                    <TaskTarget
+                      creators={creators}
+                      task={task}
+                      onOpen={() => handlers.details(task)}
+                    />
+                  </div>
                 </div>
-                <div className="pointer-events-none relative z-[1] grid grid-cols-[auto_minmax(0,1fr)_auto] items-end gap-3">
+                <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-end gap-3">
                   <TaskStatusChip status={task.status} />
                   <TaskProgressSummary task={task} />
                   <div className="text-right">
                     <p className="flex items-center justify-end gap-1 text-xs text-muted"><Gauge aria-hidden="true" size={13} />{t("tasks.totalSpeed")}</p>
-                    <strong className="mt-0.5 block text-sm tabular-nums text-foreground">{formatBytes(taskSpeed(task), "/s")}</strong>
+                    <strong className="mt-0.5 block text-sm tabular-nums text-foreground">{formatBytes(taskDownloadSpeed(task), "/s")}</strong>
                   </div>
                 </div>
-                <div className="pointer-events-none relative z-[1] grid gap-1 border-t border-border pt-3 text-xs text-muted">
+                <div className="grid gap-1 border-t border-border pt-3 text-xs text-muted">
                   <span className="data-cell-label min-w-0"><Folder aria-hidden="true" className="data-cell-icon" size={14} /><code className="min-w-0 truncate" title={task.spec.output}>{task.spec.output}</code></span>
                   <span className="data-cell-label"><CalendarTime aria-hidden="true" className="data-cell-icon" size={14} />{formatDateTime(task.created_at, i18n.language)}</span>
                 </div>
@@ -761,7 +786,7 @@ function TaskDetails({
       <Surface className="grid gap-5 rounded-lg border border-border p-5">
         <ProgressMeter isIndeterminate={task.status === "running" && !progress.total_bytes && !progress.queued_files} label={t("tasks.progress")} value={percent} />
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <Metric label={t("tasks.totalSpeed")} value={formatBytes(taskSpeed(task), "/s")} />
+          <Metric label={t("tasks.totalSpeed")} value={formatBytes(taskDownloadSpeed(task), "/s")} />
           <Metric label={t("tasks.transferred")} value={`${formatBytes(progress.transferred_bytes)} / ${formatBytes(progress.total_bytes)}`} />
           <Metric label={t("tasks.files")} value={`${progress.processed_files} / ${progress.queued_files}`} />
           <Metric label={t("tasks.eta")} value={formatDuration(progress.eta_seconds)} />
@@ -963,10 +988,6 @@ function FailureRow({ item }: { item: FailureItem }) {
       </div>
     </div>
   );
-}
-
-function taskSpeed(task: TaskRecord): number {
-  return speedVisible.has(task.status) ? task.progress.speed_bps : 0;
 }
 
 function taskStatusFilter(value: string | null): TaskStatusFilter {

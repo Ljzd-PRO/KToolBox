@@ -434,7 +434,6 @@ code {
 
 .task-table-row {
   min-height: 5.75rem;
-  cursor: pointer;
 }
 
 .task-table-content [data-slot="table-column"],
@@ -447,13 +446,13 @@ code {
   box-shadow: 0 1px 2px color-mix(in oklab, black 7%, transparent);
 }
 
-.task-card-link {
-  border-radius: var(--radius);
+.task-target-link {
+  color: inherit;
+  transition: color 140ms ease;
 }
 
-.task-card-link:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+.task-target-link:hover {
+  color: var(--accent);
 }
 
 .data-mobile-card.is-selected,

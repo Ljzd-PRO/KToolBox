@@ -149,7 +149,6 @@ class TaskScheduler:
                 TaskStatus.stopped,
                 TaskStatus.failed,
                 TaskStatus.interrupted,
-                TaskStatus.completed,
             }:
                 raise InvalidTaskStateError("this task cannot be resumed in its current state")
             updated = await self.store.queue_again(task_id)
