@@ -40,7 +40,10 @@ export function TaskTarget({
         <div className="min-w-0 flex-1">
           <SyncTaskTitle names={names} />
           <div className="mt-1 flex min-w-0 items-center gap-2">
-            <Chip className="shrink-0" size="sm" variant="soft">{t("common.sync")}</Chip>
+            <Chip className="shrink-0" size="sm" variant="soft">
+              <RefreshCw aria-hidden="true" size={13} stroke={2} />
+              {t("common.sync")}
+            </Chip>
             {roster ? (
               <Tooltip>
                 <Button className="h-auto min-h-0 w-full min-w-0 justify-start p-0 text-left text-xs font-normal text-muted" size="sm" variant="ghost">
@@ -71,7 +74,10 @@ export function TaskTarget({
       <div className="min-w-0 flex-1">
         <p className="task-target-title truncate text-sm font-semibold" title={title}>{title}</p>
         <div className="mt-1 flex min-w-0 items-center gap-2">
-          <Chip className="shrink-0" color="accent" size="sm" variant="soft">{t("common.download")}</Chip>
+          <Chip className="shrink-0" color="accent" size="sm" variant="soft">
+            <Download aria-hidden="true" size={13} stroke={2} />
+            {t("common.download")}
+          </Chip>
           <p className="truncate text-xs text-muted" title={metadata}>{metadata}</p>
         </div>
         {failureText ? <FailureLine text={failureText} /> : null}

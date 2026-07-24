@@ -211,10 +211,14 @@ describe("task and post workflows", () => {
     expect(screen.getAllByTitle("Demo Studio among 2 creators")).toHaveLength(2);
     expect(screen.getAllByText("Demo Studio · Type Lab")).toHaveLength(2);
     expect(screen.getAllByText("0 B/s").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByRole("columnheader").slice(1).every((header) => header.querySelector(".table-column-icon"))).toBe(true);
     expect(screen.getAllByRole("button", { name: /Open details for/ })).toHaveLength(2);
     expect(screen.getAllByRole("button", { name: "Pause" }).length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByRole("button", { name: "Resume" }).length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByRole("button", { name: "Stop" }).length).toBeGreaterThanOrEqual(4);
+    expect(screen.getAllByRole("button", { name: "Pause" }).every((button) => button.classList.contains("action-tone-pause"))).toBe(true);
+    expect(screen.getAllByRole("button", { name: "Resume" }).every((button) => button.classList.contains("action-tone-resume"))).toBe(true);
+    expect(screen.getAllByRole("button", { name: "Stop" }).every((button) => button.classList.contains("action-tone-stop"))).toBe(true);
     expect(screen.getAllByRole("button", { name: "Edit" }).length).toBeGreaterThanOrEqual(4);
     expect(screen.getAllByRole("button", { name: "Delete" }).length).toBeGreaterThanOrEqual(4);
     expect(screen.queryByRole("button", { name: "Move up" })).not.toBeInTheDocument();

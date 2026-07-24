@@ -165,15 +165,18 @@ describe("project workflows", () => {
 
     expect(await screen.findByRole("heading", { name: "Creators" })).toBeInTheDocument();
     expect((await screen.findAllByText("Studio Sample")).length).toBeGreaterThan(0);
-    expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual([
+    const creatorHeaders = screen.getAllByRole("columnheader");
+    expect(creatorHeaders.map((header) => header.textContent)).toEqual([
       "",
       "Creator name",
       "Creator ID",
       "Platform",
       "Note",
-      "Status",
+      "Included in full sync",
       "Actions",
     ]);
+    expect(creatorHeaders.slice(1).every((header) => header.querySelector(".table-column-icon"))).toBe(true);
+    expect(container.querySelectorAll(".platform-label-icon").length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "Add creator" })).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: "Edit fanbox:42" }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole("button", { name: "Remove fanbox:42" }).length).toBeGreaterThan(0);

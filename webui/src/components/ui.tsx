@@ -37,11 +37,20 @@ import {
   IconBox as Box,
   IconBrandPatreon as BrandPatreon,
   IconChevronDown as ChevronDown,
+  IconCircleCheck as StatusCompleted,
+  IconCircleX as StatusFailed,
+  IconClock as StatusQueued,
+  IconCloud as Cloud,
   IconEye as Eye,
   IconEyeOff as EyeOff,
   IconInbox as Inbox,
   IconCalendarOff as CalendarOff,
+  IconLoader2 as StatusRunning,
+  IconLock as StatusBlocked,
   IconMinus as Minus,
+  IconPlayerPause as StatusPaused,
+  IconPlayerStop as StatusStopped,
+  IconPlugConnectedX as StatusInterrupted,
   IconPlus as Plus,
   IconPalette as Palette,
   IconArrowsSort as ArrowsSort,
@@ -152,20 +161,22 @@ export function BatchActionBar({
       role="region"
       variant="secondary"
     >
-      <SelectionCheckbox
-        isIndeterminate={partiallySelected}
-        isSelected={allVisibleSelected}
-        label={t("common.selectAllVisible")}
-        showLabel
-        onChange={onSelectAll}
-      />
-      <Chip color="accent" size="sm" variant="soft">
-        {t("common.selectedCount", { count: selectedCount })}
-      </Chip>
-      <Button aria-label={t("common.clearSelection")} className="batch-clear-button" size="sm" variant="ghost" onPress={onClear}>
-        <X aria-hidden="true" size={16} />
-        <span className="batch-clear-label">{t("common.clearSelection")}</span>
-      </Button>
+      <div className="batch-selection-summary">
+        <SelectionCheckbox
+          isIndeterminate={partiallySelected}
+          isSelected={allVisibleSelected}
+          label={t("common.selectAllVisible")}
+          showLabel
+          onChange={onSelectAll}
+        />
+        <Chip color="accent" size="sm" variant="soft">
+          {t("common.selectedCount", { count: selectedCount })}
+        </Chip>
+        <Button aria-label={t("common.clearSelection")} className="batch-clear-button" size="sm" variant="ghost" onPress={onClear}>
+          <X aria-hidden="true" size={16} />
+          <span className="batch-clear-label">{t("common.clearSelection")}</span>
+        </Button>
+      </div>
       <div className="batch-action-buttons ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
         {children}
       </div>
@@ -178,23 +189,42 @@ export function SortableColumn({
   children,
   className,
   isRowHeader = false,
+  icon,
 }: {
   id: string;
   children: ReactNode;
   className?: string;
   isRowHeader?: boolean;
+  icon?: TablerIcon;
 }) {
   return (
     <Table.Column allowsSorting className={className} id={id} isRowHeader={isRowHeader}>
       {({ sortDirection }) => (
         <Table.SortableColumnHeader sortDirection={sortDirection}>
-          <span className="inline-flex items-center gap-1.5">
-            {children}
+          <TableColumnLabel icon={icon}>
+            <span>{children}</span>
             {!sortDirection ? <ArrowsSort aria-hidden="true" className="text-muted" size={14} /> : null}
-          </span>
+          </TableColumnLabel>
         </Table.SortableColumnHeader>
       )}
     </Table.Column>
+  );
+}
+
+export function TableColumnLabel({
+  children,
+  icon: Icon,
+  className,
+}: {
+  children: ReactNode;
+  icon?: TablerIcon;
+  className?: string;
+}) {
+  return (
+    <span className={cn("table-column-label inline-flex min-w-0 items-center gap-1.5", className)}>
+      {Icon ? <Icon aria-hidden="true" className="table-column-icon shrink-0" size={15} stroke={1.8} /> : null}
+      {children}
+    </span>
   );
 }
 
@@ -951,10 +981,30 @@ const taskTone: Record<TaskStatus, React.ComponentProps<typeof Chip>["color"]> =
   interrupted: "danger",
 };
 
+const taskStatusIcon: Record<TaskStatus, TablerIcon> = {
+  queued: StatusQueued,
+  blocked: StatusBlocked,
+  running: StatusRunning,
+  pause_requested: StatusPaused,
+  paused: StatusPaused,
+  stop_requested: StatusStopped,
+  stopped: StatusStopped,
+  completed: StatusCompleted,
+  failed: StatusFailed,
+  interrupted: StatusInterrupted,
+};
+
 export function TaskStatusChip({ status }: { status: TaskStatus }) {
   const { t } = useTranslation();
+  const StatusIcon = taskStatusIcon[status];
   return (
     <Chip color={taskTone[status]} size="sm" variant="soft">
+      <StatusIcon
+        aria-hidden="true"
+        className={status === "running" ? "animate-spin" : undefined}
+        size={13}
+        stroke={2}
+      />
       {t(`tasks.statuses.${status}`)}
     </Chip>
   );
@@ -1106,6 +1156,19 @@ const platformOptions: SelectOption[] = [
   { value: "pixiv", label: "Pixiv", icon: Palette },
   { value: "fanbox", label: "Fanbox", icon: Box },
 ];
+
+export function PlatformLabel({ platform }: { platform: string }) {
+  const option = platformOptions.find((candidate) => candidate.value === platform.toLowerCase());
+  const PlatformIcon = option?.icon ?? Cloud;
+  return (
+    <span className="platform-label inline-flex min-w-0 items-center gap-2">
+      <span className="platform-label-icon">
+        <PlatformIcon aria-hidden="true" size={15} stroke={1.8} />
+      </span>
+      <span className="min-w-0 truncate">{platform}</span>
+    </span>
+  );
+}
 
 export function PlatformComboBox({
   label,

@@ -11,9 +11,14 @@ import {
   IconArrowLeft as ArrowLeft,
   IconActivity as Activity,
   IconAlertTriangle as AlertTriangle,
+  IconCalendarTime as CalendarTime,
+  IconChartBar as ChartBar,
   IconCircleCheck as CircleCheck,
+  IconCircleDot as Status,
   IconClock as Clock,
   IconFilter as Filter,
+  IconFolder as Folder,
+  IconGauge as Gauge,
   IconPencil as Pencil,
   IconPlayerPause as Pause,
   IconPlayerPlay as Play,
@@ -21,6 +26,8 @@ import {
   IconPlugConnectedX as Interrupted,
   IconPlus as Plus,
   IconRefresh as Refresh,
+  IconTargetArrow as Target,
+  IconTool as Tools,
   IconTrash as Trash2,
   IconX as X,
 } from "@tabler/icons-react";
@@ -45,6 +52,7 @@ import {
   SelectionCheckbox,
   SelectField,
   SortableColumn,
+  TableColumnLabel,
   TaskStatusChip,
 } from "../components/ui";
 import { api, errorText } from "../lib/api";
@@ -496,6 +504,7 @@ function TaskList({
           onSelectAll={selectAllVisible}
         >
           <Button
+            className="semantic-action-button action-tone-pause"
             isDisabled={!pauseCandidates.length || batchBusy !== null}
             isPending={batchBusy === "pause"}
             size="sm"
@@ -506,6 +515,7 @@ function TaskList({
             {t("tasks.batchPause", { count: pauseCandidates.length })}
           </Button>
           <Button
+            className="semantic-action-button action-tone-resume"
             isDisabled={!resumeCandidates.length || batchBusy !== null}
             isPending={batchBusy === "resume"}
             size="sm"
@@ -516,6 +526,7 @@ function TaskList({
             {t("tasks.batchResume", { count: resumeCandidates.length })}
           </Button>
           <Button
+            className="semantic-action-button action-tone-stop"
             isDisabled={!stopCandidates.length || batchBusy !== null}
             isPending={batchBusy === "stop"}
             size="sm"
@@ -560,13 +571,13 @@ function TaskList({
                     onChange={selectAllVisible}
                   />
                 </Table.Column>
-                <SortableColumn id="target" isRowHeader>{t("tasks.target")}</SortableColumn>
-                <SortableColumn id="status">{t("common.status")}</SortableColumn>
-                <SortableColumn id="progress">{t("tasks.progress")}</SortableColumn>
-                <SortableColumn id="speed">{t("tasks.totalSpeed")}</SortableColumn>
-                <SortableColumn id="output">{t("tasks.output")}</SortableColumn>
-                <SortableColumn id="created">{t("common.created")}</SortableColumn>
-                <Table.Column>{t("common.actions")}</Table.Column>
+                <SortableColumn icon={Target} id="target" isRowHeader>{t("tasks.target")}</SortableColumn>
+                <SortableColumn icon={Status} id="status">{t("common.status")}</SortableColumn>
+                <SortableColumn icon={ChartBar} id="progress">{t("tasks.progress")}</SortableColumn>
+                <SortableColumn icon={Gauge} id="speed">{t("tasks.totalSpeed")}</SortableColumn>
+                <SortableColumn icon={Folder} id="output">{t("tasks.output")}</SortableColumn>
+                <SortableColumn icon={CalendarTime} id="created">{t("common.created")}</SortableColumn>
+                <Table.Column><TableColumnLabel icon={Tools}>{t("common.actions")}</TableColumnLabel></Table.Column>
               </Table.Header>
               <Table.Body>
                 {visibleTasks.map((task) => (
@@ -581,9 +592,18 @@ function TaskList({
                     <Table.Cell className="w-72 min-w-72 max-w-72"><TaskTarget creators={creators} task={task} /></Table.Cell>
                     <Table.Cell className="min-w-24"><TaskStatusChip status={task.status} /></Table.Cell>
                     <Table.Cell className="min-w-28"><TaskProgressSummary task={task} /></Table.Cell>
-                    <Table.Cell className="min-w-20 whitespace-nowrap text-sm font-medium tabular-nums">{formatBytes(taskSpeed(task), "/s")}</Table.Cell>
-                    <Table.Cell><code className="block max-w-28 truncate text-xs text-muted" title={task.spec.output}>{task.spec.output}</code></Table.Cell>
-                    <Table.Cell className="w-24 max-w-24 text-xs leading-relaxed text-muted"><TaskCreatedTime locale={i18n.language} value={task.created_at} /></Table.Cell>
+                    <Table.Cell className="min-w-20 whitespace-nowrap text-sm font-medium tabular-nums">
+                      <span className="data-cell-label"><Gauge aria-hidden="true" className="data-cell-icon" size={15} />{formatBytes(taskSpeed(task), "/s")}</span>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <span className="data-cell-label max-w-32">
+                        <Folder aria-hidden="true" className="data-cell-icon" size={15} />
+                        <code className="block min-w-0 truncate text-xs text-muted" title={task.spec.output}>{task.spec.output}</code>
+                      </span>
+                    </Table.Cell>
+                    <Table.Cell className="w-24 max-w-24 text-xs leading-relaxed text-muted">
+                      <span className="data-cell-label"><CalendarTime aria-hidden="true" className="data-cell-icon" size={15} /><TaskCreatedTime locale={i18n.language} value={task.created_at} /></span>
+                    </Table.Cell>
                     <Table.Cell className="w-[196px] min-w-[196px]"><TaskActions task={task} handlers={handlers} /></Table.Cell>
                   </Table.Row>
                 ))}
@@ -613,13 +633,13 @@ function TaskList({
                   <TaskStatusChip status={task.status} />
                   <TaskProgressSummary task={task} />
                   <div className="text-right">
-                    <p className="text-xs text-muted">{t("tasks.totalSpeed")}</p>
-                    <strong className="text-sm tabular-nums text-foreground">{formatBytes(taskSpeed(task), "/s")}</strong>
+                    <p className="flex items-center justify-end gap-1 text-xs text-muted"><Gauge aria-hidden="true" size={13} />{t("tasks.totalSpeed")}</p>
+                    <strong className="mt-0.5 block text-sm tabular-nums text-foreground">{formatBytes(taskSpeed(task), "/s")}</strong>
                   </div>
                 </div>
                 <div className="pointer-events-none relative z-[1] grid gap-1 border-t border-border pt-3 text-xs text-muted">
-                  <code className="truncate" title={task.spec.output}>{task.spec.output}</code>
-                  <span>{formatDateTime(task.created_at, i18n.language)}</span>
+                  <span className="data-cell-label min-w-0"><Folder aria-hidden="true" className="data-cell-icon" size={14} /><code className="min-w-0 truncate" title={task.spec.output}>{task.spec.output}</code></span>
+                  <span className="data-cell-label"><CalendarTime aria-hidden="true" className="data-cell-icon" size={14} />{formatDateTime(task.created_at, i18n.language)}</span>
                 </div>
                 <TaskActions mobile task={task} handlers={handlers} />
               </Surface>
@@ -682,13 +702,14 @@ function TaskActions({
   return (
     <div className={mobile ? "task-action-grid pointer-events-auto relative z-[2] grid grid-cols-4 justify-items-center gap-1 border-t border-border pt-3" : "task-action-grid grid w-[188px] grid-cols-4 justify-items-center gap-1"}>
       <IconButton
+        className={`semantic-action-button ${canResume ? "action-tone-resume" : "action-tone-pause"}`}
         icon={canResume ? Play : Pause}
         isDisabled={!canPause && !canResume}
         label={lifecycleAction}
         tooltip={canPause || canResume ? lifecycleAction : unavailable(lifecycleAction)}
         onPress={() => canResume ? handlers.resume(task) : handlers.pause(task)}
       />
-      <IconButton icon={Square} isDisabled={!canStop} label={t("tasks.stop")} tooltip={canStop ? t("tasks.stop") : unavailable(t("tasks.stop"))} onPress={() => handlers.stop(task)} />
+      <IconButton className="semantic-action-button action-tone-stop" icon={Square} isDisabled={!canStop} label={t("tasks.stop")} tooltip={canStop ? t("tasks.stop") : unavailable(t("tasks.stop"))} onPress={() => handlers.stop(task)} />
       <IconButton icon={Pencil} isDisabled={!canEdit} label={t("common.edit")} tooltip={canEdit ? t("common.edit") : unavailable(t("common.edit"))} onPress={() => handlers.edit(task)} />
       <IconButton className="text-danger" icon={Trash2} isDisabled={!canDelete} label={t("common.delete")} tooltip={canDelete ? t("common.delete") : unavailable(t("common.delete"))} onPress={() => handlers.remove(task)} />
     </div>
@@ -723,9 +744,9 @@ function TaskDetails({
         actions={
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onPress={onBack}><ArrowLeft aria-hidden="true" size={17} />{t("common.back")}</Button>
-            {pausable.has(task.status) ? <Button variant="outline" onPress={() => handlers.pause(task)}><Pause aria-hidden="true" size={17} />{t("tasks.pause")}</Button> : null}
-            {resumable.has(task.status) ? <Button variant="primary" onPress={() => handlers.resume(task)}><Play aria-hidden="true" size={17} />{t("tasks.resume")}</Button> : null}
-            {stoppable.has(task.status) ? <Button variant="danger" onPress={() => handlers.stop(task)}><Square aria-hidden="true" size={17} />{t("tasks.stop")}</Button> : null}
+            {pausable.has(task.status) ? <Button className="semantic-action-button action-tone-pause" variant="outline" onPress={() => handlers.pause(task)}><Pause aria-hidden="true" size={17} />{t("tasks.pause")}</Button> : null}
+            {resumable.has(task.status) ? <Button className="semantic-action-button action-tone-resume" variant="outline" onPress={() => handlers.resume(task)}><Play aria-hidden="true" size={17} />{t("tasks.resume")}</Button> : null}
+            {stoppable.has(task.status) ? <Button className="semantic-action-button action-tone-stop" variant="outline" onPress={() => handlers.stop(task)}><Square aria-hidden="true" size={17} />{t("tasks.stop")}</Button> : null}
           </div>
         }
       />

@@ -618,7 +618,7 @@ code {
 }
 
 .selection-checkbox-labeled {
-  justify-content: flex-start;
+  justify-content: center;
 }
 
 .selection-checkbox .checkbox__control {
@@ -637,6 +637,73 @@ code {
 
 .batch-action-bar {
   box-shadow: 0 1px 2px color-mix(in oklab, black 5%, transparent);
+}
+
+.batch-selection-summary {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table-column-icon {
+  color: color-mix(in oklab, var(--accent) 68%, var(--text-muted));
+}
+
+.platform-label-icon {
+  display: grid;
+  height: 1.75rem;
+  width: 1.75rem;
+  flex: 0 0 1.75rem;
+  place-items: center;
+  border-radius: 0.375rem;
+  background: var(--surface-tertiary);
+  color: var(--accent-soft-foreground);
+}
+
+.data-cell-label {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.data-cell-icon {
+  flex: 0 0 auto;
+  color: color-mix(in oklab, var(--accent) 62%, var(--text-muted));
+}
+
+.full-sync-cell > .data-cell-icon {
+  position: absolute;
+  left: 0.25rem;
+}
+
+.semantic-action-button {
+  border: 1px solid color-mix(in oklab, currentColor 24%, var(--border));
+}
+
+.semantic-action-button[data-hovered="true"] {
+  filter: saturate(1.08);
+}
+
+.action-tone-enable {
+  background: var(--accent-soft);
+  color: var(--accent-soft-foreground);
+}
+
+.action-tone-resume {
+  background: var(--success-soft);
+  color: var(--success-soft-foreground);
+}
+
+.action-tone-pause {
+  background: var(--warning-soft);
+  color: var(--warning-soft-foreground);
+}
+
+.action-tone-stop {
+  background: var(--danger-soft);
+  color: var(--danger-soft-foreground);
 }
 
 .chip-list-control {
@@ -859,6 +926,17 @@ code {
 
   .batch-action-bar {
     align-items: stretch;
+  }
+
+  .batch-selection-summary {
+    display: grid;
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) auto 2.75rem;
+  }
+
+  .batch-selection-summary .selection-checkbox-labeled {
+    width: 100%;
+    justify-content: center;
   }
 
   .batch-action-buttons {

@@ -350,6 +350,7 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   const tableFrame = page.locator(".app-table-frame");
   await expect(tableRoot).toHaveCount(1);
   await expect(tableFrame).toHaveCount(1);
+  await expect(tableFrame.locator(".table-column-icon")).toHaveCount(7);
   const tableStyles = await tableRoot.evaluate((element) => {
     const style = getComputedStyle(element);
     return {
@@ -368,6 +369,7 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   const desktopTaskRow = creatorSummary.locator("xpath=ancestor::*[@role='row'][1]");
   const desktopActions = desktopTaskRow.locator(".task-action-grid button");
   await expect(desktopActions).toHaveCount(4);
+  await expect(desktopTaskRow.locator(".task-status-chip, [data-slot='chip']").filter({ hasText: "Running" }).locator("svg")).toHaveCount(1);
   for (const label of ["Stop", "Edit", "Delete"]) {
     await expect(desktopTaskRow.getByRole("button", { name: label })).toBeVisible();
   }
@@ -400,6 +402,12 @@ test("HeroUI tables and forms preserve their visual hierarchy", async ({ page })
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
   if (batchAuditDirectory) {
     await page.screenshot({ fullPage: true, path: join(batchAuditDirectory, "tasks-mobile-light.png") });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.getByRole("button", { name: "Use dark theme" }).click();
+    await page.waitForTimeout(200);
+    await page.screenshot({ fullPage: true, path: join(batchAuditDirectory, "tasks-desktop-dark.png") });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.screenshot({ fullPage: true, path: join(batchAuditDirectory, "tasks-mobile-dark.png") });
   }
   await page.getByRole("button", { name: "Clear selection" }).click();
 
@@ -689,9 +697,11 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
     "Creator ID",
     "Platform",
     "Note",
-    "Status",
+    "Included in full sync",
     "Actions",
   ]);
+  await expect(page.locator(".app-table-frame .table-column-icon")).toHaveCount(6);
+  await expect(creatorRow.locator(".platform-label-icon")).toBeVisible();
   await expect(creatorRow.getByRole("button", { name: "Edit fanbox:demo-studio" })).toBeVisible();
   await expect(creatorRow.getByRole("button", { name: "Remove fanbox:demo-studio" })).toBeVisible();
   await expect(page.getByRole("button", { name: /Actions Demo Studio/ })).toHaveCount(0);
@@ -722,7 +732,14 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
     await page.setViewportSize({ width: 390, height: 844 });
     await page.screenshot({ fullPage: true, path: join(batchAuditDirectory, "creators-mobile-light.png") });
     await page.setViewportSize({ width: 1440, height: 900 });
+    await page.getByRole("button", { name: "Use dark theme" }).click();
+    await page.waitForTimeout(200);
+    await page.screenshot({ fullPage: true, path: join(batchAuditDirectory, "creators-desktop-dark.png") });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.screenshot({ fullPage: true, path: join(batchAuditDirectory, "creators-mobile-dark.png") });
+    await page.setViewportSize({ width: 1440, height: 900 });
   }
+  await expect(page.getByRole("button", { name: "Enable 1" })).toHaveClass(/action-tone-enable/);
   await page.getByRole("button", { name: "Enable 1" }).click();
   await expect(creatorRow.getByRole("switch", { name: "Enabled" })).toBeVisible();
 

@@ -13,13 +13,17 @@ import {
   IconCircleCheck as CircleCheck,
   IconCloud as Cloud,
   IconFilter as Filter,
+  IconFingerprint as Fingerprint,
   IconPencil as Pencil,
   IconPlus as Plus,
   IconPower as Power,
   IconCircleOff as PowerOff,
   IconSearch as Search,
   IconNotes as Notes,
+  IconRefresh as Sync,
+  IconTool as Tools,
   IconTrash as Trash2,
+  IconUser as User,
   IconUserPlus as UserPlus,
   IconUsersGroup as UsersRound,
   IconX as X,
@@ -43,9 +47,11 @@ import {
   PawchiveIdentityFields,
   PageHeader,
   PageLoading,
+  PlatformLabel,
   SelectionCheckbox,
   SelectField,
   SortableColumn,
+  TableColumnLabel,
 } from "../components/ui";
 import { ExternalChangeAlert } from "../components/ExternalChangeAlert";
 import { api, errorText } from "../lib/api";
@@ -395,6 +401,7 @@ export function CreatorsPage() {
             onSelectAll={selectAllVisible}
           >
             <Button
+              className="semantic-action-button action-tone-enable"
               isDisabled={!enableCandidates.length || batchBusy !== null}
               isPending={batchBusy === "enable"}
               size="sm"
@@ -444,12 +451,12 @@ export function CreatorsPage() {
                           onChange={selectAllVisible}
                         />
                       </Table.Column>
-                      <SortableColumn id="name" isRowHeader>{t("creators.creatorName")}</SortableColumn>
-                      <SortableColumn id="creator_id">{t("creators.creatorId")}</SortableColumn>
-                      <SortableColumn id="service">{t("creators.service")}</SortableColumn>
-                      <SortableColumn id="alias">{t("creators.alias")}</SortableColumn>
-                      <SortableColumn id="status">{t("common.status")}</SortableColumn>
-                      <Table.Column className="text-right">{t("common.actions")}</Table.Column>
+                      <SortableColumn icon={User} id="name" isRowHeader>{t("creators.creatorName")}</SortableColumn>
+                      <SortableColumn icon={Fingerprint} id="creator_id">{t("creators.creatorId")}</SortableColumn>
+                      <SortableColumn icon={Cloud} id="service">{t("creators.service")}</SortableColumn>
+                      <SortableColumn icon={Notes} id="alias">{t("creators.alias")}</SortableColumn>
+                      <SortableColumn icon={Sync} id="status">{t("creators.enabled")}</SortableColumn>
+                      <Table.Column className="text-right"><TableColumnLabel className="justify-end" icon={Tools}>{t("common.actions")}</TableColumnLabel></Table.Column>
                     </Table.Header>
                     <Table.Body>
                       {creators.map((creator) => (
@@ -461,12 +468,19 @@ export function CreatorsPage() {
                               onChange={(selected) => setCreatorSelected(creator, selected)}
                             />
                           </Table.Cell>
-                          <Table.Cell className="font-medium">{creator.name || creator.creator_id}</Table.Cell>
-                          <Table.Cell className="font-medium"><code className="text-xs">{creator.creator_id}</code></Table.Cell>
-                          <Table.Cell>{creator.service}</Table.Cell>
-                          <Table.Cell>{creator.alias || "—"}</Table.Cell>
-                          <Table.Cell className="w-24 text-center">
-                            <div className="list-switch-cell mx-auto flex w-20 items-center justify-center">
+                          <Table.Cell className="font-medium">
+                            <span className="data-cell-label"><User aria-hidden="true" className="data-cell-icon" size={16} />{creator.name || creator.creator_id}</span>
+                          </Table.Cell>
+                          <Table.Cell className="font-medium">
+                            <span className="data-cell-label"><Fingerprint aria-hidden="true" className="data-cell-icon" size={15} /><code className="text-xs">{creator.creator_id}</code></span>
+                          </Table.Cell>
+                          <Table.Cell><PlatformLabel platform={creator.service} /></Table.Cell>
+                          <Table.Cell>
+                            <span className="data-cell-label"><Notes aria-hidden="true" className="data-cell-icon" size={15} /><span>{creator.alias || "—"}</span></span>
+                          </Table.Cell>
+                          <Table.Cell className="w-32 text-center">
+                            <div className="full-sync-cell list-switch-cell relative mx-auto flex w-28 items-center justify-center">
+                              <Sync aria-hidden="true" className="data-cell-icon" size={15} />
                               <CompactSwitch
                                 isSelected={creator.enabled}
                                 label={creator.enabled ? t("common.enabled") : t("common.disabled")}
@@ -493,18 +507,21 @@ export function CreatorsPage() {
                       onChange={(selected) => setCreatorSelected(creator, selected)}
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="break-words font-medium">{creator.name || creator.creator_id}</p>
-                      <p className="mt-1 break-all text-xs text-muted"><code>{creator.service}:{creator.creator_id}</code></p>
+                      <p className="data-cell-label break-words font-medium"><User aria-hidden="true" className="data-cell-icon" size={16} /><span>{creator.name || creator.creator_id}</span></p>
+                      <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2 text-xs text-muted">
+                        <PlatformLabel platform={creator.service} />
+                        <span className="data-cell-label"><Fingerprint aria-hidden="true" className="data-cell-icon" size={14} /><code className="break-all">{creator.creator_id}</code></span>
+                      </div>
                     </div>
                     <CreatorActions creator={creator} onEdit={() => openEdit(creator)} onRemove={() => setRemoving([creator])} />
                   </div>
                   <div className="mt-3 grid grid-cols-[auto_minmax(0,1fr)] gap-2 text-sm">
-                    <span className="text-muted">{t("creators.alias")}</span>
+                    <span className="data-cell-label text-muted"><Notes aria-hidden="true" className="data-cell-icon" size={15} />{t("creators.alias")}</span>
                     <span className="min-w-0 break-words text-right">{creator.alias || "—"}</span>
                   </div>
                   <div className="mt-4 flex min-h-14 items-center justify-between gap-3 border-t border-border pt-3">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium">{t("creators.enabled")}</p>
+                      <p className="data-cell-label text-sm font-medium"><Sync aria-hidden="true" className="data-cell-icon" size={16} />{t("creators.enabled")}</p>
                       <p className="mt-0.5 text-xs text-muted">{creator.enabled ? t("common.enabled") : t("common.disabled")}</p>
                     </div>
                     <div className="list-switch-cell flex w-20 shrink-0 items-center justify-center">
