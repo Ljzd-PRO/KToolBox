@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import os
+import signal
+import socket
 import subprocess
 import sys
+import time
 from pathlib import Path
 from unittest.mock import patch
 
@@ -46,6 +49,15 @@ def test_main_initializes_runtime_and_handles_interrupt() -> None:
         patch("ktoolbox.__main__.logger.error") as error,
     ):
         assert main(["site-version"]) == 130
+    error.assert_called_once_with("KToolBox was forcefully stopped by the user")
+
+
+def test_main_handles_an_interrupt_from_the_nested_webui_command() -> None:
+    with (
+        patch("ktoolbox.webui.server.run_webui", side_effect=KeyboardInterrupt),
+        patch("ktoolbox.__main__.logger.error") as error,
+    ):
+        assert main(["webui", "--no-open"]) == 130
     error.assert_called_once_with("KToolBox was forcefully stopped by the user")
 
 
@@ -201,3 +213,61 @@ def test_terminal_webui_configuration_refusal_has_no_traceback(tmp_path: Path) -
     assert "Configuration error:" in result.stderr
     assert "not a valid Argon2 hash" in result.stderr
     assert "Traceback" not in result.stderr
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="uses POSIX SIGINT")
+@pytest.mark.enable_socket
+def test_terminal_webui_interrupt_logs_clean_shutdown(tmp_path: Path) -> None:
+    with socket.socket() as listener:
+        listener.bind(("127.0.0.1", 0))
+        port = listener.getsockname()[1]
+
+    environment = {key: value for key, value in os.environ.items() if not key.startswith("KTOOLBOX_")}
+    environment.update(
+        {
+            "KTOOLBOX_WEBUI__USERNAME": "owner",
+            "KTOOLBOX_WEBUI__PASSWORD": "test-password",
+            "NO_COLOR": "1",
+        }
+    )
+    process = subprocess.Popen(
+        [
+            sys.executable,
+            "-m",
+            "ktoolbox",
+            "webui",
+            str(tmp_path),
+            "--no-open",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            str(port),
+        ],
+        cwd=Path(__file__).parents[2],
+        env=environment,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    assert process.stdout is not None
+    deadline = time.monotonic() + 10
+    while time.monotonic() < deadline:
+        if process.poll() is not None:
+            pytest.fail("WebUI exited before opening its listening socket")
+        try:
+            with socket.create_connection(("127.0.0.1", port), timeout=0.25):
+                break
+        except OSError:
+            time.sleep(0.05)
+    else:
+        process.kill()
+        pytest.fail("WebUI did not start before the timeout")
+
+    process.send_signal(signal.SIGINT)
+    time.sleep(0.02)
+    process.send_signal(signal.SIGINT)
+    terminal_output, _ = process.communicate(timeout=10)
+
+    assert process.returncode == 130
+    assert "KToolBox was forcefully stopped by the user" in terminal_output
+    assert "Traceback" not in terminal_output

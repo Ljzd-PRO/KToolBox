@@ -1,3 +1,5 @@
+import asyncio
+import signal
 from pathlib import Path
 
 import pytest
@@ -98,6 +100,80 @@ async def test_run_webui_rejects_an_invalid_password_hash_before_server_start(
     )
 
     with pytest.raises(KToolBoxUserError, match="valid Argon2"):
+        await run_webui(tmp_path, open_browser=False)
+
+
+@pytest.mark.asyncio
+async def test_run_webui_first_sigint_requests_a_graceful_shutdown(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class FakeConfig:
+        def __init__(self, app, **kwargs) -> None:
+            self.app = app
+            self.kwargs = kwargs
+
+    class InterruptingServer:
+        def __init__(self, configuration: FakeConfig) -> None:
+            self.configuration = configuration
+            self.should_exit = False
+            self.force_exit = False
+
+        async def serve(self) -> None:
+            self.handle_exit(signal.SIGINT, None)
+            assert self.should_exit is True
+            assert self.force_exit is False
+
+    monkeypatch.setattr(
+        server_module,
+        "load_configuration",
+        lambda root: Configuration(
+            _env_file=None,
+            webui={"username": "owner", "password": "secret"},
+        ),
+    )
+    monkeypatch.setattr(uvicorn, "Config", FakeConfig)
+    monkeypatch.setattr(uvicorn, "Server", InterruptingServer)
+
+    await run_webui(tmp_path, open_browser=False)
+
+
+@pytest.mark.asyncio
+async def test_run_webui_second_sigint_returns_to_the_global_cli_boundary(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class FakeConfig:
+        def __init__(self, app, **kwargs) -> None:
+            self.app = app
+            self.kwargs = kwargs
+
+    class ForceInterruptingServer:
+        def __init__(self, configuration: FakeConfig) -> None:
+            self.configuration = configuration
+            self.should_exit = False
+            self.force_exit = False
+
+        async def serve(self) -> None:
+            self.handle_exit(signal.SIGINT, None)
+            assert self.should_exit is True
+            assert self.force_exit is False
+            self.handle_exit(signal.SIGINT, None)
+            assert self.force_exit is True
+            await asyncio.sleep(0)
+
+    monkeypatch.setattr(
+        server_module,
+        "load_configuration",
+        lambda root: Configuration(
+            _env_file=None,
+            webui={"username": "owner", "password": "secret"},
+        ),
+    )
+    monkeypatch.setattr(uvicorn, "Config", FakeConfig)
+    monkeypatch.setattr(uvicorn, "Server", ForceInterruptingServer)
+
+    with pytest.raises(KeyboardInterrupt):
         await run_webui(tmp_path, open_browser=False)
 
 

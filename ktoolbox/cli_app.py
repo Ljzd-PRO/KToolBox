@@ -67,6 +67,7 @@ app.command(post_app)
 app.command(config_app)
 app.command(webui_app)
 app.register_install_completion_command()
+app.meta.suppress_keyboard_interrupt = False
 app.meta.group_parameters = Group("Global options", sort_key=0)
 
 

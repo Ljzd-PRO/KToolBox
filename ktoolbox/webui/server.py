@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import asyncio
 import getpass
 import secrets
+import signal
+import socket
 import sys
 import threading
 import webbrowser
 from dataclasses import dataclass
 from pathlib import Path
+from types import FrameType
 
 import anyio
 from argon2 import PasswordHasher
@@ -82,7 +86,40 @@ async def run_webui(
     if webui.open_browser:
         threading.Timer(1.0, webbrowser.open, args=(url,)).start()
 
-    server = uvicorn.Server(
+    class WebUIServer(uvicorn.Server):
+        interrupt_count = 0
+        _serve_task: asyncio.Task[None] | None = None
+
+        async def serve(self, sockets: list[socket.socket] | None = None) -> None:
+            self._serve_task = asyncio.current_task()
+            try:
+                if sockets is None:
+                    await super().serve()
+                else:
+                    await super().serve(sockets=sockets)
+            except asyncio.CancelledError:
+                if self.interrupt_count < 2:
+                    raise
+                task = asyncio.current_task()
+                uncancel = getattr(task, "uncancel", None)
+                if callable(uncancel):
+                    uncancel()
+            finally:
+                self._serve_task = None
+
+        def handle_exit(self, sig: int, frame: FrameType | None) -> None:
+            if sig != signal.SIGINT:
+                super().handle_exit(sig, frame)
+                return
+            self.interrupt_count += 1
+            if self.should_exit:
+                self.force_exit = True
+                if self._serve_task is not None and not self._serve_task.done():
+                    self._serve_task.cancel()
+            else:
+                self.should_exit = True
+
+    server = WebUIServer(
         uvicorn.Config(
             application,
             host=webui.host,
@@ -91,6 +128,14 @@ async def run_webui(
         )
     )
     await server.serve()
+    if server.interrupt_count > 1:
+        lifespan = getattr(server, "lifespan", None)
+        if lifespan is not None:
+            try:
+                await asyncio.wait_for(lifespan.shutdown(), timeout=0.5)
+            except (TimeoutError, asyncio.CancelledError):
+                lifespan.logger.disabled = True
+        raise KeyboardInterrupt
 
 
 def _prepare_webui_credentials(
