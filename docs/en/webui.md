@@ -106,7 +106,13 @@ Each task also stores a presentation-only snapshot with its normalized target ke
 
 The top-level queue runs two tasks by default (`KTOOLBOX_WEBUI__MAX_ACTIVE_TASKS`) while each task retains its configured creator and file concurrency. Identical active tasks resolve to the existing task. Tasks with overlapping normalized outputs, creators, or posts wait in `blocked` until the resource lock is released.
 
-Live events use SSE with reconnect support. REST task state remains authoritative. The detail view reports prepared creators, files, bytes, overall progress, aggregate and per-file speeds, ETA, skipped/failed counts, active items, and structured logs.
+Live events use SSE with reconnect support. REST task state remains authoritative, and only a `task.status` event can change it; a completed file never marks its parent task complete. Aggregate download speed uses a five-second rolling window with a short hand-off grace period, so switching between files does not flash to zero. The overview and task page both show the speed summed across genuinely running tasks.
+
+![Overview with aggregate download speed](../assets/webui/28-overview-global-speed-light.png)
+
+The detail view reports prepared creators, files, bytes, overall progress, aggregate and per-file speeds, ETA, skipped/failed counts, active creators, active downloads, waiting retries, and structured logs. The three live panels have stable heights and their own scroll areas, so changing concurrency does not move the log or the page. The default activity view omits byte-level progress and ordinary queue noise; transfer and complete diagnostic views remain available when needed.
+
+![Stable live task panels](../assets/webui/29-task-live-panels-light.png)
 
 Failed attempts persist a bounded, redacted diagnostic report instead of only a failure count. The task row shows the first useful cause; details group failures by creator and file and identify the stage, retryability, safe field paths, and a suggested recovery action. Upstream response bodies, post titles, cookies, and complete download URLs are never stored in this report. On narrow screens, the 64px workbar, 12px page spacing, and compact appearance Popover expose more useful content without shrinking form text below 16px. The MCP tool catalog uses collapsible HeroUI groups and automatically expands matching groups during search or permission filtering.
 
@@ -116,7 +122,7 @@ Failed attempts persist a bounded, redacted diagnostic report instead of only a 
 
 ![Live task progress](../assets/webui/14-task-running-1024-dark-zh.png)
 
-Pause is cooperative: active network streams close, completed files and resumable temporary files remain, and resume creates a new attempt. Stop keeps the task definition so it can be edited and rerun. A process restart marks formerly running work as `interrupted`; recovery is always explicit.
+Pause is cooperative: active network streams close, completed files and resumable temporary files remain, and resume creates a new attempt. Stop keeps the task definition so it can be edited and rerun. Resume is available only for paused, stopped, failed, or interrupted work; completed tasks remain editable and deletable but cannot be resumed. A process restart marks formerly running work as `interrupted`, clears stale live progress, and requires explicit recovery.
 
 Deleting a task normally removes only its queue record, attempts, and logs. “Delete outputs” first produces a file and byte-count preview. Confirmation removes only unchanged, regular files recorded as created by that task; symbolic links, pre-existing files, modified files, and shared files are never followed or removed.
 

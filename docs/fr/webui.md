@@ -102,7 +102,13 @@ Chaque tâche conserve aussi un instantané réservé à la présentation avec s
 
 La file principale exécute deux tâches par défaut (`KTOOLBOX_WEBUI__MAX_ACTIVE_TASKS`), tandis que chacune conserve sa simultanéité configurée de créateurs et de fichiers. Les tâches actives identiques renvoient à la tâche existante. Les tâches dont les sorties, créateurs ou publications normalisés se chevauchent attendent dans `blocked` la libération du verrou.
 
-Les événements en direct utilisent SSE avec reconnexion. L'état REST reste la référence. La vue détaillée indique les créateurs préparés, les fichiers, les octets, la progression totale, les vitesses globale et par fichier, l'heure estimée, les nombres ignorés/échoués, les éléments actifs et les journaux structurés.
+Les événements en direct utilisent SSE avec reconnexion. L'état REST reste la référence et seul un événement `task.status` peut le modifier ; la fin d'un fichier ne termine jamais prématurément sa tâche. La vitesse globale utilise une fenêtre glissante de cinq secondes et un bref délai de transition, ce qui évite un passage furtif à zéro entre deux fichiers. L'aperçu et la page des tâches additionnent la vitesse des tâches réellement actives.
+
+![Aperçu avec vitesse globale](../assets/webui/28-overview-global-speed-light.png)
+
+La vue détaillée indique les créateurs préparés, les fichiers, les octets, la progression totale, les vitesses globale et par fichier, l'heure estimée, les nombres ignorés/échoués, les créateurs actifs, les téléchargements actifs, les nouvelles tentatives en attente et les journaux structurés. Les trois panneaux en direct ont une hauteur stable et leur propre défilement : les changements de simultanéité ne déplacent plus le journal ni la page. La vue d'activité par défaut masque la progression par blocs et le bruit ordinaire de la file ; les vues transferts et diagnostic complet restent disponibles.
+
+![Panneaux de tâche stables](../assets/webui/29-task-live-panels-light.png)
 
 Chaque tentative en échec conserve un rapport de diagnostic borné et expurgé au lieu d'un simple compteur. La ligne de tâche affiche la première cause utile ; le détail regroupe les échecs par créateur et fichier et indique l'étape, la possibilité de réessayer, les chemins de champs sûrs et l'action recommandée. Le corps des réponses amont, les titres d'œuvres, les cookies et les URL complètes de téléchargement ne sont jamais enregistrés. Sur écran étroit, la barre de 64px, l'espacement de page de 12px et le Popover d'apparence compact affichent davantage de contenu sans réduire le texte des formulaires sous 16px. Le catalogue MCP utilise des groupes HeroUI repliables et développe automatiquement les groupes correspondant à une recherche ou à un filtre de permission.
 
@@ -112,7 +118,7 @@ Chaque tentative en échec conserve un rapport de diagnostic borné et expurgé 
 
 ![Progression d'une tâche en direct](../assets/webui/14-task-running-1024-dark-zh.png)
 
-La pause est coopérative : les flux réseau actifs se ferment, les fichiers terminés et temporaires pouvant reprendre restent, et la reprise crée une nouvelle tentative. L'arrêt conserve la définition pour pouvoir la modifier et la relancer. Un redémarrage marque l'ancien travail actif `interrupted` ; la récupération est toujours explicite.
+La pause est coopérative : les flux réseau actifs se ferment, les fichiers terminés et temporaires pouvant reprendre restent, et la reprise crée une nouvelle tentative. L'arrêt conserve la définition pour pouvoir la modifier et la relancer. Seules les tâches en pause, arrêtées, échouées ou interrompues peuvent reprendre ; une tâche terminée reste modifiable et supprimable, mais ne peut pas reprendre. Un redémarrage marque l'ancien travail actif `interrupted`, efface sa progression active résiduelle et exige une récupération explicite.
 
 Supprimer une tâche ne retire normalement que son enregistrement, ses tentatives et ses journaux. « Supprimer les sorties » présente d'abord le nombre de fichiers et d'octets. La confirmation ne retire que les fichiers ordinaires inchangés enregistrés comme créés par cette tâche ; les liens symboliques et les fichiers préexistants, modifiés ou partagés ne sont ni suivis ni retirés.
 

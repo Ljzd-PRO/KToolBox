@@ -47,6 +47,10 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Add a WAL-backed SQLite queue with concurrent scheduling, resource blocking and deduplication, immutable attempts, pause/resume/stop/edit/rerun/delete actions, restart recovery, SSE replay, aggregate/per-file speeds, ETA, and structured logs.
 - Make task rows open their detail view and add explicit bulk pause, resume, stop, and record deletion actions; add bulk enable, disable, and removal to the creator roster.
 - Add one authenticated global SSE connection for task, roster, blocker, configuration, MCP-token, and filesystem refresh across tabs, with cursor recovery, heartbeats, 10-second local-only fallback polling, draft protection, and live status controls.
+- Separate file transfer outcomes from authoritative task status, serialize reporter persistence through one FIFO writer, and atomically store progress with its event so concurrent downloads cannot roll snapshots backward.
+- Stabilize aggregate download speed with a five-second rolling window and file hand-off grace, expose the global speed on overview and task pages, and clear live state when work becomes terminal or interrupted.
+- Keep active creator, download, and retry panels at stable responsive heights with independent scrolling, and add activity, transfer, and complete diagnostic event views that filter noise before applying result limits.
+- Align task controls with backend lifecycle rules: completed tasks remain editable and deletable but cannot resume, only task targets navigate from the queue, and overview rows navigate without conflicting inline actions.
 - Add ownership-aware output cleanup previews that skip symbolic links and any pre-existing, shared, or modified files.
 - Rebuild HeroUI form primitives with gray-off/blue-on switches, state-correct checkboxes, centered compact list controls, continuous modal surfaces, and direct icon actions for task, creator, and blocker rows.
 - Persist presentation-only task target snapshots so queues remain readable offline by post title and creator name without changing execution, deduplication, or resource locks.
@@ -77,6 +81,8 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Make local bucket capability checks use real temporary paths and clean up hard-link probes.
 - Strip query strings from bucket paths, deduplicate size filtering, and account for existing temporary bytes when validating resumed transfers.
 - Preserve the React MCP page on direct `GET /mcp` refreshes while routing protocol methods to the Streamable HTTP endpoint.
+- Prevent `download.finished` payloads from marking their parent task complete or prematurely zeroing live speed.
+- Repair stale terminal progress left by older concurrent writes and clear residual activity when restart recovery marks a task interrupted.
 
 ---
 
@@ -126,6 +132,10 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 从经过完整性检查的语言目录、Pydantic 元数据及英文配置 docstring 生成简体中文、繁体中文、英语、日语、韩语、法语和俄语标签与说明，提供来源标记、秘密遮蔽、类型化与高级编辑、校验、差异预览、ETag 冲突检测和原子写入。
 - 新增 WAL SQLite 队列，支持并发调度、资源阻塞与去重、不可变尝试、暂停/恢复/停止/编辑/排序/重跑/删除、重启恢复、SSE 续接、总速度/单文件速度、ETA 和结构化日志。
 - 新增单一认证全局 SSE 连接，在标签页之间自动刷新任务、作者、忽略规则、配置、MCP 令牌和文件系统，支持游标续接、心跳、每 10 秒仅本地降级轮询、草稿保护和实时状态控制。
+- 将文件传输结果与权威任务状态分离，通过单一 FIFO 写入器串行持久化 Reporter，并在同一事务中保存进度及对应事件，避免并发下载把快照倒退覆盖。
+- 使用五秒滚动窗口与文件交接宽限期稳定总下载速度，在概览和任务页展示全局速度，并在任务进入终态或中断时清空实时状态。
+- 为活动作者、活动下载和等待重试卡片设置稳定的响应式高度及独立滚动，并新增活动、传输和完整诊断三种事件视图，在限制条数前过滤无意义噪声。
+- 统一前后端任务生命周期能力：已完成任务可编辑和删除但不能恢复；任务队列只有目标可进入详情；概览行整体可进入详情且不再包含冲突的行内操作。
 - 新增基于输出归属的删除预览，跳过符号链接及任何既存、共享或已修改文件。
 - 重建 HeroUI 表单基础组件：开关关闭灰、开启蓝，复选框严格按状态显示标记，列表紧凑开关居中，弹窗表面连续，并为任务、作者和忽略规则条目直接展示图标操作。
 - 持久化仅用于展示的任务目标快照，使队列离线时仍可按作品标题和作者名识别，且不影响执行、去重或资源锁。
@@ -151,5 +161,7 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 本地存储桶能力检测改用真实临时路径，并正确清理硬链接探针。
 - 存储桶路径移除查询字符串，文件大小筛选去重，并在续传大小校验中计入已有临时字节。
 - 浏览器直接 `GET /mcp` 刷新时继续返回 React MCP 页面，协议方法则正确转交 Streamable HTTP 端点。
+- 防止 `download.finished` 事件把所属任务提前标记为完成或过早把实时速度归零。
+- 修复旧版并发写入遗留的终态进度，并在重启恢复将任务标记为中断时清理残留活动状态。
 
 **Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v0.24.0...v1.0.0
