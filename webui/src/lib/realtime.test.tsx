@@ -100,6 +100,8 @@ function Probe() {
     <>
       <output aria-label="connection">{realtime.status}</output>
       <output aria-label="bytes">{tasks.data?.[0]?.progress.transferred_bytes ?? -1}</output>
+      <output aria-label="speed">{tasks.data?.[0]?.progress.speed_bps ?? -1}</output>
+      <output aria-label="task-status">{tasks.data?.[0]?.status ?? "missing"}</output>
       <output aria-label="creators">{creators.data?.length ?? -1}</output>
       <output aria-label="events">{events.data?.length ?? -1}</output>
       <output aria-label="creator-revision">{realtime.revisions.creators}</output>
@@ -173,30 +175,40 @@ describe("RealtimeProvider", () => {
     expect(screen.getByLabelText("events")).toHaveTextContent("1");
 
     act(() => {
+      source.emit("download.finished", taskEvent(2, "download.finished", {
+        status: "completed",
+        outcome: "completed",
+        progress: { ...progress, transferred_bytes: 90, speed_bps: 20 },
+      }));
+    });
+    expect(screen.getByLabelText("task-status")).toHaveTextContent("running");
+    expect(screen.getByLabelText("speed")).toHaveTextContent("20");
+
+    act(() => {
       source.emit("download.progress", taskEvent(1, "download.progress", {
         progress: { ...progress, transferred_bytes: 90 },
       }));
       source.emit("creator_profile.changed", {
-        ...taskEvent(2, "creator_profile.changed", {}),
+        ...taskEvent(3, "creator_profile.changed", {}),
         task_id: null,
         resource: "creator_profile",
         resource_id: "fanbox:creator",
       });
       source.emit("creators.changed", {
-        ...taskEvent(3, "creators.changed", {}),
+        ...taskEvent(4, "creators.changed", {}),
         task_id: null,
         resource: "creator",
         resource_id: "fanbox:creator",
       });
-      source.emit("task.updated", taskEvent(4, "task.updated", {}));
+      source.emit("task.updated", taskEvent(5, "task.updated", {}));
       source.emit("filesystem.changed", {
-        ...taskEvent(5, "filesystem.changed", {}),
+        ...taskEvent(6, "filesystem.changed", {}),
         task_id: null,
         resource: "filesystem",
         resource_id: "downloads",
       });
     });
-    expect(screen.getByLabelText("events")).toHaveTextContent("2");
+    expect(screen.getByLabelText("events")).toHaveTextContent("3");
     expect(screen.getByLabelText("creator-revision")).toHaveTextContent("1");
     expect(screen.getByLabelText("task-revision")).toHaveTextContent("1");
     expect(screen.getByLabelText("filesystem-revision")).toHaveTextContent("2");

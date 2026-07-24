@@ -38,31 +38,51 @@ class WebUIEventStore:
         resource: str | None = None,
         resource_id: str | None = None,
     ) -> TaskEvent:
-        now = utc_now()
-        safe_data = _sanitize_mapping(data or {})
         async with self.database.connect() as connection:
-            cursor = await connection.execute(
-                """
-                INSERT INTO task_events(
-                    task_id, event_type, resource, resource_id, data_json, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    task_id,
-                    event_type,
-                    resource,
-                    resource_id,
-                    json.dumps(safe_data, ensure_ascii=False),
-                    now.isoformat(),
-                ),
+            event = await self.persist(
+                connection,
+                event_type,
+                data,
+                task_id=task_id,
+                resource=resource,
+                resource_id=resource_id,
             )
             await connection.commit()
-            event_id = cursor.lastrowid
+        await self.notify_published()
+        return event
+
+    async def persist(
+        self,
+        connection: aiosqlite.Connection,
+        event_type: str,
+        data: Mapping[str, object] | None = None,
+        *,
+        task_id: str | None = None,
+        resource: str | None = None,
+        resource_id: str | None = None,
+    ) -> TaskEvent:
+        """Insert an event into the caller's transaction."""
+
+        now = utc_now()
+        safe_data = _sanitize_mapping(data or {})
+        cursor = await connection.execute(
+            """
+            INSERT INTO task_events(
+                task_id, event_type, resource, resource_id, data_json, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (
+                task_id,
+                event_type,
+                resource,
+                resource_id,
+                json.dumps(safe_data, ensure_ascii=False),
+                now.isoformat(),
+            ),
+        )
+        event_id = cursor.lastrowid
         if event_id is None:
             raise RuntimeError("failed to persist WebUI event")
-        async with self._condition:
-            self._generation += 1
-            self._condition.notify_all()
         return TaskEvent(
             id=event_id,
             task_id=task_id,
@@ -72,6 +92,13 @@ class WebUIEventStore:
             data=safe_data,
             created_at=now,
         )
+
+    async def notify_published(self) -> None:
+        """Wake subscribers after the event transaction commits."""
+
+        async with self._condition:
+            self._generation += 1
+            self._condition.notify_all()
 
     async def latest_id(self) -> int:
         async with self.database.connect() as connection:

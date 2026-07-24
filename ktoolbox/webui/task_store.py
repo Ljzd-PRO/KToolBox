@@ -14,6 +14,7 @@ from ktoolbox.webui.task_models import (
     ACTIVE_TASK_STATUSES,
     RUNNING_TASK_STATUSES,
     TASK_SPEC_ADAPTER,
+    TERMINAL_TASK_STATUSES,
     TaskArtifact,
     TaskAttempt,
     TaskCleanupPreview,
@@ -149,13 +150,36 @@ class TaskStore:
     ) -> TaskRecord:
         now = utc_now().isoformat()
         async with self.database.connect() as connection:
+            progress_json: str | None = None
+            if status in TERMINAL_TASK_STATUSES:
+                cursor = await connection.execute(
+                    "SELECT progress_json FROM tasks WHERE id = ?",
+                    (task_id,),
+                )
+                row = await cursor.fetchone()
+                await cursor.close()
+                if row is None:
+                    raise TaskNotFoundError(task_id)
+                progress_json = _finalized_progress(
+                    TaskProgress.model_validate_json(row[0]),
+                    status,
+                ).model_dump_json()
             cursor = await connection.execute(
                 """
                 UPDATE tasks
-                SET status = ?, error = ?, failure_json = ?, blocked_by = ?, updated_at = ?
+                SET status = ?, error = ?, failure_json = ?, blocked_by = ?,
+                    progress_json = COALESCE(?, progress_json), updated_at = ?
                 WHERE id = ?
                 """,
-                (status.value, error, _failure_json(failure), blocked_by, now, task_id),
+                (
+                    status.value,
+                    error,
+                    _failure_json(failure),
+                    blocked_by,
+                    progress_json,
+                    now,
+                    task_id,
+                ),
             )
             await connection.commit()
             if cursor.rowcount == 0:
@@ -207,6 +231,33 @@ class TaskStore:
                 (progress.model_dump_json(), utc_now().isoformat(), task_id),
             )
             await connection.commit()
+
+    async def record_progress_event(
+        self,
+        task_id: str,
+        event_type: str,
+        data: dict[str, object],
+        progress: TaskProgress,
+    ) -> TaskEvent:
+        """Persist a reporter snapshot and its event in one transaction."""
+
+        payload = {**data, "progress": progress.model_dump(mode="json")}
+        async with self.database.connect() as connection:
+            await connection.execute(
+                "UPDATE tasks SET progress_json = ?, updated_at = ? WHERE id = ?",
+                (progress.model_dump_json(), utc_now().isoformat(), task_id),
+            )
+            event = await self.event_store.persist(
+                connection,
+                event_type,
+                payload,
+                task_id=task_id,
+                resource="task",
+                resource_id=task_id,
+            )
+            await connection.commit()
+        await self.event_store.notify_published()
+        return event
 
     async def queue_again(self, task_id: str) -> TaskRecord:
         now = utc_now().isoformat()
@@ -378,6 +429,19 @@ def _presentation_json(presentation: TaskPresentationSnapshot | None) -> str | N
 
 def _failure_json(failure: TaskFailureReport | None) -> str | None:
     return failure.model_dump_json() if failure is not None else None
+
+
+def _finalized_progress(progress: TaskProgress, status: TaskStatus) -> TaskProgress:
+    progress.active_creators.clear()
+    progress.active_downloads.clear()
+    progress.waiting_retries.clear()
+    progress.speed_bps = 0
+    progress.eta_seconds = (
+        0
+        if status is TaskStatus.completed and progress.total_bytes is not None
+        else None
+    )
+    return progress
 
 
 def _task_from_row(row: aiosqlite.Row) -> TaskRecord:

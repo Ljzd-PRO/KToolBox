@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from collections import deque
+from dataclasses import dataclass
 from pathlib import Path
 from time import monotonic
 
@@ -9,6 +10,18 @@ from ktoolbox.failures import FailureItem, TaskFailureReport
 from ktoolbox.reporting import NullProgressReporter
 from ktoolbox.webui.task_models import ActiveDownload, TaskProgress, WaitingRetry
 from ktoolbox.webui.task_store import TaskStore
+
+
+@dataclass(slots=True)
+class _ProgressWrite:
+    event_type: str
+    data: dict[str, object]
+    progress: TaskProgress
+
+
+@dataclass(slots=True)
+class _ArtifactWrite:
+    path: Path
 
 
 class WebTaskReporter(NullProgressReporter):
@@ -27,7 +40,13 @@ class WebTaskReporter(NullProgressReporter):
         self._speed_samples: deque[tuple[float, int]] = deque()
         self._known_total = 0
         self._has_unknown_total = False
-        self._pending: set[asyncio.Task[object]] = set()
+        self._writes: asyncio.Queue[_ProgressWrite | _ArtifactWrite | None] = asyncio.Queue()
+        self._writer = self._loop.create_task(
+            self._writer_loop(),
+            name=f"ktoolbox-webui-reporter-{task_id}",
+        )
+        self._write_errors: list[BaseException] = []
+        self._closed = False
         self._delayed_flush: asyncio.Task[object] | None = None
         self._delayed_event_type = "task.progress"
         self._delayed_event_data: dict[str, object] = {}
@@ -175,14 +194,14 @@ class WebTaskReporter(NullProgressReporter):
             "download.finished",
             {
                 "key": task_key,
-                "status": status,
+                "outcome": status,
                 "failure": failure.model_dump(mode="json") if failure else None,
             },
             immediate=True,
         )
 
     def artifact_created(self, path: Path) -> None:
-        self._track(self.store.add_artifact(self.task_id, path))
+        self._writes.put_nowait(_ArtifactWrite(path))
 
     def log(
         self,
@@ -190,27 +209,35 @@ class WebTaskReporter(NullProgressReporter):
         message: str,
         failure_report: TaskFailureReport | None = None,
     ) -> None:
-        self._track(
-            self.store.add_event(
-                self.task_id,
-                "task.log",
-                {
-                    "level": level,
-                    "message": message,
-                    "failure_report": (failure_report.model_dump(mode="json") if failure_report is not None else None),
-                },
-            )
+        self._emit(
+            "task.log",
+            {
+                "level": level,
+                "message": message,
+                "failure_report": (
+                    failure_report.model_dump(mode="json")
+                    if failure_report is not None
+                    else None
+                ),
+            },
+            immediate=True,
         )
 
     async def close(self) -> None:
+        if self._closed:
+            return
+        self._closed = True
         if self._delayed_flush is not None:
             self._delayed_flush.cancel()
             await asyncio.gather(self._delayed_flush, return_exceptions=True)
             self._delayed_flush = None
-            await self._persist(self._delayed_event_type, self._delayed_event_data)
-        await self._persist("task.progress", {"phase": "settled"})
-        while self._pending:
-            await asyncio.gather(*tuple(self._pending), return_exceptions=True)
+            self._enqueue_progress(self._delayed_event_type, self._delayed_event_data)
+        self._enqueue_progress("task.progress", {"phase": "settled"})
+        await self._writes.join()
+        self._writes.put_nowait(None)
+        await self._writer
+        if self._write_errors:
+            raise self._write_errors[0]
 
     def _record_speed(self, now: float) -> None:
         self._speed_samples.append((now, self.progress.transferred_bytes))
@@ -233,36 +260,41 @@ class WebTaskReporter(NullProgressReporter):
 
     def _emit(self, event_type: str, data: dict[str, object], *, immediate: bool = False) -> None:
         if immediate:
-            self._track(self._persist(event_type, data))
+            self._enqueue_progress(event_type, data)
             return
         self._delayed_event_type = event_type
         self._delayed_event_data = data
         if self._delayed_flush is None or self._delayed_flush.done():
             task = self._loop.create_task(self._flush_later())
             self._delayed_flush = task
-            self._remember(task)
 
     async def _flush_later(self) -> None:
         await asyncio.sleep(self.flush_interval)
         event_type = self._delayed_event_type
         event_data = self._delayed_event_data
         self._delayed_flush = None
-        await self._persist(event_type, event_data)
+        self._enqueue_progress(event_type, event_data)
 
-    async def _persist(self, event_type: str, data: dict[str, object]) -> None:
+    def _enqueue_progress(self, event_type: str, data: dict[str, object]) -> None:
         snapshot = self.progress.model_copy(deep=True)
-        await self.store.update_progress(self.task_id, snapshot)
-        await self.store.add_event(
-            self.task_id,
-            event_type,
-            {**data, "progress": snapshot.model_dump(mode="json")},
-        )
+        self._writes.put_nowait(_ProgressWrite(event_type, dict(data), snapshot))
 
-    def _track(self, coroutine: object) -> None:
-        if not asyncio.iscoroutine(coroutine):
-            raise TypeError("expected coroutine")
-        self._remember(self._loop.create_task(coroutine))
-
-    def _remember(self, task: asyncio.Task[object]) -> None:
-        self._pending.add(task)
-        task.add_done_callback(self._pending.discard)
+    async def _writer_loop(self) -> None:
+        while True:
+            write = await self._writes.get()
+            try:
+                if write is None:
+                    return
+                if isinstance(write, _ArtifactWrite):
+                    await self.store.add_artifact(self.task_id, write.path)
+                else:
+                    await self.store.record_progress_event(
+                        self.task_id,
+                        write.event_type,
+                        write.data,
+                        write.progress,
+                    )
+            except BaseException as error:
+                self._write_errors.append(error)
+            finally:
+                self._writes.task_done()

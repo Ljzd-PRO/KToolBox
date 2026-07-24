@@ -23,6 +23,7 @@ from ktoolbox.webui.task_models import (
     DownloadTaskSpec,
     SyncTaskSpec,
     TaskPresentationSnapshot,
+    TaskProgress,
     TaskRecord,
     TaskStatus,
     task_target_key,
@@ -303,7 +304,7 @@ async def test_task_presentation_database_migration_and_store_round_trip(tmp_pat
         attempt_columns = {str(row[1]) for row in await cursor.fetchall()}
         await cursor.close()
     assert "failure_json" in attempt_columns
-    assert versions == [1, 2, 3, 4, 5, 6, 7]
+    assert versions == [1, 2, 3, 4, 5, 6, 7, 8]
 
     store = TaskStore(database)
     spec = DownloadTaskSpec(service="FanBox", creator_id="creator/id", post_id="42", output=tmp_path)
@@ -448,6 +449,42 @@ async def test_web_reporter_persists_throttled_speed_progress(tmp_path: Path) ->
 
 
 @pytest.mark.asyncio
+async def test_web_reporter_persists_progress_snapshots_in_callback_order(tmp_path: Path) -> None:
+    database = WebUIDatabase(tmp_path / "webui.sqlite3")
+    await database.initialize()
+    store = TaskStore(database)
+    task = await store.create(
+        DownloadTaskSpec(
+            service="fanbox",
+            creator_id="one",
+            post_id="42",
+            output=tmp_path,
+        )
+    )
+    reporter = WebTaskReporter(task.id, store, flush_interval=0.01)
+
+    for index in range(12):
+        key = f"file-{index}"
+        reporter.download_started(key, "fanbox:one", f"{key}.bin", 10, 0)
+        reporter.download_advanced(key, 10)
+        reporter.download_finished(key, "completed")
+    await reporter.close()
+
+    events = await store.events(task_id=task.id)
+    processed = [
+        int(event.data["progress"]["processed_files"])
+        for event in events
+        if isinstance(event.data.get("progress"), dict)
+    ]
+    assert processed == sorted(processed)
+    assert processed[-1] == 12
+    assert (await store.get(task.id)).progress.processed_files == 12
+    finished = [event for event in events if event.event_type == "download.finished"]
+    assert {event.data["outcome"] for event in finished} == {"completed"}
+    assert all("status" not in event.data for event in finished)
+
+
+@pytest.mark.asyncio
 async def test_web_reporter_persists_waiting_retries_without_double_counting(tmp_path: Path) -> None:
     database = WebUIDatabase(tmp_path / "webui.sqlite3")
     await database.initialize()
@@ -516,6 +553,70 @@ async def test_web_reporter_persists_structured_creator_and_file_failures(tmp_pa
     download_event = next(event for event in events if event.event_type == "download.finished")
     assert creator_event.data["failure"]["stage"] == FailureStage.work_list.value
     assert download_event.data["failure"]["file_name"] == "sample.bin"
+    assert download_event.data["outcome"] == "failed"
+
+
+@pytest.mark.asyncio
+async def test_terminal_status_and_migration_clear_stale_live_progress(tmp_path: Path) -> None:
+    database = WebUIDatabase(tmp_path / "webui.sqlite3")
+    await database.initialize()
+    store = TaskStore(database)
+    task = await store.create(
+        DownloadTaskSpec(
+            service="fanbox",
+            creator_id="one",
+            post_id="42",
+            output=tmp_path,
+        )
+    )
+    stale = TaskProgress(
+        queued_files=2,
+        processed_files=2,
+        completed_files=2,
+        transferred_bytes=100,
+        total_bytes=100,
+        speed_bps=50,
+        eta_seconds=2,
+        active_creators=["fanbox:one"],
+        active_downloads={
+            "file": {
+                "creator_key": "fanbox:one",
+                "filename": "sample.bin",
+                "total": 100,
+                "completed": 50,
+                "speed_bps": 50,
+            }
+        },
+        waiting_retries={
+            "retry": {
+                "creator_key": "fanbox:one",
+                "filename": "retry.bin",
+                "retry_count": 1,
+                "status_code": 503,
+            }
+        },
+    )
+    await store.update_progress(task.id, stale)
+    completed = await store.set_status(task.id, TaskStatus.completed)
+    assert completed.progress.active_creators == []
+    assert completed.progress.active_downloads == {}
+    assert completed.progress.waiting_retries == {}
+    assert completed.progress.speed_bps == 0
+    assert completed.progress.eta_seconds == 0
+
+    async with database.connect() as connection:
+        await connection.execute("DELETE FROM schema_migrations WHERE version = 8")
+        await connection.execute(
+            "UPDATE tasks SET progress_json = ? WHERE id = ?",
+            (stale.model_dump_json(), task.id),
+        )
+        await connection.commit()
+    await database.initialize()
+    repaired = await store.get(task.id)
+    assert repaired.progress.active_creators == []
+    assert repaired.progress.active_downloads == {}
+    assert repaired.progress.waiting_retries == {}
+    assert repaired.progress.speed_bps == 0
 
 
 @pytest.mark.asyncio

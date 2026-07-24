@@ -157,6 +157,12 @@ class WebUIDatabase:
                 "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
                 (7, utc_now().isoformat()),
             )
+            if not await _migration_applied(connection, 8):
+                await _repair_terminal_progress(connection)
+                await connection.execute(
+                    "INSERT INTO schema_migrations(version, applied_at) VALUES (?, ?)",
+                    (8, utc_now().isoformat()),
+                )
             await connection.commit()
 
     async def create_session(self, token: str, username: str, csrf_token: str) -> WebUISession:
@@ -232,3 +238,48 @@ async def _ensure_column(
     await cursor.close()
     if column not in {str(row[1]) for row in rows}:
         await connection.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
+
+
+async def _migration_applied(
+    connection: aiosqlite.Connection,
+    version: int,
+) -> bool:
+    cursor = await connection.execute(
+        "SELECT 1 FROM schema_migrations WHERE version = ?",
+        (version,),
+    )
+    row = await cursor.fetchone()
+    await cursor.close()
+    return row is not None
+
+
+async def _repair_terminal_progress(connection: aiosqlite.Connection) -> None:
+    from ktoolbox.webui.task_models import (
+        TERMINAL_TASK_STATUSES,
+        TaskProgress,
+        TaskStatus,
+    )
+
+    placeholders = ",".join("?" for _ in TERMINAL_TASK_STATUSES)
+    cursor = await connection.execute(
+        f"SELECT id, status, progress_json FROM tasks WHERE status IN ({placeholders})",
+        tuple(status.value for status in TERMINAL_TASK_STATUSES),
+    )
+    rows = await cursor.fetchall()
+    await cursor.close()
+    for task_id, raw_status, raw_progress in rows:
+        progress = TaskProgress.model_validate_json(raw_progress)
+        progress.active_creators.clear()
+        progress.active_downloads.clear()
+        progress.waiting_retries.clear()
+        progress.speed_bps = 0
+        progress.eta_seconds = (
+            0
+            if TaskStatus(raw_status) is TaskStatus.completed
+            and progress.total_bytes is not None
+            else None
+        )
+        await connection.execute(
+            "UPDATE tasks SET progress_json = ? WHERE id = ?",
+            (progress.model_dump_json(), task_id),
+        )

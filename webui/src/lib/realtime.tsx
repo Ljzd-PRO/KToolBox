@@ -465,7 +465,9 @@ function applyTaskEvent(
     return;
   }
   const progress = taskProgress(event.data.progress);
-  const status = taskStatus(event.data.status);
+  const status = event.event_type === "task.status"
+    ? taskStatus(event.data.status)
+    : null;
   if (progress || status) {
     queryClient.setQueryData<TaskRecord[]>(["tasks"], (tasks) =>
       tasks?.map((task) => {
