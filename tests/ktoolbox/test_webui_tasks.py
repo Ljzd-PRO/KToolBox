@@ -20,12 +20,14 @@ from ktoolbox.webui.event_store import WebUIEventStore
 from ktoolbox.webui.project_lock import ProjectAlreadyRunningError
 from ktoolbox.webui.task_executor import TaskExecutionSnapshot
 from ktoolbox.webui.task_models import (
+    ActiveDownload,
     DownloadTaskSpec,
     SyncTaskSpec,
     TaskPresentationSnapshot,
     TaskProgress,
     TaskRecord,
     TaskStatus,
+    WaitingRetry,
     task_target_key,
 )
 from ktoolbox.webui.task_reporter import WebTaskReporter
@@ -471,9 +473,36 @@ async def test_recovery_marks_unfinished_attempt_interrupted(tmp_path: Path) -> 
     task = await store.create(DownloadTaskSpec(service="fanbox", creator_id="one", post_id="42", output=tmp_path))
     await store.start_attempt(task, {"environment": {}})
     await store.set_status(task.id, TaskStatus.running)
+    await store.update_progress(
+        task.id,
+        TaskProgress(
+            speed_bps=4096,
+            active_creators=["fanbox:one"],
+            active_downloads={
+                "download-1": ActiveDownload(
+                    creator_key="fanbox:one",
+                    filename="sample.bin",
+                    total=1024,
+                )
+            },
+            waiting_retries={
+                "retry-1": WaitingRetry(
+                    creator_key="fanbox:one",
+                    filename="sample.bin",
+                    retry_count=1,
+                    status_code=503,
+                )
+            },
+        ),
+    )
 
     assert await store.recover_interrupted() == 1
-    assert (await store.get(task.id)).status is TaskStatus.interrupted
+    recovered = await store.get(task.id)
+    assert recovered.status is TaskStatus.interrupted
+    assert recovered.progress.speed_bps == 0
+    assert recovered.progress.active_creators == []
+    assert recovered.progress.active_downloads == {}
+    assert recovered.progress.waiting_retries == {}
     assert (await store.attempts(task.id))[0].status is TaskStatus.interrupted
 
 

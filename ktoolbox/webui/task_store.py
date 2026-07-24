@@ -75,12 +75,34 @@ class TaskStore:
         async with self.database.connect() as connection:
             cursor = await connection.execute(
                 f"""
-                UPDATE tasks
-                SET status = ?, error = ?, failure_json = NULL, updated_at = ?
+                SELECT id, progress_json
+                FROM tasks
                 WHERE status IN ({placeholders})
                 """,
-                [TaskStatus.interrupted.value, "WebUI stopped while this task was running", now, *values],
+                values,
             )
+            interrupted_tasks = await cursor.fetchall()
+            await cursor.close()
+            for task_id, progress_json in interrupted_tasks:
+                finalized_progress = _finalized_progress(
+                    TaskProgress.model_validate_json(progress_json),
+                    TaskStatus.interrupted,
+                )
+                await connection.execute(
+                    """
+                    UPDATE tasks
+                    SET status = ?, error = ?, failure_json = NULL,
+                        progress_json = ?, updated_at = ?
+                    WHERE id = ?
+                    """,
+                    (
+                        TaskStatus.interrupted.value,
+                        "WebUI stopped while this task was running",
+                        finalized_progress.model_dump_json(),
+                        now,
+                        task_id,
+                    ),
+                )
             await connection.execute(
                 f"""
                 UPDATE task_attempts
@@ -90,7 +112,7 @@ class TaskStore:
                 [TaskStatus.interrupted.value, "WebUI stopped while this task was running", now, *values],
             )
             await connection.commit()
-            return cursor.rowcount
+            return len(interrupted_tasks)
 
     async def create(
         self,
