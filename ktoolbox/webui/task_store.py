@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Literal
 from uuid import uuid4
 
 import aiosqlite
@@ -39,6 +40,27 @@ class DuplicateTaskError(ValueError):
 
 class InvalidTaskStateError(ValueError):
     pass
+
+
+_ACTIVITY_EVENT_TYPES = frozenset(
+    {
+        "task.created",
+        "task.status",
+        "task.updated",
+        "task.log",
+        "creator.started",
+        "creator.finished",
+        "download.retrying",
+        "download.finished",
+    }
+)
+_TRANSFER_EVENT_TYPES = frozenset(
+    {
+        "download.started",
+        "download.retrying",
+        "download.finished",
+    }
+)
 
 
 class TaskStore:
@@ -361,8 +383,27 @@ class TaskStore:
             resource_id=task_id,
         )
 
-    async def events(self, *, after: int = 0, task_id: str | None = None, limit: int = 200) -> list[TaskEvent]:
-        return await self.event_store.events(after=after, task_id=task_id, limit=limit)
+    async def events(
+        self,
+        *,
+        after: int = 0,
+        task_id: str | None = None,
+        view: Literal["activity", "transfers", "all"] = "all",
+        limit: int = 200,
+    ) -> list[TaskEvent]:
+        event_types = (
+            _ACTIVITY_EVENT_TYPES
+            if view == "activity"
+            else _TRANSFER_EVENT_TYPES
+            if view == "transfers"
+            else None
+        )
+        return await self.event_store.events(
+            after=after,
+            task_id=task_id,
+            event_types=event_types,
+            limit=limit,
+        )
 
     async def add_artifact(self, task_id: str, path: Path) -> None:
         artifact = await anyio.to_thread.run_sync(_capture_artifact, path)

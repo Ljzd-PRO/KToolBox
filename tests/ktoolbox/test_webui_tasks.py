@@ -370,6 +370,60 @@ async def test_task_deletion_publishes_a_surviving_global_event(tmp_path: Path) 
 
 
 @pytest.mark.asyncio
+async def test_task_event_views_filter_before_applying_the_limit(tmp_path: Path) -> None:
+    database = WebUIDatabase(tmp_path / "webui.sqlite3")
+    await database.initialize()
+    store = TaskStore(database)
+    task = await store.create(
+        DownloadTaskSpec(
+            service="fanbox",
+            creator_id="one",
+            post_id="42",
+            output=tmp_path,
+        )
+    )
+    cursor = await store.event_store.latest_id()
+    for index in range(3):
+        await store.add_event(task.id, "download.progress", {"index": index})
+    await store.add_event(
+        task.id,
+        "download.started",
+        {"filename": "sample.bin"},
+    )
+    await store.add_event(
+        task.id,
+        "task.status",
+        {"status": TaskStatus.running.value},
+    )
+
+    activity = await store.events(
+        after=cursor,
+        task_id=task.id,
+        view="activity",
+        limit=1,
+    )
+    transfers = await store.events(
+        after=cursor,
+        task_id=task.id,
+        view="transfers",
+        limit=1,
+    )
+    all_events = await store.events(
+        after=cursor,
+        task_id=task.id,
+        view="all",
+        limit=2,
+    )
+
+    assert [event.event_type for event in activity] == ["task.status"]
+    assert [event.event_type for event in transfers] == ["download.started"]
+    assert [event.event_type for event in all_events] == [
+        "download.progress",
+        "download.progress",
+    ]
+
+
+@pytest.mark.asyncio
 async def test_task_output_safety_stop_and_cleanup(tmp_path: Path) -> None:
     executor = ControlledExecutor()
     async with task_client(tmp_path, executor, concurrency=1) as (client, headers):
@@ -590,6 +644,10 @@ async def test_web_reporter_persists_structured_creator_and_file_failures(tmp_pa
     assert creator_event.data["failure"]["stage"] == FailureStage.work_list.value
     assert download_event.data["failure"]["file_name"] == "sample.bin"
     assert download_event.data["outcome"] == "failed"
+    assert download_event.data["filename"] == "sample.bin"
+    assert download_event.data["creator"] == "fanbox:one"
+    assert download_event.data["completed_bytes"] == 0
+    assert download_event.data["total_bytes"] == 100
 
 
 @pytest.mark.asyncio

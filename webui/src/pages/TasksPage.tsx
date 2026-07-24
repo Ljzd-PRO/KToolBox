@@ -3,6 +3,7 @@ import {
   Chip,
   Surface,
   Table,
+  Tooltip,
   toast,
 } from "@heroui/react";
 import type { SortDescriptor } from "@heroui/react";
@@ -106,6 +107,7 @@ type TaskStatusFilter =
   | "failed"
   | "stopped"
   | "interrupted";
+type TaskEventView = "activity" | "transfers" | "all";
 
 export function TasksPage() {
   const { t } = useTranslation();
@@ -123,6 +125,7 @@ export function TasksPage() {
   const [removing, setRemoving] = useState<TaskRecord[]>([]);
   const [deleting, setDeleting] = useState(false);
   const [deleteOutput, setDeleteOutput] = useState(false);
+  const [eventView, setEventView] = useState<TaskEventView>("activity");
   const statusFilter = taskStatusFilter(searchParams.get("status"));
   useEffect(() => {
     if (searchParams.get("create") !== "sync") return;
@@ -137,8 +140,10 @@ export function TasksPage() {
     enabled: removing.length === 1,
   });
   const eventsQuery = useQuery({
-    queryKey: ["task-events", taskId],
-    queryFn: () => api<TaskEvent[]>(`/tasks/${taskId}/events?limit=200`),
+    queryKey: ["task-events", taskId, eventView],
+    queryFn: () => api<TaskEvent[]>(
+      `/tasks/${taskId}/events?view=${eventView}&limit=200`,
+    ),
     enabled: Boolean(taskId),
   });
   const attemptsQuery = useQuery({
@@ -288,9 +293,11 @@ export function TasksPage() {
           attempts={attemptsQuery.data ?? []}
           creators={creatorsQuery.data ?? []}
           events={eventsQuery.data ?? []}
+          eventView={eventView}
           task={selected}
           handlers={handlers}
           onBack={() => navigate("/tasks")}
+          onEventViewChange={(value) => setEventView(value as TaskEventView)}
         />
       ) : (
         <TaskList
@@ -745,21 +752,30 @@ function TaskDetails({
   task,
   creators,
   events,
+  eventView,
   attempts,
   handlers,
   onBack,
+  onEventViewChange,
 }: {
   task: TaskRecord;
   creators: CreatorRosterItem[];
   events: TaskEvent[];
+  eventView: TaskEventView;
   attempts: TaskAttempt[];
   handlers: TaskHandlers;
   onBack: () => void;
+  onEventViewChange: (view: TaskEventView) => void;
 }) {
   const { t, i18n } = useTranslation();
   const progress = task.progress;
   const percent = taskPercent(progress.processed_files, progress.queued_files, progress.transferred_bytes, progress.total_bytes);
   const waitingRetries = Object.entries(progress.waiting_retries ?? {});
+  const eventViewOptions = [
+    { value: "activity", label: t("tasks.eventViews.activity"), icon: Activity },
+    { value: "transfers", label: t("tasks.eventViews.transfers"), icon: Gauge },
+    { value: "all", label: t("tasks.eventViews.all"), icon: Tools },
+  ];
   return (
     <>
       <PageHeader
@@ -793,21 +809,50 @@ function TaskDetails({
         </div>
       </Surface>
       <div className="grid items-stretch gap-5 lg:grid-cols-3">
-        <Surface className="grid content-start gap-4 rounded-lg border border-border p-5">
+        <Surface className="task-live-card flex h-60 min-h-0 flex-col gap-4 rounded-lg border border-border p-5 lg:h-72">
           <div className="flex items-center justify-between gap-3"><h2 className="font-semibold">{t("tasks.activeCreators")}</h2><Chip size="sm" variant="soft">{progress.active_creators.length}</Chip></div>
-          {progress.active_creators.length ? <div className="flex flex-wrap gap-2">{progress.active_creators.map((creator) => <Chip color="accent" key={creator} size="sm" variant="soft">{creator}</Chip>)}</div> : <p className="text-sm text-muted">{t("common.none")}</p>}
+          <div
+            aria-label={t("tasks.activeCreators")}
+            className="task-live-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pe-1"
+            role="region"
+            tabIndex={0}
+          >
+            {progress.active_creators.length ? (
+              <div className="flex flex-wrap gap-2">
+                {progress.active_creators.map((creator) => (
+                  <Tooltip key={creator}>
+                    <Chip color="accent" size="sm" variant="soft">{creator}</Chip>
+                    <Tooltip.Content>{creator}</Tooltip.Content>
+                  </Tooltip>
+                ))}
+              </div>
+            ) : <p className="text-sm text-muted">{t("common.none")}</p>}
+          </div>
         </Surface>
-        <Surface className="grid content-start gap-4 rounded-lg border border-border p-5">
+        <Surface className="task-live-card flex h-60 min-h-0 flex-col gap-4 rounded-lg border border-border p-5 lg:h-72">
           <div className="flex items-center justify-between gap-3"><h2 className="font-semibold">{t("tasks.activeDownloads")}</h2><Chip size="sm" variant="soft">{Object.keys(progress.active_downloads).length}</Chip></div>
-          {Object.entries(progress.active_downloads).map(([key, download]) => (
-            <div className="grid gap-1 border-b border-border pb-3 last:border-0 last:pb-0" key={key}>
-              <p className="truncate text-sm font-medium" title={download.filename}>{download.filename}</p>
-              <div className="flex justify-between gap-3 text-xs text-muted"><span>{download.creator_key}</span><span>{formatBytes(download.speed_bps, "/s")}</span></div>
-            </div>
-          ))}
-          {!Object.keys(progress.active_downloads).length ? <p className="text-sm text-muted">{t("common.none")}</p> : null}
+          <div
+            aria-label={t("tasks.activeDownloads")}
+            className="task-live-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pe-1"
+            role="region"
+            tabIndex={0}
+          >
+            {Object.entries(progress.active_downloads).map(([key, download]) => (
+              <div className="grid gap-1 border-b border-border py-3 first:pt-0 last:border-0 last:pb-0" key={key}>
+                <Tooltip>
+                  <p className="truncate text-sm font-medium" tabIndex={0}>{download.filename}</p>
+                  <Tooltip.Content>{download.filename}</Tooltip.Content>
+                </Tooltip>
+                <div className="flex justify-between gap-3 text-xs text-muted">
+                  <span className="min-w-0 truncate" title={download.creator_key}>{download.creator_key}</span>
+                  <span className="shrink-0 tabular-nums">{formatBytes(download.speed_bps, "/s")}</span>
+                </div>
+              </div>
+            ))}
+            {!Object.keys(progress.active_downloads).length ? <p className="text-sm text-muted">{t("common.none")}</p> : null}
+          </div>
         </Surface>
-        <Surface className="grid min-h-0 content-start gap-4 rounded-lg border border-border p-5">
+        <Surface className="task-live-card flex h-60 min-h-0 flex-col gap-4 rounded-lg border border-border p-5 lg:h-72">
           <div className="flex items-center justify-between gap-3">
             <h2 className="flex min-w-0 items-center gap-2 font-semibold">
               <Refresh aria-hidden="true" className="shrink-0 text-warning" size={18} />
@@ -818,7 +863,7 @@ function TaskDetails({
           {waitingRetries.length ? (
             <div
               aria-label={t("tasks.waitingRetries")}
-              className="max-h-64 min-h-0 overflow-y-auto overscroll-contain pe-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              className="task-live-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pe-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               role="region"
               tabIndex={0}
             >
@@ -841,11 +886,25 @@ function TaskDetails({
                 </div>
               ))}
             </div>
-          ) : <p className="text-sm text-muted">{t("common.none")}</p>}
+          ) : <p className="min-h-0 flex-1 text-sm text-muted">{t("common.none")}</p>}
         </Surface>
       </div>
       <Surface className="grid gap-4 rounded-lg border border-border p-5">
-        <div className="flex items-center justify-between gap-3"><h2 className="font-semibold">{t("tasks.logs")}</h2><Chip size="sm" variant="soft">{events.length}</Chip></div>
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+          <div className="flex items-center gap-3">
+            <h2 className="font-semibold">{t("tasks.logs")}</h2>
+            <Chip size="sm" variant="soft">{events.length}</Chip>
+          </div>
+          <div className="w-full sm:w-56">
+            <SelectField
+              icon={Activity}
+              label={t("tasks.eventView")}
+              options={eventViewOptions}
+              value={eventView}
+              onChange={(value) => onEventViewChange(value as TaskEventView)}
+            />
+          </div>
+        </div>
         <div
           aria-label={t("tasks.logs")}
           className="max-h-80 overflow-y-auto rounded-lg bg-default p-3 font-mono text-xs leading-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"

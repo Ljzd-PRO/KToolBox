@@ -1425,6 +1425,17 @@ paths:
           minimum: 0
           default: 0
           title: After
+      - name: view
+        in: query
+        required: false
+        schema:
+          enum:
+          - activity
+          - transfers
+          - all
+          type: string
+          default: all
+          title: View
       - name: limit
         in: query
         required: false

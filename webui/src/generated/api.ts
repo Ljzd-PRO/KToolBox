@@ -2867,6 +2867,7 @@ export interface operations {
         parameters: {
             query?: {
                 after?: number;
+                view?: "activity" | "transfers" | "all";
                 limit?: number;
             };
             header?: never;

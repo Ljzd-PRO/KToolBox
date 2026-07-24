@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
-from collections.abc import Mapping
+from collections.abc import Collection, Mapping
 
 import aiosqlite
 
@@ -112,6 +112,7 @@ class WebUIEventStore:
         *,
         after: int = 0,
         task_id: str | None = None,
+        event_types: Collection[str] | None = None,
         limit: int = 200,
     ) -> list[TaskEvent]:
         query = "SELECT * FROM task_events WHERE id > ?"
@@ -119,6 +120,11 @@ class WebUIEventStore:
         if task_id is not None:
             query += " AND task_id = ?"
             parameters.append(task_id)
+        if event_types:
+            ordered_types = sorted(event_types)
+            placeholders = ",".join("?" for _ in ordered_types)
+            query += f" AND event_type IN ({placeholders})"
+            parameters.extend(ordered_types)
         query += " ORDER BY id LIMIT ?"
         parameters.append(limit)
         async with self.database.connect() as connection:

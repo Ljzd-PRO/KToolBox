@@ -455,6 +455,10 @@ code {
   color: var(--accent);
 }
 
+.task-live-scroll {
+  scrollbar-gutter: stable;
+}
+
 .data-mobile-card.is-selected,
 .task-mobile-card.is-selected {
   border-color: color-mix(in oklab, var(--border) 45%, var(--accent) 55%);

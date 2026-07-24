@@ -45,6 +45,7 @@ class WebTaskReporter(NullProgressReporter):
         self._download_started_at: dict[str, float] = {}
         self._download_attempt_started_bytes: dict[str, int] = {}
         self._download_bytes: dict[str, int] = {}
+        self._creator_stats: dict[str, dict[str, int]] = {}
         self._speed_samples: deque[tuple[float, int]] = deque()
         self._known_total = 0
         self._has_unknown_total = False
@@ -79,18 +80,24 @@ class WebTaskReporter(NullProgressReporter):
     ) -> None:
         if creator_key in self.progress.active_creators:
             self.progress.active_creators.remove(creator_key)
+        stats = self._creator_stats.get(creator_key, {})
         self._emit(
             "creator.finished",
             {
                 "creator": creator_key,
                 "error": error,
                 "failure": failure.model_dump(mode="json") if failure else None,
+                "queued_files": stats.get("queued", 0),
+                "completed_files": stats.get("completed", 0),
+                "existing_files": stats.get("existed", 0),
+                "failed_files": stats.get("failed", 0),
             },
             immediate=True,
         )
 
     def job_queued(self, creator_key: str) -> None:
         self.progress.queued_files += 1
+        self._creator_stat(creator_key, "queued")
         self._emit("job.queued", {"creator": creator_key})
 
     def download_started(
@@ -125,7 +132,14 @@ class WebTaskReporter(NullProgressReporter):
         self._record_speed(now)
         self._emit(
             "download.started",
-            {"key": task_key, "creator": creator_key, "filename": filename, "total": total},
+            {
+                "key": task_key,
+                "creator": creator_key,
+                "filename": filename,
+                "total": total,
+                "completed": completed,
+                "resumed_bytes": completed,
+            },
             immediate=True,
         )
 
@@ -182,6 +196,33 @@ class WebTaskReporter(NullProgressReporter):
         status: str,
         failure: FailureItem | None = None,
     ) -> None:
+        now = monotonic()
+        active = self.progress.active_downloads.get(task_key)
+        waiting = self.progress.waiting_retries.get(task_key)
+        creator_key = (
+            active.creator_key
+            if active is not None
+            else waiting.creator_key
+            if waiting is not None
+            else None
+        )
+        filename = (
+            active.filename
+            if active is not None
+            else waiting.filename
+            if waiting is not None
+            else None
+        )
+        completed = active.completed if active is not None else self._download_bytes.get(task_key, 0)
+        total = active.total if active is not None else None
+        started_at = self._download_started_at.get(task_key)
+        elapsed = max(now - started_at, 0.001) if started_at is not None else None
+        attempt_start = self._download_attempt_started_bytes.get(task_key, completed)
+        average_speed = (
+            max(completed - attempt_start, 0) / elapsed
+            if elapsed is not None
+            else None
+        )
         self.progress.active_downloads.pop(task_key, None)
         self.progress.waiting_retries.pop(task_key, None)
         self._download_started_at.pop(task_key, None)
@@ -194,7 +235,9 @@ class WebTaskReporter(NullProgressReporter):
             self.progress.existing_files += 1
         elif status == "failed":
             self.progress.failed_files += 1
-        self._record_speed(monotonic())
+        if creator_key is not None:
+            self._creator_stat(creator_key, status)
+        self._record_speed(now)
         self._refresh_eta()
         if not self.progress.active_downloads:
             self._schedule_idle_speed_clear()
@@ -203,6 +246,12 @@ class WebTaskReporter(NullProgressReporter):
             {
                 "key": task_key,
                 "outcome": status,
+                "creator": creator_key,
+                "filename": filename,
+                "completed_bytes": completed,
+                "total_bytes": total,
+                "elapsed_seconds": elapsed,
+                "average_speed_bps": average_speed,
                 "failure": failure.model_dump(mode="json") if failure else None,
             },
             immediate=True,
@@ -263,6 +312,10 @@ class WebTaskReporter(NullProgressReporter):
             self.progress.speed_bps = (self.progress.transferred_bytes - first_bytes) / max(now - first_time, 0.001)
         elif self.progress.transferred_bytes:
             self.progress.speed_bps = self.progress.transferred_bytes / max(now - self._started_at, 0.001)
+
+    def _creator_stat(self, creator_key: str, name: str) -> None:
+        stats = self._creator_stats.setdefault(creator_key, {})
+        stats[name] = stats.get(name, 0) + 1
 
     def _refresh_eta(self) -> None:
         total = self.progress.total_bytes

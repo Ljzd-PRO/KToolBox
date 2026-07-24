@@ -312,6 +312,22 @@ export const ja = {
     waitingRetries: "再試行待ち",
     retryCount: "再試行済み：{{count}}回",
     logs: "アクティビティログ",
+    eventView: "ログ表示",
+    eventViews: {
+      activity: "重要なアクティビティ",
+      transfers: "ファイル転送",
+      all: "すべての技術イベント",
+    },
+    downloadOutcomes: {
+      completed: "完了",
+      existed: "既存",
+      failed: "失敗",
+    },
+    eventDetails: {
+      creatorSummary: "{{creator}} · キュー {{queued}} · 完了 {{completed}} · 既存 {{existing}} · 失敗 {{failed}}",
+      transferStarted: "{{file}} · {{creator}} · {{completed}} / {{total}}",
+      transferFinished: "{{file}} · {{creator}} · {{outcome}} · {{completed}} / {{total}} · {{duration}} · {{speed}}",
+    },
     pause: "一時停止",
     resume: "再開",
     stop: "停止",

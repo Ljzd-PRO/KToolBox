@@ -5,7 +5,7 @@ import json
 from collections.abc import AsyncIterator, Coroutine
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Annotated, Any, cast
+from typing import Annotated, Any, Literal, cast
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 from fastapi.responses import StreamingResponse
@@ -138,10 +138,16 @@ def create_task_router(project_root: Path) -> APIRouter:
         _: Annotated[WebUISession, Depends(require_session)],
         store: Annotated[TaskStore, Depends(task_store)],
         after: Annotated[int, Query(ge=0)] = 0,
+        view: Annotated[Literal["activity", "transfers", "all"], Query()] = "all",
         limit: Annotated[int, Query(ge=1, le=200)] = 200,
     ) -> list[TaskEvent]:
         await _task_or_404(store, task_id)
-        return await store.events(after=after, task_id=task_id, limit=limit)
+        return await store.events(
+            after=after,
+            task_id=task_id,
+            view=view,
+            limit=limit,
+        )
 
     @router.get("/tasks/{task_id}/cleanup-preview", response_model=TaskCleanupPreview)
     async def cleanup_preview(

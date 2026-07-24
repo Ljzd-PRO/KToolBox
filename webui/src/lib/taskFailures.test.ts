@@ -75,4 +75,35 @@ describe("task failure presentation", () => {
       },
     })).toBe("Creator failures: 1; file failures: 0.");
   });
+
+  it("renders structured creator and transfer details", async () => {
+    await i18n.changeLanguage("en");
+    const base: TaskEvent = {
+      id: 2,
+      task_id: "fixture",
+      event_type: "creator.finished",
+      data: {
+        creator: "fanbox:demo",
+        queued_files: 4,
+        completed_files: 2,
+        existing_files: 1,
+        failed_files: 1,
+      },
+      created_at: "2026-07-23T00:00:00Z",
+    };
+    expect(eventMessage(i18n.t, base)).toContain("queued 4");
+    expect(eventMessage(i18n.t, {
+      ...base,
+      event_type: "download.finished",
+      data: {
+        filename: "sample.bin",
+        creator: "fanbox:demo",
+        outcome: "completed",
+        completed_bytes: 1024,
+        total_bytes: 2048,
+        elapsed_seconds: 2,
+        average_speed_bps: 512,
+      },
+    })).toContain("512 B/s");
+  });
 });

@@ -350,6 +350,22 @@ export const en = {
     "waitingRetries": "Waiting to retry",
     "retryCount": "Retries completed: {{count}}",
     "logs": "Activity log",
+    "eventView": "Log view",
+    "eventViews": {
+      "activity": "Important activity",
+      "transfers": "File transfers",
+      "all": "All technical events"
+    },
+    "downloadOutcomes": {
+      "completed": "Completed",
+      "existed": "Already existed",
+      "failed": "Failed"
+    },
+    "eventDetails": {
+      "creatorSummary": "{{creator}} · queued {{queued}} · completed {{completed}} · existing {{existing}} · failed {{failed}}",
+      "transferStarted": "{{file}} · {{creator}} · {{completed}} / {{total}}",
+      "transferFinished": "{{file}} · {{creator}} · {{outcome}} · {{completed}} / {{total}} · {{duration}} · {{speed}}"
+    },
     "pause": "Pause",
     "resume": "Resume",
     "stop": "Stop",

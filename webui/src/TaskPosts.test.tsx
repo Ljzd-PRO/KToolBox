@@ -103,7 +103,8 @@ describe("task and post workflows", () => {
     expect(screen.getByText("2.00 KiB/s")).toBeInTheDocument();
     expect(screen.getByText("a-very-long-but-safe-fixture-name.zip")).toBeInTheDocument();
     const retryRegion = screen.getByRole("region", { name: "Waiting to retry" });
-    expect(retryRegion).toHaveClass("max-h-64", "overflow-y-auto");
+    expect(retryRegion).toHaveClass("task-live-scroll", "flex-1", "overflow-y-auto");
+    expect(retryRegion.closest(".task-live-card")).toHaveClass("h-60", "lg:h-72");
     expect(within(retryRegion).getByText("retry-fixture-01.bin")).toBeInTheDocument();
     expect(within(retryRegion).getByText("Retries completed: 2")).toBeInTheDocument();
     expect(within(retryRegion).getByText("HTTP 429")).toBeInTheDocument();

@@ -7,6 +7,7 @@ import type {
   TaskEvent,
   TaskFailureReport,
 } from "../types";
+import { formatBytes, formatDuration } from "./format";
 
 const failureCodes = new Set<FailureCode>([
   "network",
@@ -120,6 +121,44 @@ export function eventMessage(t: TFunction, event: TaskEvent): string {
     const status = typeof event.data.status_code === "number" ? `HTTP ${event.data.status_code}` : "HTTP —";
     return `${event.data.filename} · ${t("tasks.retryCount", { count: retryCount })} · ${status}`;
   }
+  if (
+    event.event_type === "creator.finished"
+    && typeof event.data.creator === "string"
+  ) {
+    return t("tasks.eventDetails.creatorSummary", {
+      creator: event.data.creator,
+      queued: eventNumber(event.data.queued_files),
+      completed: eventNumber(event.data.completed_files),
+      existing: eventNumber(event.data.existing_files),
+      failed: eventNumber(event.data.failed_files),
+    });
+  }
+  if (
+    event.event_type === "download.started"
+    && typeof event.data.filename === "string"
+  ) {
+    return t("tasks.eventDetails.transferStarted", {
+      file: event.data.filename,
+      creator: eventString(event.data.creator),
+      completed: formatBytes(eventNumber(event.data.completed)),
+      total: formatBytes(eventOptionalNumber(event.data.total)),
+    });
+  }
+  if (
+    event.event_type === "download.finished"
+    && typeof event.data.filename === "string"
+  ) {
+    const outcome = eventString(event.data.outcome || event.data.status);
+    return t("tasks.eventDetails.transferFinished", {
+      file: event.data.filename,
+      creator: eventString(event.data.creator),
+      outcome: t(`tasks.downloadOutcomes.${outcome}`, { defaultValue: outcome }),
+      completed: formatBytes(eventNumber(event.data.completed_bytes)),
+      total: formatBytes(eventOptionalNumber(event.data.total_bytes)),
+      duration: formatDuration(eventOptionalNumber(event.data.elapsed_seconds)),
+      speed: formatBytes(eventOptionalNumber(event.data.average_speed_bps), "/s"),
+    });
+  }
   if (typeof event.data.message === "string") return event.data.message;
   if (typeof event.data.creator === "string") return event.data.creator;
   if (typeof event.data.filename === "string") return event.data.filename;
@@ -176,6 +215,18 @@ export function parseFailureItem(value: unknown): FailureItem | null {
 
 function optionalString(value: unknown): string | null {
   return typeof value === "string" ? value : null;
+}
+
+function eventNumber(value: unknown): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : 0;
+}
+
+function eventOptionalNumber(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function eventString(value: unknown): string {
+  return typeof value === "string" && value.trim() ? value : "—";
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -97,6 +97,21 @@ const taskStatuses = new Set<TaskStatus>([
   "failed",
   "interrupted",
 ]);
+const activityEventTypes = new Set([
+  "task.created",
+  "task.status",
+  "task.updated",
+  "task.log",
+  "creator.started",
+  "creator.finished",
+  "download.retrying",
+  "download.finished",
+]);
+const transferEventTypes = new Set([
+  "download.started",
+  "download.retrying",
+  "download.finished",
+]);
 
 const initialRevisions: Record<RealtimeResource, number> = {
   tasks: 0,
@@ -496,10 +511,22 @@ function applyTaskEvent(
 
 function appendTaskEvent(queryClient: QueryClient, event: TaskEvent) {
   if (!event.task_id) return;
-  queryClient.setQueryData<TaskEvent[]>(["task-events", event.task_id], (events) => {
-    if (!events || events.some((item) => item.id === event.id)) return events;
-    return [...events, event].sort((left, right) => left.id - right.id).slice(-200);
+  const queries = queryClient.getQueryCache().findAll({
+    queryKey: ["task-events", event.task_id],
   });
+  for (const query of queries) {
+    const view = query.queryKey[2];
+    if (
+      view === "activity" && !activityEventTypes.has(event.event_type)
+      || view === "transfers" && !transferEventTypes.has(event.event_type)
+    ) {
+      continue;
+    }
+    queryClient.setQueryData<TaskEvent[]>(query.queryKey, (events) => {
+      if (!events || events.some((item) => item.id === event.id)) return events;
+      return [...events, event].sort((left, right) => left.id - right.id).slice(-200);
+    });
+  }
 }
 
 function parseEvent(value: string): TaskEvent | null {

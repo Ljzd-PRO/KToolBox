@@ -353,6 +353,22 @@ export const zhCN = {
     "waitingRetries": "等待重试",
     "retryCount": "已重试次数：{{count}}",
     "logs": "活动日志",
+    "eventView": "日志范围",
+    "eventViews": {
+      "activity": "重要活动",
+      "transfers": "文件传输",
+      "all": "全部技术事件"
+    },
+    "downloadOutcomes": {
+      "completed": "已完成",
+      "existed": "文件已存在",
+      "failed": "失败"
+    },
+    "eventDetails": {
+      "creatorSummary": "{{creator}} · 入队 {{queued}} · 完成 {{completed}} · 已存在 {{existing}} · 失败 {{failed}}",
+      "transferStarted": "{{file}} · {{creator}} · {{completed}} / {{total}}",
+      "transferFinished": "{{file}} · {{creator}} · {{outcome}} · {{completed}} / {{total}} · {{duration}} · {{speed}}"
+    },
     "pause": "暂停",
     "resume": "恢复",
     "stop": "停止",
