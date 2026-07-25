@@ -104,8 +104,7 @@ def test_config_metadata_is_complete_in_all_languages_and_redacts_secrets(tmp_pa
         "job.post_structure.revisions",
     }
     assert all(
-        next(field for field in english.fields if field.path == path).path_selector is None
-        for path in internal_names
+        next(field for field in english.fields if field.path == path).path_selector is None for path in internal_names
     )
     log_level = next(field for field in english.fields if field.path == "logger.level")
     assert log_level.choice_mode == "fixed"
@@ -417,9 +416,7 @@ async def test_configuration_monitor_publishes_only_changed_external_documents(t
         (tmp_path / ".env").write_text("KTOOLBOX_JOB__COUNT=7\n", encoding="utf-8")
         await monitor.check_once()
         records = await events.events()
-        assert [(record.event_type, record.resource_id) for record in records] == [
-            ("configuration.changed", "dotenv")
-        ]
+        assert [(record.event_type, record.resource_id) for record in records] == [("configuration.changed", "dotenv")]
         assert records[0].data["source"] == "external"
         assert contexts[-1].configuration.job.count == 7
 

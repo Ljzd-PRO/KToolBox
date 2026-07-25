@@ -233,11 +233,7 @@ def _choices(schema: dict[str, Any], path: str) -> list[ConfigChoiceResponse]:
     values = _schema_enum(schema)
     if not values:
         values = list(_SUGGESTED_CHOICES.get(path, ()))
-    return [
-        ConfigChoiceResponse(value=str(value), label=str(value))
-        for value in values
-        if value is not None
-    ]
+    return [ConfigChoiceResponse(value=str(value), label=str(value)) for value in values if value is not None]
 
 
 def _schema_enum(schema: dict[str, Any]) -> list[Any]:
