@@ -14,7 +14,7 @@ import {
 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 
-import { PageHeader, PageLoading } from "../components/ui";
+import { InlineCode, PageHeader, PageLoading } from "../components/ui";
 import { api } from "../lib/api";
 import type { AboutInfo } from "../types";
 
@@ -88,9 +88,9 @@ export function AboutPage() {
               <Icon aria-hidden="true" className="shrink-0 text-accent" size={18} stroke={1.8} />
               <span className="min-w-0 flex-1">
                 <span className="block text-sm font-medium text-foreground">{label}</span>
-                <code className="mt-0.5 block truncate text-xs text-muted" title={about.data.urls[key]}>
+                <InlineCode className="mt-0.5 block truncate border-0 bg-transparent p-0 text-xs font-normal text-muted" title={about.data.urls[key]}>
                   {about.data.urls[key]}
-                </code>
+                </InlineCode>
               </span>
               <IconExternalLink
                 aria-hidden="true"

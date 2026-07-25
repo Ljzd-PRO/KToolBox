@@ -83,6 +83,45 @@ function FieldLabel({ label, icon: Icon }: { label: ReactNode; icon?: TablerIcon
   );
 }
 
+const ADDRESS_PATTERN =
+  /(https?:\/\/[^\s<>"'`，。；：！？）)\]}]+|(?:localhost|(?:\d{1,3}\.){3}\d{1,3})(?::\d{1,5})?)/giu;
+const ADDRESS_EXACT_PATTERN =
+  /^(?:https?:\/\/[^\s<>"'`，。；：！？）)\]}]+|(?:localhost|(?:\d{1,3}\.){3}\d{1,3})(?::\d{1,5})?)$/iu;
+
+export function InlineCode({
+  children,
+  className,
+  title,
+}: {
+  children?: ReactNode;
+  className?: string;
+  title?: string;
+}) {
+  return (
+    <code className={cn("inline-path-code", className)} title={title}>
+      {children}
+    </code>
+  );
+}
+
+export function AddressText({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(ADDRESS_PATTERN).map((part, index) => {
+        if (!ADDRESS_EXACT_PATTERN.test(part)) return part;
+        const suffix = part.match(/[.,;!?，。；：！？）)\]}]+$/u)?.[0] ?? "";
+        const address = suffix ? part.slice(0, -suffix.length) : part;
+        return (
+          <span key={`${index}:${part}`}>
+            <InlineCode>{address}</InlineCode>
+            {suffix}
+          </span>
+        );
+      })}
+    </>
+  );
+}
+
 export function FormSurface({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <Surface className={cn("form-surface control-surface rounded-lg border border-border p-4", className)} variant="secondary">
@@ -324,7 +363,7 @@ export function PasswordField({
   icon,
 }: {
   label: string;
-  description?: string;
+  description?: ReactNode;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -383,7 +422,7 @@ export function NumberInput({
   icon,
 }: {
   label: string;
-  description?: string;
+  description?: ReactNode;
   value?: number;
   onChange: (value: number) => void;
   minValue?: number;
@@ -430,7 +469,7 @@ export function DateRangeInput({
   icon,
 }: {
   label: string;
-  description?: string;
+  description?: ReactNode;
   value: DateRangeValue | null;
   onChange: (value: DateRangeValue | null) => void;
   icon?: TablerIcon;
@@ -486,7 +525,7 @@ export function ChipListField({
   commitOnComma = true,
 }: {
   label: string;
-  description?: string;
+  description?: ReactNode;
   values: string[];
   onChange: (values: string[]) => void;
   placeholder?: string;
@@ -596,7 +635,7 @@ export function OptionalDateRangeField({
   icon,
 }: {
   label: string;
-  description?: string;
+  description?: ReactNode;
   startLabel: string;
   endLabel: string;
   startUnlimitedLabel: string;
@@ -900,7 +939,7 @@ export function CodeEditor({
   label: string;
   value: string;
   onChange: (value: string) => void;
-  description?: string;
+  description?: ReactNode;
   rows?: number;
   icon?: TablerIcon;
 }) {
@@ -1020,7 +1059,7 @@ export function FormSwitchField({
   className,
 }: {
   label: string;
-  description?: string;
+  description?: ReactNode;
   isSelected: boolean;
   onChange: (selected: boolean) => void;
   isDisabled?: boolean;
@@ -1297,7 +1336,7 @@ export function SelectField({
   value: string;
   options: SelectOption[];
   onChange: (value: string) => void;
-  description?: string;
+  description?: ReactNode;
   isDisabled?: boolean;
   icon?: TablerIcon;
 }) {

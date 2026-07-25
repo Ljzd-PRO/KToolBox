@@ -34,6 +34,7 @@ import { Trans, useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 
 import {
+  AddressText,
   BatchActionBar,
   CompactSwitch,
   ConfirmModal,
@@ -44,6 +45,7 @@ import {
   FormSwitchField,
   FormSurface,
   IconButton,
+  InlineCode,
   MobileSortControls,
   PawchiveIdentityFields,
   PageHeader,
@@ -607,7 +609,7 @@ export function CreatorsPage() {
             ) : null}
             {!originalKey && creatorIdentityMode === "url" ? (
               <FormField
-                description={t("creators.creatorUrlHint")}
+                description={<AddressText text={t("creators.creatorUrlHint")} />}
                 errorMessage={creatorUrlError}
                 icon={Link}
                 isInvalid={Boolean(creatorUrlError)}
@@ -628,7 +630,7 @@ export function CreatorsPage() {
                     t("creators.identityLockedHint")
                   ) : (
                     <Trans
-                      components={{ code: <code className="inline-path-code" /> }}
+                      components={{ code: <InlineCode /> }}
                       i18nKey="creators.identityHint"
                     />
                   )

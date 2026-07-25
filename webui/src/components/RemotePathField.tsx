@@ -50,6 +50,7 @@ import {
   useState,
   type FormEvent,
   type KeyboardEvent,
+  type ReactNode,
 } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -61,7 +62,7 @@ import { ConfirmModal, FormModal } from "./ui";
 
 type RemotePathFieldProps = {
   label: string;
-  description?: string;
+  description?: ReactNode;
   value: string;
   onChange: (value: string) => void;
   selector: PathSelector;

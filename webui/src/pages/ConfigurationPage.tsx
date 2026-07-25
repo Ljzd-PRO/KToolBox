@@ -36,6 +36,7 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 
 import {
+  AddressText,
   CodeEditor,
   ComboBoxField,
   ConfirmModal,
@@ -329,7 +330,9 @@ export function ConfigurationPage() {
               <div className="grid gap-3 p-4 md:grid-cols-[minmax(0,1fr)_minmax(180px,0.7fr)_auto] md:items-center" key={field.path}>
                 <div className="min-w-0">
                   <p className="font-medium text-foreground">{field.label}</p>
-                  <p className="mt-1 text-xs leading-relaxed text-muted">{field.description}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted">
+                    <AddressText text={field.description} />
+                  </p>
                 </div>
                 <code className="min-w-0 break-all text-xs text-muted">{displayValue(field)}</code>
                 <Chip color={sourceColors[field.source] ?? "default"} size="sm" variant="soft">
@@ -465,9 +468,10 @@ function ConfigFieldEditor({
   const enumValues = schemaEnum(schema);
   const icon = configurationIcon(field, type);
   const choiceOptions = configurationChoiceOptions(field);
+  const description = <AddressText text={field.description} />;
   const control = field.path_selector ? (
     <RemotePathField
-      description={field.description}
+      description={description}
       icon={icon}
       isDisabled={disabled}
       label={field.label}
@@ -477,7 +481,7 @@ function ConfigFieldEditor({
     />
   ) : field.secret ? (
     <PasswordField
-      description={field.description}
+      description={description}
       icon={icon}
       isDisabled={disabled}
       label={field.label}
@@ -487,7 +491,7 @@ function ConfigFieldEditor({
     />
   ) : type === "boolean" ? (
     <FormSwitchField
-      description={field.description}
+      description={description}
       icon={icon}
       isDisabled={disabled}
       isSelected={String(value).toLocaleLowerCase() === "true"}
@@ -496,7 +500,7 @@ function ConfigFieldEditor({
     />
   ) : type === "integer" || type === "number" ? (
     <NumberInput
-      description={field.description}
+      description={description}
       icon={icon}
       isDisabled={disabled}
       label={field.label}
@@ -508,7 +512,7 @@ function ConfigFieldEditor({
     />
   ) : field.choice_mode === "suggested" ? (
     <ComboBoxField
-      description={field.description}
+      description={description}
       icon={icon}
       isDisabled={disabled}
       label={field.label}
@@ -518,7 +522,7 @@ function ConfigFieldEditor({
     />
   ) : field.choice_mode === "fixed" || enumValues.length ? (
     <SelectField
-      description={field.description}
+      description={description}
       icon={icon}
       isDisabled={disabled}
       label={field.label}
@@ -528,7 +532,7 @@ function ConfigFieldEditor({
     />
   ) : (
     <FormField
-      description={field.description}
+      description={description}
       icon={icon}
       isDisabled={disabled}
       label={field.label}

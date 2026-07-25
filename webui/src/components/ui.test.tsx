@@ -7,6 +7,7 @@ import { useState } from "react";
 import { describe, expect, it } from "vitest";
 
 import {
+  AddressText,
   ChipListField,
   CompactSwitch,
   ConfirmModal,
@@ -21,6 +22,20 @@ import {
   PlatformComboBox,
   SelectField,
 } from "./ui";
+
+describe("inline addresses", () => {
+  it("renders URLs and IP addresses as code while preserving punctuation", () => {
+    const { container } = render(
+      <p>
+        <AddressText text="Open https://example.test/path, then bind to 127.0.0.1:8789." />
+      </p>,
+    );
+
+    const values = [...container.querySelectorAll("code")].map((element) => element.textContent);
+    expect(values).toEqual(["https://example.test/path", "127.0.0.1:8789"]);
+    expect(container.textContent).toBe("Open https://example.test/path, then bind to 127.0.0.1:8789.");
+  });
+});
 
 function ChipListHarness({ commitOnComma = true }: { commitOnComma?: boolean }) {
   const [values, setValues] = useState<string[]>([]);

@@ -34,11 +34,13 @@ import { useRealtime } from "../lib/realtime";
 import { ExternalChangeAlert } from "./ExternalChangeAlert";
 import { RemotePathField } from "./RemotePathField";
 import {
+  AddressText,
   ChipListField,
   FormCheckbox,
   FormField,
   FormModal,
   FormSwitchField,
+  InlineCode,
   NumberInput,
   OptionalDateRangeField,
   PawchiveIdentityFields,
@@ -327,14 +329,14 @@ export function TaskEditor({
               onChange={(value) => setDownloadIdentity(value === "fields" ? "fields" : "url")}
             />
             {downloadIdentity === "url" ? (
-              <FormField description={t("tasks.postUrlHint")} icon={Link} isRequired label={t("tasks.postUrl")} value={postUrl} onChange={setPostUrl} />
+              <FormField description={<AddressText text={t("tasks.postUrlHint")} />} icon={Link} isRequired label={t("tasks.postUrl")} value={postUrl} onChange={setPostUrl} />
             ) : (
               <PawchiveIdentityFields
                 creatorId={creatorId}
                 creatorIdLabel={t("posts.creatorId")}
                 description={
                   <Trans
-                    components={{ code: <code className="inline-path-code" /> }}
+                    components={{ code: <InlineCode /> }}
                     i18nKey="tasks.identityPathHint"
                   />
                 }
@@ -354,8 +356,8 @@ export function TaskEditor({
                 <Trans
                   components={{
                     example: <span className="mt-1 block" />,
-                    code: <code className="inline-path-code break-words" />,
-                    id: <code className="inline-path-code" />,
+                    code: <InlineCode className="break-words" />,
+                    id: <InlineCode />,
                   }}
                   i18nKey="tasks.revisionHint"
                 />

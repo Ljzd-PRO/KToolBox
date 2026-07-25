@@ -30,7 +30,7 @@ import { useAuth } from "../lib/auth";
 import { useRealtime } from "../lib/realtime";
 import { useTheme, type ThemeColor } from "../lib/theme";
 import { LanguageSelector } from "./LanguageSelector";
-import { IconButton } from "./ui";
+import { AddressText, IconButton } from "./ui";
 
 type NavigationItem = {
   key: string;
@@ -296,7 +296,9 @@ function SecurityNotice({ compact = false }: { compact?: boolean }) {
               {t("shell.securityTitle")}
             </Popover.Heading>
             <p className="text-sm leading-relaxed text-muted">{t("shell.securityBody")}</p>
-            <p className="text-sm leading-relaxed text-foreground">{t("shell.securityAdvice")}</p>
+            <p className="text-sm leading-relaxed text-foreground">
+              <AddressText text={t("shell.securityAdvice")} />
+            </p>
           </div>
         </Popover.Dialog>
       </Popover.Content>
