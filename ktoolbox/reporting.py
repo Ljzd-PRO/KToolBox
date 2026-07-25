@@ -312,10 +312,7 @@ class RichProgressReporter(NullProgressReporter):
             self.downloads.remove_task(task_id)
             self._refresh_transfer_speed()
         status = f"HTTP {status_code}" if status_code is not None else "transport error"
-        self.console.print(
-            f"[yellow]Waiting to retry {filename}[/yellow] "
-            f"({retry_count} retries completed, {status})."
-        )
+        self.console.print(f"[yellow]Waiting to retry {filename}[/yellow] ({retry_count} retries completed, {status}).")
 
     def download_finished(
         self,
