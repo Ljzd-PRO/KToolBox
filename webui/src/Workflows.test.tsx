@@ -424,4 +424,89 @@ describe("project workflows", () => {
     expect(saveBar?.closest(".form-surface")).toBeInTheDocument();
     expect(container.querySelector('[data-slot="scroll-shadow"]')).not.toBeInTheDocument();
   });
+
+  it("shows a readable cleanup preview without exposing the task UUID", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState({}, "", "/tasks/task-uuid-readable");
+    const task = {
+      id: "task-uuid-readable",
+      kind: "sync",
+      status: "completed",
+      spec: {
+        kind: "sync",
+        creators: [{ service: "fanbox", creator_id: "42", alias: null, enabled: true }],
+        output: "downloads",
+        save_creator_indices: true,
+        mix_posts: null,
+        start_time: null,
+        end_time: null,
+        offset: 0,
+        length: null,
+        keywords: [],
+        keywords_exclude: [],
+      },
+      presentation: null,
+      position: 1,
+      revision: 1,
+      progress: {
+        queued_files: 2,
+        processed_files: 2,
+        completed_files: 2,
+        existing_files: 0,
+        failed_files: 0,
+        transferred_bytes: 3072,
+        total_bytes: 3072,
+        speed_bps: 0,
+        eta_seconds: null,
+        active_creators: [],
+        active_downloads: {},
+        waiting_retries: {},
+      },
+      error: null,
+      failure: null,
+      blocked_by: null,
+      created_at: "2026-07-26T00:00:00Z",
+      updated_at: "2026-07-26T00:01:00Z",
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const path = String(input);
+        if (path.endsWith("/session")) return json(session);
+        if (path.endsWith("/tasks")) return json([task]);
+        if (path.endsWith("/creators")) {
+          return json([{ service: "fanbox", creator_id: "42", alias: null, enabled: true, name: "Readable Creator" }]);
+        }
+        if (path.includes("/tasks/task-uuid-readable/events")) return json([]);
+        if (path.endsWith("/tasks/task-uuid-readable/attempts")) return json([]);
+        if (path.endsWith("/tasks/task-uuid-readable/cleanup-preview")) {
+          return json({
+            task_id: "task-uuid-readable",
+            artifacts: [
+              { path: "/project/downloads/Readable Creator/work.json", size: 1024, mtime_ns: 1, removable: true, reason: null },
+              { path: "/project/downloads/Readable Creator/archive/file.zip", size: 2048, mtime_ns: 1, removable: true, reason: null },
+            ],
+            removable_files: 2,
+            removable_bytes: 3072,
+          });
+        }
+        throw new Error(`Unexpected request: ${path}`);
+      }),
+    );
+
+    render(<BrowserRouter><App /></BrowserRouter>);
+
+    await user.click(await screen.findByRole("button", { name: "Delete" }));
+    const dialog = await screen.findByRole("dialog", { name: "Delete task" });
+    expect(within(dialog).getAllByText("Readable Creator").length).toBeGreaterThan(0);
+    expect(within(dialog).getByText("downloads", { selector: "code" })).toBeInTheDocument();
+    expect(within(dialog).getByText("2 files to delete")).toBeInTheDocument();
+    expect(within(dialog).queryByText("task-uuid-readable")).not.toBeInTheDocument();
+    await user.click(within(dialog).getByText("2 files to delete"));
+    expect(within(dialog).getByText("Readable Creator/work.json")).toBeInTheDocument();
+    expect(within(dialog).getByText("Readable Creator/archive/file.zip")).toBeInTheDocument();
+    await user.click(within(dialog).getByRole("checkbox", { name: "Also delete unchanged files created by this task" }));
+    expect(within(dialog).getByText(/Only files recorded as created by this task/)).toBeInTheDocument();
+    expect(within(dialog).queryByText(/task-uuid-readable/)).not.toBeInTheDocument();
+  });
 });

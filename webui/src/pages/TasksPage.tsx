@@ -1,6 +1,7 @@
 import {
   Button,
   Chip,
+  Disclosure,
   Surface,
   Table,
   Tooltip,
@@ -342,21 +343,70 @@ export function TasksPage() {
           {removing.length === 1 ? (
             <>
               {cleanupQuery.isLoading ? <PageLoading /> : (
-                <Surface className="grid gap-2 rounded-lg border border-border p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-sm text-muted">{t("tasks.removable")}</span>
-                    <strong>{cleanupQuery.data?.removable_files ?? 0}</strong>
+                <Surface className="overflow-hidden rounded-lg border border-border" variant="secondary">
+                  <div className="grid gap-3 p-4">
+                    <TaskTarget
+                      creators={creatorsQuery.data ?? []}
+                      showRosterTooltip={false}
+                      task={removing[0]}
+                    />
+                    <div className="flex min-w-0 items-start gap-2 border-t border-border pt-3">
+                      <Folder aria-hidden="true" className="mt-0.5 shrink-0 text-accent" size={17} />
+                      <div className="min-w-0">
+                        <span className="block text-xs font-medium text-muted">{t("tasks.outputDirectory")}</span>
+                        <code className="mt-1 block truncate text-sm text-foreground" title={removing[0].spec.output}>
+                          {removing[0].spec.output}
+                        </code>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-sm text-muted">{t("tasks.outputSize")}</span>
-                    <strong>{formatBytes(cleanupQuery.data?.removable_bytes)}</strong>
+                  <div className="grid grid-cols-2 border-t border-border">
+                    <div className="grid gap-1 border-r border-border px-4 py-3">
+                      <span className="text-xs text-muted">{t("tasks.removable")}</span>
+                      <strong className="text-base tabular-nums">{cleanupQuery.data?.removable_files ?? 0}</strong>
+                    </div>
+                    <div className="grid gap-1 px-4 py-3">
+                      <span className="text-xs text-muted">{t("tasks.outputSize")}</span>
+                      <strong className="text-base tabular-nums">{formatBytes(cleanupQuery.data?.removable_bytes)}</strong>
+                    </div>
                   </div>
+                  {cleanupQuery.data?.artifacts.some((artifact) => artifact.removable) ? (
+                    <Disclosure className="border-t border-border">
+                      <Disclosure.Heading>
+                        <Disclosure.Trigger className="flex min-h-11 w-full items-center gap-2 px-4 py-2 text-left text-sm font-semibold hover:bg-default">
+                          <Folder aria-hidden="true" className="shrink-0 text-muted" size={16} />
+                          <span className="min-w-0 flex-1">
+                            {t("tasks.filePreview", { count: cleanupQuery.data.removable_files })}
+                          </span>
+                          <Disclosure.Indicator />
+                        </Disclosure.Trigger>
+                      </Disclosure.Heading>
+                      <Disclosure.Content>
+                        <Disclosure.Body className="border-t border-border px-2 py-2">
+                          <ul className="max-h-48 overflow-y-auto overscroll-contain rounded-md bg-field p-1 font-mono text-xs [scrollbar-gutter:stable]">
+                            {cleanupQuery.data.artifacts
+                              .filter((artifact) => artifact.removable)
+                              .map((artifact) => (
+                                <li
+                                  className="flex min-w-0 items-center justify-between gap-3 rounded px-2 py-2 text-foreground"
+                                  key={artifact.path}
+                                  title={artifact.path}
+                                >
+                                  <span className="min-w-0 truncate">{readableArtifactPath(artifact.path, removing[0].spec.output)}</span>
+                                  <span className="shrink-0 tabular-nums text-muted">{formatBytes(artifact.size)}</span>
+                                </li>
+                              ))}
+                          </ul>
+                        </Disclosure.Body>
+                      </Disclosure.Content>
+                    </Disclosure>
+                  ) : null}
                 </Surface>
               )}
               <FormCheckbox isSelected={deleteOutput} label={t("tasks.deleteOutput")} onChange={setDeleteOutput} />
               {deleteOutput ? (
-                <p className="break-all text-xs text-danger">
-                  {t("tasks.deleteConfirmation", { id: removing[0]?.id })}
+                <p className="text-xs leading-relaxed text-danger">
+                  {t("tasks.deleteSafety")}
                 </p>
               ) : null}
             </>
@@ -365,6 +415,21 @@ export function TasksPage() {
       </ConfirmModal>
     </div>
   );
+}
+
+function readableArtifactPath(path: string, output: string) {
+  const normalizedPath = path.replaceAll("\\", "/");
+  const normalizedOutput = output.replaceAll("\\", "/").replace(/\/+$/, "");
+  if (normalizedOutput && normalizedPath.startsWith(`${normalizedOutput}/`)) {
+    return normalizedPath.slice(normalizedOutput.length + 1);
+  }
+  const relativeOutput = normalizedOutput.replace(/^\/+/, "");
+  if (relativeOutput) {
+    const marker = `/${relativeOutput}/`;
+    const markerIndex = normalizedPath.lastIndexOf(marker);
+    if (markerIndex >= 0) return normalizedPath.slice(markerIndex + marker.length);
+  }
+  return normalizedPath.split("/").filter(Boolean).at(-1) ?? normalizedPath;
 }
 
 type TaskHandlers = {
