@@ -89,6 +89,8 @@ KToolBox 只有一個本機 WebUI 帳號。明確設定始終優先，`KTOOLBOX_
 
 ![深色設定編輯器](../assets/webui/20-configuration-1024-dark-zh.png)
 
+![全域設定中的記錄層級選項](../assets/webui/30-global-configuration-log-level-light.png)
+
 ![限定作用域的忽略規則編輯器](../assets/webui/17-blocker-form-1024-light-zh.png)
 
 ## 工作生命週期
@@ -126,6 +128,8 @@ KToolBox 只有一個本機 WebUI 帳號。明確設定始終優先，`KTOOLBOX_
 刪除輸出前會顯示可讀工作目標、輸出目錄、檔案與位元組總數，以及可展開的相對路徑預覽；介面不顯示內部 UUID。確認後只刪除由該工作建立且未修改的一般檔案。
 
 ![可讀的工作清理預覽](../assets/webui/31-task-delete-preview-light.png)
+
+![已完成同步工作的重新執行操作](../assets/webui/33-task-rerun-light.png)
 
 ## 關於
 

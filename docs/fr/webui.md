@@ -79,6 +79,8 @@ L'identifiant du créateur est placé en premier dans les lignes de bureau comme
 
 Les libellés et descriptions sont du texte explicitement localisé, pas des identifiants Python. Les docstrings `:ivar field:` de la classe anglaise restent la source sémantique des champs ; les catalogues dont la complétude est vérifiée fournissent tous les libellés et explications dans les sept langues. Pydantic fournit les types, valeurs par défaut, plages et métadonnées secrètes.
 
+Les choix fixes comme le niveau de journal utilisent un Select HeroUI enrichi d’icônes, tandis que les champs proposant des valeurs recommandées tout en acceptant une saisie personnalisée utilisent ComboBox. Les noms internes `attachments`, `content.txt` et `external_links.txt` restent des champs de texte ordinaires ; seuls les véritables emplacements du système de fichiers proposent le sélecteur de chemin.
+
 Les onglets `.env` et `prod.env` affichent la valeur effective finale et une puce de provenance. Les valeurs remplacées par l'environnement du processus sont en lecture seule. Les secrets sont masqués par défaut. L'édition avancée du texte affiche un avertissement supplémentaire, car elle peut dévoiler des secrets.
 
 Les champs liés au système de fichiers conservent la saisie manuelle et ajoutent un bouton de navigation. La boîte de dialogue affiche l'ordinateur distant qui exécute KToolBox, et non l'appareil du navigateur, avec emplacements rapides, fil d'Ariane, recherche, éléments cachés, pagination et création de répertoire. Les valeurs de configuration relatives au projet restent relatives après sélection ; les sorties absolues des tâches et publications restent absolues. Les valeurs en lecture seule provenant de l'environnement ne peuvent pas ouvrir le sélecteur.
@@ -86,6 +88,8 @@ Les champs liés au système de fichiers conservent la saisie manuelle et ajoute
 Avant l'enregistrement, le serveur analyse et valide le fichier proposé, puis renvoie une différence sémantique. Un ETag refuse les modifications obsolètes et le fichier est remplacé atomiquement. L'éditeur TOML utilise le stockage TomlKit/Pydantic existant, les commentaires survivent donc aux changements structurés.
 
 ![Éditeur de configuration sombre](../assets/webui/20-configuration-1024-dark-zh.png)
+
+![Choix du niveau de journal dans la configuration globale](../assets/webui/30-global-configuration-log-level-light.png)
 
 ![Éditeur de règle à portée limitée](../assets/webui/17-blocker-form-1024-light-zh.png)
 
@@ -119,11 +123,13 @@ Chaque tentative en échec conserve un rapport de diagnostic borné et expurgé 
 
 ![Progression d'une tâche en direct](../assets/webui/14-task-running-1024-dark-zh.png)
 
-La pause est coopérative : les flux réseau actifs se ferment, les fichiers terminés et temporaires pouvant reprendre restent, et la reprise crée une nouvelle tentative. Seules les tâches en pause, arrêtées, échouées ou interrompues peuvent reprendre. Une synchronisation terminée propose « Relancer », qui conserve l'enregistrement et crée une nouvelle tentative ; un téléchargement unique terminé ne le propose pas.
+La pause est coopérative : les flux réseau actifs se ferment, les fichiers terminés et temporaires pouvant reprendre restent, et la reprise crée une nouvelle tentative. Seules les tâches en pause, arrêtées, échouées ou interrompues (`interrupted`) peuvent reprendre. Une synchronisation terminée propose « Relancer », qui conserve l'enregistrement et crée une nouvelle tentative ; un téléchargement unique terminé ne le propose pas.
 
 Supprimer une tâche ne retire normalement que son enregistrement, ses tentatives et ses journaux. « Supprimer les sorties » présente la cible lisible, le répertoire, les totaux et une liste extensible de chemins relatifs sans UUID interne. La confirmation ne retire que les fichiers ordinaires inchangés enregistrés comme créés par cette tâche.
 
 ![Aperçu lisible du nettoyage](../assets/webui/31-task-delete-preview-light.png)
+
+![Synchronisation terminée avec relance](../assets/webui/33-task-rerun-light.png)
 
 ## À propos
 
