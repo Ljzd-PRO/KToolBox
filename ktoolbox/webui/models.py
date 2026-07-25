@@ -30,6 +30,16 @@ class ProjectSummaryResponse(BaseModel):
     version: str
 
 
+class AboutResponse(BaseModel):
+    name: str
+    version: str
+    description: str
+    license: str
+    authors: list[str]
+    python_version: str
+    urls: dict[str, str]
+
+
 class HealthResponse(BaseModel):
     status: str = "ok"
 

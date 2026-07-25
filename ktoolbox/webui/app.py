@@ -16,6 +16,7 @@ from starlette.middleware.base import RequestResponseEndpoint
 from ktoolbox import __version__
 from ktoolbox.configuration import RuntimeContext
 from ktoolbox.project_config import ProjectConfigStore
+from ktoolbox.webui.about import build_about_response
 from ktoolbox.webui.auth import (
     SESSION_COOKIE,
     AuthService,
@@ -34,6 +35,7 @@ from ktoolbox.webui.mcp_routes import create_mcp_router
 from ktoolbox.webui.mcp_server import create_mcp_server
 from ktoolbox.webui.mcp_tokens import MCPTokenStore
 from ktoolbox.webui.models import (
+    AboutResponse,
     HealthResponse,
     LoginRequest,
     ProjectSummaryResponse,
@@ -202,6 +204,12 @@ def create_app(
             dotenv_files=[root / ".env", root / "prod.env"],
             version=__version__,
         )
+
+    @app.get("/api/v1/about", response_model=AboutResponse)
+    async def get_about(
+        _: Annotated[WebUISession, Depends(require_session)],
+    ) -> AboutResponse:
+        return build_about_response()
 
     @app.exception_handler(ValueError)
     async def value_error_handler(_: Request, error: ValueError) -> JSONResponse:

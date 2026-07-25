@@ -28,6 +28,44 @@ afterEach(() => {
 });
 
 describe("project workflows", () => {
+  it("shows localized package details and safe official links", async () => {
+    window.history.replaceState({}, "", "/about");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const path = String(input);
+        if (path.endsWith("/session")) return json(session);
+        if (path.endsWith("/about")) {
+          return json({
+            name: "KToolBox",
+            version: "1.0.0",
+            description: "Package summary",
+            license: "BSD-3-Clause",
+            authors: ["Ljzd-PRO"],
+            python_version: "3.14.0",
+            urls: {
+              documentation: "https://ktoolbox.readthedocs.io/",
+              repository: "https://github.com/Ljzd-PRO/KToolBox",
+              issues: "https://github.com/Ljzd-PRO/KToolBox/issues",
+            },
+          });
+        }
+        throw new Error(`Unexpected request: ${path}`);
+      }),
+    );
+
+    render(<BrowserRouter><App /></BrowserRouter>);
+
+    expect(await screen.findByRole("heading", { name: "About", level: 1 })).toBeInTheDocument();
+    expect(await screen.findByText("BSD-3-Clause")).toBeInTheDocument();
+    expect(await screen.findByText("3.14.0")).toBeInTheDocument();
+    expect(await screen.findByText("Ljzd-PRO")).toBeInTheDocument();
+    const repository = screen.getByRole("link", { name: "Open Source repository" });
+    expect(repository).toHaveAttribute("target", "_blank");
+    expect(repository).toHaveAttribute("rel", "noopener noreferrer");
+    expect(within(repository).getByText("https://github.com/Ljzd-PRO/KToolBox", { selector: "code" })).toBeInTheDocument();
+  });
+
   it("explains structured task failures without exposing raw event JSON", async () => {
     window.history.replaceState({}, "", "/tasks/task-failed");
     const failure = {

@@ -2143,8 +2143,67 @@ paths:
         scope: mcp:read
         safety: read
         openWorld: false
+  /api/v1/about:
+    get:
+      summary: Get application information
+      operationId: get_about
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AboutResponse'
+      description: Return KToolBox package, license, runtime, author-name, and official-resource information.
+      tags:
+      - project
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: get_about
+        scope: null
+        safety: null
+        openWorld: false
 components:
   schemas:
+    AboutResponse:
+      properties:
+        name:
+          type: string
+          title: Name
+        version:
+          type: string
+          title: Version
+        description:
+          type: string
+          title: Description
+        license:
+          type: string
+          title: License
+        authors:
+          items:
+            type: string
+          type: array
+          title: Authors
+        python_version:
+          type: string
+          title: Python Version
+        urls:
+          additionalProperties:
+            type: string
+          type: object
+          title: Urls
+      type: object
+      required:
+      - name
+      - version
+      - description
+      - license
+      - authors
+      - python_version
+      - urls
+      title: AboutResponse
     ActiveDownload:
       properties:
         creator_key:

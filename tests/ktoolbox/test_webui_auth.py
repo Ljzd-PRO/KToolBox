@@ -54,6 +54,13 @@ async def test_plaintext_login_session_project_and_logout(tmp_path: Path) -> Non
         project = await client.get("/api/v1/project")
         assert project.json()["root"] == str(tmp_path)
         assert project.headers["cache-control"] == "no-store"
+        about = await client.get("/api/v1/about")
+        assert about.status_code == 200
+        assert about.json()["name"].casefold() == "ktoolbox"
+        assert about.json()["license"] == "BSD-3-Clause"
+        assert about.json()["authors"] == ["Ljzd-PRO"]
+        assert set(about.json()["urls"]) == {"documentation", "repository", "issues"}
+        assert "@" not in about.text
 
         assert (await client.post("/api/v1/session/logout")).status_code == 403
         logout = await client.post("/api/v1/session/logout", headers={CSRF_HEADER: csrf})

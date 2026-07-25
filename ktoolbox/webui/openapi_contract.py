@@ -288,6 +288,11 @@ OPERATIONS: dict[str, OperationMetadata] = {
         "project",
         mcp=_read("get_project_summary"),
     ),
+    "get_about": OperationMetadata(
+        "Get application information",
+        "Return KToolBox package, license, runtime, author-name, and official-resource information.",
+        "project",
+    ),
     "download_openapi": OperationMetadata(
         "Download WebUI OpenAPI",
         "Download the canonical YAML contract for the authenticated WebUI REST API.",

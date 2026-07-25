@@ -6,6 +6,8 @@ export type Session = WebUIApiSchemas["SessionResponse"];
 
 export type ProjectSummary = WebUIApiSchemas["ProjectSummaryResponse"];
 
+export type AboutInfo = WebUIApiSchemas["AboutResponse"];
+
 export type MCPStatus = WebUIApiSchemas["MCPStatusResponse"];
 
 export type MCPToken = WebUIApiSchemas["MCPTokenResponse"];

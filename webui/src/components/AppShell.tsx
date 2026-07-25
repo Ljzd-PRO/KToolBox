@@ -6,6 +6,7 @@ import {
   IconDeviceDesktop,
   IconFileSearch,
   IconGauge,
+  IconInfoCircle,
   IconLogout,
   IconMenu2,
   IconMoon,
@@ -46,6 +47,7 @@ const navigation: NavigationItem[] = [
   { key: "configuration", path: "/configuration", icon: IconSettingsCog },
   { key: "mcp", path: "/mcp", icon: IconPlugConnected },
   { key: "system", path: "/system", icon: IconAdjustmentsHorizontal },
+  { key: "about", path: "/about", icon: IconInfoCircle },
 ];
 
 const themeColors: ThemeColor[] = ["blue", "emerald", "violet", "rose", "amber"];

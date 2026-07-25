@@ -80,7 +80,8 @@ export const en = {
     "blockers": "Blockers",
     "configuration": "Global configuration",
     "mcp": "MCP",
-    "system": "System"
+    "system": "System",
+    "about": "About"
   },
   "shell": {
     "menu": "Open navigation",
@@ -655,6 +656,20 @@ export const en = {
     "check": "Check Pawchive",
     "unavailable": "Unavailable",
     "apiReady": "API ready"
+  },
+  "about": {
+    "title": "About",
+    "description": "Application, runtime, and official project information.",
+    "productDescription": "Download and synchronize public Pawchive works from one reliable project workspace.",
+    "license": "License",
+    "pythonVersion": "Python runtime",
+    "author": "Author",
+    "resources": "Official resources",
+    "resourcesDescription": "Documentation, source code, and issue reporting.",
+    "documentation": "Documentation",
+    "repository": "Source repository",
+    "issues": "Issue tracker",
+    "openResource": "Open {{name}}"
   },
   "errors": {
     "requestFailed": "The request could not be completed.",

@@ -11,6 +11,7 @@ import { queryClient } from "./lib/query";
 import { RealtimeProvider } from "./lib/realtime";
 import { ThemeProvider } from "./lib/theme";
 import { DashboardPage } from "./pages/DashboardPage";
+import { AboutPage } from "./pages/AboutPage";
 import { BlockersPage } from "./pages/BlockersPage";
 import { CreatorsPage } from "./pages/CreatorsPage";
 import { ConfigurationPage } from "./pages/ConfigurationPage";
@@ -45,6 +46,7 @@ function AuthenticatedApplication() {
           <Route element={<ConfigurationPage />} path="configuration" />
           <Route element={<MCPPage />} path="mcp" />
           <Route element={<SystemPage />} path="system" />
+          <Route element={<AboutPage />} path="about" />
           <Route element={<Navigate replace to="/" />} path="*" />
         </Route>
       </Routes>

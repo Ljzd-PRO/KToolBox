@@ -83,7 +83,8 @@ export const zhCN = {
     "blockers": "忽略规则",
     "configuration": "全局配置",
     "mcp": "MCP",
-    "system": "系统"
+    "system": "系统",
+    "about": "关于"
   },
   "shell": {
     "menu": "打开导航",
@@ -658,6 +659,20 @@ export const zhCN = {
     "check": "检查 Pawchive",
     "unavailable": "不可用",
     "apiReady": "API 就绪"
+  },
+  "about": {
+    "title": "关于",
+    "description": "应用、运行环境与项目官方信息。",
+    "productDescription": "在一个可靠的同步项目中下载和同步 Pawchive 公开作品。",
+    "license": "许可证",
+    "pythonVersion": "Python 运行环境",
+    "author": "作者",
+    "resources": "官方资源",
+    "resourcesDescription": "查看文档、源代码与问题反馈渠道。",
+    "documentation": "文档",
+    "repository": "源代码仓库",
+    "issues": "问题反馈",
+    "openResource": "打开{{name}}"
   },
   "errors": {
     "requestFailed": "请求未能完成。",
