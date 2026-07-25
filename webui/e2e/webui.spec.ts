@@ -510,13 +510,13 @@ test("remote path picker localizes every visible control", async ({ page }) => {
 
 
 const localeCases = [
-  { code: "zh-CN", nativeName: "简体中文", pages: [["/", "概览"], ["/tasks", "任务"], ["/creators", "作者"], ["/posts", "作品"], ["/blockers", "忽略规则"], ["/configuration", "配置"], ["/system", "系统"]], create: "创建任务" },
-  { code: "zh-Hant", nativeName: "繁體中文", pages: [["/", "概覽"], ["/tasks", "工作"], ["/creators", "作者"], ["/posts", "作品"], ["/blockers", "忽略規則"], ["/configuration", "設定"], ["/system", "系統"]], create: "建立工作" },
-  { code: "en", nativeName: "English", pages: [["/", "Overview"], ["/tasks", "Tasks"], ["/creators", "Creators"], ["/posts", "Posts"], ["/blockers", "Blockers"], ["/configuration", "Configuration"], ["/system", "System"]], create: "Create task" },
-  { code: "ja", nativeName: "日本語", pages: [["/", "概要"], ["/tasks", "タスク"], ["/creators", "クリエイター"], ["/posts", "作品"], ["/blockers", "除外ルール"], ["/configuration", "設定"], ["/system", "システム"]], create: "タスクを作成" },
-  { code: "ko", nativeName: "한국어", pages: [["/", "개요"], ["/tasks", "작업"], ["/creators", "크리에이터"], ["/posts", "작품"], ["/blockers", "제외 규칙"], ["/configuration", "설정"], ["/system", "시스템"]], create: "작업 만들기" },
-  { code: "fr", nativeName: "Français", pages: [["/", "Aperçu"], ["/tasks", "Tâches"], ["/creators", "Créateurs"], ["/posts", "Œuvres"], ["/blockers", "Règles d’exclusion"], ["/configuration", "Configuration"], ["/system", "Système"]], create: "Créer une tâche" },
-  { code: "ru", nativeName: "Русский", pages: [["/", "Обзор"], ["/tasks", "Задачи"], ["/creators", "Авторы"], ["/posts", "Работы"], ["/blockers", "Правила исключения"], ["/configuration", "Настройки"], ["/system", "Система"]], create: "Создать задачу" },
+  { code: "zh-CN", nativeName: "简体中文", pages: [["/", "概览"], ["/tasks", "任务"], ["/creators", "作者"], ["/posts", "作品"], ["/blockers", "忽略规则"], ["/configuration", "全局配置"], ["/system", "系统"], ["/about", "关于"]], create: "创建任务" },
+  { code: "zh-Hant", nativeName: "繁體中文", pages: [["/", "概覽"], ["/tasks", "工作"], ["/creators", "作者"], ["/posts", "作品"], ["/blockers", "忽略規則"], ["/configuration", "全域設定"], ["/system", "系統"], ["/about", "關於"]], create: "建立工作" },
+  { code: "en", nativeName: "English", pages: [["/", "Overview"], ["/tasks", "Tasks"], ["/creators", "Creators"], ["/posts", "Posts"], ["/blockers", "Blockers"], ["/configuration", "Global configuration"], ["/system", "System"], ["/about", "About"]], create: "Create task" },
+  { code: "ja", nativeName: "日本語", pages: [["/", "概要"], ["/tasks", "タスク"], ["/creators", "クリエイター"], ["/posts", "作品"], ["/blockers", "除外ルール"], ["/configuration", "グローバル設定"], ["/system", "システム"], ["/about", "このアプリについて"]], create: "タスクを作成" },
+  { code: "ko", nativeName: "한국어", pages: [["/", "개요"], ["/tasks", "작업"], ["/creators", "크리에이터"], ["/posts", "작품"], ["/blockers", "제외 규칙"], ["/configuration", "전역 설정"], ["/system", "시스템"], ["/about", "정보"]], create: "작업 만들기" },
+  { code: "fr", nativeName: "Français", pages: [["/", "Aperçu"], ["/tasks", "Tâches"], ["/creators", "Créateurs"], ["/posts", "Œuvres"], ["/blockers", "Règles d’exclusion"], ["/configuration", "Configuration globale"], ["/system", "Système"], ["/about", "À propos"]], create: "Créer une tâche" },
+  { code: "ru", nativeName: "Русский", pages: [["/", "Обзор"], ["/tasks", "Задачи"], ["/creators", "Авторы"], ["/posts", "Работы"], ["/blockers", "Правила исключения"], ["/configuration", "Глобальные настройки"], ["/system", "Система"], ["/about", "О программе"]], create: "Создать задачу" },
 ] as const;
 
 for (const locale of localeCases) {
@@ -661,14 +661,12 @@ test("captures the remote path picker visual matrix", async ({ page }, testInfo)
   await picker.getByRole("button", { name: "Cancel" }).click();
   await parentDialog.getByText("Close", { exact: true }).click();
 
-  await page.getByRole("link", { name: "Configuration" }).click();
+  await page.getByRole("link", { name: "Global configuration" }).click();
   await page.getByRole("button", { name: /Configuration section/ }).click();
   await page.getByRole("option", { name: "Download jobs" }).click();
-  await page.getByRole("button", { name: "Browse the remote computer for Content file" }).click();
-  picker = page.getByRole("dialog", { name: "Content file" });
-  await expect(picker.getByRole("textbox", { name: "File name" })).toHaveValue("content.txt");
-  await capture("configuration__file-picker__light", 768, 1024);
-  await picker.getByRole("button", { name: "Cancel" }).click();
+  await expect(page.getByRole("textbox", { name: "Content file" })).toHaveValue("content.txt");
+  await expect(page.getByRole("button", { name: "Browse the remote computer for Content file" })).toHaveCount(0);
+  await capture("configuration__internal-name__light", 768, 1024);
 
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.getByRole("button", { name: "Use dark theme" }).click();
@@ -809,7 +807,7 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
   await expect(page.getByRole("dialog", { name: "Remove this blocker?" })).toBeVisible();
   await page.getByRole("dialog", { name: "Remove this blocker?" }).getByRole("button", { name: "Cancel" }).click();
 
-  await page.getByRole("link", { name: "Configuration", exact: true }).click();
+  await page.getByRole("link", { name: "Global configuration", exact: true }).click();
   const saveBar = page.locator(".config-save-bar");
   await expect(saveBar).toBeVisible();
   expect(await saveBar.evaluate((element) => Boolean(element.closest(".form-surface")))).toBe(true);
@@ -975,7 +973,9 @@ test("failed tasks explain the stage, reason, and recovery action", async ({ pag
   await dialog.getByRole("textbox", { name: "Output directory" }).fill("failure-fixture");
   await dialog.getByRole("button", { name: "Create task" }).click();
 
-  await expect(page.getByText("Failed", { exact: true })).toBeVisible({ timeout: 10_000 });
+  await expect(
+    page.locator('span[data-slot="chip"]').filter({ hasText: /^Failed$/ }).last(),
+  ).toBeVisible({ timeout: 10_000 });
   const panel = page.getByRole("heading", { name: "Why this task failed" })
     .locator('xpath=ancestor::*[@aria-labelledby="task-failure-title"]');
   await expect(panel).toContainText("Creator failures: 1; file failures: 0.");
