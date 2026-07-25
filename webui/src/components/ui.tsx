@@ -313,6 +313,7 @@ export function FormField({
   isInvalid,
   errorMessage,
   placeholder,
+  inputClassName,
   icon,
   isReadOnly = false,
   isDisabled = false,
@@ -327,6 +328,7 @@ export function FormField({
   isInvalid?: boolean;
   errorMessage?: string;
   placeholder?: string;
+  inputClassName?: string;
   icon?: TablerIcon;
   isReadOnly?: boolean;
   isDisabled?: boolean;
@@ -345,7 +347,7 @@ export function FormField({
       onChange={onChange}
     >
       <FieldLabel icon={icon} label={label} />
-      <Input autoComplete={autoComplete} placeholder={placeholder} />
+      <Input autoComplete={autoComplete} className={inputClassName} placeholder={placeholder} />
       {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
       {errorMessage ? <FieldError>{errorMessage}</FieldError> : null}
     </TextField.Root>
@@ -1275,6 +1277,7 @@ export function ComboBoxField({
   onChange,
   description,
   isDisabled = false,
+  inputClassName,
   icon,
 }: {
   label: string;
@@ -1283,6 +1286,7 @@ export function ComboBoxField({
   onChange: (value: string) => void;
   description?: ReactNode;
   isDisabled?: boolean;
+  inputClassName?: string;
   icon?: TablerIcon;
 }) {
   const { t } = useTranslation();
@@ -1303,7 +1307,7 @@ export function ComboBoxField({
     >
       <FieldLabel icon={icon} label={label} />
       <ComboBox.InputGroup>
-        <Input autoComplete="off" />
+        <Input autoComplete="off" className={inputClassName} />
         <ComboBox.Trigger aria-label={t("common.showOptions")}>
           <ChevronDown aria-hidden="true" size={16} />
         </ComboBox.Trigger>

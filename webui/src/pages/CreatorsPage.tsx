@@ -612,6 +612,7 @@ export function CreatorsPage() {
                 description={<AddressText text={t("creators.creatorUrlHint")} />}
                 errorMessage={creatorUrlError}
                 icon={Link}
+                inputClassName="font-mono text-[0.8125rem]"
                 isInvalid={Boolean(creatorUrlError)}
                 isRequired
                 label={t("creators.creatorUrl")}

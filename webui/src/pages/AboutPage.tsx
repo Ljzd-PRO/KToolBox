@@ -88,7 +88,7 @@ export function AboutPage() {
               <Icon aria-hidden="true" className="shrink-0 text-accent" size={18} stroke={1.8} />
               <span className="min-w-0 flex-1">
                 <span className="block text-sm font-medium text-foreground">{label}</span>
-                <InlineCode className="mt-0.5 block truncate border-0 bg-transparent p-0 text-xs font-normal text-muted" title={about.data.urls[key]}>
+                <InlineCode className="about-resource-url mt-0.5 border-0 bg-transparent p-0 text-xs font-normal text-muted" title={about.data.urls[key]}>
                   {about.data.urls[key]}
                 </InlineCode>
               </span>

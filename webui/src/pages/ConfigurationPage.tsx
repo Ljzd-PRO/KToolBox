@@ -469,6 +469,9 @@ function ConfigFieldEditor({
   const icon = configurationIcon(field, type);
   const choiceOptions = configurationChoiceOptions(field);
   const description = <AddressText text={field.description} />;
+  const inputClassName = configurationAddressPaths.has(field.path)
+    ? "font-mono text-[0.8125rem]"
+    : undefined;
   const control = field.path_selector ? (
     <RemotePathField
       description={description}
@@ -516,6 +519,7 @@ function ConfigFieldEditor({
       icon={icon}
       isDisabled={disabled}
       label={field.label}
+      inputClassName={inputClassName}
       options={choiceOptions}
       value={value ?? ""}
       onChange={onChange}
@@ -536,6 +540,7 @@ function ConfigFieldEditor({
       icon={icon}
       isDisabled={disabled}
       label={field.label}
+      inputClassName={inputClassName}
       value={value ?? ""}
       onChange={onChange}
     />
@@ -543,7 +548,7 @@ function ConfigFieldEditor({
 
   return (
     <div className="grid gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-      <div className="min-w-0">{control}</div>
+      <div className="min-w-0 xl:max-w-3xl">{control}</div>
       <div className="flex flex-wrap items-center gap-2 lg:max-w-60 lg:justify-end">
         <Chip color={sourceColors[field.source] ?? "default"} size="sm" variant="soft">
           {configurationSourceLabel(field.source, t)}
@@ -560,6 +565,15 @@ function ConfigFieldEditor({
     </div>
   );
 }
+
+const configurationAddressPaths = new Set([
+  "api.netloc",
+  "api.statics_netloc",
+  "api.path",
+  "downloader.files_netloc",
+  "downloader.file_path_prefix",
+  "webui.host",
+]);
 
 function configurationChoiceOptions(field: ConfigField) {
   const values = field.choices?.length

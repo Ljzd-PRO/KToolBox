@@ -329,7 +329,15 @@ export function TaskEditor({
               onChange={(value) => setDownloadIdentity(value === "fields" ? "fields" : "url")}
             />
             {downloadIdentity === "url" ? (
-              <FormField description={<AddressText text={t("tasks.postUrlHint")} />} icon={Link} isRequired label={t("tasks.postUrl")} value={postUrl} onChange={setPostUrl} />
+              <FormField
+                description={<AddressText text={t("tasks.postUrlHint")} />}
+                icon={Link}
+                inputClassName="font-mono text-[0.8125rem]"
+                isRequired
+                label={t("tasks.postUrl")}
+                value={postUrl}
+                onChange={setPostUrl}
+              />
             ) : (
               <PawchiveIdentityFields
                 creatorId={creatorId}

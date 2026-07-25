@@ -907,6 +907,14 @@ code {
   overflow-wrap: anywhere;
 }
 
+.about-resource-url {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media (max-width: 767px) {
   .app-workbar-inner {
     min-height: 4rem;

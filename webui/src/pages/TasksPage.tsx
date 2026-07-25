@@ -861,7 +861,7 @@ function TaskDetails({
   return (
     <>
       <PageHeader
-        description={`${t(`common.${task.kind}`)} · ${task.id}`}
+        description={t(`common.${task.kind}`)}
         showDescription
         title={t("tasks.details")}
         actions={

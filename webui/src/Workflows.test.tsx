@@ -454,6 +454,7 @@ describe("project workflows", () => {
     expect(screen.getByRole("button", { name: "Browse the remote computer for Log directory" })).toBeDisabled();
     expect(screen.getByRole("button", { name: /Log level$/ })).toBeInTheDocument();
     expect(screen.getByRole("combobox", { name: "Listen address" })).toHaveValue("127.0.0.1");
+    expect(screen.getByRole("combobox", { name: "Listen address" })).toHaveClass("font-mono");
     expect(screen.getByRole("textbox", { name: "External links file name" })).toHaveValue("external_links.txt");
     expect(screen.queryByRole("button", { name: "Browse the remote computer for External links file name" })).not.toBeInTheDocument();
     expect(screen.queryByText("api.timeout")).not.toBeInTheDocument();
@@ -547,5 +548,6 @@ describe("project workflows", () => {
     await user.click(within(dialog).getByRole("checkbox", { name: "Also delete unchanged files created by this task" }));
     expect(within(dialog).getByText(/Only files recorded as created by this task/)).toBeInTheDocument();
     expect(within(dialog).queryByText(/task-uuid-readable/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/task-uuid-readable/)).not.toBeInTheDocument();
   });
 });
