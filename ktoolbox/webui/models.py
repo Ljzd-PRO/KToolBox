@@ -40,6 +40,12 @@ class PathSelectorResponse(BaseModel):
     value_mode: Literal["absolute", "project_relative"]
 
 
+class ConfigChoiceResponse(BaseModel):
+    value: str
+    label: str
+    description: str | None = None
+
+
 class ConfigFieldResponse(BaseModel):
     path: str
     env_name: str
@@ -54,6 +60,8 @@ class ConfigFieldResponse(BaseModel):
     source: Literal["default", ".env", "prod.env", "environment"] | str
     apply_mode: Literal["next_task", "restart"]
     path_selector: PathSelectorResponse | None = None
+    choice_mode: Literal["fixed", "suggested"] | None = None
+    choices: list[ConfigChoiceResponse] = Field(default_factory=list)
 
 
 class FilesystemBreadcrumbResponse(BaseModel):

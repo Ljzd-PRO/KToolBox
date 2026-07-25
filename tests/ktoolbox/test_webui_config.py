@@ -84,14 +84,7 @@ def test_config_metadata_is_complete_in_all_languages_and_redacts_secrets(tmp_pa
     assert post_directory.label == "作品目录格式"
     selectors = {field.path: field.path_selector for field in english.fields if field.path_selector is not None}
 
-    def has_path_format(schema: object) -> bool:
-        if isinstance(schema, dict):
-            return schema.get("format") == "path" or any(has_path_format(value) for value in schema.values())
-        if isinstance(schema, list):
-            return any(has_path_format(value) for value in schema)
-        return False
-
-    assert {field.path for field in english.fields if has_path_format(field.json_schema)} == set(selectors)
+    assert set(selectors) == {"downloader.bucket_path", "logger.path"}
     assert selectors["downloader.bucket_path"].model_dump() == {
         "kind": "directory",
         "scope": "host",
@@ -104,8 +97,30 @@ def test_config_metadata_is_complete_in_all_languages_and_redacts_secrets(tmp_pa
     }
     assert next(field for field in english.fields if field.path == "logger.path").label == "Log directory"
     assert next(field for field in chinese.fields if field.path == "logger.path").label == "日志目录"
-    assert selectors["job.post_structure.content"].kind == "file"
-    assert selectors["job.post_structure.attachments"].value_mode == "project_relative"
+    internal_names = {
+        "job.post_structure.attachments",
+        "job.post_structure.content",
+        "job.post_structure.external_links",
+        "job.post_structure.revisions",
+    }
+    assert all(
+        next(field for field in english.fields if field.path == path).path_selector is None
+        for path in internal_names
+    )
+    log_level = next(field for field in english.fields if field.path == "logger.level")
+    assert log_level.choice_mode == "fixed"
+    assert [choice.value for choice in log_level.choices] == [
+        "TRACE",
+        "DEBUG",
+        "INFO",
+        "SUCCESS",
+        "WARNING",
+        "ERROR",
+        "CRITICAL",
+    ]
+    host = next(field for field in english.fields if field.path == "webui.host")
+    assert host.choice_mode == "suggested"
+    assert [choice.value for choice in host.choices] == ["127.0.0.1", "0.0.0.0"]
     forbidden_terms = ("\u6295\u7a3f", "\u5e16\u5b50", "\u5c4f\u853d\u5668")
     assert not any(term in f"{field.label} {field.description}" for field in chinese.fields for term in forbidden_terms)
 

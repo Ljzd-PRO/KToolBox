@@ -4,6 +4,9 @@ import asyncio
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+from pydantic import ValidationError
+
 from ktoolbox.configuration import (
     Configuration,
     DownloaderConfiguration,
@@ -36,6 +39,12 @@ def test_pawchive_defaults_and_nested_environment(monkeypatch) -> None:
     assert configured.webui.port == 8789
     assert configured.webui.max_active_tasks == 2
     assert configured.webui.password.get_secret_value() == ""
+
+
+def test_logger_level_accepts_only_loguru_levels() -> None:
+    assert Configuration(_env_file=None, logger={"level": "SUCCESS"}).logger.level == "SUCCESS"
+    with pytest.raises(ValidationError):
+        Configuration(_env_file=None, logger={"level": "verbose"})
 
 
 def test_project_configuration_uses_project_dotenv_priority(tmp_path: Path, monkeypatch) -> None:

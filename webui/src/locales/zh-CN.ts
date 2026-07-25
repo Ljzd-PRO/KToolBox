@@ -81,7 +81,7 @@ export const zhCN = {
     "creators": "作者",
     "posts": "作品",
     "blockers": "忽略规则",
-    "configuration": "配置",
+    "configuration": "全局配置",
     "mcp": "MCP",
     "system": "系统"
   },
@@ -236,7 +236,7 @@ export const zhCN = {
     "removeBody": "规则 {{id}} 将不再应用于之后创建的同步任务。"
   },
   "configuration": {
-    "title": "配置",
+    "title": "全局配置",
     "description": "使用来自 KToolBox 配置类文档的说明编辑类型化设置。",
     "structured": "结构化设置",
     "effective": "最终生效值",

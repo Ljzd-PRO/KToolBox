@@ -72,7 +72,7 @@ export const ja = {
       delete_failed: "フォルダーを削除できませんでした。",
     },
   },
-  nav: { overview: "概要", tasks: "タスク", creators: "クリエイター", posts: "作品", blockers: "除外ルール", configuration: "設定", mcp: "MCP", system: "システム" },
+  nav: { overview: "概要", tasks: "タスク", creators: "クリエイター", posts: "作品", blockers: "除外ルール", configuration: "グローバル設定", mcp: "MCP", system: "システム" },
   shell: {
     menu: "ナビゲーションを開く",
     closeMenu: "ナビゲーションを閉じる",
@@ -195,7 +195,7 @@ export const ja = {
     removeBody: "ルール{{id}}は今後の同期タスクに適用されなくなります。",
   },
   configuration: {
-    title: "設定",
+    title: "グローバル設定",
     description: "KToolBox設定クラスのドキュメントを参照しながら型付き設定を編集します。",
     structured: "構造化設定",
     effective: "有効値",

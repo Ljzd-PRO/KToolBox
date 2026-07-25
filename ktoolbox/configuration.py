@@ -1,5 +1,4 @@
 import datetime
-import logging
 import os
 import tempfile
 from collections.abc import Iterator
@@ -26,7 +25,10 @@ __all__ = [
     "active_configuration",
     "configuration_scope",
     "load_configuration",
+    "LogLevel",
 ]
+
+LogLevel = Literal["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"]
 
 
 # noinspection SpellCheckingInspection,GrazieInspection
@@ -331,7 +333,7 @@ class LoggerConfiguration(BaseModel):
     """
 
     path: Path | None = None
-    level: str | int = logging.getLevelName(logging.DEBUG)
+    level: LogLevel = "DEBUG"
     rotation: str | int | datetime.time | datetime.timedelta = "1 week"
 
 

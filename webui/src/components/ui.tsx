@@ -1229,6 +1229,61 @@ export function PlatformComboBox({
   );
 }
 
+export function ComboBoxField({
+  label,
+  value,
+  options,
+  onChange,
+  description,
+  isDisabled = false,
+  icon,
+}: {
+  label: string;
+  value: string;
+  options: SelectOption[];
+  onChange: (value: string) => void;
+  description?: ReactNode;
+  isDisabled?: boolean;
+  icon?: TablerIcon;
+}) {
+  const { t } = useTranslation();
+  const selectedKey = options.find((option) => option.value === value)?.value ?? null;
+  return (
+    <ComboBox
+      allowsCustomValue
+      allowsEmptyCollection
+      className="grid gap-1.5"
+      fullWidth
+      inputValue={value}
+      isDisabled={isDisabled}
+      menuTrigger="focus"
+      selectedKey={selectedKey}
+      variant="secondary"
+      onInputChange={onChange}
+      onSelectionChange={(key) => key != null && onChange(String(key))}
+    >
+      <FieldLabel icon={icon} label={label} />
+      <ComboBox.InputGroup>
+        <Input autoComplete="off" />
+        <ComboBox.Trigger aria-label={t("common.showOptions")}>
+          <ChevronDown aria-hidden="true" size={16} />
+        </ComboBox.Trigger>
+      </ComboBox.InputGroup>
+      {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
+      <ComboBox.Popover>
+        <ListBox aria-label={label} items={options}>
+          {(option) => (
+            <ListBox.Item id={option.value} textValue={option.label}>
+              <SelectOptionContent option={option} />
+              <ListBox.ItemIndicator />
+            </ListBox.Item>
+          )}
+        </ListBox>
+      </ComboBox.Popover>
+    </ComboBox>
+  );
+}
+
 export function SelectField({
   label,
   value,

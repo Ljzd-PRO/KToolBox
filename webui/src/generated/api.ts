@@ -893,6 +893,15 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** ConfigChoiceResponse */
+        ConfigChoiceResponse: {
+            /** Value */
+            value: string;
+            /** Label */
+            label: string;
+            /** Description */
+            description?: string | null;
+        };
         /** ConfigFieldResponse */
         ConfigFieldResponse: {
             /** Path */
@@ -925,6 +934,10 @@ export interface components {
              */
             apply_mode: "next_task" | "restart";
             path_selector?: components["schemas"]["PathSelectorResponse"] | null;
+            /** Choice Mode */
+            choice_mode?: ("fixed" | "suggested") | null;
+            /** Choices */
+            choices?: components["schemas"]["ConfigChoiceResponse"][];
         };
         /** ConfigSchemaResponse */
         ConfigSchemaResponse: {

@@ -78,7 +78,7 @@ export const en = {
     "creators": "Creators",
     "posts": "Posts",
     "blockers": "Blockers",
-    "configuration": "Configuration",
+    "configuration": "Global configuration",
     "mcp": "MCP",
     "system": "System"
   },
@@ -233,7 +233,7 @@ export const en = {
     "removeBody": "The {{id}} rule will stop applying to future sync tasks."
   },
   "configuration": {
-    "title": "Configuration",
+    "title": "Global configuration",
     "description": "Edit typed settings with documentation sourced from KToolBox configuration classes.",
     "structured": "Structured settings",
     "effective": "Effective values",

@@ -2186,6 +2186,24 @@ components:
       - id
       title: BlockerSpec
       description: Serializable definition used by the blocker registry.
+    ConfigChoiceResponse:
+      properties:
+        value:
+          type: string
+          title: Value
+        label:
+          type: string
+          title: Label
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      type: object
+      required:
+      - value
+      - label
+      title: ConfigChoiceResponse
     ConfigFieldResponse:
       properties:
         path:
@@ -2237,6 +2255,19 @@ components:
           anyOf:
           - $ref: '#/components/schemas/PathSelectorResponse'
           - type: 'null'
+        choice_mode:
+          anyOf:
+          - type: string
+            enum:
+            - fixed
+            - suggested
+          - type: 'null'
+          title: Choice Mode
+        choices:
+          items:
+            $ref: '#/components/schemas/ConfigChoiceResponse'
+          type: array
+          title: Choices
       type: object
       required:
       - path

@@ -310,6 +310,55 @@ describe("project workflows", () => {
                 apply_mode: "next_task",
               },
               {
+                path: "logger.level",
+                env_name: "KTOOLBOX_LOGGER__LEVEL",
+                section: "api",
+                label: "Log level",
+                description: "Minimum level written to the log.",
+                json_schema: { type: "string", enum: ["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"] },
+                default: "DEBUG",
+                value: "INFO",
+                is_set: true,
+                secret: false,
+                source: "default",
+                apply_mode: "next_task",
+                choice_mode: "fixed",
+                choices: ["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"].map((value) => ({ value, label: value })),
+              },
+              {
+                path: "webui.host",
+                env_name: "KTOOLBOX_WEBUI__HOST",
+                section: "api",
+                label: "Listen address",
+                description: "Address used by the WebUI server.",
+                json_schema: { type: "string" },
+                default: "0.0.0.0",
+                value: "127.0.0.1",
+                is_set: true,
+                secret: false,
+                source: "default",
+                apply_mode: "restart",
+                choice_mode: "suggested",
+                choices: [
+                  { value: "127.0.0.1", label: "127.0.0.1" },
+                  { value: "0.0.0.0", label: "0.0.0.0" },
+                ],
+              },
+              {
+                path: "job.post_structure.external_links",
+                env_name: "KTOOLBOX_JOB__POST_STRUCTURE__EXTERNAL_LINKS",
+                section: "api",
+                label: "External links file name",
+                description: "File name used inside each work directory.",
+                json_schema: { type: "string" },
+                default: "external_links.txt",
+                value: "external_links.txt",
+                is_set: true,
+                secret: false,
+                source: "default",
+                apply_mode: "next_task",
+              },
+              {
                 path: "downloader.bucket_path",
                 env_name: "KTOOLBOX_DOWNLOADER__BUCKET_PATH",
                 section: "api",
@@ -360,11 +409,15 @@ describe("project workflows", () => {
 
     const { container } = render(<BrowserRouter><App /></BrowserRouter>);
 
-    expect(await screen.findByRole("heading", { name: "Configuration" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Global configuration" })).toBeInTheDocument();
     expect(await screen.findByText("API request timeout")).toBeInTheDocument();
     expect(screen.getByText("Pawchive API request timeout")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Browse the remote computer for Storage bucket path" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Browse the remote computer for Log directory" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Log level$/ })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Listen address" })).toHaveValue("127.0.0.1");
+    expect(screen.getByRole("textbox", { name: "External links file name" })).toHaveValue("external_links.txt");
+    expect(screen.queryByRole("button", { name: "Browse the remote computer for External links file name" })).not.toBeInTheDocument();
     expect(screen.queryByText("api.timeout")).not.toBeInTheDocument();
     const saveBar = container.querySelector(".config-save-bar");
     expect(saveBar).toBeInTheDocument();

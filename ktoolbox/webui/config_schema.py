@@ -23,7 +23,12 @@ from ktoolbox.configuration import (
     WebUIConfiguration,
 )
 from ktoolbox.webui.config_locale_catalogs import CONFIG_LOCALE_CATALOGS
-from ktoolbox.webui.models import ConfigFieldResponse, ConfigSchemaResponse, PathSelectorResponse
+from ktoolbox.webui.models import (
+    ConfigChoiceResponse,
+    ConfigFieldResponse,
+    ConfigSchemaResponse,
+    PathSelectorResponse,
+)
 
 Locale = Literal["zh-CN", "zh-Hant", "en", "ja", "ko", "fr", "ru"]
 
@@ -121,16 +126,11 @@ _SECRET_PATHS = {"downloader.session_key", "webui.password", "webui.password_has
 _PATH_SELECTORS: dict[str, PathSelectorResponse] = {
     "downloader.bucket_path": PathSelectorResponse(kind="directory", scope="host", value_mode="absolute"),
     "logger.path": PathSelectorResponse(kind="directory", scope="host", value_mode="absolute"),
-    "job.post_structure.attachments": PathSelectorResponse(
-        kind="directory", scope="project", value_mode="project_relative"
-    ),
-    "job.post_structure.revisions": PathSelectorResponse(
-        kind="directory", scope="project", value_mode="project_relative"
-    ),
-    "job.post_structure.content": PathSelectorResponse(kind="file", scope="project", value_mode="project_relative"),
-    "job.post_structure.external_links": PathSelectorResponse(
-        kind="file", scope="project", value_mode="project_relative"
-    ),
+}
+_SUGGESTED_CHOICES: dict[str, tuple[str, ...]] = {
+    "downloader.encoding": ("utf-8", "utf-8-sig", "gb18030", "shift_jis"),
+    "logger.rotation": ("1 day", "1 week", "1 month"),
+    "webui.host": ("127.0.0.1", "0.0.0.0"),
 }
 _RESTART_PATHS = {
     "webui.host",
@@ -215,8 +215,43 @@ def _walk_model(
                 source=_value_source(env_name, dotenv_sources),
                 apply_mode="restart" if path in _RESTART_PATHS else "next_task",
                 path_selector=_PATH_SELECTORS.get(path),
+                choice_mode=_choice_mode(property_schemas[name], path),
+                choices=_choices(property_schemas[name], path),
             )
         )
+
+
+def _choice_mode(schema: dict[str, Any], path: str) -> Literal["fixed", "suggested"] | None:
+    if _schema_enum(schema):
+        return "fixed"
+    if path in _SUGGESTED_CHOICES:
+        return "suggested"
+    return None
+
+
+def _choices(schema: dict[str, Any], path: str) -> list[ConfigChoiceResponse]:
+    values = _schema_enum(schema)
+    if not values:
+        values = list(_SUGGESTED_CHOICES.get(path, ()))
+    return [
+        ConfigChoiceResponse(value=str(value), label=str(value))
+        for value in values
+        if value is not None
+    ]
+
+
+def _schema_enum(schema: dict[str, Any]) -> list[Any]:
+    values = schema.get("enum")
+    if isinstance(values, list):
+        return values
+    branches = schema.get("anyOf")
+    if not isinstance(branches, list):
+        return []
+    result: list[Any] = []
+    for branch in branches:
+        if isinstance(branch, dict):
+            result.extend(_schema_enum(branch))
+    return result
 
 
 def _collect_descriptions(

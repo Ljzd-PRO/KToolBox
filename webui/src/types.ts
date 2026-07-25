@@ -71,6 +71,12 @@ export type ConfigField = {
   source: string;
   apply_mode: "next_task" | "restart";
   path_selector?: PathSelector | null;
+  choice_mode?: "fixed" | "suggested" | null;
+  choices?: Array<{
+    value: string;
+    label: string;
+    description?: string | null;
+  }>;
 };
 
 export type PathSelector = WebUIApiSchemas["PathSelectorResponse"];

@@ -1,18 +1,25 @@
 import { Alert, Button, Chip, Surface, Tabs, toast } from "@heroui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  IconActivity as Activity,
+  IconAlertTriangle as AlertTriangle,
   IconArrowBackUp as Undo2,
   IconBraces as Braces,
   IconCheck as Check,
+  IconCircleCheck as CircleCheck,
+  IconCircleX as CircleX,
   IconCloud as Cloud,
+  IconBug as Bug,
   IconDeviceFloppy as Save,
   IconDownload as Download,
   IconEraser as Eraser,
   IconFileCheck as FileCheck2,
   IconFileSettings as FileCog,
   IconFileText as FileText,
+  IconFlame as Flame,
   IconForms as TextCursorInput,
   IconHash as Hash,
+  IconInfoCircle as InfoCircle,
   IconKey as KeyRound,
   IconLayoutNavbar as PanelTop,
   IconListCheck as ListTodo,
@@ -30,6 +37,7 @@ import type { TFunction } from "i18next";
 
 import {
   CodeEditor,
+  ComboBoxField,
   ConfirmModal,
   FormField,
   FormSwitchField,
@@ -456,6 +464,7 @@ function ConfigFieldEditor({
   const value = isPending ? pendingValue : serializeValue(field.value ?? field.default);
   const enumValues = schemaEnum(schema);
   const icon = configurationIcon(field, type);
+  const choiceOptions = configurationChoiceOptions(field);
   const control = field.path_selector ? (
     <RemotePathField
       description={field.description}
@@ -497,13 +506,23 @@ function ConfigFieldEditor({
       value={value === "" ? undefined : Number(value)}
       onChange={(next) => onChange(String(next))}
     />
-  ) : enumValues.length ? (
+  ) : field.choice_mode === "suggested" ? (
+    <ComboBoxField
+      description={field.description}
+      icon={icon}
+      isDisabled={disabled}
+      label={field.label}
+      options={choiceOptions}
+      value={value ?? ""}
+      onChange={onChange}
+    />
+  ) : field.choice_mode === "fixed" || enumValues.length ? (
     <SelectField
       description={field.description}
       icon={icon}
       isDisabled={disabled}
       label={field.label}
-      options={enumValues.map((item) => ({ value: String(item), label: String(item) }))}
+      options={choiceOptions}
       value={value ?? ""}
       onChange={onChange}
     />
@@ -536,6 +555,40 @@ function ConfigFieldEditor({
       </div>
     </div>
   );
+}
+
+function configurationChoiceOptions(field: ConfigField) {
+  const values = field.choices?.length
+    ? field.choices
+    : schemaEnum(field.json_schema).map((value) => ({
+        value: String(value),
+        label: String(value),
+        description: null,
+      }));
+  return values.map((choice) => {
+    if (field.path !== "logger.level") {
+      return {
+        value: choice.value,
+        label: choice.label,
+        description: choice.description ?? undefined,
+      };
+    }
+    const presentation = {
+      TRACE: { icon: Activity, tone: "default" as const },
+      DEBUG: { icon: Bug, tone: "accent" as const },
+      INFO: { icon: InfoCircle, tone: "accent" as const },
+      SUCCESS: { icon: CircleCheck, tone: "success" as const },
+      WARNING: { icon: AlertTriangle, tone: "warning" as const },
+      ERROR: { icon: CircleX, tone: "danger" as const },
+      CRITICAL: { icon: Flame, tone: "danger" as const },
+    }[choice.value];
+    return {
+      value: choice.value,
+      label: choice.label,
+      description: choice.description ?? undefined,
+      ...presentation,
+    };
+  });
 }
 
 function configurationIcon(field: ConfigField, type: string | undefined): TablerIcon {
