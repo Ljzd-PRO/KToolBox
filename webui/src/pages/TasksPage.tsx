@@ -179,7 +179,7 @@ export function TasksPage() {
     }
   }
 
-  async function taskAction(task: TaskRecord, action: "pause" | "resume" | "stop") {
+  async function taskAction(task: TaskRecord, action: "pause" | "resume" | "rerun" | "stop") {
     if (!session) return;
     try {
       await api<TaskRecord>(`/tasks/${task.id}/${action}`, {
@@ -192,7 +192,7 @@ export function TasksPage() {
     }
   }
 
-  async function batchTaskAction(tasksToUpdate: TaskRecord[], action: "pause" | "resume" | "stop") {
+  async function batchTaskAction(tasksToUpdate: TaskRecord[], action: "pause" | "resume" | "rerun" | "stop") {
     if (!session) return [];
     const succeeded: string[] = [];
     const errors: unknown[] = [];
@@ -276,6 +276,7 @@ export function TasksPage() {
     },
     pause: (task) => void taskAction(task, "pause"),
     resume: (task) => void taskAction(task, "resume"),
+    rerun: (task) => void taskAction(task, "rerun"),
     stop: (task) => void taskAction(task, "stop"),
     batchAction: batchTaskAction,
   };
@@ -438,11 +439,12 @@ type TaskHandlers = {
   remove: (task: TaskRecord) => void;
   pause: (task: TaskRecord) => void;
   resume: (task: TaskRecord) => void;
+  rerun: (task: TaskRecord) => void;
   stop: (task: TaskRecord) => void;
   removeMany: (tasks: TaskRecord[]) => void;
   batchAction: (
     tasks: TaskRecord[],
-    action: "pause" | "resume" | "stop",
+    action: "pause" | "resume" | "rerun" | "stop",
   ) => Promise<string[]>;
 };
 
@@ -464,7 +466,7 @@ function TaskList({
   const { t, i18n } = useTranslation();
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [batchBusy, setBatchBusy] = useState<"pause" | "resume" | "stop" | null>(null);
+  const [batchBusy, setBatchBusy] = useState<"pause" | "resume" | "rerun" | "stop" | null>(null);
   const filteredTasks = useMemo(
     () => tasks.filter((task) => matchesTaskStatus(task.status, statusFilter)),
     [statusFilter, tasks],
@@ -496,6 +498,7 @@ function TaskList({
   const allVisibleSelected = visibleTasks.length > 0 && selectedTasks.length === visibleTasks.length;
   const pauseCandidates = selectedTasks.filter((task) => pausable.has(task.status));
   const resumeCandidates = selectedTasks.filter((task) => resumable.has(task.status));
+  const rerunCandidates = selectedTasks.filter((task) => task.kind === "sync" && task.status === "completed");
   const stopCandidates = selectedTasks.filter((task) => stoppable.has(task.status));
   const deleteCandidates = selectedTasks.filter((task) => deletable.has(task.status));
   const globalSpeed = totalDownloadSpeed(tasks);
@@ -535,7 +538,7 @@ function TaskList({
     setSelectedIds(selected ? new Set(visibleTasks.map((task) => task.id)) : new Set());
   }
 
-  async function runBatch(action: "pause" | "resume" | "stop", candidates: TaskRecord[]) {
+  async function runBatch(action: "pause" | "resume" | "rerun" | "stop", candidates: TaskRecord[]) {
     if (!candidates.length) return;
     setBatchBusy(action);
     try {
@@ -619,6 +622,17 @@ function TaskList({
           >
             <Play aria-hidden="true" size={16} />
             {t("tasks.batchResume", { count: resumeCandidates.length })}
+          </Button>
+          <Button
+            className="semantic-action-button action-tone-resume"
+            isDisabled={!rerunCandidates.length || batchBusy !== null}
+            isPending={batchBusy === "rerun"}
+            size="sm"
+            variant="outline"
+            onPress={() => void runBatch("rerun", rerunCandidates)}
+          >
+            <Refresh aria-hidden="true" size={16} />
+            {t("tasks.batchRerun", { count: rerunCandidates.length })}
           </Button>
           <Button
             className="semantic-action-button action-tone-stop"
@@ -790,22 +804,25 @@ function TaskActions({
   const { t } = useTranslation();
   const canPause = pausable.has(task.status);
   const canResume = resumable.has(task.status);
+  const canRerun = task.kind === "sync" && task.status === "completed";
   const canStop = stoppable.has(task.status);
   const canEdit = editable.has(task.status);
   const canDelete = deletable.has(task.status);
   const status = t(`tasks.statuses.${task.status}`);
   const unavailable = (action: string) => t("tasks.actionUnavailable", { action, status });
-  const lifecycleAction = canResume ? t("tasks.resume") : t("tasks.pause");
+  const lifecycleAction = canRerun ? t("tasks.rerun") : canResume ? t("tasks.resume") : t("tasks.pause");
+  const lifecycleIcon = canRerun ? Refresh : canResume ? Play : Pause;
   return (
     <div className={mobile ? "task-action-grid pointer-events-auto relative z-[2] grid grid-cols-4 justify-items-center gap-1 border-t border-border pt-3" : "task-action-grid grid w-[188px] grid-cols-4 justify-items-center gap-1"}>
-      <IconButton
-        className={`semantic-action-button ${canResume ? "action-tone-resume" : "action-tone-pause"}`}
-        icon={canResume ? Play : Pause}
-        isDisabled={!canPause && !canResume}
-        label={lifecycleAction}
-        tooltip={canPause || canResume ? lifecycleAction : unavailable(lifecycleAction)}
-        onPress={() => canResume ? handlers.resume(task) : handlers.pause(task)}
-      />
+      {canPause || canResume || canRerun ? (
+        <IconButton
+          className={`semantic-action-button ${canResume || canRerun ? "action-tone-resume" : "action-tone-pause"}`}
+          icon={lifecycleIcon}
+          label={lifecycleAction}
+          tooltip={lifecycleAction}
+          onPress={() => canRerun ? handlers.rerun(task) : canResume ? handlers.resume(task) : handlers.pause(task)}
+        />
+      ) : <span aria-hidden="true" className="size-11" />}
       <IconButton className="semantic-action-button action-tone-stop" icon={Square} isDisabled={!canStop} label={t("tasks.stop")} tooltip={canStop ? t("tasks.stop") : unavailable(t("tasks.stop"))} onPress={() => handlers.stop(task)} />
       <IconButton icon={Pencil} isDisabled={!canEdit} label={t("common.edit")} tooltip={canEdit ? t("common.edit") : unavailable(t("common.edit"))} onPress={() => handlers.edit(task)} />
       <IconButton className="text-danger" icon={Trash2} isDisabled={!canDelete} label={t("common.delete")} tooltip={canDelete ? t("common.delete") : unavailable(t("common.delete"))} onPress={() => handlers.remove(task)} />
@@ -852,6 +869,7 @@ function TaskDetails({
             <Button variant="outline" onPress={onBack}><ArrowLeft aria-hidden="true" size={17} />{t("common.back")}</Button>
             {pausable.has(task.status) ? <Button className="semantic-action-button action-tone-pause" variant="outline" onPress={() => handlers.pause(task)}><Pause aria-hidden="true" size={17} />{t("tasks.pause")}</Button> : null}
             {resumable.has(task.status) ? <Button className="semantic-action-button action-tone-resume" variant="outline" onPress={() => handlers.resume(task)}><Play aria-hidden="true" size={17} />{t("tasks.resume")}</Button> : null}
+            {task.kind === "sync" && task.status === "completed" ? <Button className="semantic-action-button action-tone-resume" variant="outline" onPress={() => handlers.rerun(task)}><Refresh aria-hidden="true" size={17} />{t("tasks.rerun")}</Button> : null}
             {stoppable.has(task.status) ? <Button className="semantic-action-button action-tone-stop" variant="outline" onPress={() => handlers.stop(task)}><Square aria-hidden="true" size={17} />{t("tasks.stop")}</Button> : null}
             {editable.has(task.status) ? <Button variant="outline" onPress={() => handlers.edit(task)}><Pencil aria-hidden="true" size={17} />{t("common.edit")}</Button> : null}
             {deletable.has(task.status) ? <Button className="text-danger" variant="outline" onPress={() => handlers.remove(task)}><Trash2 aria-hidden="true" size={17} />{t("common.delete")}</Button> : null}

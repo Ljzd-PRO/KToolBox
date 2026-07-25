@@ -155,6 +155,15 @@ class TaskScheduler:
         self._wake.set()
         return updated
 
+    async def rerun(self, task_id: str) -> TaskRecord:
+        async with self._control_lock:
+            task = await self.store.get(task_id)
+            if task.status is not TaskStatus.completed or task.kind != "sync":
+                raise InvalidTaskStateError("only completed sync tasks can be rerun")
+            updated = await self.store.queue_again(task_id)
+        self._wake.set()
+        return updated
+
     async def _dispatch_loop(self) -> None:
         while True:
             self._wake.clear()

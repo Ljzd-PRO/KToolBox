@@ -1366,6 +1366,48 @@ paths:
         scope: mcp:write
         safety: write
         openWorld: false
+  /api/v1/tasks/{task_id}/rerun:
+    post:
+      tags:
+      - tasks
+      summary: Rerun a completed sync task
+      operationId: rerun_task
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Task Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskRecord'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Queue a completed sync task again using the same task definition and a new execution attempt.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: rerun_task
+        scope: mcp:write
+        safety: write
+        openWorld: false
   /api/v1/tasks/{task_id}/attempts:
     get:
       tags:

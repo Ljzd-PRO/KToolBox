@@ -209,6 +209,56 @@ async def test_task_concurrency_duplicate_blocking_and_resume(tmp_path: Path) ->
 
 
 @pytest.mark.asyncio
+async def test_completed_sync_reruns_same_task_with_new_attempt(tmp_path: Path) -> None:
+    executor = ControlledExecutor()
+    async with task_client(tmp_path, executor, concurrency=1) as (client, headers):
+        created = (
+            await client.post(
+                "/api/v1/tasks",
+                json={
+                    "spec": {
+                        "kind": "sync",
+                        "creators": [
+                            {
+                                "service": "fanbox",
+                                "creator_id": "one",
+                                "alias": None,
+                                "enabled": True,
+                            }
+                        ],
+                        "output": "sync-output",
+                    }
+                },
+                headers=headers,
+            )
+        ).json()
+        await wait_for_status(client, created["id"], TaskStatus.running)
+        executor.release[created["id"]].set()
+        await wait_for_status(client, created["id"], TaskStatus.completed)
+
+        first_attempts = await client.get(f"/api/v1/tasks/{created['id']}/attempts")
+        assert [attempt["sequence"] for attempt in first_attempts.json()] == [1]
+
+        rerun = await client.post(f"/api/v1/tasks/{created['id']}/rerun", headers=headers)
+        assert rerun.status_code == 200
+        assert rerun.json()["id"] == created["id"]
+        assert rerun.json()["status"] == "queued"
+        assert rerun.json()["progress"]["processed_files"] == 0
+        await wait_for_status(client, created["id"], TaskStatus.completed)
+
+        attempts = await client.get(f"/api/v1/tasks/{created['id']}/attempts")
+        assert [attempt["sequence"] for attempt in attempts.json()] == [2, 1]
+
+        download = (await client.post("/api/v1/tasks", json=task_payload("download"), headers=headers)).json()
+        await wait_for_status(client, download["id"], TaskStatus.running)
+        executor.release[download["id"]].set()
+        await wait_for_status(client, download["id"], TaskStatus.completed)
+        rejected = await client.post(f"/api/v1/tasks/{download['id']}/rerun", headers=headers)
+        assert rejected.status_code == 409
+        assert "completed sync" in rejected.text
+
+
+@pytest.mark.asyncio
 async def test_task_presentation_round_trip_validation_and_update_semantics(tmp_path: Path) -> None:
     executor = ControlledExecutor()
     target_key = "download/fanbox/one/42/"
@@ -824,6 +874,19 @@ async def test_scheduler_control_methods_and_validation(tmp_path: Path) -> None:
         await scheduler.stop_task(task.id)
     with pytest.raises(InvalidTaskStateError, match="cannot be resumed"):
         await scheduler.resume(task.id)
+    with pytest.raises(InvalidTaskStateError, match="completed sync"):
+        await scheduler.rerun(task.id)
+
+    sync = await scheduler.create(
+        SyncTaskSpec(
+            creators=[CreatorReference(service="fanbox", creator_id="one")],
+            output=tmp_path / "sync",
+        )
+    )
+    await store.set_status(sync.id, TaskStatus.completed)
+    assert (await scheduler.rerun(sync.id)).status is TaskStatus.queued
+    with pytest.raises(InvalidTaskStateError, match="completed sync"):
+        await scheduler.rerun(sync.id)
     await scheduler.stop()
 
 

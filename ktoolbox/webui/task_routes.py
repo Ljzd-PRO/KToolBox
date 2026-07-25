@@ -121,6 +121,14 @@ def create_task_router(project_root: Path) -> APIRouter:
     ) -> TaskRecord:
         return await _state_action(scheduler.resume(task_id))
 
+    @router.post("/tasks/{task_id}/rerun", response_model=TaskRecord)
+    async def rerun_task(
+        task_id: str,
+        _: Annotated[WebUISession, Depends(require_csrf)],
+        scheduler: Annotated[TaskScheduler, Depends(task_scheduler)],
+    ) -> TaskRecord:
+        return await _state_action(scheduler.rerun(task_id))
+
     @router.get("/tasks/{task_id}/attempts", response_model=list[TaskAttempt])
     async def task_attempts(
         task_id: str,

@@ -229,6 +229,13 @@ OPERATIONS: dict[str, OperationMetadata] = {
         csrf=True,
         mcp=_write(),
     ),
+    "rerun_task": OperationMetadata(
+        "Rerun a completed sync task",
+        "Queue a completed sync task again using the same task definition and a new execution attempt.",
+        "tasks",
+        csrf=True,
+        mcp=_write(),
+    ),
     "task_attempts": OperationMetadata(
         "List task attempts",
         "Return the immutable execution attempts recorded for one task.",

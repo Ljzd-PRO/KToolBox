@@ -954,6 +954,7 @@ test("completed task details keep edit and delete without offering resume", asyn
   await expect(page.getByRole("heading", { name: "Task details" })).toBeVisible();
   await expect(page.getByText("Completed", { exact: true })).toBeVisible({ timeout: 10_000 });
   await expect(page.getByRole("button", { name: "Resume" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Rerun" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Edit" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Delete" })).toBeVisible();
 
