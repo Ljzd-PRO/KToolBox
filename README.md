@@ -117,11 +117,13 @@ KTOOLBOX_WEBUI__PASSWORD_HASH='$argon2id$...'
 ktoolbox webui /path/to/project
 ```
 
-![KToolBox WebUI configuration](docs/assets/webui/09-configuration-light.png)
+![KToolBox global configuration](docs/assets/webui/30-global-configuration-log-level-light.png)
 
 The complete interface is available in Simplified Chinese, Traditional Chinese, English, Japanese, Korean, French, and Russian. First use follows the browser language; the language menu persists an explicit choice and updates dates, numbers, sorting, configuration descriptions, validation, and server error messages together.
 
 Task rows preserve readable post titles and creator names in an offline presentation snapshot. Desktop and mobile layouts expose details, lifecycle, editing, ordering, and deletion actions directly, while form switches use gray-off/blue-on tracks and checkboxes show an indicator only when selected.
+
+The **Global configuration** page uses typed Select and ComboBox controls while reserving filesystem pickers for real locations. Completed synchronization tasks offer **Rerun** on the same task record; cleanup confirmation shows a readable target and expandable relative-file preview instead of an internal UUID. The **About** page collects version, license, runtime, and official links, with URLs and listener addresses rendered as inline code.
 
 Failed tasks retain a redacted, stage-specific report with the affected creator or file, retryability, safe field paths, and recovery guidance. The compact mobile shell uses a 64px workbar and 12px page spacing; its appearance controls move into a small Popover, and the MCP tool catalog collapses by category.
 

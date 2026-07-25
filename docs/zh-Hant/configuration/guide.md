@@ -45,6 +45,8 @@ ktoolbox config edit
 
 可選的 [WebUI](../webui.md) 會透過型別化控制項顯示七種語言的標籤與說明，並提供最終值來源指示、機密遮蔽、dotenv/TOML 原文編輯、驗證、差異預覽和 ETag 衝突保護。英語設定 docstring 仍是欄位與語意來源，其餘語言目錄會接受完整欄位路徑檢查。
 
+記錄層級等固定選項顯示為 Select；具有建議值但仍允許自訂的欄位顯示為 ComboBox。路徑選擇器只用於真正的檔案或目錄位置，`attachments`、`external_links.txt` 等內部產物名稱維持一般文字欄位。
+
 不開啟編輯器即可查看或驗證專案檔案：
 
 ```bash

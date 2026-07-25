@@ -59,12 +59,13 @@ Editable areas use a muted secondary surface with distinct field backgrounds. Fi
 The main areas are:
 
 - **Overview:** project path, queue health, active transfer totals, and recent tasks. Each statistic is a keyboard-accessible link to the corresponding filtered task or creator view.
-- **Tasks:** create, edit, pause, resume, stop, rerun, delete, and inspect synchronization or single-work downloads. Select multiple rows for compatible bulk actions; clicking a row opens its details.
+- **Tasks:** create, edit, pause, resume, stop, rerun, delete, and inspect synchronization or single-work downloads. Select multiple rows for compatible bulk actions; only the readable target link opens details, so controls never trigger navigation.
 - **Creators:** search Pawchive and add, annotate, enable, disable, or remove roster entries, including bulk enable, disable, and removal.
 - **Posts:** search without rendering remote media or expanded body text, inspect revisions, and create a download task.
 - **Blockers:** order and scope `field-match` blockers and compose nested `any`/`all`, contains, equals, regular expression, and existence conditions.
-- **Configuration:** edit `.env`, `prod.env`, and `ktoolbox.toml` through typed forms or advanced text views.
+- **Global configuration:** edit `.env`, `prod.env`, and `ktoolbox.toml` through typed forms or advanced text views.
 - **System:** inspect the project and application versions and download an example environment file.
+- **About:** inspect the KToolBox version, license, runtime, author, documentation, repository, and issue tracker without exposing author email addresses.
 
 ![Task editor on a narrow screen](../assets/webui/19-task-form-mobile-light-zh.png)
 
@@ -82,6 +83,8 @@ Overview recent tasks, task queues, creator rosters, and post results support co
 
 Form labels and descriptions are explicit localized text, not Python identifiers. English configuration-class `:ivar field:` docstrings remain the semantic field source; checked locale catalogs provide complete labels and explanations for all seven languages, while Pydantic supplies types, defaults, ranges, and secret metadata.
 
+Fixed choices such as log level use icon-enhanced HeroUI Select controls. Fields with useful presets but valid custom values use ComboBox controls. Internal names such as `attachments`, `content.txt`, and `external_links.txt` remain ordinary text fields; only real filesystem locations expose the remote path picker.
+
 The `.env` and `prod.env` tabs show each final effective value and a source Chip. Values overridden by the process environment are read-only. Secret values are masked by default. Advanced text editing displays an additional warning because it can expose secrets.
 
 Filesystem-backed fields retain manual editing and add a browse button. The dialog shows the remote computer running KToolBox rather than the browser device, with localized quick locations, breadcrumbs, search, a labelled hidden-item control, pagination, an explicit new-folder dialog, and confirmed empty-folder deletion. Project-relative configuration values remain relative after selection; absolute task and post output paths remain absolute. Environment-sourced read-only values cannot open the picker.
@@ -89,6 +92,8 @@ Filesystem-backed fields retain manual editing and add a browse button. The dial
 Before a save, the server parses and validates the proposed file and returns a semantic diff. Saving uses an ETag to reject stale edits and atomically replaces the file. The TOML editor uses the existing TomlKit/Pydantic store so comments survive structured roster and blocker changes.
 
 ![Dark configuration editor](../assets/webui/20-configuration-1024-dark-zh.png)
+
+![Global configuration log-level choices](../assets/webui/30-global-configuration-log-level-light.png)
 
 ![Scoped blocker editor](../assets/webui/17-blocker-form-1024-light-zh.png)
 
@@ -122,9 +127,19 @@ Failed attempts persist a bounded, redacted diagnostic report instead of only a 
 
 ![Live task progress](../assets/webui/14-task-running-1024-dark-zh.png)
 
-Pause is cooperative: active network streams close, completed files and resumable temporary files remain, and resume creates a new attempt. Stop keeps the task definition so it can be edited and rerun. Resume is available only for paused, stopped, failed, or interrupted work; completed tasks remain editable and deletable but cannot be resumed. A process restart marks formerly running work as `interrupted`, clears stale live progress, and requires explicit recovery.
+Pause is cooperative: active network streams close, completed files and resumable temporary files remain, and resume creates a new attempt. Stop keeps the task definition so it can be edited and rerun. Resume is available only for paused, stopped, failed, or interrupted work. A completed synchronization instead offers **Rerun**, which reuses the task record and creates a new attempt; a completed single-work download does not. A process restart marks formerly running work as `interrupted`, clears stale live progress, and requires explicit recovery.
 
-Deleting a task normally removes only its queue record, attempts, and logs. “Delete outputs” first produces a file and byte-count preview. Confirmation removes only unchanged, regular files recorded as created by that task; symbolic links, pre-existing files, modified files, and shared files are never followed or removed.
+Deleting a task normally removes only its queue record, attempts, and logs. “Delete outputs” first shows the readable target, output directory, file and byte totals, and an expandable relative-path preview; internal task UUIDs are not displayed. Confirmation removes only unchanged, regular files recorded as created by that task; symbolic links, pre-existing files, modified files, and shared files are never followed or removed.
+
+![Readable task cleanup preview](../assets/webui/31-task-delete-preview-light.png)
+
+![Completed synchronization with rerun](../assets/webui/33-task-rerun-light.png)
+
+## About
+
+The About page gathers package and runtime information with safe links to documentation, source, and issue reporting. URLs and listener addresses are displayed in inline code styling, and external links open in a new tab with isolation attributes.
+
+![About page on a narrow dark screen](../assets/webui/32-about-mobile-dark.png)
 
 ## Automatic refresh
 

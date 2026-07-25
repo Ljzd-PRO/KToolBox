@@ -45,6 +45,8 @@ ktoolbox config edit
 
 La [WebUI](../webui.md) facultative présente des libellés et descriptions localisés dans les sept langues prises en charge, ainsi que la source des valeurs finales, le masquage des secrets, la modification directe de dotenv/TOML, la validation, l'aperçu des différences et la protection contre les conflits ETag. Les docstrings anglaises restent la source des champs et de leur sens ; la couverture de chaque chemin est vérifiée dans les autres catalogues.
 
+Les choix fixes, comme le niveau de journalisation, utilisent Select ; les champs avec des valeurs conseillées mais acceptant du texte personnalisé utilisent ComboBox. Le sélecteur de chemin est réservé aux vrais fichiers et répertoires ; les noms internes comme `attachments` et `external_links.txt` restent de simples champs texte.
+
 Examinez ou validez le fichier du projet sans ouvrir l'éditeur :
 
 ```bash

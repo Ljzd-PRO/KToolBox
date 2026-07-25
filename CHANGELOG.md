@@ -45,7 +45,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Add authenticated remote filesystem pickers to every filesystem-backed WebUI path field, with localized project/host locations, breadcrumbs, search, a labelled hidden-item control, pagination, explicit directory creation, confirmed empty-directory deletion, and manual path entry.
 - Generate readable form labels and descriptions in Simplified Chinese, Traditional Chinese, English, Japanese, Korean, French, and Russian from checked locale catalogs, Pydantic metadata, and English configuration docstrings; include source indicators, secret masking, typed and advanced editors, validation, diff preview, ETag conflict detection, and atomic writes.
 - Add a WAL-backed SQLite queue with concurrent scheduling, resource blocking and deduplication, immutable attempts, pause/resume/stop/edit/rerun/delete actions, restart recovery, SSE replay, aggregate/per-file speeds, ETA, and structured logs.
-- Make task rows open their detail view and add explicit bulk pause, resume, stop, and record deletion actions; add bulk enable, disable, and removal to the creator roster.
+- Make only the readable task target open details, keeping selection and lifecycle controls isolated from navigation; add explicit bulk pause, resume, stop, record deletion, and completed-sync rerun actions, plus bulk creator enable, disable, and removal.
 - Add one authenticated global SSE connection for task, roster, blocker, configuration, MCP-token, and filesystem refresh across tabs, with cursor recovery, heartbeats, 10-second local-only fallback polling, draft protection, and live status controls.
 - Separate file transfer outcomes from authoritative task status, serialize reporter persistence through one FIFO writer, and atomically store progress with its event so concurrent downloads cannot roll snapshots backward.
 - Stabilize aggregate download speed with a five-second rolling window and file hand-off grace, expose the global speed on overview and task pages, and clear live state when work becomes terminal or interrupted.
@@ -64,6 +64,11 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Add browser-language detection, a persistent HeroUI language menu, locale-aware dates/numbers/sorting, translated validation and structured API errors, and seven-language configuration Schema metadata.
 - Explain failed tasks with localized stages, retryability, safe field paths, and recovery guidance instead of a failure count alone.
 - Increase mobile information density with a 64px workbar, 12px page spacing, a compact appearance Popover, and collapsible HeroUI MCP tool groups.
+- Add typed configuration choice metadata: fixed values use icon-enhanced Select controls, recommended custom values use ComboBoxes, and internal artifact names no longer expose filesystem pickers.
+- Add safe same-record reruns for completed synchronization tasks while preserving attempt and event history.
+- Replace UUID-oriented cleanup warnings with readable task targets, output summaries, and expandable relative-file previews.
+- Add a localized About page with version, license, runtime, author, and official resource links while omitting author email addresses.
+- Render visible URLs, IP addresses, listener addresses, and URL examples with shared inline-code styling.
 
 ## Testing and quality
 
@@ -144,6 +149,11 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 新增浏览器语言识别、持久化 HeroUI 语言菜单、本地化日期/数字/排序、翻译后的校验与结构化 API 错误，以及七语言配置 Schema 元数据。
 - 使用本地化失败阶段、重试性、安全字段路径和恢复建议解释任务失败，不再只显示失败数量。
 - 通过 64px 顶栏、12px 页面间距、紧凑外观 Popover 及可折叠 HeroUI MCP 工具组提高移动端信息密度。
+- 新增类型化配置选项元数据：固定值使用带图标的 Select，允许自定义的推荐值使用 ComboBox，作品内部文件名不再错误提供路径选择器。
+- 已完成同步任务支持在原任务记录上安全重新运行，同时保留尝试与事件历史。
+- 删除确认使用可读任务目标、输出摘要和可展开的相对文件预览，不再向用户展示 UUID。
+- 新增七语言关于页，展示版本、许可证、运行环境、作者和官方资源，同时隐藏作者邮箱。
+- 所有可见 URL、IP、监听地址和 URL 示例统一使用共享行内代码样式。
 
 ## 测试与质量
 

@@ -117,11 +117,13 @@ KTOOLBOX_WEBUI__PASSWORD_HASH='$argon2id$...'
 ktoolbox webui /path/to/project
 ```
 
-![Configuration de la WebUI KToolBox](docs/assets/webui/09-configuration-light.png)
+![Configuration globale de KToolBox](docs/assets/webui/30-global-configuration-log-level-light.png)
 
 Toute l'interface est disponible en chinois simplifié, chinois traditionnel, anglais, japonais, coréen, français et russe. La première visite suit la langue du navigateur ; un choix manuel est mémorisé et actualise ensemble les dates, les nombres, le tri, les descriptions de configuration, la validation et les erreurs du serveur.
 
 Les lignes de tâches conservent des titres de publication et des noms de créateur lisibles dans un instantané de présentation hors ligne. Les dispositions pour ordinateur et mobile donnent directement accès aux détails, au cycle de vie, à la modification, au classement et à la suppression. Les interrupteurs sont gris lorsqu'ils sont désactivés et bleus lorsqu'ils sont activés ; les cases à cocher n'affichent un indicateur que lorsqu'elles sont sélectionnées.
+
+La configuration globale utilise Select ou ComboBox selon la sémantique du champ et réserve le sélecteur de chemin aux véritables emplacements. Une synchronisation terminée peut être relancée sur le même enregistrement ; la confirmation de suppression montre une cible lisible et une liste extensible de chemins relatifs plutôt qu'un UUID interne. La page À propos regroupe version, licence, environnement et liens officiels, avec les URL et adresses d'écoute en code intégré.
 
 Une tâche en échec conserve un rapport expurgé par étape avec le créateur ou fichier concerné, la possibilité de réessayer, les chemins de champs sûrs et l'action recommandée. L'interface mobile compacte utilise une barre de 64px et un espacement de 12px, place l'apparence dans un petit Popover et replie le catalogue MCP par catégorie.
 

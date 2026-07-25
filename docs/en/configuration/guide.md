@@ -45,6 +45,8 @@ ktoolbox config edit
 
 The optional [WebUI](../webui.md) exposes localized labels and descriptions in all seven supported languages through typed controls, final-value source indicators, secret masking, raw dotenv/TOML editing, validation, diff preview, and ETag conflict protection. English configuration docstrings remain the field and semantic source; the other locale catalogs are checked for complete path coverage.
 
+Fixed choices such as log levels render as Select controls; recommended values that still permit custom text render as ComboBoxes. Path pickers are limited to real directories and files, while internal artifact names such as `attachments` and `external_links.txt` remain ordinary text fields.
+
 Inspect or validate the project file without opening the editor:
 
 ```bash

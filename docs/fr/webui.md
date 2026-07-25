@@ -59,12 +59,13 @@ Les zones modifiables utilisent une surface secondaire discrète avec des arriè
 Les zones principales sont :
 
 - **Vue d'ensemble :** chemin du projet, état de la file, totaux des transferts actifs et tâches récentes.
-- **Tâches :** créer, modifier, mettre en pause, reprendre, arrêter, relancer, supprimer et examiner des synchronisations ou téléchargements uniques. Un clic sur une ligne ouvre les détails et la sélection multiple permet les actions groupées compatibles.
+- **Tâches :** créer, modifier, mettre en pause, reprendre, arrêter, relancer, supprimer et examiner des synchronisations ou téléchargements uniques. Seul le lien de cible lisible ouvre le détail, afin qu'un contrôle ne déclenche jamais la navigation ; la sélection multiple permet les actions groupées compatibles.
 - **Créateurs :** rechercher dans Pawchive et ajouter, modifier la note, activer, désactiver ou retirer des entrées, y compris par actions groupées.
 - **Publications :** rechercher sans afficher les médias distants ni le corps développé, examiner les révisions et créer une tâche de téléchargement.
 - **Règles d'exclusion :** ordonner et limiter `field-match`, composer des groupes `any`/`all` imbriqués et des conditions de contenu, égalité, expression régulière et existence.
-- **Configuration :** modifier `.env`, `prod.env` et `ktoolbox.toml` dans des formulaires typés ou des vues de texte avancées.
+- **Configuration globale :** modifier `.env`, `prod.env` et `ktoolbox.toml` dans des formulaires typés ou des vues de texte avancées.
 - **Système :** examiner les versions du projet et de l'application et télécharger un exemple d'environnement.
+- **À propos :** consulter la version, la licence, l'environnement, l'auteur, la documentation, le dépôt et le suivi des problèmes sans exposer l'adresse électronique de l'auteur.
 
 ![Éditeur de tâche sur un écran étroit](../assets/webui/19-task-form-mobile-light-zh.png)
 
@@ -118,9 +119,17 @@ Chaque tentative en échec conserve un rapport de diagnostic borné et expurgé 
 
 ![Progression d'une tâche en direct](../assets/webui/14-task-running-1024-dark-zh.png)
 
-La pause est coopérative : les flux réseau actifs se ferment, les fichiers terminés et temporaires pouvant reprendre restent, et la reprise crée une nouvelle tentative. L'arrêt conserve la définition pour pouvoir la modifier et la relancer. Seules les tâches en pause, arrêtées, échouées ou interrompues peuvent reprendre ; une tâche terminée reste modifiable et supprimable, mais ne peut pas reprendre. Un redémarrage marque l'ancien travail actif `interrupted`, efface sa progression active résiduelle et exige une récupération explicite.
+La pause est coopérative : les flux réseau actifs se ferment, les fichiers terminés et temporaires pouvant reprendre restent, et la reprise crée une nouvelle tentative. Seules les tâches en pause, arrêtées, échouées ou interrompues peuvent reprendre. Une synchronisation terminée propose « Relancer », qui conserve l'enregistrement et crée une nouvelle tentative ; un téléchargement unique terminé ne le propose pas.
 
-Supprimer une tâche ne retire normalement que son enregistrement, ses tentatives et ses journaux. « Supprimer les sorties » présente d'abord le nombre de fichiers et d'octets. La confirmation ne retire que les fichiers ordinaires inchangés enregistrés comme créés par cette tâche ; les liens symboliques et les fichiers préexistants, modifiés ou partagés ne sont ni suivis ni retirés.
+Supprimer une tâche ne retire normalement que son enregistrement, ses tentatives et ses journaux. « Supprimer les sorties » présente la cible lisible, le répertoire, les totaux et une liste extensible de chemins relatifs sans UUID interne. La confirmation ne retire que les fichiers ordinaires inchangés enregistrés comme créés par cette tâche.
+
+![Aperçu lisible du nettoyage](../assets/webui/31-task-delete-preview-light.png)
+
+## À propos
+
+La page À propos regroupe version, licence, environnement et liens officiels. Les URL, adresses IP et adresses d'écoute utilisent un style de code en ligne.
+
+![Page À propos mobile sombre](../assets/webui/32-about-mobile-dark.png)
 
 ## Actualisation automatique
 
