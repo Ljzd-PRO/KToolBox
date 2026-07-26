@@ -130,6 +130,16 @@ async def wait_for_status(client: httpx.AsyncClient, task_id: str, expected: Tas
     raise AssertionError(f"task {task_id} did not reach {expected.value}")
 
 
+async def release_executor(executor: ControlledExecutor, task_id: str) -> None:
+    for _ in range(100):
+        gate = executor.release.get(task_id)
+        if gate is not None:
+            gate.set()
+            return
+        await asyncio.sleep(0.02)
+    raise AssertionError(f"task {task_id} did not enter the controlled executor")
+
+
 async def scheduler_parts(
     tmp_path: Path,
     executor,
@@ -194,11 +204,11 @@ async def test_task_concurrency_duplicate_blocking_and_resume(tmp_path: Path) ->
         resumed = await client.post(f"/api/v1/tasks/{first['id']}/resume", headers=headers)
         assert resumed.status_code == 200
         assert resumed.json()["status"] == "queued"
-        executor.release[blocked["id"]].set()
+        await release_executor(executor, blocked["id"])
         await wait_for_status(client, blocked["id"], TaskStatus.completed)
         await wait_for_status(client, first["id"], TaskStatus.running)
-        executor.release[first["id"]].set()
-        executor.release[second["id"]].set()
+        await release_executor(executor, first["id"])
+        await release_executor(executor, second["id"])
         await wait_for_status(client, first["id"], TaskStatus.completed)
         await wait_for_status(client, second["id"], TaskStatus.completed)
 
@@ -233,7 +243,7 @@ async def test_completed_sync_reruns_same_task_with_new_attempt(tmp_path: Path) 
             )
         ).json()
         await wait_for_status(client, created["id"], TaskStatus.running)
-        executor.release[created["id"]].set()
+        await release_executor(executor, created["id"])
         await wait_for_status(client, created["id"], TaskStatus.completed)
 
         first_attempts = await client.get(f"/api/v1/tasks/{created['id']}/attempts")
@@ -251,7 +261,7 @@ async def test_completed_sync_reruns_same_task_with_new_attempt(tmp_path: Path) 
 
         download = (await client.post("/api/v1/tasks", json=task_payload("download"), headers=headers)).json()
         await wait_for_status(client, download["id"], TaskStatus.running)
-        executor.release[download["id"]].set()
+        await release_executor(executor, download["id"])
         await wait_for_status(client, download["id"], TaskStatus.completed)
         rejected = await client.post(f"/api/v1/tasks/{download['id']}/rerun", headers=headers)
         assert rejected.status_code == 409
@@ -356,7 +366,7 @@ async def test_task_presentation_database_migration_and_store_round_trip(tmp_pat
         attempt_columns = {str(row[1]) for row in await cursor.fetchall()}
         await cursor.close()
     assert "failure_json" in attempt_columns
-    assert versions == [1, 2, 3, 4, 5, 6, 7, 8]
+    assert versions == [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     store = TaskStore(database)
     spec = DownloadTaskSpec(service="FanBox", creator_id="creator/id", post_id="42", output=tmp_path)
@@ -925,17 +935,17 @@ async def test_scheduler_dispatches_fairly_across_conflicts_and_capacity(tmp_pat
     await scheduler._dispatch_ready_tasks()
     assert (await store.get(conflict.id)).blocked_by == first.id
 
-    executor.release[first.id].set()
+    await release_executor(executor, first.id)
     await wait_for_store_status(scheduler, store, first.id, TaskStatus.completed)
     await scheduler._dispatch_ready_tasks()
     assert await executor.started.get() == second.id
     assert (await store.get(conflict.id)).status is TaskStatus.queued
 
-    executor.release[second.id].set()
+    await release_executor(executor, second.id)
     await wait_for_store_status(scheduler, store, second.id, TaskStatus.completed)
     await scheduler._dispatch_ready_tasks()
     assert await executor.started.get() == conflict.id
-    executor.release[conflict.id].set()
+    await release_executor(executor, conflict.id)
     await wait_for_store_status(scheduler, store, conflict.id, TaskStatus.completed)
 
     scheduler._stopping = True

@@ -96,7 +96,7 @@ def test_readmes_have_complete_language_navigation_and_localized_docs_links() ->
 
 def test_localized_page_trees_and_markdown_structure_match_english() -> None:
     english_manifest = _manifest("en")
-    assert len(english_manifest) == 11
+    assert len(english_manifest) == 12
 
     for locale in LOCALES[1:]:
         assert _manifest(locale) == english_manifest
