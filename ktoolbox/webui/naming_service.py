@@ -90,6 +90,7 @@ class NamingConversionService:
         self.project_store = ProjectConfigStore(self.project_root / "ktoolbox.toml")
         self._workers: dict[str, asyncio.Task[None]] = {}
         self._cancellations: dict[str, asyncio.Event] = {}
+        self._apply_lock = asyncio.Lock()
 
     async def start(self) -> None:
         await self._import_startup_notice()
@@ -214,9 +215,20 @@ class NamingConversionService:
         *,
         convert_existing: bool,
     ) -> NamingConversionResponse:
+        async with self._apply_lock:
+            return await self._apply(preview_id, selected_creators, convert_existing=convert_existing)
+
+    async def _apply(
+        self,
+        preview_id: str,
+        selected_creators: list[str],
+        *,
+        convert_existing: bool,
+    ) -> NamingConversionResponse:
         conversion = await self.get(preview_id)
         if conversion.status != "preview":
             raise NamingConversionError("this preview has already been applied")
+        await self._ensure_no_active_conversion()
         await self._ensure_preview_current(conversion.preview)
         selected = selected_creators
         allowed = {creator.key for creator in conversion.preview.creators if creator.selectable}
@@ -225,9 +237,7 @@ class NamingConversionService:
         if conversion.preview.conflict_count:
             raise NamingConversionError("resolve every target path conflict before applying this preview")
 
-        candidate = ProjectNamingConfiguration.model_validate_json(
-            await self._candidate_json(preview_id)
-        )
+        candidate = ProjectNamingConfiguration.model_validate_json(await self._candidate_json(preview_id))
         if not convert_existing:
             configuration = self.project_store.load()
             configuration.naming = candidate
@@ -268,9 +278,7 @@ class NamingConversionService:
     async def list_conversions(self) -> list[NamingConversionResponse]:
         async with self.database.connect() as connection:
             connection.row_factory = aiosqlite.Row
-            rows = await connection.execute_fetchall(
-                "SELECT * FROM naming_conversions ORDER BY created_at DESC"
-            )
+            rows = await connection.execute_fetchall("SELECT * FROM naming_conversions ORDER BY created_at DESC")
         return [_conversion_from_row(row) for row in rows]
 
     async def get(self, conversion_id: str) -> NamingConversionResponse:
@@ -338,6 +346,7 @@ class NamingConversionService:
     ) -> None:
         try:
             await self._set_status(conversion_id, "running", selected=selected)
+            conversion = await self.get(conversion_id)
             operations = await self._operations(conversion_id, selected, reverse=False)
             progress = NamingConversionProgress(total_operations=len(operations))
             await self._set_progress(conversion_id, progress)
@@ -352,6 +361,11 @@ class NamingConversionService:
                     raise NamingConversionError(f"target now exists: {target}")
                 await anyio.to_thread.run_sync(target.parent.mkdir, 0o777, True, True)
                 await anyio.to_thread.run_sync(os.replace, source, target)
+                await anyio.to_thread.run_sync(
+                    _remove_empty_ancestors,
+                    source.parent,
+                    conversion.preview.roots,
+                )
                 await self._mark_operation(int(operation["id"]), "completed")
                 progress.completed_operations += 1
                 progress.current_creator = str(operation["creator_key"])
@@ -386,6 +400,7 @@ class NamingConversionService:
         error: str | None = None,
     ) -> None:
         await self._set_status(conversion_id, "rolling_back", error=error)
+        conversion = await self.get(conversion_id)
         rollback_error: str | None = None
         for operation in await self._operations(conversion_id, [], reverse=True, completed_only=True):
             source = Path(operation["source"])
@@ -396,6 +411,11 @@ class NamingConversionService:
                     if await anyio.to_thread.run_sync(source.exists):
                         raise NamingConversionError(f"rollback target already exists: {source}")
                     await anyio.to_thread.run_sync(os.replace, target, source)
+                    await anyio.to_thread.run_sync(
+                        _remove_empty_ancestors,
+                        target.parent,
+                        conversion.preview.roots,
+                    )
                 await self._mark_operation(int(operation["id"]), "rolled_back")
             except Exception as rollback_failure:
                 rollback_error = str(rollback_failure)
@@ -432,6 +452,22 @@ class NamingConversionService:
                 raise NamingConversionError(
                     f"task {task.id} overlaps a selected download root; stop it before converting"
                 )
+
+    async def _ensure_no_active_conversion(self) -> None:
+        async with self.database.connect() as connection:
+            row = await (
+                await connection.execute(
+                    """
+                    SELECT id FROM naming_conversions
+                    WHERE status IN ('queued', 'running', 'rolling_back')
+                    LIMIT 1
+                    """
+                )
+            ).fetchone()
+        if row is not None:
+            raise NamingConversionError(
+                "another naming conversion is already active; wait for it to finish or cancel it"
+            )
 
     async def _candidate_json(self, conversion_id: str) -> str:
         async with self.database.connect() as connection:
@@ -600,9 +636,8 @@ def _scan_download_roots(
             moves: list[_Move] = []
             conflicts: list[str] = []
             for source_work, post in works:
-                target_work = (
-                    generate_grouped_post_path(post, target_creator, candidate)
-                    / generate_post_path_name(post, candidate)
+                target_work = generate_grouped_post_path(post, target_creator, candidate) / generate_post_path_name(
+                    post, candidate
                 )
                 work_base = source_work
                 if source_work != target_work:
@@ -653,10 +688,7 @@ def _scan_download_roots(
             if parsed_identity is None:
                 continue
             service, creator_id, name = parsed_identity
-            selection_key = (
-                f"{service}:{creator_id}@"
-                f"{hashlib.sha1(str(source_creator).encode()).hexdigest()[:10]}"
-            )
+            selection_key = f"{service}:{creator_id}@{hashlib.sha1(str(source_creator).encode()).hexdigest()[:10]}"
             target_creator = root / generate_creator_path_name(
                 service,
                 creator_id,
@@ -716,10 +748,7 @@ def _add_indexed_works(
             key = (index.service, index.creator_id, creator, post.id)
             if key in known_posts:
                 continue
-            source_work = (
-                generate_grouped_post_path(post, creator, current)
-                / generate_post_path_name(post, current)
-            )
+            source_work = generate_grouped_post_path(post, creator, current) / generate_post_path_name(post, current)
             if source_work.is_dir() and not source_work.is_symlink():
                 grouped.setdefault(
                     (index.service, index.creator_id, creator),
@@ -773,9 +802,7 @@ def _mark_duplicate_targets(scans: list[_CreatorScan]) -> None:
         if len(duplicate_scans) < 2:
             continue
         target = next(
-            move.target
-            for move in duplicate_scans[0].moves
-            if _normalized_path(move.target) == normalized_target
+            move.target for move in duplicate_scans[0].moves if _normalized_path(move.target) == normalized_target
         )
         for scan in duplicate_scans:
             conflict = str(target)
@@ -956,6 +983,23 @@ def _paths_overlap(left: Path, right: Path) -> bool:
         or left_resolved in right_resolved.parents
         or right_resolved in left_resolved.parents
     )
+
+
+def _remove_empty_ancestors(start: Path, roots: list[Path]) -> None:
+    current = start.resolve(strict=False)
+    resolved_roots = [root.resolve(strict=False) for root in roots]
+    matching_roots = [root for root in resolved_roots if root == current or root in current.parents]
+    if not matching_roots:
+        return
+    boundary = max(matching_roots, key=lambda path: len(path.parts))
+    while current != boundary:
+        if current.is_symlink():
+            return
+        try:
+            current.rmdir()
+        except OSError:
+            return
+        current = current.parent
 
 
 def _conversion_from_row(row: aiosqlite.Row) -> NamingConversionResponse:

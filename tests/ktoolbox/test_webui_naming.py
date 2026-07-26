@@ -121,8 +121,9 @@ async def test_preview_scans_filesystem_and_conversion_updates_project(tmp_path:
             break
         await asyncio.sleep(0.01)
 
-    assert conversion.status == "completed"
+    assert conversion.status == "completed", conversion.error
     assert not source.exists()
+    assert not source.parent.exists()
     assert (downloads / "Artist (123)" / "one" / "asset.bin").is_file()
     assert store.load().naming.post_dirname_format == "{post_id}"
     await service.stop()
@@ -183,6 +184,7 @@ async def test_conversion_requires_explicit_selection_and_rolls_back_config_race
     service, _ = await service_for(tmp_path)
     candidate = ProjectNamingConfiguration(
         download_roots=[Path("downloads")],
+        creator_dirname_format="{creator_name} ({creator_id})",
         post_dirname_format="{post_id}",
     )
     preview = await service.preview(candidate)
@@ -213,7 +215,51 @@ async def test_conversion_requires_explicit_selection_and_rolls_back_config_race
 
     assert conversion.status == "failed"
     assert source.is_dir()
+    assert not (downloads / "Artist (123)").exists()
     assert store.load().naming.download_roots == [Path("changed-downloads")]
+    await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_only_one_naming_conversion_can_be_active(tmp_path: Path) -> None:
+    downloads = tmp_path / "downloads"
+    write_downloaded_work(downloads, "Artist [fanbox-123]", "Work one", "one")
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    store.save(
+        ProjectConfiguration(
+            naming=ProjectNamingConfiguration(download_roots=[Path("downloads")]),
+        )
+    )
+    service, _ = await service_for(tmp_path)
+    candidate = ProjectNamingConfiguration(
+        download_roots=[Path("downloads")],
+        post_dirname_format="{post_id}",
+    )
+    first = await service.preview(candidate)
+    second = await service.preview(candidate)
+    original_run = service._run_conversion
+    started = asyncio.Event()
+    release = asyncio.Event()
+
+    async def delayed_run(*args: object, **kwargs: object) -> None:
+        started.set()
+        await release.wait()
+        await original_run(*args, **kwargs)  # type: ignore[arg-type]
+
+    service._run_conversion = delayed_run  # type: ignore[method-assign]
+    await service.apply(first.id, [first.creators[0].key], convert_existing=True)
+    await started.wait()
+
+    with pytest.raises(NamingConversionError, match="already active"):
+        await service.apply(second.id, [second.creators[0].key], convert_existing=True)
+
+    release.set()
+    for _ in range(100):
+        conversion = await service.get(first.id)
+        if conversion.status == "completed":
+            break
+        await asyncio.sleep(0.01)
+    assert conversion.status == "completed", conversion.error
     await service.stop()
 
 
