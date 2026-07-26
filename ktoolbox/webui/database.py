@@ -119,9 +119,43 @@ class WebUIDatabase:
                     revoked_at TEXT
                 );
 
+                CREATE TABLE IF NOT EXISTS naming_conversions (
+                    id TEXT PRIMARY KEY,
+                    status TEXT NOT NULL,
+                    candidate_json TEXT NOT NULL,
+                    selected_json TEXT NOT NULL DEFAULT '[]',
+                    preview_json TEXT NOT NULL,
+                    fingerprint TEXT NOT NULL,
+                    progress_json TEXT NOT NULL DEFAULT '{}',
+                    error TEXT,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS naming_operations (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    conversion_id TEXT NOT NULL REFERENCES naming_conversions(id) ON DELETE CASCADE,
+                    sequence INTEGER NOT NULL,
+                    creator_key TEXT NOT NULL,
+                    source TEXT NOT NULL,
+                    target TEXT NOT NULL,
+                    status TEXT NOT NULL DEFAULT 'planned',
+                    UNIQUE(conversion_id, sequence)
+                );
+
+                CREATE TABLE IF NOT EXISTS startup_notices (
+                    id TEXT PRIMARY KEY,
+                    kind TEXT NOT NULL,
+                    payload_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    acknowledged_at TEXT
+                );
+
                 CREATE INDEX IF NOT EXISTS task_events_cursor ON task_events(id);
                 CREATE INDEX IF NOT EXISTS tasks_queue ON tasks(status, position);
                 CREATE INDEX IF NOT EXISTS mcp_tokens_owner ON mcp_tokens(username, created_at);
+                CREATE INDEX IF NOT EXISTS naming_conversions_status
+                    ON naming_conversions(status, created_at);
                 """
             )
             await connection.execute(
@@ -163,6 +197,10 @@ class WebUIDatabase:
                     "INSERT INTO schema_migrations(version, applied_at) VALUES (?, ?)",
                     (8, utc_now().isoformat()),
                 )
+            await connection.execute(
+                "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
+                (9, utc_now().isoformat()),
+            )
             await connection.commit()
 
     async def create_session(self, token: str, username: str, csrf_token: str) -> WebUISession:

@@ -1592,6 +1592,318 @@ paths:
         scope: null
         safety: null
         openWorld: false
+  /api/v1/naming:
+    get:
+      tags:
+      - naming
+      summary: Get project naming configuration
+      operationId: get_naming
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamingConfigurationResponse'
+      description: Return the project-scoped naming templates, their revision, and suggested download roots.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: get_naming
+        scope: mcp:read
+        safety: read
+        openWorld: false
+  /api/v1/naming/preview:
+    post:
+      tags:
+      - naming
+      summary: Preview a naming conversion
+      operationId: preview_naming
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NamingPreviewRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamingPreviewResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Scan registered download roots and return safe per-creator moves, statistics, skips, and conflicts.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: preview_naming
+        scope: null
+        safety: null
+        openWorld: false
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+  /api/v1/naming/apply:
+    post:
+      tags:
+      - naming
+      summary: Apply project naming configuration
+      operationId: apply_naming
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NamingApplyRequest'
+        required: true
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamingConversionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Save naming configuration directly or start a reversible conversion of selected downloaded creators.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: apply_naming
+        scope: null
+        safety: null
+        openWorld: false
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+  /api/v1/naming/conversions:
+    get:
+      tags:
+      - naming
+      summary: List naming conversions
+      operationId: list_naming_conversions
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/NamingConversionResponse'
+                type: array
+                title: Response List Naming Conversions
+      description: Return persistent naming conversion previews, progress, results, and history.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: list_naming_conversions
+        scope: mcp:read
+        safety: read
+        openWorld: false
+  /api/v1/naming/conversions/{conversion_id}:
+    get:
+      tags:
+      - naming
+      summary: Get a naming conversion
+      operationId: get_naming_conversion
+      parameters:
+      - name: conversion_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Conversion Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamingConversionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Return one persistent naming conversion with its preview and progress.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: get_naming_conversion
+        scope: mcp:read
+        safety: read
+        openWorld: false
+    delete:
+      tags:
+      - naming
+      summary: Delete naming conversion history
+      operationId: delete_naming_conversion
+      parameters:
+      - name: conversion_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Conversion Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Delete one inactive naming conversion record without changing downloaded files.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: delete_naming_conversion
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/naming/conversions/{conversion_id}/cancel:
+    post:
+      tags:
+      - naming
+      summary: Cancel a naming conversion
+      operationId: cancel_naming_conversion
+      parameters:
+      - name: conversion_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Conversion Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamingConversionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Request cancellation and complete rollback of an active naming conversion.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: cancel_naming_conversion
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/startup-notices:
+    get:
+      tags:
+      - naming
+      summary: List startup notices
+      operationId: list_startup_notices
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/StartupNoticeResponse'
+                type: array
+                title: Response List Startup Notices
+      description: Return unacknowledged one-time project migration notices for the signed-in user.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: list_startup_notices
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/startup-notices/{notice_id}/acknowledge:
+    post:
+      tags:
+      - naming
+      summary: Acknowledge a startup notice
+      operationId: acknowledge_startup_notice
+      parameters:
+      - name: notice_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Notice Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartupNoticeResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Permanently acknowledge one project startup notice.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: acknowledge_startup_notice
+        scope: null
+        safety: null
+        openWorld: false
   /api/v1/openapi.yaml:
     get:
       tags:
@@ -3138,6 +3450,226 @@ components:
       - safety
       - open_world
       title: MCPToolResponse
+    NamingApplyRequest:
+      properties:
+        preview_id:
+          type: string
+          title: Preview Id
+        selected_creators:
+          items:
+            type: string
+          type: array
+          title: Selected Creators
+        convert_existing:
+          type: boolean
+          title: Convert Existing
+          default: true
+      type: object
+      required:
+      - preview_id
+      - selected_creators
+      title: NamingApplyRequest
+    NamingConfigurationResponse:
+      properties:
+        naming:
+          $ref: '#/components/schemas/ProjectNamingConfiguration'
+        revision:
+          type: string
+          title: Revision
+        suggested_download_roots:
+          items:
+            type: string
+            format: path
+          type: array
+          title: Suggested Download Roots
+      type: object
+      required:
+      - naming
+      - revision
+      title: NamingConfigurationResponse
+    NamingConversionProgress:
+      properties:
+        completed_operations:
+          type: integer
+          title: Completed Operations
+          default: 0
+        total_operations:
+          type: integer
+          title: Total Operations
+          default: 0
+        current_creator:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Current Creator
+      type: object
+      title: NamingConversionProgress
+    NamingConversionResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        status:
+          type: string
+          enum:
+          - preview
+          - queued
+          - running
+          - rolling_back
+          - completed
+          - failed
+          - cancelled
+          title: Status
+        preview:
+          $ref: '#/components/schemas/NamingPreviewResponse'
+        selected_creators:
+          items:
+            type: string
+          type: array
+          title: Selected Creators
+        progress:
+          $ref: '#/components/schemas/NamingConversionProgress'
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - status
+      - preview
+      - selected_creators
+      - created_at
+      - updated_at
+      title: NamingConversionResponse
+    NamingCreatorPreview:
+      properties:
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        source:
+          type: string
+          format: path
+          title: Source
+        target:
+          type: string
+          format: path
+          title: Target
+        works:
+          type: integer
+          title: Works
+          default: 0
+        files:
+          type: integer
+          title: Files
+          default: 0
+        bytes:
+          type: integer
+          title: Bytes
+          default: 0
+        operations:
+          type: integer
+          title: Operations
+          default: 0
+        skipped:
+          type: integer
+          title: Skipped
+          default: 0
+        conflicts:
+          items:
+            type: string
+          type: array
+          title: Conflicts
+        selectable:
+          type: boolean
+          title: Selectable
+          default: true
+      type: object
+      required:
+      - key
+      - name
+      - source
+      - target
+      title: NamingCreatorPreview
+    NamingPreviewRequest:
+      properties:
+        naming:
+          $ref: '#/components/schemas/ProjectNamingConfiguration'
+      type: object
+      required:
+      - naming
+      title: NamingPreviewRequest
+    NamingPreviewResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        revision:
+          type: string
+          title: Revision
+        fingerprint:
+          type: string
+          title: Fingerprint
+        roots:
+          items:
+            type: string
+            format: path
+          type: array
+          title: Roots
+        creators:
+          items:
+            $ref: '#/components/schemas/NamingCreatorPreview'
+          type: array
+          title: Creators
+        creator_count:
+          type: integer
+          title: Creator Count
+        work_count:
+          type: integer
+          title: Work Count
+        file_count:
+          type: integer
+          title: File Count
+        total_bytes:
+          type: integer
+          title: Total Bytes
+        skipped_count:
+          type: integer
+          title: Skipped Count
+        conflict_count:
+          type: integer
+          title: Conflict Count
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - revision
+      - fingerprint
+      - roots
+      - creators
+      - creator_count
+      - work_count
+      - file_count
+      - total_bytes
+      - skipped_count
+      - conflict_count
+      - created_at
+      title: NamingPreviewResponse
     PathSelectorResponse:
       properties:
         kind:
@@ -3303,9 +3835,9 @@ components:
       properties:
         schema_version:
           type: integer
-          const: 1
+          const: 2
           title: Schema Version
-          default: 1
+          default: 2
         creators:
           items:
             $ref: '#/components/schemas/CreatorReference'
@@ -3316,6 +3848,8 @@ components:
             $ref: '#/components/schemas/BlockerSpec'
           type: array
           title: Blockers
+        naming:
+          $ref: '#/components/schemas/ProjectNamingConfiguration'
       additionalProperties: false
       type: object
       title: ProjectConfiguration
@@ -3341,6 +3875,96 @@ components:
       - revision
       - configuration
       title: ProjectDocumentResponse
+    ProjectNamingConfiguration:
+      properties:
+        download_roots:
+          items:
+            type: string
+            format: path
+          type: array
+          title: Download Roots
+        creator_dirname_format:
+          type: string
+          title: Creator Dirname Format
+          default: '{creator_name} [{service}-{creator_id}]'
+        post_dirname_format:
+          type: string
+          title: Post Dirname Format
+          default: '{title}'
+        revision_dirname_format:
+          type: string
+          title: Revision Dirname Format
+          default: '{revision_id}'
+        post_structure:
+          $ref: '#/components/schemas/ProjectPostStructureConfiguration'
+        mix_posts:
+          type: boolean
+          title: Mix Posts
+          default: false
+        sequential_filename:
+          type: boolean
+          title: Sequential Filename
+          default: false
+        sequential_filename_excludes:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+          title: Sequential Filename Excludes
+        filename_format:
+          type: string
+          title: Filename Format
+          default: '{}'
+        group_by_year:
+          type: boolean
+          title: Group By Year
+          default: false
+        group_by_month:
+          type: boolean
+          title: Group By Month
+          default: false
+        year_dirname_format:
+          type: string
+          title: Year Dirname Format
+          default: '{year}'
+        month_dirname_format:
+          type: string
+          title: Month Dirname Format
+          default: '{year}-{month:02d}'
+      additionalProperties: false
+      type: object
+      title: ProjectNamingConfiguration
+      description: Project-local directory layout and filename templates.
+    ProjectPostStructureConfiguration:
+      properties:
+        attachments:
+          type: string
+          format: path
+          title: Attachments
+          default: attachments
+        content:
+          type: string
+          format: path
+          title: Content
+          default: content.txt
+        external_links:
+          type: string
+          format: path
+          title: External Links
+          default: external_links.txt
+        file:
+          type: string
+          title: File
+          default: '{id}_{}'
+        revisions:
+          type: string
+          format: path
+          title: Revisions
+          default: revisions
+      additionalProperties: false
+      type: object
+      title: ProjectPostStructureConfiguration
+      description: Project-local names used inside each downloaded work directory.
     ProjectSummaryResponse:
       properties:
         name:
@@ -3541,6 +4165,35 @@ components:
       required:
       - version
       title: SiteVersionResponse
+    StartupNoticeResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        kind:
+          type: string
+          const: naming_migrated
+          title: Kind
+          default: naming_migrated
+        payload:
+          additionalProperties: true
+          type: object
+          title: Payload
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        acknowledged_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Acknowledged At
+      type: object
+      required:
+      - id
+      - created_at
+      title: StartupNoticeResponse
     SyncTaskSpec:
       properties:
         kind:
@@ -4085,6 +4738,8 @@ tags:
   description: Active project information.
 - name: configuration
   description: Typed and raw project configuration.
+- name: naming
+  description: Project naming templates and reversible filesystem conversions.
 - name: creators
   description: Configured creator roster.
 - name: ignore-rules

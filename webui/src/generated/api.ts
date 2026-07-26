@@ -564,6 +564,170 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/naming": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get project naming configuration
+         * @description Return the project-scoped naming templates, their revision, and suggested download roots.
+         */
+        get: operations["get_naming"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/naming/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview a naming conversion
+         * @description Scan registered download roots and return safe per-creator moves, statistics, skips, and conflicts.
+         */
+        post: operations["preview_naming"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/naming/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Apply project naming configuration
+         * @description Save naming configuration directly or start a reversible conversion of selected downloaded creators.
+         */
+        post: operations["apply_naming"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/naming/conversions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List naming conversions
+         * @description Return persistent naming conversion previews, progress, results, and history.
+         */
+        get: operations["list_naming_conversions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/naming/conversions/{conversion_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a naming conversion
+         * @description Return one persistent naming conversion with its preview and progress.
+         */
+        get: operations["get_naming_conversion"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete naming conversion history
+         * @description Delete one inactive naming conversion record without changing downloaded files.
+         */
+        delete: operations["delete_naming_conversion"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/naming/conversions/{conversion_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel a naming conversion
+         * @description Request cancellation and complete rollback of an active naming conversion.
+         */
+        post: operations["cancel_naming_conversion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/startup-notices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List startup notices
+         * @description Return unacknowledged one-time project migration notices for the signed-in user.
+         */
+        get: operations["list_startup_notices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/startup-notices/{notice_id}/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acknowledge a startup notice
+         * @description Permanently acknowledge one project startup notice.
+         */
+        post: operations["acknowledge_startup_notice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/openapi.yaml": {
         parameters: {
             query?: never;
@@ -1396,6 +1560,150 @@ export interface components {
             /** Open World */
             open_world: boolean;
         };
+        /** NamingApplyRequest */
+        NamingApplyRequest: {
+            /** Preview Id */
+            preview_id: string;
+            /** Selected Creators */
+            selected_creators: string[];
+            /**
+             * Convert Existing
+             * @default true
+             */
+            convert_existing: boolean;
+        };
+        /** NamingConfigurationResponse */
+        NamingConfigurationResponse: {
+            naming: components["schemas"]["ProjectNamingConfiguration"];
+            /** Revision */
+            revision: string;
+            /** Suggested Download Roots */
+            suggested_download_roots?: string[];
+        };
+        /** NamingConversionProgress */
+        NamingConversionProgress: {
+            /**
+             * Completed Operations
+             * @default 0
+             */
+            completed_operations: number;
+            /**
+             * Total Operations
+             * @default 0
+             */
+            total_operations: number;
+            /** Current Creator */
+            current_creator?: string | null;
+        };
+        /** NamingConversionResponse */
+        NamingConversionResponse: {
+            /** Id */
+            id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "preview" | "queued" | "running" | "rolling_back" | "completed" | "failed" | "cancelled";
+            preview: components["schemas"]["NamingPreviewResponse"];
+            /** Selected Creators */
+            selected_creators: string[];
+            progress?: components["schemas"]["NamingConversionProgress"];
+            /** Error */
+            error?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** NamingCreatorPreview */
+        NamingCreatorPreview: {
+            /** Key */
+            key: string;
+            /** Name */
+            name: string;
+            /**
+             * Source
+             * Format: path
+             */
+            source: string;
+            /**
+             * Target
+             * Format: path
+             */
+            target: string;
+            /**
+             * Works
+             * @default 0
+             */
+            works: number;
+            /**
+             * Files
+             * @default 0
+             */
+            files: number;
+            /**
+             * Bytes
+             * @default 0
+             */
+            bytes: number;
+            /**
+             * Operations
+             * @default 0
+             */
+            operations: number;
+            /**
+             * Skipped
+             * @default 0
+             */
+            skipped: number;
+            /** Conflicts */
+            conflicts?: string[];
+            /**
+             * Selectable
+             * @default true
+             */
+            selectable: boolean;
+        };
+        /** NamingPreviewRequest */
+        NamingPreviewRequest: {
+            naming: components["schemas"]["ProjectNamingConfiguration"];
+        };
+        /** NamingPreviewResponse */
+        NamingPreviewResponse: {
+            /** Id */
+            id: string;
+            /** Revision */
+            revision: string;
+            /** Fingerprint */
+            fingerprint: string;
+            /** Roots */
+            roots: string[];
+            /** Creators */
+            creators: components["schemas"]["NamingCreatorPreview"][];
+            /** Creator Count */
+            creator_count: number;
+            /** Work Count */
+            work_count: number;
+            /** File Count */
+            file_count: number;
+            /** Total Bytes */
+            total_bytes: number;
+            /** Skipped Count */
+            skipped_count: number;
+            /** Conflict Count */
+            conflict_count: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** PathSelectorResponse */
         PathSelectorResponse: {
             /**
@@ -1477,14 +1785,15 @@ export interface components {
         ProjectConfiguration: {
             /**
              * Schema Version
-             * @default 1
+             * @default 2
              * @constant
              */
-            schema_version: 1;
+            schema_version: 2;
             /** Creators */
             creators?: components["schemas"]["CreatorReference"][];
             /** Blockers */
             blockers?: components["schemas"]["BlockerSpec"][];
+            naming?: components["schemas"]["ProjectNamingConfiguration"];
         };
         /** ProjectDocumentResponse */
         ProjectDocumentResponse: {
@@ -1498,6 +1807,102 @@ export interface components {
             /** Revision */
             revision: string;
             configuration: components["schemas"]["ProjectConfiguration"];
+        };
+        /**
+         * ProjectNamingConfiguration
+         * @description Project-local directory layout and filename templates.
+         */
+        ProjectNamingConfiguration: {
+            /** Download Roots */
+            download_roots?: string[];
+            /**
+             * Creator Dirname Format
+             * @default {creator_name} [{service}-{creator_id}]
+             */
+            creator_dirname_format: string;
+            /**
+             * Post Dirname Format
+             * @default {title}
+             */
+            post_dirname_format: string;
+            /**
+             * Revision Dirname Format
+             * @default {revision_id}
+             */
+            revision_dirname_format: string;
+            post_structure?: components["schemas"]["ProjectPostStructureConfiguration"];
+            /**
+             * Mix Posts
+             * @default false
+             */
+            mix_posts: boolean;
+            /**
+             * Sequential Filename
+             * @default false
+             */
+            sequential_filename: boolean;
+            /** Sequential Filename Excludes */
+            sequential_filename_excludes?: string[];
+            /**
+             * Filename Format
+             * @default {}
+             */
+            filename_format: string;
+            /**
+             * Group By Year
+             * @default false
+             */
+            group_by_year: boolean;
+            /**
+             * Group By Month
+             * @default false
+             */
+            group_by_month: boolean;
+            /**
+             * Year Dirname Format
+             * @default {year}
+             */
+            year_dirname_format: string;
+            /**
+             * Month Dirname Format
+             * @default {year}-{month:02d}
+             */
+            month_dirname_format: string;
+        };
+        /**
+         * ProjectPostStructureConfiguration
+         * @description Project-local names used inside each downloaded work directory.
+         */
+        ProjectPostStructureConfiguration: {
+            /**
+             * Attachments
+             * Format: path
+             * @default attachments
+             */
+            attachments: string;
+            /**
+             * Content
+             * Format: path
+             * @default content.txt
+             */
+            content: string;
+            /**
+             * External Links
+             * Format: path
+             * @default external_links.txt
+             */
+            external_links: string;
+            /**
+             * File
+             * @default {id}_{}
+             */
+            file: string;
+            /**
+             * Revisions
+             * Format: path
+             * @default revisions
+             */
+            revisions: string;
         };
         /** ProjectSummaryResponse */
         ProjectSummaryResponse: {
@@ -1597,6 +2002,28 @@ export interface components {
         SiteVersionResponse: {
             /** Version */
             version: string;
+        };
+        /** StartupNoticeResponse */
+        StartupNoticeResponse: {
+            /** Id */
+            id: string;
+            /**
+             * Kind
+             * @default naming_migrated
+             * @constant
+             */
+            kind: "naming_migrated";
+            /** Payload */
+            payload?: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Acknowledged At */
+            acknowledged_at?: string | null;
         };
         /** SyncTaskSpec */
         SyncTaskSpec: {
@@ -3055,6 +3482,269 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_naming: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NamingConfigurationResponse"];
+                };
+            };
+        };
+    };
+    preview_naming: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NamingPreviewRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NamingPreviewResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    apply_naming: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NamingApplyRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NamingConversionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_naming_conversions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NamingConversionResponse"][];
+                };
+            };
+        };
+    };
+    get_naming_conversion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NamingConversionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_naming_conversion: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                conversion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_naming_conversion: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                conversion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NamingConversionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_startup_notices: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StartupNoticeResponse"][];
+                };
+            };
+        };
+    };
+    acknowledge_startup_notice: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                notice_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StartupNoticeResponse"];
                 };
             };
             /** @description Validation Error */

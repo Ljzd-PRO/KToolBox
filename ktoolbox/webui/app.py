@@ -41,6 +41,8 @@ from ktoolbox.webui.models import (
     ProjectSummaryResponse,
     SessionResponse,
 )
+from ktoolbox.webui.naming_routes import create_naming_router
+from ktoolbox.webui.naming_service import NamingConversionService
 from ktoolbox.webui.openapi_contract import build_openapi_schema, stable_operation_id
 from ktoolbox.webui.pawchive_routes import create_pawchive_router
 from ktoolbox.webui.project_lock import ProjectProcessLock
@@ -64,6 +66,12 @@ def create_app(
     event_store = WebUIEventStore(database)
     mcp_token_store = MCPTokenStore(database, event_store)
     task_store = TaskStore(database, event_store)
+    naming_service = NamingConversionService(
+        context.project_root,
+        database,
+        event_store,
+        task_store,
+    )
     task_scheduler = TaskScheduler(
         context,
         task_store,
@@ -88,12 +96,14 @@ def create_app(
         await project_lock.acquire()
         try:
             await database.initialize()
+            await naming_service.start()
             await config_monitor.start()
             await task_scheduler.start()
             yield
         finally:
             await task_scheduler.stop()
             await config_monitor.stop()
+            await naming_service.stop()
             await project_lock.release()
 
     app = FastAPI(
@@ -111,6 +121,7 @@ def create_app(
     app.state.mcp_token_store = mcp_token_store
     app.state.event_store = event_store
     app.state.task_store = task_store
+    app.state.naming_service = naming_service
     app.state.task_scheduler = task_scheduler
     app.state.config_monitor = config_monitor
     browser = filesystem_browser or FilesystemBrowser(context.project_root)
@@ -119,6 +130,7 @@ def create_app(
     app.include_router(create_filesystem_router(browser, event_store))
     app.include_router(create_pawchive_router())
     app.include_router(create_task_router(context.project_root))
+    app.include_router(create_naming_router())
     app.include_router(create_mcp_router())
 
     static_root = Path(__file__).parent / "static"
