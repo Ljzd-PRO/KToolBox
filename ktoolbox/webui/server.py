@@ -59,21 +59,6 @@ async def run_webui(
         ) from error
 
     root = await anyio.to_thread.run_sync(_project_root, project_dir)
-    migration = await anyio.to_thread.run_sync(migrate_legacy_naming, root)
-    if migration.migrated:
-        print(
-            "Migrated legacy naming settings to ktoolbox.toml. "
-            "Naming is now managed per project in the WebUI.",
-            file=sys.stderr,
-        )
-        for backup in migration.backup_paths:
-            print(f"  Backup: {backup}", file=sys.stderr)
-        if migration.ignored_environment_keys:
-            print(
-                "  Warning: legacy naming environment variables are ignored: "
-                + ", ".join(migration.ignored_environment_keys),
-                file=sys.stderr,
-            )
     configuration = await anyio.to_thread.run_sync(load_configuration, root)
     updates: dict[str, object] = {}
     if host is not None:
@@ -194,18 +179,38 @@ def _print_generated_credentials(credentials: GeneratedWebUICredentials) -> None
 
 def _project_root(project_dir: Path) -> Path:
     root = project_dir.expanduser().resolve()
+    if root.exists() and not root.is_dir():
+        raise KToolBoxUserError(
+            f"{root} is not a directory",
+            label="Configuration error",
+        )
+    root.mkdir(parents=True, exist_ok=True)
     project_config = root / "ktoolbox.toml"
-    if project_config.is_file():
-        return root
-    if project_config.exists():
+    if project_config.exists() and not project_config.is_file():
         raise KToolBoxUserError(
             f"{project_config} is not a regular file",
             label="Configuration error",
         )
 
-    ProjectConfigStore(project_config).save(ProjectConfiguration())
-    print(
-        f"Warning: {project_config} was not found; created a new project configuration.",
-        file=sys.stderr,
-    )
+    migration = migrate_legacy_naming(root)
+    if migration.migrated:
+        print(
+            "Migrated legacy naming settings to ktoolbox.toml. "
+            "Naming is now managed per project in the WebUI.",
+            file=sys.stderr,
+        )
+        for backup in migration.backup_paths:
+            print(f"  Backup: {backup}", file=sys.stderr)
+        if migration.ignored_environment_keys:
+            print(
+                "  Warning: legacy naming environment variables are ignored: "
+                + ", ".join(migration.ignored_environment_keys),
+                file=sys.stderr,
+            )
+    elif not project_config.is_file():
+        ProjectConfigStore(project_config).save(ProjectConfiguration())
+        print(
+            f"Warning: {project_config} was not found; created a new project configuration.",
+            file=sys.stderr,
+        )
     return root

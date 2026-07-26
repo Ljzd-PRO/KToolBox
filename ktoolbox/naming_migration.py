@@ -91,6 +91,16 @@ def migrate_legacy_naming(project_root: Path) -> NamingMigrationResult:
     """Move legacy dotenv naming values into ``ktoolbox.toml`` once."""
     root = project_root.expanduser().resolve()
     project_path = root / "ktoolbox.toml"
+    sources = [path for path in (root / ".env", root / "prod.env") if path.exists()]
+    originals = {path: path.read_text(encoding="utf-8") for path in sources}
+    ignored_environment = tuple(sorted(key for key in LEGACY_ENV_KEYS if key in os.environ))
+    if (
+        not project_path.exists()
+        and not ignored_environment
+        and not any(find_legacy_naming_keys(content) for content in originals.values())
+    ):
+        return NamingMigrationResult(migrated=False)
+
     original_project = project_path.read_text(encoding="utf-8") if project_path.exists() else ""
     document = tomlkit.parse(original_project) if original_project else tomlkit.document()
     if document.get("schema_version") == 2 and "naming" in document:
@@ -112,11 +122,8 @@ def migrate_legacy_naming(project_root: Path) -> NamingMigrationResult:
         month_dirname_format=legacy.month_dirname_format,
     )
 
-    sources = [path for path in (root / ".env", root / "prod.env") if path.exists()]
-    originals = {path: path.read_text(encoding="utf-8") for path in sources}
     backup_dir = root / MIGRATION_BACKUP_DIR
     backup_paths: list[Path] = []
-    ignored_environment = tuple(sorted(key for key in LEGACY_ENV_KEYS if key in os.environ))
 
     try:
         backup_dir.mkdir(parents=True, exist_ok=True)

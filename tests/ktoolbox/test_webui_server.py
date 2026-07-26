@@ -9,6 +9,7 @@ from pydantic import SecretStr
 import ktoolbox.webui.server as server_module
 from ktoolbox.configuration import Configuration, WebUIConfiguration
 from ktoolbox.exceptions import KToolBoxUserError
+from ktoolbox.naming_migration import MIGRATION_NOTICE_PATH
 from ktoolbox.project_config import ProjectConfigStore, ProjectConfiguration
 from ktoolbox.webui.server import (
     DEFAULT_WEBUI_USERNAME,
@@ -195,12 +196,35 @@ def test_project_root_preserves_existing_configuration(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     project_config = tmp_path / "ktoolbox.toml"
-    original = "# Keep this comment.\nschema_version = 1\n"
+    original = "# Keep this comment.\nschema_version = 2\n\n[naming]\n"
     project_config.write_text(original, encoding="utf-8")
 
     assert _project_root(tmp_path) == tmp_path.resolve()
     assert project_config.read_text(encoding="utf-8") == original
     assert capsys.readouterr().err == ""
+
+
+def test_project_root_migrates_legacy_values_before_creating_defaults(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    project_root = tmp_path / "legacy-project"
+    project_root.mkdir()
+    dotenv = project_root / ".env"
+    dotenv.write_text(
+        "KTOOLBOX_JOB__POST_DIRNAME_FORMAT={title} [{post_id}]\n",
+        encoding="utf-8",
+    )
+
+    assert _project_root(project_root) == project_root.resolve()
+
+    project = ProjectConfigStore(project_root / "ktoolbox.toml").load()
+    assert project.naming.post_dirname_format == "{title} [{post_id}]"
+    assert "POST_DIRNAME_FORMAT" not in dotenv.read_text(encoding="utf-8")
+    assert (project_root / MIGRATION_NOTICE_PATH).is_file()
+    error_output = capsys.readouterr().err
+    assert "Migrated legacy naming settings to ktoolbox.toml" in error_output
+    assert "created a new project configuration" not in error_output
 
 
 def test_project_root_rejects_non_file_configuration(tmp_path: Path) -> None:

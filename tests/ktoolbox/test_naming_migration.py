@@ -69,3 +69,11 @@ def test_migration_restores_sources_when_project_save_fails(tmp_path: Path) -> N
 
     assert project_path.read_text(encoding="utf-8") == "schema_version = 1\n"
     assert dotenv_path.read_text(encoding="utf-8") == "KTOOLBOX_JOB__MIX_POSTS=true\n"
+
+
+def test_missing_project_without_legacy_values_is_not_reported_as_migration(
+    tmp_path: Path,
+) -> None:
+    assert migrate_legacy_naming(tmp_path).migrated is False
+    assert not (tmp_path / "ktoolbox.toml").exists()
+    assert not (tmp_path / MIGRATION_NOTICE_PATH).exists()
