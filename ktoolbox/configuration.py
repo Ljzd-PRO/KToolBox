@@ -214,39 +214,12 @@ class JobConfiguration(BaseModel):
 
     :ivar count: Number of coroutines for concurrent download
     :ivar include_revisions: Include and download revision posts when available
-    :ivar post_dirname_format: Customize the post directory name format, you can use some of the \
-    [properties][ktoolbox.configuration.JobConfiguration] in ``Post``. \
-    e.g. ``[{published}]{id}`` could result dirname ``[2024-1-1]123123``, \
-    ``{user}_{published}_{title}`` could result dirname like ``234234_2024-1-1_TheTitle``. \
-    Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example: \
-    ``{title:.6}`` could shorten the title length to 6 characters like ``HiEveryoneThisIsALongTitle`` to ``HiEver``
-    :ivar post_structure: Post path structure
-    :ivar mix_posts: Save all files from different posts at same path in creator directory. \
-    It would not create any post directory, and ``CreatorIndices`` would not been recorded.
-    :ivar sequential_filename: Rename attachments in numerical order, e.g. ``1.png``, ``2.png``, ...
-    :ivar sequential_filename_excludes: File extensions to exclude from sequential naming when ``sequential_filename`` is enabled. \
-    Files with these extensions will keep their original names. e.g. ``[".psd", ".zip", ".mp4"]``
-    :ivar filename_format: Customize the filename format by inserting an empty ``{}`` to represent the basic filename.
-    Similar to post_dirname_format, you can use some of the [properties][ktoolbox.configuration.JobConfiguration] \
-    in Post. For example: ``{title}_{}`` could result in filenames like \
-    ``TheTitle_b4b41de2-8736-480d-b5c3-ebf0d917561b``, ``TheTitle_af349b25-ac08-46d7-98fb-6ce99a237b90``, etc. \
-    You can also use it with ``sequential_filename``. For instance, \
-    ``[{published}]_{}`` could result in filenames like ``[2024-1-1]_1.png``, ``[2024-1-1]_2.png``, etc. \
-    Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example: \
-    ``{title:.6}`` could shorten the title length to 6 characters like ``HiEveryoneThisIsALongTitle`` to ``HiEver``
     :ivar allow_list: Download files which match these patterns (Unix shell-style), e.g. ``["*.png"]``
     :ivar block_list: Not to download files which match these patterns (Unix shell-style), e.g. ``["*.psd","*.zip"]``
-    :ivar extract_content: Extract post content and save to separate file (filename was defined in ``config.job.post_structure.content``)
+    :ivar extract_content: Extract post content and save it using the project naming configuration
     :ivar extract_content_images: Extract images from post content and download them.
-    :ivar extract_external_links: Extract external file sharing links from post content and save to separate file \
-    (filename was defined in ``config.job.post_structure.external_links``)
+    :ivar extract_external_links: Extract external file sharing links and save them using the project naming configuration
     :ivar external_link_patterns: Regex patterns for extracting external links.
-    :ivar group_by_year: Group posts by year in separate directories based on published date
-    :ivar group_by_month: Group posts by month in separate directories based on published date (requires group_by_year)
-    :ivar year_dirname_format: Customize the year directory name format. Available properties: ``year``. \
-    e.g. ``{year}`` > ``2024``, ``Year_{year}`` > ``Year_2024``
-    :ivar month_dirname_format: Customize the month directory name format. Available properties: ``year``, ``month``. \
-    e.g. ``{year}-{month}`` > ``2024-01``, ``{year}_{month}`` > ``2024_01``
     :ivar keywords: keywords to filter posts by title (case-insensitive)
     :ivar keywords_exclude: Deprecated title exclusions converted to an implicit global field-match blocker. \
     Define structured blockers in ``ktoolbox.toml`` instead.
@@ -262,12 +235,6 @@ class JobConfiguration(BaseModel):
     count: int = Field(default=4, ge=1, le=64)
     creator_concurrency: int = Field(default=4, ge=1, le=64)
     include_revisions: bool = False
-    post_dirname_format: str = "{title}"
-    post_structure: PostStructureConfiguration = PostStructureConfiguration()
-    mix_posts: bool = False
-    sequential_filename: bool = False
-    sequential_filename_excludes: set[str] = Field(default_factory=set)
-    filename_format: str = "{}"
     # noinspection PyDataclass
     allow_list: set[str] = Field(default_factory=set)
     # noinspection PyDataclass
@@ -311,10 +278,6 @@ class JobConfiguration(BaseModel):
         # Generic patterns for other file hosting services
         r"https?://[^\s]*(?:file|upload|share|download|drive|storage)[^\s]*\.[a-z]{2,4}/[^\s]+",
     ]
-    group_by_year: bool = False
-    group_by_month: bool = False
-    year_dirname_format: str = "{year}"
-    month_dirname_format: str = "{year}-{month:02d}"
     keywords: set[str] = Field(default_factory=set)
     keywords_exclude: set[str] = Field(default_factory=set)
     download_file: bool = True

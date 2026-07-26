@@ -18,6 +18,7 @@ from pydantic import SecretStr
 
 from ktoolbox.configuration import RuntimeContext, WebUIConfiguration, load_configuration
 from ktoolbox.exceptions import KToolBoxUserError
+from ktoolbox.naming_migration import migrate_legacy_naming
 from ktoolbox.project_config import ProjectConfigStore, ProjectConfiguration
 
 DEFAULT_WEBUI_USERNAME = "admin"
@@ -58,6 +59,21 @@ async def run_webui(
         ) from error
 
     root = await anyio.to_thread.run_sync(_project_root, project_dir)
+    migration = await anyio.to_thread.run_sync(migrate_legacy_naming, root)
+    if migration.migrated:
+        print(
+            "Migrated legacy naming settings to ktoolbox.toml. "
+            "Naming is now managed per project in the WebUI.",
+            file=sys.stderr,
+        )
+        for backup in migration.backup_paths:
+            print(f"  Backup: {backup}", file=sys.stderr)
+        if migration.ignored_environment_keys:
+            print(
+                "  Warning: legacy naming environment variables are ignored: "
+                + ", ".join(migration.ignored_environment_keys),
+                file=sys.stderr,
+            )
     configuration = await anyio.to_thread.run_sync(load_configuration, root)
     updates: dict[str, object] = {}
     if host is not None:

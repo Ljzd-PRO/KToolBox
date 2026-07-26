@@ -156,7 +156,7 @@ class JobConfiguration(ktoolbox.configuration.JobConfiguration):
     :ivar max_file_size: 最大文件大小（字节）。大于此大小的文件将被跳过。设置为 None 禁用最大文件大小过滤。
     """
 
-    post_structure: PostStructureConfiguration = PostStructureConfiguration()
+    ...
 
 
 class LoggerConfiguration(ktoolbox.configuration.LoggerConfiguration):

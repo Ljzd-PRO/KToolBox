@@ -68,7 +68,7 @@ def test_config_metadata_is_complete_in_all_languages_and_redacts_secrets(tmp_pa
     english = schemas["en"]
     chinese = schemas["zh-CN"]
     assert {len(schema.fields) for schema in schemas.values()} == {len(english.fields)}
-    assert len(english.fields) >= 60
+    assert len(english.fields) >= 50
     assert all(field.label and "_" not in field.label for field in english.fields)
     assert all(field.label and field.description for schema in schemas.values() for field in schema.fields)
     secret = next(field for field in english.fields if field.path == "downloader.session_key")
@@ -80,8 +80,10 @@ def test_config_metadata_is_complete_in_all_languages_and_redacts_secrets(tmp_pa
     assert count.label == "Concurrent downloads"
     assert count.json_schema["minimum"] == 1
     assert next(field for field in chinese.fields if field.path == "job.count").label == "并发下载数"
-    post_directory = next(field for field in chinese.fields if field.path == "job.post_dirname_format")
-    assert post_directory.label == "作品目录格式"
+    assert not any(
+        field.path.startswith(("job.post_dirname_format", "job.post_structure", "job.filename_format"))
+        for field in english.fields
+    )
     selectors = {field.path: field.path_selector for field in english.fields if field.path_selector is not None}
 
     assert set(selectors) == {"downloader.bucket_path", "logger.path"}
@@ -97,15 +99,6 @@ def test_config_metadata_is_complete_in_all_languages_and_redacts_secrets(tmp_pa
     }
     assert next(field for field in english.fields if field.path == "logger.path").label == "Log directory"
     assert next(field for field in chinese.fields if field.path == "logger.path").label == "日志目录"
-    internal_names = {
-        "job.post_structure.attachments",
-        "job.post_structure.content",
-        "job.post_structure.external_links",
-        "job.post_structure.revisions",
-    }
-    assert all(
-        next(field for field in english.fields if field.path == path).path_selector is None for path in internal_names
-    )
     log_level = next(field for field in english.fields if field.path == "logger.level")
     assert log_level.choice_mode == "fixed"
     assert [choice.value for choice in log_level.choices] == [
@@ -132,12 +125,11 @@ def test_dotenv_store_preserves_comments_validates_and_detects_conflicts(tmp_pat
 
     context = store.patch(
         "dotenv",
-        {"KTOOLBOX_JOB__COUNT": "7", "KTOOLBOX_JOB__MIX_POSTS": "true"},
+        {"KTOOLBOX_JOB__COUNT": "7"},
         before.revision,
     )
     assert "# keep me" in path.read_text(encoding="utf-8")
     assert context.configuration.job.count == 7
-    assert context.configuration.job.mix_posts is True
     assert path.stat().st_mode & 0o777 == 0o600
 
     with pytest.raises(ConfigurationConflictError):
@@ -146,6 +138,12 @@ def test_dotenv_store_preserves_comments_validates_and_detects_conflicts(tmp_pat
         store.patch("dotenv", {"BAD KEY": "value"}, store.read("dotenv").revision)
     with pytest.raises(ConfigurationFileError, match="validation failed"):
         store.replace("dotenv", "KTOOLBOX_JOB__COUNT=invalid\n", store.read("dotenv").revision)
+    with pytest.raises(ConfigurationFileError, match="Naming page"):
+        store.replace(
+            "dotenv",
+            "KTOOLBOX_JOB__MIX_POSTS=true\n",
+            store.read("dotenv").revision,
+        )
     with pytest.raises(ConfigurationFileError, match="1 MiB"):
         store.replace("dotenv", "X=" + "x" * (1024 * 1024), store.read("dotenv").revision)
     with pytest.raises(ConfigurationFileError, match="unknown dotenv"):

@@ -13,6 +13,7 @@ from dotenv.parser import parse_stream
 from pydantic import ValidationError
 
 from ktoolbox.configuration import Configuration, RuntimeContext
+from ktoolbox.naming_migration import find_legacy_naming_keys
 
 _ALLOWED_FILES = {"dotenv": ".env", "production": "prod.env"}
 _KEY_PATTERN = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
@@ -100,6 +101,11 @@ class DotenvFileStore:
         if errors:
             lines = ", ".join(str(binding.original.line) for binding in errors)
             raise ConfigurationFileError(f"invalid dotenv syntax on line(s): {lines}")
+        if legacy_keys := find_legacy_naming_keys(content):
+            raise ConfigurationFileError(
+                "naming settings are project-specific; edit them on the Naming page instead: "
+                + ", ".join(sorted(set(legacy_keys)))
+            )
 
     @staticmethod
     def _check_revision(document: ConfigurationDocument, expected_revision: str) -> None:
