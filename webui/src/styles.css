@@ -415,6 +415,9 @@ code {
 }
 
 .app-table-frame {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   overflow: auto;
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -546,6 +549,30 @@ code {
 @media (max-width: 639px) {
   .app-modal-dialog {
     padding: 0 !important;
+  }
+
+  .naming-tabs > [data-slot="tabs-list"] {
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .naming-tabs [data-slot="tabs-tab"] {
+    min-width: 0;
+    min-height: 3.25rem;
+    height: auto;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.375rem 0.25rem;
+    font-size: 0.6875rem;
+    line-height: 0.9rem;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .naming-tabs [data-slot="tabs-tab"] svg {
+    flex: 0 0 auto;
   }
 
   .configuration-tabs [data-slot="tabs-list"] {
@@ -1003,6 +1030,35 @@ code {
   }
 }
 
+@media (max-width: 359px) {
+  .batch-selection-summary {
+    grid-template-areas:
+      "select clear"
+      "count count";
+    grid-template-columns: minmax(0, 1fr) 2.75rem;
+  }
+
+  .batch-selection-summary .selection-checkbox-labeled {
+    grid-area: select;
+    justify-content: flex-start;
+  }
+
+  .batch-selection-summary .selection-checkbox-labeled span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .batch-selected-count {
+    grid-area: count;
+    justify-self: start;
+  }
+
+  .batch-clear-button {
+    grid-area: clear;
+  }
+}
+
 @media (max-width: 379px) {
   .stat-tile {
     padding: 0.75rem;
@@ -1039,6 +1095,7 @@ code {
   gap: 0 !important;
   grid-template-rows: minmax(0, 1fr) auto;
   width: 100%;
+  min-width: 0;
   border: 0 !important;
   border-radius: 0 !important;
   background: var(--console-subtle) !important;

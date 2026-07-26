@@ -1,3 +1,5 @@
+import { namingTranslations } from "./naming";
+
 export const en = {
   "brand": "KToolBox",
   "subtitle": "Pawchive sync workspace",
@@ -79,6 +81,7 @@ export const en = {
     "posts": "Posts",
     "blockers": "Blockers",
     "configuration": "Global configuration",
+    "naming": "Naming format",
     "mcp": "MCP",
     "system": "System",
     "about": "About"
@@ -233,6 +236,7 @@ export const en = {
     "removeTitle": "Remove this blocker?",
     "removeBody": "The {{id}} rule will stop applying to future sync tasks."
   },
+  "naming": namingTranslations.en,
   "configuration": {
     "title": "Global configuration",
     "description": "Edit typed settings with documentation sourced from KToolBox configuration classes.",

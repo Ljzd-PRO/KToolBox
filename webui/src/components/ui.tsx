@@ -132,7 +132,7 @@ export function FormSurface({ children, className }: { children: ReactNode; clas
 
 export function DataTableFrame({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <Table className={className} variant="secondary">
+    <Table className={cn("min-w-0 max-w-full", className)} variant="secondary">
       <Table.ScrollContainer className="app-table-frame">{children}</Table.ScrollContainer>
     </Table>
   );
@@ -143,6 +143,7 @@ export function SelectionCheckbox({
   isSelected,
   onChange,
   isIndeterminate = false,
+  isDisabled = false,
   showLabel = false,
   className,
 }: {
@@ -150,6 +151,7 @@ export function SelectionCheckbox({
   isSelected: boolean;
   onChange: (selected: boolean) => void;
   isIndeterminate?: boolean;
+  isDisabled?: boolean;
   showLabel?: boolean;
   className?: string;
 }) {
@@ -157,6 +159,7 @@ export function SelectionCheckbox({
     <Checkbox
       aria-label={label}
       className={cn("selection-checkbox min-h-11", showLabel && "selection-checkbox-labeled", className)}
+      isDisabled={isDisabled}
       isIndeterminate={isIndeterminate}
       isSelected={isSelected}
       slot={null}
@@ -208,7 +211,7 @@ export function BatchActionBar({
           showLabel
           onChange={onSelectAll}
         />
-        <Chip color="accent" size="sm" variant="soft">
+        <Chip className="batch-selected-count" color="accent" size="sm" variant="soft">
           {t("common.selectedCount", { count: selectedCount })}
         </Chip>
         <Button aria-label={t("common.clearSelection")} className="batch-clear-button" size="sm" variant="ghost" onPress={onClear}>
@@ -1528,7 +1531,7 @@ export function FormModal({
               className="app-form-modal-surface control-surface min-h-0 flex-1 overflow-hidden rounded-none border-0 shadow-none"
               variant="secondary"
             >
-              <Modal.Body className="app-form-modal-body p-4 sm:p-5">{children}</Modal.Body>
+              <Modal.Body className="app-form-modal-body min-w-0 p-4 sm:p-5">{children}</Modal.Body>
               <Modal.Footer className="app-form-modal-actions flex flex-wrap justify-end gap-2 border-t border-border px-5 py-4">
                 {actions}
               </Modal.Footer>

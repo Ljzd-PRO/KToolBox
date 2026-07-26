@@ -102,11 +102,24 @@ export type TextDocument = {
 
 export type ProjectDocument = TextDocument & {
   configuration: {
-    schema_version: 1;
+    schema_version: 2;
     creators: CreatorReference[];
     blockers: BlockerSpec[];
+    naming: ProjectNamingConfiguration;
   };
 };
+
+export type ProjectNamingConfiguration = WebUIApiSchemas["ProjectNamingConfiguration"];
+
+export type NamingConfigurationResponse = WebUIApiSchemas["NamingConfigurationResponse"];
+
+export type NamingCreatorPreview = WebUIApiSchemas["NamingCreatorPreview"];
+
+export type NamingPreview = WebUIApiSchemas["NamingPreviewResponse"];
+
+export type NamingConversion = WebUIApiSchemas["NamingConversionResponse"];
+
+export type StartupNotice = WebUIApiSchemas["StartupNoticeResponse"];
 
 export type TaskStatus = WebUIApiSchemas["TaskStatus"];
 

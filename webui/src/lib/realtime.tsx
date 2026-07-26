@@ -35,6 +35,7 @@ export type RealtimeResource =
   | "creators"
   | "blockers"
   | "configuration"
+  | "naming"
   | "mcp"
   | "filesystem";
 
@@ -68,6 +69,9 @@ const eventTypes = [
   "creator_profile.changed",
   "blockers.changed",
   "configuration.changed",
+  "naming.changed",
+  "naming.conversion.progress",
+  "naming.conversion.finished",
   "mcp.tokens.changed",
   "filesystem.changed",
 ] as const;
@@ -79,6 +83,9 @@ const localQueryRoots = new Set([
   "blockers",
   "config-schema",
   "config-document",
+  "naming",
+  "naming-conversions",
+  "startup-notices",
   "mcp",
   "task-attempts",
   "task-cleanup",
@@ -118,6 +125,7 @@ const initialRevisions: Record<RealtimeResource, number> = {
   creators: 0,
   blockers: 0,
   configuration: 0,
+  naming: 0,
   mcp: 0,
   filesystem: 0,
 };
@@ -451,8 +459,14 @@ function applyRealtimeEvent(
     queueRefresh("blockers", "config-document");
     notifyResource("blockers");
   } else if (event.event_type === "configuration.changed") {
-    queueRefresh("config-schema", "config-document", "project", "creators", "blockers");
+    queueRefresh("config-schema", "config-document", "project", "creators", "blockers", "naming");
     notifyResource("configuration");
+  } else if (event.event_type === "naming.changed") {
+    queueRefresh("naming", "naming-conversions", "config-document");
+    notifyResource("naming");
+  } else if (event.event_type.startsWith("naming.conversion.")) {
+    queueRefresh("naming-conversions");
+    notifyResource("naming");
   } else if (event.event_type === "mcp.tokens.changed") {
     queueRefresh("mcp");
     notifyResource("mcp");

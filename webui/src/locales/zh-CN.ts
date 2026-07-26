@@ -1,5 +1,6 @@
 import type { TranslationShape } from "./types";
 import { en } from "./en";
+import { namingTranslations } from "./naming";
 
 export const zhCN = {
   "brand": "KToolBox",
@@ -82,6 +83,7 @@ export const zhCN = {
     "posts": "作品",
     "blockers": "忽略规则",
     "configuration": "全局配置",
+    "naming": "命名格式",
     "mcp": "MCP",
     "system": "系统",
     "about": "关于"
@@ -236,6 +238,7 @@ export const zhCN = {
     "removeTitle": "移除此忽略规则？",
     "removeBody": "规则 {{id}} 将不再应用于之后创建的同步任务。"
   },
+  "naming": namingTranslations["zh-CN"],
   "configuration": {
     "title": "全局配置",
     "description": "使用来自 KToolBox 配置类文档的说明编辑类型化设置。",

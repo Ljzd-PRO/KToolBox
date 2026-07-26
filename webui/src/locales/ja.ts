@@ -1,5 +1,6 @@
 import type { TranslationShape } from "./types";
 import { en } from "./en";
+import { namingTranslations } from "./naming";
 
 export const ja = {
   brand: "KToolBox",
@@ -72,7 +73,8 @@ export const ja = {
       delete_failed: "フォルダーを削除できませんでした。",
     },
   },
-  nav: { overview: "概要", tasks: "タスク", creators: "クリエイター", posts: "作品", blockers: "除外ルール", configuration: "グローバル設定", mcp: "MCP", system: "システム", about: "このアプリについて" },
+  nav: { overview: "概要", tasks: "タスク", creators: "クリエイター", posts: "作品", blockers: "除外ルール", naming: "命名形式", configuration: "グローバル設定", mcp: "MCP", system: "システム", about: "このアプリについて" },
+  naming: namingTranslations.ja,
   shell: {
     menu: "ナビゲーションを開く",
     closeMenu: "ナビゲーションを閉じる",

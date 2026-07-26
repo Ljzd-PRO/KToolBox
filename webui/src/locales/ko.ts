@@ -1,5 +1,6 @@
 import type { TranslationShape } from "./types";
 import { en } from "./en";
+import { namingTranslations } from "./naming";
 
 export const ko = {
   brand: "KToolBox",
@@ -48,7 +49,8 @@ export const ko = {
       filesystem_error: "파일 시스템 작업에 실패했습니다. 다시 시도하세요.", invalid_name: "경로 구분자가 없는 올바른 이름을 입력하세요.", parent_not_found: "상위 디렉터리가 더 이상 존재하지 않습니다.", parent_not_directory: "상위 경로가 디렉터리가 아닙니다.", already_exists: "같은 이름의 파일 또는 폴더가 이미 있습니다.", permission_denied: "KToolBox에 이 위치에 접근할 권한이 없습니다.", create_failed: "폴더를 만들 수 없습니다.", invalid_path: "경로가 올바르지 않습니다.", not_directory: "선택한 경로가 디렉터리가 아닙니다.", inspect_failed: "경로를 확인할 수 없습니다.", directory_not_found: "디렉터리가 더 이상 존재하지 않습니다.", read_failed: "디렉터리를 읽을 수 없습니다.", outside_scope: "경로가 허용된 위치 밖에 있습니다.", symlink_delete_forbidden: "여기에서는 심볼릭 링크를 삭제할 수 없습니다.", protected_directory: "보호된 디렉터리는 삭제할 수 없습니다.", directory_not_empty: "빈 폴더만 삭제할 수 있습니다. 먼저 내용을 삭제하거나 옮기세요.", delete_failed: "폴더를 삭제할 수 없습니다.",
     },
   },
-  nav: { overview: "개요", tasks: "작업", creators: "크리에이터", posts: "작품", blockers: "제외 규칙", configuration: "전역 설정", mcp: "MCP", system: "시스템", about: "정보" },
+  nav: { overview: "개요", tasks: "작업", creators: "크리에이터", posts: "작품", blockers: "제외 규칙", naming: "이름 형식", configuration: "전역 설정", mcp: "MCP", system: "시스템", about: "정보" },
+  naming: namingTranslations.ko,
   shell: {
     menu: "탐색 열기", closeMenu: "탐색 닫기", navigation: "탐색", light: "라이트 테마 사용", dark: "다크 테마 사용", theme: "테마", themeSystem: "시스템 테마 따르기", themeLight: "라이트 테마 사용", themeDark: "다크 테마 사용",
     themeColors: { blue: "파란색 강조색 사용", emerald: "에메랄드 강조색 사용", violet: "보라색 강조색 사용", rose: "장미색 강조색 사용", amber: "황색 강조색 사용" },
