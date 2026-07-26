@@ -664,12 +664,16 @@ test("captures the remote path picker visual matrix", async ({ page }, testInfo)
   await page.getByRole("link", { name: "Global configuration" }).click();
   await page.getByRole("button", { name: /Configuration section/ }).click();
   await page.getByRole("option", { name: "Download jobs" }).click();
+  await expect(page.getByRole("textbox", { name: "Content file" })).toHaveCount(0);
+  await page.getByRole("link", { name: "Naming format" }).click();
   await expect(page.getByRole("textbox", { name: "Content file" })).toHaveValue("content.txt");
   await expect(page.getByRole("button", { name: "Browse the remote computer for Content file" })).toHaveCount(0);
-  await capture("configuration__internal-name__light", 768, 1024);
+  await capture("naming__internal-name__light", 768, 1024);
 
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.getByRole("button", { name: "Use dark theme" }).click();
+  await page.goto("/configuration");
+  await expect(page.getByRole("heading", { name: "Global configuration" }).first()).toBeVisible();
   await page.getByRole("button", { name: /Configuration section/ }).click();
   await page.getByRole("option", { name: "File downloads" }).click();
   await page.getByRole("button", { name: "Browse the remote computer for Storage bucket path" }).click();
