@@ -126,6 +126,15 @@ async def test_preview_scans_filesystem_and_conversion_updates_project(tmp_path:
     assert not source.parent.exists()
     assert (downloads / "Artist (123)" / "one" / "asset.bin").is_file()
     assert store.load().naming.post_dirname_format == "{post_id}"
+
+    second_preview = await service.preview(
+        candidate.model_copy(
+            update={"creator_dirname_format": "{creator_name} - {creator_id}"},
+        )
+    )
+    assert second_preview.creators[0].name == "Artist"
+    assert second_preview.creators[0].source == downloads / "Artist (123)"
+    assert second_preview.creators[0].target == downloads / "Artist - 123"
     await service.stop()
 
 

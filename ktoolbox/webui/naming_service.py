@@ -7,6 +7,7 @@ import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
+from string import Formatter
 from urllib.parse import urlparse
 from uuid import uuid4
 
@@ -624,7 +625,7 @@ def _scan_download_roots(
         _add_indexed_works(root, current, grouped, skipped_by_creator)
         grouped_creators = {creator for _, _, creator in grouped}
         for (service, creator_id, source_creator), works in grouped.items():
-            name = _creator_name(source_creator.name, service, creator_id)
+            name = _creator_name(source_creator.name, service, creator_id, current)
             identity = f"{service}:{creator_id}"
             selection_key = f"{identity}@{hashlib.sha1(str(source_creator).encode()).hexdigest()[:10]}"
             target_creator = root / generate_creator_path_name(
@@ -684,7 +685,7 @@ def _scan_download_roots(
         for source_creator in _direct_creator_directories(root):
             if source_creator in grouped_creators:
                 continue
-            parsed_identity = _creator_identity_from_directory(source_creator)
+            parsed_identity = _creator_identity_from_directory(source_creator, current)
             if parsed_identity is None:
                 continue
             service, creator_id, name = parsed_identity
@@ -773,7 +774,10 @@ def _direct_creator_directories(root: Path) -> list[Path]:
         return []
 
 
-def _creator_identity_from_directory(path: Path) -> tuple[str, str, str] | None:
+def _creator_identity_from_directory(
+    path: Path,
+    naming: ProjectNamingConfiguration,
+) -> tuple[str, str, str] | None:
     index_path = path / DataStorageNameEnum.CreatorIndicesData.value
     if index_path.is_file() and not index_path.is_symlink():
         try:
@@ -784,8 +788,14 @@ def _creator_identity_from_directory(path: Path) -> tuple[str, str, str] | None:
             return (
                 index.service,
                 index.creator_id,
-                _creator_name(path.name, index.service, index.creator_id),
+                _creator_name(path.name, index.service, index.creator_id, naming),
             )
+    template_identity = _creator_identity_from_template(
+        path.name,
+        naming.creator_dirname_format,
+    )
+    if template_identity is not None:
+        return template_identity
     match = re.fullmatch(r"(.*?)\s*\[([A-Za-z0-9_]+)-(.+)]", path.name)
     if match is None:
         return None
@@ -912,10 +922,71 @@ def _attachment_basic_name(
     return path.name, sequence
 
 
-def _creator_name(dirname: str, service: str, creator_id: str) -> str:
+def _creator_name(
+    dirname: str,
+    service: str,
+    creator_id: str,
+    naming: ProjectNamingConfiguration,
+) -> str:
+    match = _match_creator_template(
+        dirname,
+        naming.creator_dirname_format,
+        {"service": service, "creator_id": creator_id},
+        {"creator_name"},
+    )
+    if match is not None and match.groupdict().get("creator_name"):
+        return match.group("creator_name").strip() or creator_id
     suffix = re.compile(rf"\s*\[{re.escape(service)}-{re.escape(creator_id)}\]\s*$", re.IGNORECASE)
     name = suffix.sub("", dirname).strip()
     return name or creator_id
+
+
+def _creator_identity_from_template(
+    dirname: str,
+    template: str,
+) -> tuple[str, str, str] | None:
+    match = _match_creator_template(
+        dirname,
+        template,
+        {},
+        {"creator_name", "service", "creator_id"},
+    )
+    if match is None:
+        return None
+    values = match.groupdict()
+    service = values.get("service")
+    creator_id = values.get("creator_id")
+    if not service or not creator_id:
+        return None
+    return service, creator_id, values.get("creator_name") or creator_id
+
+
+def _match_creator_template(
+    dirname: str,
+    template: str,
+    known: dict[str, str],
+    captured: set[str],
+) -> re.Match[str] | None:
+    pattern: list[str] = []
+    groups: set[str] = set()
+    try:
+        parts = Formatter().parse(template)
+        for literal, field_name, _format_spec, _conversion in parts:
+            pattern.append(re.escape(literal))
+            if field_name is None:
+                continue
+            if field_name in known:
+                pattern.append(re.escape(known[field_name]))
+            elif field_name not in captured:
+                return None
+            elif field_name in groups:
+                pattern.append(rf"(?P={field_name})")
+            else:
+                pattern.append(rf"(?P<{field_name}>.+?)")
+                groups.add(field_name)
+    except ValueError:
+        return None
+    return re.fullmatch("".join(pattern), dirname, re.IGNORECASE)
 
 
 def _tree_stats(root: Path) -> tuple[int, int, int]:
