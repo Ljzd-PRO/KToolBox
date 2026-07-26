@@ -361,7 +361,7 @@ async def test_sync_creator_url_dates_keywords_and_failures(tmp_path: Path) -> N
     assert create.await_args.kwargs["keywords"] == {"keep"}
     assert create.await_args.kwargs["keywords_exclude"] == {"block"}
     assert create.await_args.kwargs["start_time"].year == 2025
-    assert (tmp_path / "creator").is_dir()
+    assert (tmp_path / "creator [fanbox-creator]").is_dir()
 
     with patch("ktoolbox.cli.create_pawchive_client", return_value=ClientContext(client)):
         assert "does not match format" in await KToolBoxCli.sync_creator(

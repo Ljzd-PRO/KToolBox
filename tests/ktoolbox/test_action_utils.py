@@ -20,8 +20,8 @@ from ktoolbox.action.utils import (
     match_post_keywords,
 )
 from ktoolbox.api.generated import Post
-from ktoolbox.configuration import config
 from ktoolbox.job import CreatorIndices
+from ktoolbox.project_config import ProjectNamingConfiguration
 
 
 def post(post_id: str, title: str | None = None, date: datetime | None = None, edited: datetime | None = None) -> Post:
@@ -37,35 +37,51 @@ def post(post_id: str, title: str | None = None, date: datetime | None = None, e
 
 def test_path_and_filename_generation() -> None:
     dated = post("42", "A/B", datetime(2025, 3, 2))
-    assert generate_post_path_name(post("42")) == "42"
-    assert generate_post_path_name(dated) == "AB"
+    naming = ProjectNamingConfiguration()
+    assert generate_post_path_name(post("42"), naming) == "42"
+    assert generate_post_path_name(dated, naming) == "AB"
     assert generate_filename(dated, "cover.jpg", "{id}_{published}_{}") == "42_2025-03-02_cover.jpg"
-    assert generate_year_dirname(dated) == "2025"
-    assert generate_month_dirname(dated) == "2025-03"
-    assert generate_year_dirname(post("missing")) == "unknown"
-    assert generate_month_dirname(post("missing")) == "unknown"
+    assert generate_year_dirname(dated, naming) == "2025"
+    assert generate_month_dirname(dated, naming) == "2025-03"
+    assert generate_year_dirname(post("missing"), naming) == "unknown"
+    assert generate_month_dirname(post("missing"), naming) == "unknown"
 
-    config.job.group_by_year = False
-    assert generate_grouped_post_path(dated, Path("root")) == Path("root")
-    config.job.group_by_year = True
-    assert generate_grouped_post_path(dated, Path("root")) == Path("root/2025")
-    config.job.group_by_month = True
-    assert generate_grouped_post_path(dated, Path("root")) == Path("root/2025/2025-03")
+    assert generate_grouped_post_path(dated, Path("root"), naming) == Path("root")
+    yearly = ProjectNamingConfiguration(group_by_year=True)
+    assert generate_grouped_post_path(dated, Path("root"), yearly) == Path("root/2025")
+    monthly = ProjectNamingConfiguration(group_by_year=True, group_by_month=True)
+    assert generate_grouped_post_path(dated, Path("root"), monthly) == Path("root/2025/2025-03")
 
 
 @pytest.mark.parametrize(
     ("attribute", "value", "call"),
     [
-        ("post_dirname_format", "{invalid}", lambda item: generate_post_path_name(item)),
-        ("year_dirname_format", "{invalid}", lambda item: generate_year_dirname(item)),
-        ("month_dirname_format", "{invalid}", lambda item: generate_month_dirname(item)),
-        ("filename_format", "{invalid}", lambda item: generate_filename(item, "file.jpg", config.job.filename_format)),
+        (
+            "post_dirname_format",
+            "{invalid}",
+            lambda item, naming: generate_post_path_name(item, naming),
+        ),
+        (
+            "year_dirname_format",
+            "{invalid}",
+            lambda item, naming: generate_year_dirname(item, naming),
+        ),
+        (
+            "month_dirname_format",
+            "{invalid}",
+            lambda item, naming: generate_month_dirname(item, naming),
+        ),
+        (
+            "filename_format",
+            "{invalid}",
+            lambda item, naming: generate_filename(item, "file.jpg", naming.filename_format),
+        ),
     ],
 )
-def test_invalid_path_formats_exit(attribute: str, value: str, call) -> None:
-    setattr(config.job, attribute, value)
-    with pytest.raises(SystemExit):
-        call(post("42", "Title", datetime(2025, 1, 1)))
+def test_invalid_path_formats_raise_value_error(attribute: str, value: str, call) -> None:
+    naming = ProjectNamingConfiguration.model_construct(**{attribute: value})
+    with pytest.raises(ValueError, match="invalid naming template"):
+        call(post("42", "Title", datetime(2025, 1, 1)), naming)
 
 
 def test_date_keyword_and_index_filters() -> None:

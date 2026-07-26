@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 
 import aiofiles  # type: ignore[import-untyped]
 from loguru import logger
-from pathvalidate import is_valid_filename, sanitize_filename
+from pathvalidate import is_valid_filename
 
 from ktoolbox._enum import DataStorageNameEnum, PostFileTypeEnum
 from ktoolbox.action.base import ActionRet, action_error
@@ -19,6 +19,7 @@ from ktoolbox.action.utils import (
     generate_filename,
     generate_grouped_post_path,
     generate_post_path_name,
+    generate_revision_path_name,
 )
 from ktoolbox.api.client import PawchiveClient
 from ktoolbox.api.errors import PawchiveError, PawchiveNotFoundError
@@ -29,6 +30,7 @@ from ktoolbox.blocker.engine import blocker_registry, legacy_keyword_blocker
 from ktoolbox.configuration import config
 from ktoolbox.failures import FailureStage, StagedFailure
 from ktoolbox.job import CreatorIndices, Job
+from ktoolbox.project_config import ProjectNamingConfiguration
 from ktoolbox.utils import extract_external_links, generate_msg
 
 __all__ = ["CreatorJobGeneration", "create_job_from_post", "create_job_from_creator", "produce_jobs_from_creator"]
@@ -38,6 +40,7 @@ async def create_job_from_post(
     post: Post | Revision,
     post_path: Path,
     *,
+    naming: ProjectNamingConfiguration | None = None,
     post_dir: bool = True,
     dump_post_data: bool = True,
     client: PawchiveClient | None = None,
@@ -51,16 +54,17 @@ async def create_job_from_post(
     :param dump_post_data: Whether to dump post data (post.json) in post directory
     :raise FetchInterruptError: If fetching post content fails
     """
+    naming = naming or ProjectNamingConfiguration()
     await aiofiles.os.makedirs(post_path, exist_ok=True)
     job_post = Post.model_validate(post.model_dump(mode="python"))
 
     # Load ``PostStructureConfiguration``
     if post_dir:
-        attachments_path = post_path / config.job.post_structure.attachments  # attachments
+        attachments_path = post_path / naming.post_structure.attachments
         await aiofiles.os.makedirs(attachments_path, exist_ok=True)
-        content_path = post_path / config.job.post_structure.content  # content
+        content_path = post_path / naming.post_structure.content
         await aiofiles.os.makedirs(content_path.parent, exist_ok=True)
-        external_links_path = post_path / config.job.post_structure.external_links  # external_links
+        external_links_path = post_path / naming.post_structure.external_links
         await aiofiles.os.makedirs(external_links_path.parent, exist_ok=True)
     else:
         attachments_path = post_path
@@ -88,15 +92,15 @@ async def create_job_from_post(
             ) and not any(map(lambda x: fnmatch(file_path_obj.name, x), config.job.block_list)):
                 # Check if file extension should be excluded from sequential naming
                 should_use_sequential = (
-                    config.job.sequential_filename
-                    and file_path_obj.suffix.lower() not in config.job.sequential_filename_excludes
+                    naming.sequential_filename
+                    and file_path_obj.suffix.lower() not in naming.sequential_filename_excludes
                 )
                 if should_use_sequential:
                     basic_filename = f"{sequential_counter}{file_path_obj.suffix}"
                     sequential_counter += 1
                 else:
                     basic_filename = file_path_obj.name
-                alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
+                alt_filename = generate_filename(post, basic_filename, naming.filename_format)
                 jobs.append(
                     Job(
                         path=attachments_path,
@@ -114,7 +118,7 @@ async def create_job_from_post(
             if post.file.name and is_valid_filename(post.file.name)
             else Path(urlparse(post.file.path).path)
         )
-        post_file_name = Path(generate_filename(post, post_file_name.name, config.job.post_structure.file))
+        post_file_name = Path(generate_filename(post, post_file_name.name, naming.post_structure.file))
         if (
             not config.job.allow_list or any(map(lambda x: fnmatch(post_file_name.name, x), config.job.allow_list))
         ) and not any(map(lambda x: fnmatch(post_file_name.name, x), config.job.block_list)):
@@ -202,24 +206,24 @@ async def create_job_from_post(
                     image_file_path = Path(image_path)
 
                     # Apply "allow/block list" filtering first (before incrementing counter)
-                    if config.job.sequential_filename:
+                    if naming.sequential_filename:
                         basic_filename = f"{sequential_counter + 1}{image_file_path.suffix}"
                     else:
                         basic_filename = image_file_path.name
 
-                    alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
+                    alt_filename = generate_filename(post, basic_filename, naming.filename_format)
 
                     if (
                         not config.job.allow_list or any(map(lambda x: fnmatch(alt_filename, x), config.job.allow_list))
                     ) and not any(map(lambda x: fnmatch(alt_filename, x), config.job.block_list)):
                         # Regenerate filename with correct counter
                         should_use_sequential = (
-                            config.job.sequential_filename
-                            and image_file_path.suffix.lower() not in config.job.sequential_filename_excludes
+                            naming.sequential_filename
+                            and image_file_path.suffix.lower() not in naming.sequential_filename_excludes
                         )
                         if should_use_sequential:
                             basic_filename = f"{sequential_counter}{image_file_path.suffix}"
-                            alt_filename = generate_filename(post, basic_filename, config.job.filename_format)
+                            alt_filename = generate_filename(post, basic_filename, naming.filename_format)
                             sequential_counter += 1
 
                         jobs.append(
@@ -250,6 +254,7 @@ async def create_job_from_creator(
     creator_id: str,
     path: Path,
     *,
+    naming: ProjectNamingConfiguration | None = None,
     all_pages: bool = False,
     offset: int = 0,
     length: int | None = 50,
@@ -281,6 +286,7 @@ async def create_job_from_creator(
     :param blocker_engine: Structured blockers applied before post jobs are created
     :param client: Pawchive client to reuse across all creator requests
     """
+    naming = naming or ProjectNamingConfiguration()
     job_list: list[Job] = []
 
     async def collect(job: Job) -> None:
@@ -291,6 +297,7 @@ async def create_job_from_creator(
         creator_id,
         path,
         collect,
+        naming=naming,
         all_pages=all_pages,
         offset=offset,
         length=length,
@@ -314,6 +321,7 @@ async def produce_jobs_from_creator(
     path: Path,
     sink: JobSink,
     *,
+    naming: ProjectNamingConfiguration | None = None,
     all_pages: bool = False,
     offset: int = 0,
     length: int | None = 50,
@@ -327,6 +335,7 @@ async def produce_jobs_from_creator(
     client: PawchiveClient | None = None,
 ) -> ActionRet[CreatorJobGeneration]:
     """Generate and emit creator jobs as soon as each post has been processed."""
+    naming = naming or ProjectNamingConfiguration()
     if client is None:
         async with pawchive_client_scope(None) as api_client:
             return await produce_jobs_from_creator(
@@ -334,6 +343,7 @@ async def produce_jobs_from_creator(
                 creator_id,
                 path,
                 sink,
+                naming=naming,
                 all_pages=all_pages,
                 offset=offset,
                 length=length,
@@ -347,7 +357,7 @@ async def produce_jobs_from_creator(
                 client=api_client,
             )
 
-    selected_mix_posts = config.job.mix_posts if mix_posts is None else mix_posts
+    selected_mix_posts = naming.mix_posts if mix_posts is None else mix_posts
     active_engine = _creator_blocker_engine(blocker_engine, keywords_exclude)
     context = BlockerContext(service=service, creator_id=creator_id)
     summary = CreatorJobGeneration()
@@ -390,17 +400,19 @@ async def produce_jobs_from_creator(
                     continue
 
                 summary.accepted_posts += 1
-                post_path = _creator_post_path(post, path, selected_mix_posts)
+                post_path = _creator_post_path(post, path, selected_mix_posts, naming)
                 if not selected_mix_posts and save_creator_indices:
                     indexed_posts[post.id] = post
-                    indexed_paths[post.id] = generate_grouped_post_path(post, path) / sanitize_filename(
-                        post.title or post.id
+                    indexed_paths[post.id] = generate_grouped_post_path(post, path, naming) / generate_post_path_name(
+                        post,
+                        naming,
                     )
 
                 try:
                     jobs = await create_job_from_post(
                         post=post,
                         post_path=post_path,
+                        naming=naming,
                         post_dir=not selected_mix_posts,
                         dump_post_data=not selected_mix_posts,
                         client=client,
@@ -419,6 +431,7 @@ async def produce_jobs_from_creator(
                             client,
                             sink,
                             summary,
+                            naming,
                         )
                     except FetchInterruptError as error:
                         return action_error(error.error)
@@ -463,10 +476,15 @@ def _post_matches_filters(
     return not keywords or bool(list(filter_posts_by_keywords([post], keywords)))
 
 
-def _creator_post_path(post: Post, path: Path, mix_posts: bool) -> Path:
+def _creator_post_path(
+    post: Post,
+    path: Path,
+    mix_posts: bool,
+    naming: ProjectNamingConfiguration,
+) -> Path:
     if mix_posts:
         return path
-    return generate_grouped_post_path(post, path) / generate_post_path_name(post)
+    return generate_grouped_post_path(post, path, naming) / generate_post_path_name(post, naming)
 
 
 async def _emit_jobs(jobs: list[Job], sink: JobSink, summary: CreatorJobGeneration) -> None:
@@ -483,14 +501,20 @@ async def _emit_revision_jobs(
     client: PawchiveClient,
     sink: JobSink,
     summary: CreatorJobGeneration,
+    naming: ProjectNamingConfiguration,
 ) -> None:
     try:
         revisions = await client.list_post_revisions(service, creator_id, post.id)
         for revision in revisions:
-            revision_path = post_path / config.job.post_structure.revisions / generate_post_path_name(revision)
+            revision_path = (
+                post_path
+                / naming.post_structure.revisions
+                / generate_revision_path_name(revision, naming)
+            )
             revision_jobs = await create_job_from_post(
                 post=revision,
                 post_path=revision_path,
+                naming=naming,
                 dump_post_data=True,
                 client=client,
             )

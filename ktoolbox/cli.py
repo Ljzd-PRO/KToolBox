@@ -5,7 +5,6 @@ from pathlib import Path
 
 import aiofiles  # type: ignore[import-untyped]
 from loguru import logger
-from pathvalidate import sanitize_filename
 from pydantic import BaseModel, ValidationError
 from settings_doc import OutputFormat, render  # type: ignore[import-untyped]
 
@@ -15,7 +14,9 @@ from ktoolbox.action import (
     FetchInterruptError,
     create_job_from_creator,
     create_job_from_post,
+    generate_creator_path_name,
     generate_post_path_name,
+    generate_revision_path_name,
 )
 from ktoolbox.action import search_creator as search_creator_action
 from ktoolbox.action import search_creator_post as search_creator_post_action
@@ -25,6 +26,7 @@ from ktoolbox.api.generated import CreatorSummary, Post, Revision
 from ktoolbox.api.utils import create_pawchive_client
 from ktoolbox.configuration import config
 from ktoolbox.job import JobRunner
+from ktoolbox.project_config import ProjectNamingConfiguration
 from ktoolbox.reporting import ProgressReporter
 from ktoolbox.utils import check_for_updates, dump_search, generate_msg, parse_webpage_url
 
@@ -185,6 +187,7 @@ class KToolBoxCli:
         path: Path | str = Path("."),
         *,
         dump_post_data: bool = True,
+        naming: ProjectNamingConfiguration | None = None,
         reporter: ProgressReporter | None = None,
     ) -> str | None:
         """Download one post, one selected revision, or a post with all revisions."""
@@ -203,16 +206,22 @@ class KToolBoxCli:
         assert service is not None and creator_id is not None and post_id is not None
         output_path = path if isinstance(path, Path) else Path(path)
 
+        naming = naming or ProjectNamingConfiguration()
         try:
             async with create_pawchive_client() as client:
                 post = await _requested_post(client, service, creator_id, post_id, revision_id)
-                post_path = output_path / generate_post_path_name(post)
+                post_path = output_path / generate_post_path_name(post, naming)
                 if revision_id:
-                    post_path = post_path / config.job.post_structure.revisions / str(revision_id)
+                    post_path = (
+                        post_path
+                        / naming.post_structure.revisions
+                        / generate_revision_path_name(post, naming)
+                    )
 
                 jobs = await create_job_from_post(
                     post,
                     post_path,
+                    naming=naming,
                     dump_post_data=dump_post_data,
                     client=client,
                 )
@@ -224,12 +233,15 @@ class KToolBoxCli:
                         revisions = []
                     for revision in revisions:
                         revision_path = (
-                            post_path / config.job.post_structure.revisions / generate_post_path_name(revision)
+                            post_path
+                            / naming.post_structure.revisions
+                            / generate_revision_path_name(revision, naming)
                         )
                         jobs.extend(
                             await create_job_from_post(
                                 revision,
                                 revision_path,
+                                naming=naming,
                                 dump_post_data=dump_post_data,
                                 client=client,
                             )
@@ -250,6 +262,7 @@ class KToolBoxCli:
         *,
         save_creator_indices: bool = False,
         mix_posts: bool | None = None,
+        naming: ProjectNamingConfiguration | None = None,
         start_time: str | None = None,
         end_time: str | None = None,
         offset: int = 0,
@@ -277,16 +290,23 @@ class KToolBoxCli:
         keyword_set = set(keyword_values) if keyword_values else config.job.keywords
         excluded_keyword_set = set(excluded_keyword_values) if excluded_keyword_values else config.job.keywords_exclude
 
+        naming = naming or ProjectNamingConfiguration()
         try:
             async with create_pawchive_client() as client:
                 profile = await client.get_creator_profile(service, creator_id)
-                creator_path = output_path / sanitize_filename(profile.name or creator_id)
+                creator_path = output_path / generate_creator_path_name(
+                    service,
+                    creator_id,
+                    profile.name,
+                    naming,
+                )
                 creator_path.mkdir(parents=True, exist_ok=True)
 
                 result = await create_job_from_creator(
                     service,
                     creator_id,
                     creator_path,
+                    naming=naming,
                     all_pages=length is None,
                     offset=offset,
                     length=length,

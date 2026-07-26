@@ -6,16 +6,22 @@ from datetime import datetime
 from pathlib import Path
 
 import aiofiles.os  # type: ignore[import-untyped]
-from pathvalidate import sanitize_filename
 
 from ktoolbox.action.job import CreatorJobGeneration, produce_jobs_from_creator
+from ktoolbox.action.utils import generate_creator_path_name
 from ktoolbox.api.client import PawchiveClient
 from ktoolbox.blocker import BlockerEngine
 from ktoolbox.configuration import config
 from ktoolbox.failures import FailureItem, FailureStage, classify_failure, generic_failure
 from ktoolbox.job.model import Job
 from ktoolbox.job.stream import DownloadSummary, DownloadWorkerPool, FairJobQueue
-from ktoolbox.project_config import CreatorReference, ProjectConfigError, ProjectConfiguration, parse_creator_reference
+from ktoolbox.project_config import (
+    CreatorReference,
+    ProjectConfigError,
+    ProjectConfiguration,
+    ProjectNamingConfiguration,
+    parse_creator_reference,
+)
 from ktoolbox.reporting import NullProgressReporter, ProgressReporter
 
 
@@ -79,6 +85,7 @@ class SyncCoordinator:
         self,
         client: PawchiveClient,
         *,
+        naming: ProjectNamingConfiguration | None = None,
         blocker_engine: BlockerEngine | None = None,
         creator_concurrency: int = 4,
         download_pool: DownloadWorkerPool | None = None,
@@ -88,6 +95,7 @@ class SyncCoordinator:
         if creator_concurrency < 1:
             raise ValueError("creator concurrency must be positive")
         self.client = client
+        self.naming = naming or ProjectNamingConfiguration()
         self.blocker_engine = blocker_engine or BlockerEngine()
         self.creator_concurrency = creator_concurrency
         self.reporter = reporter or NullProgressReporter()
@@ -139,8 +147,12 @@ class SyncCoordinator:
         try:
             async with semaphore:
                 profile = await self.client.get_creator_profile(creator.service, creator.creator_id)
-                dirname = sanitize_filename(
-                    f"{profile.name or creator.creator_id} [{creator.service}-{creator.creator_id}]"
+                dirname = generate_creator_path_name(
+                    creator.service,
+                    creator.creator_id,
+                    profile.name,
+                    self.naming,
+                    alias=creator.alias,
                 )
                 creator_path = options.output / dirname
                 await aiofiles.os.makedirs(creator_path, exist_ok=True)
@@ -156,6 +168,7 @@ class SyncCoordinator:
                     creator.creator_id,
                     creator_path,
                     enqueue,
+                    naming=self.naming,
                     all_pages=options.length is None,
                     offset=options.offset,
                     length=options.length,

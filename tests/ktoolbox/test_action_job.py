@@ -18,6 +18,7 @@ from ktoolbox.api.generated import FileReference, Post, Revision
 from ktoolbox.blocker import BlockerEngine, BlockerSpec
 from ktoolbox.configuration import config
 from ktoolbox.job import Job
+from ktoolbox.project_config import ProjectNamingConfiguration
 
 
 def post(
@@ -49,8 +50,10 @@ def api_error(status: int = 500) -> PawchiveHTTPError:
 
 @pytest.mark.asyncio
 async def test_create_post_jobs_filters_names_and_extracts_content(tmp_path: Path) -> None:
-    config.job.sequential_filename = True
-    config.job.sequential_filename_excludes = {".zip"}
+    naming = ProjectNamingConfiguration(
+        sequential_filename=True,
+        sequential_filename_excludes={".zip"},
+    )
     config.job.block_list = {"blocked*"}
     config.job.extract_content = True
     config.job.extract_external_links = True
@@ -73,7 +76,7 @@ async def test_create_post_jobs_filters_names_and_extracts_content(tmp_path: Pat
     ]
     item.file = FileReference(name="cover.jpg", path="/aa/cover.jpg")
 
-    jobs = await create_job_from_post(item, tmp_path / "post")
+    jobs = await create_job_from_post(item, tmp_path / "post", naming=naming)
 
     assert [job.alt_filename for job in jobs] == [
         "1.jpg",

@@ -142,6 +142,10 @@ async def download(
             "provide a post URL or use --service, --creator-id, and --post-id together",
             code=2,
         )
+    try:
+        naming = _project_store(None).load().naming
+    except ProjectConfigError as error:
+        return _project_error(error)
     result = await KToolBoxCli.download_post(
         url=post,
         service=service,
@@ -150,6 +154,7 @@ async def download(
         revision_id=revision_id,
         path=output,
         dump_post_data=dump_post_data,
+        naming=naming,
         reporter=_progress_reporter(),
     )
     return _command_error("Download failed", result) if result else 0
@@ -200,6 +205,7 @@ async def sync(
         async with create_pawchive_client() as client:
             summary = await SyncCoordinator(
                 client,
+                naming=project.naming,
                 blocker_engine=engine,
                 creator_concurrency=runtime_config.job.creator_concurrency,
                 reporter=_progress_reporter(),

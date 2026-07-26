@@ -3,7 +3,11 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 
-from ktoolbox.action import create_job_from_post, generate_post_path_name
+from ktoolbox.action import (
+    create_job_from_post,
+    generate_post_path_name,
+    generate_revision_path_name,
+)
 from ktoolbox.api.client import PawchiveClient
 from ktoolbox.api.errors import PawchiveNotFoundError
 from ktoolbox.api.generated import Post, Revision
@@ -53,11 +57,16 @@ class CoreTaskExecutor:
     ) -> None:
         with snapshot.runtime.activate():
             if isinstance(task.spec, DownloadTaskSpec):
-                await self._download(task.spec, reporter)
+                await self._download(task.spec, snapshot.project, reporter)
             else:
                 await self._sync(task.spec, snapshot.project, reporter)
 
-    async def _download(self, spec: DownloadTaskSpec, reporter: ProgressReporter) -> None:
+    async def _download(
+        self,
+        spec: DownloadTaskSpec,
+        project: ProjectConfiguration,
+        reporter: ProgressReporter,
+    ) -> None:
         from ktoolbox.configuration import config
 
         service: str | None = None
@@ -69,12 +78,17 @@ class CoreTaskExecutor:
             async with create_pawchive_client() as client:
                 post = await _requested_post(client, service, creator_id, post_id, revision_id)
                 stage = FailureStage.job_generation
-                post_path = spec.output / generate_post_path_name(post)
+                post_path = spec.output / generate_post_path_name(post, project.naming)
                 if revision_id is not None:
-                    post_path = post_path / config.job.post_structure.revisions / revision_id
+                    post_path = (
+                        post_path
+                        / project.naming.post_structure.revisions
+                        / generate_revision_path_name(post, project.naming)
+                    )
                 jobs = await create_job_from_post(
                     post,
                     post_path,
+                    naming=project.naming,
                     dump_post_data=spec.dump_post_data,
                     client=client,
                 )
@@ -87,12 +101,15 @@ class CoreTaskExecutor:
                     stage = FailureStage.job_generation
                     for revision in revisions:
                         revision_path = (
-                            post_path / config.job.post_structure.revisions / generate_post_path_name(revision)
+                            post_path
+                            / project.naming.post_structure.revisions
+                            / generate_revision_path_name(revision, project.naming)
                         )
                         jobs.extend(
                             await create_job_from_post(
                                 revision,
                                 revision_path,
+                                naming=project.naming,
                                 dump_post_data=spec.dump_post_data,
                                 client=client,
                             )
@@ -128,6 +145,7 @@ class CoreTaskExecutor:
         async with create_pawchive_client() as client:
             summary = await SyncCoordinator(
                 client,
+                naming=project.naming,
                 blocker_engine=BlockerEngine.from_specs(project.blockers),
                 creator_concurrency=config.job.creator_concurrency,
                 reporter=reporter,
