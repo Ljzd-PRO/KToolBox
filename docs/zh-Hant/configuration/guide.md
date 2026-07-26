@@ -2,8 +2,8 @@
 
 KToolBox 有兩層設定：
 
-- `.env`、`prod.env` 和處理程序變數控制 API、傳輸、命名與全域下載行為。
-- `ktoolbox.toml` 儲存專案創作者清單和有順序的作品忽略規則。
+- `.env`、`prod.env` 和處理程序變數控制 API、傳輸與全域下載行為。
+- `ktoolbox.toml` 儲存專案命名、下載根目錄、創作者清單和有順序的作品忽略規則。
 
 KToolBox 會從目前工作目錄依序讀取 `.env` 和 `prod.env`。`prod.env` 的值會覆寫 `.env` 中相同的值，而處理程序環境變數具有最高優先權。
 
@@ -58,10 +58,10 @@ ktoolbox config validate
 
 ## 創作者清單
 
-每份專案文件都以 `schema_version = 1` 開頭。創作者依不區分大小寫的 `service:id` 保持唯一；可選別名也必須唯一。
+每份專案文件都以 `schema_version = 2` 開頭。Schema v2 也儲存專案命名格式與下載根目錄，請參閱[命名格式指南](../naming.md)。創作者依不區分大小寫的 `service:id` 保持唯一；可選別名也必須唯一。
 
 ```toml
-schema_version = 1
+schema_version = 2
 
 [[creators]]
 service = "fanbox"
@@ -136,26 +136,13 @@ KTOOLBOX_DOWNLOADER__FILE_PATH_PREFIX=/data
 ```dotenv
 KTOOLBOX_JOB__ALLOW_LIST='["*.jpg", "*.png"]'
 KTOOLBOX_JOB__BLOCK_LIST='["*.zip", "*.psd"]'
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME_EXCLUDES='[".zip", ".psd"]'
 ```
 
-相對輸出與 Bucket 路徑從工作目錄解析。將附件路徑設為 `./`，可把附件直接放入每個作品目錄：
-
-```dotenv
-KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-```
+相對輸出與 Bucket 路徑從工作目錄解析。
 
 ## 命名範本
 
-作品與檔案範本可使用 `id`、`user`、`service`、`title`、`added`、`published` 和 `edited`。檔案範本中的空 `{}` 代表原始或順序基礎檔名。
-
-```dotenv
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title:.60}
-KTOOLBOX_JOB__FILENAME_FORMAT=[{published}]_{title:.60}_{}
-KTOOLBOX_JOB__POST_STRUCTURE__FILE={id}_{}
-```
-
-Python 格式規格精確度（如 `{title:.60}`）適合用來處理檔案系統長度限制。
+命名範本與作品內部名稱不再屬於全域 dotenv 設定。請透過 WebUI「命名格式」頁設定專案 `[naming]`；首次啟動完成備份遷移後，舊命名鍵會被拒絕。變數、驗證、掃描與轉換請參閱[命名格式指南](../naming.md)。
 
 ## 限制下載
 

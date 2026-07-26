@@ -2,8 +2,8 @@
 
 KToolBox에는 두 가지 설정 계층이 있습니다.
 
-- `.env`, `prod.env` 및 프로세스 변수는 API, 전송, 이름 지정 및 전역 다운로드 동작을 제어합니다.
-- `ktoolbox.toml`은 프로젝트 크리에이터 목록과 순서가 있는 게시물 제외 규칙을 저장합니다.
+- `.env`, `prod.env` 및 프로세스 변수는 API, 전송 및 전역 다운로드 동작을 제어합니다.
+- `ktoolbox.toml`은 프로젝트 이름 형식, 다운로드 루트, 크리에이터 목록과 순서가 있는 게시물 제외 규칙을 저장합니다.
 
 KToolBox는 현재 작업 디렉터리에서 `.env`, 그다음 `prod.env`를 읽습니다. `prod.env` 값은 `.env`의 일치하는 값을 재정의하고 프로세스 환경 변수의 우선순위가 가장 높습니다.
 
@@ -58,10 +58,10 @@ ktoolbox config validate
 
 ## 크리에이터 목록
 
-모든 프로젝트 문서는 `schema_version = 1`로 시작합니다. 크리에이터는 대소문자를 구분하지 않는 `service:id`로 고유하며 선택적 별칭도 고유합니다.
+모든 프로젝트 문서는 `schema_version = 2`로 시작합니다. Schema v2는 프로젝트 이름 형식과 다운로드 루트도 저장합니다. [이름 형식 가이드](../naming.md)를 참조하세요. 크리에이터는 대소문자를 구분하지 않는 `service:id`로 고유하며 선택적 별칭도 고유합니다.
 
 ```toml
-schema_version = 1
+schema_version = 2
 
 [[creators]]
 service = "fanbox"
@@ -136,26 +136,13 @@ dotenv 파일의 집합과 목록에는 JSON 배열을 사용합니다.
 ```dotenv
 KTOOLBOX_JOB__ALLOW_LIST='["*.jpg", "*.png"]'
 KTOOLBOX_JOB__BLOCK_LIST='["*.zip", "*.psd"]'
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME_EXCLUDES='[".zip", ".psd"]'
 ```
 
-상대 출력 및 버킷 경로는 작업 디렉터리에서 확인됩니다. 첨부 파일을 각 게시물 디렉터리에 직접 두려면 첨부 파일 경로를 `./`로 설정하세요.
-
-```dotenv
-KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-```
+상대 출력 및 버킷 경로는 작업 디렉터리에서 확인됩니다.
 
 ## 이름 지정 템플릿
 
-게시물과 파일 템플릿은 `id`, `user`, `service`, `title`, `added`, `published`, `edited`를 사용할 수 있습니다. 파일 템플릿의 빈 `{}`는 원본 또는 순차 기본 파일 이름을 나타냅니다.
-
-```dotenv
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title:.60}
-KTOOLBOX_JOB__FILENAME_FORMAT=[{published}]_{title:.60}_{}
-KTOOLBOX_JOB__POST_STRUCTURE__FILE={id}_{}
-```
-
-`{title:.60}`과 같은 Python 형식 지정 정밀도는 파일 시스템 길이 제한에 유용합니다.
+이름 템플릿과 작품 내부 이름은 더 이상 전역 dotenv 설정이 아닙니다. WebUI의 **이름 형식** 페이지에서 프로젝트 `[naming]`을 설정하세요. 최초 시작의 백업 마이그레이션 뒤에는 이전 이름 키가 거부됩니다. 변수, 검증, 스캔과 변환은 [이름 형식 가이드](../naming.md)를 참조하세요.
 
 ## 다운로드 제한
 

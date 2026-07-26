@@ -47,19 +47,20 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 
 ## 可以將附件直接儲存在作品目錄嗎？
 
-```dotenv
-KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-```
+不可以。專案 Schema v2 要求每個內部路徑都是安全且非空的相對名稱。請在「命名格式」中選擇附件子目錄，避免附件與主要檔案或中繼資料衝突。
 
 ## 如何避免檔名過長？
 
-使用順序名稱或格式精確度限制：
+在專案 `[naming]` 中使用順序名稱或格式精確度限制：
 
-```dotenv
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}_{title:.30}
-KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
+```toml
+[naming]
+sequential_filename = true
+post_dirname_format = "[{published}]{post_id}_{title:.30}"
+filename_format = "{title:.30}_{}"
 ```
+
+轉換既有下載前請先閱讀[命名格式指南](naming.md)。
 
 ## 如何設定 Proxy？
 

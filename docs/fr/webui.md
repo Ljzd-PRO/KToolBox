@@ -75,6 +75,10 @@ La création d'une tâche utilise deux onglets fixes sans commandes de débordem
 
 L'identifiant du créateur est placé en premier dans les lignes de bureau comme dans les entrées mobiles. La note facultative de la liste est affichée séparément et ne remplace jamais cet identifiant. Lors de la modification d'un créateur existant, sa plateforme et son identifiant restent visibles, mais en lecture seule, car ils identifient ensemble l'entrée enregistrée.
 
+## Nommage du projet
+
+Le nommage est enregistré dans le fichier `ktoolbox.toml` du projet et partagé par les téléchargements de la CLI et de la WebUI. La page **Format de nommage** valide les variables, analyse les véritables racines sans contacter Pawchive et présente, avant tout déplacement, le nombre d'œuvres, de fichiers et la taille par créateur. La conversion est sélectionnée par défaut mais peut être désactivée créateur par créateur. La nouvelle configuration n'est activée qu'après la réussite de tous les déplacements sélectionnés ; une annulation ou un échec restaure les opérations terminées en ordre inverse. Consultez le [guide du nommage](naming.md).
+
 ## Modification de la configuration
 
 Les libellés et descriptions sont du texte explicitement localisé, pas des identifiants Python. Les docstrings `:ivar field:` de la classe anglaise restent la source sémantique des champs ; les catalogues dont la complétude est vérifiée fournissent tous les libellés et explications dans les sept langues. Pydantic fournit les types, valeurs par défaut, plages et métadonnées secrètes.

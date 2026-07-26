@@ -25,6 +25,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Replace Python Fire with Cyclopts commands, direct Rich help, shell completion, conventional hyphenated options, machine-readable output, and explicit `0`/`1`/`2`/`130` exit codes.
 - Add hidden compatibility aliases for the seven v0 command names with one deprecation warning per invocation.
 - Add project-level `ktoolbox.toml` with an enabled/disabled creator roster, aliases, comment-preserving atomic writes, path discovery, validation, and Urwid editor support.
+- Upgrade project configuration to Schema v2 with project-scoped download roots, naming templates, internal work layout, and one path-generation contract shared by CLI and WebUI.
 - Add extensible asynchronous post blockers with ordered global/creator scopes, recursive any/all rules, negation, safe nested field selectors, and contains/equals/regex/exists operations.
 - Add multi-creator synchronization with bounded concurrent producers, fair per-creator queue rotation, streaming startup, one shared client and download pool, partial-failure summaries, and stable creator directories.
 - Replace tqdm and the handwritten ANSI progress layer with Rich live progress, per-file and aggregate transfer speeds, Rich-aware logging, and deterministic plain output for non-TTY, `NO_COLOR`, and `--plain` environments.
@@ -69,6 +70,10 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Replace UUID-oriented cleanup warnings with readable task targets, output summaries, and expandable relative-file previews.
 - Add a localized About page with version, license, runtime, author, and official resource links while omitting author email addresses.
 - Render visible URLs, IP addresses, listener addresses, and URL examples with shared inline-code styling.
+- Add a localized Naming Format page with template validation, variable insertion, live directory-tree examples, and real download-root scanning independent of task history.
+- Preview existing creator, work, file, and byte counts before conversion; select creators individually and reject stale scans, active-task conflicts, unsafe symlinks, and destination collisions.
+- Apply naming changes as persistent background conversions with an operation journal, atomic activation, cancellation rollback, restart recovery, and empty-source cleanup.
+- Migrate legacy global naming fields before first-start project creation, back up dotenv files, remove migrated keys, and report the one-time change in both the terminal and WebUI.
 
 ## Testing and quality
 
@@ -116,6 +121,7 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 使用 Cyclopts 命令、直接 Rich 帮助、Shell 补全、常规连字符选项、机器可读输出和明确的 `0`/`1`/`2`/`130` 退出码替换 Python Fire。
 - 为 7 个 v0 命令名新增隐藏兼容别名，每次调用提示一次弃用。
 - 新增项目级 `ktoolbox.toml`，包含可启停作者清单、别名、保留注释的原子写入、路径发现、校验和 Urwid 编辑支持。
+- 将项目配置升级到 Schema v2，新增项目级下载根目录、命名模板与作品内部布局，并让 CLI 和 WebUI 共用同一套路径生成契约。
 - 新增可扩展异步作品忽略规则，支持有序全局/作者作用域、递归 any/all 规则、取反、安全嵌套字段选择器及 contains/equals/regex/exists 操作。
 - 新增多作者同步：有界并发生产者、按作者公平轮转队列、流式启动、共享客户端与下载池、部分失败汇总和稳定作者目录。
 - 使用 Rich 实时进度、单文件与总下载速度、Rich 感知日志和适用于非 TTY、`NO_COLOR`、`--plain` 的确定性逐行输出替换 tqdm 与手写 ANSI 进度层。
@@ -154,6 +160,10 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 删除确认使用可读任务目标、输出摘要和可展开的相对文件预览，不再向用户展示 UUID。
 - 新增七语言关于页，展示版本、许可证、运行环境、作者和官方资源，同时隐藏作者邮箱。
 - 所有可见 URL、IP、监听地址和 URL 示例统一使用共享行内代码样式。
+- 新增七语言“命名格式”页面，提供模板校验、变量插入、实时目录树示例，以及不依赖任务历史的真实下载根目录扫描。
+- 转换前展示作者、作品、文件和字节统计，允许逐作者选择，并拒绝陈旧扫描、活动任务冲突、不安全符号链接和目标路径冲突。
+- 使用持久操作日志在后台执行命名转换，支持原子启用、取消回滚、重启恢复和空源目录清理。
+- 在首次创建项目配置前迁移旧全局命名字段，备份 dotenv 文件、删除已迁移键，并在终端与 WebUI 中显示一次性通知。
 
 ## 测试与质量
 

@@ -125,6 +125,8 @@ Task rows preserve readable post titles and creator names in an offline presenta
 
 The **Global configuration** page uses typed Select and ComboBox controls while reserving filesystem pickers for real locations. Completed synchronization tasks offer **Rerun** on the same task record; cleanup confirmation shows a readable target and expandable relative-file preview instead of an internal UUID. The **About** page collects version, license, runtime, and official links, with URLs and listener addresses rendered as inline code.
 
+Naming is project-specific. The **Naming format** page validates templates, previews the resulting directory tree, scans the actual download roots, and can move selected creators with atomic activation and rollback. Legacy global naming values are backed up and migrated on the first WebUI start. See the [naming guide](https://ktoolbox.readthedocs.io/latest/naming/).
+
 Failed tasks retain a redacted, stage-specific report with the affected creator or file, retryability, safe field paths, and recovery guidance. The compact mobile shell uses a 64px workbar and 12px page spacing; its appearance controls move into a small Popover, and the MCP tool catalog collapses by category.
 
 Creator profiles supply the primary roster name with a resilient 24-hour cache. Data tables support locale-aware sorting, dashboard statistics link to filtered views, and every platform field uses a HeroUI ComboBox with Patreon, Pixiv, and Fanbox suggestions plus custom values.
@@ -155,10 +157,10 @@ KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
 
 `KTOOLBOX_DOWNLOADER__SESSION_KEY`, if set, is sent only to file downloads. The API client never sends an account session.
 
-`.env` controls runtime and transfer behavior. A project-level `ktoolbox.toml` stores the creator roster and blockers:
+`.env` controls runtime and transfer behavior. A project-level `ktoolbox.toml` stores naming, download roots, the creator roster, and blockers:
 
 ```toml
-schema_version = 1
+schema_version = 2
 
 [[creators]]
 service = "fanbox"

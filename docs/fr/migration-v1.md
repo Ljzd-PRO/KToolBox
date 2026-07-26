@@ -55,7 +55,7 @@ Les échecs de la CLI utilisent désormais l'état du processus : `0` pour le su
 Créez `ktoolbox.toml` uniquement si vous avez besoin d'une liste réutilisable ou de règles d'exclusion structurées. L'absence du fichier représente un projet vide valide.
 
 ```toml
-schema_version = 1
+schema_version = 2
 
 [[creators]]
 service = "fanbox"
@@ -78,6 +78,8 @@ ktoolbox webui /path/to/project --host 127.0.0.1
 ```
 
 `.env` et `prod.env` sont maintenant des fichiers locaux ignorés plutôt que des exemples suivis par le contrôle de version. Conservez-y les identifiants et les sessions du téléchargeur, utilisez `example.env` comme modèle public et vérifiez tout ancien fichier dotenv suivi avant la mise à niveau. La WebUI crée `.ktoolbox/webui.sqlite3` et un verrou de projet ; aucun des deux ne modifie les formats de sortie des téléchargements de la CLI.
+
+Les modèles de nommage et racines de téléchargement appartiennent désormais au Schema v2 du projet. Au premier démarrage, la WebUI sauvegarde `.env` et `prod.env`, migre les anciennes clés vers `ktoolbox.toml`, les supprime puis affiche une notification unique. Vérifiez l'arborescence produite avant de convertir les téléchargements existants ; consultez le [guide du nommage](naming.md).
 
 Consultez le [guide de la WebUI](webui.md) pour les risques du déploiement HTTP et le fonctionnement des tâches persistantes.
 

@@ -47,19 +47,20 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 
 ## Can attachments be stored directly in the post directory?
 
-```dotenv
-KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-```
+No. Project Schema v2 requires every internal path to be a safe, non-empty relative name. Use **Naming format** to choose an attachment subdirectory; this prevents attachments from colliding with the primary file or metadata.
 
 ## How do I avoid long filenames?
 
-Use sequential names or a format precision limit:
+Use sequential names or a format precision limit in the project's `[naming]` table:
 
-```dotenv
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}_{title:.30}
-KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
+```toml
+[naming]
+sequential_filename = true
+post_dirname_format = "[{published}]{post_id}_{title:.30}"
+filename_format = "{title:.30}_{}"
 ```
+
+See the [naming guide](naming.md) before converting existing downloads.
 
 ## How do I configure a proxy?
 

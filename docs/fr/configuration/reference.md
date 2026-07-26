@@ -48,16 +48,6 @@ Le groupe API ne contient volontairement aucune clé de session.
 
 Le mode de stockage se désactive si le système de fichiers cible ne peut pas créer de liens physiques.
 
-## `job.post_structure`
-
-| Champ | Type | Valeur par défaut | Description |
-| --- | --- | --- | --- |
-| `attachments` | chemin | `attachments` | Sous-répertoire des pièces jointes. Utilisez `./` pour la racine de la publication. |
-| `content` | chemin | `content.txt` | Fichier du contenu extrait. |
-| `external_links` | chemin | `external_links.txt` | Fichier des liens externes extraits. |
-| `file` | chaîne | `{id}_{}` | Modèle de nom de la couverture. |
-| `revisions` | chemin | `revisions` | Sous-répertoire des révisions. |
-
 ## `job`
 
 | Champ | Type | Valeur par défaut | Description |
@@ -65,29 +55,18 @@ Le mode de stockage se désactive si le système de fichiers cible ne peut pas c
 | `count` | entier | `4` | Travailleurs de téléchargement simultanés. |
 | `creator_concurrency` | entier | `4` | Producteurs de créateurs simultanés alimentant les travailleurs partagés. |
 | `include_revisions` | booléen | `False` | Inclure toutes les révisions connues de la publication actuelle. |
-| `post_dirname_format` | chaîne | `{title}` | Modèle de répertoire par publication. |
-| `mix_posts` | booléen | `False` | Stocker ensemble tous les fichiers du créateur sans répertoires de publication. |
-| `sequential_filename` | booléen | `False` | Renommer les pièces jointes dans l'ordre numérique. |
-| `sequential_filename_excludes` | ensemble | vide | Extensions qui conservent leur nom d'origine. |
-| `filename_format` | chaîne | `{}` | Modèle de nom des pièces jointes. |
 | `allow_list` | ensemble | vide | Motifs de noms Unix shell à inclure. |
 | `block_list` | ensemble | vide | Motifs de noms Unix shell à exclure. |
 | `extract_content` | booléen | `False` | Enregistrer séparément le texte de la publication. |
 | `extract_content_images` | booléen | `False` | Télécharger les images référencées dans le contenu. |
 | `extract_external_links` | booléen | `False` | Enregistrer les liens externes correspondants du contenu. |
 | `external_link_patterns` | liste | intégré | Expressions régulières servant à extraire les liens externes. |
-| `group_by_year` | booléen | `False` | Regrouper les répertoires par année de publication. |
-| `group_by_month` | booléen | `False` | Regrouper par mois ; nécessite le regroupement par année. |
-| `year_dirname_format` | chaîne | `{year}` | Modèle de répertoire d'année. |
-| `month_dirname_format` | chaîne | `{year}-{month:02d}` | Modèle de répertoire de mois. |
 | `keywords` | ensemble | vide | Termes de titre à inclure, sans distinction de casse. |
 | `keywords_exclude` | ensemble | vide | Anciennes exclusions de titre, converties en règle globale implicite. |
 | `download_file` | booléen | `True` | Télécharger le fichier principal, généralement la couverture. |
 | `download_attachments` | booléen | `True` | Télécharger les pièces jointes. |
 | `min_file_size` | entier / omis | omis | Ignorer les fichiers plus petits que ce nombre d'octets. |
 | `max_file_size` | entier / omis | omis | Ignorer les fichiers plus grands que ce nombre d'octets. |
-
-Les modèles de nom acceptent `id`, `user`, `service`, `title`, `added`, `published` et `edited`. Les modèles d'année et de mois acceptent `year` et `month`.
 
 ## Fichier de projet `ktoolbox.toml`
 
@@ -97,9 +76,10 @@ Le document de projet est distinct de la configuration d'environnement. Son chem
 
 | Champ | Type | Valeur par défaut | Description |
 | --- | --- | --- | --- |
-| `schema_version` | littéral `1` | `1` | Version du schéma du projet ; les autres valeurs sont refusées. |
+| `schema_version` | littéral `2` | `2` | Version du schéma ; les documents v1 sont mis à niveau en mémoire. |
 | `creators` | tableau de tables | vide | Liste enregistrée des créateurs. |
 | `blockers` | tableau de tables | vide | Spécifications ordonnées des règles. |
+| `naming` | table | valeurs du projet | Racines, arborescence et modèles de fichiers. Consultez le [guide du nommage](../naming.md). |
 
 ### Entrée d'un créateur
 

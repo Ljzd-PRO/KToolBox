@@ -47,19 +47,20 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 
 ## 能否把附件直接放进作品目录？
 
-```dotenv
-KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-```
+不能。项目 Schema v2 要求每个内部路径都是安全且非空的相对名称。请在“命名格式”中选择附件子目录，避免附件与主文件或元数据发生冲突。
 
 ## 如何避免文件名过长？
 
-使用顺序命名或格式精度限制：
+在项目 `[naming]` 中使用顺序命名或格式精度限制：
 
-```dotenv
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}_{title:.30}
-KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
+```toml
+[naming]
+sequential_filename = true
+post_dirname_format = "[{published}]{post_id}_{title:.30}"
+filename_format = "{title:.30}_{}"
 ```
+
+转换已有下载前请先阅读[命名格式指南](naming.md)。
 
 ## 如何配置代理？
 

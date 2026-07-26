@@ -48,16 +48,6 @@ API 그룹에는 의도적으로 세션 키가 없습니다.
 
 대상 파일 시스템이 하드 링크를 만들 수 없으면 버킷 모드가 자동으로 비활성화됩니다.
 
-## `job.post_structure`
-
-| 필드 | 형식 | 기본값 | 설명 |
-| --- | --- | --- | --- |
-| `attachments` | 경로 | `attachments` | 첨부 파일 하위 디렉터리. 게시물 루트에는 `./` 사용. |
-| `content` | 경로 | `content.txt` | 추출한 본문 파일. |
-| `external_links` | 경로 | `external_links.txt` | 추출한 외부 링크 파일. |
-| `file` | 문자열 | `{id}_{}` | 표지 파일 이름 템플릿. |
-| `revisions` | 경로 | `revisions` | 개정판 하위 디렉터리. |
-
 ## `job`
 
 | 필드 | 형식 | 기본값 | 설명 |
@@ -65,29 +55,18 @@ API 그룹에는 의도적으로 세션 키가 없습니다.
 | `count` | 정수 | `4` | 동시 다운로드 작업자. |
 | `creator_concurrency` | 정수 | `4` | 공유 파일 작업자에 공급하는 동시 크리에이터 생산자. |
 | `include_revisions` | 불리언 | `False` | 현재 게시물의 알려진 모든 개정판 포함. |
-| `post_dirname_format` | 문자열 | `{title}` | 게시물별 디렉터리 템플릿. |
-| `mix_posts` | 불리언 | `False` | 게시물 디렉터리 없이 모든 크리에이터 파일을 함께 저장. |
-| `sequential_filename` | 불리언 | `False` | 첨부 파일을 숫자 순서로 이름 변경. |
-| `sequential_filename_excludes` | 집합 | 비어 있음 | 원래 이름을 유지할 확장자. |
-| `filename_format` | 문자열 | `{}` | 첨부 파일 이름 템플릿. |
 | `allow_list` | 집합 | 비어 있음 | 포함할 Unix 셸 파일 이름 패턴. |
 | `block_list` | 집합 | 비어 있음 | 제외할 Unix 셸 파일 이름 패턴. |
 | `extract_content` | 불리언 | `False` | 게시물 텍스트를 별도로 저장. |
 | `extract_content_images` | 불리언 | `False` | 게시물 본문에서 참조한 이미지 다운로드. |
 | `extract_external_links` | 불리언 | `False` | 본문에서 일치하는 외부 링크 저장. |
 | `external_link_patterns` | 목록 | 내장 | 외부 링크 추출에 사용하는 정규식. |
-| `group_by_year` | 불리언 | `False` | 게시물 디렉터리를 게시 연도별로 그룹화. |
-| `group_by_month` | 불리언 | `False` | 월별 그룹화. 연도 그룹화 필요. |
-| `year_dirname_format` | 문자열 | `{year}` | 연도 디렉터리 템플릿. |
-| `month_dirname_format` | 문자열 | `{year}-{month:02d}` | 월 디렉터리 템플릿. |
 | `keywords` | 집합 | 비어 있음 | 포함할 대소문자 무시 제목 용어. |
 | `keywords_exclude` | 집합 | 비어 있음 | 사용 중단된 제목 제외. 암시적 전역 규칙으로 변환. |
 | `download_file` | 불리언 | `True` | 일반적으로 표지인 기본 게시물 파일 다운로드. |
 | `download_attachments` | 불리언 | `True` | 첨부 파일 다운로드. |
 | `min_file_size` | 정수 / 생략 | 생략 | 이 바이트 수보다 작은 파일 건너뛰기. |
 | `max_file_size` | 정수 / 생략 | 생략 | 이 바이트 수보다 큰 파일 건너뛰기. |
-
-이름 템플릿은 `id`, `user`, `service`, `title`, `added`, `published`, `edited`를 받습니다. 연도 및 월 템플릿은 `year`와 `month`를 받습니다.
 
 ## 프로젝트 `ktoolbox.toml`
 
@@ -97,9 +76,10 @@ API 그룹에는 의도적으로 세션 키가 없습니다.
 
 | 필드 | 형식 | 기본값 | 설명 |
 | --- | --- | --- | --- |
-| `schema_version` | 리터럴 `1` | `1` | 프로젝트 스키마 버전. 다른 값은 거부. |
+| `schema_version` | 리터럴 `2` | `2` | 프로젝트 스키마 버전. v1 문서는 메모리에서 업그레이드. |
 | `creators` | 테이블 배열 | 비어 있음 | 저장된 크리에이터 목록. |
 | `blockers` | 테이블 배열 | 비어 있음 | 순서가 있는 제외 규칙 사양. |
+| `naming` | 테이블 | 프로젝트 기본값 | 다운로드 루트, 디렉터리 구조와 파일 이름 템플릿. [이름 형식 가이드](../naming.md) 참조. |
 
 ### 크리에이터 항목
 

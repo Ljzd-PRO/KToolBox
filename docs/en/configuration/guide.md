@@ -2,8 +2,8 @@
 
 KToolBox has two configuration layers:
 
-- `.env`, `prod.env`, and process variables control API, transfer, naming, and global download behavior.
-- `ktoolbox.toml` stores a project creator roster and ordered post blockers.
+- `.env`, `prod.env`, and process variables control API, transfer, and global download behavior.
+- `ktoolbox.toml` stores project naming, download roots, the creator roster, and ordered post blockers.
 
 KToolBox reads `.env`, then `prod.env`, from the current working directory. Values from `prod.env` override matching values from `.env`, while process environment variables have the highest priority.
 
@@ -58,10 +58,10 @@ The project path resolves in this order: global `--config`, `KTOOLBOX_PROJECT_CO
 
 ## Creator roster
 
-Every project document starts with `schema_version = 1`. Creators are unique by case-insensitive `service:id`; optional aliases are also unique.
+Every project document starts with `schema_version = 2`. Schema v2 also stores project naming and download roots; see the [naming guide](../naming.md). Creators are unique by case-insensitive `service:id`; optional aliases are also unique.
 
 ```toml
-schema_version = 1
+schema_version = 2
 
 [[creators]]
 service = "fanbox"
@@ -136,26 +136,13 @@ Use JSON arrays for sets and lists in dotenv files:
 ```dotenv
 KTOOLBOX_JOB__ALLOW_LIST='["*.jpg", "*.png"]'
 KTOOLBOX_JOB__BLOCK_LIST='["*.zip", "*.psd"]'
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME_EXCLUDES='[".zip", ".psd"]'
 ```
 
-Relative output and bucket paths are resolved from the working directory. Set the attachments path to `./` to place attachments directly in each post directory:
-
-```dotenv
-KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-```
+Relative output and bucket paths are resolved from the working directory.
 
 ## Naming templates
 
-Post and file templates can use `id`, `user`, `service`, `title`, `added`, `published`, and `edited`. The empty `{}` in a file template represents the original or sequential base filename.
-
-```dotenv
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title:.60}
-KTOOLBOX_JOB__FILENAME_FORMAT=[{published}]_{title:.60}_{}
-KTOOLBOX_JOB__POST_STRUCTURE__FILE={id}_{}
-```
-
-Python format-spec precision, such as `{title:.60}`, is useful for filesystem length limits.
+Naming templates and work-internal names are no longer global dotenv settings. Configure the project's `[naming]` table through the WebUI **Naming format** page. Legacy naming keys are rejected after their backed-up first-start migration. See the [naming guide](../naming.md) for variables, validation, scanning, and conversion.
 
 ## Limit downloads
 

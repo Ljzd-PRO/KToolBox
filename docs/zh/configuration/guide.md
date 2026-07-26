@@ -2,8 +2,8 @@
 
 KToolBox 使用两层配置：
 
-- `.env`、`prod.env` 与进程变量控制 API、传输、命名及全局下载行为。
-- `ktoolbox.toml` 保存项目作者清单与有序作品忽略规则。
+- `.env`、`prod.env` 与进程变量控制 API、传输及全局下载行为。
+- `ktoolbox.toml` 保存项目命名、下载根目录、作者清单与有序作品忽略规则。
 
 KToolBox 会从当前工作目录先读取 `.env`，再读取 `prod.env`。`prod.env` 中的同名值会覆盖 `.env`，进程环境变量优先级最高。
 
@@ -58,10 +58,10 @@ ktoolbox config validate
 
 ## 作者清单
 
-每份项目文档都以 `schema_version = 1` 开始。作者按不区分大小写的 `service:id` 唯一，可选别名也必须唯一。
+每份项目文档都以 `schema_version = 2` 开始。Schema v2 还保存项目命名格式与下载根目录，详见[命名格式指南](../naming.md)。作者按不区分大小写的 `service:id` 唯一，可选别名也必须唯一。
 
 ```toml
-schema_version = 1
+schema_version = 2
 
 [[creators]]
 service = "fanbox"
@@ -136,26 +136,13 @@ dotenv 文件中的集合和列表使用 JSON 数组：
 ```dotenv
 KTOOLBOX_JOB__ALLOW_LIST='["*.jpg", "*.png"]'
 KTOOLBOX_JOB__BLOCK_LIST='["*.zip", "*.psd"]'
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME_EXCLUDES='[".zip", ".psd"]'
 ```
 
-相对输出路径和存储桶路径基于当前工作目录解析。将附件路径设为 `./`，可把附件直接放入作品目录：
-
-```dotenv
-KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-```
+相对输出路径和存储桶路径基于当前工作目录解析。
 
 ## 命名模板
 
-作品和文件模板可使用 `id`、`user`、`service`、`title`、`added`、`published` 和 `edited`。文件模板中的空 `{}` 代表原始或按顺序生成的基础文件名。
-
-```dotenv
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title:.60}
-KTOOLBOX_JOB__FILENAME_FORMAT=[{published}]_{title:.60}_{}
-KTOOLBOX_JOB__POST_STRUCTURE__FILE={id}_{}
-```
-
-使用 `{title:.60}` 这样的 Python 格式精度可规避文件系统长度限制。
+命名模板和作品内部名称不再属于全局 dotenv 设置。请通过 WebUI“命名格式”页配置项目 `[naming]`；首次启动完成备份迁移后，旧命名键会被拒绝。变量、校验、扫描与转换详见[命名格式指南](../naming.md)。
 
 ## 限制下载
 

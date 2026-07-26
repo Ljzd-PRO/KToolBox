@@ -79,6 +79,10 @@ Creator rows lead with the profile name returned by Pawchive. Names are cached f
 
 Overview recent tasks, task queues, creator rosters, and post results support controlled HeroUI column sorting. Text uses locale-aware natural ordering, while counts, progress, speeds, states, and timestamps use their real values. Mobile cards expose the same sort field and direction. Task sorting changes presentation only and never changes scheduler order.
 
+## Project naming
+
+Naming is stored in the project's `ktoolbox.toml` and is shared by CLI and WebUI downloads. The **Naming format** page validates template variables, scans the real download roots without contacting Pawchive, and shows per-creator work, file, and size statistics before anything moves. Conversion is selected by default, can be limited to individual creators, and activates the new configuration only after every selected move succeeds. Cancellation or failure rolls completed moves back. See the [naming guide](naming.md) for templates, migration, and recovery details.
+
 ## Configuration editing
 
 Form labels and descriptions are explicit localized text, not Python identifiers. English configuration-class `:ivar field:` docstrings remain the semantic field source; checked locale catalogs provide complete labels and explanations for all seven languages, while Pydantic supplies types, defaults, ranges, and secret metadata.

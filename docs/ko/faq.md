@@ -47,19 +47,20 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 
 ## 첨부 파일을 게시물 디렉터리에 직접 저장할 수 있나요?
 
-```dotenv
-KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-```
+아니요. 프로젝트 Schema v2에서는 모든 내부 경로가 안전하고 비어 있지 않은 상대 이름이어야 합니다. **이름 형식**에서 첨부 파일 하위 디렉터리를 선택하여 기본 파일이나 메타데이터와의 충돌을 막으세요.
 
 ## 긴 파일 이름을 피하려면 어떻게 하나요?
 
-순차 이름이나 형식 정밀도 제한을 사용하세요.
+프로젝트 `[naming]`에서 순차 이름이나 형식 정밀도 제한을 사용하세요.
 
-```dotenv
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}_{title:.30}
-KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
+```toml
+[naming]
+sequential_filename = true
+post_dirname_format = "[{published}]{post_id}_{title:.30}"
+filename_format = "{title:.30}_{}"
 ```
+
+기존 다운로드를 변환하기 전에 [이름 형식 가이드](naming.md)를 확인하세요.
 
 ## 프록시를 설정하려면 어떻게 하나요?
 

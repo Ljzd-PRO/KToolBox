@@ -125,6 +125,8 @@ Les lignes de tâches conservent des titres de publication et des noms de créat
 
 La configuration globale utilise Select ou ComboBox selon la sémantique du champ et réserve le sélecteur de chemin aux véritables emplacements. Une synchronisation terminée peut être relancée sur le même enregistrement ; la confirmation de suppression montre une cible lisible et une liste extensible de chemins relatifs plutôt qu'un UUID interne. La page À propos regroupe version, licence, environnement et liens officiels, avec les URL et adresses d'écoute en code intégré.
 
+Le nommage est propre à chaque projet. La page **Format de nommage** valide les modèles, prévisualise l'arborescence, analyse les véritables racines de téléchargement et peut convertir les créateurs sélectionnés avec activation atomique et restauration complète. Les anciennes valeurs globales sont sauvegardées puis migrées au premier démarrage de la WebUI. Consultez le [guide du nommage](https://ktoolbox.readthedocs.io/latest/fr/naming/).
+
 Une tâche en échec conserve un rapport expurgé par étape avec le créateur ou fichier concerné, la possibilité de réessayer, les chemins de champs sûrs et l'action recommandée. L'interface mobile compacte utilise une barre de 64px et un espacement de 12px, place l'apparence dans un petit Popover et replie le catalogue MCP par catégorie.
 
 Après la connexion, une seule connexion SSE synchronise automatiquement les tâches, créateurs, règles d'exclusion, configurations, jetons MCP et répertoires distants ouverts entre les onglets. En cas de coupure, seules les données locales sont actualisées toutes les 10 secondes, sans interroger les recherches Pawchive ni les détails d'œuvres ; les brouillons non enregistrés restent protégés des mises à jour externes.
@@ -153,10 +155,10 @@ KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
 
 Si `KTOOLBOX_DOWNLOADER__SESSION_KEY` est défini, il n'est envoyé que lors du téléchargement des fichiers. Le client API n'envoie jamais la session d'un compte.
 
-Le fichier `.env` contrôle l'exécution et les transferts. Le fichier de projet `ktoolbox.toml` contient la liste des créateurs et les règles d'exclusion :
+Le fichier `.env` contrôle l'exécution et les transferts. Le fichier de projet `ktoolbox.toml` contient le nommage, les racines de téléchargement, la liste des créateurs et les règles d'exclusion :
 
 ```toml
-schema_version = 1
+schema_version = 2
 
 [[creators]]
 service = "fanbox"

@@ -2,8 +2,8 @@
 
 KToolBox には 2 つの設定レイヤーがあります。
 
-- `.env`、`prod.env`、プロセス変数は API、転送、命名、グローバルなダウンロード動作を制御します。
-- `ktoolbox.toml` はプロジェクトのクリエイター一覧と順序付き投稿除外ルールを保存します。
+- `.env`、`prod.env`、プロセス変数は API、転送、グローバルなダウンロード動作を制御します。
+- `ktoolbox.toml` はプロジェクトの命名形式、ダウンロードルート、クリエイター一覧、順序付き投稿除外ルールを保存します。
 
 KToolBox は現在の作業ディレクトリから `.env`、次に `prod.env` を読み込みます。`prod.env` の値は `.env` の同じ値を上書きし、プロセス環境変数が最優先です。
 
@@ -58,10 +58,10 @@ ktoolbox config validate
 
 ## クリエイター一覧
 
-各プロジェクト文書は `schema_version = 1` で始まります。クリエイターは大文字小文字を区別しない `service:id` で一意で、オプションのエイリアスも一意です。
+各プロジェクト文書は `schema_version = 2` で始まります。Schema v2 はプロジェクトの命名形式とダウンロードルートも保存します。[命名形式ガイド](../naming.md)を参照してください。クリエイターは大文字小文字を区別しない `service:id` で一意で、オプションのエイリアスも一意です。
 
 ```toml
-schema_version = 1
+schema_version = 2
 
 [[creators]]
 service = "fanbox"
@@ -136,26 +136,13 @@ dotenv ファイル内の集合とリストには JSON 配列を使います。
 ```dotenv
 KTOOLBOX_JOB__ALLOW_LIST='["*.jpg", "*.png"]'
 KTOOLBOX_JOB__BLOCK_LIST='["*.zip", "*.psd"]'
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME_EXCLUDES='[".zip", ".psd"]'
 ```
 
-相対的な出力パスとバケットパスは作業ディレクトリから解決します。添付ファイルを各投稿ディレクトリに直接置くには、そのパスを `./` にします。
-
-```dotenv
-KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-```
+相対的な出力パスとバケットパスは作業ディレクトリから解決します。
 
 ## 名前テンプレート
 
-投稿とファイルのテンプレートには `id`、`user`、`service`、`title`、`added`、`published`、`edited` を使えます。ファイルテンプレート内の空の `{}` は元または連番の基本ファイル名を表します。
-
-```dotenv
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title:.60}
-KTOOLBOX_JOB__FILENAME_FORMAT=[{published}]_{title:.60}_{}
-KTOOLBOX_JOB__POST_STRUCTURE__FILE={id}_{}
-```
-
-`{title:.60}` のような Python 書式指定の精度は、ファイルシステムの長さ制限に役立ちます。
+命名テンプレートと作品内部の名前はグローバル dotenv 設定ではなくなりました。WebUI の「命名形式」ページでプロジェクトの `[naming]` を設定してください。初回起動のバックアップ移行後は旧命名キーを拒否します。変数、検証、スキャン、変換は[命名形式ガイド](../naming.md)を参照してください。
 
 ## ダウンロードを制限
 

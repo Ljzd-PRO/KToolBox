@@ -48,16 +48,6 @@ API グループには意図的にセッションキーがありません。
 
 対象ファイルシステムがハードリンクを作れない場合、バケットモードは自動的に無効になります。
 
-## `job.post_structure`
-
-| フィールド | 型 | 既定値 | 説明 |
-| --- | --- | --- | --- |
-| `attachments` | パス | `attachments` | 添付ファイルのサブディレクトリ。投稿ルートには `./`。 |
-| `content` | パス | `content.txt` | 抽出した内容のファイル。 |
-| `external_links` | パス | `external_links.txt` | 抽出した外部リンクのファイル。 |
-| `file` | 文字列 | `{id}_{}` | カバーファイルの名前テンプレート。 |
-| `revisions` | パス | `revisions` | 改訂のサブディレクトリ。 |
-
 ## `job`
 
 | フィールド | 型 | 既定値 | 説明 |
@@ -65,29 +55,18 @@ API グループには意図的にセッションキーがありません。
 | `count` | 整数 | `4` | 同時ダウンロードワーカー数。 |
 | `creator_concurrency` | 整数 | `4` | 共有ファイルワーカーへ供給する同時クリエイタープロデューサー数。 |
 | `include_revisions` | 真偽値 | `False` | 現在の投稿で既知の改訂をすべて含める。 |
-| `post_dirname_format` | 文字列 | `{title}` | 投稿ごとのディレクトリテンプレート。 |
-| `mix_posts` | 真偽値 | `False` | 投稿ディレクトリを作らず、全クリエイターファイルを一緒に保存。 |
-| `sequential_filename` | 真偽値 | `False` | 添付ファイルを数値順に改名。 |
-| `sequential_filename_excludes` | 集合 | 空 | 元の名前を保持する拡張子。 |
-| `filename_format` | 文字列 | `{}` | 添付ファイル名テンプレート。 |
 | `allow_list` | 集合 | 空 | 含める Unix シェルファイル名パターン。 |
 | `block_list` | 集合 | 空 | 除外する Unix シェルファイル名パターン。 |
 | `extract_content` | 真偽値 | `False` | 投稿テキストを別に保存。 |
 | `extract_content_images` | 真偽値 | `False` | 投稿内容で参照される画像をダウンロード。 |
 | `extract_external_links` | 真偽値 | `False` | 内容から一致する外部リンクを保存。 |
 | `external_link_patterns` | リスト | 組み込み | 外部リンク抽出用の正規表現。 |
-| `group_by_year` | 真偽値 | `False` | 投稿ディレクトリを公開年で分類。 |
-| `group_by_month` | 真偽値 | `False` | 月で分類。年での分類が必要。 |
-| `year_dirname_format` | 文字列 | `{year}` | 年ディレクトリテンプレート。 |
-| `month_dirname_format` | 文字列 | `{year}-{month:02d}` | 月ディレクトリテンプレート。 |
 | `keywords` | 集合 | 空 | 含める、大文字小文字を区別しないタイトル用語。 |
 | `keywords_exclude` | 集合 | 空 | 廃止予定のタイトル除外。暗黙的グローバルルールに変換。 |
 | `download_file` | 真偽値 | `True` | 通常はカバーであるメイン投稿ファイルをダウンロード。 |
 | `download_attachments` | 真偽値 | `True` | 添付ファイルをダウンロード。 |
 | `min_file_size` | 整数 / 省略 | 省略 | このバイト数より小さいファイルをスキップ。 |
 | `max_file_size` | 整数 / 省略 | 省略 | このバイト数より大きいファイルをスキップ。 |
-
-名前テンプレートは `id`、`user`、`service`、`title`、`added`、`published`、`edited` を受け付けます。年と月のテンプレートは `year` と `month` を受け付けます。
 
 ## プロジェクトの `ktoolbox.toml`
 
@@ -97,9 +76,10 @@ API グループには意図的にセッションキーがありません。
 
 | フィールド | 型 | 既定値 | 説明 |
 | --- | --- | --- | --- |
-| `schema_version` | リテラル `1` | `1` | プロジェクトスキーマバージョン。他の値は拒否。 |
+| `schema_version` | リテラル `2` | `2` | プロジェクトスキーマバージョン。v1 文書はメモリ上で更新。 |
 | `creators` | テーブル配列 | 空 | 保存済みクリエイター一覧。 |
 | `blockers` | テーブル配列 | 空 | 順序付き除外ルール仕様。 |
+| `naming` | テーブル | プロジェクト既定値 | ダウンロードルート、ディレクトリ構成、ファイル名テンプレート。[命名形式ガイド](../naming.md)を参照。 |
 
 ### クリエイター項目
 

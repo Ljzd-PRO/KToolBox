@@ -2,8 +2,8 @@
 
 KToolBox possède deux niveaux de configuration :
 
-- `.env`, `prod.env` et les variables du processus contrôlent l'API, les transferts, le nommage et le comportement global des téléchargements.
-- `ktoolbox.toml` conserve la liste des créateurs du projet et les règles ordonnées d'exclusion des publications.
+- `.env`, `prod.env` et les variables du processus contrôlent l'API, les transferts et le comportement global des téléchargements.
+- `ktoolbox.toml` conserve le nommage, les racines, la liste des créateurs et les règles ordonnées d'exclusion du projet.
 
 KToolBox lit `.env`, puis `prod.env`, depuis le répertoire de travail actuel. Les valeurs de `prod.env` remplacent les valeurs correspondantes de `.env`, tandis que les variables d'environnement du processus ont la priorité la plus élevée.
 
@@ -58,10 +58,10 @@ Le chemin du projet est résolu dans l'ordre suivant : l'option globale `--confi
 
 ## Liste des créateurs
 
-Chaque document de projet commence par `schema_version = 1`. Les créateurs sont uniques par `service:id` sans distinction de casse ; les alias facultatifs sont également uniques.
+Chaque document de projet commence par `schema_version = 2`. Le Schema v2 stocke aussi le nommage et les racines du projet ; consultez le [guide du nommage](../naming.md). Les créateurs sont uniques par `service:id` sans distinction de casse ; les alias facultatifs sont également uniques.
 
 ```toml
-schema_version = 1
+schema_version = 2
 
 [[creators]]
 service = "fanbox"
@@ -136,26 +136,13 @@ Utilisez des tableaux JSON pour les ensembles et les listes dans les fichiers do
 ```dotenv
 KTOOLBOX_JOB__ALLOW_LIST='["*.jpg", "*.png"]'
 KTOOLBOX_JOB__BLOCK_LIST='["*.zip", "*.psd"]'
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME_EXCLUDES='[".zip", ".psd"]'
 ```
 
-Les chemins relatifs de sortie et de stockage sont résolus depuis le répertoire de travail. Définissez le chemin des pièces jointes sur `./` pour les placer directement dans chaque répertoire de publication :
-
-```dotenv
-KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-```
+Les chemins relatifs de sortie et de stockage sont résolus depuis le répertoire de travail.
 
 ## Modèles de nommage
 
-Les modèles de publication et de fichier peuvent utiliser `id`, `user`, `service`, `title`, `added`, `published` et `edited`. La paire vide `{}` dans un modèle de fichier représente le nom de base original ou séquentiel.
-
-```dotenv
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title:.60}
-KTOOLBOX_JOB__FILENAME_FORMAT=[{published}]_{title:.60}_{}
-KTOOLBOX_JOB__POST_STRUCTURE__FILE={id}_{}
-```
-
-La précision du format Python, comme `{title:.60}`, est utile pour respecter les limites de longueur du système de fichiers.
+Les modèles et noms internes des œuvres ne sont plus des réglages dotenv globaux. Configurez la table `[naming]` du projet dans la page **Format de nommage** de la WebUI. Après la migration sauvegardée du premier démarrage, les anciennes clés sont refusées. Consultez le [guide du nommage](../naming.md) pour les variables, la validation, l'analyse et la conversion.
 
 ## Limiter les téléchargements
 

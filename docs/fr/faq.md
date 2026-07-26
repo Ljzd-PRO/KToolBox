@@ -47,19 +47,20 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 
 ## Les pièces jointes peuvent-elles être enregistrées directement dans le répertoire de la publication ?
 
-```dotenv
-KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-```
+Non. Le Schema v2 exige un nom relatif sûr et non vide pour chaque chemin interne. Choisissez un sous-répertoire dans **Format de nommage** afin d'éviter les collisions avec le fichier principal ou les métadonnées.
 
 ## Comment éviter les noms de fichiers trop longs ?
 
-Utilisez des noms séquentiels ou une limite de précision du format :
+Utilisez des noms séquentiels ou une limite de précision dans la table `[naming]` du projet :
 
-```dotenv
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}_{title:.30}
-KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
+```toml
+[naming]
+sequential_filename = true
+post_dirname_format = "[{published}]{post_id}_{title:.30}"
+filename_format = "{title:.30}_{}"
 ```
+
+Consultez le [guide du nommage](naming.md) avant de convertir les téléchargements existants.
 
 ## Comment configurer un proxy ?
 

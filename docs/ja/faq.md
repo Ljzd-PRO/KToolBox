@@ -47,19 +47,20 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 
 ## 添付ファイルを投稿ディレクトリに直接保存できますか？
 
-```dotenv
-KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-```
+いいえ。プロジェクト Schema v2 では、内部パスは安全で空でない相対名である必要があります。「命名形式」で添付ファイル用サブディレクトリを選び、メインファイルやメタデータとの衝突を防いでください。
 
 ## 長いファイル名を避けるには？
 
-連番名または書式の精度制限を使います。
+プロジェクトの `[naming]` で連番名または書式の精度制限を使います。
 
-```dotenv
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}_{title:.30}
-KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
+```toml
+[naming]
+sequential_filename = true
+post_dirname_format = "[{published}]{post_id}_{title:.30}"
+filename_format = "{title:.30}_{}"
 ```
+
+既存ダウンロードを変換する前に[命名形式ガイド](naming.md)を確認してください。
 
 ## プロキシを設定するには？
 

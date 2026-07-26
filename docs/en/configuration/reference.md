@@ -48,16 +48,6 @@ The API group intentionally contains no session key.
 
 Bucket mode disables itself when the target filesystem cannot create hard links.
 
-## `job.post_structure`
-
-| Field | Type | Default | Description |
-| --- | --- | --- | --- |
-| `attachments` | path | `attachments` | Attachment subdirectory. Use `./` for the post root. |
-| `content` | path | `content.txt` | Extracted content file. |
-| `external_links` | path | `external_links.txt` | Extracted external-link file. |
-| `file` | string | `{id}_{}` | Cover-file naming template. |
-| `revisions` | path | `revisions` | Revision subdirectory. |
-
 ## `job`
 
 | Field | Type | Default | Description |
@@ -65,29 +55,18 @@ Bucket mode disables itself when the target filesystem cannot create hard links.
 | `count` | integer | `4` | Concurrent download workers. |
 | `creator_concurrency` | integer | `4` | Concurrent creator producers feeding the shared file workers. |
 | `include_revisions` | boolean | `False` | Include all known revisions for a current post. |
-| `post_dirname_format` | string | `{title}` | Per-post directory template. |
-| `mix_posts` | boolean | `False` | Store all creator files together without post directories. |
-| `sequential_filename` | boolean | `False` | Rename attachments in numeric order. |
-| `sequential_filename_excludes` | set | empty | Extensions that retain original names. |
-| `filename_format` | string | `{}` | Attachment filename template. |
 | `allow_list` | set | empty | Unix shell filename patterns to include. |
 | `block_list` | set | empty | Unix shell filename patterns to exclude. |
 | `extract_content` | boolean | `False` | Save post text separately. |
 | `extract_content_images` | boolean | `False` | Download images referenced in post content. |
 | `extract_external_links` | boolean | `False` | Save matching external links from content. |
 | `external_link_patterns` | list | built in | Regular expressions used for external-link extraction. |
-| `group_by_year` | boolean | `False` | Group post directories by publication year. |
-| `group_by_month` | boolean | `False` | Group by month; requires year grouping. |
-| `year_dirname_format` | string | `{year}` | Year-directory template. |
-| `month_dirname_format` | string | `{year}-{month:02d}` | Month-directory template. |
 | `keywords` | set | empty | Case-insensitive title terms to include. |
 | `keywords_exclude` | set | empty | Deprecated title exclusions, converted to an implicit global blocker. |
 | `download_file` | boolean | `True` | Download the main post file, usually the cover. |
 | `download_attachments` | boolean | `True` | Download attachments. |
 | `min_file_size` | integer / omitted | omitted | Skip files smaller than this byte count. |
 | `max_file_size` | integer / omitted | omitted | Skip files larger than this byte count. |
-
-Naming templates accept `id`, `user`, `service`, `title`, `added`, `published`, and `edited`. Year and month templates accept `year` and `month`.
 
 ## Project `ktoolbox.toml`
 
@@ -97,9 +76,10 @@ The project document is separate from environment configuration. Its path resolv
 
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
-| `schema_version` | literal `1` | `1` | Project schema version; other values are rejected. |
+| `schema_version` | literal `2` | `2` | Project schema version; v1 documents upgrade in memory. |
 | `creators` | table array | empty | Saved creator roster. |
 | `blockers` | table array | empty | Ordered blocker specifications. |
+| `naming` | table | project defaults | Download roots, directory layout, and filename templates. See the [naming guide](../naming.md). |
 
 ### Creator entry
 

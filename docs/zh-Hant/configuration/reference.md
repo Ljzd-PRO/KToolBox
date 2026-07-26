@@ -48,16 +48,6 @@ API 群組刻意不包含工作階段金鑰。
 
 目標檔案系統無法建立硬連結時，Bucket 模式會自行停用。
 
-## `job.post_structure`
-
-| 欄位 | 型別 | 預設值 | 說明 |
-| --- | --- | --- | --- |
-| `attachments` | 路徑 | `attachments` | 附件子目錄。使用 `./` 代表作品根目錄。 |
-| `content` | 路徑 | `content.txt` | 擷取的正文檔案。 |
-| `external_links` | 路徑 | `external_links.txt` | 擷取的外部連結檔案。 |
-| `file` | 字串 | `{id}_{}` | 封面檔案命名範本。 |
-| `revisions` | 路徑 | `revisions` | 修訂子目錄。 |
-
 ## `job`
 
 | 欄位 | 型別 | 預設值 | 說明 |
@@ -65,29 +55,18 @@ API 群組刻意不包含工作階段金鑰。
 | `count` | 整數 | `4` | 並行下載工作者。 |
 | `creator_concurrency` | 整數 | `4` | 向共用檔案工作者供應工作的並行創作者生產者。 |
 | `include_revisions` | 布林值 | `False` | 包含目前作品的所有已知修訂。 |
-| `post_dirname_format` | 字串 | `{title}` | 每篇作品的目錄範本。 |
-| `mix_posts` | 布林值 | `False` | 不使用作品目錄，將所有創作者檔案儲存在一起。 |
-| `sequential_filename` | 布林值 | `False` | 依數字順序重新命名附件。 |
-| `sequential_filename_excludes` | 集合 | 空 | 保留原始名稱的副檔名。 |
-| `filename_format` | 字串 | `{}` | 附件檔名範本。 |
 | `allow_list` | 集合 | 空 | 要包含的 Unix Shell 檔名模式。 |
 | `block_list` | 集合 | 空 | 要排除的 Unix Shell 檔名模式。 |
 | `extract_content` | 布林值 | `False` | 另行儲存作品文字。 |
 | `extract_content_images` | 布林值 | `False` | 下載作品內容中引用的圖片。 |
 | `extract_external_links` | 布林值 | `False` | 儲存內容中符合條件的外部連結。 |
 | `external_link_patterns` | 清單 | 內建 | 用於擷取外部連結的規則運算式。 |
-| `group_by_year` | 布林值 | `False` | 依發佈年份分組作品目錄。 |
-| `group_by_month` | 布林值 | `False` | 依月份分組；需要先按年份分組。 |
-| `year_dirname_format` | 字串 | `{year}` | 年份目錄範本。 |
-| `month_dirname_format` | 字串 | `{year}-{month:02d}` | 月份目錄範本。 |
 | `keywords` | 集合 | 空 | 不區分大小寫、要包含的標題詞彙。 |
 | `keywords_exclude` | 集合 | 空 | 已棄用的標題排除，會轉換為隱含的全域忽略規則。 |
 | `download_file` | 布林值 | `True` | 下載主要作品檔案，通常是封面。 |
 | `download_attachments` | 布林值 | `True` | 下載附件。 |
 | `min_file_size` | 整數 / 省略 | 省略 | 略過小於此位元組數的檔案。 |
 | `max_file_size` | 整數 / 省略 | 省略 | 略過大於此位元組數的檔案。 |
-
-命名範本接受 `id`、`user`、`service`、`title`、`added`、`published` 和 `edited`。年與月範本接受 `year` 和 `month`。
 
 ## 專案 `ktoolbox.toml`
 
@@ -97,9 +76,10 @@ API 群組刻意不包含工作階段金鑰。
 
 | 欄位 | 型別 | 預設值 | 說明 |
 | --- | --- | --- | --- |
-| `schema_version` | 常值 `1` | `1` | 專案 Schema 版本；其他值會被拒絕。 |
+| `schema_version` | 常值 `2` | `2` | 專案 Schema 版本；v1 文件會在記憶體中升級。 |
 | `creators` | 表格陣列 | 空 | 已儲存的創作者清單。 |
 | `blockers` | 表格陣列 | 空 | 有順序的忽略規則規格。 |
+| `naming` | 表格 | 專案預設值 | 下載根目錄、目錄配置和檔名範本。請參閱[命名格式指南](../naming.md)。 |
 
 ### 創作者項目
 

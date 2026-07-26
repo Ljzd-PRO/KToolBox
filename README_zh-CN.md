@@ -125,6 +125,8 @@ ktoolbox webui /path/to/project
 
 “全局配置”页会按字段语义使用 Select 或 ComboBox，只对真正的位置字段提供路径选择器。已完成同步任务可在原任务记录上“重新运行”；删除确认展示可读目标与可展开的相对文件预览，不再暴露内部 UUID。“关于”页集中展示版本、许可证、运行环境与官方链接，URL 和监听地址统一使用行内代码样式。
 
+命名设置现为项目专属。“命名格式”页会校验模板、预览目录树、扫描真实下载根目录，并以原子启用和完整回滚的方式转换选中的作者。首次启动 WebUI 时会备份并迁移旧全局命名值。详见[命名格式指南](https://ktoolbox.readthedocs.io/latest/zh/naming/)。
+
 失败任务会保留按阶段分类且经过脱敏的报告，显示对应作者或文件、是否适合重试、安全字段路径和处理建议。紧凑移动端采用 64px 顶栏和 12px 页面间距，将外观控制收纳到小型 Popover，并按类别折叠 MCP 工具目录。
 
 作者清单以 Pawchive Profile 名称作为主身份，并使用可降级的 24 小时缓存。数据表支持本地化排序，概览统计可直接进入对应筛选视图；所有平台字段均使用 HeroUI ComboBox，提供 Patreon、Pixiv、Fanbox 建议且允许自定义值。
@@ -155,10 +157,10 @@ KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
 
 配置 `KTOOLBOX_DOWNLOADER__SESSION_KEY` 后，它只会发送给文件下载请求；API 客户端永远不会发送账号会话。
 
-`.env` 控制运行时与传输行为；项目级 `ktoolbox.toml` 保存作者清单与忽略规则：
+`.env` 控制运行时与传输行为；项目级 `ktoolbox.toml` 保存命名格式、下载根目录、作者清单与忽略规则：
 
 ```toml
-schema_version = 1
+schema_version = 2
 
 [[creators]]
 service = "fanbox"

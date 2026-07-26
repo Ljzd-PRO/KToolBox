@@ -47,19 +47,20 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 
 ## Можно ли хранить вложения прямо в каталоге публикации?
 
-```dotenv
-KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-```
+Нет. Schema v2 требует безопасного непустого относительного имени для каждого внутреннего пути. Выберите подкаталог на странице **Формат имён**, чтобы вложения не конфликтовали с основным файлом или метаданными.
 
 ## Как избежать слишком длинных имён файлов?
 
-Используйте последовательные имена или ограничение точности формата:
+Используйте последовательные имена или точность формата в таблице `[naming]` проекта:
 
-```dotenv
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}_{title:.30}
-KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
+```toml
+[naming]
+sequential_filename = true
+post_dirname_format = "[{published}]{post_id}_{title:.30}"
+filename_format = "{title:.30}_{}"
 ```
+
+Перед преобразованием существующих загрузок прочитайте [руководство по формату имён](naming.md).
 
 ## Как настроить прокси?
 

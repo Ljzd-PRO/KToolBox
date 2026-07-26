@@ -19,6 +19,7 @@ nav:
     - Guide: commands/guide.md
     - Reference: commands/reference.md
   - WebUI: webui.md
+  - Naming Format: naming.md
   - Configuration:
     - Guide: configuration/guide.md
     - Reference: configuration/reference.md
@@ -47,6 +48,7 @@ plugins:
             More: 更多
             Commands: 命令
             WebUI: WebUI
+            Naming Format: 命名格式
             Configuration: 配置
             Guide: 向导
             Reference: 参考
@@ -100,6 +102,7 @@ plugins:
             More: 更多
             Commands: 命令
             WebUI: WebUI
+            Naming Format: 命名格式
             Configuration: 設定
             Guide: 指南
             Reference: 參考
@@ -153,6 +156,7 @@ plugins:
             More: Дополнительно
             Commands: Команды
             WebUI: WebUI
+            Naming Format: Формат имён
             Configuration: Конфигурация
             Guide: Руководство
             Reference: Справочник
@@ -206,6 +210,7 @@ plugins:
             More: その他
             Commands: コマンド
             WebUI: WebUI
+            Naming Format: 命名形式
             Configuration: 設定
             Guide: ガイド
             Reference: リファレンス
@@ -259,6 +264,7 @@ plugins:
             More: 더 보기
             Commands: 명령
             WebUI: WebUI
+            Naming Format: 이름 형식
             Configuration: 설정
             Guide: 가이드
             Reference: 참조
@@ -312,6 +318,7 @@ plugins:
             More: Plus d'informations
             Commands: Commandes
             WebUI: WebUI
+            Naming Format: Format de nommage
             Configuration: Configuration
             Guide: Guide
             Reference: Référence

@@ -55,7 +55,7 @@ CLI 失敗現在使用處理程序狀態：`0` 成功、`1` 遠端/創作者/下
 只有在需要可重複使用的清單或結構化忽略規則時才建立 `ktoolbox.toml`。缺少此檔案代表有效的空專案。
 
 ```toml
-schema_version = 1
+schema_version = 2
 
 [[creators]]
 service = "fanbox"
@@ -78,6 +78,8 @@ ktoolbox webui /path/to/project --host 127.0.0.1
 ```
 
 `.env` 和 `prod.env` 現在是忽略的本機檔案，而不是受版本控制的範例。請將憑證與下載器工作階段保存在其中，以 `example.env` 作為公開範本，並在升級前稽核任何較舊的受追蹤 dotenv 檔案。WebUI 會建立 `.ktoolbox/webui.sqlite3` 和專案鎖；兩者都不會變更 CLI 下載輸出格式。
+
+命名範本與下載根目錄現在屬於專案 Schema v2。首次啟動 WebUI 會備份 `.env` 與 `prod.env`，將舊命名鍵遷移至 `ktoolbox.toml`、移除舊鍵並顯示一次性通知。轉換既有下載前請先檢查產生的目錄配置；詳見[命名格式指南](naming.md)。
 
 HTTP 部署風險和持久化工作語意請參閱 [WebUI 指南](webui.md)。
 
