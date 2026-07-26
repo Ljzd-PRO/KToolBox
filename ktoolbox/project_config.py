@@ -3,8 +3,9 @@ from __future__ import annotations
 import os
 from collections.abc import Mapping
 from pathlib import Path
+from string import Formatter
 from tempfile import NamedTemporaryFile
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 from urllib.parse import urlparse
 
 import tomlkit
@@ -49,14 +50,183 @@ class CreatorReference(BaseModel):
         return f"{self.service}:{self.creator_id}"
 
 
+_POST_TEMPLATE_FIELDS = frozenset(
+    {
+        "id",
+        "post_id",
+        "user",
+        "creator_id",
+        "service",
+        "platform",
+        "title",
+        "added",
+        "published",
+        "edited",
+    }
+)
+_CREATOR_TEMPLATE_FIELDS = frozenset(
+    {
+        "creator_name",
+        "creator_id",
+        "service",
+        "platform",
+        "alias",
+    }
+)
+_DATE_TEMPLATE_FIELDS = frozenset({"year", "month"})
+_REVISION_TEMPLATE_FIELDS = _POST_TEMPLATE_FIELDS | frozenset({"revision_id"})
+
+
+def _validate_component_template(
+    value: str,
+    *,
+    fields: frozenset[str],
+    allow_automatic_field: bool = False,
+) -> str:
+    value = value.strip()
+    if not value:
+        raise ValueError("naming templates cannot be empty")
+    if "/" in value or "\\" in value or "\0" in value:
+        raise ValueError("naming templates must describe one path component")
+    try:
+        parsed = Formatter().parse(value)
+        for _, field_name, _, _ in parsed:
+            if field_name is None:
+                continue
+            if field_name == "":
+                if allow_automatic_field:
+                    continue
+                raise ValueError("automatic fields are not supported by this template")
+            if field_name not in fields:
+                raise ValueError(f"unsupported naming variable: {field_name}")
+    except ValueError:
+        raise
+    except Exception as error:
+        raise ValueError(f"invalid naming template: {error}") from error
+    return value
+
+
+def _validate_relative_path(value: Path) -> Path:
+    if value.is_absolute() or ".." in value.parts:
+        raise ValueError("naming paths must stay within their work directory")
+    if not value.parts or str(value) in {"", "."}:
+        raise ValueError("naming paths cannot be empty")
+    return value
+
+
+class ProjectPostStructureConfiguration(BaseModel):
+    """Project-local names used inside each downloaded work directory."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    attachments: Path = Path("attachments")
+    content: Path = Path("content.txt")
+    external_links: Path = Path("external_links.txt")
+    file: str = "{id}_{}"
+    revisions: Path = Path("revisions")
+
+    @field_validator("attachments", "content", "external_links", "revisions")
+    @classmethod
+    def validate_relative_paths(cls, value: Path) -> Path:
+        return _validate_relative_path(value)
+
+    @field_validator("file")
+    @classmethod
+    def validate_primary_file_template(cls, value: str) -> str:
+        return _validate_component_template(
+            value,
+            fields=_POST_TEMPLATE_FIELDS,
+            allow_automatic_field=True,
+        )
+
+
+class ProjectNamingConfiguration(BaseModel):
+    """Project-local directory layout and filename templates."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    download_roots: list[Path] = Field(default_factory=list)
+    creator_dirname_format: str = "{creator_name} [{service}-{creator_id}]"
+    post_dirname_format: str = "{title}"
+    revision_dirname_format: str = "{revision_id}"
+    post_structure: ProjectPostStructureConfiguration = Field(default_factory=ProjectPostStructureConfiguration)
+    mix_posts: bool = False
+    sequential_filename: bool = False
+    sequential_filename_excludes: set[str] = Field(default_factory=set)
+    filename_format: str = "{}"
+    group_by_year: bool = False
+    group_by_month: bool = False
+    year_dirname_format: str = "{year}"
+    month_dirname_format: str = "{year}-{month:02d}"
+
+    @field_validator("download_roots")
+    @classmethod
+    def validate_download_roots(cls, value: list[Path]) -> list[Path]:
+        roots: list[Path] = []
+        seen: set[str] = set()
+        for root in value:
+            normalized = os.path.normcase(os.path.normpath(str(root.expanduser())))
+            if normalized in seen:
+                raise ValueError(f"duplicate download root: {root}")
+            seen.add(normalized)
+            roots.append(root)
+        return roots
+
+    @field_validator("creator_dirname_format")
+    @classmethod
+    def validate_creator_template(cls, value: str) -> str:
+        return _validate_component_template(value, fields=_CREATOR_TEMPLATE_FIELDS)
+
+    @field_validator("post_dirname_format")
+    @classmethod
+    def validate_post_template(cls, value: str) -> str:
+        return _validate_component_template(value, fields=_POST_TEMPLATE_FIELDS)
+
+    @field_validator("revision_dirname_format")
+    @classmethod
+    def validate_revision_template(cls, value: str) -> str:
+        return _validate_component_template(value, fields=_REVISION_TEMPLATE_FIELDS)
+
+    @field_validator("filename_format")
+    @classmethod
+    def validate_filename_template(cls, value: str) -> str:
+        return _validate_component_template(
+            value,
+            fields=_POST_TEMPLATE_FIELDS,
+            allow_automatic_field=True,
+        )
+
+    @field_validator("year_dirname_format", "month_dirname_format")
+    @classmethod
+    def validate_date_templates(cls, value: str) -> str:
+        return _validate_component_template(value, fields=_DATE_TEMPLATE_FIELDS)
+
+    @model_validator(mode="after")
+    def validate_grouping(self) -> ProjectNamingConfiguration:
+        if self.group_by_month and not self.group_by_year:
+            raise ValueError("month grouping requires year grouping")
+        return self
+
+
 class ProjectConfiguration(BaseModel):
     """Versioned project-local configuration."""
 
     model_config = ConfigDict(extra="forbid")
 
-    schema_version: Literal[1] = 1
+    schema_version: Literal[2] = 2
     creators: list[CreatorReference] = Field(default_factory=list)
     blockers: list[BlockerSpec] = Field(default_factory=list)
+    naming: ProjectNamingConfiguration = Field(default_factory=ProjectNamingConfiguration)
+
+    @model_validator(mode="before")
+    @classmethod
+    def upgrade_schema_v1(cls, value: Any) -> Any:
+        if isinstance(value, Mapping) and value.get("schema_version", 1) == 1:
+            upgraded = dict(value)
+            upgraded["schema_version"] = 2
+            upgraded.setdefault("naming", {})
+            return upgraded
+        return value
 
     @model_validator(mode="after")
     def validate_unique_creators(self) -> ProjectConfiguration:
@@ -149,9 +319,10 @@ class ProjectConfigStore:
             except OSError as error:
                 raise ProjectConfigError(f"unable to read project configuration {self.path}: {error}") from error
         document = tomlkit.document()
-        document.add("schema_version", 1)
+        document.add("schema_version", 2)
         document.add("creators", tomlkit.aot())
         document.add("blockers", tomlkit.aot())
+        document.add("naming", tomlkit.item(ProjectNamingConfiguration().model_dump(mode="json")))
         return tomlkit.dumps(document)
 
     def replace_text(self, content: str) -> ProjectConfiguration:
@@ -175,6 +346,7 @@ class ProjectConfigStore:
         document["schema_version"] = configuration.schema_version
         document["creators"] = _creator_tables(configuration.creators)
         document["blockers"] = _blocker_tables(configuration.blockers)
+        document["naming"] = tomlkit.item(configuration.naming.model_dump(mode="json"))
         self.path.parent.mkdir(parents=True, exist_ok=True)
 
         temporary_path: Path | None = None
