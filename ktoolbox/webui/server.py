@@ -195,8 +195,7 @@ def _project_root(project_dir: Path) -> Path:
     migration = migrate_legacy_naming(root)
     if migration.migrated:
         print(
-            "Migrated legacy naming settings to ktoolbox.toml. "
-            "Naming is now managed per project in the WebUI.",
+            "Migrated legacy naming settings to ktoolbox.toml. Naming is now managed per project in the WebUI.",
             file=sys.stderr,
         )
         for backup in migration.backup_paths:

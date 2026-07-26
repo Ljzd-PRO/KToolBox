@@ -212,11 +212,7 @@ class KToolBoxCli:
                 post = await _requested_post(client, service, creator_id, post_id, revision_id)
                 post_path = output_path / generate_post_path_name(post, naming)
                 if revision_id:
-                    post_path = (
-                        post_path
-                        / naming.post_structure.revisions
-                        / generate_revision_path_name(post, naming)
-                    )
+                    post_path = post_path / naming.post_structure.revisions / generate_revision_path_name(post, naming)
 
                 jobs = await create_job_from_post(
                     post,
@@ -233,9 +229,7 @@ class KToolBoxCli:
                         revisions = []
                     for revision in revisions:
                         revision_path = (
-                            post_path
-                            / naming.post_structure.revisions
-                            / generate_revision_path_name(revision, naming)
+                            post_path / naming.post_structure.revisions / generate_revision_path_name(revision, naming)
                         )
                         jobs.extend(
                             await create_job_from_post(
