@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import signal
 from pathlib import Path
 
@@ -143,6 +144,7 @@ async def test_run_webui_first_sigint_requests_a_graceful_shutdown(
 async def test_run_webui_second_sigint_returns_to_the_global_cli_boundary(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     class FakeConfig:
         def __init__(self, app, **kwargs) -> None:
@@ -161,6 +163,10 @@ async def test_run_webui_second_sigint_returns_to_the_global_cli_boundary(
             assert self.force_exit is False
             self.handle_exit(signal.SIGINT, None)
             assert self.force_exit is True
+            try:
+                raise asyncio.CancelledError
+            except asyncio.CancelledError:
+                logging.getLogger("uvicorn.error").exception("Expected forced shutdown cancellation")
             await asyncio.sleep(0)
 
     monkeypatch.setattr(
@@ -176,6 +182,7 @@ async def test_run_webui_second_sigint_returns_to_the_global_cli_boundary(
 
     with pytest.raises(KeyboardInterrupt):
         await run_webui(tmp_path, open_browser=False)
+    assert "Expected forced shutdown cancellation" not in caplog.text
 
 
 def test_project_root_creates_missing_configuration(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:

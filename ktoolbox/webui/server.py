@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import getpass
+import logging
 import secrets
 import signal
 import socket
@@ -128,15 +129,27 @@ async def run_webui(
             access_log=False,
         )
     )
-    await server.serve()
-    if server.interrupt_count > 1:
-        lifespan = getattr(server, "lifespan", None)
-        if lifespan is not None:
-            try:
-                await asyncio.wait_for(lifespan.shutdown(), timeout=0.5)
-            except (TimeoutError, asyncio.CancelledError):
-                lifespan.logger.disabled = True
-        raise KeyboardInterrupt
+    uvicorn_error_logger = logging.getLogger("uvicorn.error")
+
+    class ForcedShutdownCancellationFilter(logging.Filter):
+        def filter(self, record: logging.LogRecord) -> bool:
+            exception = record.exc_info[1] if record.exc_info is not None else None
+            return not (server.force_exit and isinstance(exception, asyncio.CancelledError))
+
+    cancellation_filter = ForcedShutdownCancellationFilter()
+    uvicorn_error_logger.addFilter(cancellation_filter)
+    try:
+        await server.serve()
+        if server.interrupt_count > 1:
+            lifespan = getattr(server, "lifespan", None)
+            if lifespan is not None:
+                try:
+                    await asyncio.wait_for(lifespan.shutdown(), timeout=0.5)
+                except (TimeoutError, asyncio.CancelledError):
+                    lifespan.logger.disabled = True
+            raise KeyboardInterrupt
+    finally:
+        uvicorn_error_logger.removeFilter(cancellation_filter)
 
 
 def _prepare_webui_credentials(
