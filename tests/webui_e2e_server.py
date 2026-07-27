@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import sqlite3
 import tempfile
 from contextlib import AbstractAsyncContextManager
 from importlib import import_module
@@ -41,12 +42,37 @@ PROJECT_ROOT.joinpath(".env").write_text(
     encoding="utf-8",
 )
 PROJECT_ROOT.joinpath("ktoolbox.toml").write_text(
-    'schema_version = 1\n\n[[creators]]\nservice = "fanbox"\ncreator_id = "demo-studio"\n'
+    'schema_version = 3\n\n[[creators]]\nservice = "fanbox"\ncreator_id = "demo-studio"\n'
     "enabled = true\n\n"
     '[[creators]]\nservice = "patreon"\ncreator_id = "alpha-atelier"\n'
     'alias = "Priority reference"\nenabled = true\n\n'
     '[[creators]]\nservice = "pixiv"\ncreator_id = "studio-10"\n'
-    "enabled = false\n",
+    "enabled = false\n\n"
+    "[[automatic_sync]]\n"
+    'id = "daily-studios"\n'
+    'name = "Daily studios"\n'
+    "enabled = true\n"
+    'creators = ["fanbox:demo-studio", "patreon:alpha-atelier"]\n'
+    'initial_start_date = "2026-07-01"\n\n'
+    "[automatic_sync.schedule]\n"
+    'kind = "cron"\n'
+    'expression = "0 3 * * *"\n'
+    'timezone = "Asia/Shanghai"\n\n'
+    "[automatic_sync.options]\n"
+    'output = "downloads"\n'
+    "save_creator_indices = true\n\n"
+    "[[automatic_sync]]\n"
+    'id = "weekly-reference"\n'
+    'name = "Weekly reference"\n'
+    "enabled = false\n"
+    'creators = ["pixiv:studio-10"]\n\n'
+    "[automatic_sync.schedule]\n"
+    'kind = "interval"\n'
+    "every = 7\n"
+    'unit = "days"\n'
+    'timezone = "Asia/Tokyo"\n\n'
+    "[automatic_sync.options]\n"
+    'output = "downloads"\n',
     encoding="utf-8",
 )
 
@@ -237,3 +263,58 @@ app = create_app(
         restrict_host_to_roots=True,
     ),
 )
+
+
+async def seed_automatic_sync_fixtures() -> None:
+    database = app.state.database
+    await database.initialize()
+    with sqlite3.connect(database.path) as connection:
+        connection.execute(
+            """
+            INSERT OR IGNORE INTO automatic_sync_runs(
+                id, plan_id, plan_name, trigger, status, task_id,
+                scheduled_for, cutoff_at, created_at, started_at, finished_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "fixture-auto-run",
+                "daily-studios",
+                "Daily studios",
+                "scheduled",
+                "completed",
+                None,
+                "2026-07-26T19:00:00+00:00",
+                "2026-07-26T19:00:00+00:00",
+                "2026-07-26T19:00:00+00:00",
+                "2026-07-26T19:00:01+00:00",
+                "2026-07-26T19:01:12+00:00",
+            ),
+        )
+        connection.execute(
+            """
+            INSERT OR REPLACE INTO creator_profile_cache(service, creator_id, name, fetched_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            ("fanbox", "demo-studio", "Demo Studio", "2026-07-27T00:00:00+00:00"),
+        )
+        for post_id in ("fixture-new-1", "fixture-new-2", "fixture-new-3"):
+            connection.execute(
+                """
+                INSERT OR IGNORE INTO automatic_sync_observed_posts(
+                    service, creator_id, post_id, first_seen_at,
+                    plan_id, run_id, is_baseline
+                ) VALUES (?, ?, ?, ?, ?, ?, 0)
+                """,
+                (
+                    "fanbox",
+                    "demo-studio",
+                    post_id,
+                    "2026-07-26T19:01:00+00:00",
+                    "daily-studios",
+                    "fixture-auto-run",
+                ),
+            )
+        connection.commit()
+
+
+asyncio.run(seed_automatic_sync_fixtures())
