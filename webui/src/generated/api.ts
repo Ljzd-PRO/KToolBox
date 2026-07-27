@@ -564,6 +564,158 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auto-sync/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List automatic sync plans
+         * @description Return project automatic-sync plans, their configuration revision, and next scheduled executions.
+         */
+        get: operations["list_automatic_sync_plans"];
+        put?: never;
+        /**
+         * Create an automatic sync plan
+         * @description Create a validated project automatic-sync plan after an ETag check.
+         */
+        post: operations["create_automatic_sync_plan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auto-sync/plans/{plan_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get an automatic sync plan
+         * @description Return one project automatic-sync plan.
+         */
+        get: operations["get_automatic_sync_plan"];
+        /**
+         * Update an automatic sync plan
+         * @description Replace one project automatic-sync plan after an ETag check.
+         */
+        put: operations["update_automatic_sync_plan"];
+        post?: never;
+        /**
+         * Delete an automatic sync plan
+         * @description Delete future scheduling and checkpoints while preserving prior tasks and update history.
+         */
+        delete: operations["delete_automatic_sync_plan"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auto-sync/plans/{plan_id}/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pause an automatic sync plan
+         * @description Pause future scheduled executions without stopping its current task.
+         */
+        post: operations["pause_automatic_sync_plan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auto-sync/plans/{plan_id}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resume an automatic sync plan
+         * @description Resume future scheduled executions for a paused plan.
+         */
+        post: operations["resume_automatic_sync_plan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auto-sync/plans/{plan_id}/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Run an automatic sync plan now
+         * @description Create an immediate sync task without shifting the plan's normal schedule.
+         */
+        post: operations["run_automatic_sync_plan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auto-sync/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List automatic sync runs
+         * @description Return bounded automatic-sync run history and linked task identifiers.
+         */
+        get: operations["list_automatic_sync_runs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auto-sync/updates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List recently discovered works
+         * @description Return project-wide deduplicated work counts grouped by creator without work titles or content.
+         */
+        get: operations["list_automatic_sync_updates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/naming": {
         parameters: {
             query?: never;
@@ -1074,6 +1226,154 @@ export interface components {
              */
             speed_bps: number;
         };
+        /** AutomaticCreatorWindowSnapshot */
+        AutomaticCreatorWindowSnapshot: {
+            /** Creator Key */
+            creator_key: string;
+            /** Start At */
+            start_at?: string | null;
+            /**
+             * End At
+             * Format: date-time
+             */
+            end_at: string;
+            /** Timezone */
+            timezone: string;
+            /**
+             * Baseline
+             * @default false
+             */
+            baseline: boolean;
+        };
+        /**
+         * AutomaticSyncOptions
+         * @description Reusable synchronization settings attached to an automatic plan.
+         */
+        AutomaticSyncOptions: {
+            /**
+             * Output
+             * Format: path
+             * @default .
+             */
+            output: string;
+            /**
+             * Save Creator Indices
+             * @default false
+             */
+            save_creator_indices: boolean;
+            /** Mix Posts */
+            mix_posts?: boolean | null;
+            /** Keywords */
+            keywords?: string[];
+            /** Keywords Exclude */
+            keywords_exclude?: string[];
+        };
+        /**
+         * AutomaticSyncPlan
+         * @description Project-local definition for one recurring creator synchronization.
+         */
+        AutomaticSyncPlan: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            /** Creators */
+            creators: string[];
+            /** Schedule */
+            schedule?: components["schemas"]["CronAutomaticSyncSchedule"] | components["schemas"]["IntervalAutomaticSyncSchedule"];
+            /** Initial Start Date */
+            initial_start_date?: string | null;
+            options?: components["schemas"]["AutomaticSyncOptions"];
+        };
+        /** AutomaticSyncPlanListResponse */
+        AutomaticSyncPlanListResponse: {
+            /** Plans */
+            plans: components["schemas"]["AutomaticSyncPlan"][];
+            /** Revision */
+            revision: string;
+            /** Next Runs */
+            next_runs: {
+                [key: string]: string | null;
+            };
+        };
+        /** AutomaticSyncRunNowResponse */
+        AutomaticSyncRunNowResponse: {
+            /** Task Id */
+            task_id: string;
+        };
+        /** AutomaticSyncRunRecord */
+        AutomaticSyncRunRecord: {
+            /** Id */
+            id: string;
+            /** Plan Id */
+            plan_id: string;
+            /** Plan Name */
+            plan_name: string;
+            trigger: components["schemas"]["AutomaticSyncRunTrigger"];
+            status: components["schemas"]["AutomaticSyncRunStatus"];
+            /** Task Id */
+            task_id?: string | null;
+            /** Scheduled For */
+            scheduled_for?: string | null;
+            /**
+             * Cutoff At
+             * Format: date-time
+             */
+            cutoff_at: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Started At */
+            started_at?: string | null;
+            /** Finished At */
+            finished_at?: string | null;
+            /** Error */
+            error?: string | null;
+        };
+        /**
+         * AutomaticSyncRunStatus
+         * @enum {string}
+         */
+        AutomaticSyncRunStatus: "queued" | "running" | "paused" | "completed" | "failed" | "skipped" | "interrupted";
+        /**
+         * AutomaticSyncRunTrigger
+         * @enum {string}
+         */
+        AutomaticSyncRunTrigger: "scheduled" | "immediate";
+        /** AutomaticSyncUpdateSummary */
+        AutomaticSyncUpdateSummary: {
+            /** Service */
+            service: string;
+            /** Creator Id */
+            creator_id: string;
+            /** Creator Name */
+            creator_name?: string | null;
+            /** New Posts */
+            new_posts: number;
+            /**
+             * Last Discovered At
+             * Format: date-time
+             */
+            last_discovered_at: string;
+        };
+        /** AutomaticTaskOrigin */
+        AutomaticTaskOrigin: {
+            /** Plan Id */
+            plan_id: string;
+            /** Plan Name */
+            plan_name: string;
+            /** Run Id */
+            run_id: string;
+            /** Windows */
+            windows: components["schemas"]["AutomaticCreatorWindowSnapshot"][];
+        };
         /** BlockerListResponse */
         BlockerListResponse: {
             /** Blockers */
@@ -1226,6 +1526,20 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** CreatorTaskExecutionResult */
+        CreatorTaskExecutionResult: {
+            /** Creator Key */
+            creator_key: string;
+            /** Accepted Post Ids */
+            accepted_post_ids?: string[];
+            /** Generation Successful */
+            generation_successful: boolean;
+            /**
+             * Download Failures
+             * @default 0
+             */
+            download_failures: number;
+        };
         /** CreatorUpdateRequest */
         CreatorUpdateRequest: {
             /** Alias */
@@ -1235,6 +1549,27 @@ export interface components {
              * @default true
              */
             enabled: boolean;
+        };
+        /**
+         * CronAutomaticSyncSchedule
+         * @description A standard five-field Cron schedule evaluated in an IANA timezone.
+         */
+        CronAutomaticSyncSchedule: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "cron";
+            /**
+             * Expression
+             * @default 0 3 * * *
+             */
+            expression: string;
+            /**
+             * Timezone
+             * @default UTC
+             */
+            timezone: string;
         };
         /** DotenvPatchRequest */
         DotenvPatchRequest: {
@@ -1422,6 +1757,35 @@ export interface components {
              * @default ok
              */
             status: string;
+        };
+        /**
+         * IntervalAutomaticSyncSchedule
+         * @description A fixed interval anchored to a stable UTC instant.
+         */
+        IntervalAutomaticSyncSchedule: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "interval";
+            /**
+             * Every
+             * @default 24
+             */
+            every: number;
+            /**
+             * Unit
+             * @default hours
+             * @enum {string}
+             */
+            unit: "minutes" | "hours" | "days";
+            /** Anchor At */
+            anchor_at?: string | null;
+            /**
+             * Timezone
+             * @default UTC
+             */
+            timezone: string;
         };
         /** LoginRequest */
         LoginRequest: {
@@ -1785,15 +2149,17 @@ export interface components {
         ProjectConfiguration: {
             /**
              * Schema Version
-             * @default 2
+             * @default 3
              * @constant
              */
-            schema_version: 2;
+            schema_version: 3;
             /** Creators */
             creators?: components["schemas"]["CreatorReference"][];
             /** Blockers */
             blockers?: components["schemas"]["BlockerSpec"][];
             naming?: components["schemas"]["ProjectNamingConfiguration"];
+            /** Automatic Sync */
+            automatic_sync?: components["schemas"]["AutomaticSyncPlan"][];
         };
         /** ProjectDocumentResponse */
         ProjectDocumentResponse: {
@@ -2104,6 +2470,7 @@ export interface components {
             /** Error */
             error?: string | null;
             failure?: components["schemas"]["TaskFailureReport"] | null;
+            result?: components["schemas"]["TaskExecutionResult"] | null;
         };
         /** TaskCleanupPreview */
         TaskCleanupPreview: {
@@ -2143,6 +2510,11 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** TaskExecutionResult */
+        TaskExecutionResult: {
+            /** Creators */
+            creators?: components["schemas"]["CreatorTaskExecutionResult"][];
         };
         /**
          * TaskFailureReport
@@ -2241,6 +2613,7 @@ export interface components {
             /** Spec */
             spec: components["schemas"]["DownloadTaskSpec"] | components["schemas"]["SyncTaskSpec"];
             presentation?: components["schemas"]["TaskPresentationSnapshot"] | null;
+            automatic_origin?: components["schemas"]["AutomaticTaskOrigin"] | null;
             /** Position */
             position: number;
             /** Revision */
@@ -3482,6 +3855,332 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_automatic_sync_plans: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomaticSyncPlanListResponse"];
+                };
+            };
+        };
+    };
+    create_automatic_sync_plan: {
+        parameters: {
+            query?: never;
+            header: {
+                "If-Match"?: string | null;
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AutomaticSyncPlan"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomaticSyncPlanListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_automatic_sync_plan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomaticSyncPlan"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_automatic_sync_plan: {
+        parameters: {
+            query?: never;
+            header: {
+                "If-Match"?: string | null;
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AutomaticSyncPlan"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomaticSyncPlanListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_automatic_sync_plan: {
+        parameters: {
+            query?: never;
+            header: {
+                "If-Match"?: string | null;
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pause_automatic_sync_plan: {
+        parameters: {
+            query?: never;
+            header: {
+                "If-Match"?: string | null;
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomaticSyncPlanListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resume_automatic_sync_plan: {
+        parameters: {
+            query?: never;
+            header: {
+                "If-Match"?: string | null;
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomaticSyncPlanListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_automatic_sync_plan: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomaticSyncRunNowResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_automatic_sync_runs: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomaticSyncRunRecord"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_automatic_sync_updates: {
+        parameters: {
+            query?: {
+                period?: "7d" | "30d" | "90d" | "all";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomaticSyncUpdateSummary"][];
                 };
             };
             /** @description Validation Error */

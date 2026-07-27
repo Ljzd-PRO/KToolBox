@@ -24,6 +24,7 @@ from ktoolbox.webui.auth import (
     require_csrf,
     require_session,
 )
+from ktoolbox.webui.auto_sync_routes import create_auto_sync_router
 from ktoolbox.webui.auto_sync_scheduler import AutoSyncScheduler
 from ktoolbox.webui.auto_sync_store import AutomaticSyncStore
 from ktoolbox.webui.config_monitor import ConfigurationChangeMonitor
@@ -143,6 +144,7 @@ def create_app(
     app.include_router(create_filesystem_router(browser, event_store))
     app.include_router(create_pawchive_router())
     app.include_router(create_task_router(context.project_root))
+    app.include_router(create_auto_sync_router(context.project_root))
     app.include_router(create_naming_router())
     app.include_router(create_mcp_router())
 

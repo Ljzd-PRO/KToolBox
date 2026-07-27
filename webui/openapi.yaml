@@ -1592,6 +1592,439 @@ paths:
         scope: null
         safety: null
         openWorld: false
+  /api/v1/auto-sync/plans:
+    get:
+      tags:
+      - automatic-sync
+      summary: List automatic sync plans
+      operationId: list_automatic_sync_plans
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomaticSyncPlanListResponse'
+      description: Return project automatic-sync plans, their configuration revision, and next scheduled executions.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: list_automatic_sync_plans
+        scope: mcp:read
+        safety: read
+        openWorld: false
+    post:
+      tags:
+      - automatic-sync
+      summary: Create an automatic sync plan
+      operationId: create_automatic_sync_plan
+      parameters:
+      - name: If-Match
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: If-Match
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutomaticSyncPlan'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomaticSyncPlanListResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Create a validated project automatic-sync plan after an ETag check.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: create_automatic_sync_plan
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/auto-sync/plans/{plan_id}:
+    get:
+      tags:
+      - automatic-sync
+      summary: Get an automatic sync plan
+      operationId: get_automatic_sync_plan
+      parameters:
+      - name: plan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Plan Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomaticSyncPlan'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Return one project automatic-sync plan.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: get_automatic_sync_plan
+        scope: mcp:read
+        safety: read
+        openWorld: false
+    put:
+      tags:
+      - automatic-sync
+      summary: Update an automatic sync plan
+      operationId: update_automatic_sync_plan
+      parameters:
+      - name: plan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Plan Id
+      - name: If-Match
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: If-Match
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutomaticSyncPlan'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomaticSyncPlanListResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Replace one project automatic-sync plan after an ETag check.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: update_automatic_sync_plan
+        scope: null
+        safety: null
+        openWorld: false
+    delete:
+      tags:
+      - automatic-sync
+      summary: Delete an automatic sync plan
+      operationId: delete_automatic_sync_plan
+      parameters:
+      - name: plan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Plan Id
+      - name: If-Match
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: If-Match
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Delete future scheduling and checkpoints while preserving prior tasks and update history.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: delete_automatic_sync_plan
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/auto-sync/plans/{plan_id}/pause:
+    post:
+      tags:
+      - automatic-sync
+      summary: Pause an automatic sync plan
+      operationId: pause_automatic_sync_plan
+      parameters:
+      - name: plan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Plan Id
+      - name: If-Match
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: If-Match
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomaticSyncPlanListResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Pause future scheduled executions without stopping its current task.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: pause_automatic_sync_plan
+        scope: mcp:write
+        safety: write
+        openWorld: false
+  /api/v1/auto-sync/plans/{plan_id}/resume:
+    post:
+      tags:
+      - automatic-sync
+      summary: Resume an automatic sync plan
+      operationId: resume_automatic_sync_plan
+      parameters:
+      - name: plan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Plan Id
+      - name: If-Match
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: If-Match
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomaticSyncPlanListResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Resume future scheduled executions for a paused plan.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: resume_automatic_sync_plan
+        scope: mcp:write
+        safety: write
+        openWorld: false
+  /api/v1/auto-sync/plans/{plan_id}/run:
+    post:
+      tags:
+      - automatic-sync
+      summary: Run an automatic sync plan now
+      operationId: run_automatic_sync_plan
+      parameters:
+      - name: plan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Plan Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomaticSyncRunNowResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Create an immediate sync task without shifting the plan's normal schedule.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: run_automatic_sync_plan
+        scope: mcp:write
+        safety: write
+        openWorld: false
+  /api/v1/auto-sync/runs:
+    get:
+      tags:
+      - automatic-sync
+      summary: List automatic sync runs
+      operationId: list_automatic_sync_runs
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 200
+          minimum: 1
+          default: 100
+          title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AutomaticSyncRunRecord'
+                title: Response List Automatic Sync Runs
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Return bounded automatic-sync run history and linked task identifiers.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: list_automatic_sync_runs
+        scope: mcp:read
+        safety: read
+        openWorld: false
+  /api/v1/auto-sync/updates:
+    get:
+      tags:
+      - automatic-sync
+      summary: List recently discovered works
+      operationId: list_automatic_sync_updates
+      parameters:
+      - name: period
+        in: query
+        required: false
+        schema:
+          enum:
+          - 7d
+          - 30d
+          - 90d
+          - all
+          type: string
+          default: 30d
+          title: Period
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AutomaticSyncUpdateSummary'
+                title: Response List Automatic Sync Updates
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Return project-wide deduplicated work counts grouped by creator without work titles or content.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: list_automatic_sync_updates
+        scope: mcp:read
+        safety: read
+        openWorld: false
   /api/v1/naming:
     get:
       tags:
@@ -2542,6 +2975,277 @@ components:
       - creator_key
       - filename
       title: ActiveDownload
+    AutomaticCreatorWindowSnapshot:
+      properties:
+        creator_key:
+          type: string
+          title: Creator Key
+        start_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Start At
+        end_at:
+          type: string
+          format: date-time
+          title: End At
+        timezone:
+          type: string
+          title: Timezone
+        baseline:
+          type: boolean
+          title: Baseline
+          default: false
+      type: object
+      required:
+      - creator_key
+      - end_at
+      - timezone
+      title: AutomaticCreatorWindowSnapshot
+    AutomaticSyncOptions:
+      properties:
+        output:
+          type: string
+          format: path
+          title: Output
+          default: .
+        save_creator_indices:
+          type: boolean
+          title: Save Creator Indices
+          default: false
+        mix_posts:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Mix Posts
+        keywords:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+          title: Keywords
+        keywords_exclude:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+          title: Keywords Exclude
+      additionalProperties: false
+      type: object
+      title: AutomaticSyncOptions
+      description: Reusable synchronization settings attached to an automatic plan.
+    AutomaticSyncPlan:
+      properties:
+        id:
+          type: string
+          maxLength: 64
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._-]*$
+          title: Id
+        name:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Name
+        enabled:
+          type: boolean
+          title: Enabled
+          default: true
+        creators:
+          items:
+            type: string
+          type: array
+          minItems: 1
+          title: Creators
+        schedule:
+          oneOf:
+          - $ref: '#/components/schemas/CronAutomaticSyncSchedule'
+          - $ref: '#/components/schemas/IntervalAutomaticSyncSchedule'
+          title: Schedule
+          discriminator:
+            propertyName: kind
+            mapping:
+              cron: '#/components/schemas/CronAutomaticSyncSchedule'
+              interval: '#/components/schemas/IntervalAutomaticSyncSchedule'
+        initial_start_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Initial Start Date
+        options:
+          $ref: '#/components/schemas/AutomaticSyncOptions'
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - name
+      - creators
+      title: AutomaticSyncPlan
+      description: Project-local definition for one recurring creator synchronization.
+    AutomaticSyncPlanListResponse:
+      properties:
+        plans:
+          items:
+            $ref: '#/components/schemas/AutomaticSyncPlan'
+          type: array
+          title: Plans
+        revision:
+          type: string
+          title: Revision
+        next_runs:
+          additionalProperties:
+            anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          type: object
+          title: Next Runs
+      type: object
+      required:
+      - plans
+      - revision
+      - next_runs
+      title: AutomaticSyncPlanListResponse
+    AutomaticSyncRunNowResponse:
+      properties:
+        task_id:
+          type: string
+          title: Task Id
+      type: object
+      required:
+      - task_id
+      title: AutomaticSyncRunNowResponse
+    AutomaticSyncRunRecord:
+      properties:
+        id:
+          type: string
+          title: Id
+        plan_id:
+          type: string
+          title: Plan Id
+        plan_name:
+          type: string
+          title: Plan Name
+        trigger:
+          $ref: '#/components/schemas/AutomaticSyncRunTrigger'
+        status:
+          $ref: '#/components/schemas/AutomaticSyncRunStatus'
+        task_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Task Id
+        scheduled_for:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Scheduled For
+        cutoff_at:
+          type: string
+          format: date-time
+          title: Cutoff At
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        started_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Started At
+        finished_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Finished At
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+      type: object
+      required:
+      - id
+      - plan_id
+      - plan_name
+      - trigger
+      - status
+      - cutoff_at
+      - created_at
+      title: AutomaticSyncRunRecord
+    AutomaticSyncRunStatus:
+      type: string
+      enum:
+      - queued
+      - running
+      - paused
+      - completed
+      - failed
+      - skipped
+      - interrupted
+      title: AutomaticSyncRunStatus
+    AutomaticSyncRunTrigger:
+      type: string
+      enum:
+      - scheduled
+      - immediate
+      title: AutomaticSyncRunTrigger
+    AutomaticSyncUpdateSummary:
+      properties:
+        service:
+          type: string
+          title: Service
+        creator_id:
+          type: string
+          title: Creator Id
+        creator_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Creator Name
+        new_posts:
+          type: integer
+          minimum: 0.0
+          title: New Posts
+        last_discovered_at:
+          type: string
+          format: date-time
+          title: Last Discovered At
+      type: object
+      required:
+      - service
+      - creator_id
+      - new_posts
+      - last_discovered_at
+      title: AutomaticSyncUpdateSummary
+    AutomaticTaskOrigin:
+      properties:
+        plan_id:
+          type: string
+          title: Plan Id
+        plan_name:
+          type: string
+          title: Plan Name
+        run_id:
+          type: string
+          title: Run Id
+        windows:
+          items:
+            $ref: '#/components/schemas/AutomaticCreatorWindowSnapshot'
+          type: array
+          title: Windows
+      type: object
+      required:
+      - plan_id
+      - plan_name
+      - run_id
+      - windows
+      title: AutomaticTaskOrigin
     BlockerListResponse:
       properties:
         blockers:
@@ -2817,6 +3521,29 @@ components:
       - service
       - updated
       title: CreatorSummary
+    CreatorTaskExecutionResult:
+      properties:
+        creator_key:
+          type: string
+          title: Creator Key
+        accepted_post_ids:
+          items:
+            type: string
+          type: array
+          title: Accepted Post Ids
+        generation_successful:
+          type: boolean
+          title: Generation Successful
+        download_failures:
+          type: integer
+          minimum: 0.0
+          title: Download Failures
+          default: 0
+      type: object
+      required:
+      - creator_key
+      - generation_successful
+      title: CreatorTaskExecutionResult
     CreatorUpdateRequest:
       properties:
         alias:
@@ -2830,6 +3557,25 @@ components:
           default: true
       type: object
       title: CreatorUpdateRequest
+    CronAutomaticSyncSchedule:
+      properties:
+        kind:
+          type: string
+          const: cron
+          title: Kind
+          default: cron
+        expression:
+          type: string
+          title: Expression
+          default: 0 3 * * *
+        timezone:
+          type: string
+          title: Timezone
+          default: UTC
+      additionalProperties: false
+      type: object
+      title: CronAutomaticSyncSchedule
+      description: A standard five-field Cron schedule evaluated in an IANA timezone.
     DotenvPatchRequest:
       properties:
         values:
@@ -3189,6 +3935,40 @@ components:
           default: ok
       type: object
       title: HealthResponse
+    IntervalAutomaticSyncSchedule:
+      properties:
+        kind:
+          type: string
+          const: interval
+          title: Kind
+          default: interval
+        every:
+          type: integer
+          minimum: 1.0
+          title: Every
+          default: 24
+        unit:
+          type: string
+          enum:
+          - minutes
+          - hours
+          - days
+          title: Unit
+          default: hours
+        anchor_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Anchor At
+        timezone:
+          type: string
+          title: Timezone
+          default: UTC
+      additionalProperties: false
+      type: object
+      title: IntervalAutomaticSyncSchedule
+      description: A fixed interval anchored to a stable UTC instant.
     LoginRequest:
       properties:
         username:
@@ -3835,9 +4615,9 @@ components:
       properties:
         schema_version:
           type: integer
-          const: 2
+          const: 3
           title: Schema Version
-          default: 2
+          default: 3
         creators:
           items:
             $ref: '#/components/schemas/CreatorReference'
@@ -3850,6 +4630,11 @@ components:
           title: Blockers
         naming:
           $ref: '#/components/schemas/ProjectNamingConfiguration'
+        automatic_sync:
+          items:
+            $ref: '#/components/schemas/AutomaticSyncPlan'
+          type: array
+          title: Automatic Sync
       additionalProperties: false
       type: object
       title: ProjectConfiguration
@@ -4331,6 +5116,10 @@ components:
           anyOf:
           - $ref: '#/components/schemas/TaskFailureReport'
           - type: 'null'
+        result:
+          anyOf:
+          - $ref: '#/components/schemas/TaskExecutionResult'
+          - type: 'null'
       type: object
       required:
       - id
@@ -4423,6 +5212,15 @@ components:
       - data
       - created_at
       title: TaskEvent
+    TaskExecutionResult:
+      properties:
+        creators:
+          items:
+            $ref: '#/components/schemas/CreatorTaskExecutionResult'
+          type: array
+          title: Creators
+      type: object
+      title: TaskExecutionResult
     TaskFailureReport:
       properties:
         summary:
@@ -4559,6 +5357,10 @@ components:
         presentation:
           anyOf:
           - $ref: '#/components/schemas/TaskPresentationSnapshot'
+          - type: 'null'
+        automatic_origin:
+          anyOf:
+          - $ref: '#/components/schemas/AutomaticTaskOrigin'
           - type: 'null'
         position:
           type: integer
@@ -4746,6 +5548,8 @@ tags:
   description: Ordered work ignore rules.
 - name: tasks
   description: Persistent task queue and execution history.
+- name: automatic-sync
+  description: Recurring creator synchronization plans, runs, and recent update counts.
 - name: pawchive
   description: Public Pawchive search and work data.
 - name: filesystem

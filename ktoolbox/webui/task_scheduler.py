@@ -114,6 +114,9 @@ class TaskScheduler:
         presentation: TaskPresentationSnapshot | None = None,
     ) -> TaskRecord:
         async with self._control_lock:
+            current = await self.store.get(task_id)
+            if current.automatic_origin is not None:
+                raise InvalidTaskStateError("automatic sync tasks cannot be edited directly")
             task = await self.store.update_spec(task_id, spec, presentation)
         self._wake.set()
         return task
@@ -161,6 +164,8 @@ class TaskScheduler:
     async def rerun(self, task_id: str) -> TaskRecord:
         async with self._control_lock:
             task = await self.store.get(task_id)
+            if task.automatic_origin is not None:
+                raise InvalidTaskStateError("automatic sync tasks cannot be rerun directly")
             if task.status is not TaskStatus.completed or task.kind != "sync":
                 raise InvalidTaskStateError("only completed sync tasks can be rerun")
             updated = await self.store.queue_again(task_id)

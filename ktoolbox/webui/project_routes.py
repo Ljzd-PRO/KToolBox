@@ -158,6 +158,7 @@ def create_project_router(
     @router.put("/config/project", response_model=ProjectDocumentResponse)
     async def replace_project_config(
         payload: TextDocumentUpdate,
+        request: Request,
         response: Response,
         _: CsrfDependency,
         if_match: IfMatch = None,
@@ -174,6 +175,7 @@ def create_project_router(
         content = project_store.load_text()
         revision = content_revision(content)
         await config_monitor.publish_change("project", revision, source="webui")
+        await request.app.state.automatic_sync_scheduler.reload()
         response.headers["ETag"] = f'"{revision}"'
         return ProjectDocumentResponse(
             path=project_store.path,
@@ -245,7 +247,8 @@ def create_project_router(
         try:
             creator = project_store.remove_creator(f"{service}:{creator_id}")
         except ProjectConfigError as error:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+            code = status.HTTP_409_CONFLICT if "automatic sync plans" in str(error) else status.HTTP_404_NOT_FOUND
+            raise HTTPException(status_code=code, detail=str(error)) from error
         await creator_roster.delete(service, creator_id)
         revision = content_revision(project_store.load_text())
         config_monitor.acknowledge("project", revision)

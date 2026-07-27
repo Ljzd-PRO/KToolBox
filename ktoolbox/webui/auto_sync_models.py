@@ -2,8 +2,11 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
+from typing import Literal
 
 from pydantic import BaseModel, Field
+
+from ktoolbox.project_config import AutomaticSyncPlan
 
 
 class AutomaticSyncRunTrigger(str, Enum):
@@ -49,3 +52,16 @@ class AutomaticSyncUpdateSummary(BaseModel):
     creator_name: str | None = None
     new_posts: int = Field(ge=0)
     last_discovered_at: datetime
+
+
+class AutomaticSyncPlanListResponse(BaseModel):
+    plans: list[AutomaticSyncPlan]
+    revision: str
+    next_runs: dict[str, datetime | None]
+
+
+class AutomaticSyncRunNowResponse(BaseModel):
+    task_id: str
+
+
+AutomaticSyncUpdateRange = Literal["7d", "30d", "90d", "all"]
