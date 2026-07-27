@@ -143,6 +143,7 @@ async def test_download_pool_classifies_results_and_exceptions(tmp_path: Path) -
     ]
     assert [failure.file_name for failure in summary.failures] == ["failure", "exception"]
     assert all(failure.stage is FailureStage.file_request for failure in summary.failures)
+    assert summary.creator_failures == {"fanbox:a": 2}
     assert not summary.successful
 
 

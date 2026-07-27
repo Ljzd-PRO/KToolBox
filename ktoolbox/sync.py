@@ -10,6 +10,7 @@ import aiofiles.os  # type: ignore[import-untyped]
 from ktoolbox.action.job import CreatorJobGeneration, produce_jobs_from_creator
 from ktoolbox.action.utils import generate_creator_path_name
 from ktoolbox.api.client import PawchiveClient
+from ktoolbox.automatic_sync import AutomaticSyncWindow
 from ktoolbox.blocker import BlockerEngine
 from ktoolbox.configuration import config
 from ktoolbox.failures import FailureItem, FailureStage, classify_failure, generic_failure
@@ -36,6 +37,7 @@ class SyncOptions:
     length: int | None = None
     keywords: set[str] = field(default_factory=set)
     keywords_exclude: set[str] = field(default_factory=set)
+    automatic_windows: dict[str, AutomaticSyncWindow] = field(default_factory=dict)
 
 
 @dataclass(slots=True)
@@ -45,10 +47,11 @@ class CreatorSyncResult:
     generation: CreatorJobGeneration | None = None
     error: str | None = None
     failure: FailureItem | None = None
+    download_failures: int = 0
 
     @property
     def successful(self) -> bool:
-        return self.error is None
+        return self.error is None and self.download_failures == 0
 
 
 @dataclass(slots=True)
@@ -122,6 +125,8 @@ class SyncCoordinator:
         try:
             creator_results = await asyncio.gather(*producer_tasks)
             downloads = await download_task
+            for result in creator_results:
+                result.download_failures = downloads.creator_failures.get(result.creator.key, 0)
         except BaseException:
             for task in producer_tasks:
                 task.cancel()
@@ -178,6 +183,11 @@ class SyncCoordinator:
                     end_time=options.end_time,
                     keywords=options.keywords,
                     keywords_exclude=options.keywords_exclude,
+                    post_filter=(
+                        options.automatic_windows[creator.key].includes
+                        if creator.key in options.automatic_windows
+                        else None
+                    ),
                     blocker_engine=self.blocker_engine,
                     client=self.client,
                 )

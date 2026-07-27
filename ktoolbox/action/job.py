@@ -242,11 +242,13 @@ async def create_job_from_post(
 class CreatorJobGeneration:
     fetched_posts: int = 0
     accepted_posts: int = 0
+    accepted_post_ids: list[str] = field(default_factory=list)
     generated_jobs: int = 0
     blocked_by: dict[str, int] = field(default_factory=dict)
 
 
 JobSink = Callable[[Job], Awaitable[None]]
+PostFilter = Callable[[Post], bool]
 
 
 async def create_job_from_creator(
@@ -264,6 +266,7 @@ async def create_job_from_creator(
     end_time: datetime | None,
     keywords: set[str] | None = None,
     keywords_exclude: set[str] | None = None,
+    post_filter: PostFilter | None = None,
     blocker_engine: BlockerEngine | None = None,
     client: PawchiveClient | None = None,
 ) -> ActionRet[list[Job]]:
@@ -283,6 +286,7 @@ async def create_job_from_creator(
     :param end_time: End time of the time range
     :param keywords: Set of keywords to filter posts by title (case-insensitive)
     :param keywords_exclude: Set of keywords to exclude posts by title (case-insensitive)
+    :param post_filter: Optional additional typed post predicate
     :param blocker_engine: Structured blockers applied before post jobs are created
     :param client: Pawchive client to reuse across all creator requests
     """
@@ -307,6 +311,7 @@ async def create_job_from_creator(
         end_time=end_time,
         keywords=keywords,
         keywords_exclude=keywords_exclude,
+        post_filter=post_filter,
         blocker_engine=blocker_engine,
         client=client,
     )
@@ -331,6 +336,7 @@ async def produce_jobs_from_creator(
     end_time: datetime | None,
     keywords: set[str] | None = None,
     keywords_exclude: set[str] | None = None,
+    post_filter: PostFilter | None = None,
     blocker_engine: BlockerEngine | None = None,
     client: PawchiveClient | None = None,
 ) -> ActionRet[CreatorJobGeneration]:
@@ -353,6 +359,7 @@ async def produce_jobs_from_creator(
                 end_time=end_time,
                 keywords=keywords,
                 keywords_exclude=keywords_exclude,
+                post_filter=post_filter,
                 blocker_engine=blocker_engine,
                 client=api_client,
             )
@@ -395,11 +402,14 @@ async def produce_jobs_from_creator(
                 summary.fetched_posts += 1
                 if not _post_matches_filters(post, start_time, end_time, keywords):
                     continue
+                if post_filter is not None and not post_filter(post):
+                    continue
                 if decision := await active_engine.evaluate(post, context):
                     summary.blocked_by[decision.blocker_id] = summary.blocked_by.get(decision.blocker_id, 0) + 1
                     continue
 
                 summary.accepted_posts += 1
+                summary.accepted_post_ids.append(post.id)
                 post_path = _creator_post_path(post, path, selected_mix_posts, naming)
                 if not selected_mix_posts and save_creator_indices:
                     indexed_posts[post.id] = post
@@ -506,11 +516,7 @@ async def _emit_revision_jobs(
     try:
         revisions = await client.list_post_revisions(service, creator_id, post.id)
         for revision in revisions:
-            revision_path = (
-                post_path
-                / naming.post_structure.revisions
-                / generate_revision_path_name(revision, naming)
-            )
+            revision_path = post_path / naming.post_structure.revisions / generate_revision_path_name(revision, naming)
             revision_jobs = await create_job_from_post(
                 post=revision,
                 post_path=revision_path,

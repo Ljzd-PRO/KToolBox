@@ -120,6 +120,47 @@ async def test_sync_coordinator_isolates_creator_failure(tmp_path: Path) -> None
     assert summary.creators[0].failure.stage is FailureStage.job_generation
 
 
+async def test_sync_coordinator_attributes_download_failures_to_creator(tmp_path: Path) -> None:
+    client = SimpleNamespace(
+        get_creator_profile=AsyncMock(
+            side_effect=lambda service, creator_id: CreatorProfile(
+                id=creator_id,
+                service=service,
+                name=f"Artist {creator_id}",
+            )
+        )
+    )
+
+    async def produce(service: str, creator_id: str, path: Path, sink, **kwargs: object) -> ActionRet:
+        await sink(Job(path=path, server_path=f"/{creator_id}", alt_filename=creator_id))
+        return ActionRet(
+            data=CreatorJobGeneration(
+                fetched_posts=1,
+                accepted_posts=1,
+                accepted_post_ids=[creator_id],
+                generated_jobs=1,
+            )
+        )
+
+    async def download(queued: QueuedJob, client, observer) -> DownloaderRet[str]:
+        if queued.creator_key == "fanbox:bad":
+            return DownloaderRet(code=RetCodeEnum.GeneralFailure, message="failed")
+        return DownloaderRet(data=queued.job.alt_filename)
+
+    coordinator = SyncCoordinator(
+        client,
+        download_pool=DownloadWorkerPool(2, download=download),
+    )
+    with patch("ktoolbox.sync.produce_jobs_from_creator", produce):
+        summary = await coordinator.run([creator("bad"), creator("good")], SyncOptions(output=tmp_path))
+
+    assert not summary.successful
+    results = {result.creator.key: result for result in summary.creators}
+    assert results["fanbox:bad"].download_failures == 1
+    assert not results["fanbox:bad"].successful
+    assert results["fanbox:good"].successful
+
+
 async def test_sync_coordinator_rejects_empty_target_list() -> None:
     with pytest.raises(ValueError, match="creator concurrency must be positive"):
         SyncCoordinator(SimpleNamespace(), creator_concurrency=0)  # type: ignore[arg-type]

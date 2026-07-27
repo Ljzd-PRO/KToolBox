@@ -101,6 +101,7 @@ class DownloadSummary:
     existed: int = 0
     failed: int = 0
     failures: list[FailureItem] = field(default_factory=list)
+    creator_failures: dict[str, int] = field(default_factory=dict)
 
     @property
     def successful(self) -> bool:
@@ -178,6 +179,9 @@ class DownloadWorkerPool:
                         self.reporter.artifact_created(queued.job.path / result.data)
                 else:
                     summary.failed += 1
+                    summary.creator_failures[queued.creator_key] = (
+                        summary.creator_failures.get(queued.creator_key, 0) + 1
+                    )
                     failure = (
                         failure_from_http_status(
                             result.status_code,
@@ -200,6 +204,7 @@ class DownloadWorkerPool:
                 raise
             except Exception as error:
                 summary.failed += 1
+                summary.creator_failures[queued.creator_key] = summary.creator_failures.get(queued.creator_key, 0) + 1
                 failure = classify_failure(
                     error,
                     stage=FailureStage.file_write if isinstance(error, OSError) else FailureStage.file_request,

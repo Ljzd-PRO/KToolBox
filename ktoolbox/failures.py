@@ -67,8 +67,9 @@ class TaskFailureReport(BaseModel):
 
 
 class TaskExecutionError(RuntimeError):
-    def __init__(self, report: TaskFailureReport) -> None:
+    def __init__(self, report: TaskFailureReport, *, result: object | None = None) -> None:
         self.report = report
+        self.result = result
         super().__init__(report.summary)
 
 

@@ -27,6 +27,7 @@ def post(
     title: str = "Title",
     content: str | None = None,
     substring: str | None = None,
+    added: datetime | None = None,
     published: datetime | None = None,
 ) -> Post:
     return Post(
@@ -36,6 +37,7 @@ def post(
         title=title,
         content=content,
         substring=substring,
+        added=added,
         published=published,
     )
 
@@ -414,7 +416,36 @@ async def test_produce_creator_jobs_emits_before_fetching_next_page(tmp_path: Pa
 
     assert result.data is not None
     assert result.data.generated_jobs == 2
+    assert result.data.accepted_post_ids == ["first", "second"]
     assert events == ["page:first", "sink:/first", "page:second", "sink:/second"]
+
+
+@pytest.mark.asyncio
+async def test_produce_creator_jobs_applies_additional_post_filter_before_generation(tmp_path: Path) -> None:
+    selected = post("selected")
+    skipped = post("skipped")
+
+    with (
+        patch("ktoolbox.action.job.fetch_creator_posts", page_source([selected, skipped])),
+        patch("ktoolbox.action.job.create_job_from_post", new_callable=AsyncMock, return_value=[]) as create,
+    ):
+        result = await produce_jobs_from_creator(
+            "fanbox",
+            "creator",
+            tmp_path,
+            AsyncMock(),
+            length=2,
+            start_time=None,
+            end_time=None,
+            post_filter=lambda item: item.id == "selected",
+            client=SimpleNamespace(list_post_revisions=AsyncMock()),
+        )
+
+    assert result.data is not None
+    assert result.data.fetched_posts == 2
+    assert result.data.accepted_posts == 1
+    assert result.data.accepted_post_ids == ["selected"]
+    create.assert_awaited_once()
 
 
 @pytest.mark.asyncio

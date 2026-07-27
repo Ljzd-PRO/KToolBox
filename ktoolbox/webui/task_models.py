@@ -210,6 +210,21 @@ class TaskAttempt(BaseModel):
     failure: TaskFailureReport | None = None
 
 
+class CreatorTaskExecutionResult(BaseModel):
+    creator_key: str
+    accepted_post_ids: list[str] = Field(default_factory=list)
+    generation_successful: bool
+    download_failures: int = Field(default=0, ge=0)
+
+    @property
+    def successful(self) -> bool:
+        return self.generation_successful and self.download_failures == 0
+
+
+class TaskExecutionResult(BaseModel):
+    creators: list[CreatorTaskExecutionResult] = Field(default_factory=list)
+
+
 class TaskEvent(BaseModel):
     id: int
     task_id: str | None = None

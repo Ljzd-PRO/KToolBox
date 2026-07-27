@@ -25,7 +25,13 @@ from ktoolbox.project_config import ProjectConfiguration
 from ktoolbox.reporting import ProgressReporter
 from ktoolbox.sync import SyncCoordinator, SyncOptions
 from ktoolbox.utils import parse_webpage_url
-from ktoolbox.webui.task_models import DownloadTaskSpec, SyncTaskSpec, TaskRecord
+from ktoolbox.webui.task_models import (
+    CreatorTaskExecutionResult,
+    DownloadTaskSpec,
+    SyncTaskSpec,
+    TaskExecutionResult,
+    TaskRecord,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -42,7 +48,7 @@ class TaskExecutionSnapshot:
 
 TaskExecutor = Callable[
     [TaskRecord, TaskExecutionSnapshot, ProgressReporter],
-    Awaitable[None],
+    Awaitable[TaskExecutionResult | None],
 ]
 
 
@@ -54,12 +60,12 @@ class CoreTaskExecutor:
         task: TaskRecord,
         snapshot: TaskExecutionSnapshot,
         reporter: ProgressReporter,
-    ) -> None:
+    ) -> TaskExecutionResult | None:
         with snapshot.runtime.activate():
             if isinstance(task.spec, DownloadTaskSpec):
                 await self._download(task.spec, snapshot.project, reporter)
-            else:
-                await self._sync(task.spec, snapshot.project, reporter)
+                return None
+            return await self._sync(task.spec, snapshot.project, reporter)
 
     async def _download(
         self,
@@ -139,7 +145,7 @@ class CoreTaskExecutor:
         spec: SyncTaskSpec,
         project: ProjectConfiguration,
         reporter: ProgressReporter,
-    ) -> None:
+    ) -> TaskExecutionResult:
         from ktoolbox.configuration import config
 
         async with create_pawchive_client() as client:
@@ -163,21 +169,34 @@ class CoreTaskExecutor:
                     keywords_exclude=spec.keywords_exclude or set(config.job.keywords_exclude),
                 ),
             )
+        result = TaskExecutionResult(
+            creators=[
+                CreatorTaskExecutionResult(
+                    creator_key=creator_result.creator.key,
+                    accepted_post_ids=(
+                        creator_result.generation.accepted_post_ids if creator_result.generation is not None else []
+                    ),
+                    generation_successful=creator_result.error is None,
+                    download_failures=creator_result.download_failures,
+                )
+                for creator_result in summary.creators
+            ]
+        )
         if not summary.successful:
             creator_failures = sum(not result.successful for result in summary.creators)
             items = [result.failure for result in summary.creators if result.failure is not None]
             items.extend(summary.downloads.failures)
-            raise TaskExecutionError(
-                failure_report(
-                    items,
-                    creator_failures=creator_failures,
-                    file_failures=summary.downloads.failed,
-                    summary=(
-                        f"Synchronization finished with {creator_failures} creator failures "
-                        f"and {summary.downloads.failed} file failures"
-                    ),
-                )
+            report = failure_report(
+                items,
+                creator_failures=creator_failures,
+                file_failures=summary.downloads.failed,
+                summary=(
+                    f"Synchronization finished with {creator_failures} creator failures "
+                    f"and {summary.downloads.failed} file failures"
+                ),
             )
+            raise TaskExecutionError(report, result=result)
+        return result
 
     @staticmethod
     def _download_identity(spec: DownloadTaskSpec) -> tuple[str, str, str, str | None]:
