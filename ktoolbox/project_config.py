@@ -373,9 +373,7 @@ class ProjectConfiguration(BaseModel):
             plan_names.add(normalized_name)
             missing = [target for target in plan.creators if target.casefold() not in keys]
             if missing:
-                raise ValueError(
-                    f"automatic sync plan {plan.name!r} references missing creators: {', '.join(missing)}"
-                )
+                raise ValueError(f"automatic sync plan {plan.name!r} references missing creators: {', '.join(missing)}")
         return self
 
     def find_creator(self, target: str) -> CreatorReference | None:
