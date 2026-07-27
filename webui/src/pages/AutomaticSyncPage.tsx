@@ -31,6 +31,14 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { CronExpressionParser } from "cron-parser";
+import cronstrue from "cronstrue";
+import "cronstrue/locales/fr";
+import "cronstrue/locales/ja";
+import "cronstrue/locales/ko";
+import "cronstrue/locales/ru";
+import "cronstrue/locales/zh_CN";
+import "cronstrue/locales/zh_TW";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -435,7 +443,7 @@ export function AutomaticSyncPage() {
         {plans.length ? (
           <>
             <MobileSortControls
-              className="lg:hidden"
+              className="xl:hidden"
               descriptor={planSort}
               options={[
                 { value: "name", label: t("automaticSync.columns.name") },
@@ -446,7 +454,7 @@ export function AutomaticSyncPage() {
               ]}
               onChange={(value) => value && setPlanSort(value)}
             />
-            <DataTableFrame className="hidden lg:block">
+            <DataTableFrame className="hidden xl:block">
               <Table.Content aria-label={t("automaticSync.plans")} sortDescriptor={planSort} onSortChange={setPlanSort}>
                 <Table.Header>
                   <SortableColumn id="name" icon={IconCalendarRepeat} isRowHeader>{t("automaticSync.columns.name")}</SortableColumn>
@@ -502,7 +510,7 @@ export function AutomaticSyncPage() {
                 </Table.Body>
               </Table.Content>
             </DataTableFrame>
-            <div className="grid gap-3 lg:hidden">
+            <div className="grid gap-3 md:grid-cols-2 xl:hidden">
               {sortedPlans.map((plan) => (
                 <Surface className="grid gap-3 rounded-lg border border-border p-3" key={plan.id}>
                   <div className="flex min-w-0 items-start justify-between gap-3">
@@ -550,7 +558,7 @@ export function AutomaticSyncPage() {
         {updates.length ? (
           <>
             <MobileSortControls
-              className="lg:hidden"
+              className="xl:hidden"
               descriptor={updateSort}
               options={[
                 { value: "creator", label: t("automaticSync.columns.creator") },
@@ -560,7 +568,7 @@ export function AutomaticSyncPage() {
               ]}
               onChange={(value) => value && setUpdateSort(value)}
             />
-            <DataTableFrame className="hidden lg:block">
+            <DataTableFrame className="hidden xl:block">
               <Table.Content aria-label={t("automaticSync.updates")} sortDescriptor={updateSort} onSortChange={setUpdateSort}>
                 <Table.Header>
                   <SortableColumn id="creator" icon={IconUser} isRowHeader>{t("automaticSync.columns.creator")}</SortableColumn>
@@ -580,7 +588,7 @@ export function AutomaticSyncPage() {
                 </Table.Body>
               </Table.Content>
             </DataTableFrame>
-            <div className="grid gap-3 lg:hidden">
+            <div className="grid gap-3 md:grid-cols-2 xl:hidden">
               {sortedUpdates.map((item) => (
                 <Surface className="flex items-center justify-between gap-3 rounded-lg border border-border p-3" key={`${item.service}:${item.creator_id}`}>
                   <div className="min-w-0">
@@ -601,7 +609,7 @@ export function AutomaticSyncPage() {
         {runs.length ? (
           <>
             <MobileSortControls
-              className="lg:hidden"
+              className="xl:hidden"
               descriptor={runSort}
               options={[
                 { value: "name", label: t("automaticSync.columns.name") },
@@ -611,7 +619,7 @@ export function AutomaticSyncPage() {
               ]}
               onChange={(value) => value && setRunSort(value)}
             />
-            <DataTableFrame className="hidden lg:block">
+            <DataTableFrame className="hidden xl:block">
               <Table.Content aria-label={t("automaticSync.runs")} sortDescriptor={runSort} onSortChange={setRunSort}>
                 <Table.Header>
                   <SortableColumn id="name" icon={IconCalendarRepeat} isRowHeader>{t("automaticSync.columns.name")}</SortableColumn>
@@ -633,7 +641,7 @@ export function AutomaticSyncPage() {
                 </Table.Body>
               </Table.Content>
             </DataTableFrame>
-            <div className="grid gap-3 lg:hidden">
+            <div className="grid gap-3 md:grid-cols-2 xl:hidden">
               {sortedRuns.map((run) => (
                 <Surface className="grid gap-2 rounded-lg border border-border p-3" key={run.id}>
                   <div className="flex items-start justify-between gap-3">
@@ -722,6 +730,9 @@ function PlanEditor({
   const allVisibleSelected = visibleCreators.length > 0 && visibleCreators.every((creator) => draft.creators.includes(creatorKey(creator)));
   const selectedDate: DateValue | null = draft.initial_start_date ? parseDate(draft.initial_start_date) : null;
   const timezone = draft.schedule.timezone;
+  const cronDetails = draft.schedule.kind === "cron"
+    ? describeCron(draft.schedule.expression, timezone, i18n.resolvedLanguage ?? i18n.language)
+    : null;
   const timezoneOptions = [...new Set([Intl.DateTimeFormat().resolvedOptions().timeZone, ...timezoneSuggestions])]
     .filter(Boolean)
     .map((value) => ({ value, label: value }));
@@ -961,6 +972,24 @@ function PlanEditor({
               />
             </div>
           )}
+          {cronDetails ? (
+            <div aria-live="polite" className="grid gap-2 border-t border-border pt-4">
+              <p className="text-xs font-semibold uppercase text-muted">{t("automaticSync.schedulePreview")}</p>
+              <p className="text-sm leading-relaxed text-foreground">
+                {cronDetails.description}
+                <span className="text-muted"> · </span>
+                <code className="text-xs text-muted">{timezone}</code>
+              </p>
+              <p className="text-xs font-semibold text-muted">{t("automaticSync.nextRuns")}</p>
+              <ol className="grid gap-1 text-sm text-muted sm:grid-cols-3">
+                {cronDetails.next.map((value) => (
+                  <li className="rounded-md bg-[var(--surface-tertiary)] px-3 py-2" key={value.toISOString()}>
+                    {formatDateTime(value.toISOString(), i18n.resolvedLanguage ?? i18n.language)}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ) : null}
         </FormSurface>
 
         <FormSurface className="grid gap-4">
@@ -1030,6 +1059,35 @@ function validateDraft(draft: PlanDraft): string | null {
   if (draft.schedule.kind === "cron" && draft.schedule.expression.trim().split(/\s+/u).length !== 5) return "automaticSync.validation.cron";
   if (draft.schedule.kind === "interval" && intervalMinutes(draft) < 15) return "automaticSync.validation.interval";
   return null;
+}
+
+function describeCron(expression: string, timezone: string, language: string) {
+  try {
+    const interval = CronExpressionParser.parse(expression, {
+      currentDate: new Date(),
+      tz: timezone,
+    });
+    const next = Array.from({ length: 3 }, () => interval.next().toDate());
+    return {
+      description: cronstrue.toString(expression, {
+        locale: cronLocale(language),
+        use24HourTimeFormat: true,
+      }),
+      next,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function cronLocale(language: string): string {
+  if (language.startsWith("zh-Hant")) return "zh_TW";
+  if (language.startsWith("zh")) return "zh_CN";
+  if (language.startsWith("ja")) return "ja";
+  if (language.startsWith("ko")) return "ko";
+  if (language.startsWith("fr")) return "fr";
+  if (language.startsWith("ru")) return "ru";
+  return "en";
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

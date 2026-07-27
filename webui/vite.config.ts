@@ -28,6 +28,22 @@ export default defineConfig({
               name: "data-runtime",
               test: /node_modules\/(@tanstack|i18next|react-i18next)\//,
             },
+            {
+              name: "schedule-runtime",
+              test: /node_modules\/(?:cron-parser|cronstrue)\//,
+            },
+            {
+              name: "form-runtime",
+              test: /node_modules\/(?:@hookform|react-hook-form|zod)\//,
+            },
+            {
+              name: "icon-runtime",
+              test: /node_modules\/@tabler\/icons-react\//,
+            },
+            {
+              name: "locales",
+              test: /\/src\/locales\//,
+            },
           ],
         },
       },

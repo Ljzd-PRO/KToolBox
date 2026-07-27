@@ -132,6 +132,8 @@ describe("automatic synchronization page", () => {
     const idInput = within(dialog).getByLabelText("Plan ID");
     expect(idInput).toHaveAttribute("readonly");
     expect((idInput as HTMLInputElement).value).toMatch(/^auto-[a-f0-9-]+$/u);
+    expect(within(dialog).getByText("Next three runs", { exact: true })).toBeInTheDocument();
+    expect(within(dialog).getAllByRole("listitem")).toHaveLength(3);
 
     await user.type(nameInput, "Weekly references");
     await user.click(within(dialog).getByRole("checkbox", { name: "Studio Sample" }));
