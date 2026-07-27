@@ -19,12 +19,14 @@ L'éditeur visuel couvre les fréquences horaires, quotidiennes, hebdomadaires e
 
 ## Points de contrôle et mises à jour
 
-L'heure de fin est figée au démarrage. KToolBox relit une fenêtre de 24 heures avant le dernier point réussi et déduplique par plateforme, ID de créateur et ID d'œuvre.
+L'heure de fin est figée au démarrage. KToolBox privilégie l'horodatage `added` de Pawchive, interprété comme UTC, relit une fenêtre de 24 heures avant le dernier point réussi et déduplique par plateforme, ID de créateur et ID d'œuvre.
 
 - Chaque créateur réussi avance son propre point de contrôle.
 - Un créateur en échec conserve son ancien point.
 - Une première exécution sans date établit une base sans compter tout l'historique comme nouveau.
 - Une exécution manuelle utilise les mêmes points de contrôle.
 - Les mises à jour n'affichent que les créateurs et les nombres ; aucun titre ni média n'est chargé.
+
+## Pause, conflits et arrêts
 
 Mettre un plan en pause bloque les futurs déclenchements sans arrêter la tâche courante. Les exécutions manquées pendant l'arrêt de KToolBox ne sont pas rejouées.

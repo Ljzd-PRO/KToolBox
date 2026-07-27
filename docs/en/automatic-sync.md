@@ -19,7 +19,7 @@ Cron plans support common hourly, daily, weekly, and monthly schedules through t
 
 ## Checkpoints and recent updates
 
-Each run fixes its end time before synchronization starts. KToolBox checks a 24-hour overlap before the last successful checkpoint and deduplicates works by platform, creator ID, and work ID. This avoids gaps without counting the same work twice.
+Each run fixes its end time before synchronization starts. KToolBox prefers Pawchive's UTC-like `added` time, checks a 24-hour overlap before the last successful checkpoint, and deduplicates works by platform, creator ID, and work ID. This avoids gaps without counting the same work twice.
 
 - A successful creator advances its own checkpoint.
 - A failed creator keeps its previous checkpoint; other successful creators still advance.
