@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta, timezone
 from uuid import uuid4
+from zoneinfo import ZoneInfo
 
 import aiosqlite
 
@@ -353,13 +354,18 @@ class AutomaticSyncStore:
         )
 
 
-def update_range_days(value: str) -> timedelta | None:
-    return {
+def update_range_start(value: str, *, now: datetime, timezone_name: str) -> datetime:
+    if value == "today":
+        zone = ZoneInfo(timezone_name)
+        local_midnight = datetime.combine(now.astimezone(zone).date(), time.min, tzinfo=zone)
+        return local_midnight.astimezone(timezone.utc)
+    duration = {
+        "1d": timedelta(days=1),
         "7d": timedelta(days=7),
+        "14d": timedelta(days=14),
         "30d": timedelta(days=30),
-        "90d": timedelta(days=90),
-        "all": None,
     }[value]
+    return now - duration
 
 
 def _run_from_row(row: aiosqlite.Row) -> AutomaticSyncRunRecord:

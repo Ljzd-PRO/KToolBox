@@ -19,6 +19,11 @@ test("automatic sync stays readable in a sidebar-constrained tablet layout", asy
   await expect(page.getByRole("paragraph").filter({ hasText: "Weekly reference" })).toBeVisible();
   await expect(page.locator(".app-table-frame").first()).toBeHidden();
   await expect(page.getByRole("button", { name: "Run now" }).first()).toBeVisible();
+  await expect(page.getByText("Period: Last 30 days", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: /Statistics period/ }).click();
+  await page.getByRole("option", { name: "Last 14 days", exact: true }).click();
+  await expect(page.getByText("Period: Last 14 days", { exact: true })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Statistics period" })).toBeHidden();
   await expect.poll(
     () => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth),
   ).toBe(0);

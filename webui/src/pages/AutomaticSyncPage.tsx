@@ -78,7 +78,7 @@ import type {
   CreatorRosterItem,
 } from "../types";
 
-type UpdatePeriod = "7d" | "30d" | "90d" | "all";
+type UpdatePeriod = "today" | "1d" | "7d" | "14d" | "30d";
 type Frequency = "hourly" | "daily" | "weekly" | "monthly";
 type CronMode = "visual" | "advanced";
 
@@ -237,6 +237,12 @@ export function AutomaticSyncPage() {
   const [planSort, setPlanSort] = useState<SortDescriptor>({ column: "name", direction: "ascending" });
   const [updateSort, setUpdateSort] = useState<SortDescriptor>({ column: "discovered", direction: "descending" });
   const [runSort, setRunSort] = useState<SortDescriptor>({ column: "started", direction: "descending" });
+  const updateTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  const updatePeriodOptions = (["today", "1d", "7d", "14d", "30d"] as const).map((value) => ({
+    value,
+    label: t(`automaticSync.periods.${value}`),
+  }));
+  const updatePeriodLabel = updatePeriodOptions.find((option) => option.value === period)?.label ?? period;
 
   const plansQuery = useQuery({
     queryKey: ["auto-sync-plans"],
@@ -251,8 +257,11 @@ export function AutomaticSyncPage() {
     queryFn: () => api<AutomaticSyncRun[]>("/auto-sync/runs?limit=100"),
   });
   const updatesQuery = useQuery({
-    queryKey: ["auto-sync-updates", period],
-    queryFn: () => api<AutomaticSyncUpdate[]>(`/auto-sync/updates?period=${period}`),
+    queryKey: ["auto-sync-updates", period, updateTimezone],
+    queryFn: () => {
+      const parameters = new URLSearchParams({ period, timezone: updateTimezone });
+      return api<AutomaticSyncUpdate[]>(`/auto-sync/updates?${parameters.toString()}`);
+    },
   });
 
   const plans = plansQuery.data?.plans ?? [];
@@ -407,7 +416,6 @@ export function AutomaticSyncPage() {
     { label: t("automaticSync.stats.active"), value: plans.filter((plan) => plan.enabled).length, icon: IconCalendarRepeat, tone: "blue" },
     { label: t("automaticSync.stats.paused"), value: plans.filter((plan) => !plan.enabled).length, icon: IconPlayerPause, tone: "yellow" },
     { label: t("automaticSync.stats.running"), value: activeRuns.length, icon: IconRefresh, tone: "teal" },
-    { label: t("automaticSync.stats.newWorks"), value: newWorkCount, icon: IconHistory, tone: "green" },
   ];
 
   return (
@@ -426,7 +434,7 @@ export function AutomaticSyncPage() {
 
       <section aria-label={t("automaticSync.title")} className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map(({ label, value, icon: Icon, tone }) => (
-          <Surface className="stat-tile rounded-lg border border-border p-4" data-tone={tone} key={label}>
+          <Surface className="stat-tile h-full rounded-lg border border-border p-4" data-tone={tone} key={label}>
             <div className="flex items-center justify-between gap-3">
               <span className="text-sm font-medium text-muted">{label}</span>
               <span className="stat-icon grid size-9 place-items-center rounded-lg" aria-hidden="true">
@@ -436,6 +444,24 @@ export function AutomaticSyncPage() {
             <p className="mt-3 text-3xl font-semibold tabular-nums text-foreground">{value}</p>
           </Surface>
         ))}
+        <Surface className="stat-tile h-full rounded-lg border border-border p-4" data-tone="green">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-sm font-medium text-muted">{t("automaticSync.stats.newWorks")}</span>
+            <span className="stat-icon grid size-9 place-items-center rounded-lg" aria-hidden="true">
+              <IconHistory size={18} />
+            </span>
+          </div>
+          <p className="mt-3 text-3xl font-semibold tabular-nums text-foreground">{newWorkCount}</p>
+          <div className="mt-3">
+            <SelectField
+              icon={IconCalendarClock}
+              label={t("automaticSync.statsPeriod")}
+              value={period}
+              options={updatePeriodOptions}
+              onChange={(value) => setPeriod(value as UpdatePeriod)}
+            />
+          </div>
+        </Surface>
       </section>
 
       <section className="grid gap-3">
@@ -546,14 +572,9 @@ export function AutomaticSyncPage() {
       <section className="grid gap-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <h2 className="text-lg font-semibold text-foreground">{t("automaticSync.updates")}</h2>
-          <div className="w-full sm:w-48">
-            <SelectField
-              label={t("automaticSync.period")}
-              value={period}
-              options={(["7d", "30d", "90d", "all"] as const).map((value) => ({ value, label: t(`automaticSync.periods.${value}`) }))}
-              onChange={(value) => setPeriod(value as UpdatePeriod)}
-            />
-          </div>
+          <Chip color="accent" size="sm" variant="soft">
+            {t("automaticSync.periodSummary", { period: updatePeriodLabel })}
+          </Chip>
         </div>
         {updates.length ? (
           <>

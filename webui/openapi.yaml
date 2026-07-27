@@ -1993,13 +1993,23 @@ paths:
         required: false
         schema:
           enum:
+          - today
+          - 1d
           - 7d
+          - 14d
           - 30d
-          - 90d
-          - all
           type: string
           default: 30d
           title: Period
+      - name: timezone
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 128
+          default: UTC
+          title: Timezone
       responses:
         '200':
           description: Successful Response

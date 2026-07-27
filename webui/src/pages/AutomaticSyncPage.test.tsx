@@ -53,8 +53,9 @@ afterEach(() => {
 
 describe("automatic synchronization page", () => {
   it("renders plans, recent creator counts, and task-linked run history", async () => {
+    const user = userEvent.setup();
     window.history.replaceState({}, "", "/auto-sync");
-    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       const path = String(input);
       if (path.endsWith("/session")) return json(session);
       if (path.endsWith("/auto-sync/plans")) {
@@ -91,7 +92,8 @@ describe("automatic synchronization page", () => {
         }]);
       }
       throw new Error(`Unexpected request: ${path}`);
-    }));
+    });
+    vi.stubGlobal("fetch", fetchMock);
 
     const { container } = render(<BrowserRouter><App /></BrowserRouter>);
 
@@ -101,6 +103,16 @@ describe("automatic synchronization page", () => {
     expect(screen.getAllByText("+3").length).toBeGreaterThan(0);
     expect(screen.getAllByRole("link", { name: "View task" })[0]).toHaveAttribute("href", "/tasks/task-1");
     expect(container.querySelectorAll(".table-column-icon").length).toBeGreaterThan(8);
+    expect(screen.getByText("Period: Last 30 days")).toBeInTheDocument();
+
+    const periodSelect = screen.getByRole("button", { name: /Statistics period/u });
+    await user.click(periodSelect);
+    await user.click(await screen.findByRole("option", { name: "Last 14 days" }));
+    expect(await screen.findByText("Period: Last 14 days")).toBeInTheDocument();
+    await vi.waitFor(() => {
+      expect(fetchMock.mock.calls.some(([input]) => String(input).includes("period=14d"))).toBe(true);
+    });
+    expect(fetchMock.mock.calls.some(([input]) => String(input).includes("timezone="))).toBe(true);
   });
 
   it("creates a plan with a stable generated ID and selected creators", async () => {

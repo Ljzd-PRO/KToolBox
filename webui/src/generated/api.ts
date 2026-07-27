@@ -4166,7 +4166,8 @@ export interface operations {
     list_automatic_sync_updates: {
         parameters: {
             query?: {
-                period?: "7d" | "30d" | "90d" | "all";
+                period?: "today" | "1d" | "7d" | "14d" | "30d";
+                timezone?: string;
             };
             header?: never;
             path?: never;

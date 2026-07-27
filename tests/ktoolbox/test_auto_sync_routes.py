@@ -142,9 +142,22 @@ async def test_automatic_sync_plan_crud_run_conflict_and_history(tmp_path: Path)
         runs = await client.get("/api/v1/auto-sync/runs")
         assert runs.status_code == 200
         assert runs.json()[0]["task_id"] == task_id
-        updates = await client.get("/api/v1/auto-sync/updates", params={"period": "7d"})
+        updates = await client.get(
+            "/api/v1/auto-sync/updates",
+            params={"period": "today", "timezone": "Asia/Shanghai"},
+        )
         assert updates.status_code == 200
         assert updates.json() == []
+        invalid_timezone = await client.get(
+            "/api/v1/auto-sync/updates",
+            params={"period": "today", "timezone": "Not/AZone"},
+        )
+        assert invalid_timezone.status_code == 422
+        invalid_period = await client.get(
+            "/api/v1/auto-sync/updates",
+            params={"period": "90d", "timezone": "UTC"},
+        )
+        assert invalid_period.status_code == 422
 
         creator_delete = await client.delete("/api/v1/creators/fanbox/creator", headers=csrf)
         assert creator_delete.status_code == 409

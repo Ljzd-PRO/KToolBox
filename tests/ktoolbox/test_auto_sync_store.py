@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from ktoolbox.project_config import AutomaticSyncPlan
 from ktoolbox.webui.auto_sync_models import AutomaticSyncRunStatus, AutomaticSyncRunTrigger
-from ktoolbox.webui.auto_sync_store import AutomaticSyncStore
+from ktoolbox.webui.auto_sync_store import AutomaticSyncStore, update_range_start
 from ktoolbox.webui.database import WebUIDatabase
 from ktoolbox.webui.event_store import WebUIEventStore
 from ktoolbox.webui.task_models import (
@@ -25,6 +25,22 @@ def plan(plan_id: str, *creators: str) -> AutomaticSyncPlan:
         name=f"Plan {plan_id}",
         creators=list(creators),
     )
+
+
+def test_update_range_start_distinguishes_local_today_and_rolling_windows() -> None:
+    now = datetime(2026, 7, 27, 4, 30, tzinfo=UTC)
+
+    assert update_range_start("today", now=now, timezone_name="Asia/Shanghai") == datetime(
+        2026,
+        7,
+        26,
+        16,
+        tzinfo=UTC,
+    )
+    assert update_range_start("1d", now=now, timezone_name="Asia/Shanghai") == now - timedelta(days=1)
+    assert update_range_start("7d", now=now, timezone_name="UTC") == now - timedelta(days=7)
+    assert update_range_start("14d", now=now, timezone_name="UTC") == now - timedelta(days=14)
+    assert update_range_start("30d", now=now, timezone_name="UTC") == now - timedelta(days=30)
 
 
 async def create_automatic_task(

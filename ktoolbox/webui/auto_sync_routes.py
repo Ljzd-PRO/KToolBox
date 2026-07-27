@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from datetime import timedelta
 from pathlib import Path
 from typing import Annotated, cast
+from zoneinfo import ZoneInfoNotFoundError
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, Response, status
 
@@ -16,7 +16,7 @@ from ktoolbox.webui.auto_sync_models import (
     AutomaticSyncUpdateSummary,
 )
 from ktoolbox.webui.auto_sync_scheduler import AutomaticSyncConflictError, AutoSyncScheduler
-from ktoolbox.webui.auto_sync_store import AutomaticSyncStore, update_range_days
+from ktoolbox.webui.auto_sync_store import AutomaticSyncStore, update_range_start
 from ktoolbox.webui.config_monitor import ConfigurationChangeMonitor
 from ktoolbox.webui.config_store import content_revision
 from ktoolbox.webui.database import WebUISession, utc_now
@@ -211,9 +211,15 @@ def create_auto_sync_router(project_root: Path) -> APIRouter:
         request: Request,
         _: SessionDependency,
         period: AutomaticSyncUpdateRange = "30d",
+        timezone: Annotated[str, Query(min_length=1, max_length=128)] = "UTC",
     ) -> list[AutomaticSyncUpdateSummary]:
-        duration = update_range_days(period)
-        since = utc_now() - duration if isinstance(duration, timedelta) else None
+        try:
+            since = update_range_start(period, now=utc_now(), timezone_name=timezone)
+        except (ZoneInfoNotFoundError, ValueError) as error:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="invalid IANA time zone",
+            ) from error
         return await automatic_store(request).recent_updates(since=since)
 
     return router

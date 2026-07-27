@@ -64,4 +64,4 @@ class AutomaticSyncRunNowResponse(BaseModel):
     task_id: str
 
 
-AutomaticSyncUpdateRange = Literal["7d", "30d", "90d", "all"]
+AutomaticSyncUpdateRange = Literal["today", "1d", "7d", "14d", "30d"]
