@@ -19,6 +19,7 @@ nav:
     - Guide: commands/guide.md
     - Reference: commands/reference.md
   - WebUI: webui.md
+  - Automatic Sync: automatic-sync.md
   - Naming Format: naming.md
   - Configuration:
     - Guide: configuration/guide.md
@@ -48,6 +49,7 @@ plugins:
             More: 更多
             Commands: 命令
             WebUI: WebUI
+            Automatic Sync: 自动同步
             Naming Format: 命名格式
             Configuration: 配置
             Guide: 向导
@@ -102,6 +104,7 @@ plugins:
             More: 更多
             Commands: 命令
             WebUI: WebUI
+            Automatic Sync: 自動同步
             Naming Format: 命名格式
             Configuration: 設定
             Guide: 指南
@@ -156,6 +159,7 @@ plugins:
             More: Дополнительно
             Commands: Команды
             WebUI: WebUI
+            Automatic Sync: Автоматическая синхронизация
             Naming Format: Формат имён
             Configuration: Конфигурация
             Guide: Руководство
@@ -210,6 +214,7 @@ plugins:
             More: その他
             Commands: コマンド
             WebUI: WebUI
+            Automatic Sync: 自動同期
             Naming Format: 命名形式
             Configuration: 設定
             Guide: ガイド
@@ -264,6 +269,7 @@ plugins:
             More: 더 보기
             Commands: 명령
             WebUI: WebUI
+            Automatic Sync: 자동 동기화
             Naming Format: 이름 형식
             Configuration: 설정
             Guide: 가이드
@@ -318,6 +324,7 @@ plugins:
             More: Plus d'informations
             Commands: Commandes
             WebUI: WebUI
+            Automatic Sync: Synchronisation automatique
             Naming Format: Format de nommage
             Configuration: Configuration
             Guide: Guide

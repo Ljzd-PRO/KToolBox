@@ -127,6 +127,8 @@ ktoolbox webui /path/to/project
 
 命名设置现为项目专属。“命名格式”页会校验模板、预览目录树、扫描真实下载根目录，并以原子启用和完整回滚的方式转换选中的作者。首次启动 WebUI 时会备份并迁移旧全局命名值。详见[命名格式指南](https://ktoolbox.readthedocs.io/latest/zh/naming/)。
 
+“自动同步”页支持创建多个 Cron 或固定间隔的作者同步计划，预览未来三次执行时间，暂停或立即执行，并按作者独立推进成功检查点。最近更新只汇总作者和新增作品数量，不加载标题或媒体。详见[自动同步指南](https://ktoolbox.readthedocs.io/latest/zh/automatic-sync/)。
+
 失败任务会保留按阶段分类且经过脱敏的报告，显示对应作者或文件、是否适合重试、安全字段路径和处理建议。紧凑移动端采用 64px 顶栏和 12px 页面间距，将外观控制收纳到小型 Popover，并按类别折叠 MCP 工具目录。
 
 作者清单以 Pawchive Profile 名称作为主身份，并使用可降级的 24 小时缓存。数据表支持本地化排序，概览统计可直接进入对应筛选视图；所有平台字段均使用 HeroUI ComboBox，提供 Patreon、Pixiv、Fanbox 建议且允许自定义值。

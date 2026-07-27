@@ -60,6 +60,7 @@ The main areas are:
 
 - **Overview:** project path, queue health, active transfer totals, and recent tasks. Each statistic is a keyboard-accessible link to the corresponding filtered task or creator view.
 - **Tasks:** create, edit, pause, resume, stop, rerun, delete, and inspect synchronization or single-work downloads. Select multiple rows for compatible bulk actions; only the readable target link opens details, so controls never trigger navigation.
+- **Automatic sync:** create multiple recurring creator plans, inspect recent update counts and run history, pause schedules, or run a plan immediately.
 - **Creators:** search Pawchive and add, annotate, enable, disable, or remove roster entries, including bulk enable, disable, and removal.
 - **Posts:** search without rendering remote media or expanded body text, inspect revisions, and create a download task.
 - **Blockers:** order and scope `field-match` blockers and compose nested `any`/`all`, contains, equals, regular expression, and existence conditions.
@@ -78,6 +79,12 @@ Platform fields use a HeroUI ComboBox with Patreon, Pixiv, and Fanbox suggestion
 Creator rows lead with the profile name returned by Pawchive. Names are cached for 24 hours, stale values remain available when refresh fails, and the creator ID is the fallback when no profile has ever loaded. The optional roster note remains independent and empty by default. When editing an existing creator, its platform and creator ID remain visible but read-only because they identify the stored roster entry.
 
 Overview recent tasks, task queues, creator rosters, and post results support controlled HeroUI column sorting. Text uses locale-aware natural ordering, while counts, progress, speeds, states, and timestamps use their real values. Mobile cards expose the same sort field and direction. Task sorting changes presentation only and never changes scheduler order.
+
+## Automatic synchronization
+
+The **Automatic sync** page supports multiple plans, selected creators, five-field Cron schedules, and anchored intervals of at least 15 minutes. Each plan has an IANA time zone, a first-run boundary, output options, and a preview of its next three runs. A manual run uses the same task queue and advances successful creator checkpoints without shifting an interval schedule.
+
+Automatic checks prefer Pawchive's UTC-like `added` time, overlap the previous successful checkpoint by 24 hours, and deduplicate works across all plans in the project. A first unlimited run establishes a baseline instead of reporting the entire archive as new. Missed runs while KToolBox is stopped are skipped, and an active run for the same plan prevents a duplicate trigger. See the [automatic synchronization guide](automatic-sync.md) for scheduling, checkpoint, and recovery details.
 
 ## Project naming
 

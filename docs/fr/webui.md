@@ -60,6 +60,7 @@ Les zones principales sont :
 
 - **Vue d'ensemble :** chemin du projet, état de la file, totaux des transferts actifs et tâches récentes.
 - **Tâches :** créer, modifier, mettre en pause, reprendre, arrêter, relancer, supprimer et examiner des synchronisations ou téléchargements uniques. Seul le lien de cible lisible ouvre le détail, afin qu'un contrôle ne déclenche jamais la navigation ; la sélection multiple permet les actions groupées compatibles.
+- **Synchronisation automatique :** créer plusieurs plans récurrents par créateur, consulter les mises à jour récentes et l’historique, suspendre ou exécuter immédiatement.
 - **Créateurs :** rechercher dans Pawchive et ajouter, modifier la note, activer, désactiver ou retirer des entrées, y compris par actions groupées.
 - **Publications :** rechercher sans afficher les médias distants ni le corps développé, examiner les révisions et créer une tâche de téléchargement.
 - **Règles d'exclusion :** ordonner et limiter `field-match`, composer des groupes `any`/`all` imbriqués et des conditions de contenu, égalité, expression régulière et existence.
@@ -74,6 +75,12 @@ Les zones principales sont :
 La création d'une tâche utilise deux onglets fixes sans commandes de débordement. Les dates de synchronisation restent dans un unique champ de plage HeroUI officiel au format `year/month/day - year/month/day`, tandis que « Aucune date de début » et « Aucune date de fin » effacent indépendamment la limite correspondante. Le décalage des publications progresse par pas de 50. Les filtres de titre utilisent des HeroUI Chip supprimables, créés avec une virgule ou Entrée. Le téléchargement d'une œuvre unique et l'ajout d'un créateur utilisent des champs HeroUI indépendants, séparés par des fragments de chemin Pawchive au style de code, tels que `/platform/user/creator/post/post` ; les séparateurs ne sont jamais simulés comme des champs de saisie.
 
 L'identifiant du créateur est placé en premier dans les lignes de bureau comme dans les entrées mobiles. La note facultative de la liste est affichée séparément et ne remplace jamais cet identifiant. Lors de la modification d'un créateur existant, sa plateforme et son identifiant restent visibles, mais en lecture seule, car ils identifient ensemble l'entrée enregistrée.
+
+## Synchronisation automatique
+
+La page **Synchronisation automatique** prend en charge plusieurs plans, plusieurs créateurs, les expressions Cron à cinq champs et les intervalles ancrés d’au moins 15 minutes. Chaque plan définit un fuseau IANA, une limite de première exécution, les options de sortie et un aperçu des trois prochaines exécutions. Une exécution immédiate utilise la même file et avance les points de contrôle des créateurs réussis sans déplacer l’axe de l’intervalle.
+
+Les vérifications privilégient l’horodatage `added` de Pawchive, interprété comme UTC, et recouvrent de 24 heures le dernier point de contrôle réussi. La déduplication au niveau du projet évite de compter deux fois la même œuvre entre plusieurs plans. Une première exécution sans date établit uniquement une base et ne marque pas toutes les archives comme nouvelles. Les exécutions manquées pendant l’arrêt sont ignorées, tout comme les déclenchements en double lorsqu’un plan est déjà actif. Consultez le [guide de synchronisation automatique](automatic-sync.md).
 
 ## Nommage du projet
 

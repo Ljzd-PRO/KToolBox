@@ -74,6 +74,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Preview existing creator, work, file, and byte counts before conversion; select creators individually and reject stale scans, active-task conflicts, unsafe symlinks, and destination collisions.
 - Apply naming changes as persistent background conversions with an operation journal, atomic activation, cancellation rollback, restart recovery, and empty-source cleanup.
 - Migrate legacy global naming fields before first-start project creation, back up dotenv files, remove migrated keys, and report the one-time change in both the terminal and WebUI.
+- Add project-scoped automatic synchronization plans with five-field Cron or fixed intervals, IANA time zones, future-run previews, pause and immediate-run controls, per-creator checkpoints, overlap-safe work deduplication, and privacy-preserving recent-update counts.
 
 ## Testing and quality
 
@@ -164,6 +165,7 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 转换前展示作者、作品、文件和字节统计，允许逐作者选择，并拒绝陈旧扫描、活动任务冲突、不安全符号链接和目标路径冲突。
 - 使用持久操作日志在后台执行命名转换，支持原子启用、取消回滚、重启恢复和空源目录清理。
 - 在首次创建项目配置前迁移旧全局命名字段，备份 dotenv 文件、删除已迁移键，并在终端与 WebUI 中显示一次性通知。
+- 新增项目级自动同步计划，支持五段 Cron 或固定间隔、IANA 时区、未来执行预览、暂停与立即执行、按作者推进检查点、重叠窗口作品去重，以及不加载标题和媒体的最近更新统计。
 
 ## 测试与质量
 
