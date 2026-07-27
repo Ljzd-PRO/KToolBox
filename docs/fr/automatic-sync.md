@@ -26,6 +26,7 @@ L'heure de fin est figée au démarrage. KToolBox privilégie l'horodatage `adde
 - Une première exécution sans date établit une base sans compter tout l'historique comme nouveau.
 - Une exécution manuelle utilise les mêmes points de contrôle.
 - Les mises à jour n'affichent que les créateurs et les nombres ; aucun titre ni média n'est chargé.
+- La carte **Nouvelles œuvres** contrôle la période du total et de la liste : **Aujourd’hui** commence à minuit local, tandis que les dernières 24 heures, 7, 14 et 30 jours sont des fenêtres glissantes.
 
 ## Pause, conflits et arrêts
 

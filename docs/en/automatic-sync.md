@@ -26,6 +26,7 @@ Each run fixes its end time before synchronization starts. KToolBox prefers Pawc
 - A first run with **No start date** establishes a baseline and does not count all history as new.
 - **Run now** uses and advances the same checkpoints as scheduled runs.
 - Recent updates show creator names and new-work counts only; titles and media are not loaded.
+- The **New works** card controls the period for both its total and the list below: **Today** uses local midnight, while **Last 24 hours**, 7, 14, and 30 days are rolling windows.
 
 ## Pause, conflicts, and missed runs
 
