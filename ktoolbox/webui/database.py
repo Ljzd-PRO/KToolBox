@@ -56,6 +56,7 @@ class WebUIDatabase:
                     status TEXT NOT NULL,
                     spec_json TEXT NOT NULL,
                     presentation_json TEXT,
+                    automatic_origin_json TEXT,
                     position INTEGER NOT NULL,
                     revision INTEGER NOT NULL DEFAULT 1,
                     progress_json TEXT NOT NULL DEFAULT '{}',
@@ -77,6 +78,7 @@ class WebUIDatabase:
                     finished_at TEXT,
                     error TEXT,
                     failure_json TEXT,
+                    result_json TEXT,
                     UNIQUE(task_id, sequence)
                 );
 
@@ -151,11 +153,51 @@ class WebUIDatabase:
                     acknowledged_at TEXT
                 );
 
+                CREATE TABLE IF NOT EXISTS automatic_sync_runs (
+                    id TEXT PRIMARY KEY,
+                    plan_id TEXT NOT NULL,
+                    plan_name TEXT NOT NULL,
+                    trigger TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    task_id TEXT REFERENCES tasks(id) ON DELETE SET NULL,
+                    scheduled_for TEXT,
+                    cutoff_at TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    started_at TEXT,
+                    finished_at TEXT,
+                    error TEXT
+                );
+
+                CREATE TABLE IF NOT EXISTS automatic_sync_checkpoints (
+                    plan_id TEXT NOT NULL,
+                    creator_key TEXT NOT NULL COLLATE NOCASE,
+                    checkpoint_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    PRIMARY KEY(plan_id, creator_key)
+                );
+
+                CREATE TABLE IF NOT EXISTS automatic_sync_observed_posts (
+                    service TEXT NOT NULL COLLATE NOCASE,
+                    creator_id TEXT NOT NULL COLLATE NOCASE,
+                    post_id TEXT NOT NULL,
+                    first_seen_at TEXT NOT NULL,
+                    plan_id TEXT NOT NULL,
+                    run_id TEXT NOT NULL,
+                    is_baseline INTEGER NOT NULL DEFAULT 0,
+                    PRIMARY KEY(service, creator_id, post_id)
+                );
+
                 CREATE INDEX IF NOT EXISTS task_events_cursor ON task_events(id);
                 CREATE INDEX IF NOT EXISTS tasks_queue ON tasks(status, position);
                 CREATE INDEX IF NOT EXISTS mcp_tokens_owner ON mcp_tokens(username, created_at);
                 CREATE INDEX IF NOT EXISTS naming_conversions_status
                     ON naming_conversions(status, created_at);
+                CREATE INDEX IF NOT EXISTS automatic_sync_runs_plan
+                    ON automatic_sync_runs(plan_id, created_at);
+                CREATE INDEX IF NOT EXISTS automatic_sync_runs_task
+                    ON automatic_sync_runs(task_id);
+                CREATE INDEX IF NOT EXISTS automatic_sync_updates_seen
+                    ON automatic_sync_observed_posts(is_baseline, first_seen_at);
                 """
             )
             await connection.execute(
@@ -200,6 +242,12 @@ class WebUIDatabase:
             await connection.execute(
                 "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
                 (9, utc_now().isoformat()),
+            )
+            await _ensure_column(connection, "tasks", "automatic_origin_json", "TEXT")
+            await _ensure_column(connection, "task_attempts", "result_json", "TEXT")
+            await connection.execute(
+                "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
+                (10, utc_now().isoformat()),
             )
             await connection.commit()
 

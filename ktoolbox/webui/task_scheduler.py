@@ -18,7 +18,9 @@ from ktoolbox.project_config import ProjectConfigStore
 from ktoolbox.utils import parse_webpage_url
 from ktoolbox.webui.task_executor import CoreTaskExecutor, TaskExecutionSnapshot, TaskExecutor
 from ktoolbox.webui.task_models import (
+    AutomaticTaskOrigin,
     SyncTaskSpec,
+    TaskExecutionResult,
     TaskPresentationSnapshot,
     TaskRecord,
     TaskSpec,
@@ -99,8 +101,9 @@ class TaskScheduler:
         self,
         spec: TaskSpec,
         presentation: TaskPresentationSnapshot | None = None,
+        automatic_origin: AutomaticTaskOrigin | None = None,
     ) -> TaskRecord:
-        task = await self.store.create(spec, presentation)
+        task = await self.store.create(spec, presentation, automatic_origin)
         self._wake.set()
         return task
 
@@ -227,8 +230,9 @@ class TaskScheduler:
         final_status = TaskStatus.completed
         error_text: str | None = None
         failure: TaskFailureReport | None = None
+        result: TaskExecutionResult | None = None
         try:
-            await self.executor(task, snapshot, reporter)
+            result = await self.executor(task, snapshot, reporter)
         except asyncio.CancelledError:
             running = self._running.get(task.id)
             final_status = running.requested_final_status if running is not None else TaskStatus.interrupted
@@ -236,6 +240,8 @@ class TaskScheduler:
             final_status = TaskStatus.failed
             failure = error.report
             error_text = failure.summary
+            if isinstance(error.result, TaskExecutionResult):
+                result = error.result
             reporter.log("error", error_text, failure)
         except Exception as error:
             final_status = TaskStatus.failed
@@ -246,7 +252,7 @@ class TaskScheduler:
             reporter.log("error", error_text, failure)
         finally:
             await reporter.close()
-            await self.store.finish_attempt(attempt_id, final_status, error_text, failure)
+            await self.store.finish_attempt(attempt_id, final_status, error_text, failure, result)
             await self.store.set_status(
                 task.id,
                 final_status,

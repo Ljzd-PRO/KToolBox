@@ -360,13 +360,13 @@ async def test_task_presentation_database_migration_and_store_round_trip(tmp_pat
         cursor = await connection.execute("SELECT version FROM schema_migrations ORDER BY version")
         versions = [int(row[0]) for row in await cursor.fetchall()]
         await cursor.close()
-    assert {"presentation_json", "failure_json"} <= columns
+    assert {"presentation_json", "failure_json", "automatic_origin_json"} <= columns
     async with database.connect() as connection:
         cursor = await connection.execute("PRAGMA table_info(task_attempts)")
         attempt_columns = {str(row[1]) for row in await cursor.fetchall()}
         await cursor.close()
-    assert "failure_json" in attempt_columns
-    assert versions == [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    assert {"failure_json", "result_json"} <= attempt_columns
+    assert versions == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     store = TaskStore(database)
     spec = DownloadTaskSpec(service="FanBox", creator_id="creator/id", post_id="42", output=tmp_path)

@@ -16,10 +16,12 @@ from ktoolbox.webui.task_models import (
     RUNNING_TASK_STATUSES,
     TASK_SPEC_ADAPTER,
     TERMINAL_TASK_STATUSES,
+    AutomaticTaskOrigin,
     TaskArtifact,
     TaskAttempt,
     TaskCleanupPreview,
     TaskEvent,
+    TaskExecutionResult,
     TaskPresentationSnapshot,
     TaskProgress,
     TaskRecord,
@@ -118,6 +120,7 @@ class TaskStore:
         self,
         spec: TaskSpec,
         presentation: TaskPresentationSnapshot | None = None,
+        automatic_origin: AutomaticTaskOrigin | None = None,
     ) -> TaskRecord:
         spec_json = _spec_json(spec)
         duplicate = await self.find_duplicate(spec_json)
@@ -135,8 +138,9 @@ class TaskStore:
             await connection.execute(
                 """
                 INSERT INTO tasks(
-                    id, kind, status, spec_json, presentation_json, position, progress_json, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    id, kind, status, spec_json, presentation_json, automatic_origin_json,
+                    position, progress_json, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     task_id,
@@ -144,6 +148,7 @@ class TaskStore:
                     TaskStatus.queued.value,
                     spec_json,
                     _presentation_json(presentation),
+                    _automatic_origin_json(automatic_origin),
                     position,
                     TaskProgress().model_dump_json(),
                     now,
@@ -372,15 +377,23 @@ class TaskStore:
         status: TaskStatus,
         error: str | None = None,
         failure: TaskFailureReport | None = None,
+        result: TaskExecutionResult | None = None,
     ) -> None:
         async with self.database.connect() as connection:
             await connection.execute(
                 """
                 UPDATE task_attempts
-                SET status = ?, error = ?, failure_json = ?, finished_at = ?
+                SET status = ?, error = ?, failure_json = ?, result_json = ?, finished_at = ?
                 WHERE id = ?
                 """,
-                (status.value, error, _failure_json(failure), utc_now().isoformat(), attempt_id),
+                (
+                    status.value,
+                    error,
+                    _failure_json(failure),
+                    result.model_dump_json() if result is not None else None,
+                    utc_now().isoformat(),
+                    attempt_id,
+                ),
             )
             await connection.commit()
 
@@ -486,6 +499,10 @@ def _presentation_json(presentation: TaskPresentationSnapshot | None) -> str | N
     return presentation.model_dump_json() if presentation is not None else None
 
 
+def _automatic_origin_json(origin: AutomaticTaskOrigin | None) -> str | None:
+    return origin.model_dump_json() if origin is not None else None
+
+
 def _failure_json(failure: TaskFailureReport | None) -> str | None:
     return failure.model_dump_json() if failure is not None else None
 
@@ -508,6 +525,11 @@ def _task_from_row(row: aiosqlite.Row) -> TaskRecord:
         presentation=(
             TaskPresentationSnapshot.model_validate_json(row["presentation_json"])
             if row["presentation_json"] is not None
+            else None
+        ),
+        automatic_origin=(
+            AutomaticTaskOrigin.model_validate_json(row["automatic_origin_json"])
+            if row["automatic_origin_json"] is not None
             else None
         ),
         position=row["position"],
@@ -536,6 +558,9 @@ def _attempt_from_row(row: aiosqlite.Row) -> TaskAttempt:
         error=row["error"],
         failure=(
             TaskFailureReport.model_validate_json(row["failure_json"]) if row["failure_json"] is not None else None
+        ),
+        result=(
+            TaskExecutionResult.model_validate_json(row["result_json"]) if row["result_json"] is not None else None
         ),
     )
 

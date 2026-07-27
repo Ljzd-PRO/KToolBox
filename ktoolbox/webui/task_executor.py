@@ -12,6 +12,7 @@ from ktoolbox.api.client import PawchiveClient
 from ktoolbox.api.errors import PawchiveNotFoundError
 from ktoolbox.api.generated import Post, Revision
 from ktoolbox.api.utils import create_pawchive_client
+from ktoolbox.automatic_sync import AutomaticSyncWindow
 from ktoolbox.blocker import BlockerEngine
 from ktoolbox.configuration import RuntimeContext
 from ktoolbox.failures import (
@@ -65,7 +66,7 @@ class CoreTaskExecutor:
             if isinstance(task.spec, DownloadTaskSpec):
                 await self._download(task.spec, snapshot.project, reporter)
                 return None
-            return await self._sync(task.spec, snapshot.project, reporter)
+            return await self._sync(task, snapshot.project, reporter)
 
     async def _download(
         self,
@@ -142,12 +143,27 @@ class CoreTaskExecutor:
 
     async def _sync(
         self,
-        spec: SyncTaskSpec,
+        task: TaskRecord,
         project: ProjectConfiguration,
         reporter: ProgressReporter,
     ) -> TaskExecutionResult:
         from ktoolbox.configuration import config
 
+        if not isinstance(task.spec, SyncTaskSpec):
+            raise TypeError("sync execution requires a sync task")
+        spec = task.spec
+        automatic_windows = (
+            {
+                window.creator_key: AutomaticSyncWindow(
+                    start_at=window.start_at,
+                    end_at=window.end_at,
+                    fallback_timezone=window.timezone,
+                )
+                for window in task.automatic_origin.windows
+            }
+            if task.automatic_origin is not None
+            else {}
+        )
         async with create_pawchive_client() as client:
             summary = await SyncCoordinator(
                 client,
@@ -167,6 +183,7 @@ class CoreTaskExecutor:
                     length=spec.length,
                     keywords=spec.keywords or set(config.job.keywords),
                     keywords_exclude=spec.keywords_exclude or set(config.job.keywords_exclude),
+                    automatic_windows=automatic_windows,
                 ),
             )
         result = TaskExecutionResult(

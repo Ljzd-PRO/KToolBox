@@ -144,6 +144,21 @@ def validate_task_presentation(
     return presentation
 
 
+class AutomaticCreatorWindowSnapshot(BaseModel):
+    creator_key: str
+    start_at: datetime | None = None
+    end_at: datetime
+    timezone: str
+    baseline: bool = False
+
+
+class AutomaticTaskOrigin(BaseModel):
+    plan_id: str
+    plan_name: str
+    run_id: str
+    windows: list[AutomaticCreatorWindowSnapshot]
+
+
 class TaskCreateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -187,6 +202,7 @@ class TaskRecord(BaseModel):
     status: TaskStatus
     spec: TaskSpec
     presentation: TaskPresentationSnapshot | None = None
+    automatic_origin: AutomaticTaskOrigin | None = None
     position: int
     revision: int
     progress: TaskProgress = Field(default_factory=TaskProgress)
@@ -208,6 +224,7 @@ class TaskAttempt(BaseModel):
     finished_at: datetime | None = None
     error: str | None = None
     failure: TaskFailureReport | None = None
+    result: TaskExecutionResult | None = None
 
 
 class CreatorTaskExecutionResult(BaseModel):
