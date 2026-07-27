@@ -14,6 +14,7 @@ class AutomaticSyncRunTrigger(str, Enum):
 class AutomaticSyncRunStatus(str, Enum):
     queued = "queued"
     running = "running"
+    paused = "paused"
     completed = "completed"
     failed = "failed"
     skipped = "skipped"
@@ -23,6 +24,7 @@ class AutomaticSyncRunStatus(str, Enum):
 ACTIVE_AUTOMATIC_RUN_STATUSES = {
     AutomaticSyncRunStatus.queued,
     AutomaticSyncRunStatus.running,
+    AutomaticSyncRunStatus.paused,
 }
 
 

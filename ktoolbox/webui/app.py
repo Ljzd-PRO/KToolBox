@@ -24,6 +24,8 @@ from ktoolbox.webui.auth import (
     require_csrf,
     require_session,
 )
+from ktoolbox.webui.auto_sync_scheduler import AutoSyncScheduler
+from ktoolbox.webui.auto_sync_store import AutomaticSyncStore
 from ktoolbox.webui.config_monitor import ConfigurationChangeMonitor
 from ktoolbox.webui.creator_profiles import CreatorClientFactory, CreatorProfileCache, CreatorRosterService
 from ktoolbox.webui.database import WebUIDatabase, WebUISession
@@ -66,6 +68,7 @@ def create_app(
     event_store = WebUIEventStore(database)
     mcp_token_store = MCPTokenStore(database, event_store)
     task_store = TaskStore(database, event_store)
+    automatic_sync_store = AutomaticSyncStore(database, event_store)
     naming_service = NamingConversionService(
         context.project_root,
         database,
@@ -77,6 +80,12 @@ def create_app(
         task_store,
         max_concurrency=context.configuration.webui.max_active_tasks,
         executor=task_executor,
+    )
+    automatic_sync_scheduler = AutoSyncScheduler(
+        context,
+        task_scheduler,
+        task_store,
+        automatic_sync_store,
     )
     creator_roster = CreatorRosterService(
         ProjectConfigStore(context.project_root / "ktoolbox.toml"),
@@ -99,8 +108,10 @@ def create_app(
             await naming_service.start()
             await config_monitor.start()
             await task_scheduler.start()
+            await automatic_sync_scheduler.start()
             yield
         finally:
+            await automatic_sync_scheduler.stop()
             await task_scheduler.stop()
             await config_monitor.stop()
             await naming_service.stop()
@@ -121,6 +132,8 @@ def create_app(
     app.state.mcp_token_store = mcp_token_store
     app.state.event_store = event_store
     app.state.task_store = task_store
+    app.state.automatic_sync_store = automatic_sync_store
+    app.state.automatic_sync_scheduler = automatic_sync_scheduler
     app.state.naming_service = naming_service
     app.state.task_scheduler = task_scheduler
     app.state.config_monitor = config_monitor

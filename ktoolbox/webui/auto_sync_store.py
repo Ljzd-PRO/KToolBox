@@ -99,6 +99,16 @@ class AutomaticSyncStore:
         )
         return await self.get_run(record.id)
 
+    async def mark_failed(self, run_id: str, error: str) -> AutomaticSyncRunRecord:
+        await self._set_run_status(run_id, AutomaticSyncRunStatus.failed, error=error)
+        run = await self.get_run(run_id)
+        await self._publish(
+            "auto_sync.run.finished",
+            run.plan_id,
+            {"run_id": run.id, "status": run.status.value},
+        )
+        return run
+
     async def active_run(self, plan_id: str) -> AutomaticSyncRunRecord | None:
         placeholders = ",".join("?" for _ in ACTIVE_AUTOMATIC_RUN_STATUSES)
         async with self.database.connect() as connection:
@@ -167,20 +177,26 @@ class AutomaticSyncStore:
             return None
         run = await self.get_run(origin.run_id)
         if task.status in {TaskStatus.queued, TaskStatus.blocked}:
+            if run.status is AutomaticSyncRunStatus.paused:
+                await self._set_run_status(run.id, AutomaticSyncRunStatus.queued)
+                return await self.get_run(run.id)
             return run
         if task.status in {TaskStatus.running, TaskStatus.pause_requested, TaskStatus.stop_requested}:
-            if run.status is AutomaticSyncRunStatus.queued:
+            if run.status in {AutomaticSyncRunStatus.queued, AutomaticSyncRunStatus.paused}:
                 await self._set_run_status(run.id, AutomaticSyncRunStatus.running)
                 await self._publish("auto_sync.run.started", run.plan_id, {"run_id": run.id, "task_id": task.id})
             return await self.get_run(run.id)
         if run.status not in ACTIVE_AUTOMATIC_RUN_STATUSES:
             return run
 
+        if task.status is TaskStatus.paused:
+            await self._set_run_status(run.id, AutomaticSyncRunStatus.paused)
+            return await self.get_run(run.id)
+
         mapped_status = {
             TaskStatus.completed: AutomaticSyncRunStatus.completed,
             TaskStatus.failed: AutomaticSyncRunStatus.failed,
             TaskStatus.interrupted: AutomaticSyncRunStatus.interrupted,
-            TaskStatus.paused: AutomaticSyncRunStatus.interrupted,
             TaskStatus.stopped: AutomaticSyncRunStatus.interrupted,
         }[task.status]
         if result is not None:
