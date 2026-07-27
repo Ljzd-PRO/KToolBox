@@ -121,6 +121,28 @@ export type NamingConversion = WebUIApiSchemas["NamingConversionResponse"];
 
 export type StartupNotice = WebUIApiSchemas["StartupNoticeResponse"];
 
+export type AutomaticSyncOptions = WebUIApiSchemas["AutomaticSyncOptions"];
+
+export type CronAutomaticSyncSchedule = WebUIApiSchemas["CronAutomaticSyncSchedule"];
+
+export type IntervalAutomaticSyncSchedule = WebUIApiSchemas["IntervalAutomaticSyncSchedule"];
+
+export type AutomaticSyncSchedule =
+  | CronAutomaticSyncSchedule
+  | IntervalAutomaticSyncSchedule;
+
+export type AutomaticSyncPlan = WebUIApiSchemas["AutomaticSyncPlan"];
+
+export type AutomaticSyncPlanList = WebUIApiSchemas["AutomaticSyncPlanListResponse"];
+
+export type AutomaticSyncRun = WebUIApiSchemas["AutomaticSyncRunRecord"];
+
+export type AutomaticSyncRunNow = WebUIApiSchemas["AutomaticSyncRunNowResponse"];
+
+export type AutomaticSyncUpdate = WebUIApiSchemas["AutomaticSyncUpdateSummary"];
+
+export type AutomaticTaskOrigin = WebUIApiSchemas["AutomaticTaskOrigin"];
+
 export type TaskStatus = WebUIApiSchemas["TaskStatus"];
 
 export type DownloadTaskSpec = {
@@ -205,6 +227,7 @@ export type TaskRecord = {
   status: TaskStatus;
   spec: TaskSpec;
   presentation: TaskPresentationSnapshot | null;
+  automatic_origin?: AutomaticTaskOrigin | null;
   position: number;
   revision: number;
   progress: TaskProgress;

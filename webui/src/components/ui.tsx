@@ -1,11 +1,13 @@
 import {
   Autocomplete,
   Button,
+  Calendar,
   Checkbox,
   Chip,
   ComboBox,
   Description,
   DateField,
+  DatePicker,
   DateRangePicker,
   EmptyState,
   FieldError,
@@ -465,6 +467,63 @@ export function NumberInput({
 }
 
 export type DateRangeValue = { start: DateValue; end: DateValue };
+
+export function DatePickerInput({
+  label,
+  description,
+  value,
+  onChange,
+  icon,
+  isDisabled = false,
+}: {
+  label: string;
+  description?: ReactNode;
+  value: DateValue | null;
+  onChange: (value: DateValue | null) => void;
+  icon?: TablerIcon;
+  isDisabled?: boolean;
+}) {
+  return (
+    <DatePicker
+      className="grid gap-1.5"
+      isDisabled={isDisabled}
+      value={value}
+      onChange={onChange}
+    >
+      <FieldLabel icon={icon} label={label} />
+      <DateField.Group fullWidth variant="secondary">
+        <DateField.InputContainer>
+          <DateField.Input>
+            {(segment) => <DateField.Segment segment={segment} />}
+          </DateField.Input>
+        </DateField.InputContainer>
+        <DateField.Suffix>
+          <DatePicker.Trigger aria-label={label}>
+            <DatePicker.TriggerIndicator />
+          </DatePicker.Trigger>
+        </DateField.Suffix>
+      </DateField.Group>
+      {description ? <Description className="text-xs leading-relaxed text-muted">{description}</Description> : null}
+      <DatePicker.Popover>
+        <Calendar aria-label={label}>
+          <Calendar.Header>
+            <Calendar.NavButton slot="previous" />
+            <Calendar.Heading />
+            <Calendar.NavButton slot="next" />
+          </Calendar.Header>
+          <Calendar.Grid>
+            <Calendar.GridHeader>
+              {(day) => <Calendar.HeaderCell>{day}</Calendar.HeaderCell>}
+            </Calendar.GridHeader>
+            <Calendar.GridBody>
+              {(date) => <Calendar.Cell date={date} />}
+            </Calendar.GridBody>
+          </Calendar.Grid>
+        </Calendar>
+      </DatePicker.Popover>
+    </DatePicker>
+  );
+}
 
 export function DateRangeInput({
   label,

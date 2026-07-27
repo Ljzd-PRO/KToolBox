@@ -1,6 +1,7 @@
 import type { TranslationShape } from "./types";
 import { en } from "./en";
 import { namingTranslations } from "./naming";
+import { automaticSyncTranslations } from "./automaticSync";
 
 export const zhCN = {
   "brand": "KToolBox",
@@ -79,6 +80,7 @@ export const zhCN = {
   "nav": {
     "overview": "概览",
     "tasks": "任务",
+    "automaticSync": "自动同步",
     "creators": "作者",
     "posts": "作品",
     "blockers": "忽略规则",
@@ -239,6 +241,7 @@ export const zhCN = {
     "removeBody": "规则 {{id}} 将不再应用于之后创建的同步任务。"
   },
   "naming": namingTranslations["zh-CN"],
+  "automaticSync": automaticSyncTranslations["zh-CN"],
   "configuration": {
     "title": "全局配置",
     "description": "使用来自 KToolBox 配置类文档的说明编辑类型化设置。",

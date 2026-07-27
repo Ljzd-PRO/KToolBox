@@ -1,6 +1,7 @@
 import type { TranslationShape } from "./types";
 import { en } from "./en";
 import { namingTranslations } from "./naming";
+import { automaticSyncTranslations } from "./automaticSync";
 
 export const ja = {
   brand: "KToolBox",
@@ -73,8 +74,9 @@ export const ja = {
       delete_failed: "フォルダーを削除できませんでした。",
     },
   },
-  nav: { overview: "概要", tasks: "タスク", creators: "クリエイター", posts: "作品", blockers: "除外ルール", naming: "命名形式", configuration: "グローバル設定", mcp: "MCP", system: "システム", about: "このアプリについて" },
+  nav: { overview: "概要", tasks: "タスク", automaticSync: "自動同期", creators: "クリエイター", posts: "作品", blockers: "除外ルール", naming: "命名形式", configuration: "グローバル設定", mcp: "MCP", system: "システム", about: "このアプリについて" },
   naming: namingTranslations.ja,
+  automaticSync: automaticSyncTranslations.ja,
   shell: {
     menu: "ナビゲーションを開く",
     closeMenu: "ナビゲーションを閉じる",

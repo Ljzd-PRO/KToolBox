@@ -2,6 +2,7 @@ import { Button, Drawer, Popover, Surface, Tooltip, toast, useOverlayState } fro
 import {
   IconAdjustmentsHorizontal,
   IconAddressBook,
+  IconCalendarRepeat,
   IconBan,
   IconDeviceDesktop,
   IconFileSearch,
@@ -42,6 +43,7 @@ type NavigationItem = {
 const navigation: NavigationItem[] = [
   { key: "overview", path: "/", icon: IconGauge },
   { key: "tasks", path: "/tasks", icon: IconPackages },
+  { key: "automaticSync", path: "/auto-sync", icon: IconCalendarRepeat },
   { key: "creators", path: "/creators", icon: IconAddressBook },
   { key: "posts", path: "/posts", icon: IconFileSearch },
   { key: "blockers", path: "/blockers", icon: IconBan },

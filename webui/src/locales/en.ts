@@ -1,4 +1,5 @@
 import { namingTranslations } from "./naming";
+import { automaticSyncTranslations } from "./automaticSync";
 
 export const en = {
   "brand": "KToolBox",
@@ -77,6 +78,7 @@ export const en = {
   "nav": {
     "overview": "Overview",
     "tasks": "Tasks",
+    "automaticSync": "Automatic sync",
     "creators": "Creators",
     "posts": "Posts",
     "blockers": "Blockers",
@@ -237,6 +239,7 @@ export const en = {
     "removeBody": "The {{id}} rule will stop applying to future sync tasks."
   },
   "naming": namingTranslations.en,
+  "automaticSync": automaticSyncTranslations.en,
   "configuration": {
     "title": "Global configuration",
     "description": "Edit typed settings with documentation sourced from KToolBox configuration classes.",

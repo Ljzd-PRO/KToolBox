@@ -13,6 +13,7 @@ import { RealtimeProvider } from "./lib/realtime";
 import { ThemeProvider } from "./lib/theme";
 import { DashboardPage } from "./pages/DashboardPage";
 import { AboutPage } from "./pages/AboutPage";
+import { AutomaticSyncPage } from "./pages/AutomaticSyncPage";
 import { BlockersPage } from "./pages/BlockersPage";
 import { CreatorsPage } from "./pages/CreatorsPage";
 import { ConfigurationPage } from "./pages/ConfigurationPage";
@@ -43,6 +44,7 @@ function AuthenticatedApplication() {
           <Route element={<AppShell />}>
             <Route index element={<DashboardPage />} />
             <Route element={<TasksPage />} path="tasks/:taskId?" />
+            <Route element={<AutomaticSyncPage />} path="auto-sync" />
             <Route element={<CreatorsPage />} path="creators" />
             <Route element={<PostsPage />} path="posts" />
             <Route element={<BlockersPage />} path="blockers" />

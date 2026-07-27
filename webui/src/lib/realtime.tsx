@@ -36,6 +36,7 @@ export type RealtimeResource =
   | "blockers"
   | "configuration"
   | "naming"
+  | "autoSync"
   | "mcp"
   | "filesystem";
 
@@ -72,6 +73,12 @@ const eventTypes = [
   "naming.changed",
   "naming.conversion.progress",
   "naming.conversion.finished",
+  "auto_sync.plans.changed",
+  "auto_sync.run.created",
+  "auto_sync.run.started",
+  "auto_sync.run.skipped",
+  "auto_sync.run.finished",
+  "auto_sync.updates.changed",
   "mcp.tokens.changed",
   "filesystem.changed",
 ] as const;
@@ -85,6 +92,9 @@ const localQueryRoots = new Set([
   "config-document",
   "naming",
   "naming-conversions",
+  "auto-sync-plans",
+  "auto-sync-runs",
+  "auto-sync-updates",
   "startup-notices",
   "mcp",
   "task-attempts",
@@ -126,6 +136,7 @@ const initialRevisions: Record<RealtimeResource, number> = {
   blockers: 0,
   configuration: 0,
   naming: 0,
+  autoSync: 0,
   mcp: 0,
   filesystem: 0,
 };
@@ -467,6 +478,15 @@ function applyRealtimeEvent(
   } else if (event.event_type.startsWith("naming.conversion.")) {
     queueRefresh("naming-conversions");
     notifyResource("naming");
+  } else if (event.event_type === "auto_sync.plans.changed") {
+    queueRefresh("auto-sync-plans", "config-document");
+    notifyResource("autoSync");
+  } else if (event.event_type.startsWith("auto_sync.run.")) {
+    queueRefresh("auto-sync-plans", "auto-sync-runs", "auto-sync-updates", "tasks");
+    notifyResource("autoSync");
+  } else if (event.event_type === "auto_sync.updates.changed") {
+    queueRefresh("auto-sync-updates");
+    notifyResource("autoSync");
   } else if (event.event_type === "mcp.tokens.changed") {
     queueRefresh("mcp");
     notifyResource("mcp");
