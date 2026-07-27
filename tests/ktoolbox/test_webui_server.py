@@ -192,7 +192,7 @@ def test_project_root_creates_missing_configuration(tmp_path: Path, capsys: pyte
 
     project_config = project_root / "ktoolbox.toml"
     content = project_config.read_text(encoding="utf-8")
-    assert "schema_version = 2" in content
+    assert "schema_version = 3" in content
     assert "[naming]" in content
     assert ProjectConfigStore(project_config).load() == ProjectConfiguration()
     assert capsys.readouterr().err == f"Warning: {project_config} was not found; created a new project configuration.\n"
@@ -203,8 +203,10 @@ def test_project_root_preserves_existing_configuration(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     project_config = tmp_path / "ktoolbox.toml"
-    original = "# Keep this comment.\nschema_version = 2\n\n[naming]\n"
-    project_config.write_text(original, encoding="utf-8")
+    ProjectConfigStore(project_config).save(ProjectConfiguration())
+    original = project_config.read_text(encoding="utf-8")
+    project_config.write_text(f"# Keep this comment.\n{original}", encoding="utf-8")
+    original = project_config.read_text(encoding="utf-8")
 
     assert _project_root(tmp_path) == tmp_path.resolve()
     assert project_config.read_text(encoding="utf-8") == original

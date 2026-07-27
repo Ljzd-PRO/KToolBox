@@ -18,6 +18,8 @@ dependencies = [
     "settings-doc>=4.3.1,<5.0.0",
     "rich>=14.1.0,<15.0.0",
     "tomlkit>=0.13.3,<1.0.0",
+    "croniter>=6.0,<7.0",
+    "tzdata>=2025.2",
 ]
 
 keywords = ["pawchive", "cli-app", "downloader", "asyncio", "pydantic", "os-independent"]
@@ -81,6 +83,7 @@ datamodel-code-generator = ">=0.57,<0.58"
 openapi-spec-validator = ">=0.9,<0.10"
 ruff = ">=0.15,<0.16"
 mypy = ">=2.3,<2.4"
+types-croniter = ">=6.0,<7.0"
 
 [tool.poetry.group.pyinstaller]
 optional = true

@@ -10,7 +10,7 @@ from ktoolbox.naming_migration import (
     MIGRATION_NOTICE_PATH,
     migrate_legacy_naming,
 )
-from ktoolbox.project_config import ProjectConfigStore
+from ktoolbox.project_config import ProjectConfigStore, ProjectConfiguration
 
 
 @pytest.fixture(autouse=True)
@@ -77,3 +77,14 @@ def test_missing_project_without_legacy_values_is_not_reported_as_migration(
     assert migrate_legacy_naming(tmp_path).migrated is False
     assert not (tmp_path / "ktoolbox.toml").exists()
     assert not (tmp_path / MIGRATION_NOTICE_PATH).exists()
+
+
+def test_migration_does_not_repeat_for_newer_project_schema(tmp_path: Path) -> None:
+    project_path = tmp_path / "ktoolbox.toml"
+    ProjectConfigStore(project_path).save(ProjectConfiguration())
+    original = project_path.read_text(encoding="utf-8")
+
+    result = migrate_legacy_naming(tmp_path)
+
+    assert result.migrated is False
+    assert project_path.read_text(encoding="utf-8") == original

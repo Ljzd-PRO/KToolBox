@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import pytest
 
 from ktoolbox.project_config import (
+    AutomaticSyncOptions,
+    AutomaticSyncPlan,
     CreatorReference,
+    CronAutomaticSyncSchedule,
+    IntervalAutomaticSyncSchedule,
     ProjectConfigError,
     ProjectConfigStore,
     ProjectConfiguration,
@@ -50,7 +55,7 @@ def test_store_round_trip_is_atomic_and_preserves_top_comment(tmp_path: Path) ->
 
     content = path.read_text(encoding="utf-8")
     assert content.startswith("# Keep this comment")
-    assert "schema_version = 2" in content
+    assert "schema_version = 3" in content
     assert "[naming]" in content
     assert not list(tmp_path.glob(".*.tmp"))
     configuration = store.load()
@@ -109,9 +114,10 @@ def test_schema_v1_loads_with_project_naming_defaults(tmp_path: Path) -> None:
 
     configuration = ProjectConfigStore(path).load()
 
-    assert configuration.schema_version == 2
+    assert configuration.schema_version == 3
     assert configuration.naming.creator_dirname_format == "{creator_name} [{service}-{creator_id}]"
     assert configuration.naming.post_structure.attachments == Path("attachments")
+    assert configuration.automatic_sync == []
 
 
 def test_naming_configuration_validates_templates_paths_and_roots(tmp_path: Path) -> None:
@@ -131,3 +137,106 @@ def test_naming_configuration_validates_templates_paths_and_roots(tmp_path: Path
         ProjectNamingConfiguration(group_by_month=True)
     with pytest.raises(ValueError, match="duplicate download root"):
         ProjectNamingConfiguration(download_roots=[Path("downloads"), Path("./downloads")])
+
+
+def test_schema_v2_loads_with_automatic_sync_defaults(tmp_path: Path) -> None:
+    path = tmp_path / "ktoolbox.toml"
+    path.write_text("schema_version = 2\n", encoding="utf-8")
+
+    configuration = ProjectConfigStore(path).load()
+
+    assert configuration.schema_version == 3
+    assert configuration.automatic_sync == []
+
+
+def test_automatic_sync_plan_round_trip_and_lifecycle(tmp_path: Path) -> None:
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    store.add_creator(CreatorReference(service="fanbox", creator_id="123", alias="artist"))
+    plan = AutomaticSyncPlan(
+        id="daily-art",
+        name="Daily art",
+        creators=["fanbox:123", "FANBOX:123"],
+        initial_start_date=date(2026, 7, 1),
+        schedule=CronAutomaticSyncSchedule(expression="30 4 * * 1,3,5", timezone="Asia/Shanghai"),
+        options=AutomaticSyncOptions(
+            output=Path("downloads"),
+            save_creator_indices=True,
+            keywords={"illustration", "comic"},
+        ),
+    )
+
+    configuration = store.add_automatic_sync_plan(plan)
+    assert configuration.automatic_sync[0].creators == ["fanbox:123"]
+
+    content = store.path.read_text(encoding="utf-8")
+    assert 'expression = "30 4 * * 1,3,5"' in content
+    assert 'timezone = "Asia/Shanghai"' in content
+    assert "initial_start_date = 2026-07-01" in content
+    assert 'output = "downloads"' in content
+    assert store.load().automatic_sync == configuration.automatic_sync
+
+    updated = plan.model_copy(
+        update={
+            "name": "Every other day",
+            "schedule": IntervalAutomaticSyncSchedule(
+                every=2,
+                unit="days",
+                anchor_at=datetime(2026, 7, 1, tzinfo=UTC),
+                timezone="Asia/Shanghai",
+            ),
+        }
+    )
+    assert store.update_automatic_sync_plan("daily-art", updated).name == "Every other day"
+    assert store.set_automatic_sync_plan_enabled("daily-art", False).enabled is False
+    assert store.remove_automatic_sync_plan("daily-art").id == "daily-art"
+    assert store.load().automatic_sync == []
+
+
+@pytest.mark.parametrize(
+    "expression",
+    ["@daily", "0 0 * *", "60 0 * * *"],
+)
+def test_automatic_sync_rejects_invalid_cron(expression: str) -> None:
+    with pytest.raises(ValueError, match="Cron"):
+        CronAutomaticSyncSchedule(expression=expression)
+
+
+def test_automatic_sync_rejects_invalid_intervals_timezones_and_references(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="at least 15 minutes"):
+        IntervalAutomaticSyncSchedule(every=14, unit="minutes")
+    with pytest.raises(ValueError, match="include a timezone"):
+        IntervalAutomaticSyncSchedule(anchor_at=datetime(2026, 7, 1))
+    with pytest.raises(ValueError, match="unknown IANA timezone"):
+        CronAutomaticSyncSchedule(timezone="Moon/Sea_of_Tranquility")
+
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    with pytest.raises(ProjectConfigError, match="missing creators"):
+        store.add_automatic_sync_plan(
+            AutomaticSyncPlan(
+                id="missing",
+                name="Missing creator",
+                creators=["fanbox:404"],
+            )
+        )
+
+
+def test_automatic_sync_plan_references_prevent_creator_deletion(tmp_path: Path) -> None:
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    store.add_creator(CreatorReference(service="fanbox", creator_id="123"))
+    store.add_automatic_sync_plan(
+        AutomaticSyncPlan(
+            id="daily",
+            name="Daily sync",
+            creators=["fanbox:123"],
+        )
+    )
+
+    with pytest.raises(ProjectConfigError, match="used by automatic sync plans: Daily sync"):
+        store.remove_creator("fanbox:123")
+    with pytest.raises(ProjectConfigError, match="ID cannot be changed"):
+        store.update_automatic_sync_plan(
+            "daily",
+            AutomaticSyncPlan(id="renamed", name="Renamed", creators=["fanbox:123"]),
+        )
+    with pytest.raises(ProjectConfigError, match="not found"):
+        store.remove_automatic_sync_plan("missing")

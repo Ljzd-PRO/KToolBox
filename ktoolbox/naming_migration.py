@@ -103,7 +103,8 @@ def migrate_legacy_naming(project_root: Path) -> NamingMigrationResult:
 
     original_project = project_path.read_text(encoding="utf-8") if project_path.exists() else ""
     document = tomlkit.parse(original_project) if original_project else tomlkit.document()
-    if document.get("schema_version") == 2 and "naming" in document:
+    schema_version = document.get("schema_version")
+    if isinstance(schema_version, int) and schema_version >= 2 and "naming" in document:
         return NamingMigrationResult(migrated=False)
 
     legacy = _LegacyNamingSettings(_env_file=[root / ".env", root / "prod.env"]).job
