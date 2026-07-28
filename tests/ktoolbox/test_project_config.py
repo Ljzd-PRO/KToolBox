@@ -55,7 +55,8 @@ def test_store_round_trip_is_atomic_and_preserves_top_comment(tmp_path: Path) ->
 
     content = path.read_text(encoding="utf-8")
     assert content.startswith("# Keep this comment")
-    assert "schema_version = 4" in content
+    assert "schema_version = 5" in content
+    assert 'default_output = "downloads"' in content
     assert "[naming]" in content
     assert not list(tmp_path.glob(".*.tmp"))
     configuration = store.load()
@@ -114,10 +115,30 @@ def test_schema_v1_loads_with_project_naming_defaults(tmp_path: Path) -> None:
 
     configuration = ProjectConfigStore(path).load()
 
-    assert configuration.schema_version == 4
+    assert configuration.schema_version == 5
+    assert configuration.default_output == Path("downloads")
     assert configuration.naming.creator_dirname_format == "{creator_name} [{service}-{creator_id}]"
     assert configuration.naming.post_structure.attachments == Path("attachments")
     assert configuration.automatic_sync == []
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        Path("downloads"),
+        Path("../shared-downloads"),
+        Path("/tmp/ktoolbox-downloads"),
+    ],
+)
+def test_project_default_output_accepts_relative_and_absolute_paths(value: Path) -> None:
+    configuration = ProjectConfiguration(default_output=value)
+
+    assert configuration.default_output == value
+
+
+def test_project_default_output_rejects_empty_path() -> None:
+    with pytest.raises(ValueError, match="default output directory cannot be empty"):
+        ProjectConfiguration(default_output=Path(" "))
 
 
 def test_naming_configuration_validates_templates_and_paths() -> None:
@@ -142,7 +163,8 @@ def test_schema_v2_loads_with_automatic_sync_defaults(tmp_path: Path) -> None:
 
     configuration = ProjectConfigStore(path).load()
 
-    assert configuration.schema_version == 4
+    assert configuration.schema_version == 5
+    assert configuration.default_output == Path("downloads")
     assert configuration.automatic_sync == []
 
 

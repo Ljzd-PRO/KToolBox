@@ -202,7 +202,7 @@ class AutomaticSyncOptions(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    output: Path = Path(".")
+    output: Path | None = None
     save_creator_indices: bool = False
     mix_posts: bool | None = None
     keywords: set[str] = Field(default_factory=set)
@@ -306,7 +306,8 @@ class ProjectConfiguration(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    schema_version: Literal[4] = 4
+    schema_version: Literal[5] = 5
+    default_output: Path = Path("downloads")
     creators: list[CreatorReference] = Field(default_factory=list)
     blockers: list[BlockerSpec] = Field(default_factory=list)
     naming: ProjectNamingConfiguration = Field(default_factory=ProjectNamingConfiguration)
@@ -315,14 +316,22 @@ class ProjectConfiguration(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def upgrade_schema(cls, value: Any) -> Any:
-        if isinstance(value, Mapping) and value.get("schema_version", 1) in {1, 2, 3}:
+        if isinstance(value, Mapping) and value.get("schema_version", 1) in {1, 2, 3, 4}:
             upgraded = dict(value)
-            upgraded["schema_version"] = 4
+            upgraded["schema_version"] = 5
+            upgraded.setdefault("default_output", "downloads")
             naming = dict(upgraded.get("naming") or {})
             naming.pop("download_roots", None)
             upgraded["naming"] = naming
             upgraded.setdefault("automatic_sync", [])
             return upgraded
+        return value
+
+    @field_validator("default_output")
+    @classmethod
+    def validate_default_output(cls, value: Path) -> Path:
+        if not str(value).strip():
+            raise ValueError("default output directory cannot be empty")
         return value
 
     @model_validator(mode="after")
@@ -430,7 +439,8 @@ class ProjectConfigStore:
             except OSError as error:
                 raise ProjectConfigError(f"unable to read project configuration {self.path}: {error}") from error
         document = tomlkit.document()
-        document.add("schema_version", 4)
+        document.add("schema_version", 5)
+        document.add("default_output", "downloads")
         document.add("creators", tomlkit.aot())
         document.add("blockers", tomlkit.aot())
         document.add("naming", tomlkit.item(ProjectNamingConfiguration().model_dump(mode="json")))
@@ -456,6 +466,7 @@ class ProjectConfigStore:
         configuration = ProjectConfiguration.model_validate(configuration)
         document = self._document.copy()
         document["schema_version"] = configuration.schema_version
+        document["default_output"] = str(configuration.default_output)
         document["creators"] = _creator_tables(configuration.creators)
         document["blockers"] = _blocker_tables(configuration.blockers)
         document["naming"] = tomlkit.item(configuration.naming.model_dump(mode="json"))
