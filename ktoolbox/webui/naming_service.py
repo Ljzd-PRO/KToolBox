@@ -183,7 +183,11 @@ class NamingConversionService:
             except ValueError as error:
                 raise NamingPreviewStaleError(str(error)) from error
             if result.naming != previous:
-                await self._record_layout_change(previous, result.naming)
+                await self._record_layout_change(
+                    previous,
+                    result.naming,
+                    create_prompt=False,
+                )
             await self.events.publish(
                 "configuration.changed",
                 {"documents": [".env", "prod.env", "ktoolbox.toml"]},
@@ -215,9 +219,9 @@ class NamingConversionService:
             previous = project.naming
             merged = _merge_naming_section(previous, candidate, section)
             if merged != previous:
-                await self._record_layout_change(previous, merged)
                 project.naming = merged
                 await anyio.to_thread.run_sync(self.project_store.save, project)
+                await self._record_layout_change(previous, merged)
                 await self.events.publish(
                     "naming.changed",
                     {"section": section, "conversion_pending": True},
@@ -351,6 +355,7 @@ class NamingConversionService:
         available_operations = await self._operations(preview_id, [], reverse=False)
         if not available_operations:
             await self._clear_layout_state(candidate)
+            await self._resolve_layout_notices(candidate, "convert_selected")
             await self._set_status(preview_id, "completed", selected=[])
             await self.events.publish(
                 "naming.changed",
@@ -363,6 +368,7 @@ class NamingConversionService:
         if not selected:
             raise NamingConversionError("select at least one downloaded creator to convert")
         await self._ensure_no_overlapping_tasks(conversion.preview.roots)
+        await self._resolve_layout_notices(candidate, "convert_selected")
         await self._set_status(preview_id, "queued", selected=selected)
         cancellation = asyncio.Event()
         self._cancellations[preview_id] = cancellation
@@ -470,12 +476,24 @@ class NamingConversionService:
             ).fetchone()
         if row is None or row["kind"] != "legacy_layout_conversion":
             raise LookupError(notice_id)
-        return _notice_from_row(row)
+        notice = _notice_from_row(row)
+        await self.events.publish(
+            "naming.changed",
+            {
+                "layout_version": notice.id,
+                "layout_resolution": action,
+            },
+            resource="naming",
+            resource_id=notice.id,
+        )
+        return notice
 
     async def _record_layout_change(
         self,
         previous: ProjectNamingConfiguration,
         target: ProjectNamingConfiguration,
+        *,
+        create_prompt: bool = True,
     ) -> None:
         now = utc_now().isoformat()
         async with self.database.connect() as connection:
@@ -507,7 +525,70 @@ class NamingConversionService:
                     now,
                 ),
             )
+            if create_prompt:
+                await connection.execute(
+                    """
+                    UPDATE startup_notices
+                    SET resolution = 'superseded', resolved_at = ?, acknowledged_at = ?
+                    WHERE kind = 'legacy_layout_conversion'
+                      AND resolution IS NULL
+                    """,
+                    (now, now),
+                )
+                version_id = f"naming-layout-{uuid4().hex}"
+                await connection.execute(
+                    """
+                    INSERT INTO startup_notices(
+                        id, kind, payload_json, created_at
+                    ) VALUES (?, 'legacy_layout_conversion', ?, ?)
+                    """,
+                    (
+                        version_id,
+                        json.dumps(
+                            {
+                                "version": version_id,
+                                "source": previous.model_dump(mode="json"),
+                                "target": target.model_dump(mode="json"),
+                            },
+                            ensure_ascii=False,
+                        ),
+                        now,
+                    ),
+                )
             await connection.commit()
+
+    async def _resolve_layout_notices(
+        self,
+        target: ProjectNamingConfiguration,
+        action: StartupNoticeResolution,
+    ) -> None:
+        target_data = target.model_dump(mode="json")
+        now = utc_now().isoformat()
+        async with self.database.connect() as connection:
+            connection.row_factory = aiosqlite.Row
+            rows = await connection.execute_fetchall(
+                """
+                SELECT id, payload_json FROM startup_notices
+                WHERE kind = 'legacy_layout_conversion'
+                  AND resolution IS NULL
+                """
+            )
+            matching = [
+                str(row["id"])
+                for row in rows
+                if json.loads(str(row["payload_json"])).get("target") == target_data
+            ]
+            if matching:
+                placeholders = ",".join("?" for _ in matching)
+                await connection.execute(
+                    f"""
+                    UPDATE startup_notices
+                    SET resolution = ?, resolved_at = ?, acknowledged_at = ?
+                    WHERE id IN ({placeholders})
+                    """,
+                    [action, now, now, *matching],
+                )
+                await connection.commit()
 
     async def _layout_snapshots(
         self,

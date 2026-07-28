@@ -126,10 +126,11 @@ const namingEn = {
   startup: {
     title: "Review existing downloads",
     heading: "Choose what to do with previously downloaded content",
-    body: "Project naming settings affect future downloads. Scan and preview old locations now, or ignore this prompt permanently and use the conversion tool later.",
+    body: "The saved naming format already applies to future downloads. Review old locations now, or ignore conversion for this saved layout version.",
+    versionHint: "Ignoring affects only this layout version. Saving another naming change creates a new review.",
     ignore: "Ignore",
     convert: "Review conversion",
-    ignored: "The startup conversion prompt was permanently dismissed for this project.",
+    ignored: "Conversion was ignored for this naming version.",
     convertSelected: "Opening the old download conversion tool.",
   },
   migration: {
@@ -289,10 +290,11 @@ const namingZhCN = {
   startup: {
     title: "检查已有下载内容",
     heading: "请选择如何处理以前下载的内容",
-    body: "项目命名设置只会影响未来下载。你可以现在扫描并预览旧位置，也可以永久忽略此提示，以后再手动使用转换工具。",
+    body: "保存的命名格式已经用于未来下载。你可以现在检查旧位置，也可以仅对本次保存的布局忽略转换。",
+    versionHint: "忽略只对当前布局版本生效；下次修改并保存命名设置后会重新提示。",
     ignore: "忽略",
     convert: "检查并转换",
-    ignored: "当前项目已永久忽略启动转换提示。",
+    ignored: "已忽略当前命名版本的目录转换。",
     convertSelected: "正在打开旧下载目录转换工具。",
   },
   migration: {
@@ -449,10 +451,11 @@ const namingZhHant = {
   startup: {
     title: "檢查既有下載內容",
     heading: "請選擇如何處理先前下載的內容",
-    body: "專案命名設定只影響日後下載。你可以立即掃描並預覽舊位置，或永久忽略此提示，之後再手動使用轉換工具。",
+    body: "已儲存的命名格式已套用於日後下載。你可以立即檢查舊位置，或只對此次儲存的版面忽略轉換。",
+    versionHint: "忽略只對目前版面版本生效；下次修改並儲存命名設定後會再次提示。",
     ignore: "忽略",
     convert: "檢查並轉換",
-    ignored: "目前專案已永久忽略啟動轉換提示。",
+    ignored: "已忽略目前命名版本的目錄轉換。",
     convertSelected: "正在開啟舊下載目錄轉換工具。",
   },
   migration: {
@@ -609,10 +612,11 @@ const namingJa = {
   startup: {
     title: "既存のダウンロードを確認",
     heading: "以前にダウンロードした内容の扱いを選択してください",
-    body: "プロジェクトの命名設定は今後のダウンロードに適用されます。旧場所を今すぐ確認するか、この案内を永久に無視して後で変換できます。",
+    body: "保存した命名形式は今後のダウンロードに適用済みです。旧保存先を今確認するか、このレイアウト版だけ変換を無視できます。",
+    versionHint: "無視は現在のレイアウト版だけに適用されます。次に命名設定を変更して保存すると再度案内します。",
     ignore: "無視",
     convert: "確認して変換",
-    ignored: "このプロジェクトでは起動時の変換案内を永久に非表示にしました。",
+    ignored: "現在の命名版のディレクトリ変換を無視しました。",
     convertSelected: "旧ダウンロード変換ツールを開いています。",
   },
   migration: {
@@ -769,10 +773,11 @@ const namingKo = {
   startup: {
     title: "기존 다운로드 검토",
     heading: "이전에 다운로드한 콘텐츠의 처리 방법을 선택하세요",
-    body: "프로젝트 이름 설정은 이후 다운로드에 적용됩니다. 지금 이전 위치를 검토하거나 이 안내를 영구히 무시하고 나중에 변환할 수 있습니다.",
+    body: "저장한 이름 형식은 이후 다운로드에 이미 적용됩니다. 이전 위치를 지금 검토하거나 이 레이아웃 버전의 변환만 무시할 수 있습니다.",
+    versionHint: "무시는 현재 레이아웃 버전에만 적용됩니다. 이름 설정을 다시 변경해 저장하면 새 검토가 표시됩니다.",
     ignore: "무시",
     convert: "검토 후 변환",
-    ignored: "이 프로젝트에서 시작 변환 안내를 영구히 숨겼습니다.",
+    ignored: "현재 이름 버전의 디렉터리 변환을 무시했습니다.",
     convertSelected: "이전 다운로드 변환 도구를 여는 중입니다.",
   },
   migration: {
@@ -929,10 +934,11 @@ const namingFr = {
   startup: {
     title: "Vérifier les téléchargements existants",
     heading: "Choisissez comment traiter les contenus déjà téléchargés",
-    body: "Le nommage du projet s’applique aux futurs téléchargements. Analysez les anciens emplacements maintenant, ou ignorez définitivement ce message et convertissez-les plus tard.",
+    body: "Le format enregistré s’applique déjà aux futurs téléchargements. Vérifiez les anciens emplacements maintenant, ou ignorez la conversion pour cette version uniquement.",
+    versionHint: "L’ignorance ne concerne que cette version. Un nouvel enregistrement du nommage créera une nouvelle vérification.",
     ignore: "Ignorer",
     convert: "Vérifier et convertir",
-    ignored: "L’invite de conversion au démarrage a été définitivement masquée pour ce projet.",
+    ignored: "La conversion a été ignorée pour cette version du nommage.",
     convertSelected: "Ouverture de l’outil de conversion des anciens téléchargements.",
   },
   migration: {
@@ -1089,10 +1095,11 @@ const namingRu = {
   startup: {
     title: "Проверить существующие загрузки",
     heading: "Выберите, что делать с ранее загруженными данными",
-    body: "Настройки имён применяются к будущим загрузкам. Проверьте старые расположения сейчас или навсегда скройте это сообщение и выполните преобразование позже.",
+    body: "Сохранённый формат уже применяется к будущим загрузкам. Проверьте старые каталоги сейчас или пропустите преобразование только для этой версии.",
+    versionHint: "Пропуск действует только для этой версии. После следующего изменения настроек появится новая проверка.",
     ignore: "Игнорировать",
     convert: "Проверить и преобразовать",
-    ignored: "Запрос преобразования при запуске навсегда скрыт для этого проекта.",
+    ignored: "Преобразование пропущено для текущей версии имён.",
     convertSelected: "Открывается инструмент преобразования старых загрузок.",
   },
   migration: {

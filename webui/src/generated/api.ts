@@ -912,8 +912,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List startup notices
-         * @description Return unacknowledged one-time project migration notices for the signed-in user.
+         * List project notices
+         * @description Return unresolved project notices, including immutable naming-layout conversion suggestions.
          */
         get: operations["list_startup_notices"];
         put?: never;
@@ -954,8 +954,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Resolve a startup decision
-         * @description Persist an explicit ignore or convert choice for the first-start legacy directory prompt.
+         * Resolve a project notice
+         * @description Persist an explicit ignore decision for one naming-layout version.
          */
         post: operations["resolve_startup_notice"];
         delete?: never;

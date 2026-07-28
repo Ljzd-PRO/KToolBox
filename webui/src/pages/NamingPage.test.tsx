@@ -135,6 +135,7 @@ describe("Naming format page", () => {
         const path = String(input);
         if (path.endsWith("/session")) return json(session);
         if (path.endsWith("/naming/legacy-migration")) return json(noLegacyMigration);
+        if (path.endsWith("/startup-notices")) return json([]);
         if (path.endsWith("/naming/conversions")) return json([]);
         if (path.endsWith("/naming/legacy-context")) {
           return json({
@@ -214,6 +215,7 @@ describe("Naming format page", () => {
     const user = userEvent.setup();
     window.history.replaceState({}, "", "/naming");
     const updates: Array<Record<string, unknown>> = [];
+    const ignoredLayouts = new Set<string>();
     let currentNaming = structuredClone(naming);
     let revision = "revision-1";
     vi.stubGlobal(
@@ -222,6 +224,37 @@ describe("Naming format page", () => {
         const path = String(input);
         if (path.endsWith("/session")) return json(session);
         if (path.endsWith("/naming/legacy-migration")) return json(noLegacyMigration);
+        const resolveMatch = path.match(/\/startup-notices\/(layout-\d+)\/resolve$/u);
+        if (resolveMatch) {
+          const id = resolveMatch[1];
+          expect(JSON.parse(String(init?.body))).toEqual({ action: "ignored" });
+          ignoredLayouts.add(id);
+          return json({
+            id,
+            kind: "legacy_layout_conversion",
+            payload: {},
+            created_at: "2026-07-26T00:00:00Z",
+            acknowledged_at: "2026-07-26T00:01:00Z",
+            resolution: "ignored",
+            resolved_at: "2026-07-26T00:01:00Z",
+          });
+        }
+        if (path.endsWith("/startup-notices")) {
+          const id = `layout-${updates.length}`;
+          return json(
+            updates.length && !ignoredLayouts.has(id)
+              ? [{
+                  id,
+                  kind: "legacy_layout_conversion",
+                  payload: {},
+                  created_at: "2026-07-26T00:00:00Z",
+                  acknowledged_at: null,
+                  resolution: null,
+                  resolved_at: null,
+                }]
+              : [],
+          );
+        }
         if (path.endsWith("/naming/conversions")) return json([]);
         if (path.endsWith("/naming/legacy-context")) {
           return json({ roots: [], conversion_pending: false });
@@ -262,6 +295,9 @@ describe("Naming format page", () => {
     await user.click(screen.getByRole("button", { name: "Save directory structure" }));
     await waitFor(() => expect(updates).toHaveLength(1));
     expect(updates[0]).toMatchObject({ section: "structure", revision: "revision-1" });
+    expect(await screen.findByRole("heading", { name: "Review existing downloads" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Ignore" }));
+    await waitFor(() => expect(ignoredLayouts.has("layout-1")).toBe(true));
 
     await user.click(screen.getByRole("tab", { name: /Naming templates/ }));
     const creatorTemplate = screen.getByRole("textbox", {
@@ -298,6 +334,7 @@ describe("Naming format page", () => {
         if (path.endsWith("/naming/legacy-migration")) {
           return json(migrated ? noLegacyMigration : legacyMigration);
         }
+        if (path.endsWith("/startup-notices")) return json([]);
         if (path.endsWith("/naming/legacy-context")) {
           return json({ roots: ["/project/downloads"], conversion_pending: true });
         }

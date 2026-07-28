@@ -411,8 +411,8 @@ OPERATIONS: dict[str, OperationMetadata] = {
         csrf=True,
     ),
     "list_startup_notices": OperationMetadata(
-        "List startup notices",
-        "Return unacknowledged one-time project migration notices for the signed-in user.",
+        "List project notices",
+        "Return unresolved project notices, including immutable naming-layout conversion suggestions.",
         "naming",
     ),
     "acknowledge_startup_notice": OperationMetadata(
@@ -422,8 +422,8 @@ OPERATIONS: dict[str, OperationMetadata] = {
         csrf=True,
     ),
     "resolve_startup_notice": OperationMetadata(
-        "Resolve a startup decision",
-        "Persist an explicit ignore or convert choice for the first-start legacy directory prompt.",
+        "Resolve a project notice",
+        "Persist an explicit ignore decision for one naming-layout version.",
         "naming",
         csrf=True,
     ),

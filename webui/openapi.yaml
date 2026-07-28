@@ -2411,7 +2411,7 @@ paths:
     get:
       tags:
       - naming
-      summary: List startup notices
+      summary: List project notices
       operationId: list_startup_notices
       responses:
         '200':
@@ -2423,7 +2423,7 @@ paths:
                   $ref: '#/components/schemas/StartupNoticeResponse'
                 type: array
                 title: Response List Startup Notices
-      description: Return unacknowledged one-time project migration notices for the signed-in user.
+      description: Return unresolved project notices, including immutable naming-layout conversion suggestions.
       security:
       - WebUISession: []
       x-ktoolbox-mcp:
@@ -2478,7 +2478,7 @@ paths:
     post:
       tags:
       - naming
-      summary: Resolve a startup decision
+      summary: Resolve a project notice
       operationId: resolve_startup_notice
       parameters:
       - name: notice_id
@@ -2513,7 +2513,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-      description: Persist an explicit ignore or convert choice for the first-start legacy directory prompt.
+      description: Persist an explicit ignore decision for one naming-layout version.
       security:
       - WebUISession: []
       x-ktoolbox-mcp:

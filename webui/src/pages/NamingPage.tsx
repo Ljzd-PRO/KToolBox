@@ -75,6 +75,7 @@ import type {
   NamingLegacyContext,
   NamingPreview,
   ProjectNamingConfiguration,
+  StartupNotice,
 } from "../types";
 
 type NamingDraft = Required<
@@ -260,6 +261,10 @@ export function NamingPage() {
     queryKey: ["naming-legacy-context"],
     queryFn: () => api<NamingLegacyContext>("/naming/legacy-context"),
   });
+  const noticesQuery = useQuery({
+    queryKey: ["startup-notices"],
+    queryFn: () => api<StartupNotice[]>("/startup-notices"),
+  });
   const [draft, setDraft] = useState<NamingDraft | null>(null);
   const [baselineRevision, setBaselineRevision] = useState("");
   const [structureBaseline, setStructureBaseline] = useState("");
@@ -275,6 +280,7 @@ export function NamingPage() {
     direction: "descending",
   });
   const [cancelTarget, setCancelTarget] = useState<NamingConversion | null>(null);
+  const [dismissedLayoutVersion, setDismissedLayoutVersion] = useState<string | null>(null);
 
   const remoteNamingRevision = realtime?.revisions.naming ?? 0;
   const current = namingQuery.data;
@@ -286,6 +292,11 @@ export function NamingPage() {
   const activeConversion = conversionsQuery.data?.find((item) =>
     activeConversionStatuses.has(item.status),
   );
+  const layoutNotice = noticesQuery.data?.find(
+    (notice) =>
+      notice.kind === "legacy_layout_conversion" &&
+      notice.id !== dismissedLayoutVersion,
+  ) ?? null;
 
   useEffect(() => {
     if (!current) return;
@@ -406,13 +417,12 @@ export function NamingPage() {
       setBaselineRevision(result.revision);
       if (section === "structure") setStructureBaseline(structureKey(candidate));
       else setTemplateBaseline(templateKey(candidate));
-      await queryClient.invalidateQueries({ queryKey: ["naming-legacy-context"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["naming-legacy-context"] }),
+        queryClient.invalidateQueries({ queryKey: ["startup-notices"] }),
+      ]);
       toast.success(t("naming.saved"), {
         description: t("naming.savedConversionHint"),
-        actionProps: {
-          children: t("naming.openLegacyConversion"),
-          onPress: () => setSelectedTab("legacy"),
-        },
       });
     } catch (error) {
       toast.danger(t("common.error"), { description: namingErrorText(error, t) });
@@ -465,6 +475,7 @@ export function NamingPage() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["naming"] }),
         queryClient.invalidateQueries({ queryKey: ["naming-conversions"] }),
+        queryClient.invalidateQueries({ queryKey: ["startup-notices"] }),
       ]);
       toast.success(
         t("naming.conversionStarted"),
@@ -526,6 +537,22 @@ export function NamingPage() {
       });
       await queryClient.invalidateQueries({ queryKey: ["naming-conversions"] });
       toast.success(t("naming.historyDeleted"));
+    } catch (error) {
+      toast.danger(t("common.error"), { description: namingErrorText(error, t) });
+    }
+  }
+
+  async function ignoreLayoutVersion(notice: StartupNotice) {
+    if (!session) return;
+    try {
+      await api<StartupNotice>(`/startup-notices/${notice.id}/resolve`, {
+        method: "POST",
+        body: { action: "ignored" },
+        csrfToken: session.csrf_token,
+      });
+      setDismissedLayoutVersion(notice.id);
+      await queryClient.invalidateQueries({ queryKey: ["startup-notices"] });
+      toast.success(t("naming.startup.ignored"));
     } catch (error) {
       toast.danger(t("common.error"), { description: namingErrorText(error, t) });
     }
@@ -1009,6 +1036,51 @@ export function NamingPage() {
         onOpenChange={(open) => !open && setPreview(null)}
         onSelectedChange={setSelectedCreators}
       />
+
+      <FormModal
+        open={layoutNotice !== null}
+        size="md"
+        title={t("naming.startup.title")}
+        actions={
+          <>
+            <Button
+              variant="ghost"
+              onPress={() => layoutNotice && void ignoreLayoutVersion(layoutNotice)}
+            >
+              <X aria-hidden="true" size={17} />
+              {t("naming.startup.ignore")}
+            </Button>
+            <Button
+              variant="primary"
+              onPress={() => {
+                if (layoutNotice) setDismissedLayoutVersion(layoutNotice.id);
+                startAutomaticScan();
+              }}
+            >
+              <DatabaseImport aria-hidden="true" size={17} />
+              {t("naming.startup.convert")}
+            </Button>
+          </>
+        }
+        onOpenChange={(open) => {
+          if (!open && layoutNotice) setDismissedLayoutVersion(layoutNotice.id);
+        }}
+      >
+        <div className="grid gap-4">
+          <Alert status="accent">
+            <Alert.Indicator>
+              <DatabaseImport aria-hidden="true" size={18} />
+            </Alert.Indicator>
+            <Alert.Content>
+              <Alert.Title>{t("naming.startup.heading")}</Alert.Title>
+              <Alert.Description>{t("naming.startup.body")}</Alert.Description>
+            </Alert.Content>
+          </Alert>
+          <p className="text-sm leading-6 text-muted">
+            {t("naming.startup.versionHint")}
+          </p>
+        </div>
+      </FormModal>
 
       <FormModal
         open={cancelTarget !== null}

@@ -473,7 +473,7 @@ function applyRealtimeEvent(
     queueRefresh("config-schema", "config-document", "project", "creators", "blockers", "naming");
     notifyResource("configuration");
   } else if (event.event_type === "naming.changed") {
-    queueRefresh("naming", "naming-conversions", "config-document");
+    queueRefresh("naming", "naming-conversions", "startup-notices", "config-document");
     notifyResource("naming");
   } else if (event.event_type.startsWith("naming.conversion.")) {
     queueRefresh("naming-conversions");

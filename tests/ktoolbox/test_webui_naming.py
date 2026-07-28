@@ -129,6 +129,9 @@ async def test_naming_sections_save_without_overwriting_each_other(tmp_path: Pat
     assert structure_result.naming.mix_posts is True
     assert structure_result.naming.creator_dirname_format == original.creator_dirname_format
     assert structure_result.conversion_pending is True
+    first_notice = (await service.notices())[0]
+    assert first_notice.kind == "legacy_layout_conversion"
+    assert first_notice.payload["target"]["mix_posts"] is True
 
     templates_result = await service.update_naming(
         "templates",
@@ -137,6 +140,15 @@ async def test_naming_sections_save_without_overwriting_each_other(tmp_path: Pat
     )
     assert templates_result.naming.mix_posts is True
     assert templates_result.naming.creator_dirname_format == "{creator_name} ({creator_id})"
+    second_notice = (await service.notices())[0]
+    assert second_notice.id != first_notice.id
+    assert second_notice.payload["target"]["creator_dirname_format"] == "{creator_name} ({creator_id})"
+    await service.resolve_notice(second_notice.id, "ignored")
+    assert await service.notices() == []
+
+    another = candidate.model_copy(update={"creator_dirname_format": "{creator_name}"})
+    await service.update_naming("templates", another, templates_result.revision)
+    assert len(await service.notices()) == 1
     with pytest.raises(NamingPreviewStaleError, match="reload before saving"):
         await service.update_naming("templates", original, structure_result.revision)
     await service.stop()
@@ -191,6 +203,7 @@ async def test_preview_scans_filesystem_and_conversion_updates_project(tmp_path:
         await asyncio.sleep(0.01)
 
     assert conversion.status == "completed", conversion.error
+    assert await service.notices() == []
     assert not source.exists()
     assert not source.parent.exists()
     assert (downloads / "Artist (123)" / "one" / "asset.bin").is_file()
