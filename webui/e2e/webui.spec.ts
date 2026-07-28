@@ -37,19 +37,19 @@ async function signIn(page: Page) {
   await page.goto("/");
   await page.getByLabel("Username").fill("playwright");
   await page.getByLabel("Password", { exact: true }).fill("fixture-password");
-  const startupNoticesLoaded = page.waitForResponse(
+  const migrationStatusLoaded = page.waitForResponse(
     (response) =>
-      response.url().endsWith("/api/v1/startup-notices") &&
+      response.url().endsWith("/api/v1/naming/legacy-migration") &&
       response.request().method() === "GET",
   );
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByRole("heading", { name: "Overview", exact: true })).toBeVisible();
-  const startupNotices = (await (await startupNoticesLoaded).json()) as Array<{ kind: string }>;
-  const startupDialog = page.getByRole("dialog", { name: "Review existing downloads" });
-  if (startupNotices.some((notice) => notice.kind === "legacy_layout_conversion")) {
-    await expect(startupDialog).toBeVisible();
-    await startupDialog.getByRole("button", { name: "Ignore", exact: true }).click();
-    await expect(startupDialog).toBeHidden();
+  const migrationStatus = (await (await migrationStatusLoaded).json()) as { pending: boolean };
+  const migrationDialog = page.getByRole("dialog", { name: "Migrate legacy naming settings" });
+  if (migrationStatus.pending) {
+    await expect(migrationDialog).toBeVisible();
+    await migrationDialog.getByRole("button", { name: "Ignore", exact: true }).click();
+    await expect(migrationDialog).toBeHidden();
   }
   const errors = browserErrors.get(page) ?? [];
   expect(errors.filter((error) => !error.includes("status of 401 (Unauthorized)"))).toEqual([]);
@@ -220,7 +220,8 @@ test("MCP connection page issues one-time tokens and exposes safe client configu
   await page.reload();
   await expect(page.getByRole("heading", { level: 1, name: "MCP", exact: true })).toBeVisible();
   await expect(page.getByText("Streamable HTTP", { exact: true })).toBeVisible();
-  await expect(page.getByText("http://127.0.0.1:8792/mcp", { exact: true })).toBeVisible();
+  const serviceOrigin = new URL(page.url()).origin;
+  await expect(page.getByText(`${serviceOrigin}/mcp`, { exact: true })).toBeVisible();
   await page.getByRole("button", { name: /Configuration.*2/ }).click();
   await expect(page.locator("code").filter({ hasText: "config_schema" })).toBeVisible();
 
@@ -442,7 +443,7 @@ test("remote path picker browses the server filesystem from nested forms", async
 
   const picker = page.getByRole("dialog", { name: "Output directory" });
   await expect(picker).toBeVisible();
-  await expect(picker.getByText("Project files")).toBeVisible();
+  await expect(picker.getByText("Remote computer", { exact: true })).toBeVisible();
   await expect(picker.getByRole("switch", { name: "Show hidden items" })).toBeVisible();
   await expect(picker.getByRole("textbox", { name: "Remote path" })).toHaveValue(/[/\\]downloads$/);
   await picker.getByRole("button", { name: "Parent directory" }).click();
