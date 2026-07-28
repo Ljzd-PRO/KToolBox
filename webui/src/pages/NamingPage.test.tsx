@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -77,6 +77,37 @@ const preview = {
   created_at: "2026-07-26T00:00:00Z",
 };
 
+const noLegacyMigration = {
+  pending: false,
+  project_revision: "revision-1",
+  sources: [],
+  fields: [],
+  ignored_environment_keys: [],
+};
+
+const legacyMigration = {
+  pending: true,
+  project_revision: "revision-1",
+  sources: [
+    {
+      name: ".env",
+      path: "/project/.env",
+      revision: "dotenv-revision-1",
+      keys: ["KTOOLBOX_JOB__POST_DIRNAME_FORMAT"],
+    },
+  ],
+  fields: [
+    {
+      path: "post_dirname_format",
+      env_key: "KTOOLBOX_JOB__POST_DIRNAME_FORMAT",
+      legacy_value: "{title}",
+      current_value: "{title} [{post_id}]",
+      sources: [".env"],
+    },
+  ],
+  ignored_environment_keys: [],
+};
+
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -103,7 +134,7 @@ describe("Naming format page", () => {
       vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
         const path = String(input);
         if (path.endsWith("/session")) return json(session);
-        if (path.endsWith("/startup-notices")) return json([]);
+        if (path.endsWith("/naming/legacy-migration")) return json(noLegacyMigration);
         if (path.endsWith("/naming/conversions")) return json([]);
         if (path.endsWith("/naming/legacy-context")) {
           return json({
@@ -190,7 +221,7 @@ describe("Naming format page", () => {
       vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
         const path = String(input);
         if (path.endsWith("/session")) return json(session);
-        if (path.endsWith("/startup-notices")) return json([]);
+        if (path.endsWith("/naming/legacy-migration")) return json(noLegacyMigration);
         if (path.endsWith("/naming/conversions")) return json([]);
         if (path.endsWith("/naming/legacy-context")) {
           return json({ roots: [], conversion_pending: false });
@@ -243,67 +274,71 @@ describe("Naming format page", () => {
     expect(updates[1]).toMatchObject({ section: "templates", revision: "revision-2" });
   });
 
-  it("requires an explicit first-start decision and persists ignore", async () => {
+  it("dismisses legacy migration only for the current view and migrates after review", async () => {
     const user = userEvent.setup();
-    let resolved = false;
+    let migrated = false;
+    let applyBody: Record<string, unknown> | undefined;
     vi.stubGlobal(
       "fetch",
       vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
         const path = String(input);
         if (path.endsWith("/session")) return json(session);
-        if (path.endsWith("/startup-notices/decision-1/resolve")) {
+        if (path.endsWith("/naming/legacy-migration/apply")) {
           expect(new Headers(init?.headers).get("X-CSRF-Token")).toBe("csrf-token");
-          expect(JSON.parse(String(init?.body))).toEqual({ action: "ignored" });
-          resolved = true;
+          applyBody = JSON.parse(String(init?.body)) as Record<string, unknown>;
+          migrated = true;
           return json({
-            id: "decision-1",
-            kind: "legacy_layout_conversion",
-            payload: {},
-            created_at: "2026-07-26T00:00:00Z",
-            acknowledged_at: null,
-            resolution: "ignored",
-            resolved_at: "2026-07-26T00:01:00Z",
+            migrated: true,
+            backup_paths: ["/project/.ktoolbox/migrations/project-naming-v2/.env"],
+            naming,
+            project_revision: "revision-2",
+            ignored_environment_keys: [],
           });
         }
-        if (path.endsWith("/startup-notices")) {
-          return json(
-            resolved
-              ? []
-              : [
-                  {
-                    id: "decision-1",
-                    kind: "legacy_layout_conversion",
-                    payload: {},
-                    created_at: "2026-07-26T00:00:00Z",
-                    acknowledged_at: null,
-                    resolution: null,
-                    resolved_at: null,
-                  },
-                ],
-          );
+        if (path.endsWith("/naming/legacy-migration")) {
+          return json(migrated ? noLegacyMigration : legacyMigration);
+        }
+        if (path.endsWith("/naming/legacy-context")) {
+          return json({ roots: ["/project/downloads"], conversion_pending: true });
+        }
+        if (path.endsWith("/naming")) {
+          return json({ naming, revision: migrated ? "revision-2" : "revision-1", conversion_pending: true });
         }
         if (path.endsWith("/tasks")) return json([]);
         throw new Error(`Unexpected request: ${path}`);
       }),
     );
 
-    render(
+    const first = render(
       <BrowserRouter>
         <App />
       </BrowserRouter>,
     );
 
-    expect(await screen.findByRole("heading", { name: "Review existing downloads" })).toBeInTheDocument();
-    const decisionDialog = screen.getByRole("dialog", { name: "Review existing downloads" });
-    expect(within(decisionDialog).queryByRole("button", { name: "Close" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Ignore" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Review conversion" })).toBeInTheDocument();
-    await user.keyboard("{Escape}");
-    expect(screen.getByRole("heading", { name: "Review existing downloads" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Migrate legacy naming settings" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Ignore" }));
     await waitFor(() =>
-      expect(screen.queryByRole("heading", { name: "Review existing downloads" })).not.toBeInTheDocument(),
+      expect(screen.queryByRole("heading", { name: "Migrate legacy naming settings" })).not.toBeInTheDocument(),
     );
-    expect(resolved).toBe(true);
+    expect(migrated).toBe(false);
+
+    first.unmount();
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>,
+    );
+    expect(await screen.findByRole("heading", { name: "Migrate legacy naming settings" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Review changes" }));
+    expect(await screen.findByRole("heading", { name: "Review configuration changes" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Migrate configuration" }));
+    await waitFor(() =>
+      expect(applyBody).toEqual({
+        selected_fields: ["post_dirname_format"],
+        project_revision: "revision-1",
+        source_revisions: { ".env": "dotenv-revision-1" },
+      }),
+    );
+    expect(await screen.findByText("Configuration migration is complete. You can now scan one or more old download locations, or do this later from Naming format.")).toBeInTheDocument();
   });
 });

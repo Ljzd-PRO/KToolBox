@@ -117,6 +117,10 @@ export type NamingConfigurationResponse = WebUIApiSchemas["NamingConfigurationRe
 
 export type NamingLegacyContext = WebUIApiSchemas["NamingLegacyContextResponse"];
 
+export type LegacyNamingMigration = WebUIApiSchemas["LegacyNamingMigrationResponse"];
+
+export type LegacyNamingMigrationResult = WebUIApiSchemas["LegacyNamingMigrationResultResponse"];
+
 export type NamingCreatorPreview = WebUIApiSchemas["NamingCreatorPreview"];
 
 export type NamingPreview = WebUIApiSchemas["NamingPreviewResponse"];

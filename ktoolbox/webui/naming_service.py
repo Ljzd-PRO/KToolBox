@@ -27,15 +27,25 @@ from ktoolbox.action.utils import (
 )
 from ktoolbox.api.generated import Post
 from ktoolbox.job import CreatorIndices
-from ktoolbox.naming_migration import MIGRATION_NOTICE_PATH
+from ktoolbox.naming_migration import (
+    LegacyNamingApplyResult,
+    LegacyNamingPreview,
+    apply_legacy_naming,
+    preview_legacy_naming,
+)
 from ktoolbox.project_config import (
     ProjectConfigStore,
     ProjectNamingConfiguration,
+    resolve_project_output,
 )
 from ktoolbox.webui.config_store import content_revision
 from ktoolbox.webui.database import WebUIDatabase, utc_now
 from ktoolbox.webui.event_store import WebUIEventStore
 from ktoolbox.webui.naming_models import (
+    LegacyNamingFieldResponse,
+    LegacyNamingMigrationResponse,
+    LegacyNamingMigrationResultResponse,
+    LegacyNamingSourceResponse,
     NamingConfigurationResponse,
     NamingConversionProgress,
     NamingConversionResponse,
@@ -101,8 +111,6 @@ class NamingConversionService:
 
     async def start(self) -> None:
         await self._migrate_legacy_roots()
-        await self._import_startup_notice()
-        await self._ensure_conversion_decision_notice()
         await self._recover_incomplete()
 
     async def stop(self) -> None:
@@ -114,10 +122,12 @@ class NamingConversionService:
         self._cancellations.clear()
 
     async def legacy_context(self) -> NamingLegacyContextResponse:
-        roots: list[Path] = []
+        project = self.project_store.load()
+        default_output = resolve_project_output(self.project_root, project)
+        roots: list[Path] = [_stored_root(default_output, self.project_root)]
         async with self.database.connect() as connection:
             rows = await connection.execute_fetchall("SELECT path FROM naming_legacy_roots ORDER BY created_at, path")
-        seen: set[str] = set()
+        seen: set[str] = {_normalized_path(default_output)}
         for (stored_path,) in rows:
             root = Path(str(stored_path))
             normalized = _normalized_path(self._resolve_root(root))
@@ -144,6 +154,52 @@ class NamingConversionService:
             revision=content_revision(self.project_store.load_text()),
             conversion_pending=await self.has_pending_layout(),
         )
+
+    async def legacy_migration(self) -> LegacyNamingMigrationResponse:
+        preview = await anyio.to_thread.run_sync(
+            preview_legacy_naming,
+            self.project_root,
+        )
+        return _legacy_migration_response(preview)
+
+    async def apply_legacy_migration(
+        self,
+        *,
+        selected_fields: list[str],
+        project_revision: str,
+        source_revisions: dict[str, str],
+    ) -> LegacyNamingMigrationResultResponse:
+        async with self._apply_lock:
+            previous = self.project_store.load().naming
+            try:
+                result = await anyio.to_thread.run_sync(
+                    lambda: apply_legacy_naming(
+                        self.project_root,
+                        selected_fields=set(selected_fields),
+                        project_revision=project_revision,
+                        source_revisions=source_revisions,
+                    )
+                )
+            except ValueError as error:
+                raise NamingPreviewStaleError(str(error)) from error
+            if result.naming != previous:
+                await self._record_layout_change(previous, result.naming)
+            await self.events.publish(
+                "configuration.changed",
+                {"documents": [".env", "prod.env", "ktoolbox.toml"]},
+                resource="configuration",
+                resource_id="legacy-naming",
+            )
+            await self.events.publish(
+                "naming.migration.completed",
+                {
+                    "backup_count": len(result.backup_paths),
+                    "conversion_pending": result.naming != previous,
+                },
+                resource="naming",
+                resource_id="legacy-naming",
+            )
+            return _legacy_migration_result_response(result)
 
     async def update_naming(
         self,
@@ -503,24 +559,6 @@ class NamingConversionService:
         configuration = self.project_store.load()
         await anyio.to_thread.run_sync(self.project_store.save, configuration)
 
-    async def _ensure_conversion_decision_notice(self) -> None:
-        now = utc_now().isoformat()
-        async with self.database.connect() as connection:
-            await connection.execute(
-                """
-                INSERT OR IGNORE INTO startup_notices(
-                    id, kind, payload_json, created_at
-                ) VALUES (
-                    'legacy-layout-conversion-v1',
-                    'legacy_layout_conversion',
-                    '{}',
-                    ?
-                )
-                """,
-                (now,),
-            )
-            await connection.commit()
-
     async def _run_conversion(
         self,
         conversion_id: str,
@@ -754,27 +792,6 @@ class NamingConversionService:
                 "failed",
                 error="WebUI stopped during naming conversion; completed moves were rolled back",
             )
-
-    async def _import_startup_notice(self) -> None:
-        path = self.project_root / MIGRATION_NOTICE_PATH
-        if not path.is_file():
-            return
-        try:
-            payload = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            return
-        now = utc_now().isoformat()
-        async with self.database.connect() as connection:
-            await connection.execute(
-                """
-                INSERT OR IGNORE INTO startup_notices(id, kind, payload_json, created_at)
-                VALUES (?, 'naming_migrated', ?, ?)
-                """,
-                (str(payload.get("id", "project-naming-v2")), json.dumps(payload), now),
-            )
-            await connection.commit()
-        path.unlink(missing_ok=True)
-
 
 def _scan_download_roots(
     roots: list[Path],
@@ -1368,6 +1385,47 @@ def _conversion_from_row(row: aiosqlite.Row) -> NamingConversionResponse:
         error=row["error"],
         created_at=row["created_at"],
         updated_at=row["updated_at"],
+    )
+
+
+def _legacy_migration_response(
+    preview: LegacyNamingPreview,
+) -> LegacyNamingMigrationResponse:
+    return LegacyNamingMigrationResponse(
+        pending=preview.pending,
+        project_revision=preview.project_revision,
+        sources=[
+            LegacyNamingSourceResponse(
+                name=source.path.name,
+                path=source.path,
+                revision=source.revision,
+                keys=list(source.keys),
+            )
+            for source in preview.sources
+        ],
+        fields=[
+            LegacyNamingFieldResponse(
+                path=field.path,
+                env_key=field.env_key,
+                legacy_value=field.legacy_value,
+                current_value=field.current_value,
+                sources=list(field.sources),
+            )
+            for field in preview.fields
+        ],
+        ignored_environment_keys=list(preview.ignored_environment_keys),
+    )
+
+
+def _legacy_migration_result_response(
+    result: LegacyNamingApplyResult,
+) -> LegacyNamingMigrationResultResponse:
+    return LegacyNamingMigrationResultResponse(
+        migrated=result.migrated,
+        backup_paths=list(result.backup_paths),
+        naming=result.naming,
+        project_revision=result.project_revision,
+        ignored_environment_keys=list(result.ignored_environment_keys),
     )
 
 

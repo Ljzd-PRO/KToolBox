@@ -760,6 +760,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/naming/legacy-migration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Inspect legacy naming configuration
+         * @description Return a read-only field comparison for legacy dotenv naming settings that still require confirmation.
+         */
+        get: operations["get_legacy_naming_migration"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/naming/legacy-migration/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Migrate legacy naming configuration
+         * @description Back up project files, apply selected legacy fields, and remove confirmed legacy dotenv keys.
+         */
+        post: operations["apply_legacy_naming_migration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/naming/preview": {
         parameters: {
             query?: never;
@@ -1827,6 +1867,69 @@ export interface components {
              * @default UTC
              */
             timezone: string;
+        };
+        /** LegacyNamingFieldResponse */
+        LegacyNamingFieldResponse: {
+            /** Path */
+            path: string;
+            /** Env Key */
+            env_key: string;
+            /** Legacy Value */
+            legacy_value: unknown;
+            /** Current Value */
+            current_value: unknown;
+            /** Sources */
+            sources: string[];
+        };
+        /** LegacyNamingMigrationApplyRequest */
+        LegacyNamingMigrationApplyRequest: {
+            /** Selected Fields */
+            selected_fields: string[];
+            /** Project Revision */
+            project_revision: string;
+            /** Source Revisions */
+            source_revisions: {
+                [key: string]: string;
+            };
+        };
+        /** LegacyNamingMigrationResponse */
+        LegacyNamingMigrationResponse: {
+            /** Pending */
+            pending: boolean;
+            /** Project Revision */
+            project_revision: string;
+            /** Sources */
+            sources: components["schemas"]["LegacyNamingSourceResponse"][];
+            /** Fields */
+            fields: components["schemas"]["LegacyNamingFieldResponse"][];
+            /** Ignored Environment Keys */
+            ignored_environment_keys: string[];
+        };
+        /** LegacyNamingMigrationResultResponse */
+        LegacyNamingMigrationResultResponse: {
+            /** Migrated */
+            migrated: boolean;
+            /** Backup Paths */
+            backup_paths: string[];
+            naming: components["schemas"]["ProjectNamingConfiguration"];
+            /** Project Revision */
+            project_revision: string;
+            /** Ignored Environment Keys */
+            ignored_environment_keys: string[];
+        };
+        /** LegacyNamingSourceResponse */
+        LegacyNamingSourceResponse: {
+            /** Name */
+            name: string;
+            /**
+             * Path
+             * Format: path
+             */
+            path: string;
+            /** Revision */
+            revision: string;
+            /** Keys */
+            keys: string[];
         };
         /** LoginRequest */
         LoginRequest: {
@@ -4354,6 +4457,62 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NamingLegacyContextResponse"];
+                };
+            };
+        };
+    };
+    get_legacy_naming_migration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LegacyNamingMigrationResponse"];
+                };
+            };
+        };
+    };
+    apply_legacy_naming_migration: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LegacyNamingMigrationApplyRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LegacyNamingMigrationResultResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

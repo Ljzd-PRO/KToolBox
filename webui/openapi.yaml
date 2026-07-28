@@ -2120,6 +2120,70 @@ paths:
         scope: null
         safety: null
         openWorld: false
+  /api/v1/naming/legacy-migration:
+    get:
+      tags:
+      - naming
+      summary: Inspect legacy naming configuration
+      operationId: get_legacy_naming_migration
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LegacyNamingMigrationResponse'
+      description: Return a read-only field comparison for legacy dotenv naming settings that still require confirmation.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: true
+        name: get_legacy_naming_migration
+        scope: mcp:read
+        safety: read
+        openWorld: false
+  /api/v1/naming/legacy-migration/apply:
+    post:
+      tags:
+      - naming
+      summary: Migrate legacy naming configuration
+      operationId: apply_legacy_naming_migration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LegacyNamingMigrationApplyRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LegacyNamingMigrationResultResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Back up project files, apply selected legacy fields, and remove confirmed legacy dotenv keys.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: apply_legacy_naming_migration
+        scope: null
+        safety: null
+        openWorld: false
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
   /api/v1/naming/preview:
     post:
       tags:
@@ -4092,6 +4156,136 @@ components:
       type: object
       title: IntervalAutomaticSyncSchedule
       description: A fixed interval anchored to a stable UTC instant.
+    LegacyNamingFieldResponse:
+      properties:
+        path:
+          type: string
+          title: Path
+        env_key:
+          type: string
+          title: Env Key
+        legacy_value:
+          title: Legacy Value
+        current_value:
+          title: Current Value
+        sources:
+          items:
+            type: string
+          type: array
+          title: Sources
+      type: object
+      required:
+      - path
+      - env_key
+      - legacy_value
+      - current_value
+      - sources
+      title: LegacyNamingFieldResponse
+    LegacyNamingMigrationApplyRequest:
+      properties:
+        selected_fields:
+          items:
+            type: string
+          type: array
+          title: Selected Fields
+        project_revision:
+          type: string
+          title: Project Revision
+        source_revisions:
+          additionalProperties:
+            type: string
+          type: object
+          title: Source Revisions
+      type: object
+      required:
+      - selected_fields
+      - project_revision
+      - source_revisions
+      title: LegacyNamingMigrationApplyRequest
+    LegacyNamingMigrationResponse:
+      properties:
+        pending:
+          type: boolean
+          title: Pending
+        project_revision:
+          type: string
+          title: Project Revision
+        sources:
+          items:
+            $ref: '#/components/schemas/LegacyNamingSourceResponse'
+          type: array
+          title: Sources
+        fields:
+          items:
+            $ref: '#/components/schemas/LegacyNamingFieldResponse'
+          type: array
+          title: Fields
+        ignored_environment_keys:
+          items:
+            type: string
+          type: array
+          title: Ignored Environment Keys
+      type: object
+      required:
+      - pending
+      - project_revision
+      - sources
+      - fields
+      - ignored_environment_keys
+      title: LegacyNamingMigrationResponse
+    LegacyNamingMigrationResultResponse:
+      properties:
+        migrated:
+          type: boolean
+          title: Migrated
+        backup_paths:
+          items:
+            type: string
+            format: path
+          type: array
+          title: Backup Paths
+        naming:
+          $ref: '#/components/schemas/ProjectNamingConfiguration'
+        project_revision:
+          type: string
+          title: Project Revision
+        ignored_environment_keys:
+          items:
+            type: string
+          type: array
+          title: Ignored Environment Keys
+      type: object
+      required:
+      - migrated
+      - backup_paths
+      - naming
+      - project_revision
+      - ignored_environment_keys
+      title: LegacyNamingMigrationResultResponse
+    LegacyNamingSourceResponse:
+      properties:
+        name:
+          type: string
+          title: Name
+        path:
+          type: string
+          format: path
+          title: Path
+        revision:
+          type: string
+          title: Revision
+        keys:
+          items:
+            type: string
+          type: array
+          title: Keys
+      type: object
+      required:
+      - name
+      - path
+      - revision
+      - keys
+      title: LegacyNamingSourceResponse
     LoginRequest:
       properties:
         username:

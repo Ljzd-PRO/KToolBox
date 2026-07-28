@@ -7,6 +7,9 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from ktoolbox.webui.auth import require_csrf, require_session
 from ktoolbox.webui.database import WebUISession
 from ktoolbox.webui.naming_models import (
+    LegacyNamingMigrationApplyRequest,
+    LegacyNamingMigrationResponse,
+    LegacyNamingMigrationResultResponse,
     NamingApplyRequest,
     NamingConfigurationResponse,
     NamingConversionResponse,
@@ -69,6 +72,37 @@ def create_naming_router() -> APIRouter:
         service: NamingServiceDependency,
     ) -> NamingLegacyContextResponse:
         return await service.legacy_context()
+
+    @router.get(
+        "/naming/legacy-migration",
+        response_model=LegacyNamingMigrationResponse,
+    )
+    async def get_legacy_naming_migration(
+        _: SessionDependency,
+        service: NamingServiceDependency,
+    ) -> LegacyNamingMigrationResponse:
+        return await service.legacy_migration()
+
+    @router.post(
+        "/naming/legacy-migration/apply",
+        response_model=LegacyNamingMigrationResultResponse,
+    )
+    async def apply_legacy_naming_migration(
+        payload: LegacyNamingMigrationApplyRequest,
+        _: CsrfDependency,
+        service: NamingServiceDependency,
+    ) -> LegacyNamingMigrationResultResponse:
+        try:
+            return await service.apply_legacy_migration(
+                selected_fields=payload.selected_fields,
+                project_revision=payload.project_revision,
+                source_revisions=payload.source_revisions,
+            )
+        except NamingPreviewStaleError as error:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=str(error),
+            ) from error
 
     @router.post("/naming/preview", response_model=NamingPreviewResponse)
     async def preview_naming(

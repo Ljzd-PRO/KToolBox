@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -36,6 +36,43 @@ class NamingUpdateRequest(BaseModel):
 class NamingLegacyContextResponse(BaseModel):
     roots: list[Path] = Field(default_factory=list)
     conversion_pending: bool = False
+
+
+class LegacyNamingSourceResponse(BaseModel):
+    name: str
+    path: Path
+    revision: str
+    keys: list[str]
+
+
+class LegacyNamingFieldResponse(BaseModel):
+    path: str
+    env_key: str
+    legacy_value: Any
+    current_value: Any
+    sources: list[str]
+
+
+class LegacyNamingMigrationResponse(BaseModel):
+    pending: bool
+    project_revision: str
+    sources: list[LegacyNamingSourceResponse]
+    fields: list[LegacyNamingFieldResponse]
+    ignored_environment_keys: list[str]
+
+
+class LegacyNamingMigrationApplyRequest(BaseModel):
+    selected_fields: list[str]
+    project_revision: str
+    source_revisions: dict[str, str]
+
+
+class LegacyNamingMigrationResultResponse(BaseModel):
+    migrated: bool
+    backup_paths: list[Path]
+    naming: ProjectNamingConfiguration
+    project_revision: str
+    ignored_environment_keys: list[str]
 
 
 class NamingPreviewRequest(BaseModel):

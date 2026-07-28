@@ -362,6 +362,18 @@ OPERATIONS: dict[str, OperationMetadata] = {
         "Return suggested legacy download locations and pending conversion state without changing task outputs.",
         "naming",
     ),
+    "get_legacy_naming_migration": OperationMetadata(
+        "Inspect legacy naming configuration",
+        "Return a read-only field comparison for legacy dotenv naming settings that still require confirmation.",
+        "naming",
+        mcp=_read(),
+    ),
+    "apply_legacy_naming_migration": OperationMetadata(
+        "Migrate legacy naming configuration",
+        "Back up project files, apply selected legacy fields, and remove confirmed legacy dotenv keys.",
+        "naming",
+        csrf=True,
+    ),
     "preview_naming": OperationMetadata(
         "Preview a naming conversion",
         "Scan selected legacy download locations and return safe per-creator moves, statistics, skips, and conflicts.",

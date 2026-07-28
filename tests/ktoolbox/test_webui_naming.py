@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import json
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -13,7 +12,6 @@ from ktoolbox._enum import DataStorageNameEnum
 from ktoolbox.api.generated import Post
 from ktoolbox.configuration import Configuration, RuntimeContext
 from ktoolbox.job import CreatorIndices
-from ktoolbox.naming_migration import MIGRATION_NOTICE_PATH
 from ktoolbox.project_config import (
     ProjectConfigStore,
     ProjectConfiguration,
@@ -102,7 +100,7 @@ creator_dirname_format = "{creator_name} [{service}-{creator_id}]"
     context = await service.legacy_context()
     assert set(context.roots) == {Path("downloads"), Path("/archive/ktoolbox")}
     assert "download_roots" not in project_path.read_text(encoding="utf-8")
-    assert ProjectConfigStore(project_path).load().schema_version == 4
+    assert ProjectConfigStore(project_path).load().schema_version == 5
     await service.stop()
 
     restarted, _ = await service_for(tmp_path)
@@ -365,43 +363,37 @@ async def test_preview_uses_creator_index_and_detects_duplicate_targets(tmp_path
 
 
 @pytest.mark.asyncio
-async def test_startup_migration_notice_is_imported_and_acknowledged(tmp_path: Path) -> None:
-    notice_path = tmp_path / MIGRATION_NOTICE_PATH
-    notice_path.parent.mkdir(parents=True)
-    notice_path.write_text(
-        json.dumps(
-            {
-                "id": "project-naming-v2",
-                "backup_paths": [".ktoolbox/migrations/project-naming-v2/.env.bak"],
-                "ignored_environment_keys": [],
-            }
-        ),
+async def test_legacy_migration_requires_explicit_field_confirmation(tmp_path: Path) -> None:
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    project = ProjectConfiguration()
+    project.naming.post_dirname_format = "{id}"
+    project.naming.filename_format = "{post_id}_{}"
+    store.save(project)
+    (tmp_path / ".env").write_text(
+        "KTOOLBOX_JOB__POST_DIRNAME_FORMAT={title} [{id}]\n"
+        "KTOOLBOX_JOB__FILENAME_FORMAT={id}_{}\n",
         encoding="utf-8",
     )
-
     service, _ = await service_for(tmp_path)
 
-    assert not notice_path.exists()
-    notices = await service.notices()
-    assert {notice.id for notice in notices} == {
-        "project-naming-v2",
-        "legacy-layout-conversion-v1",
+    preview = await service.legacy_migration()
+    assert preview.pending is True
+    assert {field.path for field in preview.fields} == {
+        "post_dirname_format",
+        "filename_format",
     }
-    acknowledged = await service.acknowledge_notice("project-naming-v2")
-    assert acknowledged.acknowledged_at is not None
-    assert (await service.acknowledge_notice("project-naming-v2")).acknowledged_at is not None
-    resolved = await service.resolve_notice(
-        "legacy-layout-conversion-v1",
-        "ignored",
+    result = await service.apply_legacy_migration(
+        selected_fields=["post_dirname_format"],
+        project_revision=preview.project_revision,
+        source_revisions={source.name: source.revision for source in preview.sources},
     )
-    assert resolved.resolution == "ignored"
-    assert (
-        await service.resolve_notice(
-            "legacy-layout-conversion-v1",
-            "convert_selected",
-        )
-    ).resolution == "ignored"
-    assert await service.notices() == []
+
+    assert result.migrated is True
+    migrated = store.load()
+    assert migrated.naming.post_dirname_format == "{title} [{id}]"
+    assert migrated.naming.filename_format == "{post_id}_{}"
+    assert (await service.legacy_migration()).pending is False
+    assert await service.has_pending_layout() is True
     await service.stop()
 
 
@@ -464,3 +456,47 @@ async def test_naming_routes_require_session_and_csrf(tmp_path: Path) -> None:
         )
         assert apply.status_code == 202
         assert store.load().naming.post_dirname_format == "{post_id}"
+
+
+@pytest.mark.asyncio
+async def test_legacy_migration_routes_apply_selected_fields(tmp_path: Path) -> None:
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    store.save(ProjectConfiguration())
+    (tmp_path / ".env").write_text(
+        "KTOOLBOX_JOB__POST_DIRNAME_FORMAT={id}\n"
+        "KTOOLBOX_JOB__MIX_POSTS=true\n",
+        encoding="utf-8",
+    )
+
+    async with authenticated_client(tmp_path) as (client, csrf):
+        preview = await client.get("/api/v1/naming/legacy-migration")
+        assert preview.status_code == 200
+        body = preview.json()
+        assert body["pending"] is True
+        assert {field["path"] for field in body["fields"]} == {
+            "post_dirname_format",
+            "mix_posts",
+        }
+        payload = {
+            "selected_fields": ["post_dirname_format"],
+            "project_revision": body["project_revision"],
+            "source_revisions": {
+                source["name"]: source["revision"]
+                for source in body["sources"]
+            },
+        }
+        assert (
+            await client.post(
+                "/api/v1/naming/legacy-migration/apply",
+                json=payload,
+            )
+        ).status_code == 403
+        applied = await client.post(
+            "/api/v1/naming/legacy-migration/apply",
+            json=payload,
+            headers=csrf,
+        )
+        assert applied.status_code == 200
+        assert applied.json()["naming"]["post_dirname_format"] == "{id}"
+        assert applied.json()["naming"]["mix_posts"] is False
+        assert (await client.get("/api/v1/naming/legacy-migration")).json()["pending"] is False
