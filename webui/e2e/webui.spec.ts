@@ -37,8 +37,20 @@ async function signIn(page: Page) {
   await page.goto("/");
   await page.getByLabel("Username").fill("playwright");
   await page.getByLabel("Password", { exact: true }).fill("fixture-password");
+  const startupNoticesLoaded = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/api/v1/startup-notices") &&
+      response.request().method() === "GET",
+  );
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByRole("heading", { name: "Overview", exact: true })).toBeVisible();
+  const startupNotices = (await (await startupNoticesLoaded).json()) as Array<{ kind: string }>;
+  const startupDialog = page.getByRole("dialog", { name: "Review existing downloads" });
+  if (startupNotices.some((notice) => notice.kind === "legacy_layout_conversion")) {
+    await expect(startupDialog).toBeVisible();
+    await startupDialog.getByRole("button", { name: "Ignore", exact: true }).click();
+    await expect(startupDialog).toBeHidden();
+  }
   const errors = browserErrors.get(page) ?? [];
   expect(errors.filter((error) => !error.includes("status of 401 (Unauthorized)"))).toEqual([]);
   errors.length = 0;

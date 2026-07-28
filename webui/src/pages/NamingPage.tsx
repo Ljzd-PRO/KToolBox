@@ -1307,7 +1307,11 @@ function PreviewModal({
                   </Table.Cell>
                   <Table.Cell className="font-medium">{creator.name}</Table.Cell>
                   <Table.Cell className="overflow-hidden">
-                    <PathChange source={creator.source} target={creator.target} />
+                    <PathChange
+                      operations={creator.operations}
+                      source={creator.source}
+                      target={creator.target}
+                    />
                   </Table.Cell>
                   <Table.Cell className="text-right tabular-nums">{creator.works}</Table.Cell>
                   <Table.Cell className="text-right tabular-nums">{creator.files}</Table.Cell>
@@ -1332,7 +1336,11 @@ function PreviewModal({
                 <p className="min-w-0 flex-1 truncate font-semibold">{creator.name}</p>
                 <PreviewResult creator={creator} />
               </div>
-              <PathChange source={creator.source} target={creator.target} />
+              <PathChange
+                operations={creator.operations}
+                source={creator.source}
+                target={creator.target}
+              />
               <div className="flex flex-wrap gap-2 text-xs text-muted">
                 <span>{t("naming.workCount", { count: creator.works })}</span>
                 <span>{t("naming.fileCount", { count: creator.files })}</span>
@@ -1357,9 +1365,30 @@ function PreviewResult({ creator }: { creator: NamingCreatorPreview }) {
   return <Chip color="success" size="sm" variant="soft">{t("naming.ready")}</Chip>;
 }
 
-function PathChange({ source, target }: { source: string; target: string }) {
+function PathChange({
+  operations,
+  source,
+  target,
+}: {
+  operations: number;
+  source: string;
+  target: string;
+}) {
+  const { t } = useTranslation();
   const sourceLabel = pathTail(source);
   const targetLabel = pathTail(target);
+  if (source === target) {
+    return (
+      <div className="grid min-w-0 max-w-full gap-1 overflow-hidden">
+        <InlineCode className="block w-full max-w-full truncate" title={source}>
+          {sourceLabel}
+        </InlineCode>
+        <p className="truncate text-xs text-muted">
+          {t("naming.internalMoves", { count: operations })}
+        </p>
+      </div>
+    );
+  }
   return (
     <div className="grid min-w-0 max-w-full gap-1 overflow-hidden">
       <InlineCode className="block w-full max-w-full truncate" title={source}>{sourceLabel}</InlineCode>

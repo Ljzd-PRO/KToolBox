@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -45,7 +45,7 @@ const preview = {
       key: "fanbox:123",
       name: "Sample Creator",
       source: "/project/downloads/Sample Creator [fanbox-123]",
-      target: "/project/downloads/Sample Creator (123)",
+      target: "/project/downloads/Sample Creator [fanbox-123]",
       works: 2,
       files: 5,
       bytes: 4096,
@@ -159,6 +159,9 @@ describe("Naming format page", () => {
 
     await user.click(screen.getByRole("button", { name: "Scan old locations" }));
     expect(await screen.findByRole("heading", { name: "Review naming changes" })).toBeInTheDocument();
+    expect(
+      screen.getAllByText("Creator directory unchanged · 1 internal moves"),
+    ).not.toHaveLength(0);
     for (const checkbox of screen.getAllByRole("checkbox", { name: "Select Sample Creator" })) {
       expect(checkbox).toBeChecked();
     }
@@ -291,6 +294,8 @@ describe("Naming format page", () => {
     );
 
     expect(await screen.findByRole("heading", { name: "Review existing downloads" })).toBeInTheDocument();
+    const decisionDialog = screen.getByRole("dialog", { name: "Review existing downloads" });
+    expect(within(decisionDialog).queryByRole("button", { name: "Close" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Ignore" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Review conversion" })).toBeInTheDocument();
     await user.keyboard("{Escape}");

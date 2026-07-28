@@ -116,9 +116,7 @@ class NamingConversionService:
     async def legacy_context(self) -> NamingLegacyContextResponse:
         roots: list[Path] = []
         async with self.database.connect() as connection:
-            rows = await connection.execute_fetchall(
-                "SELECT path FROM naming_legacy_roots ORDER BY created_at, path"
-            )
+            rows = await connection.execute_fetchall("SELECT path FROM naming_legacy_roots ORDER BY created_at, path")
         seen: set[str] = set()
         for (stored_path,) in rows:
             root = Path(str(stored_path))
@@ -174,9 +172,7 @@ class NamingConversionService:
 
     async def has_pending_layout(self) -> bool:
         async with self.database.connect() as connection:
-            row = await (
-                await connection.execute("SELECT 1 FROM naming_layout_state WHERE id = 1")
-            ).fetchone()
+            row = await (await connection.execute("SELECT 1 FROM naming_layout_state WHERE id = 1")).fetchone()
         return row is not None
 
     async def preview(self, roots: list[Path]) -> NamingPreviewResponse:
@@ -189,9 +185,7 @@ class NamingConversionService:
             if not root.is_dir():
                 raise NamingConversionError(f"old download location is not a directory: {root}")
             if root.is_symlink():
-                raise NamingConversionError(
-                    f"old download location cannot be a symbolic link: {root}"
-                )
+                raise NamingConversionError(f"old download location cannot be a symbolic link: {root}")
 
         sources, candidate = await self._layout_snapshots(project.naming)
         fingerprint = await anyio.to_thread.run_sync(_filesystem_fingerprint, resolved_roots)
@@ -375,7 +369,8 @@ class NamingConversionService:
     async def acknowledge_notice(self, notice_id: str) -> StartupNoticeResponse:
         now = utc_now()
         async with self.database.connect() as connection:
-            cursor = await connection.execute(
+            connection.row_factory = aiosqlite.Row
+            await connection.execute(
                 """
                 UPDATE startup_notices SET acknowledged_at = ?
                 WHERE id = ? AND acknowledged_at IS NULL
@@ -383,9 +378,6 @@ class NamingConversionService:
                 (now.isoformat(), notice_id),
             )
             await connection.commit()
-            if cursor.rowcount == 0:
-                raise LookupError(notice_id)
-            connection.row_factory = aiosqlite.Row
             row = await (
                 await connection.execute(
                     "SELECT * FROM startup_notices WHERE id = ?",
@@ -403,7 +395,8 @@ class NamingConversionService:
     ) -> StartupNoticeResponse:
         now = utc_now()
         async with self.database.connect() as connection:
-            cursor = await connection.execute(
+            connection.row_factory = aiosqlite.Row
+            await connection.execute(
                 """
                 UPDATE startup_notices
                 SET resolution = ?, resolved_at = ?, acknowledged_at = ?
@@ -413,16 +406,13 @@ class NamingConversionService:
                 (action, now.isoformat(), now.isoformat(), notice_id),
             )
             await connection.commit()
-            if cursor.rowcount == 0:
-                raise LookupError(notice_id)
-            connection.row_factory = aiosqlite.Row
             row = await (
                 await connection.execute(
                     "SELECT * FROM startup_notices WHERE id = ?",
                     (notice_id,),
                 )
             ).fetchone()
-        if row is None:
+        if row is None or row["kind"] != "legacy_layout_conversion":
             raise LookupError(notice_id)
         return _notice_from_row(row)
 
@@ -434,15 +424,10 @@ class NamingConversionService:
         now = utc_now().isoformat()
         async with self.database.connect() as connection:
             row = await (
-                await connection.execute(
-                    "SELECT sources_json FROM naming_layout_state WHERE id = 1"
-                )
+                await connection.execute("SELECT sources_json FROM naming_layout_state WHERE id = 1")
             ).fetchone()
             sources = (
-                [
-                    ProjectNamingConfiguration.model_validate(item)
-                    for item in json.loads(str(row[0]))
-                ]
+                [ProjectNamingConfiguration.model_validate(item) for item in json.loads(str(row[0]))]
                 if row is not None
                 else []
             )
@@ -474,32 +459,23 @@ class NamingConversionService:
     ) -> tuple[list[ProjectNamingConfiguration], ProjectNamingConfiguration]:
         async with self.database.connect() as connection:
             row = await (
-                await connection.execute(
-                    "SELECT sources_json, target_json FROM naming_layout_state WHERE id = 1"
-                )
+                await connection.execute("SELECT sources_json, target_json FROM naming_layout_state WHERE id = 1")
             ).fetchone()
         if row is None:
             return [current], current
-        sources = [
-            ProjectNamingConfiguration.model_validate(item)
-            for item in json.loads(str(row[0]))
-        ]
+        sources = [ProjectNamingConfiguration.model_validate(item) for item in json.loads(str(row[0]))]
         target = ProjectNamingConfiguration.model_validate_json(str(row[1]))
         return sources or [current], target
 
     async def _clear_layout_state(self, candidate: ProjectNamingConfiguration) -> None:
         async with self.database.connect() as connection:
             row = await (
-                await connection.execute(
-                    "SELECT target_json FROM naming_layout_state WHERE id = 1"
-                )
+                await connection.execute("SELECT target_json FROM naming_layout_state WHERE id = 1")
             ).fetchone()
             if row is not None:
                 target = ProjectNamingConfiguration.model_validate_json(str(row[0]))
                 if target != candidate:
-                    raise NamingPreviewStaleError(
-                        "naming layout changed during conversion; create a new preview"
-                    )
+                    raise NamingPreviewStaleError("naming layout changed during conversion; create a new preview")
                 await connection.execute("DELETE FROM naming_layout_state WHERE id = 1")
                 await connection.commit()
 
@@ -509,11 +485,7 @@ class NamingConversionService:
         try:
             document = tomlkit.parse(self.project_store.load_text())
             naming = document.unwrap().get("naming")
-            raw_roots = (
-                list(naming.get("download_roots", []))
-                if isinstance(naming, Mapping)
-                else []
-            )
+            raw_roots = list(naming.get("download_roots", [])) if isinstance(naming, Mapping) else []
         except (OSError, ValueError, TypeError):
             return
         if not raw_roots:
@@ -903,9 +875,14 @@ def _scan_download_roots(
                 continue
             parsed = next(
                 (
-                    (identity, source)
+                    (creator_identity, source)
                     for source in sources
-                    if (identity := _creator_identity_from_directory(source_creator, source))
+                    if (
+                        creator_identity := _creator_identity_from_directory(
+                            source_creator,
+                            source,
+                        )
+                    )
                     is not None
                 ),
                 None,
@@ -1006,9 +983,7 @@ def _source_naming_for_creator(
         matching_works = sum(
             1
             for work_path, post in works
-            if generate_grouped_post_path(post, creator, source)
-            / generate_post_path_name(post, source)
-            == work_path
+            if generate_grouped_post_path(post, creator, source) / generate_post_path_name(post, source) == work_path
         )
         identity = _creator_identity_from_template(
             creator.name,

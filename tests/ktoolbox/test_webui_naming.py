@@ -268,9 +268,7 @@ async def test_conversion_requires_explicit_selection_and_rolls_back_config_race
     async def mutate_configuration(operation_id: int, status: str) -> None:
         await original_mark(operation_id, status)
         project = store.load()
-        project.creators = [
-            project.creators[0]
-        ] if project.creators else []
+        project.creators = [project.creators[0]] if project.creators else []
         project.naming.post_dirname_format = "{title}"
         store.save(project)
 
@@ -391,11 +389,18 @@ async def test_startup_migration_notice_is_imported_and_acknowledged(tmp_path: P
     }
     acknowledged = await service.acknowledge_notice("project-naming-v2")
     assert acknowledged.acknowledged_at is not None
+    assert (await service.acknowledge_notice("project-naming-v2")).acknowledged_at is not None
     resolved = await service.resolve_notice(
         "legacy-layout-conversion-v1",
         "ignored",
     )
     assert resolved.resolution == "ignored"
+    assert (
+        await service.resolve_notice(
+            "legacy-layout-conversion-v1",
+            "convert_selected",
+        )
+    ).resolution == "ignored"
     assert await service.notices() == []
     await service.stop()
 
@@ -442,9 +447,7 @@ async def test_naming_routes_require_session_and_csrf(tmp_path: Path) -> None:
         )
         assert updated.status_code == 200
         preview_payload = {"roots": ["downloads"]}
-        assert (
-            await client.post("/api/v1/naming/preview", json=preview_payload)
-        ).status_code == 403
+        assert (await client.post("/api/v1/naming/preview", json=preview_payload)).status_code == 403
         preview = await client.post(
             "/api/v1/naming/preview",
             json=preview_payload,

@@ -1609,6 +1609,7 @@ export function ConfirmModal({
   actions,
   onOpenChange,
   size = "md",
+  hideCloseButton = false,
 }: {
   open: boolean;
   title: string;
@@ -1616,6 +1617,7 @@ export function ConfirmModal({
   actions: ReactNode;
   onOpenChange: (open: boolean) => void;
   size?: React.ComponentProps<typeof Modal.Container>["size"];
+  hideCloseButton?: boolean;
 }) {
   const { t } = useTranslation();
   const state = useOverlayState({ isOpen: open, onOpenChange });
@@ -1627,12 +1629,16 @@ export function ConfirmModal({
           <Modal.Dialog className="app-modal-dialog overflow-hidden">
             <Modal.Header className="flex items-center justify-between gap-3 border-b border-border px-5 py-4">
               <Modal.Heading className="text-lg font-semibold text-foreground">{title}</Modal.Heading>
-              <Modal.CloseTrigger
-                aria-label={t("common.close")}
-                className="grid size-10 place-items-center rounded-lg text-muted hover:bg-default"
-              >
-                <X aria-hidden="true" size={18} />
-              </Modal.CloseTrigger>
+              {hideCloseButton ? (
+                <span aria-hidden="true" className="size-10 shrink-0" />
+              ) : (
+                <Modal.CloseTrigger
+                  aria-label={t("common.close")}
+                  className="grid size-10 place-items-center rounded-lg text-muted hover:bg-default"
+                >
+                  <X aria-hidden="true" size={18} />
+                </Modal.CloseTrigger>
+              )}
             </Modal.Header>
             <Modal.Body className="app-confirm-modal-body p-5">{children}</Modal.Body>
             <Modal.Footer className="app-confirm-modal-actions flex flex-wrap justify-end gap-2 border-t border-border px-5 py-4">

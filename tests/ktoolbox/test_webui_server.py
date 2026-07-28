@@ -192,7 +192,7 @@ def test_project_root_creates_missing_configuration(tmp_path: Path, capsys: pyte
 
     project_config = project_root / "ktoolbox.toml"
     content = project_config.read_text(encoding="utf-8")
-    assert "schema_version = 3" in content
+    assert "schema_version = 4" in content
     assert "[naming]" in content
     assert ProjectConfigStore(project_config).load() == ProjectConfiguration()
     assert capsys.readouterr().err == f"Warning: {project_config} was not found; created a new project configuration.\n"

@@ -104,6 +104,7 @@ export function StartupNoticeCenter() {
 
   return (
     <ConfirmModal
+      hideCloseButton={decision !== null}
       open={notice !== null}
       title={t(decision ? "naming.startup.title" : "naming.migration.title")}
       actions={
