@@ -55,7 +55,7 @@ def test_store_round_trip_is_atomic_and_preserves_top_comment(tmp_path: Path) ->
 
     content = path.read_text(encoding="utf-8")
     assert content.startswith("# Keep this comment")
-    assert "schema_version = 3" in content
+    assert "schema_version = 4" in content
     assert "[naming]" in content
     assert not list(tmp_path.glob(".*.tmp"))
     configuration = store.load()
@@ -114,15 +114,14 @@ def test_schema_v1_loads_with_project_naming_defaults(tmp_path: Path) -> None:
 
     configuration = ProjectConfigStore(path).load()
 
-    assert configuration.schema_version == 3
+    assert configuration.schema_version == 4
     assert configuration.naming.creator_dirname_format == "{creator_name} [{service}-{creator_id}]"
     assert configuration.naming.post_structure.attachments == Path("attachments")
     assert configuration.automatic_sync == []
 
 
-def test_naming_configuration_validates_templates_paths_and_roots(tmp_path: Path) -> None:
+def test_naming_configuration_validates_templates_and_paths() -> None:
     configuration = ProjectNamingConfiguration(
-        download_roots=[tmp_path / "downloads"],
         post_dirname_format="[{published}] {title}",
         filename_format="{post_id}_{}",
         month_dirname_format="{year}-{month:02d}",
@@ -135,8 +134,6 @@ def test_naming_configuration_validates_templates_paths_and_roots(tmp_path: Path
         ProjectNamingConfiguration(creator_dirname_format="{creator_name}/works")
     with pytest.raises(ValueError, match="month grouping requires"):
         ProjectNamingConfiguration(group_by_month=True)
-    with pytest.raises(ValueError, match="duplicate download root"):
-        ProjectNamingConfiguration(download_roots=[Path("downloads"), Path("./downloads")])
 
 
 def test_schema_v2_loads_with_automatic_sync_defaults(tmp_path: Path) -> None:
@@ -145,7 +142,7 @@ def test_schema_v2_loads_with_automatic_sync_defaults(tmp_path: Path) -> None:
 
     configuration = ProjectConfigStore(path).load()
 
-    assert configuration.schema_version == 3
+    assert configuration.schema_version == 4
     assert configuration.automatic_sync == []
 
 

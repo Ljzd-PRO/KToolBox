@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from string import Formatter
@@ -13,6 +14,7 @@ from uuid import uuid4
 
 import aiosqlite
 import anyio
+import tomlkit
 from pathvalidate import is_valid_filename
 
 from ktoolbox._enum import DataStorageNameEnum
@@ -34,10 +36,14 @@ from ktoolbox.webui.config_store import content_revision
 from ktoolbox.webui.database import WebUIDatabase, utc_now
 from ktoolbox.webui.event_store import WebUIEventStore
 from ktoolbox.webui.naming_models import (
+    NamingConfigurationResponse,
     NamingConversionProgress,
     NamingConversionResponse,
     NamingCreatorPreview,
+    NamingLegacyContextResponse,
     NamingPreviewResponse,
+    NamingSection,
+    StartupNoticeResolution,
     StartupNoticeResponse,
 )
 from ktoolbox.webui.task_models import ACTIVE_TASK_STATUSES
@@ -94,7 +100,9 @@ class NamingConversionService:
         self._apply_lock = asyncio.Lock()
 
     async def start(self) -> None:
+        await self._migrate_legacy_roots()
         await self._import_startup_notice()
+        await self._ensure_conversion_decision_notice()
         await self._recover_incomplete()
 
     async def stop(self) -> None:
@@ -105,10 +113,19 @@ class NamingConversionService:
         self._workers.clear()
         self._cancellations.clear()
 
-    async def suggested_download_roots(self) -> list[Path]:
-        project = self.project_store.load()
-        roots = list(project.naming.download_roots)
-        seen = {_normalized_path(self._resolve_root(root)) for root in roots}
+    async def legacy_context(self) -> NamingLegacyContextResponse:
+        roots: list[Path] = []
+        async with self.database.connect() as connection:
+            rows = await connection.execute_fetchall(
+                "SELECT path FROM naming_legacy_roots ORDER BY created_at, path"
+            )
+        seen: set[str] = set()
+        for (stored_path,) in rows:
+            root = Path(str(stored_path))
+            normalized = _normalized_path(self._resolve_root(root))
+            if normalized not in seen:
+                seen.add(normalized)
+                roots.append(root)
         for task in await self.tasks.list_tasks():
             resolved = task.spec.output.expanduser()
             if not resolved.is_absolute():
@@ -117,25 +134,69 @@ class NamingConversionService:
             if normalized not in seen:
                 seen.add(normalized)
                 roots.append(_stored_root(resolved, self.project_root))
-        return roots
+        return NamingLegacyContextResponse(
+            roots=roots,
+            conversion_pending=await self.has_pending_layout(),
+        )
 
-    async def preview(self, candidate: ProjectNamingConfiguration) -> NamingPreviewResponse:
-        current = self.project_store.load()
+    async def configuration(self) -> NamingConfigurationResponse:
+        project = self.project_store.load()
+        return NamingConfigurationResponse(
+            naming=project.naming,
+            revision=content_revision(self.project_store.load_text()),
+            conversion_pending=await self.has_pending_layout(),
+        )
+
+    async def update_naming(
+        self,
+        section: NamingSection,
+        candidate: ProjectNamingConfiguration,
+        revision: str,
+    ) -> NamingConfigurationResponse:
+        async with self._apply_lock:
+            current_revision = content_revision(self.project_store.load_text())
+            if revision != current_revision:
+                raise NamingPreviewStaleError("project configuration changed; reload before saving")
+            project = self.project_store.load()
+            previous = project.naming
+            merged = _merge_naming_section(previous, candidate, section)
+            if merged != previous:
+                await self._record_layout_change(previous, merged)
+                project.naming = merged
+                await anyio.to_thread.run_sync(self.project_store.save, project)
+                await self.events.publish(
+                    "naming.changed",
+                    {"section": section, "conversion_pending": True},
+                    resource="naming",
+                    resource_id=section,
+                )
+            return await self.configuration()
+
+    async def has_pending_layout(self) -> bool:
+        async with self.database.connect() as connection:
+            row = await (
+                await connection.execute("SELECT 1 FROM naming_layout_state WHERE id = 1")
+            ).fetchone()
+        return row is not None
+
+    async def preview(self, roots: list[Path]) -> NamingPreviewResponse:
+        project = self.project_store.load()
         revision = content_revision(self.project_store.load_text())
-        roots = [self._resolve_root(root) for root in candidate.download_roots]
-        if not roots:
+        resolved_roots = [self._resolve_root(root) for root in _unique_paths(roots)]
+        if not resolved_roots:
             raise NamingConversionError("add at least one download root before scanning")
-        for root in roots:
+        for root in resolved_roots:
             if not root.is_dir():
                 raise NamingConversionError(f"download root is not a directory: {root}")
             if root.is_symlink():
                 raise NamingConversionError(f"download root cannot be a symbolic link: {root}")
 
-        fingerprint = await anyio.to_thread.run_sync(_filesystem_fingerprint, roots)
+        sources, candidate = await self._layout_snapshots(project.naming)
+        fingerprint = await anyio.to_thread.run_sync(_filesystem_fingerprint, resolved_roots)
         scans = await anyio.to_thread.run_sync(
             _scan_download_roots,
-            roots,
-            current.naming,
+            resolved_roots,
+            sources,
             candidate,
         )
         preview_id = uuid4().hex
@@ -160,7 +221,7 @@ class NamingConversionService:
             id=preview_id,
             revision=revision,
             fingerprint=fingerprint,
-            roots=roots,
+            roots=resolved_roots,
             creators=creators,
             creator_count=len(creators),
             work_count=sum(item.works for item in creators),
@@ -213,18 +274,14 @@ class NamingConversionService:
         self,
         preview_id: str,
         selected_creators: list[str],
-        *,
-        convert_existing: bool,
     ) -> NamingConversionResponse:
         async with self._apply_lock:
-            return await self._apply(preview_id, selected_creators, convert_existing=convert_existing)
+            return await self._apply(preview_id, selected_creators)
 
     async def _apply(
         self,
         preview_id: str,
         selected_creators: list[str],
-        *,
-        convert_existing: bool,
     ) -> NamingConversionResponse:
         conversion = await self.get(preview_id)
         if conversion.status != "preview":
@@ -239,14 +296,13 @@ class NamingConversionService:
             raise NamingConversionError("resolve every target path conflict before applying this preview")
 
         candidate = ProjectNamingConfiguration.model_validate_json(await self._candidate_json(preview_id))
-        if not convert_existing:
-            configuration = self.project_store.load()
-            configuration.naming = candidate
-            self.project_store.save(configuration)
+        available_operations = await self._operations(preview_id, [], reverse=False)
+        if not available_operations:
+            await self._clear_layout_state(candidate)
             await self._set_status(preview_id, "completed", selected=[])
             await self.events.publish(
                 "naming.changed",
-                {"conversion_id": preview_id, "converted": False},
+                {"conversion_id": preview_id, "converted": False, "already_current": True},
                 resource="naming",
                 resource_id=preview_id,
             )
@@ -338,6 +394,159 @@ class NamingConversionService:
             raise LookupError(notice_id)
         return _notice_from_row(row)
 
+    async def resolve_notice(
+        self,
+        notice_id: str,
+        action: StartupNoticeResolution,
+    ) -> StartupNoticeResponse:
+        now = utc_now()
+        async with self.database.connect() as connection:
+            cursor = await connection.execute(
+                """
+                UPDATE startup_notices
+                SET resolution = ?, resolved_at = ?, acknowledged_at = ?
+                WHERE id = ? AND kind = 'legacy_layout_conversion'
+                  AND resolution IS NULL
+                """,
+                (action, now.isoformat(), now.isoformat(), notice_id),
+            )
+            await connection.commit()
+            if cursor.rowcount == 0:
+                raise LookupError(notice_id)
+            connection.row_factory = aiosqlite.Row
+            row = await (
+                await connection.execute(
+                    "SELECT * FROM startup_notices WHERE id = ?",
+                    (notice_id,),
+                )
+            ).fetchone()
+        if row is None:
+            raise LookupError(notice_id)
+        return _notice_from_row(row)
+
+    async def _record_layout_change(
+        self,
+        previous: ProjectNamingConfiguration,
+        target: ProjectNamingConfiguration,
+    ) -> None:
+        now = utc_now().isoformat()
+        async with self.database.connect() as connection:
+            row = await (
+                await connection.execute(
+                    "SELECT sources_json FROM naming_layout_state WHERE id = 1"
+                )
+            ).fetchone()
+            sources = (
+                [
+                    ProjectNamingConfiguration.model_validate(item)
+                    for item in json.loads(str(row[0]))
+                ]
+                if row is not None
+                else []
+            )
+            if previous not in sources:
+                sources.append(previous)
+            await connection.execute(
+                """
+                INSERT INTO naming_layout_state(id, sources_json, target_json, updated_at)
+                VALUES (1, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    sources_json = excluded.sources_json,
+                    target_json = excluded.target_json,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    json.dumps(
+                        [item.model_dump(mode="json") for item in sources],
+                        ensure_ascii=False,
+                    ),
+                    target.model_dump_json(),
+                    now,
+                ),
+            )
+            await connection.commit()
+
+    async def _layout_snapshots(
+        self,
+        current: ProjectNamingConfiguration,
+    ) -> tuple[list[ProjectNamingConfiguration], ProjectNamingConfiguration]:
+        async with self.database.connect() as connection:
+            row = await (
+                await connection.execute(
+                    "SELECT sources_json, target_json FROM naming_layout_state WHERE id = 1"
+                )
+            ).fetchone()
+        if row is None:
+            return [current], current
+        sources = [
+            ProjectNamingConfiguration.model_validate(item)
+            for item in json.loads(str(row[0]))
+        ]
+        target = ProjectNamingConfiguration.model_validate_json(str(row[1]))
+        return sources or [current], target
+
+    async def _clear_layout_state(self, candidate: ProjectNamingConfiguration) -> None:
+        async with self.database.connect() as connection:
+            row = await (
+                await connection.execute(
+                    "SELECT target_json FROM naming_layout_state WHERE id = 1"
+                )
+            ).fetchone()
+            if row is not None:
+                target = ProjectNamingConfiguration.model_validate_json(str(row[0]))
+                if target != candidate:
+                    raise NamingPreviewStaleError(
+                        "naming layout changed during conversion; create a new preview"
+                    )
+                await connection.execute("DELETE FROM naming_layout_state WHERE id = 1")
+                await connection.commit()
+
+    async def _migrate_legacy_roots(self) -> None:
+        if not self.project_store.path.is_file():
+            return
+        try:
+            document = tomlkit.parse(self.project_store.load_text())
+            naming = document.unwrap().get("naming")
+            raw_roots = (
+                list(naming.get("download_roots", []))
+                if isinstance(naming, Mapping)
+                else []
+            )
+        except (OSError, ValueError, TypeError):
+            return
+        if not raw_roots:
+            return
+        now = utc_now().isoformat()
+        async with self.database.connect() as connection:
+            await connection.executemany(
+                """
+                INSERT OR IGNORE INTO naming_legacy_roots(path, created_at)
+                VALUES (?, ?)
+                """,
+                [(str(root), now) for root in raw_roots],
+            )
+            await connection.commit()
+        configuration = self.project_store.load()
+        await anyio.to_thread.run_sync(self.project_store.save, configuration)
+
+    async def _ensure_conversion_decision_notice(self) -> None:
+        now = utc_now().isoformat()
+        async with self.database.connect() as connection:
+            await connection.execute(
+                """
+                INSERT OR IGNORE INTO startup_notices(
+                    id, kind, payload_json, created_at
+                ) VALUES (
+                    'legacy-layout-conversion-v1',
+                    'legacy_layout_conversion',
+                    '{}',
+                    ?
+                )
+                """,
+                (now,),
+            )
+            await connection.commit()
+
     async def _run_conversion(
         self,
         conversion_id: str,
@@ -376,9 +585,7 @@ class NamingConversionService:
                 raise NamingPreviewStaleError(
                     "project configuration changed during conversion; moved files will be rolled back"
                 )
-            configuration = self.project_store.load()
-            configuration.naming = candidate
-            await anyio.to_thread.run_sync(self.project_store.save, configuration)
+            await self._clear_layout_state(candidate)
             await self._set_status(conversion_id, "completed", selected=selected)
             await self.events.publish(
                 "naming.changed",
@@ -597,7 +804,7 @@ class NamingConversionService:
 
 def _scan_download_roots(
     roots: list[Path],
-    current: ProjectNamingConfiguration,
+    sources: list[ProjectNamingConfiguration],
     candidate: ProjectNamingConfiguration,
 ) -> list[_CreatorScan]:
     scans: list[_CreatorScan] = []
@@ -622,9 +829,16 @@ def _scan_download_roots(
             creator = root / relative.parts[0]
             grouped.setdefault((post.service, post.user, creator), []).append((metadata.parent, post))
 
-        _add_indexed_works(root, current, grouped, skipped_by_creator)
+        _add_indexed_works(root, sources, grouped, skipped_by_creator)
         grouped_creators = {creator for _, _, creator in grouped}
         for (service, creator_id, source_creator), works in grouped.items():
+            current = _source_naming_for_creator(
+                source_creator,
+                service,
+                creator_id,
+                works,
+                sources,
+            )
             name = _creator_name(source_creator.name, service, creator_id, current)
             identity = f"{service}:{creator_id}"
             selection_key = f"{identity}@{hashlib.sha1(str(source_creator).encode()).hexdigest()[:10]}"
@@ -685,9 +899,18 @@ def _scan_download_roots(
         for source_creator in _direct_creator_directories(root):
             if source_creator in grouped_creators:
                 continue
-            parsed_identity = _creator_identity_from_directory(source_creator, current)
-            if parsed_identity is None:
+            parsed = next(
+                (
+                    (identity, source)
+                    for source in sources
+                    if (identity := _creator_identity_from_directory(source_creator, source))
+                    is not None
+                ),
+                None,
+            )
+            if parsed is None:
                 continue
+            parsed_identity, current = parsed
             service, creator_id, name = parsed_identity
             selection_key = f"{service}:{creator_id}@{hashlib.sha1(str(source_creator).encode()).hexdigest()[:10]}"
             target_creator = root / generate_creator_path_name(
@@ -725,7 +948,7 @@ def _scan_download_roots(
 
 def _add_indexed_works(
     root: Path,
-    current: ProjectNamingConfiguration,
+    sources: list[ProjectNamingConfiguration],
     grouped: dict[tuple[str, str, Path], list[tuple[Path, Post]]],
     skipped_by_creator: dict[Path, int],
 ) -> None:
@@ -743,14 +966,24 @@ def _add_indexed_works(
         except (OSError, ValueError):
             skipped_by_creator[creator] = skipped_by_creator.get(creator, 0) + 1
             continue
-        if current.mix_posts:
-            continue
         for post in index.posts.values():
             key = (index.service, index.creator_id, creator, post.id)
             if key in known_posts:
                 continue
-            source_work = generate_grouped_post_path(post, creator, current) / generate_post_path_name(post, current)
-            if source_work.is_dir() and not source_work.is_symlink():
+            source_work = next(
+                (
+                    path
+                    for source in sources
+                    if not source.mix_posts
+                    and (
+                        path := generate_grouped_post_path(post, creator, source)
+                        / generate_post_path_name(post, source)
+                    ).is_dir()
+                    and not path.is_symlink()
+                ),
+                None,
+            )
+            if source_work is not None:
                 grouped.setdefault(
                     (index.service, index.creator_id, creator),
                     [],
@@ -758,6 +991,35 @@ def _add_indexed_works(
                 known_posts.add(key)
             else:
                 skipped_by_creator[creator] = skipped_by_creator.get(creator, 0) + 1
+
+
+def _source_naming_for_creator(
+    creator: Path,
+    service: str,
+    creator_id: str,
+    works: list[tuple[Path, Post]],
+    sources: list[ProjectNamingConfiguration],
+) -> ProjectNamingConfiguration:
+    def score(source: ProjectNamingConfiguration) -> tuple[int, int]:
+        matching_works = sum(
+            1
+            for work_path, post in works
+            if generate_grouped_post_path(post, creator, source)
+            / generate_post_path_name(post, source)
+            == work_path
+        )
+        identity = _creator_identity_from_template(
+            creator.name,
+            source.creator_dirname_format,
+        )
+        matching_creator = int(
+            identity is not None
+            and identity[0].casefold() == service.casefold()
+            and identity[1].casefold() == creator_id.casefold()
+        )
+        return matching_works, matching_creator
+
+    return max(sources, key=score)
 
 
 def _direct_creator_directories(root: Path) -> list[Path]:
@@ -1042,6 +1304,52 @@ def _stored_root(path: Path, project_root: Path) -> Path:
         return resolved
 
 
+def _unique_paths(paths: list[Path]) -> list[Path]:
+    unique: list[Path] = []
+    seen: set[str] = set()
+    for path in paths:
+        normalized = os.path.normcase(os.path.normpath(str(path.expanduser())))
+        if normalized not in seen:
+            seen.add(normalized)
+            unique.append(path)
+    return unique
+
+
+def _merge_naming_section(
+    previous: ProjectNamingConfiguration,
+    candidate: ProjectNamingConfiguration,
+    section: NamingSection,
+) -> ProjectNamingConfiguration:
+    merged = previous.model_copy(deep=True)
+    if section == "structure":
+        for field in (
+            "mix_posts",
+            "sequential_filename",
+            "sequential_filename_excludes",
+            "group_by_year",
+            "group_by_month",
+        ):
+            setattr(merged, field, getattr(candidate, field))
+        for field in ("attachments", "content", "external_links", "revisions"):
+            setattr(
+                merged.post_structure,
+                field,
+                getattr(candidate.post_structure, field),
+            )
+    else:
+        for field in (
+            "creator_dirname_format",
+            "post_dirname_format",
+            "revision_dirname_format",
+            "filename_format",
+            "year_dirname_format",
+            "month_dirname_format",
+        ):
+            setattr(merged, field, getattr(candidate, field))
+        merged.post_structure.file = candidate.post_structure.file
+    return ProjectNamingConfiguration.model_validate(merged)
+
+
 def _normalized_path(path: Path) -> str:
     return os.path.normcase(os.path.normpath(str(path.expanduser().resolve(strict=False))))
 
@@ -1093,4 +1401,6 @@ def _notice_from_row(row: aiosqlite.Row) -> StartupNoticeResponse:
         payload=json.loads(row["payload_json"]),
         created_at=row["created_at"],
         acknowledged_at=row["acknowledged_at"],
+        resolution=row["resolution"],
+        resolved_at=row["resolved_at"],
     )

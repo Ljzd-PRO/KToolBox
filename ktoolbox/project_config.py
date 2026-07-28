@@ -148,7 +148,6 @@ class ProjectNamingConfiguration(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    download_roots: list[Path] = Field(default_factory=list)
     creator_dirname_format: str = "{creator_name} [{service}-{creator_id}]"
     post_dirname_format: str = "{title}"
     revision_dirname_format: str = "{revision_id}"
@@ -161,19 +160,6 @@ class ProjectNamingConfiguration(BaseModel):
     group_by_month: bool = False
     year_dirname_format: str = "{year}"
     month_dirname_format: str = "{year}-{month:02d}"
-
-    @field_validator("download_roots")
-    @classmethod
-    def validate_download_roots(cls, value: list[Path]) -> list[Path]:
-        roots: list[Path] = []
-        seen: set[str] = set()
-        for root in value:
-            normalized = os.path.normcase(os.path.normpath(str(root.expanduser())))
-            if normalized in seen:
-                raise ValueError(f"duplicate download root: {root}")
-            seen.add(normalized)
-            roots.append(root)
-        return roots
 
     @field_validator("creator_dirname_format")
     @classmethod
@@ -320,7 +306,7 @@ class ProjectConfiguration(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    schema_version: Literal[3] = 3
+    schema_version: Literal[4] = 4
     creators: list[CreatorReference] = Field(default_factory=list)
     blockers: list[BlockerSpec] = Field(default_factory=list)
     naming: ProjectNamingConfiguration = Field(default_factory=ProjectNamingConfiguration)
@@ -329,10 +315,12 @@ class ProjectConfiguration(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def upgrade_schema(cls, value: Any) -> Any:
-        if isinstance(value, Mapping) and value.get("schema_version", 1) in {1, 2}:
+        if isinstance(value, Mapping) and value.get("schema_version", 1) in {1, 2, 3}:
             upgraded = dict(value)
-            upgraded["schema_version"] = 3
-            upgraded.setdefault("naming", {})
+            upgraded["schema_version"] = 4
+            naming = dict(upgraded.get("naming") or {})
+            naming.pop("download_roots", None)
+            upgraded["naming"] = naming
             upgraded.setdefault("automatic_sync", [])
             return upgraded
         return value
@@ -442,7 +430,7 @@ class ProjectConfigStore:
             except OSError as error:
                 raise ProjectConfigError(f"unable to read project configuration {self.path}: {error}") from error
         document = tomlkit.document()
-        document.add("schema_version", 3)
+        document.add("schema_version", 4)
         document.add("creators", tomlkit.aot())
         document.add("blockers", tomlkit.aot())
         document.add("naming", tomlkit.item(ProjectNamingConfiguration().model_dump(mode="json")))

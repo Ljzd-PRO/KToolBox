@@ -21,6 +21,7 @@ from ktoolbox.project_config import (
 )
 from ktoolbox.webui.app import create_app
 from ktoolbox.webui.auth import CSRF_HEADER
+from ktoolbox.webui.config_store import content_revision
 from ktoolbox.webui.database import WebUIDatabase
 from ktoolbox.webui.event_store import WebUIEventStore
 from ktoolbox.webui.naming_service import (
@@ -68,6 +69,19 @@ async def service_for(tmp_path: Path) -> tuple[NamingConversionService, TaskStor
     return service, tasks
 
 
+async def save_naming(
+    service: NamingConversionService,
+    store: ProjectConfigStore,
+    candidate: ProjectNamingConfiguration,
+    section: str = "templates",
+) -> None:
+    await service.update_naming(
+        section,  # type: ignore[arg-type]
+        candidate,
+        content_revision(store.load_text()),
+    )
+
+
 def write_downloaded_work(root: Path, creator_dir: str, work_dir: str, post_id: str) -> Path:
     path = root / creator_dir / work_dir
     path.mkdir(parents=True)
@@ -87,19 +101,15 @@ async def test_preview_scans_filesystem_and_conversion_updates_project(tmp_path:
     downloads = tmp_path / "downloads"
     source = write_downloaded_work(downloads, "Artist [fanbox-123]", "Work one", "one")
     store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
-    store.save(
-        ProjectConfiguration(
-            naming=ProjectNamingConfiguration(download_roots=[Path("downloads")]),
-        )
-    )
+    store.save(ProjectConfiguration())
     service, _ = await service_for(tmp_path)
     candidate = ProjectNamingConfiguration(
-        download_roots=[Path("downloads")],
         creator_dirname_format="{creator_name} ({creator_id})",
         post_dirname_format="{post_id}",
     )
+    await save_naming(service, store, candidate)
 
-    preview = await service.preview(candidate)
+    preview = await service.preview([Path("downloads")])
 
     assert preview.creator_count == 1
     assert preview.work_count == 1
@@ -112,7 +122,6 @@ async def test_preview_scans_filesystem_and_conversion_updates_project(tmp_path:
     conversion = await service.apply(
         preview.id,
         [preview.creators[0].key],
-        convert_existing=True,
     )
     assert conversion.status in {"queued", "running"}
     for _ in range(100):
@@ -127,11 +136,11 @@ async def test_preview_scans_filesystem_and_conversion_updates_project(tmp_path:
     assert (downloads / "Artist (123)" / "one" / "asset.bin").is_file()
     assert store.load().naming.post_dirname_format == "{post_id}"
 
-    second_preview = await service.preview(
-        candidate.model_copy(
-            update={"creator_dirname_format": "{creator_name} - {creator_id}"},
-        )
+    second_candidate = candidate.model_copy(
+        update={"creator_dirname_format": "{creator_name} - {creator_id}"},
     )
+    await save_naming(service, store, second_candidate)
+    second_preview = await service.preview([Path("downloads")])
     assert second_preview.creators[0].name == "Artist"
     assert second_preview.creators[0].source == downloads / "Artist (123)"
     assert second_preview.creators[0].target == downloads / "Artist - 123"
@@ -143,37 +152,32 @@ async def test_preview_detects_conflicts_staleness_and_active_tasks(tmp_path: Pa
     downloads = tmp_path / "downloads"
     write_downloaded_work(downloads, "Artist [fanbox-123]", "Work one", "one")
     store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
-    store.save(
-        ProjectConfiguration(
-            naming=ProjectNamingConfiguration(download_roots=[Path("downloads")]),
-        )
-    )
+    store.save(ProjectConfiguration())
     service, tasks = await service_for(tmp_path)
     candidate = ProjectNamingConfiguration(
-        download_roots=[Path("downloads")],
         post_dirname_format="{post_id}",
     )
+    await save_naming(service, store, candidate)
     conflict = downloads / "Artist [fanbox-123]" / "one"
     conflict.mkdir(parents=True)
-    preview = await service.preview(candidate)
+    preview = await service.preview([Path("downloads")])
     assert preview.conflict_count == 1
     with pytest.raises(NamingConversionError, match="conflict"):
-        await service.apply(preview.id, [], convert_existing=True)
+        await service.apply(preview.id, [])
 
     conflict.rmdir()
-    preview = await service.preview(candidate)
+    preview = await service.preview([Path("downloads")])
     (downloads / "changed.txt").write_text("changed", encoding="utf-8")
     with pytest.raises(NamingPreviewStaleError, match="changed"):
-        await service.apply(preview.id, [], convert_existing=True)
+        await service.apply(preview.id, [])
 
     (downloads / "changed.txt").unlink()
-    preview = await service.preview(candidate)
+    preview = await service.preview([Path("downloads")])
     await tasks.create(SyncTaskSpec(creators=[], output=downloads))
     with pytest.raises(NamingConversionError, match="overlaps"):
         await service.apply(
             preview.id,
             [preview.creators[0].key],
-            convert_existing=True,
         )
     await service.stop()
 
@@ -185,36 +189,33 @@ async def test_conversion_requires_explicit_selection_and_rolls_back_config_race
     downloads = tmp_path / "downloads"
     source = write_downloaded_work(downloads, "Artist [fanbox-123]", "Work one", "one")
     store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
-    store.save(
-        ProjectConfiguration(
-            naming=ProjectNamingConfiguration(download_roots=[Path("downloads")]),
-        )
-    )
+    store.save(ProjectConfiguration())
     service, _ = await service_for(tmp_path)
     candidate = ProjectNamingConfiguration(
-        download_roots=[Path("downloads")],
         creator_dirname_format="{creator_name} ({creator_id})",
         post_dirname_format="{post_id}",
     )
-    preview = await service.preview(candidate)
+    await save_naming(service, store, candidate)
+    preview = await service.preview([Path("downloads")])
     with pytest.raises(NamingConversionError, match="select at least one"):
-        await service.apply(preview.id, [], convert_existing=True)
+        await service.apply(preview.id, [])
 
-    preview = await service.preview(candidate)
+    preview = await service.preview([Path("downloads")])
     original_mark = service._mark_operation
 
     async def mutate_configuration(operation_id: int, status: str) -> None:
         await original_mark(operation_id, status)
         project = store.load()
-        project.creators = []
-        project.naming.download_roots = [Path("changed-downloads")]
+        project.creators = [
+            project.creators[0]
+        ] if project.creators else []
+        project.naming.post_dirname_format = "{title}"
         store.save(project)
 
     service._mark_operation = mutate_configuration  # type: ignore[method-assign]
     await service.apply(
         preview.id,
         [preview.creators[0].key],
-        convert_existing=True,
     )
     for _ in range(100):
         conversion = await service.get(preview.id)
@@ -225,7 +226,7 @@ async def test_conversion_requires_explicit_selection_and_rolls_back_config_race
     assert conversion.status == "failed"
     assert source.is_dir()
     assert not (downloads / "Artist (123)").exists()
-    assert store.load().naming.download_roots == [Path("changed-downloads")]
+    assert store.load().naming.post_dirname_format == "{title}"
     await service.stop()
 
 
@@ -234,18 +235,14 @@ async def test_only_one_naming_conversion_can_be_active(tmp_path: Path) -> None:
     downloads = tmp_path / "downloads"
     write_downloaded_work(downloads, "Artist [fanbox-123]", "Work one", "one")
     store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
-    store.save(
-        ProjectConfiguration(
-            naming=ProjectNamingConfiguration(download_roots=[Path("downloads")]),
-        )
-    )
+    store.save(ProjectConfiguration())
     service, _ = await service_for(tmp_path)
     candidate = ProjectNamingConfiguration(
-        download_roots=[Path("downloads")],
         post_dirname_format="{post_id}",
     )
-    first = await service.preview(candidate)
-    second = await service.preview(candidate)
+    await save_naming(service, store, candidate)
+    first = await service.preview([Path("downloads")])
+    second = await service.preview([Path("downloads")])
     original_run = service._run_conversion
     started = asyncio.Event()
     release = asyncio.Event()
@@ -256,11 +253,11 @@ async def test_only_one_naming_conversion_can_be_active(tmp_path: Path) -> None:
         await original_run(*args, **kwargs)  # type: ignore[arg-type]
 
     service._run_conversion = delayed_run  # type: ignore[method-assign]
-    await service.apply(first.id, [first.creators[0].key], convert_existing=True)
+    await service.apply(first.id, [first.creators[0].key])
     await started.wait()
 
     with pytest.raises(NamingConversionError, match="already active"):
-        await service.apply(second.id, [second.creators[0].key], convert_existing=True)
+        await service.apply(second.id, [second.creators[0].key])
 
     release.set()
     for _ in range(100):
@@ -290,19 +287,15 @@ async def test_preview_uses_creator_index_and_detects_duplicate_targets(tmp_path
         encoding="utf-8",
     )
     store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
-    store.save(
-        ProjectConfiguration(
-            naming=ProjectNamingConfiguration(download_roots=[Path("downloads")]),
-        )
-    )
+    store.save(ProjectConfiguration())
     service, _ = await service_for(tmp_path)
     candidate = ProjectNamingConfiguration(
-        download_roots=[Path("downloads")],
         creator_dirname_format="all-creators",
         post_dirname_format="same-work",
     )
+    await save_naming(service, store, candidate)
 
-    preview = await service.preview(candidate)
+    preview = await service.preview([Path("downloads")])
 
     assert preview.creator_count == 2
     assert preview.conflict_count >= 2
@@ -330,9 +323,17 @@ async def test_startup_migration_notice_is_imported_and_acknowledged(tmp_path: P
 
     assert not notice_path.exists()
     notices = await service.notices()
-    assert [notice.id for notice in notices] == ["project-naming-v2"]
+    assert {notice.id for notice in notices} == {
+        "project-naming-v2",
+        "legacy-layout-conversion-v1",
+    }
     acknowledged = await service.acknowledge_notice("project-naming-v2")
     assert acknowledged.acknowledged_at is not None
+    resolved = await service.resolve_notice(
+        "legacy-layout-conversion-v1",
+        "ignored",
+    )
+    assert resolved.resolution == "ignored"
     assert await service.notices() == []
     await service.stop()
 
@@ -342,11 +343,7 @@ async def test_naming_routes_require_session_and_csrf(tmp_path: Path) -> None:
     downloads = tmp_path / "downloads"
     downloads.mkdir()
     store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
-    store.save(
-        ProjectConfiguration(
-            naming=ProjectNamingConfiguration(download_roots=[Path("downloads")]),
-        )
-    )
+    store.save(ProjectConfiguration())
     app = create_app(
         RuntimeContext(
             tmp_path,
@@ -367,17 +364,28 @@ async def test_naming_routes_require_session_and_csrf(tmp_path: Path) -> None:
     async with authenticated_client(tmp_path) as (client, csrf):
         current = await client.get("/api/v1/naming")
         assert current.status_code == 200
-        assert current.json()["naming"]["download_roots"] == ["downloads"]
-        payload = {
+        update_payload = {
+            "section": "templates",
+            "revision": current.json()["revision"],
             "naming": {
                 **current.json()["naming"],
                 "post_dirname_format": "{post_id}",
-            }
+            },
         }
-        assert (await client.post("/api/v1/naming/preview", json=payload)).status_code == 403
+        assert (await client.patch("/api/v1/naming", json=update_payload)).status_code == 403
+        updated = await client.patch(
+            "/api/v1/naming",
+            json=update_payload,
+            headers=csrf,
+        )
+        assert updated.status_code == 200
+        preview_payload = {"roots": ["downloads"]}
+        assert (
+            await client.post("/api/v1/naming/preview", json=preview_payload)
+        ).status_code == 403
         preview = await client.post(
             "/api/v1/naming/preview",
-            json=payload,
+            json=preview_payload,
             headers=csrf,
         )
         assert preview.status_code == 200
@@ -386,7 +394,6 @@ async def test_naming_routes_require_session_and_csrf(tmp_path: Path) -> None:
             json={
                 "preview_id": preview.json()["id"],
                 "selected_creators": [],
-                "convert_existing": False,
             },
             headers=csrf,
         )

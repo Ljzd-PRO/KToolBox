@@ -4,16 +4,17 @@ from typing import Annotated, cast
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 
-from ktoolbox.project_config import ProjectConfigStore
 from ktoolbox.webui.auth import require_csrf, require_session
-from ktoolbox.webui.config_store import content_revision
 from ktoolbox.webui.database import WebUISession
 from ktoolbox.webui.naming_models import (
     NamingApplyRequest,
     NamingConfigurationResponse,
     NamingConversionResponse,
+    NamingLegacyContextResponse,
     NamingPreviewRequest,
     NamingPreviewResponse,
+    NamingUpdateRequest,
+    StartupNoticeResolveRequest,
     StartupNoticeResponse,
 )
 from ktoolbox.webui.naming_service import (
@@ -37,17 +38,37 @@ def create_naming_router() -> APIRouter:
 
     @router.get("/naming", response_model=NamingConfigurationResponse)
     async def get_naming(
-        request: Request,
         _: SessionDependency,
         service: NamingServiceDependency,
     ) -> NamingConfigurationResponse:
-        store = ProjectConfigStore(request.app.state.runtime_context.project_root / "ktoolbox.toml")
-        project = store.load()
-        return NamingConfigurationResponse(
-            naming=project.naming,
-            revision=content_revision(store.load_text()),
-            suggested_download_roots=await service.suggested_download_roots(),
-        )
+        return await service.configuration()
+
+    @router.patch("/naming", response_model=NamingConfigurationResponse)
+    async def update_naming(
+        payload: NamingUpdateRequest,
+        _: CsrfDependency,
+        service: NamingServiceDependency,
+    ) -> NamingConfigurationResponse:
+        try:
+            return await service.update_naming(
+                payload.section,
+                payload.naming,
+                payload.revision,
+            )
+        except NamingPreviewStaleError as error:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
+        except NamingConversionError as error:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail=str(error),
+            ) from error
+
+    @router.get("/naming/legacy-context", response_model=NamingLegacyContextResponse)
+    async def get_naming_legacy_context(
+        _: SessionDependency,
+        service: NamingServiceDependency,
+    ) -> NamingLegacyContextResponse:
+        return await service.legacy_context()
 
     @router.post("/naming/preview", response_model=NamingPreviewResponse)
     async def preview_naming(
@@ -56,7 +77,7 @@ def create_naming_router() -> APIRouter:
         service: NamingServiceDependency,
     ) -> NamingPreviewResponse:
         try:
-            return await service.preview(payload.naming)
+            return await service.preview(payload.roots)
         except NamingConversionError as error:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
@@ -77,7 +98,6 @@ def create_naming_router() -> APIRouter:
             return await service.apply(
                 payload.preview_id,
                 payload.selected_creators,
-                convert_existing=payload.convert_existing,
             )
         except NamingPreviewStaleError as error:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
@@ -161,6 +181,21 @@ def create_naming_router() -> APIRouter:
     ) -> StartupNoticeResponse:
         try:
             return await service.acknowledge_notice(notice_id)
+        except LookupError as error:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="notice not found") from error
+
+    @router.post(
+        "/startup-notices/{notice_id}/resolve",
+        response_model=StartupNoticeResponse,
+    )
+    async def resolve_startup_notice(
+        notice_id: str,
+        payload: StartupNoticeResolveRequest,
+        _: CsrfDependency,
+        service: NamingServiceDependency,
+    ) -> StartupNoticeResponse:
+        try:
+            return await service.resolve_notice(notice_id, payload.action)
         except LookupError as error:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="notice not found") from error
 

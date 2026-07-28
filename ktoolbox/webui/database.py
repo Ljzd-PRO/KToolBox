@@ -150,7 +150,21 @@ class WebUIDatabase:
                     kind TEXT NOT NULL,
                     payload_json TEXT NOT NULL,
                     created_at TEXT NOT NULL,
-                    acknowledged_at TEXT
+                    acknowledged_at TEXT,
+                    resolution TEXT,
+                    resolved_at TEXT
+                );
+
+                CREATE TABLE IF NOT EXISTS naming_legacy_roots (
+                    path TEXT PRIMARY KEY,
+                    created_at TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS naming_layout_state (
+                    id INTEGER PRIMARY KEY CHECK (id = 1),
+                    sources_json TEXT NOT NULL,
+                    target_json TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS automatic_sync_runs (
@@ -248,6 +262,12 @@ class WebUIDatabase:
             await connection.execute(
                 "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
                 (10, utc_now().isoformat()),
+            )
+            await _ensure_column(connection, "startup_notices", "resolution", "TEXT")
+            await _ensure_column(connection, "startup_notices", "resolved_at", "TEXT")
+            await connection.execute(
+                "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
+                (11, utc_now().isoformat()),
             )
             await connection.commit()
 

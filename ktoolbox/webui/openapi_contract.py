@@ -347,19 +347,30 @@ OPERATIONS: dict[str, OperationMetadata] = {
     ),
     "get_naming": OperationMetadata(
         "Get project naming configuration",
-        "Return the project-scoped naming templates, their revision, and suggested download roots.",
+        "Return the project-scoped naming templates, their revision, and whether legacy content needs review.",
         "naming",
         mcp=_read(),
     ),
+    "update_naming": OperationMetadata(
+        "Update a naming configuration section",
+        "Save either directory-structure or naming-template fields after a revision check.",
+        "naming",
+        csrf=True,
+    ),
+    "get_naming_legacy_context": OperationMetadata(
+        "Get legacy download conversion context",
+        "Return suggested legacy download locations and pending conversion state without changing task outputs.",
+        "naming",
+    ),
     "preview_naming": OperationMetadata(
         "Preview a naming conversion",
-        "Scan registered download roots and return safe per-creator moves, statistics, skips, and conflicts.",
+        "Scan selected legacy download locations and return safe per-creator moves, statistics, skips, and conflicts.",
         "naming",
         csrf=True,
     ),
     "apply_naming": OperationMetadata(
-        "Apply project naming configuration",
-        "Save naming configuration directly or start a reversible conversion of selected downloaded creators.",
+        "Apply a legacy directory conversion",
+        "Start a reversible conversion of selected downloaded creators using the saved naming configuration.",
         "naming",
         csrf=True,
     ),
@@ -395,6 +406,12 @@ OPERATIONS: dict[str, OperationMetadata] = {
     "acknowledge_startup_notice": OperationMetadata(
         "Acknowledge a startup notice",
         "Permanently acknowledge one project startup notice.",
+        "naming",
+        csrf=True,
+    ),
+    "resolve_startup_notice": OperationMetadata(
+        "Resolve a startup decision",
+        "Persist an explicit ignore or convert choice for the first-start legacy directory prompt.",
         "naming",
         csrf=True,
     ),

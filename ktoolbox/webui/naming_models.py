@@ -17,16 +17,29 @@ NamingConversionStatus = Literal[
     "failed",
     "cancelled",
 ]
+NamingSection = Literal["structure", "templates"]
+StartupNoticeResolution = Literal["ignored", "convert_selected"]
 
 
 class NamingConfigurationResponse(BaseModel):
     naming: ProjectNamingConfiguration
     revision: str
-    suggested_download_roots: list[Path] = Field(default_factory=list)
+    conversion_pending: bool = False
+
+
+class NamingUpdateRequest(BaseModel):
+    section: NamingSection
+    naming: ProjectNamingConfiguration
+    revision: str
+
+
+class NamingLegacyContextResponse(BaseModel):
+    roots: list[Path] = Field(default_factory=list)
+    conversion_pending: bool = False
 
 
 class NamingPreviewRequest(BaseModel):
-    naming: ProjectNamingConfiguration
+    roots: list[Path]
 
 
 class NamingCreatorPreview(BaseModel):
@@ -61,7 +74,6 @@ class NamingPreviewResponse(BaseModel):
 class NamingApplyRequest(BaseModel):
     preview_id: str
     selected_creators: list[str]
-    convert_existing: bool = True
 
 
 class NamingConversionProgress(BaseModel):
@@ -83,7 +95,13 @@ class NamingConversionResponse(BaseModel):
 
 class StartupNoticeResponse(BaseModel):
     id: str
-    kind: Literal["naming_migrated"] = "naming_migrated"
+    kind: Literal["naming_migrated", "legacy_layout_conversion"]
     payload: dict[str, object] = Field(default_factory=dict)
     created_at: datetime
     acknowledged_at: datetime | None = None
+    resolution: StartupNoticeResolution | None = None
+    resolved_at: datetime | None = None
+
+
+class StartupNoticeResolveRequest(BaseModel):
+    action: StartupNoticeResolution
