@@ -79,7 +79,7 @@ ktoolbox webui /path/to/project --host 127.0.0.1
 
 `.env` 与 `prod.env` 现在是被忽略的本地文件，不再作为受版本控制示例。请在其中保存凭据和下载会话，以 `example.env` 作为公开模板；升级前应检查曾经被跟踪的 dotenv 文件。WebUI 会创建 `.ktoolbox/webui.sqlite3` 与项目锁，但不会改变 CLI 下载输出格式。
 
-命名模板现归属于项目 Schema v4；旧下载位置不再属于命名配置，只供转换工具使用。首次启动 WebUI 会备份 `.env` 和 `prod.env`，将旧命名键迁移到 `ktoolbox.toml`、移除旧键，并要求选择忽略旧内容或检查转换。详见[命名格式指南](naming.md)。
+命名模板和默认输出位置现归属于项目 Schema v4；旧下载位置不再属于命名配置，只供转换工具使用。检测到旧命名键时，WebUI 启动阶段只警告；登录后由用户逐字段检查差异并明确确认带备份的原子迁移，之后才会修改文件。目录扫描仍是独立的显式步骤。详见[命名格式指南](naming.md)。
 
 HTTP 部署风险和持久任务语义详见 [WebUI 指南](webui.md)。
 

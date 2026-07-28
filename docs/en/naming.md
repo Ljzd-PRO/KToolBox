@@ -15,7 +15,9 @@ Template fields accept only the variable chips shown beside them, such as `{crea
 
 **Directory structure** and **Naming templates** have separate save buttons. Saving changes future downloads immediately. Old files are never moved merely because a naming setting was saved.
 
-![Naming templates in the dark theme](../assets/webui/34-naming-templates-desktop-dark.png)
+The **Default download location** belongs to the project too. Its default value is `downloads`, resolved relative to the project root. You may also enter an absolute host path outside the project. A task uses its explicit output first, then an automatic-sync plan's explicit output, and finally this project default. KToolBox stores the resolved absolute path in each created task, so later project changes do not silently relocate it.
+
+![Directory structure and default output](../assets/webui/37-naming-structure-desktop-light.png)
 
 ## Convert old download locations
 
@@ -25,28 +27,28 @@ The scan reads the filesystem rather than relying only on task history, and it d
 
 The preview shows each creator's old and new path, work and file counts, total size, skipped items, and conflicts. Every safely convertible creator starts selected, and you can exclude individual creators before applying the change.
 
-![Naming conversion review on mobile](../assets/webui/35-naming-conversion-mobile-light.png)
+![Naming conversion review on mobile](../assets/webui/38-naming-conversion-mobile-dark.png)
 
 KToolBox never overwrites or merges a target. A stale scan, changed configuration, active related task, duplicate target, or filesystem change requires a new preview.
 
 ## Convert and recover
 
-KToolBox runs selected moves as a persistent background conversion. Cancellation, write failure, or an interrupted process rolls completed moves back in reverse order. The already saved naming format remains active for future downloads.
+KToolBox runs selected moves as a persistent background conversion. **Pause** waits for the current atomic file operation and keeps completed moves in place; **Continue** revalidates the configuration, filesystem fingerprint, conflicts, and free space before resuming. **Cancel** is different: it rolls completed moves back in reverse order. Write failure or an interrupted process also rolls back safely. The already saved naming format remains active for future downloads.
 
 Conversion progress and history are stored in `.ktoolbox/webui.sqlite3`. Successful temporary move logs are removed; completed history remains until you delete its record. A successful conversion removes empty source directories, but it never deletes unrelated files.
 
 ## First-start migration
 
-On the first WebUI startup, KToolBox migrates legacy naming keys from `.env` and `prod.env` before creating a default project configuration. It:
+The migration guide appears only when KToolBox detects legacy naming keys in `.env` or `prod.env`. Startup performs detection and prints a warning, but does not modify any file. After login, the guided dialog:
 
-1. writes the effective values to `ktoolbox.toml`;
-2. backs up the dotenv files under `.ktoolbox/migrations/project-naming-v2/`;
-3. removes the migrated legacy keys;
-4. prints a terminal summary; and
-5. asks after login whether to ignore old content permanently or review a conversion.
+1. shows every source, old value, and current project value;
+2. selects legacy values by default while allowing individual fields to keep the project value;
+3. previews the exact project and dotenv changes;
+4. after confirmation, creates backups under `.ktoolbox/migrations/project-naming-v2/`, writes `ktoolbox.toml`, and removes the migrated dotenv keys atomically; and
+5. then offers a separate old-directory conversion step.
 
-![One-time naming migration notice](../assets/webui/36-naming-migration-notice-light.png)
+![Guided legacy naming migration](../assets/webui/39-naming-migration-desktop-light.png)
 
-The decision dialog cannot be dismissed without choosing. Refreshing continues to show it until **Ignore** or **Review conversion** is selected. **Review conversion** opens the legacy conversion tab; known old locations are scanned automatically, otherwise the page asks you to add one. It never moves files before the preview is confirmed.
+Closing or choosing **Ignore** dismisses only the current dialog. As long as legacy keys remain, refreshing or signing in again shows it again. Configuration migration and directory conversion are separate: after configuration succeeds, review one or more old locations and explicitly choose **Scan old locations**. No scan or file move occurs merely by opening the conversion tool.
 
-The CLI uses the project naming configuration too. When a legacy project still needs migration, start its WebUI once to complete the backed-up, atomic configuration migration.
+The CLI uses the project naming configuration too. When a legacy project still needs migration, start its WebUI and confirm the backed-up atomic migration. Legacy values supplied only through the process environment cannot be deleted; KToolBox ignores them for project naming and keeps warning until they are removed from the launching environment.

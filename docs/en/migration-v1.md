@@ -79,7 +79,7 @@ ktoolbox webui /path/to/project --host 127.0.0.1
 
 `.env` and `prod.env` are now ignored local files rather than version-controlled examples. Keep credentials and downloader sessions there, use `example.env` as the public template, and audit any older tracked dotenv file before upgrading. The WebUI creates `.ktoolbox/webui.sqlite3` and a project lock; neither changes CLI download output formats.
 
-Naming templates now belong to project Schema v4; old download locations are kept outside naming configuration for the conversion tool only. The first WebUI start backs up `.env` and `prod.env`, migrates legacy naming keys into `ktoolbox.toml`, removes those keys, and requires a choice to ignore old content or review a conversion. See the [naming guide](naming.md).
+Naming templates and the default output belong to project Schema v4; old download locations are kept outside naming configuration for the conversion tool only. If WebUI detects legacy naming keys, startup only warns. After login, the user reviews field-level differences and explicitly confirms the backed-up atomic migration before any file changes. Directory scanning remains a separate, explicit step. See the [naming guide](naming.md).
 
 See the [WebUI guide](webui.md) for HTTP deployment risks and persistent task semantics.
 

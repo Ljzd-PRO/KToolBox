@@ -58,7 +58,7 @@ The project path resolves in this order: global `--config`, `KTOOLBOX_PROJECT_CO
 
 ## Creator roster
 
-Every project document starts with `schema_version = 4`. Schema v4 stores project naming and automatic-sync plans; old download locations belong only to the naming conversion tool. See the [naming guide](../naming.md). Creators are unique by case-insensitive `service:id`; optional aliases are also unique.
+Every project document starts with `schema_version = 4`. Schema v4 stores project naming and automatic-sync plans; old download locations belong only to the naming conversion tool. `default_output = "downloads"` sets the project-wide default, while an absolute path may point outside the project. See the [naming guide](../naming.md). Creators are unique by case-insensitive `service:id`; optional aliases are also unique.
 
 ```toml
 schema_version = 4

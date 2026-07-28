@@ -28,9 +28,10 @@ ktoolbox download https://pawchive.pw/fanbox/user/6570768/post/1836570
 ktoolbox download \
   --service fanbox \
   --creator-id 6570768 \
-  --post-id 1836570 \
-  --output downloads
+  --post-id 1836570
 ```
+
+Без `--output` используется каталог загрузки проекта по умолчанию. Укажите `--output` только для переопределения в этом запуске; допустим абсолютный путь вне проекта.
 
 С помощью `--revision-id` можно выбрать редакцию. Поскольку у Pawchive нет адреса сведений об одной редакции, KToolBox получает список редакций и находит указанный ID. Задайте `KTOOLBOX_JOB__INCLUDE_REVISIONS=True`, чтобы при скачивании текущей публикации включить все редакции.
 

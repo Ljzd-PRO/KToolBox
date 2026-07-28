@@ -28,9 +28,10 @@ ktoolbox download https://pawchive.pw/fanbox/user/6570768/post/1836570
 ktoolbox download \
   --service fanbox \
   --creator-id 6570768 \
-  --post-id 1836570 \
-  --output downloads
+  --post-id 1836570
 ```
+
+Without `--output`, KToolBox uses the project's default download location. Pass `--output` only to override it for this run; absolute paths outside the project are allowed.
 
 Use `--revision-id` to select one revision. KToolBox fetches the revision list and matches that ID because Pawchive has no single-revision detail endpoint. Set `KTOOLBOX_JOB__INCLUDE_REVISIONS=True` to include all revisions when downloading the current post.
 

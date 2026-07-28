@@ -88,7 +88,7 @@ Automatic checks prefer Pawchive's UTC-like `added` time, overlap the previous s
 
 ## Project naming
 
-Naming is stored in the project's `ktoolbox.toml` and is shared by CLI and WebUI downloads. The **Naming format** page saves directory structure and templates independently. Its separate legacy-conversion tab scans user-selected old locations without contacting Pawchive, shows per-creator work, file, and size statistics, and rolls completed moves back after cancellation or failure. Old locations are not future download destinations. See the [naming guide](naming.md) for templates, first-start decisions, and recovery details.
+Naming and the default output are stored in the project's `ktoolbox.toml` and shared by CLI, WebUI, MCP, work downloads, and automatic synchronization. The **Naming format** page saves directory structure and templates independently. Its separate legacy-conversion tab scans explicitly selected old locations without contacting Pawchive, shows per-creator statistics, and supports pause, continuation, or rollback. Old locations are never future download destinations. See the [naming guide](naming.md) for inheritance, guided legacy migration, and recovery.
 
 ## Configuration editing
 

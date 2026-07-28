@@ -71,9 +71,10 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Add a localized About page with version, license, runtime, author, and official resource links while omitting author email addresses.
 - Render visible URLs, IP addresses, listener addresses, and URL examples with shared inline-code styling.
 - Add a localized Naming Format page with separate structure/template saves, variable validation, and live directory-tree examples.
+- Add a project default download location inherited by CLI, WebUI, MCP, work downloads, and automatic synchronization unless an entry supplies an explicit output; resolve relative values from the project and allow absolute host paths.
 - Move old locations into a dedicated legacy-conversion tab so they cannot be mistaken for future task destinations; scan the filesystem independently of task history and preview creator, work, file, and byte counts.
-- Apply selected legacy moves as persistent background conversions with an operation journal, cancellation rollback, restart recovery, and empty-source cleanup.
-- Migrate legacy global naming fields before first-start project creation, back up dotenv files, remove migrated keys, and require an explicit ignore-or-review decision after login.
+- Apply selected legacy moves as persistent background conversions with an operation journal, pause/continue validation, cancellation rollback, restart recovery, lifecycle events, and empty-source cleanup.
+- Detect legacy dotenv naming fields without mutating files at startup; after login, guide users through field-level comparison, explicit backed-up atomic migration, and a separate manually triggered directory scan.
 - Add project-scoped automatic synchronization plans with five-field Cron or fixed intervals, IANA time zones, future-run previews, pause and immediate-run controls, per-creator checkpoints, overlap-safe work deduplication, and privacy-preserving recent-update counts.
 
 ## Testing and quality
@@ -162,9 +163,10 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 新增七语言关于页，展示版本、许可证、运行环境、作者和官方资源，同时隐藏作者邮箱。
 - 所有可见 URL、IP、监听地址和 URL 示例统一使用共享行内代码样式。
 - 新增七语言“命名格式”页面，分别保存目录结构和命名模板，提供变量校验与实时目录树示例。
+- 新增项目默认下载位置；CLI、WebUI、MCP、作品下载和自动同步在未显式指定输出时共同继承，相对路径以项目解析，也允许主机绝对路径。
 - 将旧下载位置放入独立转换标签页，避免被误解为未来任务输出设置；扫描不依赖任务历史，并在转换前展示作者、作品、文件和字节统计。
-- 使用持久操作日志在后台执行选中的旧目录转换，支持取消回滚、重启恢复和空源目录清理。
-- 在首次创建项目配置前迁移旧全局命名字段，备份 dotenv 文件、删除已迁移键，并在登录后要求明确选择忽略旧内容或检查转换。
+- 使用持久操作日志在后台执行选中的旧目录转换，支持暂停/继续校验、取消回滚、重启恢复、生命周期事件和空源目录清理。
+- 启动阶段只检测旧 dotenv 命名字段而不修改文件；登录后通过逐字段对比、明确确认的带备份原子迁移和独立的手动目录扫描引导用户完成升级。
 - 新增项目级自动同步计划，支持五段 Cron 或固定间隔、IANA 时区、未来执行预览、暂停与立即执行、按作者推进检查点、重叠窗口作品去重，以及不加载标题和媒体的最近更新统计。
 
 ## 测试与质量

@@ -28,9 +28,10 @@ ktoolbox download https://pawchive.pw/fanbox/user/6570768/post/1836570
 ktoolbox download \
   --service fanbox \
   --creator-id 6570768 \
-  --post-id 1836570 \
-  --output downloads
+  --post-id 1836570
 ```
+
+未提供 `--output` 时，KToolBox 使用项目默认下载位置。仅需覆盖本次运行时再传入 `--output`；允许使用项目外的绝对路径。
 
 使用 `--revision-id` 选择一个修订。Pawchive 没有单修订详情端点，因此 KToolBox 会读取修订列表并匹配该 ID。设置 `KTOOLBOX_JOB__INCLUDE_REVISIONS=True` 可在下载当前作品时包含全部修订。
 

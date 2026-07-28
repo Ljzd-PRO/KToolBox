@@ -58,7 +58,7 @@ ktoolbox config validate
 
 ## 創作者清單
 
-每份專案文件都以 `schema_version = 4` 開頭。Schema v4 儲存專案命名格式與自動同步計畫；舊下載位置只屬於命名轉換工具。請參閱[命名格式指南](../naming.md)。創作者依不區分大小寫的 `service:id` 保持唯一；可選別名也必須唯一。
+每份專案文件都以 `schema_version = 4` 開頭。Schema v4 儲存專案命名格式與自動同步計畫；舊下載位置只屬於命名轉換工具。`default_output = "downloads"` 設定專案預設下載目錄，也可以填寫專案外的絕對路徑。請參閱[命名格式指南](../naming.md)。創作者依不區分大小寫的 `service:id` 保持唯一；可選別名也必須唯一。
 
 ```toml
 schema_version = 4

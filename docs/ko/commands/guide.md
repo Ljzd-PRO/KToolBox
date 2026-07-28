@@ -28,9 +28,10 @@ ktoolbox download https://pawchive.pw/fanbox/user/6570768/post/1836570
 ktoolbox download \
   --service fanbox \
   --creator-id 6570768 \
-  --post-id 1836570 \
-  --output downloads
+  --post-id 1836570
 ```
+
+`--output`을 생략하면 프로젝트 기본 다운로드 위치를 사용합니다. 이번 실행만 바꿀 때 `--output`을 지정하며 프로젝트 밖의 절대 경로도 사용할 수 있습니다.
 
 `--revision-id`를 사용하여 개정판 하나를 선택합니다. Pawchive에는 단일 개정판 상세 엔드포인트가 없으므로 KToolBox는 개정판 목록을 가져와 해당 ID를 일치시킵니다. 현재 게시물을 다운로드할 때 모든 개정판을 포함하려면 `KTOOLBOX_JOB__INCLUDE_REVISIONS=True`를 설정하세요.
 

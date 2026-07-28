@@ -28,9 +28,10 @@ ktoolbox download https://pawchive.pw/fanbox/user/6570768/post/1836570
 ktoolbox download \
   --service fanbox \
   --creator-id 6570768 \
-  --post-id 1836570 \
-  --output downloads
+  --post-id 1836570
 ```
+
+`--output` を省略すると、プロジェクトの既定ダウンロード先を使用します。この実行だけ変更するときに `--output` を指定し、プロジェクト外の絶対パスも利用できます。
 
 `--revision-id` で 1 つの改訂を選択できます。Pawchive には単一改訂の詳細エンドポイントがないため、KToolBox は改訂一覧を取得して ID を照合します。現在の投稿をダウンロードするときにすべての改訂を含めるには、`KTOOLBOX_JOB__INCLUDE_REVISIONS=True` を設定します。
 

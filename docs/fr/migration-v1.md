@@ -79,7 +79,7 @@ ktoolbox webui /path/to/project --host 127.0.0.1
 
 `.env` et `prod.env` sont maintenant des fichiers locaux ignorés plutôt que des exemples suivis par le contrôle de version. Conservez-y les identifiants et les sessions du téléchargeur, utilisez `example.env` comme modèle public et vérifiez tout ancien fichier dotenv suivi avant la mise à niveau. La WebUI crée `.ktoolbox/webui.sqlite3` et un verrou de projet ; aucun des deux ne modifie les formats de sortie des téléchargements de la CLI.
 
-Les modèles de nommage appartiennent désormais au Schema v4 du projet ; les anciens emplacements ne font plus partie du nommage et servent uniquement à la conversion. Au premier démarrage, la WebUI sauvegarde `.env` et `prod.env`, migre les anciennes clés vers `ktoolbox.toml`, les supprime, puis demande d’ignorer l’ancien contenu ou de vérifier une conversion. Consultez le [guide du nommage](naming.md).
+Les modèles de nommage et la sortie par défaut appartiennent désormais au Schema v4 ; les anciens emplacements servent uniquement à la conversion. Si la WebUI détecte d’anciennes clés, le démarrage se limite à un avertissement. Après connexion, l’utilisateur examine les différences champ par champ et confirme explicitement la migration atomique avec sauvegarde avant toute modification. L’analyse des répertoires reste une étape séparée et explicite. Consultez le [guide du nommage](naming.md).
 
 Consultez le [guide de la WebUI](webui.md) pour les risques du déploiement HTTP et le fonctionnement des tâches persistantes.
 

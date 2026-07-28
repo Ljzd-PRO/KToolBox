@@ -79,7 +79,7 @@ ktoolbox webui /path/to/project --host 127.0.0.1
 
 `.env` 和 `prod.env` 現在是忽略的本機檔案，而不是受版本控制的範例。請將憑證與下載器工作階段保存在其中，以 `example.env` 作為公開範本，並在升級前稽核任何較舊的受追蹤 dotenv 檔案。WebUI 會建立 `.ktoolbox/webui.sqlite3` 和專案鎖；兩者都不會變更 CLI 下載輸出格式。
 
-命名範本現在屬於專案 Schema v4；舊下載位置不再屬於命名設定，只供轉換工具使用。首次啟動 WebUI 會備份 `.env` 與 `prod.env`，將舊命名鍵遷移至 `ktoolbox.toml`、移除舊鍵，並要求選擇忽略舊內容或檢查轉換。詳見[命名格式指南](naming.md)。
+命名範本與預設輸出位置現在屬於專案 Schema v4；舊下載位置只供轉換工具使用。偵測到舊命名鍵時，WebUI 啟動階段只警告；登入後由使用者逐欄位檢查差異並明確確認具有備份的原子遷移，之後才修改檔案。目錄掃描仍是獨立的明確步驟。詳見[命名格式指南](naming.md)。
 
 HTTP 部署風險和持久化工作語意請參閱 [WebUI 指南](webui.md)。
 

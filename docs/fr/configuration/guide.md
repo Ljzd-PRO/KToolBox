@@ -58,7 +58,7 @@ Le chemin du projet est résolu dans l'ordre suivant : l'option globale `--confi
 
 ## Liste des créateurs
 
-Chaque document de projet commence par `schema_version = 4`. Le Schema v4 stocke le nommage et les plans de synchronisation automatique ; les anciens emplacements servent uniquement à l’outil de conversion. Consultez le [guide du nommage](../naming.md). Les créateurs sont uniques par `service:id` sans distinction de casse ; les alias facultatifs sont également uniques.
+Chaque document de projet commence par `schema_version = 4`. Le Schema v4 stocke le nommage et les plans de synchronisation automatique ; les anciens emplacements servent uniquement à l’outil de conversion. `default_output = "downloads"` définit la destination commune du projet, tandis qu’un chemin absolu peut viser l’extérieur du projet. Consultez le [guide du nommage](../naming.md). Les créateurs sont uniques par `service:id` sans distinction de casse ; les alias facultatifs sont également uniques.
 
 ```toml
 schema_version = 4

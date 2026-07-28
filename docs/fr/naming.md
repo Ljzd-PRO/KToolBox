@@ -15,7 +15,9 @@ Seules les variables affichées à côté du champ sont acceptées, par exemple 
 
 **Structure des répertoires** et **Modèles de nommage** disposent de boutons d’enregistrement distincts. L’enregistrement s’applique immédiatement aux futurs téléchargements, sans jamais déplacer les anciens fichiers.
 
-![Modèles de nommage en thème sombre](../assets/webui/34-naming-templates-desktop-dark.png)
+L’**emplacement de téléchargement par défaut** appartient aussi au projet. Sa valeur initiale est `downloads` ; un chemin relatif est résolu depuis la racine du projet et un chemin absolu peut sortir du projet. L’ordre est : sortie explicite de la tâche, sortie explicite du plan de synchronisation automatique, puis valeur par défaut du projet. Chaque tâche conserve le chemin absolu résolu à sa création.
+
+![Structure et emplacement par défaut](../assets/webui/37-naming-structure-desktop-light.png)
 
 ## Convertir les anciens emplacements
 
@@ -25,28 +27,28 @@ L’analyse lit directement le système de fichiers, ne dépend pas uniquement d
 
 La prévisualisation indique anciens et nouveaux chemins, nombres d’œuvres et de fichiers, taille totale, éléments ignorés et conflits. Tous les auteurs convertibles en sécurité sont sélectionnés par défaut.
 
-![Prévisualisation mobile de conversion](../assets/webui/35-naming-conversion-mobile-light.png)
+![Prévisualisation mobile de conversion](../assets/webui/38-naming-conversion-mobile-dark.png)
 
 KToolBox n’écrase ni ne fusionne une cible. Une prévisualisation périmée, une configuration modifiée, une tâche liée active, une cible dupliquée ou un changement du système de fichiers impose une nouvelle analyse.
 
 ## Convertir et récupérer
 
-KToolBox exécute les déplacements choisis dans une tâche persistante en arrière-plan. Une annulation, une erreur d’écriture ou une interruption restaure les déplacements en ordre inverse. Le format déjà enregistré reste actif pour les futurs téléchargements.
+KToolBox exécute les déplacements choisis dans une tâche persistante en arrière-plan. **Pause** attend la fin de l’opération de fichier atomique en cours et conserve les déplacements achevés. **Continuer** revérifie la configuration, l’empreinte du système de fichiers, les conflits et l’espace libre. **Annuler** restaure les déplacements en ordre inverse. Une erreur d’écriture ou une interruption déclenche également une restauration sûre.
 
 La progression et l’historique résident dans `.ktoolbox/webui.sqlite3`. Les journaux temporaires sont supprimés après réussite ; l’historique reste jusqu’à sa suppression manuelle. Les anciens dossiers devenus vides sont retirés, jamais les fichiers sans rapport.
 
 ## Migration au premier démarrage
 
-Au premier démarrage de la WebUI, KToolBox migre les anciennes clés de `.env` et `prod.env` avant de créer une configuration par défaut :
+L’assistant n’apparaît que si KToolBox détecte d’anciennes clés de nommage dans `.env` ou `prod.env`. Le démarrage se limite à la détection et à un avertissement dans le terminal ; aucun fichier n’est modifié. Après connexion, l’assistant :
 
-1. écriture des valeurs effectives dans `ktoolbox.toml` ;
-2. sauvegarde sous `.ktoolbox/migrations/project-naming-v2/` ;
-3. suppression des anciennes clés dotenv ;
-4. résumé dans le terminal ;
-5. choix obligatoire après connexion entre ignorer définitivement l’ancien contenu et vérifier une conversion.
+1. présente la source, l’ancienne valeur et la valeur actuelle ;
+2. sélectionne les anciennes valeurs par défaut, avec choix champ par champ ;
+3. prévisualise les modifications du projet et les clés dotenv supprimées ;
+4. après confirmation, sauvegarde sous `.ktoolbox/migrations/project-naming-v2/`, écrit `ktoolbox.toml` et supprime les anciennes clés de façon atomique ;
+5. propose ensuite, séparément, la conversion des anciens répertoires.
 
-![Notification unique de migration](../assets/webui/36-naming-migration-notice-light.png)
+![Assistant de migration des anciens réglages](../assets/webui/39-naming-migration-desktop-light.png)
 
-La boîte de dialogue ne peut pas être fermée sans choix et réapparaît après actualisation. **Vérifier la conversion** ouvre l’onglet dédié ; les anciens emplacements connus sont analysés automatiquement, sinon la page demande d’en ajouter un. Aucun fichier n’est déplacé avant confirmation de la prévisualisation.
+Fermer ou choisir **Ignorer** ne masque que cette occurrence. Tant que les anciennes clés existent, l’assistant réapparaît après actualisation ou reconnexion. Migration de configuration et conversion de répertoires sont distinctes : vérifiez les anciens emplacements puis lancez explicitement leur analyse. Ouvrir l’outil ne déclenche ni analyse ni déplacement.
 
-La CLI utilise également le nommage du projet. Démarrez une fois la WebUI d’un ancien projet pour terminer cette migration atomique de configuration avec sauvegarde.
+La CLI utilise également le nommage du projet. Pour un ancien projet, confirmez dans la WebUI la migration atomique avec sauvegarde. Les anciennes valeurs présentes uniquement dans l’environnement du processus ne peuvent pas être supprimées : elles sont ignorées pour le nommage et restent signalées jusqu’à leur retrait de l’environnement de lancement.

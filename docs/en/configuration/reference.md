@@ -79,6 +79,7 @@ The project document is separate from environment configuration. Its path resolv
 | `schema_version` | literal `4` | `4` | Project schema version; older documents upgrade when saved. |
 | `creators` | table array | empty | Saved creator roster. |
 | `blockers` | table array | empty | Ordered blocker specifications. |
+| `default_output` | string | `downloads` | Default download directory. Relative paths resolve from the project root; absolute paths may point outside the project. |
 | `naming` | table | project defaults | Directory layout and filename templates. Old locations are entered only in the conversion tool. See the [naming guide](../naming.md). |
 
 ### Creator entry
