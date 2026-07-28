@@ -113,6 +113,8 @@ export type ProjectNamingConfiguration = WebUIApiSchemas["ProjectNamingConfigura
 
 export type NamingConfigurationResponse = WebUIApiSchemas["NamingConfigurationResponse"];
 
+export type NamingLegacyContext = WebUIApiSchemas["NamingLegacyContextResponse"];
+
 export type NamingCreatorPreview = WebUIApiSchemas["NamingCreatorPreview"];
 
 export type NamingPreview = WebUIApiSchemas["NamingPreviewResponse"];

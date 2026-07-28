@@ -184,12 +184,14 @@ class NamingConversionService:
         revision = content_revision(self.project_store.load_text())
         resolved_roots = [self._resolve_root(root) for root in _unique_paths(roots)]
         if not resolved_roots:
-            raise NamingConversionError("add at least one download root before scanning")
+            raise NamingConversionError("add at least one old download location before scanning")
         for root in resolved_roots:
             if not root.is_dir():
-                raise NamingConversionError(f"download root is not a directory: {root}")
+                raise NamingConversionError(f"old download location is not a directory: {root}")
             if root.is_symlink():
-                raise NamingConversionError(f"download root cannot be a symbolic link: {root}")
+                raise NamingConversionError(
+                    f"old download location cannot be a symbolic link: {root}"
+                )
 
         sources, candidate = await self._layout_snapshots(project.naming)
         fingerprint = await anyio.to_thread.run_sync(_filesystem_fingerprint, resolved_roots)

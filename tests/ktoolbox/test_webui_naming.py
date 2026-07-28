@@ -82,6 +82,68 @@ async def save_naming(
     )
 
 
+@pytest.mark.asyncio
+async def test_legacy_download_roots_move_out_of_project_naming(tmp_path: Path) -> None:
+    project_path = tmp_path / "ktoolbox.toml"
+    project_path.write_text(
+        """
+schema_version = 3
+
+[naming]
+download_roots = ["downloads", "/archive/ktoolbox"]
+creator_dirname_format = "{creator_name} [{service}-{creator_id}]"
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+
+    service, _ = await service_for(tmp_path)
+
+    context = await service.legacy_context()
+    assert set(context.roots) == {Path("downloads"), Path("/archive/ktoolbox")}
+    assert "download_roots" not in project_path.read_text(encoding="utf-8")
+    assert ProjectConfigStore(project_path).load().schema_version == 4
+    await service.stop()
+
+    restarted, _ = await service_for(tmp_path)
+    assert set((await restarted.legacy_context()).roots) == set(context.roots)
+    await restarted.stop()
+
+
+@pytest.mark.asyncio
+async def test_naming_sections_save_without_overwriting_each_other(tmp_path: Path) -> None:
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    store.save(ProjectConfiguration())
+    service, _ = await service_for(tmp_path)
+    original = store.load().naming
+    candidate = original.model_copy(
+        update={
+            "mix_posts": True,
+            "creator_dirname_format": "{creator_name} ({creator_id})",
+        }
+    )
+
+    structure_result = await service.update_naming(
+        "structure",
+        candidate,
+        content_revision(store.load_text()),
+    )
+    assert structure_result.naming.mix_posts is True
+    assert structure_result.naming.creator_dirname_format == original.creator_dirname_format
+    assert structure_result.conversion_pending is True
+
+    templates_result = await service.update_naming(
+        "templates",
+        candidate,
+        structure_result.revision,
+    )
+    assert templates_result.naming.mix_posts is True
+    assert templates_result.naming.creator_dirname_format == "{creator_name} ({creator_id})"
+    with pytest.raises(NamingPreviewStaleError, match="reload before saving"):
+        await service.update_naming("templates", original, structure_result.revision)
+    await service.stop()
+
+
 def write_downloaded_work(root: Path, creator_dir: str, work_dir: str, post_id: str) -> Path:
     path = root / creator_dir / work_dir
     path.mkdir(parents=True)

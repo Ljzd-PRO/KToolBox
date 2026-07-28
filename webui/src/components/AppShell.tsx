@@ -47,9 +47,9 @@ const navigation: NavigationItem[] = [
   { key: "creators", path: "/creators", icon: IconAddressBook },
   { key: "posts", path: "/posts", icon: IconFileSearch },
   { key: "blockers", path: "/blockers", icon: IconBan },
-  { key: "configuration", path: "/configuration", icon: IconSettingsCog },
   { key: "naming", path: "/naming", icon: IconFolderCog },
   { key: "mcp", path: "/mcp", icon: IconPlugConnected },
+  { key: "configuration", path: "/configuration", icon: IconSettingsCog },
   { key: "system", path: "/system", icon: IconAdjustmentsHorizontal },
   { key: "about", path: "/about", icon: IconInfoCircle },
 ];

@@ -19,6 +19,8 @@ import {
   IconCalendarStats as CalendarStats,
   IconCheck as Check,
   IconChevronRight as ChevronRight,
+  IconDatabaseImport as DatabaseImport,
+  IconDeviceFloppy as Save,
   IconFile as File,
   IconFileCode as FileCode,
   IconFileDescription as FileDescription,
@@ -27,7 +29,6 @@ import {
   IconFolderCog as FolderCog,
   IconFolderOpen as FolderOpen,
   IconFolderPlus as FolderPlus,
-  IconHistory as History,
   IconInfoCircle as InfoCircle,
   IconListNumbers as ListNumbers,
   IconPlayerStop as PlayerStop,
@@ -41,8 +42,9 @@ import {
   IconUsers as Users,
   IconX as X,
 } from "@tabler/icons-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
 
 import { ExternalChangeAlert } from "../components/ExternalChangeAlert";
 import { RemotePathField } from "../components/RemotePathField";
@@ -70,6 +72,7 @@ import type {
   NamingConfigurationResponse,
   NamingConversion,
   NamingCreatorPreview,
+  NamingLegacyContext,
   NamingPreview,
   ProjectNamingConfiguration,
 } from "../types";
@@ -77,10 +80,9 @@ import type {
 type NamingDraft = Required<
   Omit<
     ProjectNamingConfiguration,
-    "download_roots" | "post_structure" | "sequential_filename_excludes"
+    "post_structure" | "sequential_filename_excludes"
   >
 > & {
-  download_roots: string[];
   post_structure: {
     attachments: string;
     content: string;
@@ -109,7 +111,6 @@ const activeConversionStatuses = new Set(["queued", "running", "rolling_back"]);
 
 function normalizeNaming(value: ProjectNamingConfiguration): NamingDraft {
   return {
-    download_roots: [...(value.download_roots ?? [])],
     creator_dirname_format: value.creator_dirname_format,
     post_dirname_format: value.post_dirname_format,
     revision_dirname_format: value.revision_dirname_format,
@@ -131,8 +132,34 @@ function normalizeNaming(value: ProjectNamingConfiguration): NamingDraft {
   };
 }
 
-function draftKey(value: NamingDraft | ProjectNamingConfiguration): string {
-  return JSON.stringify(normalizeNaming(value));
+function structureKey(value: NamingDraft | ProjectNamingConfiguration): string {
+  const naming = normalizeNaming(value);
+  return JSON.stringify({
+    mix_posts: naming.mix_posts,
+    sequential_filename: naming.sequential_filename,
+    sequential_filename_excludes: naming.sequential_filename_excludes,
+    group_by_year: naming.group_by_year,
+    group_by_month: naming.group_by_month,
+    post_structure: {
+      attachments: naming.post_structure.attachments,
+      content: naming.post_structure.content,
+      external_links: naming.post_structure.external_links,
+      revisions: naming.post_structure.revisions,
+    },
+  });
+}
+
+function templateKey(value: NamingDraft | ProjectNamingConfiguration): string {
+  const naming = normalizeNaming(value);
+  return JSON.stringify({
+    creator_dirname_format: naming.creator_dirname_format,
+    post_dirname_format: naming.post_dirname_format,
+    revision_dirname_format: naming.revision_dirname_format,
+    filename_format: naming.filename_format,
+    year_dirname_format: naming.year_dirname_format,
+    month_dirname_format: naming.month_dirname_format,
+    primary_file: naming.post_structure.file,
+  });
 }
 
 function formatTemplate(
@@ -218,6 +245,7 @@ function invalidRelativePath(value: string): boolean {
 export function NamingPage() {
   const { t, i18n } = useTranslation();
   const { session } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const realtime = useRealtime(false);
   const queryClient = useQueryClient();
   const namingQuery = useQuery({
@@ -228,13 +256,20 @@ export function NamingPage() {
     queryKey: ["naming-conversions"],
     queryFn: () => api<NamingConversion[]>("/naming/conversions"),
   });
+  const legacyContextQuery = useQuery({
+    queryKey: ["naming-legacy-context"],
+    queryFn: () => api<NamingLegacyContext>("/naming/legacy-context"),
+  });
   const [draft, setDraft] = useState<NamingDraft | null>(null);
   const [baselineRevision, setBaselineRevision] = useState("");
+  const [structureBaseline, setStructureBaseline] = useState("");
+  const [templateBaseline, setTemplateBaseline] = useState("");
+  const [legacyRoots, setLegacyRoots] = useState<string[] | null>(null);
   const [preview, setPreview] = useState<NamingPreview | null>(null);
   const [selectedCreators, setSelectedCreators] = useState<Set<string>>(new Set());
-  const [convertExisting, setConvertExisting] = useState(true);
   const [scanning, setScanning] = useState(false);
   const [applying, setApplying] = useState(false);
+  const [savingSection, setSavingSection] = useState<"structure" | "templates" | null>(null);
   const [historySort, setHistorySort] = useState<SortDescriptor>({
     column: "created_at",
     direction: "descending",
@@ -243,10 +278,9 @@ export function NamingPage() {
 
   const remoteNamingRevision = realtime?.revisions.naming ?? 0;
   const current = namingQuery.data;
-  const dirty =
-    draft !== null &&
-    current !== undefined &&
-    draftKey(draft) !== draftKey(current.naming);
+  const structureDirty = draft !== null && structureKey(draft) !== structureBaseline;
+  const templatesDirty = draft !== null && templateKey(draft) !== templateBaseline;
+  const dirty = structureDirty || templatesDirty;
   const externalChange =
     dirty && Boolean(baselineRevision) && current?.revision !== baselineRevision;
   const activeConversion = conversionsQuery.data?.find((item) =>
@@ -255,15 +289,27 @@ export function NamingPage() {
 
   useEffect(() => {
     if (!current) return;
-    if (!draft || !dirty || draftKey(draft) === draftKey(current.naming)) {
+    if (!draft || !dirty) {
       const timer = window.setTimeout(() => {
-        setDraft(normalizeNaming(current.naming));
+        const normalized = normalizeNaming(current.naming);
+        setDraft(normalized);
         setBaselineRevision(current.revision);
+        setStructureBaseline(structureKey(normalized));
+        setTemplateBaseline(templateKey(normalized));
       }, 0);
       return () => window.clearTimeout(timer);
     }
     return undefined;
   }, [current, dirty, draft, remoteNamingRevision]);
+
+  useEffect(() => {
+    if (legacyRoots !== null || !legacyContextQuery.data) return;
+    const timer = window.setTimeout(
+      () => setLegacyRoots([...(legacyContextQuery.data?.roots ?? [])]),
+      0,
+    );
+    return () => window.clearTimeout(timer);
+  }, [legacyContextQuery.data, legacyRoots]);
 
   const templateProblems = useMemo(() => {
     if (!draft) return [];
@@ -284,8 +330,7 @@ export function NamingPage() {
       .map(([name]) => name);
   }, [draft]);
   const rootProblems = useMemo(() => {
-    if (!draft) return [];
-    const normalized = draft.download_roots.map((root) => root.trim());
+    const normalized = (legacyRoots ?? []).map((root) => root.trim());
     return normalized.map((root, index) =>
       !root
         ? "empty"
@@ -293,12 +338,11 @@ export function NamingPage() {
           ? "duplicate"
           : null,
     );
-  }, [draft]);
-  const hasValidationErrors =
-    templateProblems.length > 0 ||
+  }, [legacyRoots]);
+  const hasStructureErrors =
     pathProblems.length > 0 ||
-    rootProblems.some(Boolean) ||
     Boolean(draft?.group_by_month && !draft.group_by_year);
+  const hasTemplateErrors = templateProblems.length > 0;
   const tree = useMemo(() => (draft ? sampleTree(draft) : []), [draft]);
   const sortedConversions = useMemo(() => {
     const values = [...(conversionsQuery.data ?? [])];
@@ -311,7 +355,14 @@ export function NamingPage() {
     });
   }, [conversionsQuery.data, historySort, i18n.language]);
 
-  if (namingQuery.isLoading || conversionsQuery.isLoading || !draft || !current) {
+  if (
+    namingQuery.isLoading ||
+    conversionsQuery.isLoading ||
+    legacyContextQuery.isLoading ||
+    !draft ||
+    !current ||
+    legacyRoots === null
+  ) {
     return <PageLoading />;
   }
 
@@ -330,30 +381,65 @@ export function NamingPage() {
   }
 
   function addDownloadRoot() {
-    if (!current || !draft) return;
-    const suggested = current.suggested_download_roots?.find(
-      (root) => !draft.download_roots.includes(root),
-    );
-    updateDraft((value) => ({
-      ...value,
-      download_roots: [...value.download_roots, suggested ?? ""],
-    }));
+    setLegacyRoots((value) => [...(value ?? []), ""]);
+  }
+
+  async function saveSection(section: "structure" | "templates") {
+    if (
+      !session ||
+      !draft ||
+      (section === "structure" ? hasStructureErrors : hasTemplateErrors)
+    ) return;
+    const candidate = draft;
+    setSavingSection(section);
+    try {
+      const result = await api<NamingConfigurationResponse>("/naming", {
+        method: "PATCH",
+        body: {
+          section,
+          naming: candidate,
+          revision: baselineRevision,
+        },
+        csrfToken: session.csrf_token,
+      });
+      queryClient.setQueryData(["naming"], result);
+      setBaselineRevision(result.revision);
+      if (section === "structure") setStructureBaseline(structureKey(candidate));
+      else setTemplateBaseline(templateKey(candidate));
+      await queryClient.invalidateQueries({ queryKey: ["naming-legacy-context"] });
+      toast.success(t("naming.saved"), {
+        description: t("naming.savedConversionHint"),
+        actionProps: {
+          children: t("naming.openLegacyConversion"),
+          onPress: () => setSelectedTab("legacy"),
+        },
+      });
+    } catch (error) {
+      toast.danger(t("common.error"), { description: namingErrorText(error, t) });
+    } finally {
+      setSavingSection(null);
+    }
   }
 
   async function scanPreview() {
-    if (!session || hasValidationErrors) return;
+    if (
+      !session ||
+      !legacyRoots ||
+      rootProblems.some(Boolean) ||
+      legacyRoots.length === 0
+    ) return;
+    const roots = legacyRoots;
     setScanning(true);
     try {
       const result = await api<NamingPreview>("/naming/preview", {
         method: "POST",
-        body: { naming: draft },
+        body: { roots },
         csrfToken: session.csrf_token,
       });
       setPreview(result);
       setSelectedCreators(
         new Set(result.creators.filter((creator) => creator.selectable).map((creator) => creator.key)),
       );
-      setConvertExisting(true);
     } catch (error) {
       toast.danger(t("naming.previewFailed"), {
         description: namingErrorText(error, t),
@@ -372,7 +458,6 @@ export function NamingPage() {
         body: {
           preview_id: preview.id,
           selected_creators: [...selectedCreators],
-          convert_existing: convertExisting,
         },
         csrfToken: session.csrf_token,
       });
@@ -382,7 +467,7 @@ export function NamingPage() {
         queryClient.invalidateQueries({ queryKey: ["naming-conversions"] }),
       ]);
       toast.success(
-        t(convertExisting ? "naming.conversionStarted" : "naming.saved"),
+        t("naming.conversionStarted"),
         result.status === "completed"
           ? undefined
           : { description: t("naming.conversionBackground") },
@@ -391,6 +476,29 @@ export function NamingPage() {
       toast.danger(t("common.error"), { description: namingErrorText(error, t) });
     } finally {
       setApplying(false);
+    }
+  }
+
+  const selectedTab = searchParams.get("tab") === "legacy"
+    ? "legacy"
+    : searchParams.get("tab") === "templates"
+      ? "templates"
+      : "structure";
+
+  function setSelectedTab(tab: string) {
+    const next = new URLSearchParams(searchParams);
+    if (tab === "structure") next.delete("tab");
+    else next.set("tab", tab);
+    setSearchParams(next, { replace: true });
+  }
+
+  function startAutomaticScan() {
+    const next = new URLSearchParams(searchParams);
+    next.delete("autostart");
+    next.set("tab", "legacy");
+    setSearchParams(next, { replace: true });
+    if (legacyRoots && legacyRoots.length > 0 && !rootProblems.some(Boolean)) {
+      void scanPreview();
     }
   }
 
@@ -425,21 +533,13 @@ export function NamingPage() {
 
   return (
     <div className="grid min-w-0 gap-5">
+      {searchParams.get("autostart") === "1" ? (
+        <AutoScanTrigger onTrigger={startAutomaticScan} />
+      ) : null}
       <PageHeader
         showDescription
         description={t("naming.description")}
         title={t("naming.title")}
-        actions={
-          <Button
-            isDisabled={hasValidationErrors || draft.download_roots.length === 0 || Boolean(activeConversion)}
-            isPending={scanning}
-            variant="primary"
-            onPress={() => void scanPreview()}
-          >
-            <Scan aria-hidden="true" size={17} />
-            {t("naming.scanAndReview")}
-          </Button>
-        }
       />
 
       {activeConversion ? (
@@ -460,16 +560,20 @@ export function NamingPage() {
         visible={externalChange}
         onKeepEditing={() => setBaselineRevision(current.revision)}
         onReload={() => {
-          setDraft(normalizeNaming(current.naming));
+          const normalized = normalizeNaming(current.naming);
+          setDraft(normalized);
           setBaselineRevision(current.revision);
+          setStructureBaseline(structureKey(normalized));
+          setTemplateBaseline(templateKey(normalized));
         }}
       />
 
       <Tabs
         aria-label={t("naming.title")}
         className="naming-tabs min-w-0"
-        defaultSelectedKey="structure"
+        selectedKey={selectedTab}
         variant="secondary"
+        onSelectionChange={(key) => setSelectedTab(String(key))}
       >
         <Tabs.List>
           <Tabs.Tab id="structure">
@@ -482,83 +586,14 @@ export function NamingPage() {
             {t("naming.templatesTab")}
             <Tabs.Indicator />
           </Tabs.Tab>
-          <Tabs.Tab id="history">
-            <History aria-hidden="true" size={16} />
-            {t("naming.historyTab")}
+          <Tabs.Tab id="legacy">
+            <DatabaseImport aria-hidden="true" size={16} />
+            {t("naming.legacyTab")}
             <Tabs.Indicator />
           </Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel className="grid min-w-0 gap-5 pt-5" id="structure">
-          <FormSurface className="grid gap-4">
-            <SectionHeading
-              icon={FolderOpen}
-              title={t("naming.downloadRoots")}
-              description={t("naming.downloadRootsHint")}
-              action={
-                <Button size="sm" variant="outline" onPress={addDownloadRoot}>
-                  <FolderPlus aria-hidden="true" size={16} />
-                  {t("naming.addRoot")}
-                </Button>
-              }
-            />
-            {draft.download_roots.length ? (
-              <div className="grid gap-3">
-                {draft.download_roots.map((root, index) => (
-                  <div
-                    className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-end gap-2"
-                    key={`download-root-${index}`}
-                  >
-                    <RemotePathField
-                      errorMessage={
-                        rootProblems[index]
-                          ? t(`naming.validation.${rootProblems[index]}Root`)
-                          : undefined
-                      }
-                      icon={Folder}
-                      isInvalid={rootProblems[index] !== null}
-                      label={t("naming.downloadRootNumber", { number: index + 1 })}
-                      selector={{ kind: "directory", scope: "host", value_mode: "absolute" }}
-                      value={root}
-                      onChange={(value) =>
-                        updateDraft((currentDraft) => ({
-                          ...currentDraft,
-                          download_roots: currentDraft.download_roots.map((item, itemIndex) =>
-                            itemIndex === index ? value : item,
-                          ),
-                        }))
-                      }
-                    />
-                    <Tooltip>
-                      <Button
-                        isIconOnly
-                        aria-label={t("naming.removeRoot", { number: index + 1 })}
-                        className="size-11 min-w-11 text-danger"
-                        variant="ghost"
-                        onPress={() =>
-                          updateDraft((currentDraft) => ({
-                            ...currentDraft,
-                            download_roots: currentDraft.download_roots.filter(
-                              (_, itemIndex) => itemIndex !== index,
-                            ),
-                          }))
-                        }
-                      >
-                        <Trash aria-hidden="true" size={18} />
-                      </Button>
-                      <Tooltip.Content>{t("naming.removeRoot", { number: index + 1 })}</Tooltip.Content>
-                    </Tooltip>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <EmptyPanel
-                title={t("naming.noRoots")}
-                description={t("naming.noRootsHint")}
-              />
-            )}
-          </FormSurface>
-
           <div className="grid gap-5 xl:grid-cols-2">
             <FormSurface className="grid content-start gap-3">
               <SectionHeading
@@ -660,9 +695,16 @@ export function NamingPage() {
               </div>
             </FormSurface>
           </div>
+          <SectionSaveBar
+            dirty={structureDirty}
+            isDisabled={hasStructureErrors}
+            isPending={savingSection === "structure"}
+            label={t("naming.saveStructure")}
+            onSave={() => void saveSection("structure")}
+          />
         </Tabs.Panel>
 
-        <Tabs.Panel className="min-w-0 pt-5" id="templates">
+        <Tabs.Panel className="grid min-w-0 gap-5 pt-5" id="templates">
           <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(20rem,0.8fr)]">
             <FormSurface className="grid content-start gap-5">
               <SectionHeading
@@ -814,21 +856,140 @@ export function NamingPage() {
               </Surface>
             </div>
           </div>
+          <SectionSaveBar
+            dirty={templatesDirty}
+            isDisabled={hasTemplateErrors}
+            isPending={savingSection === "templates"}
+            label={t("naming.saveTemplates")}
+            onSave={() => void saveSection("templates")}
+          />
         </Tabs.Panel>
 
-        <Tabs.Panel className="min-w-0 pt-5" id="history">
-          <ConversionHistory
-            conversions={sortedConversions}
-            locale={i18n.language}
-            sortDescriptor={historySort}
-            onCancel={setCancelTarget}
-            onDelete={(conversion) => void deleteConversion(conversion)}
-            onSortChange={setHistorySort}
-          />
+        <Tabs.Panel className="grid min-w-0 gap-5 pt-5" id="legacy">
+          <Alert status="accent">
+            <Alert.Indicator>
+              <DatabaseImport aria-hidden="true" size={18} />
+            </Alert.Indicator>
+            <Alert.Content>
+              <Alert.Title>{t("naming.legacyTitle")}</Alert.Title>
+              <Alert.Description>{t("naming.legacyDescription")}</Alert.Description>
+            </Alert.Content>
+          </Alert>
+
+          <FormSurface className="grid gap-4">
+            <SectionHeading
+              icon={FolderOpen}
+              title={t("naming.legacyRoots")}
+              description={t("naming.legacyRootsHint")}
+              action={
+                <Button size="sm" variant="outline" onPress={addDownloadRoot}>
+                  <FolderPlus aria-hidden="true" size={16} />
+                  {t("naming.addLegacyRoot")}
+                </Button>
+              }
+            />
+            {legacyRoots.length ? (
+              <div className="grid gap-3">
+                {legacyRoots.map((root, index) => (
+                  <div
+                    className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-end gap-2"
+                    key={`legacy-root-${index}`}
+                  >
+                    <RemotePathField
+                      errorMessage={
+                        rootProblems[index]
+                          ? t(`naming.validation.${rootProblems[index]}Root`)
+                          : undefined
+                      }
+                      icon={Folder}
+                      isInvalid={rootProblems[index] !== null}
+                      label={t("naming.legacyRootNumber", { number: index + 1 })}
+                      selector={{ kind: "directory", scope: "host", value_mode: "absolute" }}
+                      value={root}
+                      onChange={(value) =>
+                        setLegacyRoots((roots) =>
+                          (roots ?? []).map((item, itemIndex) =>
+                            itemIndex === index ? value : item,
+                          ),
+                        )
+                      }
+                    />
+                    <Tooltip>
+                      <Button
+                        isIconOnly
+                        aria-label={t("naming.removeLegacyRoot", { number: index + 1 })}
+                        className="size-11 min-w-11 text-danger"
+                        variant="ghost"
+                        onPress={() =>
+                          setLegacyRoots((roots) =>
+                            (roots ?? []).filter((_, itemIndex) => itemIndex !== index),
+                          )
+                        }
+                      >
+                        <Trash aria-hidden="true" size={18} />
+                      </Button>
+                      <Tooltip.Content>
+                        {t("naming.removeLegacyRoot", { number: index + 1 })}
+                      </Tooltip.Content>
+                    </Tooltip>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <EmptyPanel
+                title={t("naming.noLegacyRoots")}
+                description={t("naming.noLegacyRootsHint")}
+              />
+            )}
+            <div className="flex justify-end border-t border-border pt-4">
+              <Button
+                isDisabled={
+                  rootProblems.some(Boolean) ||
+                  legacyRoots.length === 0 ||
+                  Boolean(activeConversion)
+                }
+                isPending={scanning}
+                variant="primary"
+                onPress={() => void scanPreview()}
+              >
+                <Scan aria-hidden="true" size={17} />
+                {t("naming.scanLegacyRoots")}
+              </Button>
+            </div>
+          </FormSurface>
+
+          <section className="grid gap-3" aria-labelledby="naming-history-title">
+            <div>
+              <h2 className="text-lg font-semibold" id="naming-history-title">
+                {t("naming.historyTab")}
+              </h2>
+              <p className="mt-1 text-sm text-muted">{t("naming.historyHint")}</p>
+            </div>
+            <ConversionHistory
+              conversions={sortedConversions}
+              locale={i18n.language}
+              sortDescriptor={historySort}
+              onCancel={setCancelTarget}
+              onDelete={(conversion) => void deleteConversion(conversion)}
+              onSortChange={setHistorySort}
+            />
+          </section>
         </Tabs.Panel>
       </Tabs>
 
-      {hasValidationErrors ? (
+      {selectedTab === "structure" && hasStructureErrors ? (
+        <Alert status="danger">
+          <Alert.Indicator>
+            <AlertTriangle aria-hidden="true" size={18} />
+          </Alert.Indicator>
+          <Alert.Content>
+            <Alert.Title>{t("naming.validation.title")}</Alert.Title>
+            <Alert.Description>{t("naming.validation.body")}</Alert.Description>
+          </Alert.Content>
+        </Alert>
+      ) : null}
+
+      {selectedTab === "templates" && hasTemplateErrors ? (
         <Alert status="danger">
           <Alert.Indicator>
             <AlertTriangle aria-hidden="true" size={18} />
@@ -842,11 +1003,9 @@ export function NamingPage() {
 
       <PreviewModal
         applying={applying}
-        convertExisting={convertExisting}
         preview={preview}
         selected={selectedCreators}
         onApply={() => void applyPreview()}
-        onConvertChange={setConvertExisting}
         onOpenChange={(open) => !open && setPreview(null)}
         onSelectedChange={setSelectedCreators}
       />
@@ -878,6 +1037,16 @@ export function NamingPage() {
   );
 }
 
+function AutoScanTrigger({ onTrigger }: { onTrigger: () => void }) {
+  const fired = useRef(false);
+  useEffect(() => {
+    if (fired.current) return;
+    fired.current = true;
+    onTrigger();
+  }, [onTrigger]);
+  return null;
+}
+
 function SectionHeading({
   icon: Icon,
   title,
@@ -902,6 +1071,45 @@ function SectionHeading({
       </div>
       {action ? <div className="shrink-0">{action}</div> : null}
     </div>
+  );
+}
+
+function SectionSaveBar({
+  dirty,
+  isDisabled,
+  isPending,
+  label,
+  onSave,
+}: {
+  dirty: boolean;
+  isDisabled: boolean;
+  isPending: boolean;
+  label: string;
+  onSave: () => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <Surface
+      className="flex flex-col gap-3 rounded-lg border border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+      variant="secondary"
+    >
+      <div className="flex min-w-0 items-center gap-2">
+        <Chip color={dirty ? "warning" : "success"} size="sm" variant="soft">
+          {t(dirty ? "naming.unsavedChanges" : "naming.changesSaved")}
+        </Chip>
+        <span className="text-xs leading-5 text-muted">{t("naming.saveSectionHint")}</span>
+      </div>
+      <Button
+        className="w-full sm:w-auto"
+        isDisabled={!dirty || isDisabled}
+        isPending={isPending}
+        variant="primary"
+        onPress={onSave}
+      >
+        <Save aria-hidden="true" size={17} />
+        {label}
+      </Button>
+    </Surface>
   );
 }
 
@@ -968,19 +1176,15 @@ function VariableGroup({ label, values }: { label: string; values: readonly stri
 function PreviewModal({
   preview,
   selected,
-  convertExisting,
   applying,
   onSelectedChange,
-  onConvertChange,
   onApply,
   onOpenChange,
 }: {
   preview: NamingPreview | null;
   selected: Set<string>;
-  convertExisting: boolean;
   applying: boolean;
   onSelectedChange: (value: Set<string>) => void;
-  onConvertChange: (value: boolean) => void;
   onApply: () => void;
   onOpenChange: (open: boolean) => void;
 }) {
@@ -992,6 +1196,7 @@ function PreviewModal({
   const selectedWorks = selectedItems.reduce((total, creator) => total + creator.works, 0);
   const selectedBytes = selectedItems.reduce((total, creator) => total + creator.bytes, 0);
   const allSelected = selectable.length > 0 && selectedItems.length === selectable.length;
+  const hasMoves = selectable.length > 0;
 
   function toggleCreator(creator: NamingCreatorPreview, isSelected: boolean) {
     const next = new Set(selected);
@@ -1015,38 +1220,21 @@ function PreviewModal({
           <Button
             isDisabled={
               preview.conflict_count > 0 ||
-              (convertExisting && selected.size === 0)
+              (hasMoves && selected.size === 0)
             }
             isPending={applying}
             variant="primary"
             onPress={onApply}
           >
             <Check aria-hidden="true" size={17} />
-            {convertExisting ? t("naming.applyAndConvert") : t("naming.saveWithoutConvert")}
+            {hasMoves ? t("naming.applyAndConvert") : t("naming.completeReview")}
           </Button>
         </>
       }
       onOpenChange={onOpenChange}
     >
       <div className="grid gap-4">
-        <FormSwitchField
-          icon={Refresh}
-          isSelected={convertExisting}
-          label={t("naming.convertExisting")}
-          description={t("naming.convertExistingHint")}
-          onChange={onConvertChange}
-        />
-        {!convertExisting ? (
-          <Alert status="warning">
-            <Alert.Indicator>
-              <AlertTriangle aria-hidden="true" size={18} />
-            </Alert.Indicator>
-            <Alert.Content>
-              <Alert.Title>{t("naming.saveOnlyTitle")}</Alert.Title>
-              <Alert.Description>{t("naming.saveOnlyBody")}</Alert.Description>
-            </Alert.Content>
-          </Alert>
-        ) : null}
+        <p className="text-sm leading-6 text-muted">{t("naming.reviewDescription")}</p>
         {preview.conflict_count ? (
           <Alert status="danger">
             <Alert.Indicator>
@@ -1066,7 +1254,7 @@ function PreviewModal({
           <Stat label={t("naming.stats.files")} value={selectedFiles} />
           <Stat label={t("naming.stats.size")} value={formatBytes(selectedBytes)} />
         </div>
-        {convertExisting && selectable.length ? (
+        {hasMoves ? (
           <BatchActionBar
             allVisibleSelected={allSelected}
             partiallySelected={selectedItems.length > 0 && !allSelected}
@@ -1111,7 +1299,7 @@ function PreviewModal({
                 <Table.Row key={creator.key}>
                   <Table.Cell>
                     <SelectionCheckbox
-                      isDisabled={!convertExisting || !creator.selectable}
+                      isDisabled={!creator.selectable}
                       isSelected={selected.has(creator.key)}
                       label={t("naming.selectCreator", { name: creator.name })}
                       onChange={(isSelected) => toggleCreator(creator, isSelected)}
@@ -1136,7 +1324,7 @@ function PreviewModal({
             <Surface className="grid gap-3 rounded-lg border border-border p-3" key={creator.key}>
               <div className="flex items-center gap-2">
                 <SelectionCheckbox
-                  isDisabled={!convertExisting || !creator.selectable}
+                  isDisabled={!creator.selectable}
                   isSelected={selected.has(creator.key)}
                   label={t("naming.selectCreator", { name: creator.name })}
                   onChange={(isSelected) => toggleCreator(creator, isSelected)}

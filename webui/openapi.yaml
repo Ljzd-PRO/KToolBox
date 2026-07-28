@@ -2048,7 +2048,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NamingConfigurationResponse'
-      description: Return the project-scoped naming templates, their revision, and suggested download roots.
+      description: Return the project-scoped naming templates, their revision, and whether legacy content needs review.
       security:
       - WebUISession: []
       x-ktoolbox-mcp:
@@ -2056,6 +2056,69 @@ paths:
         name: get_naming
         scope: mcp:read
         safety: read
+        openWorld: false
+    patch:
+      tags:
+      - naming
+      summary: Update a naming configuration section
+      operationId: update_naming
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NamingUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamingConfigurationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Save either directory-structure or naming-template fields after a revision check.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: update_naming
+        scope: null
+        safety: null
+        openWorld: false
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+  /api/v1/naming/legacy-context:
+    get:
+      tags:
+      - naming
+      summary: Get legacy download conversion context
+      operationId: get_naming_legacy_context
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamingLegacyContextResponse'
+      description: Return suggested legacy download locations and pending conversion state without changing task outputs.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: get_naming_legacy_context
+        scope: null
+        safety: null
         openWorld: false
   /api/v1/naming/preview:
     post:
@@ -2082,7 +2145,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-      description: Scan registered download roots and return safe per-creator moves, statistics, skips, and conflicts.
+      description: Scan selected legacy download locations and return safe per-creator moves, statistics, skips, and conflicts.
       security:
       - WebUISession: []
       x-ktoolbox-mcp:
@@ -2103,7 +2166,7 @@ paths:
     post:
       tags:
       - naming
-      summary: Apply project naming configuration
+      summary: Apply a legacy directory conversion
       operationId: apply_naming
       requestBody:
         content:
@@ -2124,7 +2187,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-      description: Save naming configuration directly or start a reversible conversion of selected downloaded creators.
+      description: Start a reversible conversion of selected downloaded creators using the saved naming configuration.
       security:
       - WebUISession: []
       x-ktoolbox-mcp:
@@ -2344,6 +2407,54 @@ paths:
       x-ktoolbox-mcp:
         enabled: false
         name: acknowledge_startup_notice
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/startup-notices/{notice_id}/resolve:
+    post:
+      tags:
+      - naming
+      summary: Resolve a startup decision
+      operationId: resolve_startup_notice
+      parameters:
+      - name: notice_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Notice Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartupNoticeResolveRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartupNoticeResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Persist an explicit ignore or convert choice for the first-start legacy directory prompt.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: resolve_startup_notice
         scope: null
         safety: null
         openWorld: false
@@ -4250,10 +4361,6 @@ components:
             type: string
           type: array
           title: Selected Creators
-        convert_existing:
-          type: boolean
-          title: Convert Existing
-          default: true
       type: object
       required:
       - preview_id
@@ -4266,12 +4373,10 @@ components:
         revision:
           type: string
           title: Revision
-        suggested_download_roots:
-          items:
-            type: string
-            format: path
-          type: array
-          title: Suggested Download Roots
+        conversion_pending:
+          type: boolean
+          title: Conversion Pending
+          default: false
       type: object
       required:
       - naming
@@ -4393,13 +4498,31 @@ components:
       - source
       - target
       title: NamingCreatorPreview
+    NamingLegacyContextResponse:
+      properties:
+        roots:
+          items:
+            type: string
+            format: path
+          type: array
+          title: Roots
+        conversion_pending:
+          type: boolean
+          title: Conversion Pending
+          default: false
+      type: object
+      title: NamingLegacyContextResponse
     NamingPreviewRequest:
       properties:
-        naming:
-          $ref: '#/components/schemas/ProjectNamingConfiguration'
+        roots:
+          items:
+            type: string
+            format: path
+          type: array
+          title: Roots
       type: object
       required:
-      - naming
+      - roots
       title: NamingPreviewRequest
     NamingPreviewResponse:
       properties:
@@ -4460,6 +4583,25 @@ components:
       - conflict_count
       - created_at
       title: NamingPreviewResponse
+    NamingUpdateRequest:
+      properties:
+        section:
+          type: string
+          enum:
+          - structure
+          - templates
+          title: Section
+        naming:
+          $ref: '#/components/schemas/ProjectNamingConfiguration'
+        revision:
+          type: string
+          title: Revision
+      type: object
+      required:
+      - section
+      - naming
+      - revision
+      title: NamingUpdateRequest
     PathSelectorResponse:
       properties:
         kind:
@@ -4625,9 +4767,9 @@ components:
       properties:
         schema_version:
           type: integer
-          const: 3
+          const: 4
           title: Schema Version
-          default: 3
+          default: 4
         creators:
           items:
             $ref: '#/components/schemas/CreatorReference'
@@ -4672,12 +4814,6 @@ components:
       title: ProjectDocumentResponse
     ProjectNamingConfiguration:
       properties:
-        download_roots:
-          items:
-            type: string
-            format: path
-          type: array
-          title: Download Roots
         creator_dirname_format:
           type: string
           title: Creator Dirname Format
@@ -4960,6 +5096,18 @@ components:
       required:
       - version
       title: SiteVersionResponse
+    StartupNoticeResolveRequest:
+      properties:
+        action:
+          type: string
+          enum:
+          - ignored
+          - convert_selected
+          title: Action
+      type: object
+      required:
+      - action
+      title: StartupNoticeResolveRequest
     StartupNoticeResponse:
       properties:
         id:
@@ -4967,9 +5115,10 @@ components:
           title: Id
         kind:
           type: string
-          const: naming_migrated
+          enum:
+          - naming_migrated
+          - legacy_layout_conversion
           title: Kind
-          default: naming_migrated
         payload:
           additionalProperties: true
           type: object
@@ -4984,9 +5133,24 @@ components:
             format: date-time
           - type: 'null'
           title: Acknowledged At
+        resolution:
+          anyOf:
+          - type: string
+            enum:
+            - ignored
+            - convert_selected
+          - type: 'null'
+          title: Resolution
+        resolved_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Resolved At
       type: object
       required:
       - id
+      - kind
       - created_at
       title: StartupNoticeResponse
     SyncTaskSpec:

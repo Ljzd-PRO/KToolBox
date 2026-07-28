@@ -725,9 +725,33 @@ export interface paths {
         };
         /**
          * Get project naming configuration
-         * @description Return the project-scoped naming templates, their revision, and suggested download roots.
+         * @description Return the project-scoped naming templates, their revision, and whether legacy content needs review.
          */
         get: operations["get_naming"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update a naming configuration section
+         * @description Save either directory-structure or naming-template fields after a revision check.
+         */
+        patch: operations["update_naming"];
+        trace?: never;
+    };
+    "/api/v1/naming/legacy-context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get legacy download conversion context
+         * @description Return suggested legacy download locations and pending conversion state without changing task outputs.
+         */
+        get: operations["get_naming_legacy_context"];
         put?: never;
         post?: never;
         delete?: never;
@@ -747,7 +771,7 @@ export interface paths {
         put?: never;
         /**
          * Preview a naming conversion
-         * @description Scan registered download roots and return safe per-creator moves, statistics, skips, and conflicts.
+         * @description Scan selected legacy download locations and return safe per-creator moves, statistics, skips, and conflicts.
          */
         post: operations["preview_naming"];
         delete?: never;
@@ -766,8 +790,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Apply project naming configuration
-         * @description Save naming configuration directly or start a reversible conversion of selected downloaded creators.
+         * Apply a legacy directory conversion
+         * @description Start a reversible conversion of selected downloaded creators using the saved naming configuration.
          */
         post: operations["apply_naming"];
         delete?: never;
@@ -874,6 +898,26 @@ export interface paths {
          * @description Permanently acknowledge one project startup notice.
          */
         post: operations["acknowledge_startup_notice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/startup-notices/{notice_id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resolve a startup decision
+         * @description Persist an explicit ignore or convert choice for the first-start legacy directory prompt.
+         */
+        post: operations["resolve_startup_notice"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1930,19 +1974,17 @@ export interface components {
             preview_id: string;
             /** Selected Creators */
             selected_creators: string[];
-            /**
-             * Convert Existing
-             * @default true
-             */
-            convert_existing: boolean;
         };
         /** NamingConfigurationResponse */
         NamingConfigurationResponse: {
             naming: components["schemas"]["ProjectNamingConfiguration"];
             /** Revision */
             revision: string;
-            /** Suggested Download Roots */
-            suggested_download_roots?: string[];
+            /**
+             * Conversion Pending
+             * @default false
+             */
+            conversion_pending: boolean;
         };
         /** NamingConversionProgress */
         NamingConversionProgress: {
@@ -2034,9 +2076,20 @@ export interface components {
              */
             selectable: boolean;
         };
+        /** NamingLegacyContextResponse */
+        NamingLegacyContextResponse: {
+            /** Roots */
+            roots?: string[];
+            /**
+             * Conversion Pending
+             * @default false
+             */
+            conversion_pending: boolean;
+        };
         /** NamingPreviewRequest */
         NamingPreviewRequest: {
-            naming: components["schemas"]["ProjectNamingConfiguration"];
+            /** Roots */
+            roots: string[];
         };
         /** NamingPreviewResponse */
         NamingPreviewResponse: {
@@ -2067,6 +2120,17 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** NamingUpdateRequest */
+        NamingUpdateRequest: {
+            /**
+             * Section
+             * @enum {string}
+             */
+            section: "structure" | "templates";
+            naming: components["schemas"]["ProjectNamingConfiguration"];
+            /** Revision */
+            revision: string;
         };
         /** PathSelectorResponse */
         PathSelectorResponse: {
@@ -2149,10 +2213,10 @@ export interface components {
         ProjectConfiguration: {
             /**
              * Schema Version
-             * @default 3
+             * @default 4
              * @constant
              */
-            schema_version: 3;
+            schema_version: 4;
             /** Creators */
             creators?: components["schemas"]["CreatorReference"][];
             /** Blockers */
@@ -2179,8 +2243,6 @@ export interface components {
          * @description Project-local directory layout and filename templates.
          */
         ProjectNamingConfiguration: {
-            /** Download Roots */
-            download_roots?: string[];
             /**
              * Creator Dirname Format
              * @default {creator_name} [{service}-{creator_id}]
@@ -2369,16 +2431,23 @@ export interface components {
             /** Version */
             version: string;
         };
+        /** StartupNoticeResolveRequest */
+        StartupNoticeResolveRequest: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "ignored" | "convert_selected";
+        };
         /** StartupNoticeResponse */
         StartupNoticeResponse: {
             /** Id */
             id: string;
             /**
              * Kind
-             * @default naming_migrated
-             * @constant
+             * @enum {string}
              */
-            kind: "naming_migrated";
+            kind: "naming_migrated" | "legacy_layout_conversion";
             /** Payload */
             payload?: {
                 [key: string]: unknown;
@@ -2390,6 +2459,10 @@ export interface components {
             created_at: string;
             /** Acknowledged At */
             acknowledged_at?: string | null;
+            /** Resolution */
+            resolution?: ("ignored" | "convert_selected") | null;
+            /** Resolved At */
+            resolved_at?: string | null;
         };
         /** SyncTaskSpec */
         SyncTaskSpec: {
@@ -4215,6 +4288,62 @@ export interface operations {
             };
         };
     };
+    update_naming: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NamingUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NamingConfigurationResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_naming_legacy_context: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NamingLegacyContextResponse"];
+                };
+            };
+        };
+    };
     preview_naming: {
         parameters: {
             query?: never;
@@ -4437,6 +4566,44 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StartupNoticeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resolve_startup_notice: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                notice_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartupNoticeResolveRequest"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
