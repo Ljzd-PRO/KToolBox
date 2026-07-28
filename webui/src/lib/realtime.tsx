@@ -1,5 +1,6 @@
 import { toast } from "@heroui/react";
 import { useQueryClient, type QueryClient } from "@tanstack/react-query";
+import type { TFunction } from "i18next";
 import {
   createContext,
   useCallback,
@@ -71,7 +72,16 @@ const eventTypes = [
   "blockers.changed",
   "configuration.changed",
   "naming.changed",
+  "naming.migration.started",
+  "naming.migration.completed",
+  "naming.migration.failed",
+  "naming.conversion.started",
   "naming.conversion.progress",
+  "naming.conversion.paused",
+  "naming.conversion.resumed",
+  "naming.conversion.completed",
+  "naming.conversion.failed",
+  "naming.conversion.cancelled",
   "naming.conversion.finished",
   "auto_sync.plans.changed",
   "auto_sync.run.created",
@@ -160,6 +170,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   const connectedOnceRef = useRef(false);
   const degradedSinceRef = useRef<number | null>(null);
   const degradedNoticeShownRef = useRef(false);
+  const lifecycleToastsRef = useRef(new Set<string>());
 
   useEffect(() => {
     statusRef.current = status;
@@ -280,6 +291,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       const event = parseEvent(message.data);
       if (!event || event.id <= latestEventIdRef.current) return;
       latestEventIdRef.current = event.id;
+      showNamingLifecycleToast(event, t, lifecycleToastsRef.current);
       applyRealtimeEvent(
         queryClient,
         event,
@@ -356,6 +368,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
     queryClient,
     queueRefresh,
     refreshNow,
+    t,
   ]);
 
   useEffect(() => {
@@ -475,6 +488,9 @@ function applyRealtimeEvent(
   } else if (event.event_type === "naming.changed") {
     queueRefresh("naming", "naming-conversions", "startup-notices", "config-document");
     notifyResource("naming");
+  } else if (event.event_type.startsWith("naming.migration.")) {
+    queueRefresh("naming", "startup-notices", "config-document");
+    notifyResource("naming");
   } else if (event.event_type.startsWith("naming.conversion.")) {
     queueRefresh("naming-conversions");
     notifyResource("naming");
@@ -492,6 +508,41 @@ function applyRealtimeEvent(
     notifyResource("mcp");
   } else if (event.event_type === "filesystem.changed") {
     notifyResource("filesystem");
+  }
+}
+
+function showNamingLifecycleToast(
+  event: TaskEvent,
+  t: TFunction,
+  shown: Set<string>,
+) {
+  const key = `${event.resource_id ?? "naming"}:${event.event_type}`;
+  if (shown.has(key)) return;
+  const translation = {
+    "naming.migration.completed": "naming.migration.success",
+    "naming.migration.failed": "naming.migration.failed",
+    "naming.conversion.started": "naming.conversionStarted",
+    "naming.conversion.paused": "naming.lifecyclePaused",
+    "naming.conversion.resumed": "naming.lifecycleResumed",
+    "naming.conversion.completed": "naming.lifecycleCompleted",
+    "naming.conversion.failed": "naming.lifecycleFailed",
+    "naming.conversion.cancelled": "naming.lifecycleCancelled",
+  }[event.event_type];
+  if (!translation) return;
+  shown.add(key);
+  if (shown.size > 200) shown.delete(shown.values().next().value ?? key);
+  if (
+    event.event_type === "naming.migration.failed" ||
+    event.event_type === "naming.conversion.failed"
+  ) {
+    toast.danger(t(translation));
+  } else if (
+    event.event_type === "naming.conversion.paused" ||
+    event.event_type === "naming.conversion.cancelled"
+  ) {
+    toast.warning(t(translation));
+  } else {
+    toast.success(t(translation));
   }
 }
 

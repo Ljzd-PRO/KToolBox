@@ -1,3 +1,4 @@
+import { toast } from "@heroui/react";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
@@ -246,6 +247,43 @@ describe("RealtimeProvider", () => {
     expect(screen.getByLabelText("connection")).toHaveTextContent("connected");
     vi.useRealTimers();
   });
+
+  it("shows each naming lifecycle notification once after event replay", async () => {
+    const success = vi.spyOn(toast, "success").mockImplementation(() => "");
+    const warning = vi.spyOn(toast, "warning").mockImplementation(() => "");
+
+    render(
+      <QueryClientProvider client={client}>
+        <AuthProvider>
+          <Authenticated>
+            <Probe />
+          </Authenticated>
+        </AuthProvider>
+      </QueryClientProvider>,
+    );
+
+    await waitFor(() => expect(FakeEventSource.instances).toHaveLength(1));
+    const source = FakeEventSource.instances[0];
+    act(() => source.open());
+    await screen.findByLabelText("connection");
+
+    const paused = resourceEvent(1, "naming.conversion.paused", "conversion-1");
+    act(() => {
+      source.emit(paused.event_type, paused);
+      source.emit(paused.event_type, paused);
+      source.emit(
+        "naming.conversion.resumed",
+        resourceEvent(2, "naming.conversion.resumed", "conversion-1"),
+      );
+      source.emit(
+        "naming.conversion.completed",
+        resourceEvent(3, "naming.conversion.completed", "conversion-1"),
+      );
+    });
+
+    expect(warning).toHaveBeenCalledTimes(1);
+    expect(success).toHaveBeenCalledTimes(2);
+  });
 });
 
 function taskEvent(id: number, eventType: string, data: Record<string, unknown>): TaskEvent {
@@ -257,6 +295,15 @@ function taskEvent(id: number, eventType: string, data: Record<string, unknown>)
     resource_id: "task-1",
     data,
     created_at: "2026-07-23T00:00:01Z",
+  };
+}
+
+function resourceEvent(id: number, eventType: string, resourceId: string): TaskEvent {
+  return {
+    ...taskEvent(id, eventType, {}),
+    task_id: null,
+    resource: "naming",
+    resource_id: resourceId,
   };
 }
 

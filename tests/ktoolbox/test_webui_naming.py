@@ -274,6 +274,19 @@ async def test_conversion_pauses_at_atomic_boundary_and_resumes_after_restart(
         await asyncio.sleep(0.01)
     assert resumed.status == "completed", resumed.error
     assert resumed.progress.completed_operations == resumed.progress.total_operations
+    lifecycle = await restarted.events.events(
+        event_types={
+            "naming.conversion.paused",
+            "naming.conversion.resumed",
+            "naming.conversion.completed",
+        },
+    )
+    assert [event.event_type for event in lifecycle] == [
+        "naming.conversion.paused",
+        "naming.conversion.resumed",
+        "naming.conversion.completed",
+    ]
+    assert all(event.resource_id == conversion.id for event in lifecycle)
     await restarted.stop()
 
 

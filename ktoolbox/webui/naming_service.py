@@ -174,6 +174,12 @@ class NamingConversionService:
     ) -> LegacyNamingMigrationResultResponse:
         async with self._apply_lock:
             previous = self.project_store.load().naming
+            await self.events.publish(
+                "naming.migration.started",
+                {"field_count": len(selected_fields)},
+                resource="naming",
+                resource_id="legacy-naming",
+            )
             try:
                 result = await anyio.to_thread.run_sync(
                     lambda: apply_legacy_naming(
@@ -184,7 +190,21 @@ class NamingConversionService:
                     )
                 )
             except ValueError as error:
+                await self.events.publish(
+                    "naming.migration.failed",
+                    {"reason": "configuration_changed"},
+                    resource="naming",
+                    resource_id="legacy-naming",
+                )
                 raise NamingPreviewStaleError(str(error)) from error
+            except Exception:
+                await self.events.publish(
+                    "naming.migration.failed",
+                    {"reason": "migration_failed"},
+                    resource="naming",
+                    resource_id="legacy-naming",
+                )
+                raise
             if result.naming != previous:
                 await self._record_layout_change(
                     previous,
@@ -373,6 +393,12 @@ class NamingConversionService:
         await self._ensure_no_overlapping_tasks(conversion.preview.roots)
         await self._resolve_layout_notices(candidate, "convert_selected")
         await self._set_status(preview_id, "queued", selected=selected)
+        await self.events.publish(
+            "naming.conversion.started",
+            {"status": "queued"},
+            resource="naming",
+            resource_id=preview_id,
+        )
         self._start_conversion_worker(preview_id, candidate, selected)
         return await self.get(preview_id)
 
@@ -403,6 +429,12 @@ class NamingConversionService:
                 await self._candidate_json(conversion_id)
             )
             await self._set_status(conversion_id, "queued")
+            await self.events.publish(
+                "naming.conversion.resumed",
+                {"status": "queued"},
+                resource="naming",
+                resource_id=conversion_id,
+            )
             self._start_conversion_worker(
                 conversion_id,
                 candidate,
@@ -713,6 +745,12 @@ class NamingConversionService:
                     raise asyncio.CancelledError
                 if pause.is_set():
                     await self._set_status(conversion_id, "paused")
+                    await self.events.publish(
+                        "naming.conversion.paused",
+                        {"status": "paused"},
+                        resource="naming",
+                        resource_id=conversion_id,
+                    )
                     return
                 source = Path(operation["source"])
                 target = Path(operation["target"])
@@ -735,6 +773,12 @@ class NamingConversionService:
                     raise asyncio.CancelledError
                 if pause.is_set():
                     await self._set_status(conversion_id, "paused")
+                    await self.events.publish(
+                        "naming.conversion.paused",
+                        {"status": "paused"},
+                        resource="naming",
+                        resource_id=conversion_id,
+                    )
                     return
             conversion = await self.get(conversion_id)
             if content_revision(self.project_store.load_text()) != conversion.preview.revision:
@@ -998,6 +1042,18 @@ class NamingConversionService:
             resource="naming",
             resource_id=conversion_id,
         )
+        lifecycle_event = {
+            "completed": "naming.conversion.completed",
+            "failed": "naming.conversion.failed",
+            "cancelled": "naming.conversion.cancelled",
+        }.get(status)
+        if lifecycle_event is not None:
+            await self.events.publish(
+                lifecycle_event,
+                {"status": status, "has_error": error is not None},
+                resource="naming",
+                resource_id=conversion_id,
+            )
 
     async def _set_status_if_current(
         self,

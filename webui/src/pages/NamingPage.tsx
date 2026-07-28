@@ -471,7 +471,7 @@ export function NamingPage() {
     if (!session || !preview) return;
     setApplying(true);
     try {
-      const result = await api<NamingConversion>("/naming/apply", {
+      await api<NamingConversion>("/naming/apply", {
         method: "POST",
         body: {
           preview_id: preview.id,
@@ -485,12 +485,6 @@ export function NamingPage() {
         queryClient.invalidateQueries({ queryKey: ["naming-conversions"] }),
         queryClient.invalidateQueries({ queryKey: ["startup-notices"] }),
       ]);
-      toast.success(
-        t("naming.conversionStarted"),
-        result.status === "completed"
-          ? undefined
-          : { description: t("naming.conversionBackground") },
-      );
     } catch (error) {
       toast.danger(t("common.error"), { description: namingErrorText(error, t) });
     } finally {
@@ -544,7 +538,6 @@ export function NamingPage() {
         csrfToken: session.csrf_token,
       });
       await queryClient.invalidateQueries({ queryKey: ["naming-conversions"] });
-      toast.success(t("naming.pauseRequested"));
     } catch (error) {
       toast.danger(t("common.error"), { description: namingErrorText(error, t) });
     }
@@ -558,7 +551,6 @@ export function NamingPage() {
         csrfToken: session.csrf_token,
       });
       await queryClient.invalidateQueries({ queryKey: ["naming-conversions"] });
-      toast.success(t("naming.resumeRequested"));
     } catch (error) {
       toast.danger(t("common.error"), { description: namingErrorText(error, t) });
     }

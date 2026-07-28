@@ -23,7 +23,6 @@ import { TASK_OUTPUT_PATH_SELECTOR } from "../lib/pathSelectors";
 import type {
   LegacyNamingMigration,
   LegacyNamingMigrationResult,
-  NamingConversion,
   NamingLegacyContext,
   NamingPreview,
 } from "../types";
@@ -153,7 +152,6 @@ export function StartupNoticeCenter() {
       ]);
       setRoots(legacyContextQuery.data?.roots ?? []);
       setPhase("directories");
-      toast.success(t("naming.migration.success"));
     } catch (error) {
       toast.danger(t("naming.migration.failed"), {
         description: errorText(error),
@@ -194,7 +192,7 @@ export function StartupNoticeCenter() {
     if (!session || !preview) return;
     setWorking(true);
     try {
-      const result = await api<NamingConversion>("/naming/apply", {
+      await api("/naming/apply", {
         method: "POST",
         body: {
           preview_id: preview.id,
@@ -203,11 +201,6 @@ export function StartupNoticeCenter() {
         csrfToken: session.csrf_token,
       });
       await queryClient.invalidateQueries({ queryKey: ["naming-conversions"] });
-      toast.success(t("naming.conversionStarted"), {
-        description: result.status === "completed"
-          ? t("naming.statuses.completed")
-          : t("naming.conversionBackground"),
-      });
       setPhase("fields");
       setPreview(null);
     } catch (error) {
