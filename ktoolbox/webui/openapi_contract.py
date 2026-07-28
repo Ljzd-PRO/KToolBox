@@ -398,6 +398,18 @@ OPERATIONS: dict[str, OperationMetadata] = {
         "naming",
         mcp=_read(),
     ),
+    "pause_naming_conversion": OperationMetadata(
+        "Pause a naming conversion",
+        "Request a pause after the current atomic filesystem move completes.",
+        "naming",
+        csrf=True,
+    ),
+    "resume_naming_conversion": OperationMetadata(
+        "Resume a naming conversion",
+        "Revalidate project configuration and filesystem state, then continue a paused conversion.",
+        "naming",
+        csrf=True,
+    ),
     "cancel_naming_conversion": OperationMetadata(
         "Cancel a naming conversion",
         "Request cancellation and complete rollback of an active naming conversion.",

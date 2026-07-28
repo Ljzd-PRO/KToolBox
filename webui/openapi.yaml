@@ -2365,6 +2365,90 @@ paths:
         scope: null
         safety: null
         openWorld: false
+  /api/v1/naming/conversions/{conversion_id}/pause:
+    post:
+      tags:
+      - naming
+      summary: Pause a naming conversion
+      operationId: pause_naming_conversion
+      parameters:
+      - name: conversion_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Conversion Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamingConversionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Request a pause after the current atomic filesystem move completes.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: pause_naming_conversion
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/naming/conversions/{conversion_id}/resume:
+    post:
+      tags:
+      - naming
+      summary: Resume a naming conversion
+      operationId: resume_naming_conversion
+      parameters:
+      - name: conversion_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Conversion Id
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamingConversionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Revalidate project configuration and filesystem state, then continue a paused conversion.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: resume_naming_conversion
+        scope: null
+        safety: null
+        openWorld: false
   /api/v1/naming/conversions/{conversion_id}/cancel:
     post:
       tags:
@@ -4606,6 +4690,8 @@ components:
           - preview
           - queued
           - running
+          - pause_requested
+          - paused
           - rolling_back
           - completed
           - failed

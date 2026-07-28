@@ -221,6 +221,63 @@ async def test_preview_scans_filesystem_and_conversion_updates_project(tmp_path:
 
 
 @pytest.mark.asyncio
+async def test_conversion_pauses_at_atomic_boundary_and_resumes_after_restart(
+    tmp_path: Path,
+) -> None:
+    downloads = tmp_path / "downloads"
+    write_downloaded_work(downloads, "Artist [fanbox-123]", "Work one", "one")
+    write_downloaded_work(downloads, "Artist [fanbox-123]", "Work two", "two")
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    store.save(ProjectConfiguration())
+    service, _ = await service_for(tmp_path)
+    candidate = ProjectNamingConfiguration(post_dirname_format="{post_id}")
+    await save_naming(service, store, candidate)
+    preview = await service.preview([Path("downloads")])
+
+    first_operation = asyncio.Event()
+    release_operation = asyncio.Event()
+    original_mark = service._mark_operation
+
+    async def hold_after_first_move(operation_id: int, status: str) -> None:
+        await original_mark(operation_id, status)
+        if not first_operation.is_set():
+            first_operation.set()
+            await release_operation.wait()
+
+    service._mark_operation = hold_after_first_move  # type: ignore[method-assign]
+    conversion = await service.apply(
+        preview.id,
+        [preview.creators[0].key],
+    )
+    await asyncio.wait_for(first_operation.wait(), timeout=1)
+    requested = await service.pause(conversion.id)
+    assert requested.status == "pause_requested"
+    release_operation.set()
+
+    for _ in range(100):
+        conversion = await service.get(conversion.id)
+        if conversion.status == "paused":
+            break
+        await asyncio.sleep(0.01)
+    assert conversion.status == "paused"
+    assert conversion.progress.completed_operations == 1
+    await service.stop()
+
+    restarted, _ = await service_for(tmp_path)
+    assert (await restarted.get(conversion.id)).status == "paused"
+    resumed = await restarted.resume(conversion.id)
+    assert resumed.status in {"queued", "running"}
+    for _ in range(100):
+        resumed = await restarted.get(conversion.id)
+        if resumed.status == "completed":
+            break
+        await asyncio.sleep(0.01)
+    assert resumed.status == "completed", resumed.error
+    assert resumed.progress.completed_operations == resumed.progress.total_operations
+    await restarted.stop()
+
+
+@pytest.mark.asyncio
 async def test_preview_detects_conflicts_staleness_and_active_tasks(tmp_path: Path) -> None:
     downloads = tmp_path / "downloads"
     write_downloaded_work(downloads, "Artist [fanbox-123]", "Work one", "one")

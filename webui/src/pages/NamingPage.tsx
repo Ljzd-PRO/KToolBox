@@ -31,6 +31,8 @@ import {
   IconFolderPlus as FolderPlus,
   IconInfoCircle as InfoCircle,
   IconListNumbers as ListNumbers,
+  IconPlayerPause as PlayerPause,
+  IconPlayerPlay as PlayerPlay,
   IconPlayerStop as PlayerStop,
   IconRefresh as Refresh,
   IconRestore as Restore,
@@ -108,7 +110,13 @@ const workVariables = [
 ] as const;
 const revisionVariables = [...workVariables, "revision_id"] as const;
 const dateVariables = ["year", "month"] as const;
-const activeConversionStatuses = new Set(["queued", "running", "rolling_back"]);
+const activeConversionStatuses = new Set([
+  "queued",
+  "running",
+  "pause_requested",
+  "paused",
+  "rolling_back",
+]);
 
 function normalizeNaming(value: ProjectNamingConfiguration): NamingDraft {
   return {
@@ -523,6 +531,34 @@ export function NamingPage() {
       setCancelTarget(null);
       await queryClient.invalidateQueries({ queryKey: ["naming-conversions"] });
       toast.success(t("naming.cancelRequested"));
+    } catch (error) {
+      toast.danger(t("common.error"), { description: namingErrorText(error, t) });
+    }
+  }
+
+  async function pauseConversion(conversion: NamingConversion) {
+    if (!session) return;
+    try {
+      await api<NamingConversion>(`/naming/conversions/${conversion.id}/pause`, {
+        method: "POST",
+        csrfToken: session.csrf_token,
+      });
+      await queryClient.invalidateQueries({ queryKey: ["naming-conversions"] });
+      toast.success(t("naming.pauseRequested"));
+    } catch (error) {
+      toast.danger(t("common.error"), { description: namingErrorText(error, t) });
+    }
+  }
+
+  async function resumeConversion(conversion: NamingConversion) {
+    if (!session) return;
+    try {
+      await api<NamingConversion>(`/naming/conversions/${conversion.id}/resume`, {
+        method: "POST",
+        csrfToken: session.csrf_token,
+      });
+      await queryClient.invalidateQueries({ queryKey: ["naming-conversions"] });
+      toast.success(t("naming.resumeRequested"));
     } catch (error) {
       toast.danger(t("common.error"), { description: namingErrorText(error, t) });
     }
@@ -998,6 +1034,8 @@ export function NamingPage() {
               sortDescriptor={historySort}
               onCancel={setCancelTarget}
               onDelete={(conversion) => void deleteConversion(conversion)}
+              onPause={(conversion) => void pauseConversion(conversion)}
+              onResume={(conversion) => void resumeConversion(conversion)}
               onSortChange={setHistorySort}
             />
           </section>
@@ -1494,6 +1532,8 @@ function ConversionHistory({
   onSortChange,
   onCancel,
   onDelete,
+  onPause,
+  onResume,
 }: {
   conversions: NamingConversion[];
   locale: string;
@@ -1501,6 +1541,8 @@ function ConversionHistory({
   onSortChange: (value: SortDescriptor) => void;
   onCancel: (value: NamingConversion) => void;
   onDelete: (value: NamingConversion) => void;
+  onPause: (value: NamingConversion) => void;
+  onResume: (value: NamingConversion) => void;
 }) {
   const { t } = useTranslation();
   if (!conversions.length) {
@@ -1543,7 +1585,13 @@ function ConversionHistory({
                   <ConversionProgress conversion={conversion} />
                 </Table.Cell>
                 <Table.Cell className="text-right">
-                  <ConversionActions conversion={conversion} onCancel={onCancel} onDelete={onDelete} />
+                  <ConversionActions
+                    conversion={conversion}
+                    onCancel={onCancel}
+                    onDelete={onDelete}
+                    onPause={onPause}
+                    onResume={onResume}
+                  />
                 </Table.Cell>
               </Table.Row>
             ))}
@@ -1563,7 +1611,13 @@ function ConversionHistory({
               <ConversionStatus status={conversion.status} />
             </div>
             <ConversionProgress conversion={conversion} />
-            <ConversionActions conversion={conversion} onCancel={onCancel} onDelete={onDelete} />
+            <ConversionActions
+              conversion={conversion}
+              onCancel={onCancel}
+              onDelete={onDelete}
+              onPause={onPause}
+              onResume={onResume}
+            />
           </Surface>
         ))}
       </div>
@@ -1606,7 +1660,7 @@ function ConversionProgress({ conversion }: { conversion: NamingConversion }) {
     <div className="grid min-w-[10rem] gap-1.5">
       <ProgressBar
         aria-label={t("naming.progress")}
-        isIndeterminate={["queued", "rolling_back"].includes(conversion.status)}
+        isIndeterminate={["queued", "pause_requested", "rolling_back"].includes(conversion.status)}
         value={percent}
       >
         <ProgressBar.Track>
@@ -1629,20 +1683,53 @@ function ConversionActions({
   conversion,
   onCancel,
   onDelete,
+  onPause,
+  onResume,
 }: {
   conversion: NamingConversion;
   onCancel: (value: NamingConversion) => void;
   onDelete: (value: NamingConversion) => void;
+  onPause: (value: NamingConversion) => void;
+  onResume: (value: NamingConversion) => void;
 }) {
   const { t } = useTranslation();
   const active = activeConversionStatuses.has(conversion.status);
   return (
     <div className="flex justify-end gap-2">
       {active ? (
-        <Button size="sm" variant="danger-soft" onPress={() => onCancel(conversion)}>
-          <PlayerStop aria-hidden="true" size={16} />
-          {t("common.cancel")}
-        </Button>
+        <>
+          {["queued", "running"].includes(conversion.status) ? (
+            <Button
+              className="text-warning"
+              size="sm"
+              variant="secondary"
+              onPress={() => onPause(conversion)}
+            >
+              <PlayerPause aria-hidden="true" size={16} />
+              {t("naming.pause")}
+            </Button>
+          ) : null}
+          {conversion.status === "paused" ? (
+            <Button
+              className="text-success"
+              size="sm"
+              variant="secondary"
+              onPress={() => onResume(conversion)}
+            >
+              <PlayerPlay aria-hidden="true" size={16} />
+              {t("naming.resume")}
+            </Button>
+          ) : null}
+          <Button
+            isDisabled={conversion.status === "rolling_back"}
+            size="sm"
+            variant="danger-soft"
+            onPress={() => onCancel(conversion)}
+          >
+            <PlayerStop aria-hidden="true" size={16} />
+            {t("common.cancel")}
+          </Button>
+        </>
       ) : (
         <Tooltip>
           <Button

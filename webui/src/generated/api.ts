@@ -884,6 +884,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/naming/conversions/{conversion_id}/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pause a naming conversion
+         * @description Request a pause after the current atomic filesystem move completes.
+         */
+        post: operations["pause_naming_conversion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/naming/conversions/{conversion_id}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resume a naming conversion
+         * @description Revalidate project configuration and filesystem state, then continue a paused conversion.
+         */
+        post: operations["resume_naming_conversion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/naming/conversions/{conversion_id}/cancel": {
         parameters: {
             query?: never;
@@ -2109,7 +2149,7 @@ export interface components {
              * Status
              * @enum {string}
              */
-            status: "preview" | "queued" | "running" | "rolling_back" | "completed" | "failed" | "cancelled";
+            status: "preview" | "queued" | "running" | "pause_requested" | "paused" | "rolling_back" | "completed" | "failed" | "cancelled";
             preview: components["schemas"]["NamingPreviewResponse"];
             /** Selected Creators */
             selected_creators: string[];
@@ -4660,6 +4700,74 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pause_naming_conversion: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                conversion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NamingConversionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resume_naming_conversion: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path: {
+                conversion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NamingConversionResponse"];
+                };
             };
             /** @description Validation Error */
             422: {

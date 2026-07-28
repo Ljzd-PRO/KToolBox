@@ -162,6 +162,40 @@ def create_naming_router() -> APIRouter:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="conversion not found") from error
 
     @router.post(
+        "/naming/conversions/{conversion_id}/pause",
+        response_model=NamingConversionResponse,
+    )
+    async def pause_naming_conversion(
+        conversion_id: str,
+        _: CsrfDependency,
+        service: NamingServiceDependency,
+    ) -> NamingConversionResponse:
+        try:
+            return await service.pause(conversion_id)
+        except LookupError as error:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="conversion not found") from error
+        except NamingConversionError as error:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
+
+    @router.post(
+        "/naming/conversions/{conversion_id}/resume",
+        response_model=NamingConversionResponse,
+    )
+    async def resume_naming_conversion(
+        conversion_id: str,
+        _: CsrfDependency,
+        service: NamingServiceDependency,
+    ) -> NamingConversionResponse:
+        try:
+            return await service.resume(conversion_id)
+        except LookupError as error:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="conversion not found") from error
+        except NamingPreviewStaleError as error:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
+        except NamingConversionError as error:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
+
+    @router.post(
         "/naming/conversions/{conversion_id}/cancel",
         response_model=NamingConversionResponse,
     )

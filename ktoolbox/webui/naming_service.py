@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -107,6 +108,7 @@ class NamingConversionService:
         self.project_store = ProjectConfigStore(self.project_root / "ktoolbox.toml")
         self._workers: dict[str, asyncio.Task[None]] = {}
         self._cancellations: dict[str, asyncio.Event] = {}
+        self._pauses: dict[str, asyncio.Event] = {}
         self._apply_lock = asyncio.Lock()
 
     async def start(self) -> None:
@@ -120,6 +122,7 @@ class NamingConversionService:
             await asyncio.gather(*self._workers.values(), return_exceptions=True)
         self._workers.clear()
         self._cancellations.clear()
+        self._pauses.clear()
 
     async def legacy_context(self) -> NamingLegacyContextResponse:
         project = self.project_store.load()
@@ -370,20 +373,55 @@ class NamingConversionService:
         await self._ensure_no_overlapping_tasks(conversion.preview.roots)
         await self._resolve_layout_notices(candidate, "convert_selected")
         await self._set_status(preview_id, "queued", selected=selected)
-        cancellation = asyncio.Event()
-        self._cancellations[preview_id] = cancellation
-        worker = asyncio.create_task(
-            self._run_conversion(preview_id, candidate, selected, cancellation),
-            name=f"naming-conversion-{preview_id}",
-        )
-        self._workers[preview_id] = worker
-        worker.add_done_callback(lambda _: self._workers.pop(preview_id, None))
+        self._start_conversion_worker(preview_id, candidate, selected)
         return await self.get(preview_id)
+
+    async def pause(self, conversion_id: str) -> NamingConversionResponse:
+        pause = self._pauses.get(conversion_id)
+        if pause is None:
+            await self.get(conversion_id)
+            raise NamingConversionError("conversion worker is not active")
+        changed = await self._set_status_if_current(
+            conversion_id,
+            {"queued", "running"},
+            "pause_requested",
+        )
+        if not changed:
+            raise NamingConversionError("only queued or running conversions can be paused")
+        pause.set()
+        return await self.get(conversion_id)
+
+    async def resume(self, conversion_id: str) -> NamingConversionResponse:
+        async with self._apply_lock:
+            conversion = await self.get(conversion_id)
+            if conversion.status != "paused":
+                raise NamingConversionError("only paused conversions can be resumed")
+            await self._ensure_no_active_conversion(exclude_id=conversion_id)
+            await self._ensure_no_overlapping_tasks(conversion.preview.roots)
+            await self._validate_resume_state(conversion)
+            candidate = ProjectNamingConfiguration.model_validate_json(
+                await self._candidate_json(conversion_id)
+            )
+            await self._set_status(conversion_id, "queued")
+            self._start_conversion_worker(
+                conversion_id,
+                candidate,
+                conversion.selected_creators,
+            )
+            return await self.get(conversion_id)
 
     async def cancel(self, conversion_id: str) -> NamingConversionResponse:
         conversion = await self.get(conversion_id)
-        if conversion.status not in {"queued", "running"}:
-            raise NamingConversionError("only queued or running conversions can be cancelled")
+        if conversion.status not in {"queued", "running", "pause_requested", "paused"}:
+            raise NamingConversionError("only active or paused conversions can be cancelled")
+        if conversion.status == "paused":
+            await self._set_status(conversion_id, "rolling_back")
+            worker = asyncio.create_task(
+                self._rollback(conversion_id, "cancelled"),
+                name=f"naming-conversion-rollback-{conversion_id}",
+            )
+            self._track_worker(conversion_id, worker)
+            return await self.get(conversion_id)
         cancellation = self._cancellations.get(conversion_id)
         if cancellation is None:
             raise NamingConversionError("conversion worker is not active")
@@ -411,7 +449,13 @@ class NamingConversionService:
 
     async def delete(self, conversion_id: str) -> None:
         conversion = await self.get(conversion_id)
-        if conversion.status in {"queued", "running", "rolling_back"}:
+        if conversion.status in {
+            "queued",
+            "running",
+            "pause_requested",
+            "paused",
+            "rolling_back",
+        }:
             raise NamingConversionError("active conversion history cannot be deleted")
         async with self.database.connect() as connection:
             await connection.execute(
@@ -646,16 +690,30 @@ class NamingConversionService:
         candidate: ProjectNamingConfiguration,
         selected: list[str],
         cancellation: asyncio.Event,
+        pause: asyncio.Event,
     ) -> None:
         try:
             await self._set_status(conversion_id, "running", selected=selected)
             conversion = await self.get(conversion_id)
-            operations = await self._operations(conversion_id, selected, reverse=False)
-            progress = NamingConversionProgress(total_operations=len(operations))
+            all_operations = await self._operations(
+                conversion_id,
+                selected,
+                reverse=False,
+            )
+            operations = [row for row in all_operations if row["status"] == "planned"]
+            progress = NamingConversionProgress(
+                completed_operations=sum(
+                    1 for row in all_operations if row["status"] == "completed"
+                ),
+                total_operations=len(all_operations),
+            )
             await self._set_progress(conversion_id, progress)
             for operation in operations:
                 if cancellation.is_set():
                     raise asyncio.CancelledError
+                if pause.is_set():
+                    await self._set_status(conversion_id, "paused")
+                    return
                 source = Path(operation["source"])
                 target = Path(operation["target"])
                 if not await anyio.to_thread.run_sync(source.exists):
@@ -673,6 +731,11 @@ class NamingConversionService:
                 progress.completed_operations += 1
                 progress.current_creator = str(operation["creator_key"])
                 await self._set_progress(conversion_id, progress)
+                if cancellation.is_set():
+                    raise asyncio.CancelledError
+                if pause.is_set():
+                    await self._set_status(conversion_id, "paused")
+                    return
             conversion = await self.get(conversion_id)
             if content_revision(self.project_store.load_text()) != conversion.preview.revision:
                 raise NamingPreviewStaleError(
@@ -691,7 +754,45 @@ class NamingConversionService:
         except Exception as error:
             await self._rollback(conversion_id, "failed", error=str(error))
         finally:
-            self._cancellations.pop(conversion_id, None)
+            if self._cancellations.get(conversion_id) is cancellation:
+                self._cancellations.pop(conversion_id, None)
+            if self._pauses.get(conversion_id) is pause:
+                self._pauses.pop(conversion_id, None)
+
+    def _start_conversion_worker(
+        self,
+        conversion_id: str,
+        candidate: ProjectNamingConfiguration,
+        selected: list[str],
+    ) -> None:
+        cancellation = asyncio.Event()
+        pause = asyncio.Event()
+        self._cancellations[conversion_id] = cancellation
+        self._pauses[conversion_id] = pause
+        worker = asyncio.create_task(
+            self._run_conversion(
+                conversion_id,
+                candidate,
+                selected,
+                cancellation,
+                pause,
+            ),
+            name=f"naming-conversion-{conversion_id}",
+        )
+        self._track_worker(conversion_id, worker)
+
+    def _track_worker(
+        self,
+        conversion_id: str,
+        worker: asyncio.Task[None],
+    ) -> None:
+        self._workers[conversion_id] = worker
+
+        def remove(completed: asyncio.Task[None]) -> None:
+            if self._workers.get(conversion_id) is completed:
+                self._workers.pop(conversion_id, None)
+
+        worker.add_done_callback(remove)
 
     async def _rollback(
         self,
@@ -754,21 +855,60 @@ class NamingConversionService:
                     f"task {task.id} overlaps a selected download root; stop it before converting"
                 )
 
-    async def _ensure_no_active_conversion(self) -> None:
+    async def _ensure_no_active_conversion(
+        self,
+        *,
+        exclude_id: str | None = None,
+    ) -> None:
+        parameters: list[object] = []
+        exclusion = ""
+        if exclude_id is not None:
+            exclusion = "AND id != ?"
+            parameters.append(exclude_id)
         async with self.database.connect() as connection:
             row = await (
                 await connection.execute(
-                    """
+                    f"""
                     SELECT id FROM naming_conversions
-                    WHERE status IN ('queued', 'running', 'rolling_back')
+                    WHERE status IN (
+                        'queued', 'running', 'pause_requested', 'paused', 'rolling_back'
+                    )
+                    {exclusion}
                     LIMIT 1
-                    """
+                    """,
+                    parameters,
                 )
             ).fetchone()
         if row is not None:
             raise NamingConversionError(
                 "another naming conversion is already active; wait for it to finish or cancel it"
             )
+
+    async def _validate_resume_state(
+        self,
+        conversion: NamingConversionResponse,
+    ) -> None:
+        if content_revision(self.project_store.load_text()) != conversion.preview.revision:
+            raise NamingPreviewStaleError(
+                "project configuration changed while conversion was paused"
+            )
+        operations = await self._operations(
+            conversion.id,
+            conversion.selected_creators,
+            reverse=False,
+        )
+        await anyio.to_thread.run_sync(
+            _validate_resume_filesystem,
+            conversion.preview.roots,
+            [
+                (
+                    str(operation["status"]),
+                    Path(operation["source"]),
+                    Path(operation["target"]),
+                )
+                for operation in operations
+            ],
+        )
 
     async def _candidate_json(self, conversion_id: str) -> str:
         async with self.database.connect() as connection:
@@ -859,12 +999,41 @@ class NamingConversionService:
             resource_id=conversion_id,
         )
 
+    async def _set_status_if_current(
+        self,
+        conversion_id: str,
+        allowed: set[str],
+        status: str,
+    ) -> bool:
+        placeholders = ",".join("?" for _ in allowed)
+        now = utc_now().isoformat()
+        async with self.database.connect() as connection:
+            cursor = await connection.execute(
+                f"""
+                UPDATE naming_conversions
+                SET status = ?, error = NULL, updated_at = ?
+                WHERE id = ? AND status IN ({placeholders})
+                """,
+                [status, now, conversion_id, *sorted(allowed)],
+            )
+            await connection.commit()
+            changed = cursor.rowcount == 1
+            await cursor.close()
+        if changed:
+            await self.events.publish(
+                "naming.conversion.progress",
+                {"status": status, "error": None},
+                resource="naming",
+                resource_id=conversion_id,
+            )
+        return changed
+
     async def _recover_incomplete(self) -> None:
         async with self.database.connect() as connection:
             rows = await connection.execute_fetchall(
                 """
                 SELECT id FROM naming_conversions
-                WHERE status IN ('queued', 'running', 'rolling_back')
+                WHERE status IN ('queued', 'running', 'pause_requested', 'rolling_back')
                 """
             )
         for (conversion_id,) in rows:
@@ -873,6 +1042,35 @@ class NamingConversionService:
                 "failed",
                 error="WebUI stopped during naming conversion; completed moves were rolled back",
             )
+
+
+def _validate_resume_filesystem(
+    roots: list[Path],
+    operations: list[tuple[str, Path, Path]],
+) -> None:
+    for root in roots:
+        if not root.is_dir() or root.is_symlink():
+            raise NamingPreviewStaleError(
+                f"download location changed while conversion was paused: {root}"
+            )
+        if shutil.disk_usage(root).free <= 0:
+            raise NamingConversionError(f"download location has no free space: {root}")
+    for status, source, target in operations:
+        if status == "completed":
+            if source.exists() or not target.exists():
+                raise NamingPreviewStaleError(
+                    "completed conversion paths changed while paused"
+                )
+        elif status == "planned":
+            if not source.exists() or target.exists():
+                raise NamingPreviewStaleError(
+                    "pending conversion paths changed while paused"
+                )
+        else:
+            raise NamingPreviewStaleError(
+                "conversion operation state changed while paused"
+            )
+
 
 def _scan_download_roots(
     roots: list[Path],

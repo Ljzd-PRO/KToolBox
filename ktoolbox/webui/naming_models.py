@@ -12,6 +12,8 @@ NamingConversionStatus = Literal[
     "preview",
     "queued",
     "running",
+    "pause_requested",
+    "paused",
     "rolling_back",
     "completed",
     "failed",
