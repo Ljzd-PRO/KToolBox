@@ -129,15 +129,23 @@ async def run_webui(
             access_log=False,
         )
     )
-    uvicorn_error_logger = logging.getLogger("uvicorn.error")
 
     class ForcedShutdownCancellationFilter(logging.Filter):
         def filter(self, record: logging.LogRecord) -> bool:
             exception = record.exc_info[1] if record.exc_info is not None else None
-            return not (server.force_exit and isinstance(exception, asyncio.CancelledError))
+            forced_asgi_cancellation = record.getMessage().startswith("Exception in ASGI application") and isinstance(
+                exception, asyncio.CancelledError
+            )
+            return not (
+                forced_asgi_cancellation or (server.force_exit and isinstance(exception, asyncio.CancelledError))
+            )
 
     cancellation_filter = ForcedShutdownCancellationFilter()
+    uvicorn_error_logger = logging.getLogger("uvicorn.error")
     uvicorn_error_logger.addFilter(cancellation_filter)
+    uvicorn_handlers = tuple(logging.getLogger("uvicorn").handlers)
+    for handler in uvicorn_handlers:
+        handler.addFilter(cancellation_filter)
     try:
         await server.serve()
         if server.interrupt_count > 1:
@@ -149,7 +157,10 @@ async def run_webui(
                     lifespan.logger.disabled = True
             raise KeyboardInterrupt
     finally:
-        uvicorn_error_logger.removeFilter(cancellation_filter)
+        if server.interrupt_count < 2:
+            uvicorn_error_logger.removeFilter(cancellation_filter)
+            for handler in uvicorn_handlers:
+                handler.removeFilter(cancellation_filter)
 
 
 def _prepare_webui_credentials(

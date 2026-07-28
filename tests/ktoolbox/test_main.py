@@ -6,6 +6,7 @@ import socket
 import subprocess
 import sys
 import time
+from http.client import HTTPConnection
 from pathlib import Path
 from unittest.mock import patch
 
@@ -263,10 +264,38 @@ def test_terminal_webui_interrupt_logs_clean_shutdown(tmp_path: Path) -> None:
         process.kill()
         pytest.fail("WebUI did not start before the timeout")
 
-    process.send_signal(signal.SIGINT)
-    time.sleep(0.02)
-    process.send_signal(signal.SIGINT)
-    terminal_output, _ = process.communicate(timeout=10)
+    login_connection = HTTPConnection("127.0.0.1", port, timeout=2)
+    login_connection.request(
+        "POST",
+        "/api/v1/session/login",
+        body='{"username":"owner","password":"test-password"}',
+        headers={"Content-Type": "application/json"},
+    )
+    login_response = login_connection.getresponse()
+    assert login_response.status == 200
+    session_cookie = login_response.getheader("Set-Cookie")
+    assert session_cookie is not None
+    login_response.read()
+    login_connection.close()
+
+    events_connection = HTTPConnection("127.0.0.1", port, timeout=2)
+    events_connection.request(
+        "GET",
+        "/api/v1/events",
+        headers={
+            "Accept": "text/event-stream",
+            "Cookie": session_cookie.split(";", 1)[0],
+        },
+    )
+    events_response = events_connection.getresponse()
+    assert events_response.status == 200
+    try:
+        process.send_signal(signal.SIGINT)
+        time.sleep(0.02)
+        process.send_signal(signal.SIGINT)
+        terminal_output, _ = process.communicate(timeout=10)
+    finally:
+        events_connection.close()
 
     assert process.returncode == 130
     assert "KToolBox was forcefully stopped by the user" in terminal_output
