@@ -102,10 +102,12 @@ export type TextDocument = {
 
 export type ProjectDocument = TextDocument & {
   configuration: {
-    schema_version: 2;
+    schema_version: 5;
+    default_output: string;
     creators: CreatorReference[];
     blockers: BlockerSpec[];
     naming: ProjectNamingConfiguration;
+    automatic_sync: AutomaticSyncPlan[];
   };
 };
 

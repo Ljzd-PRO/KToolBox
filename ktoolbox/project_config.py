@@ -415,6 +415,20 @@ def project_config_path(
     return DEFAULT_PROJECT_CONFIG_PATH
 
 
+def resolve_project_output(
+    project_root: Path,
+    configuration: ProjectConfiguration,
+    override: Path | None = None,
+) -> Path:
+    """Resolve an explicit or project-default download directory."""
+
+    output = configuration.default_output if override is None else override
+    expanded = output.expanduser()
+    if not expanded.is_absolute():
+        expanded = project_root.expanduser().resolve() / expanded
+    return expanded.resolve(strict=False)
+
+
 class ProjectConfigStore:
     """Load and atomically update a project configuration document."""
 

@@ -20,6 +20,16 @@ function json(body: unknown, status = 200) {
   });
 }
 
+const projectSummary = {
+  name: "Fixture",
+  root: "/project",
+  project_config: "/project/ktoolbox.toml",
+  dotenv_files: [],
+  version: "1.0.0",
+  default_output: "downloads",
+  resolved_default_output: "/project/downloads",
+};
+
 afterEach(() => {
   queryClient.clear();
   vi.unstubAllGlobals();
@@ -129,6 +139,7 @@ describe("project workflows", () => {
       vi.fn(async (input: RequestInfo | URL) => {
         const path = String(input);
         if (path.endsWith("/session")) return json(session);
+        if (path.endsWith("/project")) return json(projectSummary);
         if (path.endsWith("/tasks")) return json([task]);
         if (path.endsWith("/creators")) return json([]);
         if (path.includes("/tasks/task-failed/events")) {
@@ -512,6 +523,7 @@ describe("project workflows", () => {
       vi.fn(async (input: RequestInfo | URL) => {
         const path = String(input);
         if (path.endsWith("/session")) return json(session);
+        if (path.endsWith("/project")) return json(projectSummary);
         if (path.endsWith("/tasks")) return json([task]);
         if (path.endsWith("/creators")) {
           return json([{ service: "fanbox", creator_id: "42", alias: null, enabled: true, name: "Readable Creator" }]);

@@ -18,7 +18,6 @@ _EXACT_CODES = {
     "revision not found": "revision_not_found",
     "task not found": "task_not_found",
     "invalid Last-Event-ID": "invalid_event_id",
-    "task output must stay inside the project directory": "task_output_invalid",
     "no enabled creators are configured": "no_enabled_creators",
     "the post URL does not contain a service, creator, and post ID": "post_identity_invalid",
     "provide a post URL or service, creator_id, and post_id": "post_identity_invalid",

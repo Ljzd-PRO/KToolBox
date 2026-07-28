@@ -156,7 +156,7 @@ describe("automatic synchronization page", () => {
       name: "Weekly references",
       creators: ["fanbox:42"],
       schedule: { kind: "cron", expression: "0 3 * * *" },
-      options: { output: "downloads" },
+      options: { output: null },
     });
     const postCall = fetchMock.mock.calls.find(([, init]) => init?.method === "POST");
     expect(new Headers(postCall?.[1]?.headers).get("If-Match")).toBe("\"revision-1\"");

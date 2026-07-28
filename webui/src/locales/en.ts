@@ -695,7 +695,7 @@ export const en = {
       "revision_not_found": "The requested revision could not be found.",
       "task_not_found": "The task could not be found. It may have been deleted.",
       "invalid_event_id": "The task event position is invalid. Reconnect to the activity stream.",
-      "task_output_invalid": "The task output must stay inside the project directory.",
+      "task_output_invalid": "The task output directory could not be resolved.",
       "no_enabled_creators": "No enabled creators are available for this sync.",
       "post_identity_invalid": "Enter a valid Pawchive post URL or complete platform, creator ID, and post ID.",
       "date_range_invalid": "The start date cannot be later than the end date.",

@@ -1294,12 +1294,8 @@ export interface components {
          * @description Reusable synchronization settings attached to an automatic plan.
          */
         AutomaticSyncOptions: {
-            /**
-             * Output
-             * Format: path
-             * @default .
-             */
-            output: string;
+            /** Output */
+            output?: string | null;
             /**
              * Save Creator Indices
              * @default false
@@ -1642,6 +1638,7 @@ export interface components {
             /**
              * Output
              * Format: path
+             * @description Optional task output override. Omit it to use the project default output directory.
              * @default .
              */
             output: string;
@@ -2213,10 +2210,16 @@ export interface components {
         ProjectConfiguration: {
             /**
              * Schema Version
-             * @default 4
+             * @default 5
              * @constant
              */
-            schema_version: 4;
+            schema_version: 5;
+            /**
+             * Default Output
+             * Format: path
+             * @default downloads
+             */
+            default_output: string;
             /** Creators */
             creators?: components["schemas"]["CreatorReference"][];
             /** Blockers */
@@ -2346,6 +2349,16 @@ export interface components {
              * Format: path
              */
             project_config: string;
+            /**
+             * Default Output
+             * Format: path
+             */
+            default_output: string;
+            /**
+             * Resolved Default Output
+             * Format: path
+             */
+            resolved_default_output: string;
             /** Dotenv Files */
             dotenv_files: string[];
             /** Version */
@@ -2476,6 +2489,7 @@ export interface components {
             /**
              * Output
              * Format: path
+             * @description Optional task output override. Omit it to use the project default output directory.
              * @default .
              */
             output: string;

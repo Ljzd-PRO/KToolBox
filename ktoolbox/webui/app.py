@@ -15,7 +15,7 @@ from starlette.middleware.base import RequestResponseEndpoint
 
 from ktoolbox import __version__
 from ktoolbox.configuration import RuntimeContext
-from ktoolbox.project_config import ProjectConfigStore
+from ktoolbox.project_config import ProjectConfigStore, resolve_project_output
 from ktoolbox.webui.about import build_about_response
 from ktoolbox.webui.auth import (
     SESSION_COOKIE,
@@ -224,10 +224,13 @@ def create_app(
         _: Annotated[WebUISession, Depends(require_session)],
     ) -> ProjectSummaryResponse:
         root: Path = context.project_root
+        configuration = ProjectConfigStore(root / "ktoolbox.toml").load()
         return ProjectSummaryResponse(
             name=root.name,
             root=root,
             project_config=root / "ktoolbox.toml",
+            default_output=configuration.default_output,
+            resolved_default_output=resolve_project_output(root, configuration),
             dotenv_files=[root / ".env", root / "prod.env"],
             version=__version__,
         )

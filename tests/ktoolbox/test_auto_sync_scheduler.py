@@ -43,9 +43,17 @@ async def scheduler_fixture(
     tmp_path: Path,
     clock: MutableClock,
     plan: AutomaticSyncPlan,
+    *,
+    default_output: Path = Path("downloads"),
 ) -> tuple[AutoSyncScheduler, AutomaticSyncStore, TaskStore]:
     creator = CreatorReference(service="fanbox", creator_id="creator")
-    ProjectConfigStore(tmp_path / "ktoolbox.toml").save(ProjectConfiguration(creators=[creator], automatic_sync=[plan]))
+    ProjectConfigStore(tmp_path / "ktoolbox.toml").save(
+        ProjectConfiguration(
+            default_output=default_output,
+            creators=[creator],
+            automatic_sync=[plan],
+        )
+    )
     database = WebUIDatabase(tmp_path / ".ktoolbox" / "webui.sqlite3")
     await database.initialize()
     event_store = WebUIEventStore(database)
@@ -113,6 +121,20 @@ async def test_successful_checkpoint_creates_24_hour_overlap_window(tmp_path: Pa
     assert second_task.automatic_origin is not None
     assert second_task.automatic_origin.windows[0].start_at == datetime(2026, 7, 26, 4, tzinfo=UTC)
     assert second_task.automatic_origin.windows[0].baseline is False
+
+
+async def test_automatic_sync_inherits_external_project_default_output(tmp_path: Path) -> None:
+    plan = AutomaticSyncPlan(id="daily", name="Daily", creators=["fanbox:creator"])
+    scheduler, _, tasks = await scheduler_fixture(
+        tmp_path,
+        MutableClock(datetime(2026, 7, 27, 4, tzinfo=UTC)),
+        plan,
+        default_output=Path("../shared-downloads"),
+    )
+
+    task = await tasks.get(await scheduler.run_now("daily"))
+
+    assert task.spec.output == tmp_path.parent / "shared-downloads"
 
 
 async def test_explicit_initial_date_uses_plan_timezone_and_counts_updates(tmp_path: Path) -> None:

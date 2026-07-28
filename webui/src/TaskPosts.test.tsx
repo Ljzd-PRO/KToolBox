@@ -20,6 +20,16 @@ function json(body: unknown, status = 200) {
   });
 }
 
+const projectSummary = {
+  name: "Fixture",
+  root: "/project",
+  project_config: "/project/ktoolbox.toml",
+  dotenv_files: [],
+  version: "1.0.0",
+  default_output: "downloads",
+  resolved_default_output: "/project/downloads",
+};
+
 afterEach(() => {
   queryClient.clear();
   vi.unstubAllGlobals();
@@ -87,6 +97,7 @@ describe("task and post workflows", () => {
     vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
       const path = String(input);
       if (path.endsWith("/session")) return json(session);
+      if (path.endsWith("/project")) return json(projectSummary);
       if (path.endsWith("/tasks")) return json([task]);
       if (path.endsWith("/creators")) return json([]);
       if (path.includes("/tasks/task-1/events")) {
@@ -188,6 +199,7 @@ describe("task and post workflows", () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const path = String(input);
       if (path.endsWith("/session")) return json(session);
+      if (path.endsWith("/project")) return json(projectSummary);
       if (path.endsWith("/tasks")) return json(tasks);
       if (path.endsWith("/creators")) return json([]);
       if (path.endsWith("/tasks/download-task/pause") && init?.method === "POST") {
@@ -287,6 +299,7 @@ describe("task and post workflows", () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const path = String(input);
       if (path.endsWith("/session")) return json(session);
+      if (path.endsWith("/project")) return json(projectSummary);
       if (path.endsWith("/tasks") && init?.method === "POST") return json(createdTask, 201);
       if (path.endsWith("/tasks")) return json([createdTask]);
       if (path.endsWith("/creators")) return json([]);
@@ -306,7 +319,7 @@ describe("task and post workflows", () => {
 
     render(<BrowserRouter><App /></BrowserRouter>);
     await screen.findByRole("heading", { name: "Posts" });
-    await user.type(screen.getByRole("textbox", { name: "Creator ID" }), "42");
+    await user.type(await screen.findByRole("textbox", { name: "Creator ID" }), "42");
     await user.type(screen.getByRole("textbox", { name: "Creator name" }), "Demo Studio");
     await user.click(screen.getByRole("button", { name: "Search posts" }));
     expect((await screen.findAllByText("Fictional fixture")).length).toBeGreaterThan(0);
@@ -324,7 +337,7 @@ describe("task and post workflows", () => {
         creator_id: "42",
         post_id: "99",
         revision_id: null,
-        output: "downloads",
+        output: "/project/downloads",
         dump_post_data: true,
       },
       presentation: {

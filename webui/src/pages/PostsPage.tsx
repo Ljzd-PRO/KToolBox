@@ -44,13 +44,23 @@ import { formatDateTime } from "../lib/format";
 import { stableSort } from "../lib/sorting";
 import { TASK_OUTPUT_PATH_SELECTOR } from "../lib/pathSelectors";
 import { downloadTaskTargetKey } from "../lib/taskPresentation";
-import type { DownloadTaskSpec, PawchivePost, PawchiveRevision, TaskRecord } from "../types";
+import type {
+  DownloadTaskSpec,
+  PawchivePost,
+  PawchiveRevision,
+  ProjectSummary,
+  TaskRecord,
+} from "../types";
 
 export function PostsPage() {
   const { t, i18n } = useTranslation();
   const { session } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const projectQuery = useQuery({
+    queryKey: ["project"],
+    queryFn: () => api<ProjectSummary>("/project"),
+  });
   const [service, setService] = useState("fanbox");
   const [creatorId, setCreatorId] = useState("");
   const [creatorName, setCreatorName] = useState("");
@@ -62,7 +72,7 @@ export function PostsPage() {
   const [selected, setSelected] = useState<PawchivePost | null>(null);
   const [selectedRevision, setSelectedRevision] = useState("");
   const [showContent, setShowContent] = useState(false);
-  const [output, setOutput] = useState("downloads");
+  const [output, setOutput] = useState("");
   const [dumpMetadata, setDumpMetadata] = useState(true);
   const [creating, setCreating] = useState(false);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
@@ -106,7 +116,7 @@ export function PostsPage() {
     setSelected(post);
     setSelectedRevision("");
     setShowContent(false);
-    setOutput("downloads");
+    setOutput(projectQuery.data?.resolved_default_output ?? "downloads");
     setDumpMetadata(true);
   }
 
@@ -180,6 +190,8 @@ export function PostsPage() {
     { value: "service", label: t("posts.service") },
     { value: "published", label: t("posts.published") },
   ];
+
+  if (projectQuery.isLoading) return <PageLoading />;
 
   return (
     <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6">

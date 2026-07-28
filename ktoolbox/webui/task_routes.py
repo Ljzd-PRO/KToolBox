@@ -10,7 +10,7 @@ from typing import Annotated, Any, Literal, cast
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 from fastapi.responses import StreamingResponse
 
-from ktoolbox.project_config import ProjectConfigError, ProjectConfigStore
+from ktoolbox.project_config import ProjectConfigStore, resolve_project_output
 from ktoolbox.utils import parse_webpage_url
 from ktoolbox.webui.auth import require_csrf, require_session
 from ktoolbox.webui.database import WebUISession
@@ -262,19 +262,12 @@ def _updated_presentation(
 
 
 def _normalize_spec(spec: TaskSpec, project_root: Path) -> TaskSpec:
-    output = spec.output.expanduser()
-    if not output.is_absolute():
-        output = project_root / output
-    output = output.resolve()
     root = project_root.resolve()
-    if output != root and root not in output.parents:
-        raise ValueError("task output must stay inside the project directory")
+    project = ProjectConfigStore(root / "ktoolbox.toml").load()
+    explicit_output = spec.output if "output" in spec.model_fields_set else None
+    output = resolve_project_output(root, project, explicit_output)
     normalized = spec.model_copy(update={"output": output})
     if isinstance(normalized, SyncTaskSpec) and not normalized.creators:
-        try:
-            project = ProjectConfigStore(root / "ktoolbox.toml").load()
-        except ProjectConfigError:
-            raise
         creators = [creator.model_copy(deep=True) for creator in project.creators if creator.enabled]
         if not creators:
             raise ValueError("no enabled creators are configured")

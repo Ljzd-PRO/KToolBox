@@ -49,12 +49,14 @@ import {
 
 export function TaskEditor({
   creators,
+  defaultOutput,
   task,
   saving,
   onClose,
   onSave,
 }: {
   creators: CreatorRosterItem[];
+  defaultOutput: string;
   task?: TaskRecord;
   saving: boolean;
   onClose: () => void;
@@ -70,7 +72,7 @@ export function TaskEditor({
     realtime?.revisions.tasks ?? 0,
   );
   const [kind, setKind] = useState<"sync" | "download">(initial?.kind ?? "sync");
-  const [output, setOutput] = useState(initial?.output ?? "downloads");
+  const [output, setOutput] = useState(initial?.output ?? defaultOutput);
 
   const initialSync = initial?.kind === "sync" ? initial : undefined;
   const [allEnabled, setAllEnabled] = useState(!initialSync || initialSync.creators.length === 0);

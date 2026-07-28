@@ -65,9 +65,11 @@ import {
   TableColumnLabel,
   ComboBoxField,
 } from "../components/ui";
+import { RemotePathField } from "../components/RemotePathField";
 import { api, ApiError, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { formatDateTime } from "../lib/format";
+import { TASK_OUTPUT_PATH_SELECTOR } from "../lib/pathSelectors";
 import { stableSort } from "../lib/sorting";
 import type {
   AutomaticSyncPlan,
@@ -123,7 +125,7 @@ function blankPlan(): PlanDraft {
     schedule: { kind: "cron", expression: "0 3 * * *", timezone },
     initial_start_date: today(getLocalTimeZone()).toString(),
     options: {
-      output: "downloads",
+      output: "",
       save_creator_indices: false,
       mix_posts: null,
       keywords: [],
@@ -151,7 +153,7 @@ function normalizePlan(plan: AutomaticSyncPlan): PlanDraft {
     schedule,
     initial_start_date: plan.initial_start_date ?? null,
     options: {
-      output: plan.options?.output ?? "downloads",
+      output: plan.options?.output ?? "",
       save_creator_indices: plan.options?.save_creator_indices ?? false,
       mix_posts: plan.options?.mix_posts ?? null,
       keywords: [...(plan.options?.keywords ?? [])],
@@ -362,7 +364,13 @@ export function AutomaticSyncPage() {
         editingId ? `/auto-sync/plans/${editingId}` : "/auto-sync/plans",
         {
           method: editingId ? "PUT" : "POST",
-          body: editor,
+          body: {
+            ...editor,
+            options: {
+              ...editor.options,
+              output: editor.options.output.trim() || null,
+            },
+          },
           csrfToken: session.csrf_token,
           headers: { "If-Match": `"${plansQuery.data.revision}"` },
         },
@@ -1033,7 +1041,14 @@ function PlanEditor({
 
         <FormSurface className="grid gap-4">
           <SectionHeading description={t("automaticSync.optionsHint")} icon={IconRefresh} title={t("automaticSync.options")} />
-          <FormField icon={IconFolder} label={t("automaticSync.output")} description={t("automaticSync.outputHint")} value={draft.options.output} onChange={(output) => patch({ options: { ...draft.options, output } })} />
+          <RemotePathField
+            description={t("automaticSync.outputHint")}
+            icon={IconFolder}
+            label={t("automaticSync.output")}
+            selector={TASK_OUTPUT_PATH_SELECTOR}
+            value={draft.options.output}
+            onChange={(output) => patch({ options: { ...draft.options, output } })}
+          />
           <div className="grid gap-3 md:grid-cols-2">
             <FormSwitchField icon={IconHistory} isSelected={draft.options.save_creator_indices} label={t("automaticSync.saveIndex")} description={t("automaticSync.saveIndexHint")} onChange={(save_creator_indices) => patch({ options: { ...draft.options, save_creator_indices } })} />
             <SelectField

@@ -11,7 +11,11 @@ import pytest
 
 from ktoolbox.configuration import Configuration, RuntimeContext
 from ktoolbox.failures import FailureCode, FailureStage, TaskExecutionError, failure_report, generic_failure
-from ktoolbox.project_config import CreatorReference
+from ktoolbox.project_config import (
+    CreatorReference,
+    ProjectConfigStore,
+    ProjectConfiguration,
+)
 from ktoolbox.reporting import ProgressReporter
 from ktoolbox.webui.app import create_app
 from ktoolbox.webui.auth import CSRF_HEADER
@@ -216,6 +220,39 @@ async def test_task_concurrency_duplicate_blocking_and_resume(tmp_path: Path) ->
         assert [item["status"] for item in attempts.json()] == ["completed", "paused"]
         events = await client.get(f"/api/v1/tasks/{first['id']}/events", params={"after": 0})
         assert any(item["data"].get("progress", {}).get("transferred_bytes") == 100 for item in events.json())
+
+
+@pytest.mark.asyncio
+async def test_task_output_uses_project_default_and_allows_external_override(tmp_path: Path) -> None:
+    executor = ControlledExecutor()
+    async with task_client(tmp_path, executor) as (client, headers):
+        store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+        store.save(ProjectConfiguration(default_output=Path("../shared-downloads")))
+
+        inherited_payload = task_payload("inherited")
+        inherited_spec = inherited_payload["spec"]
+        assert isinstance(inherited_spec, dict)
+        inherited_spec.pop("output")
+        inherited = await client.post("/api/v1/tasks", json=inherited_payload, headers=headers)
+
+        external_output = tmp_path.parent / "manual-downloads"
+        explicit = await client.post(
+            "/api/v1/tasks",
+            json=task_payload("explicit", output=str(external_output)),
+            headers=headers,
+        )
+
+        assert inherited.status_code == 201
+        assert Path(inherited.json()["spec"]["output"]) == tmp_path.parent / "shared-downloads"
+        assert explicit.status_code == 201
+        assert Path(explicit.json()["spec"]["output"]) == external_output
+
+        await wait_for_status(client, inherited.json()["id"], TaskStatus.running)
+        await wait_for_status(client, explicit.json()["id"], TaskStatus.running)
+        await release_executor(executor, inherited.json()["id"])
+        await release_executor(executor, explicit.json()["id"])
+        await wait_for_status(client, inherited.json()["id"], TaskStatus.completed)
+        await wait_for_status(client, explicit.json()["id"], TaskStatus.completed)
 
 
 @pytest.mark.asyncio
@@ -487,13 +524,6 @@ async def test_task_event_views_filter_before_applying_the_limit(tmp_path: Path)
 async def test_task_output_safety_stop_and_cleanup(tmp_path: Path) -> None:
     executor = ControlledExecutor()
     async with task_client(tmp_path, executor, concurrency=1) as (client, headers):
-        outside = await client.post(
-            "/api/v1/tasks",
-            json=task_payload("outside", output="../outside"),
-            headers=headers,
-        )
-        assert outside.status_code == 422
-
         task = (await client.post("/api/v1/tasks", json=task_payload("stop"), headers=headers)).json()
         await wait_for_status(client, task["id"], TaskStatus.running)
         stopped = await client.post(f"/api/v1/tasks/{task['id']}/stop", headers=headers)

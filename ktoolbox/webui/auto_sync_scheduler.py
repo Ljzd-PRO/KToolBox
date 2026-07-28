@@ -7,7 +7,12 @@ from datetime import datetime, time, timedelta, timezone
 
 from ktoolbox.automatic_sync import next_automatic_sync_time
 from ktoolbox.configuration import RuntimeContext
-from ktoolbox.project_config import AutomaticSyncPlan, CreatorReference, ProjectConfigStore
+from ktoolbox.project_config import (
+    AutomaticSyncPlan,
+    CreatorReference,
+    ProjectConfigStore,
+    resolve_project_output,
+)
 from ktoolbox.webui.auto_sync_models import AutomaticSyncRunTrigger
 from ktoolbox.webui.auto_sync_store import AutomaticSyncStore
 from ktoolbox.webui.database import utc_now
@@ -183,9 +188,11 @@ class AutoSyncScheduler:
             run_id=run.id,
             windows=windows,
         )
-        output = plan.options.output.expanduser()
-        if not output.is_absolute():
-            output = self.context.project_root / output
+        output = resolve_project_output(
+            self.context.project_root,
+            project,
+            plan.options.output,
+        )
         spec = SyncTaskSpec(
             creators=creators,
             output=output,

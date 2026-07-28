@@ -3127,10 +3127,11 @@ components:
     AutomaticSyncOptions:
       properties:
         output:
-          type: string
-          format: path
+          anyOf:
+          - type: string
+            format: path
+          - type: 'null'
           title: Output
-          default: .
         save_creator_indices:
           type: boolean
           title: Save Creator Indices
@@ -3746,6 +3747,7 @@ components:
           type: string
           format: path
           title: Output
+          description: Optional task output override. Omit it to use the project default output directory.
           default: .
         dump_post_data:
           type: boolean
@@ -4767,9 +4769,14 @@ components:
       properties:
         schema_version:
           type: integer
-          const: 4
+          const: 5
           title: Schema Version
-          default: 4
+          default: 5
+        default_output:
+          type: string
+          format: path
+          title: Default Output
+          default: downloads
         creators:
           items:
             $ref: '#/components/schemas/CreatorReference'
@@ -4909,6 +4916,14 @@ components:
           type: string
           format: path
           title: Project Config
+        default_output:
+          type: string
+          format: path
+          title: Default Output
+        resolved_default_output:
+          type: string
+          format: path
+          title: Resolved Default Output
         dotenv_files:
           items:
             type: string
@@ -4923,6 +4938,8 @@ components:
       - name
       - root
       - project_config
+      - default_output
+      - resolved_default_output
       - dotenv_files
       - version
       title: ProjectSummaryResponse
@@ -5169,6 +5186,7 @@ components:
           type: string
           format: path
           title: Output
+          description: Optional task output override. Omit it to use the project default output directory.
           default: .
         save_creator_indices:
           type: boolean

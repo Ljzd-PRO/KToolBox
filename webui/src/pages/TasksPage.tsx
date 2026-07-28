@@ -90,6 +90,7 @@ import type {
   TaskRecord,
   TaskSpec,
   TaskStatus,
+  ProjectSummary,
 } from "../types";
 
 const pausable = new Set<TaskStatus>(["queued", "blocked", "running"]);
@@ -119,6 +120,10 @@ export function TasksPage() {
   const queryClient = useQueryClient();
   const tasksQuery = useQuery({ queryKey: ["tasks"], queryFn: () => api<TaskRecord[]>("/tasks") });
   const creatorsQuery = useQuery({ queryKey: ["creators"], queryFn: () => api<CreatorRosterItem[]>("/creators") });
+  const projectQuery = useQuery({
+    queryKey: ["project"],
+    queryFn: () => api<ProjectSummary>("/project"),
+  });
   const [editor, setEditor] = useState<TaskRecord | "new" | null>(() =>
     searchParams.get("create") === "sync" ? "new" : null,
   );
@@ -153,7 +158,7 @@ export function TasksPage() {
     enabled: Boolean(taskId),
   });
 
-  if (tasksQuery.isLoading || creatorsQuery.isLoading) return <PageLoading />;
+  if (tasksQuery.isLoading || creatorsQuery.isLoading || projectQuery.isLoading) return <PageLoading />;
   const tasks = tasksQuery.data ?? [];
   const selected = taskId ? tasks.find((task) => task.id === taskId) : undefined;
 
@@ -315,6 +320,7 @@ export function TasksPage() {
       {editor ? (
         <TaskEditor
           creators={creatorsQuery.data ?? []}
+          defaultOutput={projectQuery.data?.resolved_default_output ?? "downloads"}
           key={editor === "new" ? "new" : `${editor.id}-${editor.revision}`}
           saving={saving}
           task={editor === "new" ? undefined : editor}

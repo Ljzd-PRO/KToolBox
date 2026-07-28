@@ -697,7 +697,7 @@ export const zhCN = {
       "revision_not_found": "找不到指定的修订版本。",
       "task_not_found": "找不到此任务，它可能已被删除。",
       "invalid_event_id": "任务事件位置无效，请重新连接活动日志。",
-      "task_output_invalid": "任务输出必须位于项目目录内。",
+      "task_output_invalid": "无法解析任务输出目录。",
       "no_enabled_creators": "当前没有可用于同步的已启用作者。",
       "post_identity_invalid": "请输入有效的 Pawchive 作品 URL，或完整填写平台、作者 ID 和作品 ID。",
       "date_range_invalid": "起始日期不能晚于结束日期。",

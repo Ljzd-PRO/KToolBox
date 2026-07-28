@@ -12,7 +12,11 @@ from ktoolbox.api.errors import PawchiveError
 from ktoolbox.api.generated import CreatorSummary, Post
 from ktoolbox.cli_app import app, run_cli, stderr, stdout
 from ktoolbox.job.stream import DownloadSummary
-from ktoolbox.project_config import CreatorReference
+from ktoolbox.project_config import (
+    CreatorReference,
+    ProjectConfigStore,
+    ProjectConfiguration,
+)
 from ktoolbox.reporting import NullProgressReporter
 from ktoolbox.sync import CreatorSyncResult, SyncSummary
 
@@ -73,17 +77,44 @@ def test_webui_hash_password_command(capsys) -> None:
     assert "$argon2id$example" in capsys.readouterr().out
 
 
-def test_download_uses_friendly_option_names() -> None:
+def test_download_uses_friendly_option_names(tmp_path: Path) -> None:
+    config = tmp_path / "ktoolbox.toml"
+    ProjectConfigStore(config).save(ProjectConfiguration())
     with patch("ktoolbox.cli_app.KToolBoxCli.download_post", new=AsyncMock(return_value=None)) as download:
         assert (
-            app(
-                ["download", "https://pawchive.pw/fanbox/user/1/post/2", "--output", "downloads"],
-                result_action="return_int_as_exit_code_else_zero",
+            run_cli(
+                [
+                    "--config",
+                    str(config),
+                    "download",
+                    "https://pawchive.pw/fanbox/user/1/post/2",
+                    "--output",
+                    "downloads",
+                ]
             )
             == 0
         )
     download.assert_awaited_once()
-    assert str(download.await_args.kwargs["path"]) == "downloads"
+    assert download.await_args.kwargs["path"] == tmp_path / "downloads"
+
+
+def test_download_inherits_project_default_output(tmp_path: Path) -> None:
+    config = tmp_path / "ktoolbox.toml"
+    ProjectConfigStore(config).save(ProjectConfiguration(default_output=Path("../shared")))
+    with patch("ktoolbox.cli_app.KToolBoxCli.download_post", new=AsyncMock(return_value=None)) as download:
+        assert (
+            run_cli(
+                [
+                    "--config",
+                    str(config),
+                    "download",
+                    "https://pawchive.pw/fanbox/user/1/post/2",
+                ]
+            )
+            == 0
+        )
+
+    assert download.await_args.kwargs["path"] == tmp_path.parent / "shared"
 
 
 def test_legacy_download_alias_keeps_signature() -> None:

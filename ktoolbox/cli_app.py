@@ -26,6 +26,7 @@ from ktoolbox.project_config import (
     ProjectConfigError,
     ProjectConfigStore,
     parse_creator_reference,
+    resolve_project_output,
 )
 from ktoolbox.reporting import ProgressReporter, create_progress_reporter
 from ktoolbox.sync import SyncCoordinator, SyncOptions, SyncSummary, resolve_sync_targets
@@ -132,7 +133,7 @@ async def download(
     creator_id: str | None = None,
     post_id: str | None = None,
     revision_id: str | None = None,
-    output: Annotated[Path, Parameter(name=("--output", "-o", "--path"))] = Path("."),
+    output: Annotated[Path | None, Parameter(name=("--output", "-o", "--path"))] = None,
     dump_post_data: bool = True,
 ) -> int:
     """Download one post or revision."""
@@ -143,7 +144,9 @@ async def download(
             code=2,
         )
     try:
-        naming = _project_store(None).load().naming
+        store = _project_store(None)
+        project = store.load()
+        project_root = store.path.expanduser().resolve().parent
     except ProjectConfigError as error:
         return _project_error(error)
     result = await KToolBoxCli.download_post(
@@ -152,9 +155,9 @@ async def download(
         creator_id=creator_id,
         post_id=post_id,
         revision_id=revision_id,
-        path=output,
+        path=resolve_project_output(project_root, project, output),
         dump_post_data=dump_post_data,
-        naming=naming,
+        naming=project.naming,
         reporter=_progress_reporter(),
     )
     return _command_error("Download failed", result) if result else 0
@@ -165,7 +168,7 @@ async def sync(
     *creators: str,
     service: str | None = None,
     creator_id: str | None = None,
-    output: Annotated[Path, Parameter(name=("--output", "-o", "--path"))] = Path("."),
+    output: Annotated[Path | None, Parameter(name=("--output", "-o", "--path"))] = None,
     save_creator_indices: bool = False,
     mix_posts: bool | None = None,
     start_time: Annotated[str | None, Parameter(name=("--start-time", "--start"))] = None,
@@ -185,9 +188,10 @@ async def sync(
     store = _project_store(None)
     try:
         project = store.load()
+        project_root = store.path.expanduser().resolve().parent
         selected_creators = resolve_sync_targets(targets, project)
         options = SyncOptions(
-            output=output,
+            output=resolve_project_output(project_root, project, output),
             save_creator_indices=save_creator_indices,
             mix_posts=mix_posts,
             start_time=datetime.strptime(start_time, "%Y-%m-%d") if start_time else None,

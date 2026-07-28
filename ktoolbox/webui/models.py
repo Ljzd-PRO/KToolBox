@@ -26,6 +26,8 @@ class ProjectSummaryResponse(BaseModel):
     name: str
     root: Path
     project_config: Path
+    default_output: Path
+    resolved_default_output: Path
     dotenv_files: list[Path]
     version: str
 

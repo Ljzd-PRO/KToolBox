@@ -11,6 +11,7 @@ function renderEditor({ task, onSave = vi.fn(noopSave) }: { task?: TaskRecord; o
   render(
     <TaskEditor
       creators={[]}
+      defaultOutput="/project/downloads"
       saving={false}
       task={task}
       onClose={() => undefined}
@@ -45,7 +46,7 @@ describe("TaskEditor", () => {
       end_time: null,
       keywords: ["painting"],
       keywords_exclude: ["daily"],
-      output: "downloads",
+      output: "/project/downloads",
     }));
   });
 
@@ -95,7 +96,7 @@ describe("TaskEditor", () => {
       creator_id: "42",
       post_id: "99",
       revision_id: "3",
-      output: "downloads",
+      output: "/project/downloads",
       dump_post_data: true,
     });
   });
@@ -105,6 +106,7 @@ describe("TaskEditor", () => {
     const { unmount } = render(
       <TaskEditor
         creators={[]}
+        defaultOutput="/project/downloads"
         saving={false}
         onClose={() => undefined}
         onSave={noopSave}
