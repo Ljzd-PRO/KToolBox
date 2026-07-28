@@ -76,10 +76,10 @@ Le document de projet est distinct de la configuration d'environnement. Son chem
 
 | Champ | Type | Valeur par défaut | Description |
 | --- | --- | --- | --- |
-| `schema_version` | littéral `2` | `2` | Version du schéma ; les documents v1 sont mis à niveau en mémoire. |
+| `schema_version` | littéral `4` | `4` | Version du schéma ; les anciens documents sont mis à niveau lors de l’enregistrement. |
 | `creators` | tableau de tables | vide | Liste enregistrée des créateurs. |
 | `blockers` | tableau de tables | vide | Spécifications ordonnées des règles. |
-| `naming` | table | valeurs du projet | Racines, arborescence et modèles de fichiers. Consultez le [guide du nommage](../naming.md). |
+| `naming` | table | valeurs du projet | Arborescence et modèles de fichiers. Les anciens emplacements sont saisis uniquement dans l’outil de conversion. Consultez le [guide du nommage](../naming.md). |
 
 ### Entrée d'un créateur
 

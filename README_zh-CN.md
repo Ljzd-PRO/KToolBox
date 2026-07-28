@@ -125,7 +125,7 @@ ktoolbox webui /path/to/project
 
 “全局配置”页会按字段语义使用 Select 或 ComboBox，只对真正的位置字段提供路径选择器。已完成同步任务可在原任务记录上“重新运行”；删除确认展示可读目标与可展开的相对文件预览，不再暴露内部 UUID。“关于”页集中展示版本、许可证、运行环境与官方链接，URL 和监听地址统一使用行内代码样式。
 
-命名设置现为项目专属。“命名格式”页会校验模板、预览目录树、扫描真实下载根目录，并以原子启用和完整回滚的方式转换选中的作者。首次启动 WebUI 时会备份并迁移旧全局命名值。详见[命名格式指南](https://ktoolbox.readthedocs.io/latest/zh/naming/)。
+命名设置现为项目专属。“命名格式”页分别保存目录结构和命名模板；独立的“旧下载目录转换”标签页负责扫描旧位置并以完整回滚保护转换选中的作者。首次启动 WebUI 会迁移旧全局值，并要求选择忽略旧内容或检查转换。详见[命名格式指南](https://ktoolbox.readthedocs.io/latest/zh/naming/)。
 
 “自动同步”页支持创建多个 Cron 或固定间隔的作者同步计划，预览未来三次执行时间，暂停或立即执行，并按作者独立推进成功检查点。最近更新只汇总作者和新增作品数量，不加载标题或媒体。详见[自动同步指南](https://ktoolbox.readthedocs.io/latest/zh/automatic-sync/)。
 
@@ -159,10 +159,10 @@ KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
 
 配置 `KTOOLBOX_DOWNLOADER__SESSION_KEY` 后，它只会发送给文件下载请求；API 客户端永远不会发送账号会话。
 
-`.env` 控制运行时与传输行为；项目级 `ktoolbox.toml` 保存命名格式、下载根目录、作者清单与忽略规则：
+`.env` 控制运行时与传输行为；项目级 `ktoolbox.toml` 保存命名格式、作者清单、自动同步计划与忽略规则：
 
 ```toml
-schema_version = 2
+schema_version = 4
 
 [[creators]]
 service = "fanbox"

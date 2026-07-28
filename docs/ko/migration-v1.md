@@ -55,7 +55,7 @@ CLI 실패는 프로세스 상태를 사용합니다. `0`은 성공, `1`은 원�
 재사용 가능한 목록이나 구조화된 제외 규칙이 필요한 경우에만 `ktoolbox.toml`을 만드세요. 파일이 없는 상태는 유효한 빈 프로젝트입니다.
 
 ```toml
-schema_version = 2
+schema_version = 4
 
 [[creators]]
 service = "fanbox"
@@ -79,7 +79,7 @@ ktoolbox webui /path/to/project --host 127.0.0.1
 
 `.env`와 `prod.env`는 이제 버전 관리되는 예제가 아니라 무시되는 로컬 파일입니다. 자격 증명과 다운로더 세션은 여기에 보관하고 `example.env`를 공개 템플릿으로 사용하며, 업그레이드 전에 이전에 추적된 dotenv 파일을 점검하세요. WebUI는 `.ktoolbox/webui.sqlite3`와 프로젝트 잠금을 만들지만 둘 다 CLI 다운로드 출력 형식을 변경하지 않습니다.
 
-이름 템플릿과 다운로드 루트는 이제 프로젝트 Schema v2에 속합니다. WebUI를 처음 시작하면 `.env`와 `prod.env`를 백업하고 이전 이름 키를 `ktoolbox.toml`로 옮긴 뒤 제거하며 일회성 알림을 표시합니다. 기존 다운로드를 변환하기 전에 생성될 레이아웃을 확인하세요. 자세한 내용은 [이름 형식 가이드](naming.md)를 참조하세요.
+이름 템플릿은 프로젝트 Schema v4에 속하며, 이전 다운로드 위치는 이름 설정이 아니라 변환 도구에서만 사용합니다. WebUI를 처음 시작하면 `.env`와 `prod.env`를 백업하고 이전 이름 키를 `ktoolbox.toml`로 옮긴 뒤 제거하며 기존 콘텐츠를 무시할지 변환을 검토할지 선택합니다. 자세한 내용은 [이름 형식 가이드](naming.md)를 참조하세요.
 
 HTTP 배포 위험과 영구 작업 동작은 [WebUI 가이드](webui.md)를 참조하세요.
 

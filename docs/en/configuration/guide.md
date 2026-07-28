@@ -3,7 +3,7 @@
 KToolBox has two configuration layers:
 
 - `.env`, `prod.env`, and process variables control API, transfer, and global download behavior.
-- `ktoolbox.toml` stores project naming, download roots, the creator roster, and ordered post blockers.
+- `ktoolbox.toml` stores project naming, the creator roster, automatic-sync plans, and ordered post blockers.
 
 KToolBox reads `.env`, then `prod.env`, from the current working directory. Values from `prod.env` override matching values from `.env`, while process environment variables have the highest priority.
 
@@ -58,10 +58,10 @@ The project path resolves in this order: global `--config`, `KTOOLBOX_PROJECT_CO
 
 ## Creator roster
 
-Every project document starts with `schema_version = 2`. Schema v2 also stores project naming and download roots; see the [naming guide](../naming.md). Creators are unique by case-insensitive `service:id`; optional aliases are also unique.
+Every project document starts with `schema_version = 4`. Schema v4 stores project naming and automatic-sync plans; old download locations belong only to the naming conversion tool. See the [naming guide](../naming.md). Creators are unique by case-insensitive `service:id`; optional aliases are also unique.
 
 ```toml
-schema_version = 2
+schema_version = 4
 
 [[creators]]
 service = "fanbox"

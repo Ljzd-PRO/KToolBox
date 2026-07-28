@@ -47,7 +47,7 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 
 ## Les pièces jointes peuvent-elles être enregistrées directement dans le répertoire de la publication ?
 
-Non. Le Schema v2 exige un nom relatif sûr et non vide pour chaque chemin interne. Choisissez un sous-répertoire dans **Format de nommage** afin d'éviter les collisions avec le fichier principal ou les métadonnées.
+Non. Le Schema v4 exige un nom relatif sûr et non vide pour chaque chemin interne. Choisissez un sous-répertoire dans **Format de nommage** afin d'éviter les collisions avec le fichier principal ou les métadonnées.
 
 ## Comment éviter les noms de fichiers trop longs ?
 

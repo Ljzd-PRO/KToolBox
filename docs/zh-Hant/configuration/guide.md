@@ -3,7 +3,7 @@
 KToolBox 有兩層設定：
 
 - `.env`、`prod.env` 和處理程序變數控制 API、傳輸與全域下載行為。
-- `ktoolbox.toml` 儲存專案命名、下載根目錄、創作者清單和有順序的作品忽略規則。
+- `ktoolbox.toml` 儲存專案命名、創作者清單、自動同步計畫和有順序的作品忽略規則。
 
 KToolBox 會從目前工作目錄依序讀取 `.env` 和 `prod.env`。`prod.env` 的值會覆寫 `.env` 中相同的值，而處理程序環境變數具有最高優先權。
 
@@ -58,10 +58,10 @@ ktoolbox config validate
 
 ## 創作者清單
 
-每份專案文件都以 `schema_version = 2` 開頭。Schema v2 也儲存專案命名格式與下載根目錄，請參閱[命名格式指南](../naming.md)。創作者依不區分大小寫的 `service:id` 保持唯一；可選別名也必須唯一。
+每份專案文件都以 `schema_version = 4` 開頭。Schema v4 儲存專案命名格式與自動同步計畫；舊下載位置只屬於命名轉換工具。請參閱[命名格式指南](../naming.md)。創作者依不區分大小寫的 `service:id` 保持唯一；可選別名也必須唯一。
 
 ```toml
-schema_version = 2
+schema_version = 4
 
 [[creators]]
 service = "fanbox"

@@ -125,7 +125,7 @@ Task rows preserve readable post titles and creator names in an offline presenta
 
 The **Global configuration** page uses typed Select and ComboBox controls while reserving filesystem pickers for real locations. Completed synchronization tasks offer **Rerun** on the same task record; cleanup confirmation shows a readable target and expandable relative-file preview instead of an internal UUID. The **About** page collects version, license, runtime, and official links, with URLs and listener addresses rendered as inline code.
 
-Naming is project-specific. The **Naming format** page validates templates, previews the resulting directory tree, scans the actual download roots, and can move selected creators with atomic activation and rollback. Legacy global naming values are backed up and migrated on the first WebUI start. See the [naming guide](https://ktoolbox.readthedocs.io/latest/naming/).
+Naming is project-specific. The **Naming format** page saves directory structure and templates independently. Its separate **Legacy download conversion** tab scans old locations and can move selected creators with rollback. The first WebUI start migrates legacy global values and asks whether to ignore old content or review a conversion. See the [naming guide](https://ktoolbox.readthedocs.io/latest/naming/).
 
 The **Automatic sync** page runs multiple creator synchronization plans with Cron or fixed intervals. It previews the next three executions, supports pausing and immediate runs, advances checkpoints independently for successful creators, and summarizes recently discovered works without loading titles or media. See the [automatic synchronization guide](https://ktoolbox.readthedocs.io/latest/automatic-sync/).
 
@@ -159,10 +159,10 @@ KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
 
 `KTOOLBOX_DOWNLOADER__SESSION_KEY`, if set, is sent only to file downloads. The API client never sends an account session.
 
-`.env` controls runtime and transfer behavior. A project-level `ktoolbox.toml` stores naming, download roots, the creator roster, and blockers:
+`.env` controls runtime and transfer behavior. A project-level `ktoolbox.toml` stores naming, the creator roster, automatic-sync plans, and blockers:
 
 ```toml
-schema_version = 2
+schema_version = 4
 
 [[creators]]
 service = "fanbox"

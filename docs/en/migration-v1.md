@@ -55,7 +55,7 @@ CLI failures now use process status: `0` success, `1` remote/creator/download fa
 Create `ktoolbox.toml` only when you need a reusable roster or structured blockers. A missing file is a valid empty project.
 
 ```toml
-schema_version = 2
+schema_version = 4
 
 [[creators]]
 service = "fanbox"
@@ -79,7 +79,7 @@ ktoolbox webui /path/to/project --host 127.0.0.1
 
 `.env` and `prod.env` are now ignored local files rather than version-controlled examples. Keep credentials and downloader sessions there, use `example.env` as the public template, and audit any older tracked dotenv file before upgrading. The WebUI creates `.ktoolbox/webui.sqlite3` and a project lock; neither changes CLI download output formats.
 
-Naming templates and download roots now belong to the project Schema v2. The first WebUI start backs up `.env` and `prod.env`, migrates any legacy naming keys into `ktoolbox.toml`, removes those keys, and displays a one-time notice. Review the generated layout before converting existing downloads; see the [naming guide](naming.md).
+Naming templates now belong to project Schema v4; old download locations are kept outside naming configuration for the conversion tool only. The first WebUI start backs up `.env` and `prod.env`, migrates legacy naming keys into `ktoolbox.toml`, removes those keys, and requires a choice to ignore old content or review a conversion. See the [naming guide](naming.md).
 
 See the [WebUI guide](webui.md) for HTTP deployment risks and persistent task semantics.
 

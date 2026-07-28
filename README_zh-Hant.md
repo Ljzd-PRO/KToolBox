@@ -125,7 +125,7 @@ ktoolbox webui /path/to/project
 
 「全域設定」頁會依欄位語意使用 Select 或 ComboBox，只對真正的位置欄位提供路徑選擇器。已完成同步工作可沿用原記錄「重新執行」；刪除確認顯示可讀目標與可展開的相對檔案預覽，不再揭露內部 UUID。「關於」頁集中顯示版本、授權、執行環境及官方連結，URL 與監聽位址統一使用行內程式碼樣式。
 
-命名設定現在屬於個別專案。「命名格式」頁會驗證範本、預覽目錄樹、掃描實際下載根目錄，並以原子啟用與完整復原方式轉換選取的創作者。首次啟動 WebUI 時會備份並遷移舊全域命名值。請參閱[命名格式指南](https://ktoolbox.readthedocs.io/latest/zh-Hant/naming/)。
+命名設定現在屬於個別專案。「命名格式」頁分別儲存目錄結構與命名範本；獨立的「舊下載目錄轉換」分頁負責掃描舊位置，並以完整復原保護轉換選取的創作者。首次啟動 WebUI 會遷移舊全域值，並要求選擇忽略舊內容或檢查轉換。請參閱[命名格式指南](https://ktoolbox.readthedocs.io/latest/zh-Hant/naming/)。
 
 「自動同步」頁可建立多個 Cron 或固定間隔的作者同步計畫，預覽未來三次執行時間、暫停或立即執行，並依作者獨立推進成功檢查點。最近更新只彙總作者與新增作品數量，不載入標題或媒體。請參閱[自動同步指南](https://ktoolbox.readthedocs.io/latest/zh-Hant/automatic-sync/)。
 
@@ -157,10 +157,10 @@ KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
 
 如果設定了 `KTOOLBOX_DOWNLOADER__SESSION_KEY`，它只會傳送給檔案下載請求；API 用戶端永遠不會傳送帳號工作階段。
 
-`.env` 控制執行環境與傳輸行為；專案層級的 `ktoolbox.toml` 儲存命名格式、下載根目錄、創作者清單與忽略規則：
+`.env` 控制執行環境與傳輸行為；專案層級的 `ktoolbox.toml` 儲存命名格式、創作者清單、自動同步計畫與忽略規則：
 
 ```toml
-schema_version = 2
+schema_version = 4
 
 [[creators]]
 service = "fanbox"

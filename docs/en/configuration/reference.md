@@ -76,10 +76,10 @@ The project document is separate from environment configuration. Its path resolv
 
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
-| `schema_version` | literal `2` | `2` | Project schema version; v1 documents upgrade in memory. |
+| `schema_version` | literal `4` | `4` | Project schema version; older documents upgrade when saved. |
 | `creators` | table array | empty | Saved creator roster. |
 | `blockers` | table array | empty | Ordered blocker specifications. |
-| `naming` | table | project defaults | Download roots, directory layout, and filename templates. See the [naming guide](../naming.md). |
+| `naming` | table | project defaults | Directory layout and filename templates. Old locations are entered only in the conversion tool. See the [naming guide](../naming.md). |
 
 ### Creator entry
 

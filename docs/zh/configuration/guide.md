@@ -3,7 +3,7 @@
 KToolBox 使用两层配置：
 
 - `.env`、`prod.env` 与进程变量控制 API、传输及全局下载行为。
-- `ktoolbox.toml` 保存项目命名、下载根目录、作者清单与有序作品忽略规则。
+- `ktoolbox.toml` 保存项目命名、作者清单、自动同步计划与有序作品忽略规则。
 
 KToolBox 会从当前工作目录先读取 `.env`，再读取 `prod.env`。`prod.env` 中的同名值会覆盖 `.env`，进程环境变量优先级最高。
 
@@ -58,10 +58,10 @@ ktoolbox config validate
 
 ## 作者清单
 
-每份项目文档都以 `schema_version = 2` 开始。Schema v2 还保存项目命名格式与下载根目录，详见[命名格式指南](../naming.md)。作者按不区分大小写的 `service:id` 唯一，可选别名也必须唯一。
+每份项目文档都以 `schema_version = 4` 开始。Schema v4 保存项目命名格式与自动同步计划；旧下载位置仅属于命名转换工具。详见[命名格式指南](../naming.md)。作者按不区分大小写的 `service:id` 唯一，可选别名也必须唯一。
 
 ```toml
-schema_version = 2
+schema_version = 4
 
 [[creators]]
 service = "fanbox"

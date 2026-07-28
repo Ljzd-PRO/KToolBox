@@ -3,7 +3,7 @@
 KToolBox에는 두 가지 설정 계층이 있습니다.
 
 - `.env`, `prod.env` 및 프로세스 변수는 API, 전송 및 전역 다운로드 동작을 제어합니다.
-- `ktoolbox.toml`은 프로젝트 이름 형식, 다운로드 루트, 크리에이터 목록과 순서가 있는 게시물 제외 규칙을 저장합니다.
+- `ktoolbox.toml`은 프로젝트 이름 형식, 크리에이터 목록, 자동 동기화 계획과 순서가 있는 게시물 제외 규칙을 저장합니다.
 
 KToolBox는 현재 작업 디렉터리에서 `.env`, 그다음 `prod.env`를 읽습니다. `prod.env` 값은 `.env`의 일치하는 값을 재정의하고 프로세스 환경 변수의 우선순위가 가장 높습니다.
 
@@ -58,10 +58,10 @@ ktoolbox config validate
 
 ## 크리에이터 목록
 
-모든 프로젝트 문서는 `schema_version = 2`로 시작합니다. Schema v2는 프로젝트 이름 형식과 다운로드 루트도 저장합니다. [이름 형식 가이드](../naming.md)를 참조하세요. 크리에이터는 대소문자를 구분하지 않는 `service:id`로 고유하며 선택적 별칭도 고유합니다.
+모든 프로젝트 문서는 `schema_version = 4`로 시작합니다. Schema v4는 프로젝트 이름 형식과 자동 동기화 계획을 저장하며, 이전 다운로드 위치는 이름 변환 도구에서만 사용합니다. [이름 형식 가이드](../naming.md)를 참조하세요. 크리에이터는 대소문자를 구분하지 않는 `service:id`로 고유하며 선택적 별칭도 고유합니다.
 
 ```toml
-schema_version = 2
+schema_version = 4
 
 [[creators]]
 service = "fanbox"

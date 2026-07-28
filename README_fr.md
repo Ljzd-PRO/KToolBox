@@ -125,7 +125,7 @@ Les lignes de tâches conservent des titres de publication et des noms de créat
 
 La configuration globale utilise Select ou ComboBox selon la sémantique du champ et réserve le sélecteur de chemin aux véritables emplacements. Une synchronisation terminée peut être relancée sur le même enregistrement ; la confirmation de suppression montre une cible lisible et une liste extensible de chemins relatifs plutôt qu'un UUID interne. La page À propos regroupe version, licence, environnement et liens officiels, avec les URL et adresses d'écoute en code intégré.
 
-Le nommage est propre à chaque projet. La page **Format de nommage** valide les modèles, prévisualise l'arborescence, analyse les véritables racines de téléchargement et peut convertir les créateurs sélectionnés avec activation atomique et restauration complète. Les anciennes valeurs globales sont sauvegardées puis migrées au premier démarrage de la WebUI. Consultez le [guide du nommage](https://ktoolbox.readthedocs.io/latest/fr/naming/).
+Le nommage est propre à chaque projet. La page **Format de nommage** enregistre séparément la structure et les modèles. Son onglet de conversion des anciens téléchargements analyse les anciens emplacements et convertit les créateurs choisis avec restauration complète. Au premier démarrage, la WebUI migre les anciennes valeurs globales et demande d’ignorer l’ancien contenu ou de vérifier une conversion. Consultez le [guide du nommage](https://ktoolbox.readthedocs.io/latest/fr/naming/).
 
 La page **Synchronisation automatique** gère plusieurs plans Cron ou à intervalle fixe, prévisualise les trois prochaines exécutions et permet la pause ou l'exécution immédiate. Les points de contrôle avancent par créateur et les mises à jour récentes ne chargent ni titres ni médias. Consultez le [guide de synchronisation automatique](https://ktoolbox.readthedocs.io/latest/fr/automatic-sync/).
 
@@ -157,10 +157,10 @@ KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
 
 Si `KTOOLBOX_DOWNLOADER__SESSION_KEY` est défini, il n'est envoyé que lors du téléchargement des fichiers. Le client API n'envoie jamais la session d'un compte.
 
-Le fichier `.env` contrôle l'exécution et les transferts. Le fichier de projet `ktoolbox.toml` contient le nommage, les racines de téléchargement, la liste des créateurs et les règles d'exclusion :
+Le fichier `.env` contrôle l'exécution et les transferts. Le fichier de projet `ktoolbox.toml` contient le nommage, la liste des créateurs, les plans de synchronisation automatique et les règles d'exclusion :
 
 ```toml
-schema_version = 2
+schema_version = 4
 
 [[creators]]
 service = "fanbox"

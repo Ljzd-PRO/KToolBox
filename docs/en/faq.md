@@ -47,7 +47,7 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 
 ## Can attachments be stored directly in the post directory?
 
-No. Project Schema v2 requires every internal path to be a safe, non-empty relative name. Use **Naming format** to choose an attachment subdirectory; this prevents attachments from colliding with the primary file or metadata.
+No. Project Schema v4 requires every internal path to be a safe, non-empty relative name. Use **Naming format** to choose an attachment subdirectory; this prevents attachments from colliding with the primary file or metadata.
 
 ## How do I avoid long filenames?
 

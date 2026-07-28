@@ -3,7 +3,7 @@
 KToolBox possède deux niveaux de configuration :
 
 - `.env`, `prod.env` et les variables du processus contrôlent l'API, les transferts et le comportement global des téléchargements.
-- `ktoolbox.toml` conserve le nommage, les racines, la liste des créateurs et les règles ordonnées d'exclusion du projet.
+- `ktoolbox.toml` conserve le nommage, la liste des créateurs, les plans de synchronisation automatique et les règles ordonnées d'exclusion du projet.
 
 KToolBox lit `.env`, puis `prod.env`, depuis le répertoire de travail actuel. Les valeurs de `prod.env` remplacent les valeurs correspondantes de `.env`, tandis que les variables d'environnement du processus ont la priorité la plus élevée.
 
@@ -58,10 +58,10 @@ Le chemin du projet est résolu dans l'ordre suivant : l'option globale `--confi
 
 ## Liste des créateurs
 
-Chaque document de projet commence par `schema_version = 2`. Le Schema v2 stocke aussi le nommage et les racines du projet ; consultez le [guide du nommage](../naming.md). Les créateurs sont uniques par `service:id` sans distinction de casse ; les alias facultatifs sont également uniques.
+Chaque document de projet commence par `schema_version = 4`. Le Schema v4 stocke le nommage et les plans de synchronisation automatique ; les anciens emplacements servent uniquement à l’outil de conversion. Consultez le [guide du nommage](../naming.md). Les créateurs sont uniques par `service:id` sans distinction de casse ; les alias facultatifs sont également uniques.
 
 ```toml
-schema_version = 2
+schema_version = 4
 
 [[creators]]
 service = "fanbox"
