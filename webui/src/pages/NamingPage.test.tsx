@@ -184,6 +184,10 @@ describe("Naming format page", () => {
     expect(screen.queryByRole("heading", { name: "Conversion history" })).not.toBeInTheDocument();
     await user.click(screen.getByRole("tab", { name: /Conversion history/ }));
     expect(screen.getByRole("heading", { name: "Conversion history" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /Conversion history/ })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
     await user.click(screen.getByRole("tab", { name: /Legacy download conversion/ }));
     const rootInput = screen.getByRole("textbox", { name: "Old location 1" });
     await user.clear(rootInput);
@@ -222,6 +226,7 @@ describe("Naming format page", () => {
     window.history.replaceState({}, "", "/naming");
     const updates: Array<Record<string, unknown>> = [];
     const ignoredLayouts = new Set<string>();
+    let previewRequests = 0;
     let currentNaming = structuredClone(naming);
     let currentDefaultOutput = "downloads";
     let revision = "revision-1";
@@ -263,6 +268,10 @@ describe("Naming format page", () => {
           );
         }
         if (path.endsWith("/naming/conversions")) return json([]);
+        if (path.endsWith("/naming/preview")) {
+          previewRequests += 1;
+          return json(preview);
+        }
         if (path.endsWith("/naming/legacy-context")) {
           return json({ roots: [], conversion_pending: false });
         }
@@ -316,8 +325,12 @@ describe("Naming format page", () => {
       default_output: "archive",
     });
     expect(await screen.findByRole("heading", { name: "Review existing downloads" })).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Ignore" }));
-    await waitFor(() => expect(ignoredLayouts.has("layout-1")).toBe(true));
+    await user.click(screen.getByRole("button", { name: "Review conversion" }));
+    expect(screen.getByRole("tab", { name: /Legacy download conversion/ })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(previewRequests).toBe(0);
 
     await user.click(screen.getByRole("tab", { name: /Naming templates/ }));
     const creatorTemplate = screen.getByRole("textbox", {

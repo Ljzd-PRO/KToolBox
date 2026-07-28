@@ -243,7 +243,7 @@ export function StartupNoticeCenter() {
         if (!nextOpen) closeForNow();
       }}
     >
-      <div className="grid gap-5">
+      <div className="grid min-w-0 gap-5">
         <MigrationSteps phase={phase} />
         {phase === "fields" ? (
           <FieldSelection
@@ -274,7 +274,10 @@ function MigrationSteps({ phase }: { phase: MigrationPhase }) {
   const { t } = useTranslation();
   const current = { fields: 1, review: 2, directories: 3, preview: 4 }[phase];
   return (
-    <ol className="grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label={t("naming.migration.progress")}>
+    <ol
+      className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:grid-cols-4"
+      aria-label={t("naming.migration.progress")}
+    >
       {[
         t("naming.migration.configStep"),
         t("naming.migration.reviewStep"),
@@ -339,7 +342,7 @@ function FieldSelection({
             <h3 className="font-semibold text-foreground">{t("naming.migration.fieldsTitle")}</h3>
             <p className="mt-1 text-sm text-muted">{t("naming.migration.fieldsBody")}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="grid w-full grid-cols-1 gap-2 min-[380px]:grid-cols-2 sm:flex sm:w-auto">
             <Button size="sm" variant="ghost" onPress={() => onChange(new Set())}>
               {t("naming.migration.clearSelection")}
             </Button>

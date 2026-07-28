@@ -46,7 +46,7 @@ import {
   IconUsers as Users,
   IconX as X,
 } from "@tabler/icons-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 
@@ -257,6 +257,9 @@ export function NamingPage() {
   const { t, i18n } = useTranslation();
   const { session } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedTab, setSelectedTabState] = useState(() =>
+    namingTabFromSearchParams(searchParams),
+  );
   const realtime = useRealtime(false);
   const queryClient = useQueryClient();
   const namingQuery = useQuery({
@@ -341,6 +344,16 @@ export function NamingPage() {
     return () => window.clearTimeout(timer);
   }, [legacyContextQuery.data, legacyRoots]);
 
+  useEffect(() => {
+    const syncFromHistory = () => {
+      setSelectedTabState(
+        namingTabFromSearchParams(new URLSearchParams(window.location.search)),
+      );
+    };
+    window.addEventListener("popstate", syncFromHistory);
+    return () => window.removeEventListener("popstate", syncFromHistory);
+  }, []);
+
   const templateProblems = useMemo(() => {
     if (!draft) return [];
     return [
@@ -422,6 +435,9 @@ export function NamingPage() {
       (section === "structure" ? hasStructureErrors : hasTemplateErrors)
     ) return;
     const candidate = draft;
+    const layoutChanged = section === "structure"
+      ? structureKey(candidate) !== structureBaseline
+      : templateKey(candidate) !== templateBaseline;
     setSavingSection(section);
     try {
       const result = await api<NamingConfigurationResponse>("/naming", {
@@ -447,8 +463,12 @@ export function NamingPage() {
         queryClient.invalidateQueries({ queryKey: ["naming-legacy-context"] }),
         queryClient.invalidateQueries({ queryKey: ["startup-notices"] }),
       ]);
-      toast.success(t("naming.saved"), {
-        description: t("naming.savedConversionHint"),
+      toast.success(t(layoutChanged ? "naming.saved" : "naming.defaultOutputSaved"), {
+        description: t(
+          layoutChanged
+            ? "naming.savedConversionHint"
+            : "naming.defaultOutputSavedHint",
+        ),
       });
     } catch (error) {
       toast.danger(t("common.error"), { description: namingErrorText(error, t) });
@@ -510,12 +530,8 @@ export function NamingPage() {
     }
   }
 
-  const requestedTab = searchParams.get("tab");
-  const selectedTab = requestedTab === "legacy" || requestedTab === "templates" || requestedTab === "history"
-    ? requestedTab
-    : "structure";
-
   function setSelectedTab(tab: string) {
+    setSelectedTabState(tab as NamingTab);
     const next = new URLSearchParams(searchParams);
     if (tab === "structure") next.delete("tab");
     else next.set("tab", tab);
@@ -523,13 +539,11 @@ export function NamingPage() {
   }
 
   function startAutomaticScan() {
+    setSelectedTabState("legacy");
     const next = new URLSearchParams(searchParams);
     next.delete("autostart");
     next.set("tab", "legacy");
     setSearchParams(next, { replace: true });
-    if (legacyRoots && legacyRoots.length > 0 && !rootProblems.some(Boolean)) {
-      void scanPreview();
-    }
   }
 
   async function cancelConversion(conversion: NamingConversion) {
@@ -605,9 +619,6 @@ export function NamingPage() {
 
   return (
     <div className="grid min-w-0 gap-5">
-      {searchParams.get("autostart") === "1" ? (
-        <AutoScanTrigger onTrigger={startAutomaticScan} />
-      ) : null}
       <PageHeader
         showDescription
         description={t("naming.description")}
@@ -1190,14 +1201,13 @@ export function NamingPage() {
   );
 }
 
-function AutoScanTrigger({ onTrigger }: { onTrigger: () => void }) {
-  const fired = useRef(false);
-  useEffect(() => {
-    if (fired.current) return;
-    fired.current = true;
-    onTrigger();
-  }, [onTrigger]);
-  return null;
+type NamingTab = "structure" | "templates" | "legacy" | "history";
+
+function namingTabFromSearchParams(searchParams: URLSearchParams): NamingTab {
+  const tab = searchParams.get("tab");
+  return tab === "legacy" || tab === "templates" || tab === "history"
+    ? tab
+    : "structure";
 }
 
 function SectionHeading({
