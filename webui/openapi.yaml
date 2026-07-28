@@ -4648,6 +4648,14 @@ components:
       title: NamingApplyRequest
     NamingConfigurationResponse:
       properties:
+        default_output:
+          type: string
+          format: path
+          title: Default Output
+        resolved_default_output:
+          type: string
+          format: path
+          title: Resolved Default Output
         naming:
           $ref: '#/components/schemas/ProjectNamingConfiguration'
         revision:
@@ -4659,6 +4667,8 @@ components:
           default: false
       type: object
       required:
+      - default_output
+      - resolved_default_output
       - naming
       - revision
       title: NamingConfigurationResponse
@@ -4878,6 +4888,12 @@ components:
         revision:
           type: string
           title: Revision
+        default_output:
+          anyOf:
+          - type: string
+            format: path
+          - type: 'null'
+          title: Default Output
       type: object
       required:
       - section

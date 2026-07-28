@@ -153,6 +153,8 @@ class NamingConversionService:
     async def configuration(self) -> NamingConfigurationResponse:
         project = self.project_store.load()
         return NamingConfigurationResponse(
+            default_output=project.default_output,
+            resolved_default_output=resolve_project_output(self.project_root, project),
             naming=project.naming,
             revision=content_revision(self.project_store.load_text()),
             conversion_pending=await self.has_pending_layout(),
@@ -233,6 +235,8 @@ class NamingConversionService:
         section: NamingSection,
         candidate: ProjectNamingConfiguration,
         revision: str,
+        *,
+        default_output: Path | None = None,
     ) -> NamingConfigurationResponse:
         async with self._apply_lock:
             current_revision = content_revision(self.project_store.load_text())
@@ -241,16 +245,37 @@ class NamingConversionService:
             project = self.project_store.load()
             previous = project.naming
             merged = _merge_naming_section(previous, candidate, section)
-            if merged != previous:
+            naming_changed = merged != previous
+            output_changed = (
+                section == "structure"
+                and default_output is not None
+                and default_output != project.default_output
+            )
+            if naming_changed or output_changed:
                 project.naming = merged
+                if output_changed:
+                    assert default_output is not None
+                    project.default_output = default_output
                 await anyio.to_thread.run_sync(self.project_store.save, project)
-                await self._record_layout_change(previous, merged)
+                if naming_changed:
+                    await self._record_layout_change(previous, merged)
                 await self.events.publish(
                     "naming.changed",
-                    {"section": section, "conversion_pending": True},
+                    {
+                        "section": section,
+                        "conversion_pending": naming_changed,
+                        "default_output_changed": output_changed,
+                    },
                     resource="naming",
                     resource_id=section,
                 )
+                if output_changed:
+                    await self.events.publish(
+                        "configuration.changed",
+                        {"documents": ["ktoolbox.toml"]},
+                        resource="configuration",
+                        resource_id="project-default-output",
+                    )
             return await self.configuration()
 
     async def has_pending_layout(self) -> bool:

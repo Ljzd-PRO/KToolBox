@@ -27,8 +27,10 @@ import {
   IconFiles as Files,
   IconFolder as Folder,
   IconFolderCog as FolderCog,
+  IconFolderDown as FolderOutput,
   IconFolderOpen as FolderOpen,
   IconFolderPlus as FolderPlus,
+  IconHistory as History,
   IconInfoCircle as InfoCircle,
   IconListNumbers as ListNumbers,
   IconPlayerPause as PlayerPause,
@@ -277,6 +279,8 @@ export function NamingPage() {
   const [baselineRevision, setBaselineRevision] = useState("");
   const [structureBaseline, setStructureBaseline] = useState("");
   const [templateBaseline, setTemplateBaseline] = useState("");
+  const [defaultOutput, setDefaultOutput] = useState("");
+  const [defaultOutputBaseline, setDefaultOutputBaseline] = useState("");
   const [legacyRoots, setLegacyRoots] = useState<string[] | null>(null);
   const [preview, setPreview] = useState<NamingPreview | null>(null);
   const [selectedCreators, setSelectedCreators] = useState<Set<string>>(new Set());
@@ -292,7 +296,12 @@ export function NamingPage() {
 
   const remoteNamingRevision = realtime?.revisions.naming ?? 0;
   const current = namingQuery.data;
-  const structureDirty = draft !== null && structureKey(draft) !== structureBaseline;
+  const structureDirty =
+    draft !== null &&
+    (
+      structureKey(draft) !== structureBaseline ||
+      defaultOutput !== defaultOutputBaseline
+    );
   const templatesDirty = draft !== null && templateKey(draft) !== templateBaseline;
   const dirty = structureDirty || templatesDirty;
   const externalChange =
@@ -315,6 +324,8 @@ export function NamingPage() {
         setBaselineRevision(current.revision);
         setStructureBaseline(structureKey(normalized));
         setTemplateBaseline(templateKey(normalized));
+        setDefaultOutput(current.default_output);
+        setDefaultOutputBaseline(current.default_output);
       }, 0);
       return () => window.clearTimeout(timer);
     }
@@ -360,6 +371,7 @@ export function NamingPage() {
   }, [legacyRoots]);
   const hasStructureErrors =
     pathProblems.length > 0 ||
+    !defaultOutput.trim() ||
     Boolean(draft?.group_by_month && !draft.group_by_year);
   const hasTemplateErrors = templateProblems.length > 0;
   const tree = useMemo(() => (draft ? sampleTree(draft) : []), [draft]);
@@ -418,13 +430,19 @@ export function NamingPage() {
           section,
           naming: candidate,
           revision: baselineRevision,
+          default_output: section === "structure" ? defaultOutput : undefined,
         },
         csrfToken: session.csrf_token,
       });
       queryClient.setQueryData(["naming"], result);
       setBaselineRevision(result.revision);
-      if (section === "structure") setStructureBaseline(structureKey(candidate));
-      else setTemplateBaseline(templateKey(candidate));
+      if (section === "structure") {
+        setStructureBaseline(structureKey(candidate));
+        setDefaultOutput(result.default_output);
+        setDefaultOutputBaseline(result.default_output);
+      } else {
+        setTemplateBaseline(templateKey(candidate));
+      }
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["naming-legacy-context"] }),
         queryClient.invalidateQueries({ queryKey: ["startup-notices"] }),
@@ -492,11 +510,10 @@ export function NamingPage() {
     }
   }
 
-  const selectedTab = searchParams.get("tab") === "legacy"
-    ? "legacy"
-    : searchParams.get("tab") === "templates"
-      ? "templates"
-      : "structure";
+  const requestedTab = searchParams.get("tab");
+  const selectedTab = requestedTab === "legacy" || requestedTab === "templates" || requestedTab === "history"
+    ? requestedTab
+    : "structure";
 
   function setSelectedTab(tab: string) {
     const next = new URLSearchParams(searchParams);
@@ -620,6 +637,8 @@ export function NamingPage() {
           setBaselineRevision(current.revision);
           setStructureBaseline(structureKey(normalized));
           setTemplateBaseline(templateKey(normalized));
+          setDefaultOutput(current.default_output);
+          setDefaultOutputBaseline(current.default_output);
         }}
       />
 
@@ -646,9 +665,38 @@ export function NamingPage() {
             {t("naming.legacyTab")}
             <Tabs.Indicator />
           </Tabs.Tab>
+          <Tabs.Tab id="history">
+            <History aria-hidden="true" size={16} />
+            {t("naming.historyTab")}
+            <Tabs.Indicator />
+          </Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel className="grid min-w-0 gap-5 pt-5" id="structure">
+          <FormSurface className="grid gap-4">
+            <SectionHeading
+              icon={FolderOutput}
+              title={t("naming.defaultOutputTitle")}
+              description={t("naming.defaultOutputDescription")}
+            />
+            <RemotePathField
+              description={
+                <>
+                  {t("naming.defaultOutputHint")}{" "}
+                  {current.resolved_default_output ? (
+                    <InlineCode>{current.resolved_default_output}</InlineCode>
+                  ) : null}
+                </>
+              }
+              errorMessage={!defaultOutput.trim() ? t("naming.validation.emptyRoot") : undefined}
+              icon={FolderOutput}
+              isInvalid={!defaultOutput.trim()}
+              label={t("naming.defaultOutputLabel")}
+              selector={{ kind: "directory", scope: "host", value_mode: "absolute" }}
+              value={defaultOutput}
+              onChange={setDefaultOutput}
+            />
+          </FormSurface>
           <div className="grid gap-5 xl:grid-cols-2">
             <FormSurface className="grid content-start gap-3">
               <SectionHeading
@@ -1013,6 +1061,9 @@ export function NamingPage() {
             </div>
           </FormSurface>
 
+        </Tabs.Panel>
+
+        <Tabs.Panel className="grid min-w-0 gap-5 pt-5" id="history">
           <section className="grid gap-3" aria-labelledby="naming-history-title">
             <div>
               <h2 className="text-lg font-semibold" id="naming-history-title">

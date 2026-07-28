@@ -125,9 +125,12 @@ async def test_naming_sections_save_without_overwriting_each_other(tmp_path: Pat
         "structure",
         candidate,
         content_revision(store.load_text()),
+        default_output=Path("../shared-downloads"),
     )
     assert structure_result.naming.mix_posts is True
     assert structure_result.naming.creator_dirname_format == original.creator_dirname_format
+    assert structure_result.default_output == Path("../shared-downloads")
+    assert structure_result.resolved_default_output == tmp_path.parent / "shared-downloads"
     assert structure_result.conversion_pending is True
     first_notice = (await service.notices())[0]
     assert first_notice.kind == "legacy_layout_conversion"
@@ -140,6 +143,7 @@ async def test_naming_sections_save_without_overwriting_each_other(tmp_path: Pat
     )
     assert templates_result.naming.mix_posts is True
     assert templates_result.naming.creator_dirname_format == "{creator_name} ({creator_id})"
+    assert templates_result.default_output == Path("../shared-downloads")
     second_notice = (await service.notices())[0]
     assert second_notice.id != first_notice.id
     assert second_notice.payload["target"]["creator_dirname_format"] == "{creator_name} ({creator_id})"

@@ -24,6 +24,8 @@ StartupNoticeResolution = Literal["ignored", "convert_selected"]
 
 
 class NamingConfigurationResponse(BaseModel):
+    default_output: Path
+    resolved_default_output: Path
     naming: ProjectNamingConfiguration
     revision: str
     conversion_pending: bool = False
@@ -33,6 +35,7 @@ class NamingUpdateRequest(BaseModel):
     section: NamingSection
     naming: ProjectNamingConfiguration
     revision: str
+    default_output: Path | None = None
 
 
 class NamingLegacyContextResponse(BaseModel):

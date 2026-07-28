@@ -2117,6 +2117,16 @@ export interface components {
         };
         /** NamingConfigurationResponse */
         NamingConfigurationResponse: {
+            /**
+             * Default Output
+             * Format: path
+             */
+            default_output: string;
+            /**
+             * Resolved Default Output
+             * Format: path
+             */
+            resolved_default_output: string;
             naming: components["schemas"]["ProjectNamingConfiguration"];
             /** Revision */
             revision: string;
@@ -2271,6 +2281,8 @@ export interface components {
             naming: components["schemas"]["ProjectNamingConfiguration"];
             /** Revision */
             revision: string;
+            /** Default Output */
+            default_output?: string | null;
         };
         /** PathSelectorResponse */
         PathSelectorResponse: {

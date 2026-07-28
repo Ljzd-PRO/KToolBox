@@ -57,6 +57,7 @@ def create_naming_router() -> APIRouter:
                 payload.section,
                 payload.naming,
                 payload.revision,
+                default_output=payload.default_output,
             )
         except NamingPreviewStaleError as error:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error

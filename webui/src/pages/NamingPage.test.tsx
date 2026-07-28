@@ -159,6 +159,8 @@ describe("Naming format page", () => {
         }
         if (path.endsWith("/naming")) {
           return json({
+            default_output: "downloads",
+            resolved_default_output: "/project/downloads",
             naming,
             revision: "revision-1",
             conversion_pending: true,
@@ -178,6 +180,10 @@ describe("Naming format page", () => {
     expect(screen.getByRole("link", { name: /Naming format/ })).toHaveAttribute("href", "/naming");
     expect(await screen.findByText("Attachments directory")).toBeInTheDocument();
 
+    await user.click(screen.getByRole("tab", { name: /Legacy download conversion/ }));
+    expect(screen.queryByRole("heading", { name: "Conversion history" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("tab", { name: /Conversion history/ }));
+    expect(screen.getByRole("heading", { name: "Conversion history" })).toBeInTheDocument();
     await user.click(screen.getByRole("tab", { name: /Legacy download conversion/ }));
     const rootInput = screen.getByRole("textbox", { name: "Old location 1" });
     await user.clear(rootInput);
@@ -217,6 +223,7 @@ describe("Naming format page", () => {
     const updates: Array<Record<string, unknown>> = [];
     const ignoredLayouts = new Set<string>();
     let currentNaming = structuredClone(naming);
+    let currentDefaultOutput = "downloads";
     let revision = "revision-1";
     vi.stubGlobal(
       "fetch",
@@ -263,11 +270,15 @@ describe("Naming format page", () => {
           const body = JSON.parse(String(init.body)) as {
             section: "structure" | "templates";
             naming: typeof naming;
+            default_output?: string;
           };
           updates.push(body as unknown as Record<string, unknown>);
           currentNaming = body.naming;
+          if (body.default_output) currentDefaultOutput = body.default_output;
           revision = `revision-${updates.length + 1}`;
           return json({
+            default_output: currentDefaultOutput,
+            resolved_default_output: `/project/${currentDefaultOutput}`,
             naming: currentNaming,
             revision,
             conversion_pending: true,
@@ -275,6 +286,8 @@ describe("Naming format page", () => {
         }
         if (path.endsWith("/naming")) {
           return json({
+            default_output: currentDefaultOutput,
+            resolved_default_output: `/project/${currentDefaultOutput}`,
             naming: currentNaming,
             revision,
             conversion_pending: false,
@@ -291,10 +304,17 @@ describe("Naming format page", () => {
     );
 
     expect(await screen.findByText("Attachments directory")).toBeInTheDocument();
+    const defaultOutput = screen.getByRole("textbox", { name: "Default download location" });
+    await user.clear(defaultOutput);
+    await user.type(defaultOutput, "archive");
     await user.click(screen.getByRole("switch", { name: /Group by year/ }));
     await user.click(screen.getByRole("button", { name: "Save directory structure" }));
     await waitFor(() => expect(updates).toHaveLength(1));
-    expect(updates[0]).toMatchObject({ section: "structure", revision: "revision-1" });
+    expect(updates[0]).toMatchObject({
+      section: "structure",
+      revision: "revision-1",
+      default_output: "archive",
+    });
     expect(await screen.findByRole("heading", { name: "Review existing downloads" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Ignore" }));
     await waitFor(() => expect(ignoredLayouts.has("layout-1")).toBe(true));
@@ -339,7 +359,13 @@ describe("Naming format page", () => {
           return json({ roots: ["/project/downloads"], conversion_pending: true });
         }
         if (path.endsWith("/naming")) {
-          return json({ naming, revision: migrated ? "revision-2" : "revision-1", conversion_pending: true });
+          return json({
+            default_output: "downloads",
+            resolved_default_output: "/project/downloads",
+            naming,
+            revision: migrated ? "revision-2" : "revision-1",
+            conversion_pending: true,
+          });
         }
         if (path.endsWith("/tasks")) return json([]);
         throw new Error(`Unexpected request: ${path}`);
