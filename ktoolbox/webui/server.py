@@ -19,7 +19,7 @@ from pydantic import SecretStr
 
 from ktoolbox.configuration import RuntimeContext, WebUIConfiguration, load_configuration
 from ktoolbox.exceptions import KToolBoxUserError
-from ktoolbox.naming_migration import migrate_legacy_naming
+from ktoolbox.naming_migration import detect_legacy_naming
 from ktoolbox.project_config import ProjectConfigStore, ProjectConfiguration
 
 DEFAULT_WEBUI_USERNAME = "admin"
@@ -216,24 +216,30 @@ def _project_root(project_dir: Path) -> Path:
             label="Configuration error",
         )
 
-    migration = migrate_legacy_naming(root)
-    if migration.migrated:
-        print(
-            "Migrated legacy naming settings to ktoolbox.toml. Naming is now managed per project in the WebUI.",
-            file=sys.stderr,
-        )
-        for backup in migration.backup_paths:
-            print(f"  Backup: {backup}", file=sys.stderr)
-        if migration.ignored_environment_keys:
-            print(
-                "  Warning: legacy naming environment variables are ignored: "
-                + ", ".join(migration.ignored_environment_keys),
-                file=sys.stderr,
-            )
-    elif not project_config.is_file():
+    created = False
+    if not project_config.is_file():
         ProjectConfigStore(project_config).save(ProjectConfiguration())
+        created = True
         print(
             f"Warning: {project_config} was not found; created a new project configuration.",
             file=sys.stderr,
         )
+
+    legacy = detect_legacy_naming(root)
+    if legacy.pending:
+        print(
+            "Warning: legacy naming settings were detected in .env files. "
+            "Sign in to the WebUI to review and migrate them; no files were changed.",
+            file=sys.stderr,
+        )
+        for path, keys in legacy.dotenv_keys.items():
+            print(f"  {path.name}: {', '.join(keys)}", file=sys.stderr)
+    if legacy.ignored_environment_keys:
+        print(
+            "Warning: legacy naming environment variables are ignored and cannot be migrated automatically: "
+            + ", ".join(legacy.ignored_environment_keys),
+            file=sys.stderr,
+        )
+    if created and legacy.pending:
+        print("  The new project defaults remain active until migration is confirmed.", file=sys.stderr)
     return root

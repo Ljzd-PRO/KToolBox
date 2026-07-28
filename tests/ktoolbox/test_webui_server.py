@@ -192,7 +192,8 @@ def test_project_root_creates_missing_configuration(tmp_path: Path, capsys: pyte
 
     project_config = project_root / "ktoolbox.toml"
     content = project_config.read_text(encoding="utf-8")
-    assert "schema_version = 4" in content
+    assert "schema_version = 5" in content
+    assert 'default_output = "downloads"' in content
     assert "[naming]" in content
     assert ProjectConfigStore(project_config).load() == ProjectConfiguration()
     assert capsys.readouterr().err == f"Warning: {project_config} was not found; created a new project configuration.\n"
@@ -213,7 +214,7 @@ def test_project_root_preserves_existing_configuration(
     assert capsys.readouterr().err == ""
 
 
-def test_project_root_migrates_legacy_values_before_creating_defaults(
+def test_project_root_defers_legacy_values_until_user_confirmation(
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
@@ -228,12 +229,13 @@ def test_project_root_migrates_legacy_values_before_creating_defaults(
     assert _project_root(project_root) == project_root.resolve()
 
     project = ProjectConfigStore(project_root / "ktoolbox.toml").load()
-    assert project.naming.post_dirname_format == "{title} [{post_id}]"
-    assert "POST_DIRNAME_FORMAT" not in dotenv.read_text(encoding="utf-8")
-    assert (project_root / MIGRATION_NOTICE_PATH).is_file()
+    assert project.naming.post_dirname_format == "{title}"
+    assert "POST_DIRNAME_FORMAT" in dotenv.read_text(encoding="utf-8")
+    assert not (project_root / MIGRATION_NOTICE_PATH).exists()
     error_output = capsys.readouterr().err
-    assert "Migrated legacy naming settings to ktoolbox.toml" in error_output
-    assert "created a new project configuration" not in error_output
+    assert "legacy naming settings were detected" in error_output
+    assert "no files were changed" in error_output
+    assert "created a new project configuration" in error_output
 
 
 def test_project_root_rejects_non_file_configuration(tmp_path: Path) -> None:

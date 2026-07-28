@@ -8,6 +8,7 @@ import pytest
 from ktoolbox.naming_migration import (
     LEGACY_ENV_KEYS,
     MIGRATION_NOTICE_PATH,
+    detect_legacy_naming,
     migrate_legacy_naming,
 )
 from ktoolbox.project_config import ProjectConfigStore, ProjectConfiguration
@@ -77,6 +78,36 @@ def test_missing_project_without_legacy_values_is_not_reported_as_migration(
     assert migrate_legacy_naming(tmp_path).migrated is False
     assert not (tmp_path / "ktoolbox.toml").exists()
     assert not (tmp_path / MIGRATION_NOTICE_PATH).exists()
+
+
+def test_detection_reports_sources_without_modifying_them(tmp_path: Path) -> None:
+    dotenv = tmp_path / ".env"
+    dotenv.write_text(
+        "# keep\nKTOOLBOX_JOB__POST_DIRNAME_FORMAT={id}\n",
+        encoding="utf-8",
+    )
+    original = dotenv.read_text(encoding="utf-8")
+
+    detection = detect_legacy_naming(tmp_path)
+
+    assert detection.pending is True
+    assert detection.dotenv_keys == {
+        dotenv: ("KTOOLBOX_JOB__POST_DIRNAME_FORMAT",),
+    }
+    assert dotenv.read_text(encoding="utf-8") == original
+    assert not (tmp_path / "ktoolbox.toml").exists()
+
+
+def test_environment_only_legacy_values_warn_but_do_not_require_migration(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("KTOOLBOX_JOB__FILENAME_FORMAT", "{post_id}_{}")
+
+    detection = detect_legacy_naming(tmp_path)
+
+    assert detection.pending is False
+    assert detection.ignored_environment_keys == ("KTOOLBOX_JOB__FILENAME_FORMAT",)
 
 
 def test_migration_does_not_repeat_for_newer_project_schema(tmp_path: Path) -> None:

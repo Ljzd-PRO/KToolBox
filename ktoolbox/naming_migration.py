@@ -8,7 +8,6 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import ClassVar
 
-import tomlkit
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -87,26 +86,46 @@ class NamingMigrationResult:
     ignored_environment_keys: tuple[str, ...] = ()
 
 
+@dataclass(frozen=True, slots=True)
+class LegacyNamingDetection:
+    """Legacy naming settings that still require an explicit user decision."""
+
+    dotenv_keys: dict[Path, tuple[str, ...]]
+    ignored_environment_keys: tuple[str, ...] = ()
+
+    @property
+    def pending(self) -> bool:
+        return any(self.dotenv_keys.values())
+
+
+def detect_legacy_naming(project_root: Path) -> LegacyNamingDetection:
+    """Inspect legacy naming sources without changing project files."""
+
+    root = project_root.expanduser().resolve()
+    dotenv_keys: dict[Path, tuple[str, ...]] = {}
+    for path in (root / ".env", root / "prod.env"):
+        if path.is_file():
+            keys = tuple(find_legacy_naming_keys(path.read_text(encoding="utf-8")))
+            if keys:
+                dotenv_keys[path] = keys
+    ignored_environment = tuple(sorted(key for key in LEGACY_ENV_KEYS if key in os.environ))
+    return LegacyNamingDetection(
+        dotenv_keys=dotenv_keys,
+        ignored_environment_keys=ignored_environment,
+    )
+
+
 def migrate_legacy_naming(project_root: Path) -> NamingMigrationResult:
-    """Move legacy dotenv naming values into ``ktoolbox.toml`` once."""
+    """Explicitly move legacy dotenv naming values into ``ktoolbox.toml``."""
     root = project_root.expanduser().resolve()
     project_path = root / "ktoolbox.toml"
     sources = [path for path in (root / ".env", root / "prod.env") if path.exists()]
     originals = {path: path.read_text(encoding="utf-8") for path in sources}
-    ignored_environment = tuple(sorted(key for key in LEGACY_ENV_KEYS if key in os.environ))
-    if (
-        not project_path.exists()
-        and not ignored_environment
-        and not any(find_legacy_naming_keys(content) for content in originals.values())
-    ):
+    detection = detect_legacy_naming(root)
+    if not detection.pending:
         return NamingMigrationResult(migrated=False)
 
     original_project = project_path.read_text(encoding="utf-8") if project_path.exists() else ""
-    document = tomlkit.parse(original_project) if original_project else tomlkit.document()
-    schema_version = document.get("schema_version")
-    if isinstance(schema_version, int) and schema_version >= 2 and "naming" in document:
-        return NamingMigrationResult(migrated=False)
-
     legacy = _LegacyNamingSettings(_env_file=[root / ".env", root / "prod.env"]).job
     naming = ProjectNamingConfiguration(
         post_dirname_format=legacy.post_dirname_format,
@@ -143,7 +162,7 @@ def migrate_legacy_naming(project_root: Path) -> NamingMigrationResult:
             {
                 "id": MIGRATION_ID,
                 "backup_paths": [str(path.relative_to(root)) for path in backup_paths],
-                "ignored_environment_keys": list(ignored_environment),
+                "ignored_environment_keys": list(detection.ignored_environment_keys),
             },
         )
     except Exception:
@@ -158,7 +177,7 @@ def migrate_legacy_naming(project_root: Path) -> NamingMigrationResult:
     return NamingMigrationResult(
         migrated=True,
         backup_paths=tuple(backup_paths),
-        ignored_environment_keys=ignored_environment,
+        ignored_environment_keys=detection.ignored_environment_keys,
     )
 
 
