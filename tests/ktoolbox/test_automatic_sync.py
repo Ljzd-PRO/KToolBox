@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 import pytest
 
 from ktoolbox.api.generated import Post
 from ktoolbox.automatic_sync import AutomaticSyncWindow, automatic_post_timestamp, next_automatic_sync_time
 from ktoolbox.project_config import CronAutomaticSyncSchedule, IntervalAutomaticSyncSchedule
+
+UTC = timezone.utc
 
 
 def work(

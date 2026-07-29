@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from ktoolbox.project_config import AutomaticSyncPlan
@@ -17,6 +17,8 @@ from ktoolbox.webui.task_models import (
     TaskStatus,
 )
 from ktoolbox.webui.task_store import TaskStore
+
+UTC = timezone.utc
 
 
 def plan(plan_id: str, *creators: str) -> AutomaticSyncPlan:

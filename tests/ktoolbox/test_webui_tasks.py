@@ -25,8 +25,10 @@ from ktoolbox.webui.project_lock import ProjectAlreadyRunningError
 from ktoolbox.webui.task_executor import TaskExecutionSnapshot
 from ktoolbox.webui.task_models import (
     ActiveDownload,
+    AutomaticTaskOrigin,
     DownloadTaskSpec,
     SyncTaskSpec,
+    TaskExecutionResult,
     TaskPresentationSnapshot,
     TaskProgress,
     TaskRecord,
@@ -927,6 +929,24 @@ async def test_scheduler_control_methods_and_validation(tmp_path: Path) -> None:
     assert (await scheduler.rerun(sync.id)).status is TaskStatus.queued
     with pytest.raises(InvalidTaskStateError, match="completed sync"):
         await scheduler.rerun(sync.id)
+
+    automatic = await scheduler.create(
+        SyncTaskSpec(
+            creators=[CreatorReference(service="fanbox", creator_id="automatic")],
+            output=tmp_path / "automatic",
+        ),
+        automatic_origin=AutomaticTaskOrigin(
+            plan_id="plan",
+            plan_name="Automatic plan",
+            run_id="run",
+            windows=[],
+        ),
+    )
+    with pytest.raises(InvalidTaskStateError, match="cannot be edited"):
+        await scheduler.update(automatic.id, automatic.spec)
+    await store.set_status(automatic.id, TaskStatus.completed)
+    with pytest.raises(InvalidTaskStateError, match="cannot be rerun"):
+        await scheduler.rerun(automatic.id)
     await scheduler.stop()
 
 
@@ -1029,14 +1049,21 @@ async def test_scheduler_records_snapshot_and_executor_failures(tmp_path: Path) 
         ],
         creator_failures=1,
     )
+    partial_result = TaskExecutionResult()
 
     class StructuredFailingExecutor:
+        def __init__(self) -> None:
+            self.calls = 0
+
         async def __call__(self, *_args, **_kwargs) -> None:
-            raise TaskExecutionError(structured)
+            self.calls += 1
+            result = partial_result if self.calls == 1 else None
+            raise TaskExecutionError(structured, result=result)
 
     structured_root = tmp_path / "structured"
     structured_root.mkdir()
-    scheduler, store = await scheduler_parts(structured_root, StructuredFailingExecutor())
+    structured_executor = StructuredFailingExecutor()
+    scheduler, store = await scheduler_parts(structured_root, structured_executor)
     task = await store.create(
         DownloadTaskSpec(
             service="fanbox",
@@ -1049,6 +1076,19 @@ async def test_scheduler_records_snapshot_and_executor_failures(tmp_path: Path) 
     failed = await wait_for_store_status(scheduler, store, task.id, TaskStatus.failed)
     assert failed.failure == structured
     assert failed.error == structured.summary
+    assert (await store.attempts(task.id))[0].result == partial_result
+    second_task = await store.create(
+        DownloadTaskSpec(
+            service="fanbox",
+            creator_id="one",
+            post_id="43",
+            output=structured_root / "two",
+        )
+    )
+    await scheduler._dispatch_ready_tasks()
+    second_failed = await wait_for_store_status(scheduler, store, second_task.id, TaskStatus.failed)
+    assert second_failed.failure == structured
+    assert (await store.attempts(second_task.id))[0].result is None
 
     broken_root = tmp_path / "broken"
     broken_root.mkdir()

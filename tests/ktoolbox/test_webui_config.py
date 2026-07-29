@@ -161,6 +161,10 @@ def test_config_schema_docstring_and_environment_source_edges(tmp_path: Path, mo
     config_schema_module._collect_descriptions(UndocumentedConfiguration, "", "en", descriptions)
     assert descriptions == {}
     assert config_schema_module._parse_ivar_descriptions("No ivar metadata here.") == {}
+    assert config_schema_module._schema_enum({"anyOf": [{"enum": ["INFO"]}, "ignored"]}) == ["INFO"]
+    assert config_schema_module._parse_ivar_descriptions(":ivar value: first line\n    second line") == {
+        "value": "first line second line"
+    }
 
     class TextNode:
         def __init__(self, text: str) -> None:

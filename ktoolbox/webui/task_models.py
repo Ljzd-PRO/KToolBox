@@ -57,7 +57,8 @@ class DownloadTaskSpec(BaseModel):
     post_id: str | None = None
     revision_id: str | None = None
     output: Path = Field(
-        default=Path("."),
+        default=".",
+        validate_default=True,
         description="Optional task output override. Omit it to use the project default output directory.",
     )
     dump_post_data: bool = True
@@ -77,7 +78,8 @@ class SyncTaskSpec(BaseModel):
     kind: Literal["sync"] = "sync"
     creators: list[CreatorReference] = Field(default_factory=list)
     output: Path = Field(
-        default=Path("."),
+        default=".",
+        validate_default=True,
         description="Optional task output override. Omit it to use the project default output directory.",
     )
     save_creator_indices: bool = False

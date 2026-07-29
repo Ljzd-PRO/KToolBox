@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, date, datetime
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -18,6 +18,8 @@ from ktoolbox.project_config import (
     parse_creator_reference,
     project_config_path,
 )
+
+UTC = timezone.utc
 
 
 def test_project_config_path_priority(tmp_path: Path) -> None:

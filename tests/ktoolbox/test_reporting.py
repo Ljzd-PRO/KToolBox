@@ -148,6 +148,7 @@ def test_rich_reporter_handles_idempotence_failures_and_missing_tasks() -> None:
     reporter.creator_finished("fanbox:1", "API failed")
     reporter.creator_finished("fanbox:missing")
     reporter.download_advanced("missing", 1)
+    reporter.download_retrying("missing-retry", "fanbox:1", "retry.bin", 1, None)
     reporter.download_finished("missing-failed", "failed", failure_item(file_name="failed.bin"))
     reporter.download_finished("missing-failed-without-detail", "failed")
     reporter.download_finished("missing-existing", "existed")
@@ -155,6 +156,7 @@ def test_rich_reporter_handles_idempotence_failures_and_missing_tasks() -> None:
     reporter.stop()
 
     assert "Creator fanbox:1 failed: API failed" in output.getvalue()
+    assert "retry.bin" in output.getvalue()
     assert "Download failed (failed.bin):" in output.getvalue()
     assert reporter.overall.tasks[0].completed == 3
 

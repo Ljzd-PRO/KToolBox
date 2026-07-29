@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, date, datetime
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -21,6 +21,8 @@ from ktoolbox.webui.database import WebUIDatabase
 from ktoolbox.webui.event_store import WebUIEventStore
 from ktoolbox.webui.task_models import CreatorTaskExecutionResult, TaskExecutionResult, TaskStatus
 from ktoolbox.webui.task_store import TaskStore
+
+UTC = timezone.utc
 
 
 class MutableClock:

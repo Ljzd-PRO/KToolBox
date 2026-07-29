@@ -14,6 +14,7 @@
     "typecheck": "tsc -b --pretty false",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:ci": "vitest run --maxWorkers=1 --no-file-parallelism",
     "test:watch": "vitest",
     "test:e2e": "playwright test"
   },

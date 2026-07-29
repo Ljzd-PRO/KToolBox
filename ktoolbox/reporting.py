@@ -216,9 +216,9 @@ class RichProgressReporter(NullProgressReporter):
         self.downloads = Progress(
             TextColumn(
                 "{task.description}",
-                table_column=Column(max_width=44, overflow="ellipsis", no_wrap=True),
+                table_column=Column(max_width=30, overflow="ellipsis", no_wrap=True),
             ),
-            BarColumn(),
+            BarColumn(bar_width=10),
             DownloadColumn(),
             TransferSpeedColumn(),
             TimeRemainingColumn(),
