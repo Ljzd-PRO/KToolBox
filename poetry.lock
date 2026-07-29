@@ -4287,4 +4287,4 @@ winloop = ["winloop"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<=3.14"
-content-hash = "9f9c84fb61813e7eae56ace05d1ee4689d483adb20d992ce1aa213aa617db716"
+content-hash = "1aa8e7790d4aa7e085964932f73ca825981a557a151d8f7e4ebed47bddfb0195"

@@ -559,6 +559,17 @@ async def test_naming_routes_require_session_and_csrf(tmp_path: Path) -> None:
         versions = await client.get("/api/v1/naming/layout-versions")
         assert versions.status_code == 200
         assert len(versions.json()) == 1
+        source_parse = await client.post(
+            "/api/v1/naming/source/parse",
+            json={
+                "format": "env",
+                "content": "KTOOLBOX_JOB__POST_DIRNAME_FORMAT={post_id}\n",
+            },
+            headers=csrf,
+        )
+        assert source_parse.status_code == 200
+        assert source_parse.json()["naming"]["post_dirname_format"] == "{post_id}"
+        assert "content" not in source_parse.json()
         update_payload = {
             "section": "templates",
             "revision": current.json()["revision"],

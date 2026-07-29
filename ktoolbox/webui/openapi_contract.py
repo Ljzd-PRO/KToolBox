@@ -367,6 +367,12 @@ OPERATIONS: dict[str, OperationMetadata] = {
         "Return persistent, deduplicated project naming snapshots available as legacy directory conversion sources.",
         "naming",
     ),
+    "parse_naming_source": OperationMetadata(
+        "Parse a pasted legacy naming source",
+        "Validate an in-memory legacy dotenv or TOML naming source without persisting or applying the pasted text.",
+        "naming",
+        csrf=True,
+    ),
     "get_legacy_naming_migration": OperationMetadata(
         "Inspect legacy naming configuration",
         "Return a read-only field comparison for legacy dotenv naming settings that still require confirmation.",

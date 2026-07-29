@@ -780,6 +780,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/naming/source/parse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Parse a pasted legacy naming source
+         * @description Validate an in-memory legacy dotenv or TOML naming source without persisting or applying the pasted text.
+         */
+        post: operations["parse_naming_source"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/naming/legacy-migration": {
         parameters: {
             query?: never;
@@ -2313,6 +2333,51 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** NamingSourceDifferenceResponse */
+        NamingSourceDifferenceResponse: {
+            /** Path */
+            path: string;
+            /** Source Value */
+            source_value: unknown;
+            /** Target Value */
+            target_value: unknown;
+        };
+        /** NamingSourceParseRequest */
+        NamingSourceParseRequest: {
+            /**
+             * Format
+             * @enum {string}
+             */
+            format: "env" | "toml";
+            /** Content */
+            content: string;
+        };
+        /** NamingSourceParseResponse */
+        NamingSourceParseResponse: {
+            /**
+             * Format
+             * @enum {string}
+             */
+            format: "env" | "toml";
+            naming: components["schemas"]["ProjectNamingConfiguration"];
+            /** Digest */
+            digest: string;
+            /** Recognized Fields */
+            recognized_fields: string[];
+            /** Defaulted Fields */
+            defaulted_fields: string[];
+            /** Warnings */
+            warnings: components["schemas"]["NamingSourceWarningResponse"][];
+            /** Differences */
+            differences: components["schemas"]["NamingSourceDifferenceResponse"][];
+        };
+        /** NamingSourceWarningResponse */
+        NamingSourceWarningResponse: {
+            /** Code */
+            code: string;
+            /** Count */
+            count: number;
         };
         /** NamingUpdateRequest */
         NamingUpdateRequest: {
@@ -4572,6 +4637,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NamingLayoutVersionResponse"][];
+                };
+            };
+        };
+    };
+    parse_naming_source: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF token returned by the current browser session. */
+                "X-CSRF-Token": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NamingSourceParseRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NamingSourceParseResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

@@ -6,6 +6,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+from ktoolbox.naming_sources import NamingSourceFormat
 from ktoolbox.project_config import ProjectNamingConfiguration
 
 NamingConversionStatus = Literal[
@@ -56,6 +57,32 @@ class NamingLayoutVersionResponse(BaseModel):
     origin: NamingLayoutVersionOrigin
     created_at: datetime
     is_current: bool = False
+
+
+class NamingSourceParseRequest(BaseModel):
+    format: NamingSourceFormat
+    content: str
+
+
+class NamingSourceWarningResponse(BaseModel):
+    code: str
+    count: int
+
+
+class NamingSourceDifferenceResponse(BaseModel):
+    path: str
+    source_value: Any
+    target_value: Any
+
+
+class NamingSourceParseResponse(BaseModel):
+    format: NamingSourceFormat
+    naming: ProjectNamingConfiguration
+    digest: str
+    recognized_fields: list[str]
+    defaulted_fields: list[str]
+    warnings: list[NamingSourceWarningResponse]
+    differences: list[NamingSourceDifferenceResponse]
 
 
 class LegacyNamingSourceResponse(BaseModel):

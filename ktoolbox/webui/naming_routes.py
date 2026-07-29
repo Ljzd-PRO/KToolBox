@@ -4,6 +4,7 @@ from typing import Annotated, cast
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 
+from ktoolbox.naming_sources import NamingSourceParseError
 from ktoolbox.webui.auth import require_csrf, require_session
 from ktoolbox.webui.database import WebUISession
 from ktoolbox.webui.naming_models import (
@@ -17,6 +18,8 @@ from ktoolbox.webui.naming_models import (
     NamingLegacyContextResponse,
     NamingPreviewRequest,
     NamingPreviewResponse,
+    NamingSourceParseRequest,
+    NamingSourceParseResponse,
     NamingUpdateRequest,
     StartupNoticeResolveRequest,
     StartupNoticeResponse,
@@ -84,6 +87,35 @@ def create_naming_router() -> APIRouter:
         service: NamingServiceDependency,
     ) -> list[NamingLayoutVersionResponse]:
         return await service.layout_versions()
+
+    @router.post(
+        "/naming/source/parse",
+        response_model=NamingSourceParseResponse,
+    )
+    async def parse_naming_source(
+        payload: NamingSourceParseRequest,
+        _: CsrfDependency,
+        service: NamingServiceDependency,
+    ) -> NamingSourceParseResponse:
+        try:
+            return await service.parse_source(payload.format, payload.content)
+        except NamingSourceParseError as error:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail={
+                    "code": "invalid_naming_source",
+                    "issues": [
+                        {
+                            "code": issue.code,
+                            "message": issue.message,
+                            "path": issue.path,
+                            "line": issue.line,
+                            "column": issue.column,
+                        }
+                        for issue in error.issues
+                    ],
+                },
+            ) from error
 
     @router.get(
         "/naming/legacy-migration",

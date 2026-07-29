@@ -34,6 +34,7 @@ from ktoolbox.naming_migration import (
     apply_legacy_naming,
     preview_legacy_naming,
 )
+from ktoolbox.naming_sources import NamingSourceFormat, parse_naming_source
 from ktoolbox.project_config import (
     ProjectConfigStore,
     ProjectNamingConfiguration,
@@ -56,6 +57,9 @@ from ktoolbox.webui.naming_models import (
     NamingLegacyContextResponse,
     NamingPreviewResponse,
     NamingSection,
+    NamingSourceDifferenceResponse,
+    NamingSourceParseResponse,
+    NamingSourceWarningResponse,
     StartupNoticeResolution,
     StartupNoticeResponse,
 )
@@ -185,6 +189,35 @@ class NamingConversionService:
             )
             for row in rows
         ]
+
+    async def parse_source(
+        self,
+        source_format: NamingSourceFormat,
+        content: str,
+    ) -> NamingSourceParseResponse:
+        parsed = parse_naming_source(
+            source_format,
+            content,
+            target=self.project_store.load().naming,
+        )
+        return NamingSourceParseResponse(
+            format=parsed.format,
+            naming=parsed.naming,
+            digest=parsed.digest,
+            recognized_fields=list(parsed.recognized_fields),
+            defaulted_fields=list(parsed.defaulted_fields),
+            warnings=[
+                NamingSourceWarningResponse(code=warning.code, count=warning.count) for warning in parsed.warnings
+            ],
+            differences=[
+                NamingSourceDifferenceResponse(
+                    path=difference.path,
+                    source_value=difference.source_value,
+                    target_value=difference.target_value,
+                )
+                for difference in parsed.differences
+            ],
+        )
 
     async def legacy_migration(self) -> LegacyNamingMigrationResponse:
         preview = await anyio.to_thread.run_sync(

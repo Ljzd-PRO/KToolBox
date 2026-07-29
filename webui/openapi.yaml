@@ -2145,6 +2145,48 @@ paths:
         scope: null
         safety: null
         openWorld: false
+  /api/v1/naming/source/parse:
+    post:
+      tags:
+      - naming
+      summary: Parse a pasted legacy naming source
+      operationId: parse_naming_source
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NamingSourceParseRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamingSourceParseResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Validate an in-memory legacy dotenv or TOML naming source without persisting or applying the pasted text.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: parse_naming_source
+        scope: null
+        safety: null
+        openWorld: false
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        description: CSRF token returned by the current browser session.
+        schema:
+          type: string
+          minLength: 1
   /api/v1/naming/legacy-migration:
     get:
       tags:
@@ -4934,6 +4976,93 @@ components:
       - conflict_count
       - created_at
       title: NamingPreviewResponse
+    NamingSourceDifferenceResponse:
+      properties:
+        path:
+          type: string
+          title: Path
+        source_value:
+          title: Source Value
+        target_value:
+          title: Target Value
+      type: object
+      required:
+      - path
+      - source_value
+      - target_value
+      title: NamingSourceDifferenceResponse
+    NamingSourceParseRequest:
+      properties:
+        format:
+          type: string
+          enum:
+          - env
+          - toml
+          title: Format
+        content:
+          type: string
+          title: Content
+      type: object
+      required:
+      - format
+      - content
+      title: NamingSourceParseRequest
+    NamingSourceParseResponse:
+      properties:
+        format:
+          type: string
+          enum:
+          - env
+          - toml
+          title: Format
+        naming:
+          $ref: '#/components/schemas/ProjectNamingConfiguration'
+        digest:
+          type: string
+          title: Digest
+        recognized_fields:
+          items:
+            type: string
+          type: array
+          title: Recognized Fields
+        defaulted_fields:
+          items:
+            type: string
+          type: array
+          title: Defaulted Fields
+        warnings:
+          items:
+            $ref: '#/components/schemas/NamingSourceWarningResponse'
+          type: array
+          title: Warnings
+        differences:
+          items:
+            $ref: '#/components/schemas/NamingSourceDifferenceResponse'
+          type: array
+          title: Differences
+      type: object
+      required:
+      - format
+      - naming
+      - digest
+      - recognized_fields
+      - defaulted_fields
+      - warnings
+      - differences
+      title: NamingSourceParseResponse
+    NamingSourceWarningResponse:
+      properties:
+        code:
+          type: string
+          title: Code
+        count:
+          type: integer
+          title: Count
+      type: object
+      required:
+      - code
+      - count
+      title: NamingSourceWarningResponse
     NamingUpdateRequest:
       properties:
         section:
