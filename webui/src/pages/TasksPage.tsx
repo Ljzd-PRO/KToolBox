@@ -667,7 +667,7 @@ function TaskList({
           <DataTableFrame className="hidden xl:block">
             <Table.Content
               aria-label={t("tasks.title")}
-              className="task-table-content min-w-[940px]"
+              className="task-table-content min-w-[940px] table-fixed"
               sortDescriptor={sortDescriptor ?? undefined}
               onSortChange={(next) => setSortDescriptor(
                 normalizeTableSort(sortDescriptor, next, descendingTaskColumns),

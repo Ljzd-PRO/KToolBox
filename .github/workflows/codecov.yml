@@ -103,15 +103,35 @@ jobs:
 
       - name: Run Windows portable contract suite
         if: runner.os == 'Windows'
-        run: >-
-          poetry run pytest -q
-          tests/ktoolbox/test_action_utils.py
-          tests/ktoolbox/test_api_contract.py
-          tests/ktoolbox/test_blocker.py
-          tests/ktoolbox/test_downloader_utils.py
-          tests/ktoolbox/test_failures.py
-          tests/ktoolbox/test_models.py
-          tests/ktoolbox/test_naming_migration.py
-          tests/ktoolbox/test_naming_sources.py
-          tests/ktoolbox/test_project_config.py
-          tests/ktoolbox/test_reporting.py
+        shell: pwsh
+        run: |
+          $testFiles = @(
+            "tests/ktoolbox/test_action_utils.py"
+            "tests/ktoolbox/test_api_contract.py"
+            "tests/ktoolbox/test_blocker.py"
+            "tests/ktoolbox/test_downloader_utils.py"
+            "tests/ktoolbox/test_failures.py"
+            "tests/ktoolbox/test_models.py"
+            "tests/ktoolbox/test_naming_migration.py"
+            "tests/ktoolbox/test_naming_sources.py"
+            "tests/ktoolbox/test_project_config.py"
+            "tests/ktoolbox/test_reporting.py"
+          )
+          $failed = @()
+          foreach ($testFile in $testFiles) {
+            Write-Output "::group::$testFile"
+            $output = & poetry run pytest -q $testFile 2>&1
+            $exitCode = $LASTEXITCODE
+            $output | Write-Output
+            Write-Output "::endgroup::"
+            if ($exitCode -ne 0) {
+              $failed += $testFile
+              $details = (($output | Select-Object -Last 35) -join "`n")
+              $details = $details.Replace("%", "%25").Replace("`r", "%0D").Replace("`n", "%0A")
+              Write-Output "::error title=Pytest failed: $testFile::$details"
+            }
+          }
+          if ($failed.Count -gt 0) {
+            Write-Error "Windows compatibility tests failed: $($failed -join ', ')"
+            exit 1
+          }

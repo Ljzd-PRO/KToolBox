@@ -143,7 +143,8 @@ def test_creator_roster_commands(tmp_path: Path, capsys) -> None:
 
     assert run_cli(["creator", "remove", "artist", *common]) == 0
     assert run_cli(["config", "validate", *common]) == 0
-    assert "0 creators" in capsys.readouterr().out
+    output = " ".join(capsys.readouterr().out.split())
+    assert "0 creators" in output
 
 
 def test_creator_roster_command_reports_invalid_target(tmp_path: Path, capsys) -> None:
