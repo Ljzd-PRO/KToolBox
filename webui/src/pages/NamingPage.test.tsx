@@ -95,6 +95,17 @@ const layoutVersions = [
     is_current: false,
   },
   {
+    id: "naming-layout-older",
+    revision: "naming-revision-older",
+    naming: {
+      ...naming,
+      post_dirname_format: "{post_id}",
+    },
+    origin: "recovered",
+    created_at: "2026-07-24T00:00:00Z",
+    is_current: false,
+  },
+  {
     id: "naming-layout-current",
     revision: "naming-revision-current",
     naming,
@@ -205,6 +216,11 @@ describe("Naming format page", { timeout: 10_000 }, () => {
     expect(await screen.findByText("Attachments directory")).toBeInTheDocument();
 
     await user.click(screen.getByRole("tab", { name: /Legacy download conversion/ }));
+    const unselectedVersion = screen
+      .getAllByRole("checkbox", { name: /Select naming version/ })
+      .find((checkbox) => !checkbox.hasAttribute("disabled") && !checkbox.hasAttribute("checked"));
+    expect(unselectedVersion).toBeDefined();
+    await user.click(unselectedVersion!);
     expect(screen.queryByRole("heading", { name: "Conversion history" })).not.toBeInTheDocument();
     await user.click(screen.getByRole("tab", { name: /Conversion history/ }));
     expect(screen.getByRole("heading", { name: "Conversion history" })).toBeInTheDocument();
@@ -229,7 +245,7 @@ describe("Naming format page", { timeout: 10_000 }, () => {
       roots: ["downloads"],
       source: {
         kind: "project_layout",
-        version_ids: ["naming-layout-source"],
+        version_ids: ["naming-layout-source", "naming-layout-older"],
       },
     });
     expect(

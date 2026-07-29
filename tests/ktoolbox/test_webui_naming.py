@@ -300,18 +300,194 @@ async def test_preview_rejects_unknown_or_changed_explicit_sources(
     await service.stop()
 
 
-def write_downloaded_work(root: Path, creator_dir: str, work_dir: str, post_id: str) -> Path:
+def write_downloaded_work(
+    root: Path,
+    creator_dir: str,
+    work_dir: str,
+    post_id: str,
+    creator_id: str = "123",
+) -> Path:
     path = root / creator_dir / work_dir
     path.mkdir(parents=True)
     post = Post(
         id=post_id,
-        user="123",
+        user=creator_id,
         service="fanbox",
         title=f"Work {post_id}",
     )
     (path / "post.json").write_text(post.model_dump_json(), encoding="utf-8")
     (path / "asset.bin").write_bytes(b"data")
     return path
+
+
+async def wait_for_conversion(
+    service: NamingConversionService,
+    conversion_id: str,
+    status: str,
+) -> None:
+    for _ in range(200):
+        conversion = await service.get(conversion_id)
+        if conversion.status == status:
+            return
+        await asyncio.sleep(0.01)
+    pytest.fail(
+        f"conversion {conversion_id} remained {conversion.status!r}; expected {status!r}"
+    )
+
+
+@pytest.mark.asyncio
+async def test_preview_converts_creators_from_multiple_project_layout_versions(
+    tmp_path: Path,
+) -> None:
+    downloads = tmp_path / "downloads"
+    first_source = write_downloaded_work(
+        downloads,
+        "First [fanbox-123]",
+        "Work one",
+        "one",
+    )
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    store.save(ProjectConfiguration())
+    service, _ = await service_for(tmp_path)
+
+    intermediate = ProjectNamingConfiguration(
+        creator_dirname_format="{creator_name} ({creator_id})",
+        post_dirname_format="{post_id}",
+    )
+    await save_naming(service, store, intermediate)
+    second_source = write_downloaded_work(
+        downloads,
+        "Second (456)",
+        "two",
+        "two",
+        creator_id="456",
+    )
+    target = intermediate.model_copy(
+        update={"creator_dirname_format": "{creator_name} - {creator_id}"}
+    )
+    await save_naming(service, store, target)
+
+    versions = await service.layout_versions()
+    source_ids = [version.id for version in versions if not version.is_current]
+    preview = await service.preview(
+        [Path("downloads")],
+        ProjectLayoutConversionSource(version_ids=source_ids),
+    )
+
+    assert {creator.key.split("@", 1)[0] for creator in preview.creators} == {
+        "fanbox:123",
+        "fanbox:456",
+    }
+    assert all(creator.selectable for creator in preview.creators)
+    conversion = await service.apply(
+        preview.id,
+        [creator.key for creator in preview.creators],
+    )
+    await wait_for_conversion(service, conversion.id, "completed")
+
+    assert not first_source.parent.exists()
+    assert not second_source.parent.exists()
+    assert (downloads / "First - 123" / "one" / "asset.bin").is_file()
+    assert (downloads / "Second - 456" / "two" / "asset.bin").is_file()
+    await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_pasted_env_source_converts_files_without_persisting_raw_text(
+    tmp_path: Path,
+) -> None:
+    downloads = tmp_path / "downloads"
+    source = write_downloaded_work(
+        downloads,
+        "Artist [fanbox-123]",
+        "Work one",
+        "one",
+    )
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    store.save(ProjectConfiguration())
+    service, _ = await service_for(tmp_path)
+    target = ProjectNamingConfiguration(
+        creator_dirname_format="{creator_name} ({creator_id})",
+        post_dirname_format="{post_id}",
+    )
+    await save_naming(service, store, target)
+    raw_source = (
+        'KTOOLBOX_JOB__CREATOR_DIRNAME_FORMAT="{creator_name} '
+        '[{service}-{creator_id}]"\n'
+        'KTOOLBOX_JOB__POST_DIRNAME_FORMAT="{title}"\n'
+    )
+    parsed = await service.parse_source("env", raw_source)
+    preview = await service.preview(
+        [Path("downloads")],
+        PastedConfigConversionSource(
+            format="env",
+            naming=parsed.naming,
+            digest=parsed.digest,
+        ),
+    )
+    conversion = await service.apply(preview.id, [preview.creators[0].key])
+    await wait_for_conversion(service, conversion.id, "completed")
+
+    assert not source.parent.exists()
+    assert (downloads / "Artist (123)" / "one" / "asset.bin").is_file()
+    assert raw_source.encode() not in service.database.path.read_bytes()
+    stored = await service.get(conversion.id)
+    assert stored.preview.source.kind == "pasted_config"
+    assert "KTOOLBOX_JOB" not in stored.preview.source.model_dump_json()
+    await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_cancelled_conversion_rolls_back_every_completed_move(
+    tmp_path: Path,
+) -> None:
+    downloads = tmp_path / "downloads"
+    first = write_downloaded_work(
+        downloads,
+        "Artist [fanbox-123]",
+        "Work one",
+        "one",
+    )
+    second = write_downloaded_work(
+        downloads,
+        "Artist [fanbox-123]",
+        "Work two",
+        "two",
+    )
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    store.save(ProjectConfiguration())
+    service, _ = await service_for(tmp_path)
+    await save_naming(
+        service,
+        store,
+        ProjectNamingConfiguration(post_dirname_format="{post_id}"),
+    )
+    preview = await preview_from_history(service, [Path("downloads")])
+
+    first_operation = asyncio.Event()
+    release_operation = asyncio.Event()
+    original_mark = service._mark_operation
+
+    async def hold_after_first_move(operation_id: int, status: str) -> None:
+        await original_mark(operation_id, status)
+        if status == "completed" and not first_operation.is_set():
+            first_operation.set()
+            await release_operation.wait()
+
+    service._mark_operation = hold_after_first_move  # type: ignore[method-assign]
+    conversion = await service.apply(preview.id, [preview.creators[0].key])
+    await asyncio.wait_for(first_operation.wait(), timeout=1)
+    await service.pause(conversion.id)
+    release_operation.set()
+    await wait_for_conversion(service, conversion.id, "paused")
+    await service.cancel(conversion.id)
+    await wait_for_conversion(service, conversion.id, "cancelled")
+
+    assert first.is_dir()
+    assert second.is_dir()
+    assert not (downloads / "Artist [fanbox-123]" / "one").exists()
+    assert not (downloads / "Artist [fanbox-123]" / "two").exists()
+    await service.stop()
 
 
 @pytest.mark.asyncio
