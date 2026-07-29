@@ -2,7 +2,7 @@
 
 “**自动同步**”页面按计划复用现有作者同步流程。每次运行都会创建普通同步任务，因此仍可在“**任务**”页面查看进度、失败原因、暂停、停止和日志。
 
-![自动同步计划与最近更新](../assets/webui/37-auto-sync-desktop-light.png)
+![自动同步计划与最近更新](../assets/webui/42-auto-sync-showcase-desktop-light.png)
 
 ## 创建计划
 

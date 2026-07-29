@@ -2,7 +2,7 @@
 
 「**自動同步**」頁面會依排程重用現有作者同步流程。每次執行都會建立一般同步任務，因此仍可在「**任務**」查看進度、失敗原因、暫停、停止與日誌。
 
-![自動同步計畫與最近更新](../assets/webui/37-auto-sync-desktop-light.png)
+![自動同步計畫與最近更新](../assets/webui/42-auto-sync-showcase-desktop-light.png)
 
 ## 建立計畫
 

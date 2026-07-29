@@ -9,6 +9,9 @@ copyright: Copyright © 2023 by Ljzd-PRO
 watch:
   - ktoolbox
 
+hooks:
+  - scripts/mkdocs_hooks.py
+
 nav:
   - Get Started:
     - Welcome to KToolBox: index.md
@@ -403,6 +406,9 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+
+extra_css:
+  - stylesheets/extra.css
 
 extra:
   version:

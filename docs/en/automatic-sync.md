@@ -2,7 +2,7 @@
 
 The **Automatic sync** page runs the existing creator synchronization workflow on a schedule. Every run creates a normal task, so progress, failures, pause, stop, and logs remain available from **Tasks**.
 
-![Automatic sync plans and recent updates](../assets/webui/37-auto-sync-desktop-light.png)
+![Automatic sync plans and recent updates](../assets/webui/42-auto-sync-showcase-desktop-light.png)
 
 ## Create a plan
 

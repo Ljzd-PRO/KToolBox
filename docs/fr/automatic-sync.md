@@ -2,7 +2,7 @@
 
 La page **Synchronisation automatique** exécute le flux existant de synchronisation des créateurs selon un calendrier. Chaque exécution crée une tâche normale ; sa progression, ses erreurs, sa pause, son arrêt et ses journaux restent accessibles dans **Tâches**.
 
-![Plans automatiques et mises à jour récentes](../assets/webui/37-auto-sync-desktop-light.png)
+![Plans automatiques et mises à jour récentes](../assets/webui/42-auto-sync-showcase-desktop-light.png)
 
 ## Créer un plan
 

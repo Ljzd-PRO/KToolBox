@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import os
 import sqlite3
 import tempfile
 from contextlib import AbstractAsyncContextManager
@@ -27,9 +28,11 @@ from ktoolbox.webui.app import create_app
 from ktoolbox.webui.filesystem import FilesystemBrowser
 from ktoolbox.webui.task_executor import TaskExecutionSnapshot
 from ktoolbox.webui.task_models import SyncTaskSpec, TaskRecord
+from tests.webui_showcase_data import SHOWCASE_CREATOR_BY_KEY, SHOWCASE_CREATORS
 
+SHOWCASE_MODE = os.environ.get("KTOOLBOX_SHOWCASE") == "1"
 HOST_ROOT = Path(tempfile.mkdtemp(prefix="ktoolbox-playwright-host-"))
-PROJECT_ROOT = HOST_ROOT / "project"
+PROJECT_ROOT = HOST_ROOT / ("Pawchive Showcase" if SHOWCASE_MODE else "project")
 PROJECT_ROOT.mkdir()
 HOST_HOME = HOST_ROOT / "home"
 HOST_HOME.mkdir()
@@ -44,42 +47,79 @@ PROJECT_ROOT.joinpath(".env").write_text(
     "KTOOLBOX_WEBUI__OPEN_BROWSER=false\n",
     encoding="utf-8",
 )
-PROJECT_ROOT.joinpath("ktoolbox.toml").write_text(
-    'schema_version = 3\n\n[[creators]]\nservice = "fanbox"\ncreator_id = "demo-studio"\n'
-    "enabled = true\n\n"
-    '[[creators]]\nservice = "patreon"\ncreator_id = "alpha-atelier"\n'
-    'alias = "Priority reference"\nenabled = true\n\n'
-    '[[creators]]\nservice = "pixiv"\ncreator_id = "studio-10"\n'
-    "enabled = false\n\n"
-    "[[automatic_sync]]\n"
-    'id = "daily-studios"\n'
-    'name = "Daily studios"\n'
-    "enabled = true\n"
-    'creators = ["fanbox:demo-studio", "patreon:alpha-atelier"]\n'
-    'initial_start_date = "2026-07-01"\n\n'
-    "[automatic_sync.schedule]\n"
-    'kind = "cron"\n'
-    'expression = "0 3 * * *"\n'
-    'timezone = "Asia/Shanghai"\n\n'
-    "[automatic_sync.options]\n"
-    'output = "downloads"\n'
-    "save_creator_indices = true\n\n"
-    "[[automatic_sync]]\n"
-    'id = "weekly-reference"\n'
-    'name = "Weekly reference"\n'
-    "enabled = false\n"
-    'creators = ["pixiv:studio-10"]\n\n'
-    "[automatic_sync.schedule]\n"
-    'kind = "interval"\n'
-    "every = 7\n"
-    'unit = "days"\n'
-    'timezone = "Asia/Tokyo"\n\n'
-    "[automatic_sync.options]\n"
-    'output = "downloads"\n\n'
-    "[naming]\n"
-    'creator_dirname_format = "{creator_name} ({service}-{creator_id})"\n',
-    encoding="utf-8",
-)
+if SHOWCASE_MODE:
+    project_configuration = (
+        'schema_version = 3\n\n[[creators]]\nservice = "fanbox"\ncreator_id = "476249"\n'
+        "enabled = true\n\n"
+        '[[creators]]\nservice = "fanbox"\ncreator_id = "6570768"\n'
+        'alias = "重点关注"\nenabled = true\n\n'
+        '[[creators]]\nservice = "fanbox"\ncreator_id = "6005584"\n'
+        "enabled = false\n\n"
+        "[[automatic_sync]]\n"
+        'id = "daily-pawchive-check"\n'
+        'name = "每日更新检查"\n'
+        "enabled = true\n"
+        'creators = ["fanbox:476249", "fanbox:6570768"]\n'
+        'initial_start_date = "2026-07-01"\n\n'
+        "[automatic_sync.schedule]\n"
+        'kind = "cron"\n'
+        'expression = "0 3 * * *"\n'
+        'timezone = "Asia/Shanghai"\n\n'
+        "[automatic_sync.options]\n"
+        'output = "downloads"\n'
+        "save_creator_indices = true\n\n"
+        "[[automatic_sync]]\n"
+        'id = "weekly-archive-check"\n'
+        'name = "每周归档检查"\n'
+        "enabled = false\n"
+        'creators = ["fanbox:6005584"]\n\n'
+        "[automatic_sync.schedule]\n"
+        'kind = "interval"\n'
+        "every = 7\n"
+        'unit = "days"\n'
+        'timezone = "Asia/Tokyo"\n\n'
+        "[automatic_sync.options]\n"
+        'output = "downloads"\n\n'
+        "[naming]\n"
+        'creator_dirname_format = "{creator_name} ({service}-{creator_id})"\n'
+    )
+else:
+    project_configuration = (
+        'schema_version = 3\n\n[[creators]]\nservice = "fanbox"\ncreator_id = "demo-studio"\n'
+        "enabled = true\n\n"
+        '[[creators]]\nservice = "patreon"\ncreator_id = "alpha-atelier"\n'
+        'alias = "Priority reference"\nenabled = true\n\n'
+        '[[creators]]\nservice = "pixiv"\ncreator_id = "studio-10"\n'
+        "enabled = false\n\n"
+        "[[automatic_sync]]\n"
+        'id = "daily-studios"\n'
+        'name = "Daily studios"\n'
+        "enabled = true\n"
+        'creators = ["fanbox:demo-studio", "patreon:alpha-atelier"]\n'
+        'initial_start_date = "2026-07-01"\n\n'
+        "[automatic_sync.schedule]\n"
+        'kind = "cron"\n'
+        'expression = "0 3 * * *"\n'
+        'timezone = "Asia/Shanghai"\n\n'
+        "[automatic_sync.options]\n"
+        'output = "downloads"\n'
+        "save_creator_indices = true\n\n"
+        "[[automatic_sync]]\n"
+        'id = "weekly-reference"\n'
+        'name = "Weekly reference"\n'
+        "enabled = false\n"
+        'creators = ["pixiv:studio-10"]\n\n'
+        "[automatic_sync.schedule]\n"
+        'kind = "interval"\n'
+        "every = 7\n"
+        'unit = "days"\n'
+        'timezone = "Asia/Tokyo"\n\n'
+        "[automatic_sync.options]\n"
+        'output = "downloads"\n\n'
+        "[naming]\n"
+        'creator_dirname_format = "{creator_name} ({service}-{creator_id})"\n'
+    )
+PROJECT_ROOT.joinpath("ktoolbox.toml").write_text(project_configuration, encoding="utf-8")
 
 LEGACY_FIXTURES = (
     (
@@ -125,6 +165,18 @@ class FixtureClient(AbstractAsyncContextManager["FixtureClient"]):
         return None
 
     async def list_creators(self) -> list[CreatorSummary]:
+        if SHOWCASE_MODE:
+            return [
+                CreatorSummary(
+                    id=creator.creator_id,
+                    service=creator.service,
+                    name=creator.name,
+                    favorited=0,
+                    indexed=creator.indexed,
+                    updated=creator.updated,
+                )
+                for creator in SHOWCASE_CREATORS
+            ]
         return [
             CreatorSummary(
                 id="demo-studio",
@@ -153,6 +205,16 @@ class FixtureClient(AbstractAsyncContextManager["FixtureClient"]):
         ]
 
     async def get_creator_profile(self, service: str, creator_id: str) -> CreatorProfile:
+        if SHOWCASE_MODE:
+            creator = SHOWCASE_CREATOR_BY_KEY.get(f"{service}:{creator_id}")
+            if creator is not None:
+                return CreatorProfile(
+                    id=creator.creator_id,
+                    service=creator.service,
+                    name=creator.name,
+                    indexed=creator.indexed,
+                    updated=creator.updated,
+                )
         names = {
             ("fanbox", "demo-studio"): "Demo Studio",
             ("patreon", "alpha-atelier"): "Alpha Atelier",
@@ -161,6 +223,20 @@ class FixtureClient(AbstractAsyncContextManager["FixtureClient"]):
         return CreatorProfile(id=creator_id, service=service, name=names.get((service, creator_id), creator_id))
 
     async def list_creator_posts(self, service: str, creator_id: str, **_: object) -> list[Post]:
+        if SHOWCASE_MODE:
+            creator = SHOWCASE_CREATOR_BY_KEY.get(f"{service}:{creator_id}")
+            if creator is not None:
+                return [
+                    Post(
+                        id=post.post_id,
+                        user=creator.creator_id,
+                        service=creator.service,
+                        title=post.title,
+                        published=post.published,
+                        added=post.added,
+                    )
+                    for post in creator.posts
+                ]
         return [
             Post(
                 id="fiction-1001",
@@ -173,10 +249,22 @@ class FixtureClient(AbstractAsyncContextManager["FixtureClient"]):
         ]
 
     async def get_post(self, service: str, creator_id: str, post_id: str) -> Post:
-        return (await self.list_creator_posts(service, creator_id))[0].model_copy(update={"id": post_id})
+        posts = await self.list_creator_posts(service, creator_id)
+        return next((post for post in posts if post.id == post_id), posts[0].model_copy(update={"id": post_id}))
 
     async def list_post_revisions(self, service: str, creator_id: str, post_id: str) -> list[Revision]:
-        return [Revision(id=post_id, user=creator_id, service=service, revision_id=1, title="Fictional revision")]
+        if not SHOWCASE_MODE:
+            return [
+                Revision(
+                    id=post_id,
+                    user=creator_id,
+                    service=service,
+                    revision_id=1,
+                    title="Fictional revision",
+                )
+            ]
+        post = await self.get_post(service, creator_id, post_id)
+        return [Revision(id=post_id, user=creator_id, service=service, revision_id=1, title=post.title)]
 
     async def get_app_version(self) -> str:
         return "playwright-fixture"
@@ -190,13 +278,13 @@ class FixtureExecutor:
         reporter: ProgressReporter,
     ) -> None:
         if task.spec.output.name == "failure-fixture":
-            creator = "fanbox:demo-studio"
+            creator = "fanbox:476249" if SHOWCASE_MODE else "fanbox:demo-studio"
             failure = generic_failure(
                 code=FailureCode.response_incompatible,
                 stage=FailureStage.work_list,
                 message="Pawchive returned data in an unsupported format",
                 platform="fanbox",
-                creator_id="demo-studio",
+                creator_id="476249" if SHOWCASE_MODE else "demo-studio",
             ).model_copy(
                 update={
                     "operation": "list_creator_posts",
@@ -237,29 +325,57 @@ class FixtureExecutor:
             return
 
         if task.spec.output.name == "live-layout-fixture":
-            creators = ["fanbox:demo-studio", "patreon:alpha-atelier"]
+            creators = (
+                ["fanbox:476249", "fanbox:6570768"]
+                if SHOWCASE_MODE
+                else ["fanbox:demo-studio", "patreon:alpha-atelier"]
+            )
+            showcase_files = (
+                [
+                    *SHOWCASE_CREATORS[0].posts[0].files,
+                    *SHOWCASE_CREATORS[0].posts[1].files[1:],
+                ]
+                if SHOWCASE_MODE
+                else []
+            )
             reporter.start()
             for creator in creators:
                 reporter.creator_started(creator)
+            active_downloads: dict[int, tuple[int, int]] = {}
             for index in range(8):
                 creator = creators[index % len(creators)]
+                file_name = (
+                    showcase_files[index].name if SHOWCASE_MODE else f"fictional-active-file-{index + 1:02d}.zip"
+                )
+                total = (
+                    showcase_files[index].size_bytes
+                    if SHOWCASE_MODE
+                    else (1024 * 1024 if index < 4 else 2 * 1024 * 1024)
+                )
                 reporter.job_queued(creator)
                 reporter.download_started(
                     f"live-{index}",
                     creator,
-                    f"fictional-active-file-{index + 1:02d}.zip",
-                    1024 * 1024 if index < 4 else 2 * 1024 * 1024,
+                    file_name,
+                    total,
                     0,
                 )
-            for step in range(64):
+                active_downloads[index] = (total, 0)
+            step_count = 320 if SHOWCASE_MODE else 64
+            for _ in range(step_count):
                 await asyncio.sleep(0.25)
-                for index in range(4 if step >= 32 else 8):
-                    task_index = index + 4 if step >= 32 else index
-                    reporter.download_advanced(f"live-{task_index}", 32 * 1024)
-                if step == 31:
-                    for index in range(4):
+                for index, (total, transferred) in list(active_downloads.items()):
+                    chunk = min(32 * 1024, total - transferred)
+                    reporter.download_advanced(f"live-{index}", chunk)
+                    transferred += chunk
+                    if transferred >= total:
                         reporter.download_finished(f"live-{index}", "completed")
-            for index in range(4, 8):
+                        del active_downloads[index]
+                    else:
+                        active_downloads[index] = (total, transferred)
+                if not active_downloads:
+                    break
+            for index in active_downloads:
                 reporter.download_finished(f"live-{index}", "completed")
             for creator in creators:
                 reporter.creator_finished(creator)
@@ -275,7 +391,7 @@ class FixtureExecutor:
             if isinstance(task.spec, SyncTaskSpec)
             else [f"{task.spec.service}:{task.spec.creator_id}"]
         )
-        creators = creators or ["fanbox:demo-studio"]
+        creators = creators or (["fanbox:476249"] if SHOWCASE_MODE else ["fanbox:demo-studio"])
         reporter.start()
         for creator in creators:
             reporter.creator_started(creator)
@@ -308,6 +424,20 @@ app = create_app(
 async def seed_automatic_sync_fixtures() -> None:
     database = app.state.database
     await database.initialize()
+    plan_id = "daily-pawchive-check" if SHOWCASE_MODE else "daily-studios"
+    plan_name = "每日更新检查" if SHOWCASE_MODE else "Daily studios"
+    run_id = "showcase-auto-run" if SHOWCASE_MODE else "fixture-auto-run"
+    run_timestamps = (
+        ("2026-07-28T19:01:12+00:00",) * 5
+        if SHOWCASE_MODE
+        else (
+            "2026-07-26T19:00:00+00:00",
+            "2026-07-26T19:00:00+00:00",
+            "2026-07-26T19:00:00+00:00",
+            "2026-07-26T19:00:01+00:00",
+            "2026-07-26T19:01:12+00:00",
+        )
+    )
     with sqlite3.connect(database.path) as connection:
         connection.execute(
             """
@@ -317,26 +447,33 @@ async def seed_automatic_sync_fixtures() -> None:
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
-                "fixture-auto-run",
-                "daily-studios",
-                "Daily studios",
+                run_id,
+                plan_id,
+                plan_name,
                 "scheduled",
                 "completed",
                 None,
-                "2026-07-26T19:00:00+00:00",
-                "2026-07-26T19:00:00+00:00",
-                "2026-07-26T19:00:00+00:00",
-                "2026-07-26T19:00:01+00:00",
-                "2026-07-26T19:01:12+00:00",
+                *run_timestamps,
             ),
         )
-        connection.execute(
-            """
-            INSERT OR REPLACE INTO creator_profile_cache(service, creator_id, name, fetched_at)
-            VALUES (?, ?, ?, ?)
-            """,
-            ("fanbox", "demo-studio", "Demo Studio", "2026-07-27T00:00:00+00:00"),
+        profile_fixtures = (
+            [(creator.service, creator.creator_id, creator.name) for creator in SHOWCASE_CREATORS]
+            if SHOWCASE_MODE
+            else [("fanbox", "demo-studio", "Demo Studio")]
         )
+        for service, creator_id, name in profile_fixtures:
+            connection.execute(
+                """
+                INSERT OR REPLACE INTO creator_profile_cache(service, creator_id, name, fetched_at)
+                VALUES (?, ?, ?, ?)
+                """,
+                (
+                    service,
+                    creator_id,
+                    name,
+                    "2026-07-29T00:00:00+00:00" if SHOWCASE_MODE else "2026-07-27T00:00:00+00:00",
+                ),
+            )
         for naming, _, _ in LEGACY_FIXTURES:
             naming_json = json.dumps(
                 naming.model_dump(mode="json"),
@@ -359,7 +496,20 @@ async def seed_automatic_sync_fixtures() -> None:
                     "2026-07-20T00:00:00+00:00",
                 ),
             )
-        for post_id in ("fixture-new-1", "fixture-new-2", "fixture-new-3"):
+        observed_posts = (
+            [
+                ("fanbox", creator.creator_id, post.post_id)
+                for creator in SHOWCASE_CREATORS[:2]
+                for post in creator.posts[: (4 if creator.creator_id == "476249" else 3)]
+            ]
+            if SHOWCASE_MODE
+            else [
+                ("fanbox", "demo-studio", "fixture-new-1"),
+                ("fanbox", "demo-studio", "fixture-new-2"),
+                ("fanbox", "demo-studio", "fixture-new-3"),
+            ]
+        )
+        for service, creator_id, post_id in observed_posts:
             connection.execute(
                 """
                 INSERT OR IGNORE INTO automatic_sync_observed_posts(
@@ -368,12 +518,12 @@ async def seed_automatic_sync_fixtures() -> None:
                 ) VALUES (?, ?, ?, ?, ?, ?, 0)
                 """,
                 (
-                    "fanbox",
-                    "demo-studio",
+                    service,
+                    creator_id,
                     post_id,
-                    "2026-07-26T19:01:00+00:00",
-                    "daily-studios",
-                    "fixture-auto-run",
+                    "2026-07-28T19:01:00+00:00" if SHOWCASE_MODE else "2026-07-26T19:01:00+00:00",
+                    plan_id,
+                    run_id,
                 ),
             )
         connection.commit()

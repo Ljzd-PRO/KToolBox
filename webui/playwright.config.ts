@@ -12,6 +12,7 @@ export default defineConfig({
   use: {
     baseURL: `http://127.0.0.1:${e2ePort}`,
     colorScheme: "light",
+    deviceScaleFactor: Number(process.env.KTOOLBOX_E2E_DPR ?? "1"),
     locale: "en-US",
     screenshot: "only-on-failure",
     trace: "retain-on-failure",

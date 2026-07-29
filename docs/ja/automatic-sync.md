@@ -2,7 +2,7 @@
 
 **自動同期**ページは既存のクリエイター同期をスケジュール実行します。各実行は通常のタスクとして作成され、進捗、失敗理由、一時停止、停止、ログを**タスク**ページで確認できます。
 
-![自動同期プランと最近の更新](../assets/webui/37-auto-sync-desktop-light.png)
+![自動同期プランと最近の更新](../assets/webui/42-auto-sync-showcase-desktop-light.png)
 
 ## プランを作成する
 

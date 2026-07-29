@@ -70,7 +70,7 @@ Les zones principales sont :
 
 ![Éditeur de tâche sur un écran étroit](../assets/webui/19-task-form-mobile-light-zh.png)
 
-![Liste des créateurs sur un écran étroit](../assets/webui/12-creators-mobile-light-zh.png)
+![Liste des créateurs Pawchive](../assets/webui/41-creators-showcase-desktop-light.png)
 
 La création d'une tâche utilise deux onglets fixes sans commandes de débordement. Les dates de synchronisation restent dans un unique champ de plage HeroUI officiel au format `year/month/day - year/month/day`, tandis que « Aucune date de début » et « Aucune date de fin » effacent indépendamment la limite correspondante. Le décalage des publications progresse par pas de 50. Les filtres de titre utilisent des HeroUI Chip supprimables, créés avec une virgule ou Entrée. Le téléchargement d'une œuvre unique et l'ajout d'un créateur utilisent des champs HeroUI indépendants, séparés par des fragments de chemin Pawchive au style de code, tels que `/platform/user/creator/post/post` ; les séparateurs ne sont jamais simulés comme des champs de saisie.
 
@@ -110,7 +110,7 @@ Les tâches `sync` et `download` conservent toutes les entrées de la CLI corres
 
 Chaque tâche conserve aussi un instantané réservé à la présentation avec sa clé cible normalisée, ainsi que les titre et nom du créateur facultatifs. Il reste lisible hors ligne et n'affecte jamais l'exécution, la déduplication ou les verrous. Les lignes commencent par cette cible plutôt que le chemin de sortie, et les détails, la pause/reprise, l'arrêt, la modification, le classement et la suppression restent visibles directement.
 
-![File de tâches de bureau avec des cibles lisibles](../assets/webui/21-task-queue-1440-dark-zh.png)
+![File de tâches de bureau avec des cibles lisibles](../assets/webui/43-task-queue-showcase-desktop-light.png)
 
 ![File mobile avec actions directes](../assets/webui/22-task-queue-mobile-light-zh.png)
 
@@ -120,11 +120,11 @@ La file principale exécute deux tâches par défaut (`KTOOLBOX_WEBUI__MAX_ACTIV
 
 Les événements en direct utilisent SSE avec reconnexion. L'état REST reste la référence et seul un événement `task.status` peut le modifier ; la fin d'un fichier ne termine jamais prématurément sa tâche. La vitesse globale utilise une fenêtre glissante de cinq secondes et un bref délai de transition, ce qui évite un passage furtif à zéro entre deux fichiers. L'aperçu et la page des tâches additionnent la vitesse des tâches réellement actives.
 
-![Aperçu avec vitesse globale](../assets/webui/28-overview-global-speed-light.png)
+![Aperçu avec vitesse globale](../assets/webui/40-overview-showcase-desktop-light.png)
 
 La vue détaillée indique les créateurs préparés, les fichiers, les octets, la progression totale, les vitesses globale et par fichier, l'heure estimée, les nombres ignorés/échoués, les créateurs actifs, les téléchargements actifs, les nouvelles tentatives en attente et les journaux structurés. Les trois panneaux en direct ont une hauteur stable et leur propre défilement : les changements de simultanéité ne déplacent plus le journal ni la page. La vue d'activité par défaut masque la progression par blocs et le bruit ordinaire de la file ; les vues transferts et diagnostic complet restent disponibles.
 
-![Panneaux de tâche stables](../assets/webui/29-task-live-panels-light.png)
+![Panneaux de tâche stables](../assets/webui/44-task-live-showcase-desktop-dark.png)
 
 Chaque tentative en échec conserve un rapport de diagnostic borné et expurgé au lieu d'un simple compteur. La ligne de tâche affiche la première cause utile ; le détail regroupe les échecs par créateur et fichier et indique l'étape, la possibilité de réessayer, les chemins de champs sûrs et l'action recommandée. Le corps des réponses amont, les titres d'œuvres, les cookies et les URL complètes de téléchargement ne sont jamais enregistrés. Sur écran étroit, la barre de 64px, l'espacement de page de 12px et le Popover d'apparence compact affichent davantage de contenu sans réduire le texte des formulaires sous 16px. Le catalogue MCP utilise des groupes HeroUI repliables et développe automatiquement les groupes correspondant à une recherche ou à un filtre de permission.
 
@@ -132,7 +132,7 @@ Chaque tentative en échec conserve un rapport de diagnostic borné et expurgé 
 
 ![Contrôles d'apparence mobiles compacts](../assets/webui/27-appearance-mobile-dark-zh.png)
 
-![Progression d'une tâche en direct](../assets/webui/14-task-running-1024-dark-zh.png)
+![Progression d'une tâche en direct sur mobile](../assets/webui/45-task-live-showcase-mobile-dark.png)
 
 La pause est coopérative : les flux réseau actifs se ferment, les fichiers terminés et temporaires pouvant reprendre restent, et la reprise crée une nouvelle tentative. Seules les tâches en pause, arrêtées, échouées ou interrompues (`interrupted`) peuvent reprendre. Une synchronisation terminée propose « Relancer », qui conserve l'enregistrement et crée une nouvelle tentative ; un téléchargement unique terminé ne le propose pas.
 

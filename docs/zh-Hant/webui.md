@@ -70,7 +70,7 @@ KToolBox 只有一個本機 WebUI 帳號。明確設定始終優先，`KTOOLBOX_
 
 ![窄螢幕工作編輯器](../assets/webui/19-task-form-mobile-light-zh.png)
 
-![窄螢幕創作者清單](../assets/webui/12-creators-mobile-light-zh.png)
+![Pawchive 創作者清單](../assets/webui/41-creators-showcase-desktop-light.png)
 
 建立工作使用兩個固定分頁，不會出現多餘的滾動控制項。同步日期保留為官方 HeroUI 的單一 `year/month/day - year/month/day` 範圍欄位，「不限開始日期」與「不限結束日期」可分別清除任一邊界。作品偏移量以 50 為步長。標題篩選使用可刪除的 HeroUI Chip，輸入逗號或 Enter 即可新增。單篇作品下載與新增創作者使用獨立的 HeroUI 欄位，並以程式碼樣式的 Pawchive 路徑片段（例如 `/platform/user/creator/post/post`）分隔，不會將分隔符模擬成輸入欄位。
 
@@ -110,7 +110,7 @@ KToolBox 只有一個本機 WebUI 帳號。明確設定始終優先，`KTOOLBOX_
 
 每個工作也會儲存僅用於顯示的快照，包含標準化目標金鑰以及可選的作品標題與創作者名稱。即使離線也保持可讀，永遠不影響執行、去重或資源鎖定。佇列列會優先顯示此目標而非輸出路徑，詳細資料、暫停/繼續、停止、編輯、排序與刪除控制則保持直接可見。
 
-![以可讀目標顯示的桌面工作佇列](../assets/webui/21-task-queue-1440-dark-zh.png)
+![以可讀目標顯示的桌面工作佇列](../assets/webui/43-task-queue-showcase-desktop-light.png)
 
 ![直接顯示操作的行動工作佇列](../assets/webui/22-task-queue-mobile-light-zh.png)
 
@@ -120,11 +120,11 @@ KToolBox 只有一個本機 WebUI 帳號。明確設定始終優先，`KTOOLBOX_
 
 即時事件使用支援重新連線的 SSE。REST 工作狀態仍是權威來源，且只有 `task.status` 事件可變更工作狀態；單一檔案完成不會讓上層工作提早完成。總下載速度採用五秒滾動視窗與短暫的檔案交接寬限期，切換檔案時不會瞬間歸零。概覽和工作頁都會彙總真正執行中工作的速度。
 
-![顯示全域下載速度的概覽](../assets/webui/28-overview-global-speed-light.png)
+![顯示全域下載速度的概覽](../assets/webui/40-overview-showcase-desktop-light.png)
 
 詳細檢視會報告已準備創作者、檔案、位元組、總進度、總速度與單檔速度、ETA、略過/失敗數、作用中創作者、作用中下載、等待重試和結構化記錄。三個即時面板有固定高度與獨立捲動區域，並行數變化不會再推動記錄或頁面。預設活動檢視會略過位元組級進度與一般入列雜訊，需要時仍可切換到傳輸或完整診斷檢視。
 
-![穩定的即時工作面板](../assets/webui/29-task-live-panels-light.png)
+![穩定的即時工作面板](../assets/webui/44-task-live-showcase-desktop-dark.png)
 
 失敗嘗試會持久儲存有界且已脫敏的診斷報告，不再只記錄失敗數量。工作項目直接顯示第一個有意義的原因；詳細資料依創作者與檔案分組，並標示失敗階段、是否適合重試、安全欄位路徑及建議處理方式。報告不會儲存上游回應本文、作品標題、Cookie 或完整下載 URL。窄螢幕採用 64px 頂列、12px 頁面間距和精簡外觀 Popover，在不把表單文字縮小到 16px 以下的前提下顯示更多內容；MCP 工具目錄使用可摺疊 HeroUI 群組，搜尋或權限篩選時會自動展開相符群組。
 
@@ -132,7 +132,7 @@ KToolBox 只有一個本機 WebUI 帳號。明確設定始終優先，`KTOOLBOX_
 
 ![精簡行動版外觀控制](../assets/webui/27-appearance-mobile-dark-zh.png)
 
-![即時工作進度](../assets/webui/14-task-running-1024-dark-zh.png)
+![行動版即時工作進度](../assets/webui/45-task-live-showcase-mobile-dark.png)
 
 暫停採合作方式：作用中網路串流會關閉，完成檔案與可續傳暫存檔會保留，繼續會建立新嘗試。停止會保留工作定義，以便編輯和重新執行。只有已暫停、已停止、失敗或中斷的工作可以繼續；已完成同步工作改為提供「重新執行」，沿用原工作記錄並建立新嘗試，已完成單篇下載不提供此操作。處理程序重新啟動會將先前執行中的工作標記為 `interrupted`、清除殘留即時進度，且復原永遠需要明確操作。
 

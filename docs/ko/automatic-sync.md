@@ -2,7 +2,7 @@
 
 **자동 동기화** 페이지는 기존 크리에이터 동기화 흐름을 예약 실행합니다. 각 실행은 일반 작업으로 생성되므로 **작업** 페이지에서 진행률, 실패 원인, 일시 중지, 중지 및 로그를 계속 확인할 수 있습니다.
 
-![자동 동기화 계획과 최근 업데이트](../assets/webui/37-auto-sync-desktop-light.png)
+![자동 동기화 계획과 최근 업데이트](../assets/webui/42-auto-sync-showcase-desktop-light.png)
 
 ## 계획 만들기
 

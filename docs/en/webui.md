@@ -70,7 +70,7 @@ The main areas are:
 
 ![Task editor on a narrow screen](../assets/webui/19-task-form-mobile-light-zh.png)
 
-![Creator roster on a narrow screen](../assets/webui/12-creators-mobile-light-zh.png)
+![Pawchive creator roster](../assets/webui/41-creators-showcase-desktop-light.png)
 
 Task creation uses two fixed tabs without overflow controls. Synchronization dates remain one official HeroUI range field in `year/month/day - year/month/day` form, while “No start date” and “No end date” independently clear either boundary. The post offset control advances in steps of 50. Title filters use removable HeroUI Chips created with a comma or Enter. Single-work downloads and new roster entries use independent HeroUI fields separated by code-styled Pawchive path fragments such as `/platform/user/creator/post/post`; the separators are never simulated inputs.
 
@@ -114,7 +114,7 @@ Before a save, the server parses and validates the proposed file and returns a s
 
 Each task also stores a presentation-only snapshot with its normalized target key and optional post title and creator name. It remains readable offline and never affects execution, deduplication, or resource locking. Queue rows lead with that target instead of an output path, and details, pause/resume, stop, edit, ordering, and delete controls remain directly visible.
 
-![Desktop task queue with readable targets](../assets/webui/21-task-queue-1440-dark-zh.png)
+![Desktop task queue with readable targets](../assets/webui/43-task-queue-showcase-desktop-light.png)
 
 ![Mobile task queue with direct actions](../assets/webui/22-task-queue-mobile-light-zh.png)
 
@@ -124,11 +124,11 @@ The top-level queue runs two tasks by default (`KTOOLBOX_WEBUI__MAX_ACTIVE_TASKS
 
 Live events use SSE with reconnect support. REST task state remains authoritative, and only a `task.status` event can change it; a completed file never marks its parent task complete. Aggregate download speed uses a five-second rolling window with a short hand-off grace period, so switching between files does not flash to zero. The overview and task page both show the speed summed across genuinely running tasks.
 
-![Overview with aggregate download speed](../assets/webui/28-overview-global-speed-light.png)
+![Overview with aggregate download speed](../assets/webui/40-overview-showcase-desktop-light.png)
 
 The detail view reports prepared creators, files, bytes, overall progress, aggregate and per-file speeds, ETA, skipped/failed counts, active creators, active downloads, waiting retries, and structured logs. The three live panels have stable heights and their own scroll areas, so changing concurrency does not move the log or the page. The default activity view omits byte-level progress and ordinary queue noise; transfer and complete diagnostic views remain available when needed.
 
-![Stable live task panels](../assets/webui/29-task-live-panels-light.png)
+![Stable live task panels](../assets/webui/44-task-live-showcase-desktop-dark.png)
 
 Failed attempts persist a bounded, redacted diagnostic report instead of only a failure count. The task row shows the first useful cause; details group failures by creator and file and identify the stage, retryability, safe field paths, and a suggested recovery action. Upstream response bodies, post titles, cookies, and complete download URLs are never stored in this report. On narrow screens, the 64px workbar, 12px page spacing, and compact appearance Popover expose more useful content without shrinking form text below 16px. The MCP tool catalog uses collapsible HeroUI groups and automatically expands matching groups during search or permission filtering.
 
@@ -136,7 +136,7 @@ Failed attempts persist a bounded, redacted diagnostic report instead of only a 
 
 ![Compact mobile appearance controls](../assets/webui/27-appearance-mobile-dark-zh.png)
 
-![Live task progress](../assets/webui/14-task-running-1024-dark-zh.png)
+![Live task progress on a mobile screen](../assets/webui/45-task-live-showcase-mobile-dark.png)
 
 Pause is cooperative: active network streams close, completed files and resumable temporary files remain, and resume creates a new attempt. Stop keeps the task definition so it can be edited and rerun. Resume is available only for paused, stopped, failed, or interrupted work. A completed synchronization instead offers **Rerun**, which reuses the task record and creates a new attempt; a completed single-work download does not. A process restart marks formerly running work as `interrupted`, clears stale live progress, and requires explicit recovery.
 

@@ -70,7 +70,7 @@ KToolBox 只提供一个本地 WebUI 账户。显式配置始终优先，`KTOOLB
 
 ![窄屏任务编辑器](../assets/webui/19-task-form-mobile-light-zh.png)
 
-![窄屏作者清单](../assets/webui/12-creators-mobile-light-zh.png)
+![Pawchive 作者清单](../assets/webui/41-creators-showcase-desktop-light.png)
 
 创建任务使用两个固定标签，不会出现多余的滚动按钮。同步日期保留为官方 HeroUI 的单个 `year/month/day - year/month/day` 范围字段，同时允许“不限起始日期”和“不限结束日期”分别清空任一边界；作品偏移量始终以 50 为步长。标题筛选以可删除的 HeroUI Chip 展示，输入中英文逗号或回车即可添加。单个作品下载和新增作者使用独立 HeroUI 字段，并以代码样式的 `/platform/user/creator/post/post` 路径片段分隔，不再把分隔符伪装成输入控件。
 
@@ -114,7 +114,7 @@ KToolBox 只提供一个本地 WebUI 账户。显式配置始终优先，`KTOOLB
 
 每项任务还保存仅用于展示的快照，其中包含规范化目标键及可选作品标题、作者名；离线时仍然可读，且不会参与执行、去重或资源锁。队列条目以任务目标而非输出路径作为主体，详情、暂停/恢复、停止、编辑、排序和删除操作始终直接可见。
 
-![具有可读任务目标的桌面队列](../assets/webui/21-task-queue-1440-dark-zh.png)
+![具有可读任务目标的桌面队列](../assets/webui/43-task-queue-showcase-desktop-light.png)
 
 ![直接展示操作的移动任务队列](../assets/webui/22-task-queue-mobile-light-zh.png)
 
@@ -124,11 +124,11 @@ KToolBox 只提供一个本地 WebUI 账户。显式配置始终优先，`KTOOLB
 
 实时事件通过支持断线续接的 SSE 发送，REST 中的任务状态始终是最终依据，且只有 `task.status` 事件可以改变任务状态；单个文件下载完成不会把所属任务提前标记为完成。总下载速度使用五秒滚动窗口和短暂的文件交接宽限期，切换文件时不会瞬间闪为零。概览页和任务页都会汇总所有真正运行中任务的速度。
 
-![显示全局下载速度的概览](../assets/webui/28-overview-global-speed-light.png)
+![显示全局下载速度的概览](../assets/webui/40-overview-showcase-desktop-light.png)
 
 详情页显示作者准备状态、文件数、传输字节、总体进度、总速度与单文件速度、ETA、跳过/失败计数、活动作者、活动下载、等待重试及结构化日志。三张实时卡片拥有稳定高度和独立滚动区域，并发数量变化不会再推动日志或页面。默认“活动”视图会过滤逐块进度与普通入队噪声，需要时仍可切换到文件传输或完整诊断视图。
 
-![稳定的任务实时卡片](../assets/webui/29-task-live-panels-light.png)
+![稳定的任务实时卡片](../assets/webui/44-task-live-showcase-desktop-dark.png)
 
 失败尝试会持久保存有界且脱敏的诊断报告，不再只记录失败数量。任务条目直接显示第一条有意义的原因；详情页按作者与文件分组，并给出失败阶段、是否适合重试、安全字段路径和建议处理方式。报告不会保存上游响应正文、作品标题、Cookie 或完整下载 URL。窄屏使用 64px 顶栏、12px 页面间距和紧凑外观 Popover，在不把表单文字缩小到 16px 以下的前提下展示更多内容；MCP 工具目录使用可折叠 HeroUI 分组，并在搜索或权限筛选时自动展开匹配组。
 
@@ -136,7 +136,7 @@ KToolBox 只提供一个本地 WebUI 账户。显式配置始终优先，`KTOOLB
 
 ![紧凑移动端外观控制](../assets/webui/27-appearance-mobile-dark-zh.png)
 
-![实时任务进度](../assets/webui/14-task-running-1024-dark-zh.png)
+![移动端实时任务进度](../assets/webui/45-task-live-showcase-mobile-dark.png)
 
 暂停采用协作方式：关闭活动网络流，保留已完成文件和可续传临时文件；恢复会新建一次尝试。停止会保留任务定义，以便编辑后重新执行。只有暂停、停止、失败和中断任务可以恢复；已完成同步任务改为提供“重新运行”，复用原任务记录并新建一次尝试，已完成的单作品下载不提供此操作。服务进程重启后，原运行任务标记为 `interrupted`，残留实时进度会被清空，并且必须由用户明确恢复。
 
