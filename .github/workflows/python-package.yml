@@ -46,7 +46,7 @@ jobs:
         run: poetry build
 
       - name: Upload Wheels
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ktoolbox-wheels
           path: dist
@@ -121,7 +121,7 @@ jobs:
             "
 
       - name: Upload Executable
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ktoolbox-${{ runner.os }}-${{ matrix.arch }}
           path: dist
