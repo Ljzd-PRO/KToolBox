@@ -748,7 +748,7 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
       response.request().method() === "GET" &&
       response.ok(),
   );
-  await creatorRow.getByRole("switch", { name: "Enabled" }).press("Space");
+  await creatorRow.locator('[data-slot="switch"]').click();
   await Promise.all([creatorUpdate, creatorRefresh]);
   const disabledCreatorSwitch = creatorRow.getByRole("switch", { name: "Disabled" });
   await expect(disabledCreatorSwitch).toBeVisible({ timeout: 15_000 });
