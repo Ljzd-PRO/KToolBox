@@ -760,6 +760,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/naming/layout-versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List project naming layout versions
+         * @description Return persistent, deduplicated project naming snapshots available as legacy directory conversion sources.
+         */
+        get: operations["get_naming_layout_versions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/naming/legacy-migration": {
         parameters: {
             query?: never;
@@ -2225,6 +2245,29 @@ export interface components {
              * @default true
              */
             selectable: boolean;
+        };
+        /** NamingLayoutVersionResponse */
+        NamingLayoutVersionResponse: {
+            /** Id */
+            id: string;
+            /** Revision */
+            revision: string;
+            naming: components["schemas"]["ProjectNamingConfiguration"];
+            /**
+             * Origin
+             * @enum {string}
+             */
+            origin: "project_current" | "project_change" | "legacy_migration" | "recovered";
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Is Current
+             * @default false
+             */
+            is_current: boolean;
         };
         /** NamingLegacyContextResponse */
         NamingLegacyContextResponse: {
@@ -4509,6 +4552,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NamingLegacyContextResponse"];
+                };
+            };
+        };
+    };
+    get_naming_layout_versions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NamingLayoutVersionResponse"][];
                 };
             };
         };

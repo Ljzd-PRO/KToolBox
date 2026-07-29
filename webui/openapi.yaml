@@ -2120,6 +2120,31 @@ paths:
         scope: null
         safety: null
         openWorld: false
+  /api/v1/naming/layout-versions:
+    get:
+      tags:
+      - naming
+      summary: List project naming layout versions
+      operationId: get_naming_layout_versions
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/NamingLayoutVersionResponse'
+                type: array
+                title: Response Get Naming Layout Versions
+      description: Return persistent, deduplicated project naming snapshots available as legacy directory conversion sources.
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: get_naming_layout_versions
+        scope: null
+        safety: null
+        openWorld: false
   /api/v1/naming/legacy-migration:
     get:
       tags:
@@ -4790,6 +4815,40 @@ components:
       - source
       - target
       title: NamingCreatorPreview
+    NamingLayoutVersionResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        revision:
+          type: string
+          title: Revision
+        naming:
+          $ref: '#/components/schemas/ProjectNamingConfiguration'
+        origin:
+          type: string
+          enum:
+          - project_current
+          - project_change
+          - legacy_migration
+          - recovered
+          title: Origin
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        is_current:
+          type: boolean
+          title: Is Current
+          default: false
+      type: object
+      required:
+      - id
+      - revision
+      - naming
+      - origin
+      - created_at
+      title: NamingLayoutVersionResponse
     NamingLegacyContextResponse:
       properties:
         roots:

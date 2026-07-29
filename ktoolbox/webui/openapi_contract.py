@@ -362,6 +362,11 @@ OPERATIONS: dict[str, OperationMetadata] = {
         "Return suggested legacy download locations and pending conversion state without changing task outputs.",
         "naming",
     ),
+    "get_naming_layout_versions": OperationMetadata(
+        "List project naming layout versions",
+        "Return persistent, deduplicated project naming snapshots available as legacy directory conversion sources.",
+        "naming",
+    ),
     "get_legacy_naming_migration": OperationMetadata(
         "Inspect legacy naming configuration",
         "Return a read-only field comparison for legacy dotenv naming settings that still require confirmation.",

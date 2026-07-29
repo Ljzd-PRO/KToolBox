@@ -167,6 +167,14 @@ class WebUIDatabase:
                     updated_at TEXT NOT NULL
                 );
 
+                CREATE TABLE IF NOT EXISTS naming_layout_versions (
+                    id TEXT PRIMARY KEY,
+                    revision TEXT NOT NULL UNIQUE,
+                    naming_json TEXT NOT NULL,
+                    origin TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+
                 CREATE TABLE IF NOT EXISTS automatic_sync_runs (
                     id TEXT PRIMARY KEY,
                     plan_id TEXT NOT NULL,
@@ -268,6 +276,10 @@ class WebUIDatabase:
             await connection.execute(
                 "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
                 (11, utc_now().isoformat()),
+            )
+            await connection.execute(
+                "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
+                (12, utc_now().isoformat()),
             )
             await connection.commit()
 

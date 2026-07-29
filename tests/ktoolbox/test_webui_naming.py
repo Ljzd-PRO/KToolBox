@@ -158,6 +158,53 @@ async def test_naming_sections_save_without_overwriting_each_other(tmp_path: Pat
     await service.stop()
 
 
+@pytest.mark.asyncio
+async def test_naming_layout_versions_are_persistent_and_deduplicated(tmp_path: Path) -> None:
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    store.save(ProjectConfiguration())
+    service, _ = await service_for(tmp_path)
+
+    initial_versions = await service.layout_versions()
+    assert len(initial_versions) == 1
+    assert initial_versions[0].is_current is True
+    initial_id = initial_versions[0].id
+
+    candidate = store.load().naming.model_copy(update={"post_dirname_format": "{post_id}"})
+    await save_naming(service, store, candidate)
+    versions = await service.layout_versions()
+    assert len(versions) == 2
+    assert {version.id for version in versions} >= {initial_id}
+    assert sum(version.is_current for version in versions) == 1
+
+    await save_naming(service, store, candidate)
+    assert len(await service.layout_versions()) == 2
+    await service.stop()
+
+    restarted, _ = await service_for(tmp_path)
+    restarted_versions = await restarted.layout_versions()
+    assert {version.id for version in restarted_versions} == {version.id for version in versions}
+    await restarted.stop()
+
+
+@pytest.mark.asyncio
+async def test_layout_version_history_survives_completed_conversion(tmp_path: Path) -> None:
+    downloads = tmp_path / "downloads"
+    downloads.mkdir()
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    store.save(ProjectConfiguration())
+    service, _ = await service_for(tmp_path)
+    candidate = store.load().naming.model_copy(update={"post_dirname_format": "{post_id}"})
+    await save_naming(service, store, candidate)
+
+    preview = await service.preview([Path("downloads")])
+    conversion = await service.apply(preview.id, [])
+
+    assert conversion.status == "completed"
+    assert await service.has_pending_layout() is False
+    assert len(await service.layout_versions()) == 2
+    await service.stop()
+
+
 def write_downloaded_work(root: Path, creator_dir: str, work_dir: str, post_id: str) -> Path:
     path = root / creator_dir / work_dir
     path.mkdir(parents=True)
@@ -457,8 +504,7 @@ async def test_legacy_migration_requires_explicit_field_confirmation(tmp_path: P
     project.naming.filename_format = "{post_id}_{}"
     store.save(project)
     (tmp_path / ".env").write_text(
-        "KTOOLBOX_JOB__POST_DIRNAME_FORMAT={title} [{id}]\n"
-        "KTOOLBOX_JOB__FILENAME_FORMAT={id}_{}\n",
+        "KTOOLBOX_JOB__POST_DIRNAME_FORMAT={title} [{id}]\nKTOOLBOX_JOB__FILENAME_FORMAT={id}_{}\n",
         encoding="utf-8",
     )
     service, _ = await service_for(tmp_path)
@@ -510,6 +556,9 @@ async def test_naming_routes_require_session_and_csrf(tmp_path: Path) -> None:
     async with authenticated_client(tmp_path) as (client, csrf):
         current = await client.get("/api/v1/naming")
         assert current.status_code == 200
+        versions = await client.get("/api/v1/naming/layout-versions")
+        assert versions.status_code == 200
+        assert len(versions.json()) == 1
         update_payload = {
             "section": "templates",
             "revision": current.json()["revision"],
@@ -550,8 +599,7 @@ async def test_legacy_migration_routes_apply_selected_fields(tmp_path: Path) -> 
     store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
     store.save(ProjectConfiguration())
     (tmp_path / ".env").write_text(
-        "KTOOLBOX_JOB__POST_DIRNAME_FORMAT={id}\n"
-        "KTOOLBOX_JOB__MIX_POSTS=true\n",
+        "KTOOLBOX_JOB__POST_DIRNAME_FORMAT={id}\nKTOOLBOX_JOB__MIX_POSTS=true\n",
         encoding="utf-8",
     )
 
@@ -567,10 +615,7 @@ async def test_legacy_migration_routes_apply_selected_fields(tmp_path: Path) -> 
         payload = {
             "selected_fields": ["post_dirname_format"],
             "project_revision": body["project_revision"],
-            "source_revisions": {
-                source["name"]: source["revision"]
-                for source in body["sources"]
-            },
+            "source_revisions": {source["name"]: source["revision"] for source in body["sources"]},
         }
         assert (
             await client.post(

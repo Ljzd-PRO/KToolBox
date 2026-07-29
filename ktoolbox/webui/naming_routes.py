@@ -13,6 +13,7 @@ from ktoolbox.webui.naming_models import (
     NamingApplyRequest,
     NamingConfigurationResponse,
     NamingConversionResponse,
+    NamingLayoutVersionResponse,
     NamingLegacyContextResponse,
     NamingPreviewRequest,
     NamingPreviewResponse,
@@ -73,6 +74,16 @@ def create_naming_router() -> APIRouter:
         service: NamingServiceDependency,
     ) -> NamingLegacyContextResponse:
         return await service.legacy_context()
+
+    @router.get(
+        "/naming/layout-versions",
+        response_model=list[NamingLayoutVersionResponse],
+    )
+    async def get_naming_layout_versions(
+        _: SessionDependency,
+        service: NamingServiceDependency,
+    ) -> list[NamingLayoutVersionResponse]:
+        return await service.layout_versions()
 
     @router.get(
         "/naming/legacy-migration",

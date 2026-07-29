@@ -51,6 +51,8 @@ from ktoolbox.webui.naming_models import (
     NamingConversionProgress,
     NamingConversionResponse,
     NamingCreatorPreview,
+    NamingLayoutVersionOrigin,
+    NamingLayoutVersionResponse,
     NamingLegacyContextResponse,
     NamingPreviewResponse,
     NamingSection,
@@ -113,6 +115,7 @@ class NamingConversionService:
 
     async def start(self) -> None:
         await self._migrate_legacy_roots()
+        await self._seed_layout_versions()
         await self._recover_incomplete()
 
     async def stop(self) -> None:
@@ -159,6 +162,29 @@ class NamingConversionService:
             revision=content_revision(self.project_store.load_text()),
             conversion_pending=await self.has_pending_layout(),
         )
+
+    async def layout_versions(self) -> list[NamingLayoutVersionResponse]:
+        current_revision = _naming_revision(self.project_store.load().naming)
+        async with self.database.connect() as connection:
+            connection.row_factory = aiosqlite.Row
+            rows = await connection.execute_fetchall(
+                """
+                SELECT id, revision, naming_json, origin, created_at
+                FROM naming_layout_versions
+                ORDER BY created_at DESC, id DESC
+                """
+            )
+        return [
+            NamingLayoutVersionResponse(
+                id=row["id"],
+                revision=row["revision"],
+                naming=ProjectNamingConfiguration.model_validate_json(row["naming_json"]),
+                origin=row["origin"],
+                created_at=row["created_at"],
+                is_current=row["revision"] == current_revision,
+            )
+            for row in rows
+        ]
 
     async def legacy_migration(self) -> LegacyNamingMigrationResponse:
         preview = await anyio.to_thread.run_sync(
@@ -212,6 +238,7 @@ class NamingConversionService:
                     previous,
                     result.naming,
                     create_prompt=False,
+                    target_origin="legacy_migration",
                 )
             await self.events.publish(
                 "configuration.changed",
@@ -247,9 +274,7 @@ class NamingConversionService:
             merged = _merge_naming_section(previous, candidate, section)
             naming_changed = merged != previous
             output_changed = (
-                section == "structure"
-                and default_output is not None
-                and default_output != project.default_output
+                section == "structure" and default_output is not None and default_output != project.default_output
             )
             if naming_changed or output_changed:
                 project.naming = merged
@@ -450,9 +475,7 @@ class NamingConversionService:
             await self._ensure_no_active_conversion(exclude_id=conversion_id)
             await self._ensure_no_overlapping_tasks(conversion.preview.roots)
             await self._validate_resume_state(conversion)
-            candidate = ProjectNamingConfiguration.model_validate_json(
-                await self._candidate_json(conversion_id)
-            )
+            candidate = ProjectNamingConfiguration.model_validate_json(await self._candidate_json(conversion_id))
             await self._set_status(conversion_id, "queued")
             await self.events.publish(
                 "naming.conversion.resumed",
@@ -595,9 +618,22 @@ class NamingConversionService:
         target: ProjectNamingConfiguration,
         *,
         create_prompt: bool = True,
+        target_origin: NamingLayoutVersionOrigin = "project_change",
     ) -> None:
         now = utc_now().isoformat()
         async with self.database.connect() as connection:
+            await self._store_layout_version(
+                connection,
+                previous,
+                origin="project_change",
+                created_at=now,
+            )
+            await self._store_layout_version(
+                connection,
+                target,
+                origin=target_origin,
+                created_at=now,
+            )
             row = await (
                 await connection.execute("SELECT sources_json FROM naming_layout_state WHERE id = 1")
             ).fetchone()
@@ -658,6 +694,77 @@ class NamingConversionService:
                 )
             await connection.commit()
 
+    async def _seed_layout_versions(self) -> None:
+        current = self.project_store.load().naming
+        now = utc_now().isoformat()
+        recovered: list[ProjectNamingConfiguration] = []
+        async with self.database.connect() as connection:
+            connection.row_factory = aiosqlite.Row
+            state = await (
+                await connection.execute("SELECT sources_json, target_json FROM naming_layout_state WHERE id = 1")
+            ).fetchone()
+            if state is not None:
+                recovered.extend(
+                    ProjectNamingConfiguration.model_validate(item) for item in json.loads(str(state["sources_json"]))
+                )
+                recovered.append(ProjectNamingConfiguration.model_validate_json(str(state["target_json"])))
+            notices = await connection.execute_fetchall(
+                """
+                SELECT payload_json FROM startup_notices
+                WHERE kind = 'legacy_layout_conversion'
+                """
+            )
+            for notice in notices:
+                try:
+                    payload = json.loads(str(notice["payload_json"]))
+                    recovered.extend(
+                        ProjectNamingConfiguration.model_validate(payload[key])
+                        for key in ("source", "target")
+                        if payload.get(key) is not None
+                    )
+                except (TypeError, ValueError):
+                    continue
+            for naming in recovered:
+                await self._store_layout_version(
+                    connection,
+                    naming,
+                    origin="recovered",
+                    created_at=now,
+                )
+            await self._store_layout_version(
+                connection,
+                current,
+                origin="project_current",
+                created_at=now,
+            )
+            await connection.commit()
+
+    async def _store_layout_version(
+        self,
+        connection: aiosqlite.Connection,
+        naming: ProjectNamingConfiguration,
+        *,
+        origin: NamingLayoutVersionOrigin,
+        created_at: str,
+    ) -> str:
+        revision = _naming_revision(naming)
+        version_id = f"naming-layout-{revision[:24]}"
+        await connection.execute(
+            """
+            INSERT OR IGNORE INTO naming_layout_versions(
+                id, revision, naming_json, origin, created_at
+            ) VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                version_id,
+                revision,
+                _canonical_naming_json(naming),
+                origin,
+                created_at,
+            ),
+        )
+        return version_id
+
     async def _resolve_layout_notices(
         self,
         target: ProjectNamingConfiguration,
@@ -675,9 +782,7 @@ class NamingConversionService:
                 """
             )
             matching = [
-                str(row["id"])
-                for row in rows
-                if json.loads(str(row["payload_json"])).get("target") == target_data
+                str(row["id"]) for row in rows if json.loads(str(row["payload_json"])).get("target") == target_data
             ]
             if matching:
                 placeholders = ",".join("?" for _ in matching)
@@ -759,9 +864,7 @@ class NamingConversionService:
             )
             operations = [row for row in all_operations if row["status"] == "planned"]
             progress = NamingConversionProgress(
-                completed_operations=sum(
-                    1 for row in all_operations if row["status"] == "completed"
-                ),
+                completed_operations=sum(1 for row in all_operations if row["status"] == "completed"),
                 total_operations=len(all_operations),
             )
             await self._set_progress(conversion_id, progress)
@@ -958,9 +1061,7 @@ class NamingConversionService:
         conversion: NamingConversionResponse,
     ) -> None:
         if content_revision(self.project_store.load_text()) != conversion.preview.revision:
-            raise NamingPreviewStaleError(
-                "project configuration changed while conversion was paused"
-            )
+            raise NamingPreviewStaleError("project configuration changed while conversion was paused")
         operations = await self._operations(
             conversion.id,
             conversion.selected_creators,
@@ -1131,26 +1232,18 @@ def _validate_resume_filesystem(
 ) -> None:
     for root in roots:
         if not root.is_dir() or root.is_symlink():
-            raise NamingPreviewStaleError(
-                f"download location changed while conversion was paused: {root}"
-            )
+            raise NamingPreviewStaleError(f"download location changed while conversion was paused: {root}")
         if shutil.disk_usage(root).free <= 0:
             raise NamingConversionError(f"download location has no free space: {root}")
     for status, source, target in operations:
         if status == "completed":
             if source.exists() or not target.exists():
-                raise NamingPreviewStaleError(
-                    "completed conversion paths changed while paused"
-                )
+                raise NamingPreviewStaleError("completed conversion paths changed while paused")
         elif status == "planned":
             if not source.exists() or target.exists():
-                raise NamingPreviewStaleError(
-                    "pending conversion paths changed while paused"
-                )
+                raise NamingPreviewStaleError("pending conversion paths changed while paused")
         else:
-            raise NamingPreviewStaleError(
-                "conversion operation state changed while paused"
-            )
+            raise NamingPreviewStaleError("conversion operation state changed while paused")
 
 
 def _scan_download_roots(
@@ -1746,6 +1839,19 @@ def _conversion_from_row(row: aiosqlite.Row) -> NamingConversionResponse:
         created_at=row["created_at"],
         updated_at=row["updated_at"],
     )
+
+
+def _canonical_naming_json(naming: ProjectNamingConfiguration) -> str:
+    return json.dumps(
+        naming.model_dump(mode="json"),
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+
+
+def _naming_revision(naming: ProjectNamingConfiguration) -> str:
+    return hashlib.sha256(_canonical_naming_json(naming).encode("utf-8")).hexdigest()
 
 
 def _legacy_migration_response(

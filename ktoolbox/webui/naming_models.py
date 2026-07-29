@@ -21,6 +21,12 @@ NamingConversionStatus = Literal[
 ]
 NamingSection = Literal["structure", "templates"]
 StartupNoticeResolution = Literal["ignored", "convert_selected"]
+NamingLayoutVersionOrigin = Literal[
+    "project_current",
+    "project_change",
+    "legacy_migration",
+    "recovered",
+]
 
 
 class NamingConfigurationResponse(BaseModel):
@@ -41,6 +47,15 @@ class NamingUpdateRequest(BaseModel):
 class NamingLegacyContextResponse(BaseModel):
     roots: list[Path] = Field(default_factory=list)
     conversion_pending: bool = False
+
+
+class NamingLayoutVersionResponse(BaseModel):
+    id: str
+    revision: str
+    naming: ProjectNamingConfiguration
+    origin: NamingLayoutVersionOrigin
+    created_at: datetime
+    is_current: bool = False
 
 
 class LegacyNamingSourceResponse(BaseModel):
