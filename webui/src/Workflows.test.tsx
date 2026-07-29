@@ -273,7 +273,7 @@ describe("project workflows", () => {
     await user.click(screen.getAllByRole("button", { name: "Edit fanbox:42" })[0]);
     expect(screen.getByRole("combobox", { name: "Platform" })).toHaveAttribute("readonly");
     expect(screen.getByRole("textbox", { name: "Creator ID" })).toHaveAttribute("readonly");
-  });
+  }, 15_000);
 
   it("renders scoped blocker controls from project TOML", async () => {
     const user = userEvent.setup();

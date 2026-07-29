@@ -109,6 +109,7 @@ async def test_run_webui_rejects_an_invalid_password_hash_before_server_start(
 async def test_run_webui_first_sigint_requests_a_graceful_shutdown(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     class FakeConfig:
         def __init__(self, app, **kwargs) -> None:
@@ -138,6 +139,7 @@ async def test_run_webui_first_sigint_requests_a_graceful_shutdown(
     monkeypatch.setattr(uvicorn, "Server", InterruptingServer)
 
     await run_webui(tmp_path, open_browser=False)
+    assert "Graceful shutdown requested; press Ctrl+C again to force stop." in capsys.readouterr().err
 
 
 @pytest.mark.asyncio

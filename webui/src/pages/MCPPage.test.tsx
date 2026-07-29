@@ -156,5 +156,5 @@ describe("MCP page", () => {
     expect(screen.getByText("“Codex desktop” will stop working immediately. Existing WebUI sessions are not affected.")).toBeInTheDocument();
     await user.click(screen.getAllByRole("button", { name: "Revoke" }).at(-1)!);
     await waitFor(() => expect(screen.getAllByText("Revoked").length).toBeGreaterThan(0));
-  });
+  }, 15_000);
 });

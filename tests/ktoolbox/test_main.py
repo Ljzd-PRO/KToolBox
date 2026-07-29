@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import selectors
 import signal
 import socket
 import subprocess
@@ -291,12 +292,38 @@ def test_terminal_webui_interrupt_logs_clean_shutdown(tmp_path: Path) -> None:
     assert events_response.status == 200
     try:
         process.send_signal(signal.SIGINT)
-        time.sleep(0.02)
+        shutdown_output = _read_until(
+            process,
+            "Graceful shutdown requested; press Ctrl+C again to force stop.",
+            timeout=5,
+        )
         process.send_signal(signal.SIGINT)
-        terminal_output, _ = process.communicate(timeout=10)
+        remaining_output, _ = process.communicate(timeout=10)
     finally:
         events_connection.close()
 
+    terminal_output = shutdown_output + remaining_output
     assert process.returncode == 130
     assert "KToolBox was forcefully stopped by the user" in terminal_output
     assert "Traceback" not in terminal_output
+
+
+def _read_until(process: subprocess.Popen[str], expected: str, *, timeout: float) -> str:
+    assert process.stdout is not None
+    output: list[str] = []
+    deadline = time.monotonic() + timeout
+    with selectors.DefaultSelector() as selector:
+        selector.register(process.stdout, selectors.EVENT_READ)
+        while time.monotonic() < deadline:
+            if process.poll() is not None:
+                pytest.fail("WebUI exited before acknowledging graceful shutdown")
+            if not selector.select(timeout=min(0.1, deadline - time.monotonic())):
+                continue
+            line = process.stdout.readline()
+            if not line:
+                continue
+            output.append(line)
+            if expected in line:
+                return "".join(output)
+    process.kill()
+    pytest.fail("WebUI did not acknowledge graceful shutdown before the timeout")

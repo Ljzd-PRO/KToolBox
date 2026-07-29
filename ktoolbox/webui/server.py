@@ -120,6 +120,11 @@ async def run_webui(
                     self._serve_task.cancel()
             else:
                 self.should_exit = True
+                print(
+                    "Graceful shutdown requested; press Ctrl+C again to force stop.",
+                    file=sys.stderr,
+                    flush=True,
+                )
 
     server = WebUIServer(
         uvicorn.Config(
