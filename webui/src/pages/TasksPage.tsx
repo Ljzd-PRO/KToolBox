@@ -667,7 +667,7 @@ function TaskList({
           <DataTableFrame className="hidden xl:block">
             <Table.Content
               aria-label={t("tasks.title")}
-              className="task-table-content min-w-[940px] table-fixed"
+              className="task-table-content min-w-[940px] w-full table-fixed"
               sortDescriptor={sortDescriptor ?? undefined}
               onSortChange={(next) => setSortDescriptor(
                 normalizeTableSort(sortDescriptor, next, descendingTaskColumns),
@@ -682,13 +682,13 @@ function TaskList({
                     onChange={selectAllVisible}
                   />
                 </Table.Column>
-                <SortableColumn icon={Target} id="target" isRowHeader>{t("tasks.target")}</SortableColumn>
-                <SortableColumn icon={Status} id="status">{t("common.status")}</SortableColumn>
-                <SortableColumn icon={ChartBar} id="progress">{t("tasks.progress")}</SortableColumn>
-                <SortableColumn icon={Gauge} id="speed">{t("tasks.totalSpeed")}</SortableColumn>
+                <SortableColumn className="w-72" icon={Target} id="target" isRowHeader>{t("tasks.target")}</SortableColumn>
+                <SortableColumn className="w-28" icon={Status} id="status">{t("common.status")}</SortableColumn>
+                <SortableColumn className="w-32" icon={ChartBar} id="progress">{t("tasks.progress")}</SortableColumn>
+                <SortableColumn className="w-28" icon={Gauge} id="speed">{t("tasks.totalSpeed")}</SortableColumn>
                 <SortableColumn icon={Folder} id="output">{t("tasks.output")}</SortableColumn>
-                <SortableColumn icon={CalendarTime} id="created">{t("common.created")}</SortableColumn>
-                <Table.Column><TableColumnLabel icon={Tools}>{t("common.actions")}</TableColumnLabel></Table.Column>
+                <SortableColumn className="w-28" icon={CalendarTime} id="created">{t("common.created")}</SortableColumn>
+                <Table.Column className="w-[208px]"><TableColumnLabel icon={Tools}>{t("common.actions")}</TableColumnLabel></Table.Column>
               </Table.Header>
               <Table.Body>
                 {visibleTasks.map((task) => (
@@ -721,7 +721,7 @@ function TaskList({
                     <Table.Cell className="w-24 max-w-24 text-xs leading-relaxed text-muted">
                       <span className="data-cell-label"><CalendarTime aria-hidden="true" className="data-cell-icon" size={15} /><TaskCreatedTime locale={i18n.language} value={task.created_at} /></span>
                     </Table.Cell>
-                    <Table.Cell className="w-[196px] min-w-[196px]"><TaskActions task={task} handlers={handlers} /></Table.Cell>
+                    <Table.Cell className="w-[208px] min-w-[208px]"><TaskActions task={task} handlers={handlers} /></Table.Cell>
                   </Table.Row>
                 ))}
               </Table.Body>
