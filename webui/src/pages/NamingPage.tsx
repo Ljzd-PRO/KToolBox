@@ -24,6 +24,7 @@ import {
   IconFile as File,
   IconFileCode as FileCode,
   IconFileDescription as FileDescription,
+  IconFileTypeTxt as FileTypeEnv,
   IconFiles as Files,
   IconFolder as Folder,
   IconFolderCog as FolderCog,
@@ -33,12 +34,14 @@ import {
   IconHistory as History,
   IconInfoCircle as InfoCircle,
   IconListNumbers as ListNumbers,
+  IconListCheck as ListCheck,
   IconPlayerPause as PlayerPause,
   IconPlayerPlay as PlayerPlay,
   IconPlayerStop as PlayerStop,
   IconRefresh as Refresh,
   IconRestore as Restore,
   IconScan as Scan,
+  IconSourceCode as SourceCode,
   IconSettings as Settings,
   IconTags as Tags,
   IconTrash as Trash,
@@ -55,6 +58,7 @@ import { RemotePathField } from "../components/RemotePathField";
 import {
   BatchActionBar,
   ChipListField,
+  CodeEditor,
   DataTableFrame,
   EmptyPanel,
   FormField,
@@ -79,6 +83,7 @@ import type {
   NamingLayoutVersion,
   NamingLegacyContext,
   NamingPreview,
+  NamingSourceParse,
   ProjectNamingConfiguration,
   StartupNotice,
 } from "../types";
@@ -120,6 +125,26 @@ const activeConversionStatuses = new Set([
   "paused",
   "rolling_back",
 ]);
+const legacyEnvSample = `# KToolBox v0 naming layout
+KTOOLBOX_JOB__POST_DIRNAME_FORMAT="{title}"
+KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS="attachments"
+KTOOLBOX_JOB__POST_STRUCTURE__FILE="{id}_{}"
+KTOOLBOX_JOB__FILENAME_FORMAT="{}"
+KTOOLBOX_JOB__GROUP_BY_YEAR=false
+`;
+const namingTomlSample = `[naming]
+creator_dirname_format = "{creator_name} [{service}-{creator_id}]"
+post_dirname_format = "{title}"
+revision_dirname_format = "{revision_id}"
+filename_format = "{}"
+
+[naming.post_structure]
+attachments = "attachments"
+content = "content.txt"
+external_links = "external_links.txt"
+file = "{id}_{}"
+revisions = "revisions"
+`;
 
 function normalizeNaming(value: ProjectNamingConfiguration): NamingDraft {
   return {
@@ -290,6 +315,17 @@ export function NamingPage() {
   const [defaultOutput, setDefaultOutput] = useState("");
   const [defaultOutputBaseline, setDefaultOutputBaseline] = useState("");
   const [legacyRoots, setLegacyRoots] = useState<string[] | null>(null);
+  const [sourceMode, setSourceMode] = useState<"project_layout" | "pasted_config">(
+    "project_layout",
+  );
+  const [selectedVersionIds, setSelectedVersionIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const [pastedFormat, setPastedFormat] = useState<"env" | "toml">("env");
+  const [pastedDrafts, setPastedDrafts] = useState({ env: "", toml: "" });
+  const [parsedSource, setParsedSource] = useState<NamingSourceParse | null>(null);
+  const [parsingSource, setParsingSource] = useState(false);
+  const [sourceError, setSourceError] = useState<string | null>(null);
   const [preview, setPreview] = useState<NamingPreview | null>(null);
   const [selectedCreators, setSelectedCreators] = useState<Set<string>>(new Set());
   const [scanning, setScanning] = useState(false);
@@ -350,6 +386,17 @@ export function NamingPage() {
   }, [legacyContextQuery.data, legacyRoots]);
 
   useEffect(() => {
+    if (selectedVersionIds.size || !layoutVersionsQuery.data?.length) return;
+    const latestOld = layoutVersionsQuery.data.find((version) => !version.is_current);
+    if (!latestOld) return;
+    const timer = window.setTimeout(
+      () => setSelectedVersionIds(new Set([latestOld.id])),
+      0,
+    );
+    return () => window.clearTimeout(timer);
+  }, [layoutVersionsQuery.data, selectedVersionIds.size]);
+
+  useEffect(() => {
     const syncFromHistory = () => {
       setSelectedTabState(
         namingTabFromSearchParams(new URLSearchParams(window.location.search)),
@@ -393,6 +440,19 @@ export function NamingPage() {
     Boolean(draft?.group_by_month && !draft.group_by_year);
   const hasTemplateErrors = templateProblems.length > 0;
   const tree = useMemo(() => (draft ? sampleTree(draft) : []), [draft]);
+  const sourceReady =
+    sourceMode === "project_layout"
+      ? selectedVersionIds.size > 0
+      : parsedSource !== null && parsedSource.format === pastedFormat;
+  const workflowStep = activeConversion
+    ? 4
+    : preview
+      ? 3
+      : sourceReady && legacyRoots?.length && !rootProblems.some(Boolean)
+        ? 3
+        : sourceReady
+          ? 2
+          : 1;
   const sortedConversions = useMemo(() => {
     const values = [...(conversionsQuery.data ?? [])];
     const column = String(historySort.column ?? "created_at");
@@ -432,6 +492,39 @@ export function NamingPage() {
 
   function addDownloadRoot() {
     setLegacyRoots((value) => [...(value ?? []), ""]);
+  }
+
+  function updatePastedDraft(value: string) {
+    setPastedDrafts((drafts) => ({ ...drafts, [pastedFormat]: value }));
+    setParsedSource(null);
+    setSourceError(null);
+  }
+
+  async function parsePastedSource() {
+    if (!session || !pastedDrafts[pastedFormat].trim()) return;
+    setParsingSource(true);
+    setSourceError(null);
+    try {
+      const result = await api<NamingSourceParse>("/naming/source/parse", {
+        method: "POST",
+        body: {
+          format: pastedFormat,
+          content: pastedDrafts[pastedFormat],
+        },
+        csrfToken: session.csrf_token,
+      });
+      setParsedSource(result);
+      toast.success(t("naming.workflow.parseSuccess"), {
+        description: t("naming.workflow.parseSuccessHint", {
+          count: result.recognized_fields.length,
+        }),
+      });
+    } catch (error) {
+      setParsedSource(null);
+      setSourceError(sourceParseErrorText(error, t));
+    } finally {
+      setParsingSource(false);
+    }
   }
 
   async function saveSection(section: "structure" | "templates") {
@@ -488,24 +581,32 @@ export function NamingPage() {
     if (
       !session ||
       !legacyRoots ||
+      !sourceReady ||
       rootProblems.some(Boolean) ||
       legacyRoots.length === 0
     ) return;
     const roots = legacyRoots;
-    const versions = layoutVersionsQuery.data ?? [];
-    const sourceVersions = versions.filter((version) => !version.is_current);
-    const selectedVersions = sourceVersions.length > 0 ? sourceVersions : versions.slice(0, 1);
-    if (selectedVersions.length === 0) return;
+    const source = sourceMode === "project_layout"
+      ? {
+          kind: "project_layout" as const,
+          version_ids: [...selectedVersionIds],
+        }
+      : parsedSource
+        ? {
+            kind: "pasted_config" as const,
+            format: parsedSource.format,
+            naming: parsedSource.naming,
+            digest: parsedSource.digest,
+          }
+        : null;
+    if (!source) return;
     setScanning(true);
     try {
       const result = await api<NamingPreview>("/naming/preview", {
         method: "POST",
         body: {
           roots,
-          source: {
-            kind: "project_layout",
-            version_ids: selectedVersions.map((version) => version.id),
-          },
+          source,
         },
         csrfToken: session.csrf_token,
       });
@@ -555,7 +656,13 @@ export function NamingPage() {
     setSearchParams(next, { replace: true });
   }
 
-  function startAutomaticScan() {
+  function startAutomaticScan(notice?: StartupNotice) {
+    const linkedVersion =
+      typeof notice?.payload?.source_version_id === "string"
+        ? notice.payload.source_version_id
+        : null;
+    if (linkedVersion) setSelectedVersionIds(new Set([linkedVersion]));
+    setSourceMode("project_layout");
     setSelectedTabState("legacy");
     const next = new URLSearchParams(searchParams);
     next.delete("autostart");
@@ -1007,6 +1114,253 @@ export function NamingPage() {
             </Alert.Content>
           </Alert>
 
+          <WorkflowSteps current={workflowStep} />
+
+          <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)]">
+            <FormSurface className="grid min-w-0 gap-4">
+              <SectionHeading
+                icon={SourceCode}
+                title={t("naming.workflow.sourceTitle")}
+                description={t("naming.workflow.sourceHint")}
+              />
+              <Tabs
+                aria-label={t("naming.workflow.sourceTitle")}
+                selectedKey={sourceMode}
+                variant="secondary"
+                onSelectionChange={(key) =>
+                  setSourceMode(String(key) as typeof sourceMode)
+                }
+              >
+                <Tabs.List className="grid grid-cols-2">
+                  <Tabs.Tab id="project_layout">
+                    <History aria-hidden="true" size={16} />
+                    {t("naming.workflow.projectMode")}
+                    <Tabs.Indicator />
+                  </Tabs.Tab>
+                  <Tabs.Tab id="pasted_config">
+                    <FileCode aria-hidden="true" size={16} />
+                    {t("naming.workflow.pastedMode")}
+                    <Tabs.Indicator />
+                  </Tabs.Tab>
+                </Tabs.List>
+                <Tabs.Panel className="grid gap-3 pt-4" id="project_layout">
+                  <p className="text-xs leading-5 text-muted">
+                    {t("naming.workflow.projectModeHint")}
+                  </p>
+                  {layoutVersionsQuery.data?.some((version) => !version.is_current) ? (
+                    <div className="grid max-h-72 gap-2 overflow-y-auto pr-1">
+                      {layoutVersionsQuery.data.map((version) => {
+                        const selected = selectedVersionIds.has(version.id);
+                        return (
+                          <Surface
+                            className="grid gap-2 rounded-lg border border-border p-3"
+                            key={version.id}
+                            variant={selected ? "secondary" : "default"}
+                          >
+                            <div className="flex min-w-0 items-center gap-3">
+                              <SelectionCheckbox
+                                isDisabled={version.is_current}
+                                isSelected={selected}
+                                label={t("naming.workflow.selectVersion", {
+                                  date: formatDateTime(version.created_at, i18n.language),
+                                })}
+                                onChange={(isSelected) => {
+                                  const next = new Set(selectedVersionIds);
+                                  if (isSelected) next.add(version.id);
+                                  else next.delete(version.id);
+                                  setSelectedVersionIds(next);
+                                }}
+                              />
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-semibold">
+                                  {formatDateTime(version.created_at, i18n.language)}
+                                </p>
+                                <InlineCode className="mt-1 block w-fit max-w-full truncate">
+                                  {version.revision.slice(0, 12)}
+                                </InlineCode>
+                              </div>
+                              <Chip
+                                color={version.is_current ? "success" : "default"}
+                                size="sm"
+                                variant="soft"
+                              >
+                                {t(
+                                  version.is_current
+                                    ? "naming.workflow.currentVersion"
+                                    : "naming.workflow.previousVersion",
+                                )}
+                              </Chip>
+                            </div>
+                          </Surface>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <EmptyPanel
+                      title={t("naming.workflow.noPreviousVersions")}
+                      description={t("naming.workflow.noPreviousVersionsHint")}
+                    />
+                  )}
+                </Tabs.Panel>
+                <Tabs.Panel className="grid min-w-0 gap-4 pt-4" id="pasted_config">
+                  <p className="text-xs leading-5 text-muted">
+                    {t("naming.workflow.pastedModeHint")}
+                  </p>
+                  <Tabs
+                    aria-label={t("naming.workflow.sourceFormat")}
+                    selectedKey={pastedFormat}
+                    variant="secondary"
+                    onSelectionChange={(key) => {
+                      setPastedFormat(String(key) as typeof pastedFormat);
+                      setParsedSource(null);
+                      setSourceError(null);
+                    }}
+                  >
+                    <Tabs.List className="grid grid-cols-2">
+                      <Tabs.Tab id="env">
+                        <FileTypeEnv aria-hidden="true" size={16} />
+                        {t("naming.workflow.envFormat")}
+                        <Tabs.Indicator />
+                      </Tabs.Tab>
+                      <Tabs.Tab id="toml">
+                        <Braces aria-hidden="true" size={16} />
+                        {t("naming.workflow.tomlFormat")}
+                        <Tabs.Indicator />
+                      </Tabs.Tab>
+                    </Tabs.List>
+                    <Tabs.Panel className="pt-3" id="env">
+                      <CodeEditor
+                        description={t("naming.workflow.editorPrivacy")}
+                        icon={FileTypeEnv}
+                        label={t("naming.workflow.envEditor")}
+                        rows={12}
+                        value={pastedDrafts.env}
+                        onChange={updatePastedDraft}
+                      />
+                    </Tabs.Panel>
+                    <Tabs.Panel className="pt-3" id="toml">
+                      <CodeEditor
+                        description={t("naming.workflow.editorPrivacy")}
+                        icon={Braces}
+                        label={t("naming.workflow.tomlEditor")}
+                        rows={12}
+                        value={pastedDrafts.toml}
+                        onChange={updatePastedDraft}
+                      />
+                    </Tabs.Panel>
+                  </Tabs>
+                  {sourceError ? (
+                    <Alert status="danger">
+                      <Alert.Indicator>
+                        <AlertTriangle aria-hidden="true" size={18} />
+                      </Alert.Indicator>
+                      <Alert.Content>
+                        <Alert.Title>{t("naming.workflow.parseFailed")}</Alert.Title>
+                        <Alert.Description>{sourceError}</Alert.Description>
+                      </Alert.Content>
+                    </Alert>
+                  ) : null}
+                  {parsedSource ? (
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      <Stat
+                        label={t("naming.workflow.recognizedFields")}
+                        value={parsedSource.recognized_fields.length}
+                      />
+                      <Stat
+                        label={t("naming.workflow.defaultedFields")}
+                        value={parsedSource.defaulted_fields.length}
+                      />
+                      <Stat
+                        label={t("naming.workflow.differences")}
+                        value={parsedSource.differences.length}
+                      />
+                      <Stat
+                        label={t("naming.workflow.ignoredEntries")}
+                        value={parsedSource.warnings.reduce(
+                          (total, warning) => total + warning.count,
+                          0,
+                        )}
+                      />
+                    </div>
+                  ) : null}
+                  <div className="flex flex-wrap justify-end gap-2 border-t border-border pt-3">
+                    <Button
+                      variant="outline"
+                      onPress={() =>
+                        updatePastedDraft(
+                          pastedFormat === "env" ? legacyEnvSample : namingTomlSample,
+                        )
+                      }
+                    >
+                      <FileCode aria-hidden="true" size={16} />
+                      {t("naming.workflow.insertSample")}
+                    </Button>
+                    <Button
+                      isDisabled={!pastedDrafts[pastedFormat].trim()}
+                      isPending={parsingSource}
+                      variant="primary"
+                      onPress={() => void parsePastedSource()}
+                    >
+                      <ListCheck aria-hidden="true" size={16} />
+                      {t("naming.workflow.parseSource")}
+                    </Button>
+                  </div>
+                </Tabs.Panel>
+              </Tabs>
+            </FormSurface>
+
+            <FormSurface className="grid min-w-0 content-start gap-4">
+              <SectionHeading
+                icon={FolderCog}
+                title={t("naming.workflow.targetTitle")}
+                description={t("naming.workflow.targetHint")}
+              />
+              <div className="flex flex-wrap items-center gap-2">
+                <Chip color="success" size="sm" variant="soft">
+                  {t("naming.workflow.currentTarget")}
+                </Chip>
+                <span className="text-xs text-muted">
+                  {t("naming.workflow.targetRevision")}
+                </span>
+                <InlineCode>{current.revision.slice(0, 12)}</InlineCode>
+              </div>
+              <div
+                aria-label={t("naming.directoryPreview")}
+                className="naming-tree max-h-[26rem] overflow-auto rounded-lg border border-border bg-surface p-3"
+                role="tree"
+                tabIndex={0}
+              >
+                {tree.map((entry, index) => {
+                  const EntryIcon = entry.kind === "folder" ? Folder : File;
+                  return (
+                    <div
+                      className="flex min-w-max items-center gap-2 py-1.5 text-sm"
+                      key={`target:${entry.depth}:${entry.name}:${index}`}
+                      role="treeitem"
+                      style={{ paddingInlineStart: `${entry.depth * 1.25}rem` }}
+                    >
+                      {entry.depth ? (
+                        <ChevronRight
+                          aria-hidden="true"
+                          className="shrink-0 text-muted"
+                          size={14}
+                        />
+                      ) : null}
+                      <EntryIcon
+                        aria-hidden="true"
+                        className={entry.kind === "folder" ? "text-accent" : "text-muted"}
+                        size={16}
+                      />
+                      <code className="max-w-[24rem] truncate" title={entry.name}>
+                        {entry.name}
+                      </code>
+                    </div>
+                  );
+                })}
+              </div>
+            </FormSurface>
+          </div>
+
           <FormSurface className="grid gap-4">
             <SectionHeading
               icon={FolderOpen}
@@ -1075,6 +1429,7 @@ export function NamingPage() {
             <div className="flex justify-end border-t border-border pt-4">
               <Button
                 isDisabled={
+                  !sourceReady ||
                   rootProblems.some(Boolean) ||
                   legacyRoots.length === 0 ||
                   Boolean(activeConversion)
@@ -1163,7 +1518,7 @@ export function NamingPage() {
               variant="primary"
               onPress={() => {
                 if (layoutNotice) setDismissedLayoutVersion(layoutNotice.id);
-                startAutomaticScan();
+                startAutomaticScan(layoutNotice ?? undefined);
               }}
             >
               <DatabaseImport aria-hidden="true" size={17} />
@@ -1225,6 +1580,53 @@ function namingTabFromSearchParams(searchParams: URLSearchParams): NamingTab {
   return tab === "legacy" || tab === "templates" || tab === "history"
     ? tab
     : "structure";
+}
+
+function WorkflowSteps({ current }: { current: number }) {
+  const { t } = useTranslation();
+  const steps = [
+    ["source", SourceCode],
+    ["roots", FolderOpen],
+    ["preview", Scan],
+    ["convert", Refresh],
+  ] as const;
+  return (
+    <ol
+      aria-label={t("naming.workflow.title")}
+      className="grid grid-cols-2 gap-2 sm:grid-cols-4"
+    >
+      {steps.map(([key, Icon], index) => {
+        const number = index + 1;
+        const completed = number < current;
+        const active = number === current;
+        return (
+          <li
+            aria-current={active ? "step" : undefined}
+            className={[
+              "flex min-w-0 items-center gap-2 rounded-lg border px-3 py-2.5 text-sm",
+              active
+                ? "border-accent bg-accent-soft text-accent-soft-foreground"
+                : completed
+                  ? "border-success/40 bg-success/10 text-foreground"
+                  : "border-border bg-surface text-muted",
+            ].join(" ")}
+            key={key}
+          >
+            <span
+              aria-hidden="true"
+              className="grid size-7 shrink-0 place-items-center rounded-full bg-surface font-semibold tabular-nums"
+            >
+              {completed ? <Check size={15} /> : number}
+            </span>
+            <Icon aria-hidden="true" className="shrink-0" size={16} />
+            <span className="min-w-0 truncate">
+              {t(`naming.workflow.steps.${key}`)}
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
 }
 
 function SectionHeading({
@@ -1630,6 +2032,11 @@ function ConversionHistory({
             <SortableColumn icon={CalendarStats} id="created_at" isRowHeader>
               {t("naming.startedAt")}
             </SortableColumn>
+            <Table.Column>
+              <TableColumnLabel icon={SourceCode}>
+                {t("naming.workflow.historySource")}
+              </TableColumnLabel>
+            </Table.Column>
             <SortableColumn icon={Refresh} id="status">
               {t("common.status")}
             </SortableColumn>
@@ -1649,6 +2056,9 @@ function ConversionHistory({
             {conversions.map((conversion) => (
               <Table.Row key={conversion.id}>
                 <Table.Cell>{formatDateTime(conversion.created_at, locale)}</Table.Cell>
+                <Table.Cell>
+                  <ConversionSourceChip conversion={conversion} />
+                </Table.Cell>
                 <Table.Cell><ConversionStatus status={conversion.status} /></Table.Cell>
                 <Table.Cell className="tabular-nums">{conversion.selected_creators.length}</Table.Cell>
                 <Table.Cell>
@@ -1680,6 +2090,7 @@ function ConversionHistory({
               </div>
               <ConversionStatus status={conversion.status} />
             </div>
+            <ConversionSourceChip conversion={conversion} />
             <ConversionProgress conversion={conversion} />
             <ConversionActions
               conversion={conversion}
@@ -1692,6 +2103,35 @@ function ConversionHistory({
         ))}
       </div>
     </>
+  );
+}
+
+function ConversionSourceChip({ conversion }: { conversion: NamingConversion }) {
+  const { t } = useTranslation();
+  const source = conversion.preview.source;
+  const label =
+    source?.kind === "pasted_config"
+      ? t(`naming.workflow.sourceKinds.${source.format}`)
+      : t("naming.workflow.sourceKinds.project");
+  const detail =
+    source?.kind === "pasted_config"
+      ? t("naming.workflow.pastedSourceSummary", {
+          digest: source.digest.slice(0, 12),
+        })
+      : t("naming.workflow.projectSourceSummary", {
+          count: source?.kind === "project_layout" ? source.version_ids.length : 0,
+        });
+  return (
+    <Tooltip>
+      <Chip
+        color={source?.kind === "pasted_config" ? "accent" : "default"}
+        size="sm"
+        variant="soft"
+      >
+        {label}
+      </Chip>
+      <Tooltip.Content>{detail}</Tooltip.Content>
+    </Tooltip>
   );
 }
 
@@ -1825,4 +2265,34 @@ function namingErrorText(error: unknown, t: ReturnType<typeof useTranslation>["t
     if (error.status === 422) return t("naming.errors.invalid");
   }
   return errorText(error);
+}
+
+function sourceParseErrorText(
+  error: unknown,
+  t: ReturnType<typeof useTranslation>["t"],
+): string {
+  if (!(error instanceof ApiError) || !isRecord(error.detail)) {
+    return errorText(error);
+  }
+  const issues = error.detail.issues;
+  if (!Array.isArray(issues) || !issues.length || !isRecord(issues[0])) {
+    return t("naming.workflow.parseErrors.invalid");
+  }
+  const issue = issues[0];
+  const code = typeof issue.code === "string" ? issue.code : "invalid";
+  const supportedCodes = new Set([
+    "source_too_large",
+    "source_empty",
+    "no_legacy_naming_fields",
+  ]);
+  const message = supportedCodes.has(code)
+    ? t(`naming.workflow.parseErrors.${code}`)
+    : t("naming.workflow.parseErrors.invalid");
+  return typeof issue.line === "number"
+    ? t("naming.workflow.errorAtLine", { line: issue.line, message })
+    : message;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
 }

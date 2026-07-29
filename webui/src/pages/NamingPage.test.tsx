@@ -252,6 +252,103 @@ describe("Naming format page", () => {
     );
   });
 
+  it("keeps pasted drafts separate and previews a normalized pasted source", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState({}, "", "/naming?tab=legacy");
+    let parseBody: Record<string, unknown> | undefined;
+    let previewBody: Record<string, unknown> | undefined;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const path = String(input);
+        if (path.endsWith("/session")) return json(session);
+        if (path.endsWith("/naming/legacy-migration")) return json(noLegacyMigration);
+        if (path.endsWith("/naming/layout-versions")) return json(layoutVersions);
+        if (path.endsWith("/startup-notices")) return json([]);
+        if (path.endsWith("/naming/conversions")) return json([]);
+        if (path.endsWith("/naming/legacy-context")) {
+          return json({ roots: ["downloads"], conversion_pending: false });
+        }
+        if (path.endsWith("/naming/source/parse")) {
+          parseBody = JSON.parse(String(init?.body)) as Record<string, unknown>;
+          return json({
+            format: "env",
+            naming,
+            digest: "a".repeat(64),
+            recognized_fields: ["post_dirname_format"],
+            defaulted_fields: ["creator_dirname_format"],
+            warnings: [{ code: "ignored_unknown_entries", count: 1 }],
+            differences: [
+              {
+                path: "post_dirname_format",
+                source_value: "{title}",
+                target_value: "{title} [{post_id}]",
+              },
+            ],
+          });
+        }
+        if (path.endsWith("/naming/preview")) {
+          previewBody = JSON.parse(String(init?.body)) as Record<string, unknown>;
+          return json({
+            ...preview,
+            source: {
+              kind: "pasted_config",
+              format: "env",
+              naming,
+              digest: "a".repeat(64),
+            },
+          });
+        }
+        if (path.endsWith("/naming")) {
+          return json({
+            default_output: "downloads",
+            resolved_default_output: "/project/downloads",
+            naming,
+            revision: "revision-1",
+            conversion_pending: false,
+          });
+        }
+        throw new Error(`Unexpected request: ${path}`);
+      }),
+    );
+
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>,
+    );
+
+    await user.click(await screen.findByRole("tab", { name: "Paste configuration" }));
+    const editor = screen.getByRole("textbox", {
+      name: "Legacy .env naming settings",
+    });
+    const content = "KTOOLBOX_JOB__MIX_POSTS=true";
+    await user.type(editor, content);
+    await user.click(screen.getByRole("button", { name: "Parse configuration" }));
+    await waitFor(() =>
+      expect(parseBody).toEqual({ format: "env", content }),
+    );
+    expect(await screen.findByText("Legacy format parsed")).toBeInTheDocument();
+    expect(screen.getByText("1 naming fields were recognized.")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("tab", { name: "Project history" }));
+    await user.click(screen.getByRole("tab", { name: "Paste configuration" }));
+    expect(screen.getByRole("textbox", { name: "Legacy .env naming settings" })).toHaveValue(
+      content,
+    );
+    await user.click(screen.getByRole("button", { name: "Scan old locations" }));
+    expect(await screen.findByRole("heading", { name: "Review naming changes" })).toBeInTheDocument();
+    expect(previewBody).toMatchObject({
+      roots: ["downloads"],
+      source: {
+        kind: "pasted_config",
+        format: "env",
+        digest: "a".repeat(64),
+      },
+    });
+    expect((previewBody?.source as { content?: string }).content).toBeUndefined();
+  });
+
   it("saves directory structure and naming templates independently", async () => {
     const user = userEvent.setup();
     window.history.replaceState({}, "", "/naming");
