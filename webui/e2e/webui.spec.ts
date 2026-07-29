@@ -707,7 +707,9 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
   await expect(page).toHaveURL(/\/creators$/);
   await expect(page.getByRole("columnheader", { name: "Creator name" })).toBeVisible();
 
-  const creatorRow = page.getByRole("row").filter({ hasText: "demo-studio" });
+  const creatorRow = page.getByRole("row").filter({
+    has: page.getByRole("button", { name: "Edit fanbox:demo-studio" }),
+  });
   expect(await page.getByRole("columnheader").allTextContents()).toEqual([
     "",
     "Creator name",
@@ -735,10 +737,9 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
       - (creatorControlBox?.x ?? 0) - (creatorControlBox?.width ?? 0) / 2,
   )).toBeLessThan(1);
   await creatorRow.getByRole("switch", { name: "Enabled" }).press("Space");
-  const updatedCreatorRow = page.getByRole("row").filter({ hasText: "demo-studio" });
-  const disabledCreatorSwitch = updatedCreatorRow.getByRole("switch", { name: "Disabled" });
+  const disabledCreatorSwitch = creatorRow.getByRole("switch", { name: "Disabled" });
   await expect(disabledCreatorSwitch).toBeVisible();
-  const offTrack = await updatedCreatorRow
+  const offTrack = await creatorRow
     .locator(".list-switch-cell [data-slot='switch-control']")
     .evaluate((element) => getComputedStyle(element).backgroundColor);
   const fieldSurface = await page.locator("main input").first().evaluate((element) => getComputedStyle(element).backgroundColor);
