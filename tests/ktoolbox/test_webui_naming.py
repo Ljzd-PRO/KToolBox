@@ -330,9 +330,7 @@ async def wait_for_conversion(
         if conversion.status == status:
             return
         await asyncio.sleep(0.01)
-    pytest.fail(
-        f"conversion {conversion_id} remained {conversion.status!r}; expected {status!r}"
-    )
+    pytest.fail(f"conversion {conversion_id} remained {conversion.status!r}; expected {status!r}")
 
 
 @pytest.mark.asyncio
@@ -362,9 +360,7 @@ async def test_preview_converts_creators_from_multiple_project_layout_versions(
         "two",
         creator_id="456",
     )
-    target = intermediate.model_copy(
-        update={"creator_dirname_format": "{creator_name} - {creator_id}"}
-    )
+    target = intermediate.model_copy(update={"creator_dirname_format": "{creator_name} - {creator_id}"})
     await save_naming(service, store, target)
 
     versions = await service.layout_versions()
@@ -596,13 +592,18 @@ async def test_conversion_pauses_at_atomic_boundary_and_resumes_after_restart(
         await asyncio.sleep(0.01)
     assert resumed.status == "completed", resumed.error
     assert resumed.progress.completed_operations == resumed.progress.total_operations
-    lifecycle = await restarted.events.events(
-        event_types={
-            "naming.conversion.paused",
-            "naming.conversion.resumed",
-            "naming.conversion.completed",
-        },
-    )
+    lifecycle = []
+    for _ in range(100):
+        lifecycle = await restarted.events.events(
+            event_types={
+                "naming.conversion.paused",
+                "naming.conversion.resumed",
+                "naming.conversion.completed",
+            },
+        )
+        if len(lifecycle) == 3:
+            break
+        await asyncio.sleep(0.01)
     assert [event.event_type for event in lifecycle] == [
         "naming.conversion.paused",
         "naming.conversion.resumed",

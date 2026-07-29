@@ -119,8 +119,7 @@ def test_field_preview_and_apply_keep_unselected_project_values(tmp_path: Path) 
     project.naming.filename_format = "{post_id}_{}"
     store.save(project)
     (tmp_path / ".env").write_text(
-        "KTOOLBOX_JOB__POST_DIRNAME_FORMAT={title} [{id}]\n"
-        "KTOOLBOX_JOB__FILENAME_FORMAT={id}_{}\n",
+        "KTOOLBOX_JOB__POST_DIRNAME_FORMAT={title} [{id}]\nKTOOLBOX_JOB__FILENAME_FORMAT={id}_{}\n",
         encoding="utf-8",
     )
 
