@@ -736,9 +736,22 @@ test("roster blockers and configuration keep controls aligned and visible", asyn
     (creatorCellBox?.x ?? 0) + (creatorCellBox?.width ?? 0) / 2
       - (creatorControlBox?.x ?? 0) - (creatorControlBox?.width ?? 0) / 2,
   )).toBeLessThan(1);
+  const creatorUpdate = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/api/v1/creators/fanbox/demo-studio") &&
+      response.request().method() === "PUT" &&
+      response.ok(),
+  );
+  const creatorRefresh = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/api/v1/creators") &&
+      response.request().method() === "GET" &&
+      response.ok(),
+  );
   await creatorRow.getByRole("switch", { name: "Enabled" }).press("Space");
+  await Promise.all([creatorUpdate, creatorRefresh]);
   const disabledCreatorSwitch = creatorRow.getByRole("switch", { name: "Disabled" });
-  await expect(disabledCreatorSwitch).toBeVisible();
+  await expect(disabledCreatorSwitch).toBeVisible({ timeout: 15_000 });
   const offTrack = await creatorRow
     .locator(".list-switch-cell [data-slot='switch-control']")
     .evaluate((element) => getComputedStyle(element).backgroundColor);
