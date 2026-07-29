@@ -69,28 +69,20 @@ jobs:
         include:
           - os: ubuntu-latest
             python-version: "3.10"
-            pytest_selection: ""
           - os: ubuntu-latest
             python-version: "3.11"
-            pytest_selection: ""
           - os: ubuntu-latest
             python-version: "3.13"
-            pytest_selection: ""
           - os: ubuntu-latest
             python-version: "3.14"
-            pytest_selection: ""
           - os: windows-latest
             python-version: "3.12"
-            pytest_selection: "-m 'not asyncio'"
           - os: windows-latest
             python-version: "3.14"
-            pytest_selection: "-m 'not asyncio'"
           - os: macos-15
             python-version: "3.12"
-            pytest_selection: ""
           - os: macos-15
             python-version: "3.14"
-            pytest_selection: ""
 
     steps:
       - uses: actions/checkout@v6
@@ -103,8 +95,23 @@ jobs:
           install-event-loop: "false"
 
       - name: Run portable core test suite
+        if: runner.os != 'Windows'
         run: >-
           poetry run pytest -q tests/ktoolbox
           --ignore-glob="tests/ktoolbox/test_webui_*.py"
           --ignore=tests/ktoolbox/test_auto_sync_routes.py
-          ${{ matrix.pytest_selection }}
+
+      - name: Run Windows portable contract suite
+        if: runner.os == 'Windows'
+        run: >-
+          poetry run pytest -q
+          tests/ktoolbox/test_action_utils.py
+          tests/ktoolbox/test_api_contract.py
+          tests/ktoolbox/test_blocker.py
+          tests/ktoolbox/test_downloader_utils.py
+          tests/ktoolbox/test_failures.py
+          tests/ktoolbox/test_models.py
+          tests/ktoolbox/test_naming_migration.py
+          tests/ktoolbox/test_naming_sources.py
+          tests/ktoolbox/test_project_config.py
+          tests/ktoolbox/test_reporting.py
