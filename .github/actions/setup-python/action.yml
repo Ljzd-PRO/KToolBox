@@ -10,19 +10,41 @@ inputs:
     description: Python architecture
     required: false
     default: "x64"
+  install-project:
+    description: Install the project and dependency groups with Poetry
+    required: false
+    default: "true"
+  poetry-install-arguments:
+    description: Arguments passed to poetry install
+    required: false
+    default: "--with test,docs,dev --extras urwid --extras webui"
+  install-event-loop:
+    description: Install the platform-specific optional event loop
+    required: false
+    default: "true"
 
 runs:
   using: "composite"
   steps:
-    - name: Install poetry
-      run: pipx install poetry
+    - name: Install Poetry
+      run: pipx install poetry==2.4.1
       shell: bash
 
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with:
         python-version: ${{ inputs.python-version }}
         architecture: ${{ inputs.architecture }}
         cache: "poetry"
 
-    - run: poetry install --with test,docs,dev,pyinstaller --extras urwid --extras webui --extras ${{ runner.os == 'Windows' && 'winloop' || 'uvloop' }}
+    - name: Install project dependencies
+      if: inputs.install-project == 'true' && inputs.install-event-loop != 'true'
+      run: poetry install ${{ inputs.poetry-install-arguments }}
+      shell: bash
+
+    - name: Install project dependencies with optimized event loop
+      if: inputs.install-project == 'true' && inputs.install-event-loop == 'true'
+      run: >-
+        poetry install
+        ${{ inputs.poetry-install-arguments }}
+        --extras ${{ runner.os == 'Windows' && 'winloop' || 'uvloop' }}
       shell: bash

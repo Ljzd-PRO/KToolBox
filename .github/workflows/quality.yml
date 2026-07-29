@@ -8,11 +8,15 @@ on:
       - pawchive
   pull_request:
 
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Python environment
         uses: ./.github/actions/setup-python
@@ -166,10 +170,10 @@ jobs:
   webui:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Node.js 24
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "24"
           cache: npm
@@ -196,7 +200,7 @@ jobs:
 
       - name: Run WebUI unit tests
         working-directory: webui
-        run: npm run test
+        run: npm run test:ci
 
       - name: Build packaged WebUI assets
         working-directory: webui

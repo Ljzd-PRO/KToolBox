@@ -10,59 +10,92 @@ on:
       - pawchive
     paths:
       - "ktoolbox/**"
+      - "k_generator/**"
+      - "scripts/**"
       - "tests/**"
+      - "webui/**"
       - ".github/actions/setup-python/**"
       - ".github/workflows/codecov.yml"
       - "pyproject.toml"
-      - "prod.env"
+      - "poetry.lock"
   pull_request:
     paths:
       - "ktoolbox/**"
+      - "k_generator/**"
+      - "scripts/**"
       - "tests/**"
+      - "webui/**"
       - ".github/actions/setup-python/**"
       - ".github/workflows/codecov.yml"
       - "pyproject.toml"
-      - "prod.env"
+      - "poetry.lock"
+
+concurrency:
+  group: coverage-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
-    name: Test With Coverage
+  coverage:
+    name: Full Coverage (Python 3.12)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Python environment
+        uses: ./.github/actions/setup-python
+        with:
+          python-version: "3.12"
+          poetry-install-arguments: "--with test,dev --extras urwid --extras webui"
+          install-event-loop: "false"
+
+      - name: Run full test suite with coverage
+        run: poetry run pytest -v --capture=sys --cov --cov-report=xml tests/
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v6
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          files: coverage.xml
+          flags: python-3.12
+          fail_ci_if_error: true
+
+  compatibility:
+    name: Compatibility (${{ matrix.os }}, Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
-    concurrency:
-      group: test-coverage-${{ github.ref }}-${{ matrix.os }}-${{ matrix.python-version }}
-      cancel-in-progress: true
     strategy:
       fail-fast: false
-      # macos-14 aka. macos-latest has switched to being an ARM runner, only supporting newer versions of Python.
-      # https://github.com/actions/setup-python/issues/855#issuecomment-2096792205
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-15 ]
-        python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14" ]
-        exclude:
-          - os: macos-15
-            python-version: "3.10"
         include:
-          - os: macos-15-intel
+          - os: ubuntu-latest
             python-version: "3.10"
-    env:
-      PYTEST_REPORT_FILENAME: report-${{ matrix.os }}-${{ matrix.python-version }}.html
+          - os: ubuntu-latest
+            python-version: "3.11"
+          - os: ubuntu-latest
+            python-version: "3.13"
+          - os: ubuntu-latest
+            python-version: "3.14"
+          - os: windows-latest
+            python-version: "3.12"
+          - os: windows-latest
+            python-version: "3.14"
+          - os: macos-15
+            python-version: "3.12"
+          - os: macos-15
+            python-version: "3.14"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Python environment
         uses: ./.github/actions/setup-python
         with:
           python-version: ${{ matrix.python-version }}
+          poetry-install-arguments: "--with test,dev --extras urwid --extras webui"
+          install-event-loop: "false"
 
-      - name: Run Pytest
-        run: |
-          poetry run pytest -v --capture=sys --cov --cov-report=xml tests/
-
-      - name: Upload coverage report
-        uses: codecov/codecov-action@v4
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        with:
-          files: coverage.xml
-          flags: ${{ matrix.os }}-${{ matrix.python-version }}
+      - name: Run portable core test suite
+        run: >-
+          poetry run pytest -q tests/ktoolbox
+          --ignore-glob="tests/ktoolbox/test_webui_*.py"
+          --ignore=tests/ktoolbox/test_auto_sync_routes.py

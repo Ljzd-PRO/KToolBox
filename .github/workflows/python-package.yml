@@ -4,17 +4,43 @@ on:
   workflow_dispatch:
   workflow_call:
   push:
+    paths:
+      - "ktoolbox/**"
+      - "custom_templates/**"
+      - "webui/**"
+      - ".github/actions/**"
+      - ".github/workflows/python-package.yml"
+      - "ktoolbox.spec"
+      - "pyproject.toml"
+      - "poetry.lock"
+      - "example.env"
+      - "README*.md"
+      - "LICENSE"
   pull_request:
+    paths:
+      - "ktoolbox/**"
+      - "custom_templates/**"
+      - "webui/**"
+      - ".github/actions/**"
+      - ".github/workflows/python-package.yml"
+      - "ktoolbox.spec"
+      - "pyproject.toml"
+      - "poetry.lock"
+      - "example.env"
+      - "README*.md"
+      - "LICENSE"
 
 jobs:
   build-wheels:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Python environment
         uses: ./.github/actions/setup-python
+        with:
+          install-project: "false"
 
       - name: Build package with Poetry
         run: poetry build
@@ -41,7 +67,7 @@ jobs:
           # macOS builds  
           - os: macos-latest
             arch: arm64
-            python-arch: "x64"
+            python-arch: "arm64"
           - os: macos-15-intel
             arch: x64
             python-arch: "x64"
@@ -58,7 +84,7 @@ jobs:
             qemu-arch: aarch64
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up QEMU
         if: matrix.qemu == true
@@ -72,6 +98,7 @@ jobs:
         with:
           python-version: "3.14"
           architecture: ${{ matrix.python-arch }}
+          poetry-install-arguments: "--with pyinstaller --extras urwid --extras webui"
 
       - name: Create Executable (Native)
         if: matrix.qemu != true
@@ -87,7 +114,7 @@ jobs:
             python:3.13-slim-bullseye \
             bash -c "
               apt-get update && apt-get install -y git binutils &&
-              pip install poetry &&
+              pip install poetry==2.4.1 &&
               poetry install --with pyinstaller --extras urwid --extras webui --extras uvloop &&
               poetry run pyinstaller ktoolbox.spec --distpath dist &&
               cp README*.md example.env LICENSE dist/

@@ -23,13 +23,16 @@ jobs:
     name: Build documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
 
       - name: Setup Python environment
         uses: ./.github/actions/setup-python
+        with:
+          poetry-install-arguments: "--with docs --extras webui"
+          install-event-loop: "false"
 
       - name: Build and push
         run: |
@@ -37,7 +40,7 @@ jobs:
           poetry run mike deploy --push --update-aliases master latest
 
       - name: Upload to GitHub Pages
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: site
 
