@@ -542,6 +542,11 @@ code {
   font-size: 0.8125rem;
 }
 
+.legacy-config-editor > [class*="cm-theme"] {
+  width: 100%;
+  min-width: 0;
+}
+
 .legacy-config-editor .cm-editor:hover {
   border-color: var(--field-border-hover);
 }

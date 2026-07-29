@@ -1112,8 +1112,11 @@ export function NamingPage() {
           />
         </Tabs.Panel>
 
-        <Tabs.Panel className="grid min-w-0 gap-5 pt-5" id="legacy">
-          <Alert status="accent">
+        <Tabs.Panel
+          className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 pt-5"
+          id="legacy"
+        >
+          <Alert className="min-w-0" status="accent">
             <Alert.Indicator>
               <DatabaseImport aria-hidden="true" size={18} />
             </Alert.Indicator>
@@ -1125,8 +1128,8 @@ export function NamingPage() {
 
           <WorkflowSteps current={workflowStep} />
 
-          <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)]">
-            <FormSurface className="grid min-w-0 gap-4">
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)]">
+            <FormSurface className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4">
               <SectionHeading
                 icon={SourceCode}
                 title={t("naming.workflow.sourceTitle")}
@@ -1134,25 +1137,29 @@ export function NamingPage() {
               />
               <Tabs
                 aria-label={t("naming.workflow.sourceTitle")}
+                className="min-w-0"
                 selectedKey={sourceMode}
                 variant="secondary"
                 onSelectionChange={(key) =>
                   setSourceMode(String(key) as typeof sourceMode)
                 }
               >
-                <Tabs.List className="grid grid-cols-2">
-                  <Tabs.Tab id="project_layout">
+                <Tabs.List className="grid w-full min-w-0 grid-cols-2">
+                  <Tabs.Tab className="min-w-0 whitespace-normal text-center" id="project_layout">
                     <History aria-hidden="true" size={16} />
                     {t("naming.workflow.projectMode")}
                     <Tabs.Indicator />
                   </Tabs.Tab>
-                  <Tabs.Tab id="pasted_config">
+                  <Tabs.Tab className="min-w-0 whitespace-normal text-center" id="pasted_config">
                     <FileCode aria-hidden="true" size={16} />
                     {t("naming.workflow.pastedMode")}
                     <Tabs.Indicator />
                   </Tabs.Tab>
                 </Tabs.List>
-                <Tabs.Panel className="grid gap-3 pt-4" id="project_layout">
+                <Tabs.Panel
+                  className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 pt-4"
+                  id="project_layout"
+                >
                   <p className="text-xs leading-5 text-muted">
                     {t("naming.workflow.projectModeHint")}
                   </p>
@@ -1211,12 +1218,16 @@ export function NamingPage() {
                     />
                   )}
                 </Tabs.Panel>
-                <Tabs.Panel className="grid min-w-0 gap-4 pt-4" id="pasted_config">
+                <Tabs.Panel
+                  className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 pt-4"
+                  id="pasted_config"
+                >
                   <p className="text-xs leading-5 text-muted">
                     {t("naming.workflow.pastedModeHint")}
                   </p>
                   <Tabs
                     aria-label={t("naming.workflow.sourceFormat")}
+                    className="min-w-0"
                     selectedKey={pastedFormat}
                     variant="secondary"
                     onSelectionChange={(key) => {
@@ -1226,19 +1237,19 @@ export function NamingPage() {
                       setSourceIssues([]);
                     }}
                   >
-                    <Tabs.List className="grid grid-cols-2">
-                      <Tabs.Tab id="env">
+                    <Tabs.List className="grid w-full min-w-0 grid-cols-2">
+                      <Tabs.Tab className="min-w-0" id="env">
                         <FileTypeEnv aria-hidden="true" size={16} />
                         {t("naming.workflow.envFormat")}
                         <Tabs.Indicator />
                       </Tabs.Tab>
-                      <Tabs.Tab id="toml">
+                      <Tabs.Tab className="min-w-0" id="toml">
                         <Braces aria-hidden="true" size={16} />
                         {t("naming.workflow.tomlFormat")}
                         <Tabs.Indicator />
                       </Tabs.Tab>
                     </Tabs.List>
-                    <Tabs.Panel className="pt-3" id="env">
+                    <Tabs.Panel className="min-w-0 pt-3" id="env">
                       <LegacyConfigEditor
                         description={t("naming.workflow.editorPrivacy")}
                         format="env"
@@ -1249,7 +1260,7 @@ export function NamingPage() {
                         onChange={updatePastedDraft}
                       />
                     </Tabs.Panel>
-                    <Tabs.Panel className="pt-3" id="toml">
+                    <Tabs.Panel className="min-w-0 pt-3" id="toml">
                       <LegacyConfigEditor
                         description={t("naming.workflow.editorPrivacy")}
                         format="toml"
@@ -1379,7 +1390,12 @@ export function NamingPage() {
               title={t("naming.legacyRoots")}
               description={t("naming.legacyRootsHint")}
               action={
-                <Button size="sm" variant="outline" onPress={addDownloadRoot}>
+                <Button
+                  className="h-auto max-w-full whitespace-normal py-2 text-center"
+                  size="sm"
+                  variant="outline"
+                  onPress={addDownloadRoot}
+                >
                   <FolderPlus aria-hidden="true" size={16} />
                   {t("naming.addLegacyRoot")}
                 </Button>
@@ -1440,6 +1456,7 @@ export function NamingPage() {
             )}
             <div className="flex justify-end border-t border-border pt-4">
               <Button
+                className="h-auto max-w-full whitespace-normal py-2 text-center"
                 isDisabled={
                   !sourceReady ||
                   rootProblems.some(Boolean) ||
@@ -1605,7 +1622,7 @@ function WorkflowSteps({ current }: { current: number }) {
   return (
     <ol
       aria-label={t("naming.workflow.title")}
-      className="grid grid-cols-2 gap-2 sm:grid-cols-4"
+      className="grid min-w-0 grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:grid-cols-4"
     >
       {steps.map(([key, Icon], index) => {
         const number = index + 1;
@@ -1615,7 +1632,7 @@ function WorkflowSteps({ current }: { current: number }) {
           <li
             aria-current={active ? "step" : undefined}
             className={[
-              "flex min-w-0 items-center gap-2 rounded-lg border px-3 py-2.5 text-sm",
+              "flex min-w-0 items-center gap-1.5 rounded-lg border px-2 py-2.5 text-xs sm:gap-2 sm:px-3 sm:text-sm",
               active
                 ? "border-accent bg-accent-soft text-accent-soft-foreground"
                 : completed
@@ -1630,8 +1647,8 @@ function WorkflowSteps({ current }: { current: number }) {
             >
               {completed ? <Check size={15} /> : number}
             </span>
-            <Icon aria-hidden="true" className="shrink-0" size={16} />
-            <span className="min-w-0 truncate">
+            <Icon aria-hidden="true" className="hidden shrink-0 sm:block" size={16} />
+            <span className="min-w-0 leading-4 sm:truncate">
               {t(`naming.workflow.steps.${key}`)}
             </span>
           </li>
@@ -1865,84 +1882,93 @@ function PreviewModal({
             </Chip>
           </BatchActionBar>
         ) : null}
-        <DataTableFrame className="hidden md:block">
-          <Table.Content
-            aria-label={t("naming.reviewTitle")}
-            className="table-fixed"
-          >
-            <Table.Header>
-              <Table.Column aria-label={t("common.select")} className="w-12" />
-              <Table.Column className="w-32" isRowHeader>
-                <TableColumnLabel icon={User}>{t("naming.creator")}</TableColumnLabel>
-              </Table.Column>
-              <Table.Column>
-                <TableColumnLabel icon={FolderOpen}>{t("naming.pathChange")}</TableColumnLabel>
-              </Table.Column>
-              <Table.Column className="w-20 text-right">
-                <TableColumnLabel className="justify-end" icon={File}>{t("naming.stats.works")}</TableColumnLabel>
-              </Table.Column>
-              <Table.Column className="w-20 text-right">
-                <TableColumnLabel className="justify-end" icon={Files}>{t("naming.stats.files")}</TableColumnLabel>
-              </Table.Column>
-              <Table.Column className="w-24">
-                <TableColumnLabel icon={InfoCircle}>{t("naming.result")}</TableColumnLabel>
-              </Table.Column>
-            </Table.Header>
-            <Table.Body>
+        {preview.creators.length ? (
+          <>
+            <DataTableFrame className="hidden md:block">
+              <Table.Content
+                aria-label={t("naming.reviewTitle")}
+                className="table-fixed"
+              >
+                <Table.Header>
+                  <Table.Column aria-label={t("common.select")} className="w-12" />
+                  <Table.Column className="w-32" isRowHeader>
+                    <TableColumnLabel icon={User}>{t("naming.creator")}</TableColumnLabel>
+                  </Table.Column>
+                  <Table.Column>
+                    <TableColumnLabel icon={FolderOpen}>{t("naming.pathChange")}</TableColumnLabel>
+                  </Table.Column>
+                  <Table.Column className="w-20 text-right">
+                    <TableColumnLabel className="justify-end" icon={File}>{t("naming.stats.works")}</TableColumnLabel>
+                  </Table.Column>
+                  <Table.Column className="w-20 text-right">
+                    <TableColumnLabel className="justify-end" icon={Files}>{t("naming.stats.files")}</TableColumnLabel>
+                  </Table.Column>
+                  <Table.Column className="w-24">
+                    <TableColumnLabel icon={InfoCircle}>{t("naming.result")}</TableColumnLabel>
+                  </Table.Column>
+                </Table.Header>
+                <Table.Body>
+                  {preview.creators.map((creator) => (
+                    <Table.Row key={creator.key}>
+                      <Table.Cell>
+                        <SelectionCheckbox
+                          isDisabled={!creator.selectable}
+                          isSelected={selected.has(creator.key)}
+                          label={t("naming.selectCreator", { name: creator.name })}
+                          onChange={(isSelected) => toggleCreator(creator, isSelected)}
+                        />
+                      </Table.Cell>
+                      <Table.Cell className="font-medium">{creator.name}</Table.Cell>
+                      <Table.Cell className="overflow-hidden">
+                        <PathChange
+                          operations={creator.operations}
+                          source={creator.source}
+                          target={creator.target}
+                        />
+                      </Table.Cell>
+                      <Table.Cell className="text-right tabular-nums">{creator.works}</Table.Cell>
+                      <Table.Cell className="text-right tabular-nums">{creator.files}</Table.Cell>
+                      <Table.Cell>
+                        <PreviewResult creator={creator} />
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table.Content>
+            </DataTableFrame>
+            <div className="grid gap-3 md:hidden">
               {preview.creators.map((creator) => (
-                <Table.Row key={creator.key}>
-                  <Table.Cell>
+                <Surface className="grid gap-3 rounded-lg border border-border p-3" key={creator.key}>
+                  <div className="flex items-center gap-2">
                     <SelectionCheckbox
                       isDisabled={!creator.selectable}
                       isSelected={selected.has(creator.key)}
                       label={t("naming.selectCreator", { name: creator.name })}
                       onChange={(isSelected) => toggleCreator(creator, isSelected)}
                     />
-                  </Table.Cell>
-                  <Table.Cell className="font-medium">{creator.name}</Table.Cell>
-                  <Table.Cell className="overflow-hidden">
-                    <PathChange
-                      operations={creator.operations}
-                      source={creator.source}
-                      target={creator.target}
-                    />
-                  </Table.Cell>
-                  <Table.Cell className="text-right tabular-nums">{creator.works}</Table.Cell>
-                  <Table.Cell className="text-right tabular-nums">{creator.files}</Table.Cell>
-                  <Table.Cell>
+                    <p className="min-w-0 flex-1 truncate font-semibold">{creator.name}</p>
                     <PreviewResult creator={creator} />
-                  </Table.Cell>
-                </Table.Row>
+                  </div>
+                  <PathChange
+                    operations={creator.operations}
+                    source={creator.source}
+                    target={creator.target}
+                  />
+                  <div className="flex flex-wrap gap-2 text-xs text-muted">
+                    <span>{t("naming.workCount", { count: creator.works })}</span>
+                    <span>{t("naming.fileCount", { count: creator.files })}</span>
+                    <span>{formatBytes(creator.bytes)}</span>
+                  </div>
+                </Surface>
               ))}
-            </Table.Body>
-          </Table.Content>
-        </DataTableFrame>
-        <div className="grid gap-3 md:hidden">
-          {preview.creators.map((creator) => (
-            <Surface className="grid gap-3 rounded-lg border border-border p-3" key={creator.key}>
-              <div className="flex items-center gap-2">
-                <SelectionCheckbox
-                  isDisabled={!creator.selectable}
-                  isSelected={selected.has(creator.key)}
-                  label={t("naming.selectCreator", { name: creator.name })}
-                  onChange={(isSelected) => toggleCreator(creator, isSelected)}
-                />
-                <p className="min-w-0 flex-1 truncate font-semibold">{creator.name}</p>
-                <PreviewResult creator={creator} />
-              </div>
-              <PathChange
-                operations={creator.operations}
-                source={creator.source}
-                target={creator.target}
-              />
-              <div className="flex flex-wrap gap-2 text-xs text-muted">
-                <span>{t("naming.workCount", { count: creator.works })}</span>
-                <span>{t("naming.fileCount", { count: creator.files })}</span>
-                <span>{formatBytes(creator.bytes)}</span>
-              </div>
-            </Surface>
-          ))}
-        </div>
+            </div>
+          </>
+        ) : (
+          <EmptyPanel
+            title={t("naming.emptyPreview")}
+            description={t("naming.emptyPreviewHint")}
+          />
+        )}
       </div>
     </FormModal>
   );

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
+import json
 import sqlite3
 import tempfile
 from contextlib import AbstractAsyncContextManager
@@ -19,6 +21,7 @@ from ktoolbox.failures import (
     failure_report,
     generic_failure,
 )
+from ktoolbox.project_config import ProjectNamingConfiguration
 from ktoolbox.reporting import ProgressReporter
 from ktoolbox.webui.app import create_app
 from ktoolbox.webui.filesystem import FilesystemBrowser
@@ -72,9 +75,46 @@ PROJECT_ROOT.joinpath("ktoolbox.toml").write_text(
     'unit = "days"\n'
     'timezone = "Asia/Tokyo"\n\n'
     "[automatic_sync.options]\n"
-    'output = "downloads"\n',
+    'output = "downloads"\n\n'
+    "[naming]\n"
+    'creator_dirname_format = "{creator_name} ({service}-{creator_id})"\n',
     encoding="utf-8",
 )
+
+LEGACY_FIXTURES = (
+    (
+        ProjectNamingConfiguration(),
+        "Fixture Artist [fanbox-demo-studio]",
+        Post(
+            id="fiction-1001",
+            user="demo-studio",
+            service="fanbox",
+            title="Fictional project study",
+            content="Harmless fixture text for browser verification.",
+            published="2026-07-20T08:30:00Z",
+        ),
+    ),
+    (
+        ProjectNamingConfiguration(creator_dirname_format="{creator_name}_{creator_id}"),
+        "Archive Artist_archive-studio",
+        Post(
+            id="archive-2002",
+            user="archive-studio",
+            service="patreon",
+            title="Archived layout sample",
+            content="Harmless fixture text for browser verification.",
+            published="2026-06-10T09:00:00Z",
+        ),
+    ),
+)
+for _naming, _creator_directory, _post in LEGACY_FIXTURES:
+    _work_directory = PROJECT_ROOT / "downloads" / _creator_directory / str(_post.title)
+    _work_directory.mkdir(parents=True)
+    _work_directory.joinpath("post.json").write_text(
+        _post.model_dump_json(),
+        encoding="utf-8",
+    )
+    _work_directory.joinpath(f"{_post.id}_cover.jpg").write_bytes(b"fixture-image-data")
 
 
 class FixtureClient(AbstractAsyncContextManager["FixtureClient"]):
@@ -297,6 +337,28 @@ async def seed_automatic_sync_fixtures() -> None:
             """,
             ("fanbox", "demo-studio", "Demo Studio", "2026-07-27T00:00:00+00:00"),
         )
+        for naming, _, _ in LEGACY_FIXTURES:
+            naming_json = json.dumps(
+                naming.model_dump(mode="json"),
+                ensure_ascii=False,
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+            revision = hashlib.sha256(naming_json.encode("utf-8")).hexdigest()
+            connection.execute(
+                """
+                INSERT OR IGNORE INTO naming_layout_versions(
+                    id, revision, naming_json, origin, created_at
+                ) VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    f"fixture-layout-{revision[:24]}",
+                    revision,
+                    naming_json,
+                    "recovered",
+                    "2026-07-20T00:00:00+00:00",
+                ),
+            )
         for post_id in ("fixture-new-1", "fixture-new-2", "fixture-new-3"):
             connection.execute(
                 """
