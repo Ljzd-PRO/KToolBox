@@ -120,7 +120,7 @@ jobs:
           $failed = @()
           foreach ($testFile in $testFiles) {
             Write-Output "::group::$testFile"
-            $output = & poetry run pytest -q $testFile 2>&1
+            $output = & poetry run pytest -q "--allow-hosts=127.0.0.1,localhost,::1" $testFile 2>&1
             $exitCode = $LASTEXITCODE
             $output | Write-Output
             Write-Output "::endgroup::"
