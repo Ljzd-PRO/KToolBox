@@ -100,7 +100,7 @@ ktoolbox sync
 
 ## WebUI
 
-WebUI 固定繫結一個包含 `ktoolbox.toml` 的專案目錄。請設定單一帳號，並優先使用 Argon2id 密碼雜湊：
+WebUI 固定繫結一個包含 `ktoolbox.toml` 的專案目錄。啟動時可以不設定帳號；此時終端機會輸出本次處理程序使用的 `admin` 帳號和新隨機密碼。如需固定憑證，請優先使用 Argon2id 密碼雜湊：
 
 ```bash
 ktoolbox webui hash-password
@@ -133,7 +133,21 @@ ktoolbox webui /path/to/project
 
 登入後只會建立一個 SSE 連線，自動在分頁之間同步工作、創作者、忽略規則、設定、MCP 權杖和目前開啟的遠端目錄。連線中斷時，本機資料會改為每 10 秒降級重新整理，不會輪詢 Pawchive 搜尋或作品詳細資料；未儲存的表單草稿也不會被外部更新覆寫。
 
-預設監聽 `0.0.0.0:8789`，方便在受信任的區域網路中使用，但 HTTP 無法加密傳輸帳號憑證和專案資料。在不受信任的網路中，請繫結 `127.0.0.1` 或置於 HTTPS 反向代理之後。專案沒有預設帳號，未設定有效憑證時會拒絕啟動。工作生命週期、安全措施與部署方式詳見 [WebUI 指南](https://ktoolbox.readthedocs.io/latest/zh-Hant/webui/)。
+預設監聽 `0.0.0.0:8789`，方便在受信任的區域網路中使用，但 HTTP 無法加密傳輸帳號憑證和專案資料。在不受信任的網路中，請繫結 `127.0.0.1` 或置於 HTTPS 反向代理之後。未設定憑證時，KToolBox 只在目前處理程序中產生並透過終端機顯示憑證。工作生命週期、安全措施與部署方式詳見 [WebUI 指南](https://ktoolbox.readthedocs.io/latest/zh-Hant/webui/)。
+
+## MCP
+
+啟動 WebUI 時也會在 `/mcp` 啟動經過篩選的 Streamable HTTP MCP 服務；需要登入的 WebUI REST OpenAPI YAML 位於 `/api/v1/openapi.yaml`。登入後開啟 **MCP** 頁面，再次確認目前帳號密碼即可建立唯讀或管理權杖。權杖明文只顯示一次，並可隨時撤銷。
+
+Codex 設定範例：
+
+```toml
+[mcp_servers.ktoolbox]
+url = "http://127.0.0.1:8789/mcp"
+bearer_token_env_var = "KTOOLBOX_MCP_TOKEN"
+```
+
+頁面也提供通用 HTTP、Claude、Cursor 和 VS Code 設定。權限、回傳上限與 HTTPS 建議請參閱 [MCP 指南](https://ktoolbox.readthedocs.io/latest/zh-Hant/mcp/)。
 
 ## 設定
 
@@ -160,7 +174,7 @@ KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
 `.env` 控制執行環境與傳輸行為；專案層級的 `ktoolbox.toml` 儲存命名格式、創作者清單、自動同步計畫與忽略規則：
 
 ```toml
-schema_version = 4
+schema_version = 5
 
 [[creators]]
 service = "fanbox"

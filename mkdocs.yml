@@ -19,6 +19,7 @@ nav:
     - Guide: commands/guide.md
     - Reference: commands/reference.md
   - WebUI: webui.md
+  - MCP: mcp.md
   - Automatic Sync: automatic-sync.md
   - Naming Format: naming.md
   - Configuration:

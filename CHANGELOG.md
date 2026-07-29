@@ -25,7 +25,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Replace Python Fire with Cyclopts commands, direct Rich help, shell completion, conventional hyphenated options, machine-readable output, and explicit `0`/`1`/`2`/`130` exit codes.
 - Add hidden compatibility aliases for the seven v0 command names with one deprecation warning per invocation.
 - Add project-level `ktoolbox.toml` with an enabled/disabled creator roster, aliases, comment-preserving atomic writes, path discovery, validation, and Urwid editor support.
-- Upgrade project configuration to Schema v4 with project-scoped naming, automatic-sync plans, and one path-generation contract shared by CLI and WebUI.
+- Upgrade project configuration to Schema v5 with project-scoped naming, automatic-sync plans, a default output directory, and one path-generation contract shared by CLI and WebUI.
 - Add extensible asynchronous post blockers with ordered global/creator scopes, recursive any/all rules, negation, safe nested field selectors, and contains/equals/regex/exists operations.
 - Add multi-creator synchronization with bounded concurrent producers, fair per-creator queue rotation, streaming startup, one shared client and download pool, partial-failure summaries, and stable creator directories.
 - Replace tqdm and the handwritten ANSI progress layer with Rich live progress, per-file and aggregate transfer speeds, Rich-aware logging, and deterministic plain output for non-TTY, `NO_COLOR`, and `--plain` environments.
@@ -42,6 +42,9 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Add `ktoolbox webui [PROJECT_DIR]`, host/port/browser overrides, and `webui hash-password`; use terminal-printed `admin`/random credentials when account settings are absent and prefer configured Argon2id password hashes.
 - Warn and atomically create a minimal `ktoolbox.toml` when the selected WebUI project does not have one yet.
 - Add rate-limited authentication with hashed opaque sessions, strict cookies, CSRF and Origin validation, security headers, redacted configuration snapshots, and a persistent project lock.
+- Make `webui/openapi.yaml` the deterministic WebUI REST contract, validate it in CI, generate TypeScript types from it, and package it in wheels and standalone builds.
+- Start a curated Streamable HTTP MCP service at `/mcp` with WebUI, using password-confirmed, hashed, revocable read-only or management bearer tokens and bounded tool results.
+- Add a seven-language MCP page with service status, one-time token creation, revocation, tool catalog, OpenAPI download, and ready-to-copy configurations for generic clients, Claude, Cursor, VS Code, and Codex.
 - Add seven-language, responsive light/dark workflows for project overview, `.env`/`prod.env` and TOML editing, author roster, recursive blockers, Pawchive creator/post queries, revision inspection, site version, and task creation.
 - Add authenticated remote filesystem pickers to every filesystem-backed WebUI path field, with localized project/host locations, breadcrumbs, search, a labelled hidden-item control, pagination, explicit directory creation, confirmed empty-directory deletion, and manual path entry.
 - Generate readable form labels and descriptions in Simplified Chinese, Traditional Chinese, English, Japanese, Korean, French, and Russian from checked locale catalogs, Pydantic metadata, and English configuration docstrings; include source indicators, secret masking, typed and advanced editors, validation, diff preview, ETag conflict detection, and atomic writes.
@@ -125,7 +128,7 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 使用 Cyclopts 命令、直接 Rich 帮助、Shell 补全、常规连字符选项、机器可读输出和明确的 `0`/`1`/`2`/`130` 退出码替换 Python Fire。
 - 为 7 个 v0 命令名新增隐藏兼容别名，每次调用提示一次弃用。
 - 新增项目级 `ktoolbox.toml`，包含可启停作者清单、别名、保留注释的原子写入、路径发现、校验和 Urwid 编辑支持。
-- 将项目配置升级到 Schema v4，新增项目级命名格式与自动同步计划，并让 CLI 和 WebUI 共用同一套路径生成契约。
+- 将项目配置升级到 Schema v5，新增项目级命名格式、自动同步计划和默认输出目录，并让 CLI 和 WebUI 共用同一套路径生成契约。
 - 新增可扩展异步作品忽略规则，支持有序全局/作者作用域、递归 any/all 规则、取反、安全嵌套字段选择器及 contains/equals/regex/exists 操作。
 - 新增多作者同步：有界并发生产者、按作者公平轮转队列、流式启动、共享客户端与下载池、部分失败汇总和稳定作者目录。
 - 使用 Rich 实时进度、单文件与总下载速度、Rich 感知日志和适用于非 TTY、`NO_COLOR`、`--plain` 的确定性逐行输出替换 tqdm 与手写 ANSI 进度层。
@@ -142,6 +145,9 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 新增 `ktoolbox webui [项目目录]`、主机/端口/浏览器覆盖参数及 `webui hash-password`；未配置账户时使用终端输出的 `admin`/随机密码，并优先使用已配置的 Argon2id 密码哈希。
 - WebUI 项目尚无 `ktoolbox.toml` 时给出警告，并以原子写入方式创建最小有效配置。
 - 新增登录速率限制、哈希化不透明会话、严格 Cookie、CSRF 与 Origin 校验、安全响应头、脱敏配置快照及持久项目锁。
+- 将 `webui/openapi.yaml` 设为确定生成的 WebUI REST 正式契约，在 CI 中校验并据此生成 TypeScript 类型，同时打包进 wheel 与独立构建。
+- WebUI 启动时在 `/mcp` 同进程启动经过筛选的 Streamable HTTP MCP 服务，使用需再次确认密码、仅保存哈希且可撤销的只读或管理 Bearer 令牌，并限制工具返回规模。
+- 新增七语言 MCP 页面，提供服务状态、一次性令牌创建、撤销、工具目录、OpenAPI 下载，以及通用客户端、Claude、Cursor、VS Code 和 Codex 配置。
 - 新增支持七种语言的响应式深浅色流程，覆盖项目概览、`.env`/`prod.env` 与 TOML 编辑、作者清单、递归忽略规则、Pawchive 作者/作品查询、修订查看、站点版本与任务创建。
 - 为 WebUI 中全部基于文件系统的路径字段新增需认证的远程路径选择器，支持项目/主机作用域、面包屑、搜索、隐藏项控制、分页、安全创建目录及手动输入路径。
 - 从经过完整性检查的语言目录、Pydantic 元数据及英文配置 docstring 生成简体中文、繁体中文、英语、日语、韩语、法语和俄语标签与说明，提供来源标记、秘密遮蔽、类型化与高级编辑、校验、差异预览、ETag 冲突检测和原子写入。

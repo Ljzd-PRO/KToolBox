@@ -58,10 +58,10 @@ ktoolbox config validate
 
 ## 作者清单
 
-每份项目文档都以 `schema_version = 4` 开始。Schema v4 保存项目命名格式与自动同步计划；旧下载位置仅属于命名转换工具。`default_output = "downloads"` 设置项目默认下载目录，也可以填写项目外的绝对路径。详见[命名格式指南](../naming.md)。作者按不区分大小写的 `service:id` 唯一，可选别名也必须唯一。
+每份项目文档都以 `schema_version = 5` 开始。Schema v5 保存项目命名格式与自动同步计划；旧下载位置仅属于命名转换工具。`default_output = "downloads"` 设置项目默认下载目录，也可以填写项目外的绝对路径。详见[命名格式指南](../naming.md)。作者按不区分大小写的 `service:id` 唯一，可选别名也必须唯一。
 
 ```toml
-schema_version = 4
+schema_version = 5
 
 [[creators]]
 service = "fanbox"

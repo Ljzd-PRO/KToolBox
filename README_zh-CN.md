@@ -100,7 +100,7 @@ ktoolbox sync
 
 ## WebUI
 
-WebUI 固定绑定一个包含 `ktoolbox.toml` 的项目目录。请配置单一账户，并优先使用 Argon2id 密码哈希：
+WebUI 固定绑定一个包含 `ktoolbox.toml` 的项目目录。启动时可以不配置账户；此时终端会输出本次进程使用的 `admin` 用户名和新随机密码。如需稳定凭据，请优先使用 Argon2id 密码哈希：
 
 ```bash
 ktoolbox webui hash-password
@@ -135,7 +135,21 @@ ktoolbox webui /path/to/project
 
 登录后只建立一个 SSE 连接，自动在标签页之间同步任务、作者、忽略规则、配置、MCP 令牌和当前打开的远程目录。连接中断时，本地数据会切换为每 10 秒降级刷新，不会轮询 Pawchive 搜索或作品详情；未保存的表单草稿也不会被外部更新覆盖。
 
-默认监听 `0.0.0.0:8789`，便于在可信局域网使用，但 HTTP 无法加密传输账户凭据和项目数据。在不可信网络中请绑定 `127.0.0.1` 或置于 HTTPS 反向代理之后。项目没有默认账户，未配置有效凭据时会拒绝启动。文件系统路径字段可以浏览运行 KToolBox 的计算机；项目字段始终限制在当前同步项目内，空目录只能在明确确认后以非递归方式删除。任务生命周期、安全措施与部署方法详见 [WebUI 指南](https://ktoolbox.readthedocs.io/latest/zh/webui/)。
+默认监听 `0.0.0.0:8789`，便于在可信局域网使用，但 HTTP 无法加密传输账户凭据和项目数据。在不可信网络中请绑定 `127.0.0.1` 或置于 HTTPS 反向代理之后。未配置凭据时，KToolBox 只在当前进程中生成并通过终端显示凭据。文件系统路径字段可以浏览运行 KToolBox 的计算机；项目字段始终限制在当前同步项目内，空目录只能在明确确认后以非递归方式删除。任务生命周期、安全措施与部署方法详见 [WebUI 指南](https://ktoolbox.readthedocs.io/latest/zh/webui/)。
+
+## MCP
+
+启动 WebUI 时会同时在 `/mcp` 启动经过筛选的 Streamable HTTP MCP 服务；需要登录的 WebUI REST OpenAPI YAML 位于 `/api/v1/openapi.yaml`。登录后打开 **MCP** 页面，再次确认当前账户密码即可创建只读或管理令牌。令牌明文只显示一次，可随时在同一页面撤销。
+
+Codex 配置示例：
+
+```toml
+[mcp_servers.ktoolbox]
+url = "http://127.0.0.1:8789/mcp"
+bearer_token_env_var = "KTOOLBOX_MCP_TOKEN"
+```
+
+页面还提供通用 HTTP、Claude、Cursor 和 VS Code 配置。权限范围、返回上限与 HTTPS 建议详见 [MCP 指南](https://ktoolbox.readthedocs.io/latest/zh/mcp/)。
 
 ## 配置
 
@@ -162,7 +176,7 @@ KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
 `.env` 控制运行时与传输行为；项目级 `ktoolbox.toml` 保存命名格式、作者清单、自动同步计划与忽略规则：
 
 ```toml
-schema_version = 4
+schema_version = 5
 
 [[creators]]
 service = "fanbox"

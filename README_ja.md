@@ -100,7 +100,7 @@ ktoolbox sync
 
 ## WebUI
 
-WebUI は `ktoolbox.toml` を含む 1 つのプロジェクトディレクトリに固定されます。単一アカウントを、できれば Argon2id ハッシュで設定してください。
+WebUI は `ktoolbox.toml` を含む 1 つのプロジェクトディレクトリに固定されます。認証情報は省略でき、その場合は今回のプロセスで使う `admin` と新しいランダムパスワードがターミナルに表示されます。固定の認証情報には Argon2id ハッシュを推奨します。
 
 ```bash
 ktoolbox webui hash-password
@@ -133,7 +133,21 @@ ktoolbox webui /path/to/project
 
 ログイン後は 1 本の SSE 接続だけで、タスク、クリエイター、除外ルール、設定、MCP トークン、開いているリモートディレクトリをタブ間で自動同期します。切断時はローカルデータだけを 10 秒ごとに更新し、Pawchive 検索や作品詳細はポーリングしません。未保存のフォーム下書きも外部更新から保護されます。
 
-既定の `0.0.0.0:8789` リスナーは信頼できる LAN では便利ですが、HTTP は認証情報やプロジェクトデータの通信を保護しません。信頼できないネットワークでは `127.0.0.1` にバインドするか、HTTPS リバースプロキシの背後に配置してください。既定のアカウントはなく、有効な認証情報を設定するまで起動に失敗します。タスクのライフサイクル、セキュリティ、デプロイについては [WebUI ガイド](https://ktoolbox.readthedocs.io/latest/ja/webui/) を参照してください。
+既定の `0.0.0.0:8789` リスナーは信頼できる LAN では便利ですが、HTTP は認証情報やプロジェクトデータの通信を保護しません。信頼できないネットワークでは `127.0.0.1` にバインドするか、HTTPS リバースプロキシの背後に配置してください。設定がない認証情報は現在のプロセスだけで生成され、ターミナルだけに表示されます。タスクのライフサイクル、セキュリティ、デプロイについては [WebUI ガイド](https://ktoolbox.readthedocs.io/latest/ja/webui/) を参照してください。
+
+## MCP
+
+WebUI の起動時に、選定された Streamable HTTP MCP サービスも `/mcp` で起動します。認証付き WebUI REST OpenAPI YAML は `/api/v1/openapi.yaml` です。ログイン後に **MCP** ページを開き、現在のアカウントパスワードを再確認すると、読み取り専用または管理トークンを作成できます。平文のトークンは一度だけ表示され、同じページから失効できます。
+
+Codex 設定例：
+
+```toml
+[mcp_servers.ktoolbox]
+url = "http://127.0.0.1:8789/mcp"
+bearer_token_env_var = "KTOOLBOX_MCP_TOKEN"
+```
+
+このページでは汎用 HTTP、Claude、Cursor、VS Code の設定も生成します。権限、返却上限、HTTPS の注意事項は [MCP ガイド](https://ktoolbox.readthedocs.io/latest/ja/mcp/)を参照してください。
 
 ## 設定
 
@@ -160,7 +174,7 @@ KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
 `.env` はランタイムと転送動作を制御し、プロジェクト単位の `ktoolbox.toml` は命名形式、クリエイター一覧、自動同期プラン、除外ルールを保存します。
 
 ```toml
-schema_version = 4
+schema_version = 5
 
 [[creators]]
 service = "fanbox"

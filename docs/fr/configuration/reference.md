@@ -76,11 +76,12 @@ Le document de projet est distinct de la configuration d'environnement. Son chem
 
 | Champ | Type | Valeur par défaut | Description |
 | --- | --- | --- | --- |
-| `schema_version` | littéral `4` | `4` | Version du schéma ; les anciens documents sont mis à niveau lors de l’enregistrement. |
+| `schema_version` | littéral `5` | `5` | Version du schéma ; les anciens documents sont mis à niveau lors de l’enregistrement. |
 | `creators` | tableau de tables | vide | Liste enregistrée des créateurs. |
 | `blockers` | tableau de tables | vide | Spécifications ordonnées des règles. |
 | `default_output` | chaîne | `downloads` | Répertoire de téléchargement par défaut. Les chemins relatifs partent de la racine du projet ; les chemins absolus peuvent viser l’extérieur du projet. |
 | `naming` | table | valeurs du projet | Arborescence et modèles de fichiers. Les anciens emplacements sont saisis uniquement dans l’outil de conversion. Consultez le [guide du nommage](../naming.md). |
+| `automatic_sync` | tableau de tables | vide | Plans programmés de synchronisation des créateurs. Consultez le [guide](../automatic-sync.md). |
 
 ### Entrée d'un créateur
 

@@ -100,7 +100,7 @@ Les fichiers existants sont ignorés lors des exécutions suivantes. Un fichier 
 
 ## WebUI
 
-La WebUI est liée à un seul répertoire de projet contenant `ktoolbox.toml`. Configurez un compte unique, de préférence avec un hachage Argon2id :
+La WebUI est liée à un seul répertoire de projet contenant `ktoolbox.toml`. Les identifiants sont facultatifs : s'ils manquent, le terminal affiche `admin` et un nouveau mot de passe aléatoire valable pour ce processus. Pour des identifiants stables, préférez un hachage Argon2id :
 
 ```bash
 ktoolbox webui hash-password
@@ -133,7 +133,21 @@ Une tâche en échec conserve un rapport expurgé par étape avec le créateur o
 
 Après la connexion, une seule connexion SSE synchronise automatiquement les tâches, créateurs, règles d'exclusion, configurations, jetons MCP et répertoires distants ouverts entre les onglets. En cas de coupure, seules les données locales sont actualisées toutes les 10 secondes, sans interroger les recherches Pawchive ni les détails d'œuvres ; les brouillons non enregistrés restent protégés des mises à jour externes.
 
-L'écoute par défaut sur `0.0.0.0:8789` est pratique sur un réseau local de confiance, mais HTTP ne protège ni les identifiants ni les données du projet en transit. Sur un réseau non fiable, liez le service à `127.0.0.1` ou placez-le derrière un proxy inverse HTTPS. Il n'existe aucun compte par défaut et le démarrage échoue tant que des identifiants valides ne sont pas configurés. Consultez le [guide de la WebUI](https://ktoolbox.readthedocs.io/latest/fr/webui/) pour le cycle de vie des tâches, la sécurité et le déploiement.
+L'écoute par défaut sur `0.0.0.0:8789` est pratique sur un réseau local de confiance, mais HTTP ne protège ni les identifiants ni les données du projet en transit. Sur un réseau non fiable, liez le service à `127.0.0.1` ou placez-le derrière un proxy inverse HTTPS. Les identifiants absents sont générés uniquement pour le processus courant et affichés seulement dans son terminal. Consultez le [guide de la WebUI](https://ktoolbox.readthedocs.io/latest/fr/webui/) pour le cycle de vie des tâches, la sécurité et le déploiement.
+
+## MCP
+
+Le démarrage de la WebUI lance également un service MCP Streamable HTTP sélectionné sur `/mcp`. Le contrat OpenAPI YAML de l'API REST WebUI authentifiée se trouve à `/api/v1/openapi.yaml`. Après connexion, ouvrez **MCP** et confirmez le mot de passe du compte pour créer un jeton en lecture seule ou de gestion. Sa valeur n'est affichée qu'une fois et peut être révoquée depuis la même page.
+
+Exemple pour Codex :
+
+```toml
+[mcp_servers.ktoolbox]
+url = "http://127.0.0.1:8789/mcp"
+bearer_token_env_var = "KTOOLBOX_MCP_TOKEN"
+```
+
+La page génère aussi des configurations pour HTTP générique, Claude, Cursor et VS Code. Consultez le [guide MCP](https://ktoolbox.readthedocs.io/latest/fr/mcp/) pour les permissions, limites et recommandations HTTPS.
 
 ## Configuration
 
@@ -160,7 +174,7 @@ Si `KTOOLBOX_DOWNLOADER__SESSION_KEY` est défini, il n'est envoyé que lors du 
 Le fichier `.env` contrôle l'exécution et les transferts. Le fichier de projet `ktoolbox.toml` contient le nommage, la liste des créateurs, les plans de synchronisation automatique et les règles d'exclusion :
 
 ```toml
-schema_version = 4
+schema_version = 5
 
 [[creators]]
 service = "fanbox"

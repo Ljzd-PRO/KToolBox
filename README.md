@@ -137,6 +137,20 @@ One authenticated SSE connection automatically synchronizes tasks, creators, ign
 
 The default `0.0.0.0:8789` listener is convenient on a trusted LAN, but HTTP does not protect credentials or project data in transit. Bind to `127.0.0.1` or put the service behind HTTPS for untrusted networks. When credentials are not configured, KToolBox generates credentials for the current process and prints them only in its terminal. Filesystem-backed path fields can browse the computer running KToolBox; project fields stay inside the bound project, while the storage-bucket and log-directory fields use the server process's host permissions. Empty directories can only be removed through an explicit, non-recursive confirmation. See the [WebUI guide](https://ktoolbox.readthedocs.io/latest/webui/) for task lifecycle, security, and deployment details.
 
+## MCP
+
+Starting WebUI also starts a curated Streamable HTTP MCP service at `/mcp`; the authenticated WebUI REST contract is available as OpenAPI YAML at `/api/v1/openapi.yaml`. Sign in, open **MCP**, and confirm the current account password to create a read-only or management token. The token is displayed once and can be revoked from the same page.
+
+For Codex, store the token outside the repository and reference it from the configuration:
+
+```toml
+[mcp_servers.ktoolbox]
+url = "http://127.0.0.1:8789/mcp"
+bearer_token_env_var = "KTOOLBOX_MCP_TOKEN"
+```
+
+The page also generates configurations for generic HTTP clients, Claude, Cursor, and VS Code. See the [MCP guide](https://ktoolbox.readthedocs.io/latest/mcp/) for permissions, limits, and HTTPS guidance.
+
 ## Configuration
 
 KToolBox reads `.env`, then `prod.env`, from the current working directory. Nested fields use `__`:
@@ -162,7 +176,7 @@ KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
 `.env` controls runtime and transfer behavior. A project-level `ktoolbox.toml` stores naming, the creator roster, automatic-sync plans, and blockers:
 
 ```toml
-schema_version = 4
+schema_version = 5
 
 [[creators]]
 service = "fanbox"

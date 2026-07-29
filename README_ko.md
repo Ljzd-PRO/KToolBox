@@ -100,7 +100,7 @@ ktoolbox sync
 
 ## WebUI
 
-WebUI는 `ktoolbox.toml`이 포함된 하나의 프로젝트 디렉터리에 연결됩니다. 가능하면 Argon2id 해시를 사용하여 단일 계정을 설정하세요.
+WebUI는 `ktoolbox.toml`이 포함된 하나의 프로젝트 디렉터리에 연결됩니다. 자격 증명을 생략하면 이번 프로세스에서 사용할 `admin`과 새 무작위 암호가 터미널에 표시됩니다. 고정 자격 증명에는 Argon2id 해시를 권장합니다.
 
 ```bash
 ktoolbox webui hash-password
@@ -133,7 +133,21 @@ ktoolbox webui /path/to/project
 
 로그인 후에는 하나의 SSE 연결만 사용하여 작업, 크리에이터, 제외 규칙, 설정, MCP 토큰 및 열린 원격 디렉터리를 탭 사이에서 자동으로 동기화합니다. 연결이 끊기면 로컬 데이터만 10초마다 새로 고치며 Pawchive 검색이나 작품 상세 정보는 폴링하지 않습니다. 저장하지 않은 양식 초안도 외부 업데이트로부터 보호됩니다.
 
-기본 `0.0.0.0:8789` 리스너는 신뢰할 수 있는 LAN에서 편리하지만, HTTP는 전송 중인 자격 증명이나 프로젝트 데이터를 보호하지 않습니다. 신뢰할 수 없는 네트워크에서는 `127.0.0.1`에 바인딩하거나 HTTPS 리버스 프록시 뒤에 배치하세요. 기본 계정은 없으며 유효한 자격 증명을 설정할 때까지 시작되지 않습니다. 작업 수명 주기, 보안 및 배포에 대해서는 [WebUI 가이드](https://ktoolbox.readthedocs.io/latest/ko/webui/)를 참조하세요.
+기본 `0.0.0.0:8789` 리스너는 신뢰할 수 있는 LAN에서 편리하지만, HTTP는 전송 중인 자격 증명이나 프로젝트 데이터를 보호하지 않습니다. 신뢰할 수 없는 네트워크에서는 `127.0.0.1`에 바인딩하거나 HTTPS 리버스 프록시 뒤에 배치하세요. 설정되지 않은 자격 증명은 현재 프로세스에서만 생성되고 터미널에만 표시됩니다. 작업 수명 주기, 보안 및 배포에 대해서는 [WebUI 가이드](https://ktoolbox.readthedocs.io/latest/ko/webui/)를 참조하세요.
+
+## MCP
+
+WebUI를 시작하면 선별된 Streamable HTTP MCP 서비스도 `/mcp`에서 시작됩니다. 인증된 WebUI REST OpenAPI YAML은 `/api/v1/openapi.yaml`에서 받을 수 있습니다. 로그인 후 **MCP** 페이지에서 현재 계정 암호를 다시 확인하여 읽기 전용 또는 관리 토큰을 만들 수 있습니다. 원문 토큰은 한 번만 표시되며 같은 페이지에서 취소할 수 있습니다.
+
+Codex 설정 예:
+
+```toml
+[mcp_servers.ktoolbox]
+url = "http://127.0.0.1:8789/mcp"
+bearer_token_env_var = "KTOOLBOX_MCP_TOKEN"
+```
+
+페이지는 일반 HTTP, Claude, Cursor 및 VS Code 설정도 생성합니다. 권한, 반환 한도 및 HTTPS 지침은 [MCP 가이드](https://ktoolbox.readthedocs.io/latest/ko/mcp/)를 참조하세요.
 
 ## 설정
 
@@ -160,7 +174,7 @@ KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
 `.env`는 런타임과 전송 동작을 제어하고, 프로젝트 수준 `ktoolbox.toml`은 이름 형식, 크리에이터 목록, 자동 동기화 계획과 제외 규칙을 저장합니다.
 
 ```toml
-schema_version = 4
+schema_version = 5
 
 [[creators]]
 service = "fanbox"

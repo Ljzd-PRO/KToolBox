@@ -58,10 +58,10 @@ ktoolbox config validate
 
 ## クリエイター一覧
 
-各プロジェクト文書は `schema_version = 4` で始まります。Schema v4 はプロジェクトの命名形式と自動同期プランを保存し、以前のダウンロード場所は命名変換ツールだけで扱います。`default_output = "downloads"` はプロジェクト共通の既定値で、絶対パスならプロジェクト外も指定できます。[命名形式ガイド](../naming.md)を参照してください。クリエイターは大文字小文字を区別しない `service:id` で一意で、オプションのエイリアスも一意です。
+各プロジェクト文書は `schema_version = 5` で始まります。Schema v5 はプロジェクトの命名形式と自動同期プランを保存し、以前のダウンロード場所は命名変換ツールだけで扱います。`default_output = "downloads"` はプロジェクト共通の既定値で、絶対パスならプロジェクト外も指定できます。[命名形式ガイド](../naming.md)を参照してください。クリエイターは大文字小文字を区別しない `service:id` で一意で、オプションのエイリアスも一意です。
 
 ```toml
-schema_version = 4
+schema_version = 5
 
 [[creators]]
 service = "fanbox"
