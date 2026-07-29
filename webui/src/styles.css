@@ -531,6 +531,43 @@ code {
   box-shadow: var(--surface-shadow);
 }
 
+.legacy-config-editor .cm-editor {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--field-border);
+  border-radius: var(--radius);
+  background: var(--field-background);
+  color: var(--foreground);
+  box-shadow: var(--surface-shadow);
+  font-size: 0.8125rem;
+}
+
+.legacy-config-editor .cm-editor:hover {
+  border-color: var(--field-border-hover);
+}
+
+.legacy-config-editor .cm-editor.cm-focused {
+  border-color: var(--field-border-focus);
+  outline: 2px solid color-mix(in oklab, var(--accent) 28%, transparent);
+  outline-offset: 1px;
+}
+
+.legacy-config-editor .cm-gutters {
+  border-right-color: var(--border);
+  background: var(--surface-secondary);
+  color: var(--muted);
+}
+
+.legacy-config-editor .cm-scroller {
+  overflow: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+.legacy-config-editor .cm-activeLine,
+.legacy-config-editor .cm-activeLineGutter {
+  background: color-mix(in oklab, var(--accent) 8%, transparent);
+}
+
 .config-save-bar {
   background: color-mix(in oklab, var(--surface-secondary) 92%, var(--surface) 8%);
   box-shadow: 0 -1px 0 var(--border), 0 -8px 18px color-mix(in oklab, var(--background) 72%, transparent);

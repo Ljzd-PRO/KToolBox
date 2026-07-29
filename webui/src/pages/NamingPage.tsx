@@ -54,11 +54,14 @@ import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 
 import { ExternalChangeAlert } from "../components/ExternalChangeAlert";
+import {
+  LegacyConfigEditor,
+  type LegacyConfigEditorIssue,
+} from "../components/LegacyConfigEditor";
 import { RemotePathField } from "../components/RemotePathField";
 import {
   BatchActionBar,
   ChipListField,
-  CodeEditor,
   DataTableFrame,
   EmptyPanel,
   FormField,
@@ -326,6 +329,7 @@ export function NamingPage() {
   const [parsedSource, setParsedSource] = useState<NamingSourceParse | null>(null);
   const [parsingSource, setParsingSource] = useState(false);
   const [sourceError, setSourceError] = useState<string | null>(null);
+  const [sourceIssues, setSourceIssues] = useState<LegacyConfigEditorIssue[]>([]);
   const [preview, setPreview] = useState<NamingPreview | null>(null);
   const [selectedCreators, setSelectedCreators] = useState<Set<string>>(new Set());
   const [scanning, setScanning] = useState(false);
@@ -498,12 +502,14 @@ export function NamingPage() {
     setPastedDrafts((drafts) => ({ ...drafts, [pastedFormat]: value }));
     setParsedSource(null);
     setSourceError(null);
+    setSourceIssues([]);
   }
 
   async function parsePastedSource() {
     if (!session || !pastedDrafts[pastedFormat].trim()) return;
     setParsingSource(true);
     setSourceError(null);
+    setSourceIssues([]);
     try {
       const result = await api<NamingSourceParse>("/naming/source/parse", {
         method: "POST",
@@ -514,6 +520,7 @@ export function NamingPage() {
         csrfToken: session.csrf_token,
       });
       setParsedSource(result);
+      setSourceIssues([]);
       toast.success(t("naming.workflow.parseSuccess"), {
         description: t("naming.workflow.parseSuccessHint", {
           count: result.recognized_fields.length,
@@ -521,7 +528,9 @@ export function NamingPage() {
       });
     } catch (error) {
       setParsedSource(null);
-      setSourceError(sourceParseErrorText(error, t));
+      const issues = sourceParseIssues(error, t);
+      setSourceIssues(issues);
+      setSourceError(issues[0]?.message ?? sourceParseErrorText(error, t));
     } finally {
       setParsingSource(false);
     }
@@ -1214,6 +1223,7 @@ export function NamingPage() {
                       setPastedFormat(String(key) as typeof pastedFormat);
                       setParsedSource(null);
                       setSourceError(null);
+                      setSourceIssues([]);
                     }}
                   >
                     <Tabs.List className="grid grid-cols-2">
@@ -1229,21 +1239,23 @@ export function NamingPage() {
                       </Tabs.Tab>
                     </Tabs.List>
                     <Tabs.Panel className="pt-3" id="env">
-                      <CodeEditor
+                      <LegacyConfigEditor
                         description={t("naming.workflow.editorPrivacy")}
-                        icon={FileTypeEnv}
+                        format="env"
+                        issues={sourceIssues}
                         label={t("naming.workflow.envEditor")}
-                        rows={12}
+                        placeholder={legacyEnvSample}
                         value={pastedDrafts.env}
                         onChange={updatePastedDraft}
                       />
                     </Tabs.Panel>
                     <Tabs.Panel className="pt-3" id="toml">
-                      <CodeEditor
+                      <LegacyConfigEditor
                         description={t("naming.workflow.editorPrivacy")}
-                        icon={Braces}
+                        format="toml"
+                        issues={sourceIssues}
                         label={t("naming.workflow.tomlEditor")}
-                        rows={12}
+                        placeholder={namingTomlSample}
                         value={pastedDrafts.toml}
                         onChange={updatePastedDraft}
                       />
@@ -2271,26 +2283,42 @@ function sourceParseErrorText(
   error: unknown,
   t: ReturnType<typeof useTranslation>["t"],
 ): string {
+  return sourceParseIssues(error, t)[0]?.message ?? errorText(error);
+}
+
+function sourceParseIssues(
+  error: unknown,
+  t: ReturnType<typeof useTranslation>["t"],
+): LegacyConfigEditorIssue[] {
   if (!(error instanceof ApiError) || !isRecord(error.detail)) {
-    return errorText(error);
+    return [{ message: errorText(error) }];
   }
   const issues = error.detail.issues;
   if (!Array.isArray(issues) || !issues.length || !isRecord(issues[0])) {
-    return t("naming.workflow.parseErrors.invalid");
+    return [{ message: t("naming.workflow.parseErrors.invalid") }];
   }
-  const issue = issues[0];
-  const code = typeof issue.code === "string" ? issue.code : "invalid";
   const supportedCodes = new Set([
     "source_too_large",
     "source_empty",
     "no_legacy_naming_fields",
   ]);
-  const message = supportedCodes.has(code)
-    ? t(`naming.workflow.parseErrors.${code}`)
-    : t("naming.workflow.parseErrors.invalid");
-  return typeof issue.line === "number"
-    ? t("naming.workflow.errorAtLine", { line: issue.line, message })
-    : message;
+  return issues.filter(isRecord).map((issue) => {
+    const code = typeof issue.code === "string" ? issue.code : "invalid";
+    const baseMessage = supportedCodes.has(code)
+      ? t(`naming.workflow.parseErrors.${code}`)
+      : t("naming.workflow.parseErrors.invalid");
+    const line = typeof issue.line === "number" ? issue.line : null;
+    return {
+      line,
+      column: typeof issue.column === "number" ? issue.column : null,
+      message: line
+        ? t("naming.workflow.errorAtLine", {
+            line,
+            message: baseMessage,
+          })
+        : baseMessage,
+    };
+  });
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

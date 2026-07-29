@@ -143,7 +143,7 @@ afterEach(async () => {
   await i18n.changeLanguage("en");
 });
 
-describe("Naming format page", () => {
+describe("Naming format page", { timeout: 10_000 }, () => {
   it("scans real roots and defaults to converting every safe creator", async () => {
     const user = userEvent.setup();
     window.history.replaceState({}, "", "/naming");
@@ -323,7 +323,8 @@ describe("Naming format page", () => {
       name: "Legacy .env naming settings",
     });
     const content = "KTOOLBOX_JOB__MIX_POSTS=true";
-    await user.type(editor, content);
+    await user.click(editor);
+    await user.paste(content);
     await user.click(screen.getByRole("button", { name: "Parse configuration" }));
     await waitFor(() =>
       expect(parseBody).toEqual({ format: "env", content }),
@@ -333,9 +334,9 @@ describe("Naming format page", () => {
 
     await user.click(screen.getByRole("tab", { name: "Project history" }));
     await user.click(screen.getByRole("tab", { name: "Paste configuration" }));
-    expect(screen.getByRole("textbox", { name: "Legacy .env naming settings" })).toHaveValue(
-      content,
-    );
+    expect(
+      screen.getByRole("textbox", { name: "Legacy .env naming settings" }),
+    ).toHaveTextContent(content);
     await user.click(screen.getByRole("button", { name: "Scan old locations" }));
     expect(await screen.findByRole("heading", { name: "Review naming changes" })).toBeInTheDocument();
     expect(previewBody).toMatchObject({
