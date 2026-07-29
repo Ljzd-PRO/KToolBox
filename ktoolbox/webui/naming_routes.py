@@ -155,7 +155,7 @@ def create_naming_router() -> APIRouter:
         service: NamingServiceDependency,
     ) -> NamingPreviewResponse:
         try:
-            return await service.preview(payload.roots)
+            return await service.preview(payload.roots, payload.source)
         except NamingConversionError as error:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,

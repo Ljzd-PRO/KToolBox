@@ -85,6 +85,25 @@ const noLegacyMigration = {
   ignored_environment_keys: [],
 };
 
+const layoutVersions = [
+  {
+    id: "naming-layout-source",
+    revision: "naming-revision-source",
+    naming,
+    origin: "project_change",
+    created_at: "2026-07-25T00:00:00Z",
+    is_current: false,
+  },
+  {
+    id: "naming-layout-current",
+    revision: "naming-revision-current",
+    naming,
+    origin: "project_current",
+    created_at: "2026-07-26T00:00:00Z",
+    is_current: true,
+  },
+];
+
 const legacyMigration = {
   pending: true,
   project_revision: "revision-1",
@@ -129,12 +148,14 @@ describe("Naming format page", () => {
     const user = userEvent.setup();
     window.history.replaceState({}, "", "/naming");
     let applyBody: Record<string, unknown> | undefined;
+    let previewBody: Record<string, unknown> | undefined;
     vi.stubGlobal(
       "fetch",
       vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
         const path = String(input);
         if (path.endsWith("/session")) return json(session);
         if (path.endsWith("/naming/legacy-migration")) return json(noLegacyMigration);
+        if (path.endsWith("/naming/layout-versions")) return json(layoutVersions);
         if (path.endsWith("/startup-notices")) return json([]);
         if (path.endsWith("/naming/conversions")) return json([]);
         if (path.endsWith("/naming/legacy-context")) {
@@ -143,7 +164,10 @@ describe("Naming format page", () => {
             conversion_pending: true,
           });
         }
-        if (path.endsWith("/naming/preview")) return json(preview);
+        if (path.endsWith("/naming/preview")) {
+          previewBody = JSON.parse(String(init?.body)) as Record<string, unknown>;
+          return json(preview);
+        }
         if (path.endsWith("/naming/apply")) {
           applyBody = JSON.parse(String(init?.body)) as Record<string, unknown>;
           return json({
@@ -201,6 +225,13 @@ describe("Naming format page", () => {
 
     await user.click(screen.getByRole("button", { name: "Scan old locations" }));
     expect(await screen.findByRole("heading", { name: "Review naming changes" })).toBeInTheDocument();
+    expect(previewBody).toEqual({
+      roots: ["downloads"],
+      source: {
+        kind: "project_layout",
+        version_ids: ["naming-layout-source"],
+      },
+    });
     expect(
       screen.getAllByText("Creator directory unchanged · 1 internal moves"),
     ).not.toHaveLength(0);
@@ -236,6 +267,7 @@ describe("Naming format page", () => {
         const path = String(input);
         if (path.endsWith("/session")) return json(session);
         if (path.endsWith("/naming/legacy-migration")) return json(noLegacyMigration);
+        if (path.endsWith("/naming/layout-versions")) return json(layoutVersions);
         const resolveMatch = path.match(/\/startup-notices\/(layout-\d+)\/resolve$/u);
         if (resolveMatch) {
           const id = resolveMatch[1];
@@ -367,6 +399,7 @@ describe("Naming format page", () => {
         if (path.endsWith("/naming/legacy-migration")) {
           return json(migrated ? noLegacyMigration : legacyMigration);
         }
+        if (path.endsWith("/naming/layout-versions")) return json(layoutVersions);
         if (path.endsWith("/startup-notices")) return json([]);
         if (path.endsWith("/naming/legacy-context")) {
           return json({ roots: ["/project/downloads"], conversion_pending: true });

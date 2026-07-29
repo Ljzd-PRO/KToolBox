@@ -125,6 +125,9 @@ class WebUIDatabase:
                     id TEXT PRIMARY KEY,
                     status TEXT NOT NULL,
                     candidate_json TEXT NOT NULL,
+                    source_kind TEXT NOT NULL DEFAULT 'project_layout',
+                    source_json TEXT NOT NULL DEFAULT '{}',
+                    target_revision TEXT,
                     selected_json TEXT NOT NULL DEFAULT '[]',
                     preview_json TEXT NOT NULL,
                     fingerprint TEXT NOT NULL,
@@ -280,6 +283,28 @@ class WebUIDatabase:
             await connection.execute(
                 "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
                 (12, utc_now().isoformat()),
+            )
+            await _ensure_column(
+                connection,
+                "naming_conversions",
+                "source_kind",
+                "TEXT NOT NULL DEFAULT 'project_layout'",
+            )
+            await _ensure_column(
+                connection,
+                "naming_conversions",
+                "source_json",
+                "TEXT NOT NULL DEFAULT '{}'",
+            )
+            await _ensure_column(
+                connection,
+                "naming_conversions",
+                "target_revision",
+                "TEXT",
+            )
+            await connection.execute(
+                "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
+                (13, utc_now().isoformat()),
             )
             await connection.commit()
 

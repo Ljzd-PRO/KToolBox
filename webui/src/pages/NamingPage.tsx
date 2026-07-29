@@ -76,6 +76,7 @@ import type {
   NamingConfigurationResponse,
   NamingConversion,
   NamingCreatorPreview,
+  NamingLayoutVersion,
   NamingLegacyContext,
   NamingPreview,
   ProjectNamingConfiguration,
@@ -274,6 +275,10 @@ export function NamingPage() {
     queryKey: ["naming-legacy-context"],
     queryFn: () => api<NamingLegacyContext>("/naming/legacy-context"),
   });
+  const layoutVersionsQuery = useQuery({
+    queryKey: ["naming-layout-versions"],
+    queryFn: () => api<NamingLayoutVersion[]>("/naming/layout-versions"),
+  });
   const noticesQuery = useQuery({
     queryKey: ["startup-notices"],
     queryFn: () => api<StartupNotice[]>("/startup-notices"),
@@ -403,6 +408,7 @@ export function NamingPage() {
     namingQuery.isLoading ||
     conversionsQuery.isLoading ||
     legacyContextQuery.isLoading ||
+    layoutVersionsQuery.isLoading ||
     !draft ||
     !current ||
     legacyRoots === null
@@ -461,6 +467,7 @@ export function NamingPage() {
       }
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["naming-legacy-context"] }),
+        queryClient.invalidateQueries({ queryKey: ["naming-layout-versions"] }),
         queryClient.invalidateQueries({ queryKey: ["startup-notices"] }),
       ]);
       toast.success(t(layoutChanged ? "naming.saved" : "naming.defaultOutputSaved"), {
@@ -485,11 +492,21 @@ export function NamingPage() {
       legacyRoots.length === 0
     ) return;
     const roots = legacyRoots;
+    const versions = layoutVersionsQuery.data ?? [];
+    const sourceVersions = versions.filter((version) => !version.is_current);
+    const selectedVersions = sourceVersions.length > 0 ? sourceVersions : versions.slice(0, 1);
+    if (selectedVersions.length === 0) return;
     setScanning(true);
     try {
       const result = await api<NamingPreview>("/naming/preview", {
         method: "POST",
-        body: { roots },
+        body: {
+          roots,
+          source: {
+            kind: "project_layout",
+            version_ids: selectedVersions.map((version) => version.id),
+          },
+        },
         csrfToken: session.csrf_token,
       });
       setPreview(result);

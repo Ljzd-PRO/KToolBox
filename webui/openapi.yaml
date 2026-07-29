@@ -4913,9 +4913,20 @@ components:
             format: path
           type: array
           title: Roots
+        source:
+          oneOf:
+          - $ref: '#/components/schemas/ProjectLayoutConversionSource'
+          - $ref: '#/components/schemas/PastedConfigConversionSource'
+          title: Source
+          discriminator:
+            propertyName: kind
+            mapping:
+              pasted_config: '#/components/schemas/PastedConfigConversionSource'
+              project_layout: '#/components/schemas/ProjectLayoutConversionSource'
       type: object
       required:
       - roots
+      - source
       title: NamingPreviewRequest
     NamingPreviewResponse:
       properties:
@@ -4961,6 +4972,22 @@ components:
           type: string
           format: date-time
           title: Created At
+        source:
+          anyOf:
+          - oneOf:
+            - $ref: '#/components/schemas/ProjectLayoutConversionSource'
+            - $ref: '#/components/schemas/PastedConfigConversionSource'
+            discriminator:
+              propertyName: kind
+              mapping:
+                pasted_config: '#/components/schemas/PastedConfigConversionSource'
+                project_layout: '#/components/schemas/ProjectLayoutConversionSource'
+          - type: 'null'
+          title: Source
+        resolves_pending_layout:
+          type: boolean
+          title: Resolves Pending Layout
+          default: false
       type: object
       required:
       - id
@@ -5088,6 +5115,31 @@ components:
       - naming
       - revision
       title: NamingUpdateRequest
+    PastedConfigConversionSource:
+      properties:
+        kind:
+          type: string
+          const: pasted_config
+          title: Kind
+          default: pasted_config
+        format:
+          type: string
+          enum:
+          - env
+          - toml
+          title: Format
+        naming:
+          $ref: '#/components/schemas/ProjectNamingConfiguration'
+        digest:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+          title: Digest
+      type: object
+      required:
+      - format
+      - naming
+      - digest
+      title: PastedConfigConversionSource
     PathSelectorResponse:
       properties:
         kind:
@@ -5303,6 +5355,23 @@ components:
       - revision
       - configuration
       title: ProjectDocumentResponse
+    ProjectLayoutConversionSource:
+      properties:
+        kind:
+          type: string
+          const: project_layout
+          title: Kind
+          default: project_layout
+        version_ids:
+          items:
+            type: string
+          type: array
+          minItems: 1
+          title: Version Ids
+      type: object
+      required:
+      - version_ids
+      title: ProjectLayoutConversionSource
     ProjectNamingConfiguration:
       properties:
         creator_dirname_format:

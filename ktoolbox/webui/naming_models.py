@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -85,6 +85,24 @@ class NamingSourceParseResponse(BaseModel):
     differences: list[NamingSourceDifferenceResponse]
 
 
+class ProjectLayoutConversionSource(BaseModel):
+    kind: Literal["project_layout"] = "project_layout"
+    version_ids: list[str] = Field(min_length=1)
+
+
+class PastedConfigConversionSource(BaseModel):
+    kind: Literal["pasted_config"] = "pasted_config"
+    format: NamingSourceFormat
+    naming: ProjectNamingConfiguration
+    digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+NamingConversionSource = Annotated[
+    ProjectLayoutConversionSource | PastedConfigConversionSource,
+    Field(discriminator="kind"),
+]
+
+
 class LegacyNamingSourceResponse(BaseModel):
     name: str
     path: Path
@@ -124,6 +142,7 @@ class LegacyNamingMigrationResultResponse(BaseModel):
 
 class NamingPreviewRequest(BaseModel):
     roots: list[Path]
+    source: NamingConversionSource
 
 
 class NamingCreatorPreview(BaseModel):
@@ -153,6 +172,8 @@ class NamingPreviewResponse(BaseModel):
     skipped_count: int
     conflict_count: int
     created_at: datetime
+    source: NamingConversionSource | None = None
+    resolves_pending_layout: bool = False
 
 
 class NamingApplyRequest(BaseModel):

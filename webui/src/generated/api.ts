@@ -2303,6 +2303,8 @@ export interface components {
         NamingPreviewRequest: {
             /** Roots */
             roots: string[];
+            /** Source */
+            source: components["schemas"]["ProjectLayoutConversionSource"] | components["schemas"]["PastedConfigConversionSource"];
         };
         /** NamingPreviewResponse */
         NamingPreviewResponse: {
@@ -2333,6 +2335,13 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /** Source */
+            source?: (components["schemas"]["ProjectLayoutConversionSource"] | components["schemas"]["PastedConfigConversionSource"]) | null;
+            /**
+             * Resolves Pending Layout
+             * @default false
+             */
+            resolves_pending_layout: boolean;
         };
         /** NamingSourceDifferenceResponse */
         NamingSourceDifferenceResponse: {
@@ -2391,6 +2400,22 @@ export interface components {
             revision: string;
             /** Default Output */
             default_output?: string | null;
+        };
+        /** PastedConfigConversionSource */
+        PastedConfigConversionSource: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "pasted_config";
+            /**
+             * Format
+             * @enum {string}
+             */
+            format: "env" | "toml";
+            naming: components["schemas"]["ProjectNamingConfiguration"];
+            /** Digest */
+            digest: string;
         };
         /** PathSelectorResponse */
         PathSelectorResponse: {
@@ -2503,6 +2528,16 @@ export interface components {
             /** Revision */
             revision: string;
             configuration: components["schemas"]["ProjectConfiguration"];
+        };
+        /** ProjectLayoutConversionSource */
+        ProjectLayoutConversionSource: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "project_layout";
+            /** Version Ids */
+            version_ids: string[];
         };
         /**
          * ProjectNamingConfiguration

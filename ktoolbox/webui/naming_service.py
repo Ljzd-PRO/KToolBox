@@ -51,6 +51,7 @@ from ktoolbox.webui.naming_models import (
     NamingConfigurationResponse,
     NamingConversionProgress,
     NamingConversionResponse,
+    NamingConversionSource,
     NamingCreatorPreview,
     NamingLayoutVersionOrigin,
     NamingLayoutVersionResponse,
@@ -60,6 +61,8 @@ from ktoolbox.webui.naming_models import (
     NamingSourceDifferenceResponse,
     NamingSourceParseResponse,
     NamingSourceWarningResponse,
+    PastedConfigConversionSource,
+    ProjectLayoutConversionSource,
     StartupNoticeResolution,
     StartupNoticeResponse,
 )
@@ -341,7 +344,11 @@ class NamingConversionService:
             row = await (await connection.execute("SELECT 1 FROM naming_layout_state WHERE id = 1")).fetchone()
         return row is not None
 
-    async def preview(self, roots: list[Path]) -> NamingPreviewResponse:
+    async def preview(
+        self,
+        roots: list[Path],
+        source: NamingConversionSource,
+    ) -> NamingPreviewResponse:
         project = self.project_store.load()
         revision = content_revision(self.project_store.load_text())
         resolved_roots = [self._resolve_root(root) for root in _unique_paths(roots)]
@@ -353,7 +360,12 @@ class NamingConversionService:
             if root.is_symlink():
                 raise NamingConversionError(f"old download location cannot be a symbolic link: {root}")
 
-        sources, candidate = await self._layout_snapshots(project.naming)
+        sources = await self._resolve_conversion_sources(source)
+        candidate = project.naming
+        resolves_pending = await self._source_resolves_pending_layout(
+            source,
+            candidate,
+        )
         fingerprint = await anyio.to_thread.run_sync(_filesystem_fingerprint, resolved_roots)
         scans = await anyio.to_thread.run_sync(
             _scan_download_roots,
@@ -392,18 +404,23 @@ class NamingConversionService:
             skipped_count=sum(item.skipped for item in creators),
             conflict_count=sum(len(item.conflicts) for item in creators),
             created_at=now,
+            source=source,
+            resolves_pending_layout=resolves_pending,
         )
         async with self.database.connect() as connection:
             await connection.execute(
                 """
                 INSERT INTO naming_conversions(
-                    id, status, candidate_json, preview_json, fingerprint, progress_json,
-                    created_at, updated_at
-                ) VALUES (?, 'preview', ?, ?, ?, ?, ?, ?)
+                    id, status, candidate_json, source_kind, source_json, target_revision,
+                    preview_json, fingerprint, progress_json, created_at, updated_at
+                ) VALUES (?, 'preview', ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     preview_id,
                     candidate.model_dump_json(),
+                    source.kind,
+                    source.model_dump_json(),
+                    _naming_revision(candidate),
                     preview.model_dump_json(),
                     fingerprint,
                     NamingConversionProgress().model_dump_json(),
@@ -460,8 +477,9 @@ class NamingConversionService:
         candidate = ProjectNamingConfiguration.model_validate_json(await self._candidate_json(preview_id))
         available_operations = await self._operations(preview_id, [], reverse=False)
         if not available_operations:
-            await self._clear_layout_state(candidate)
-            await self._resolve_layout_notices(candidate, "convert_selected")
+            if conversion.preview.resolves_pending_layout:
+                await self._clear_layout_state(candidate)
+                await self._resolve_layout_notices(candidate, "convert_selected")
             await self._set_status(preview_id, "completed", selected=[])
             await self.events.publish(
                 "naming.changed",
@@ -474,7 +492,8 @@ class NamingConversionService:
         if not selected:
             raise NamingConversionError("select at least one downloaded creator to convert")
         await self._ensure_no_overlapping_tasks(conversion.preview.roots)
-        await self._resolve_layout_notices(candidate, "convert_selected")
+        if conversion.preview.resolves_pending_layout:
+            await self._resolve_layout_notices(candidate, "convert_selected")
         await self._set_status(preview_id, "queued", selected=selected)
         await self.events.publish(
             "naming.conversion.started",
@@ -655,13 +674,13 @@ class NamingConversionService:
     ) -> None:
         now = utc_now().isoformat()
         async with self.database.connect() as connection:
-            await self._store_layout_version(
+            source_version_id = await self._store_layout_version(
                 connection,
                 previous,
                 origin="project_change",
                 created_at=now,
             )
-            await self._store_layout_version(
+            target_version_id = await self._store_layout_version(
                 connection,
                 target,
                 origin=target_origin,
@@ -717,6 +736,8 @@ class NamingConversionService:
                         json.dumps(
                             {
                                 "version": version_id,
+                                "source_version_id": source_version_id,
+                                "target_version_id": target_version_id,
                                 "source": previous.model_dump(mode="json"),
                                 "target": target.model_dump(mode="json"),
                             },
@@ -829,19 +850,57 @@ class NamingConversionService:
                 )
                 await connection.commit()
 
-    async def _layout_snapshots(
+    async def _resolve_conversion_sources(
         self,
-        current: ProjectNamingConfiguration,
-    ) -> tuple[list[ProjectNamingConfiguration], ProjectNamingConfiguration]:
+        source: NamingConversionSource,
+    ) -> list[ProjectNamingConfiguration]:
+        if isinstance(source, PastedConfigConversionSource):
+            if _naming_revision(source.naming) != source.digest:
+                raise NamingConversionError("pasted naming source changed after parsing; parse it again")
+            return [source.naming]
+        unique_ids = list(dict.fromkeys(source.version_ids))
+        placeholders = ",".join("?" for _ in unique_ids)
         async with self.database.connect() as connection:
-            row = await (
+            connection.row_factory = aiosqlite.Row
+            rows = await connection.execute_fetchall(
+                f"""
+                SELECT id, naming_json FROM naming_layout_versions
+                WHERE id IN ({placeholders})
+                """,
+                unique_ids,
+            )
+        by_id = {str(row["id"]): str(row["naming_json"]) for row in rows}
+        if missing := [version_id for version_id in unique_ids if version_id not in by_id]:
+            raise NamingConversionError("unknown project naming versions: " + ", ".join(missing))
+        return [ProjectNamingConfiguration.model_validate_json(by_id[version_id]) for version_id in unique_ids]
+
+    async def _source_resolves_pending_layout(
+        self,
+        source: NamingConversionSource,
+        target: ProjectNamingConfiguration,
+    ) -> bool:
+        if not isinstance(source, ProjectLayoutConversionSource):
+            return False
+        async with self.database.connect() as connection:
+            state = await (
                 await connection.execute("SELECT sources_json, target_json FROM naming_layout_state WHERE id = 1")
             ).fetchone()
-        if row is None:
-            return [current], current
-        sources = [ProjectNamingConfiguration.model_validate(item) for item in json.loads(str(row[0]))]
-        target = ProjectNamingConfiguration.model_validate_json(str(row[1]))
-        return sources or [current], target
+            if state is None:
+                return False
+            selected_rows = await connection.execute_fetchall(
+                f"""
+                SELECT revision FROM naming_layout_versions
+                WHERE id IN ({",".join("?" for _ in source.version_ids)})
+                """,
+                source.version_ids,
+            )
+        pending_target = ProjectNamingConfiguration.model_validate_json(str(state[1]))
+        if pending_target != target:
+            return False
+        pending_revisions = {
+            _naming_revision(ProjectNamingConfiguration.model_validate(item)) for item in json.loads(str(state[0]))
+        }
+        return pending_revisions.issubset({str(row[0]) for row in selected_rows})
 
     async def _clear_layout_state(self, candidate: ProjectNamingConfiguration) -> None:
         async with self.database.connect() as connection:
@@ -946,7 +1005,8 @@ class NamingConversionService:
                 raise NamingPreviewStaleError(
                     "project configuration changed during conversion; moved files will be rolled back"
                 )
-            await self._clear_layout_state(candidate)
+            if conversion.preview.resolves_pending_layout:
+                await self._clear_layout_state(candidate)
             await self._set_status(conversion_id, "completed", selected=selected)
             await self.events.publish(
                 "naming.changed",

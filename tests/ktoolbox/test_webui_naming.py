@@ -22,6 +22,11 @@ from ktoolbox.webui.auth import CSRF_HEADER
 from ktoolbox.webui.config_store import content_revision
 from ktoolbox.webui.database import WebUIDatabase
 from ktoolbox.webui.event_store import WebUIEventStore
+from ktoolbox.webui.naming_models import (
+    NamingPreviewResponse,
+    PastedConfigConversionSource,
+    ProjectLayoutConversionSource,
+)
 from ktoolbox.webui.naming_service import (
     NamingConversionError,
     NamingConversionService,
@@ -77,6 +82,20 @@ async def save_naming(
         section,  # type: ignore[arg-type]
         candidate,
         content_revision(store.load_text()),
+    )
+
+
+async def preview_from_history(
+    service: NamingConversionService,
+    roots: list[Path],
+) -> NamingPreviewResponse:
+    versions = await service.layout_versions()
+    source_versions = [version.id for version in versions if not version.is_current]
+    if not source_versions:
+        source_versions = [versions[0].id]
+    return await service.preview(
+        roots,
+        ProjectLayoutConversionSource(version_ids=source_versions),
     )
 
 
@@ -196,12 +215,88 @@ async def test_layout_version_history_survives_completed_conversion(tmp_path: Pa
     candidate = store.load().naming.model_copy(update={"post_dirname_format": "{post_id}"})
     await save_naming(service, store, candidate)
 
-    preview = await service.preview([Path("downloads")])
+    preview = await preview_from_history(service, [Path("downloads")])
     conversion = await service.apply(preview.id, [])
 
     assert conversion.status == "completed"
     assert await service.has_pending_layout() is False
     assert len(await service.layout_versions()) == 2
+    await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_pasted_source_preview_uses_current_target_without_resolving_pending(
+    tmp_path: Path,
+) -> None:
+    downloads = tmp_path / "downloads"
+    downloads.mkdir()
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    store.save(ProjectConfiguration())
+    service, _ = await service_for(tmp_path)
+    current = store.load().naming.model_copy(update={"post_dirname_format": "{post_id}"})
+    await save_naming(service, store, current)
+    parsed = await service.parse_source(
+        "env",
+        "KTOOLBOX_JOB__POST_DIRNAME_FORMAT={title}\n",
+    )
+    source = PastedConfigConversionSource(
+        format="env",
+        naming=parsed.naming,
+        digest=parsed.digest,
+    )
+
+    preview = await service.preview([Path("downloads")], source)
+    conversion = await service.apply(preview.id, [])
+
+    assert preview.source == source
+    assert preview.resolves_pending_layout is False
+    assert conversion.status == "completed"
+    assert await service.has_pending_layout() is True
+    async with service.database.connect() as connection:
+        stored = await (
+            await connection.execute(
+                """
+                SELECT source_kind, source_json, target_revision
+                FROM naming_conversions WHERE id = ?
+                """,
+                (preview.id,),
+            )
+        ).fetchone()
+    assert stored is not None
+    assert stored[0] == "pasted_config"
+    assert "KTOOLBOX_JOB" not in str(stored[1])
+    assert stored[2]
+    await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_preview_rejects_unknown_or_changed_explicit_sources(
+    tmp_path: Path,
+) -> None:
+    downloads = tmp_path / "downloads"
+    downloads.mkdir()
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    store.save(ProjectConfiguration())
+    service, _ = await service_for(tmp_path)
+
+    with pytest.raises(NamingConversionError, match="unknown project naming versions"):
+        await service.preview(
+            [Path("downloads")],
+            ProjectLayoutConversionSource(version_ids=["missing"]),
+        )
+    parsed = await service.parse_source(
+        "env",
+        "KTOOLBOX_JOB__MIX_POSTS=true\n",
+    )
+    with pytest.raises(NamingConversionError, match="changed after parsing"):
+        await service.preview(
+            [Path("downloads")],
+            PastedConfigConversionSource(
+                format="env",
+                naming=parsed.naming,
+                digest="0" * 64,
+            ),
+        )
     await service.stop()
 
 
@@ -232,7 +327,7 @@ async def test_preview_scans_filesystem_and_conversion_updates_project(tmp_path:
     )
     await save_naming(service, store, candidate)
 
-    preview = await service.preview([Path("downloads")])
+    preview = await preview_from_history(service, [Path("downloads")])
 
     assert preview.creator_count == 1
     assert preview.work_count == 1
@@ -264,7 +359,7 @@ async def test_preview_scans_filesystem_and_conversion_updates_project(tmp_path:
         update={"creator_dirname_format": "{creator_name} - {creator_id}"},
     )
     await save_naming(service, store, second_candidate)
-    second_preview = await service.preview([Path("downloads")])
+    second_preview = await preview_from_history(service, [Path("downloads")])
     assert second_preview.creators[0].name == "Artist"
     assert second_preview.creators[0].source == downloads / "Artist (123)"
     assert second_preview.creators[0].target == downloads / "Artist - 123"
@@ -283,7 +378,7 @@ async def test_conversion_pauses_at_atomic_boundary_and_resumes_after_restart(
     service, _ = await service_for(tmp_path)
     candidate = ProjectNamingConfiguration(post_dirname_format="{post_id}")
     await save_naming(service, store, candidate)
-    preview = await service.preview([Path("downloads")])
+    preview = await preview_from_history(service, [Path("downloads")])
 
     first_operation = asyncio.Event()
     release_operation = asyncio.Event()
@@ -354,19 +449,19 @@ async def test_preview_detects_conflicts_staleness_and_active_tasks(tmp_path: Pa
     await save_naming(service, store, candidate)
     conflict = downloads / "Artist [fanbox-123]" / "one"
     conflict.mkdir(parents=True)
-    preview = await service.preview([Path("downloads")])
+    preview = await preview_from_history(service, [Path("downloads")])
     assert preview.conflict_count == 1
     with pytest.raises(NamingConversionError, match="conflict"):
         await service.apply(preview.id, [])
 
     conflict.rmdir()
-    preview = await service.preview([Path("downloads")])
+    preview = await preview_from_history(service, [Path("downloads")])
     (downloads / "changed.txt").write_text("changed", encoding="utf-8")
     with pytest.raises(NamingPreviewStaleError, match="changed"):
         await service.apply(preview.id, [])
 
     (downloads / "changed.txt").unlink()
-    preview = await service.preview([Path("downloads")])
+    preview = await preview_from_history(service, [Path("downloads")])
     await tasks.create(SyncTaskSpec(creators=[], output=downloads))
     with pytest.raises(NamingConversionError, match="overlaps"):
         await service.apply(
@@ -390,11 +485,11 @@ async def test_conversion_requires_explicit_selection_and_rolls_back_config_race
         post_dirname_format="{post_id}",
     )
     await save_naming(service, store, candidate)
-    preview = await service.preview([Path("downloads")])
+    preview = await preview_from_history(service, [Path("downloads")])
     with pytest.raises(NamingConversionError, match="select at least one"):
         await service.apply(preview.id, [])
 
-    preview = await service.preview([Path("downloads")])
+    preview = await preview_from_history(service, [Path("downloads")])
     original_mark = service._mark_operation
 
     async def mutate_configuration(operation_id: int, status: str) -> None:
@@ -433,8 +528,8 @@ async def test_only_one_naming_conversion_can_be_active(tmp_path: Path) -> None:
         post_dirname_format="{post_id}",
     )
     await save_naming(service, store, candidate)
-    first = await service.preview([Path("downloads")])
-    second = await service.preview([Path("downloads")])
+    first = await preview_from_history(service, [Path("downloads")])
+    second = await preview_from_history(service, [Path("downloads")])
     original_run = service._run_conversion
     started = asyncio.Event()
     release = asyncio.Event()
@@ -487,7 +582,7 @@ async def test_preview_uses_creator_index_and_detects_duplicate_targets(tmp_path
     )
     await save_naming(service, store, candidate)
 
-    preview = await service.preview([Path("downloads")])
+    preview = await preview_from_history(service, [Path("downloads")])
 
     assert preview.creator_count == 2
     assert preview.conflict_count >= 2
@@ -585,7 +680,13 @@ async def test_naming_routes_require_session_and_csrf(tmp_path: Path) -> None:
             headers=csrf,
         )
         assert updated.status_code == 200
-        preview_payload = {"roots": ["downloads"]}
+        preview_payload = {
+            "roots": ["downloads"],
+            "source": {
+                "kind": "project_layout",
+                "version_ids": [versions.json()[0]["id"]],
+            },
+        }
         assert (await client.post("/api/v1/naming/preview", json=preview_payload)).status_code == 403
         preview = await client.post(
             "/api/v1/naming/preview",

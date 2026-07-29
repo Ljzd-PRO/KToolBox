@@ -117,6 +117,8 @@ export type NamingConfigurationResponse = WebUIApiSchemas["NamingConfigurationRe
 
 export type NamingLegacyContext = WebUIApiSchemas["NamingLegacyContextResponse"];
 
+export type NamingLayoutVersion = WebUIApiSchemas["NamingLayoutVersionResponse"];
+
 export type LegacyNamingMigration = WebUIApiSchemas["LegacyNamingMigrationResponse"];
 
 export type LegacyNamingMigrationResult = WebUIApiSchemas["LegacyNamingMigrationResultResponse"];
