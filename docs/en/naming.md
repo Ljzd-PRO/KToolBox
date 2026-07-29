@@ -23,6 +23,8 @@ The **Default download location** belongs to the project too. Its default value 
 
 Open the dedicated **Legacy download conversion** tab only when previously downloaded content needs to follow the saved naming format. Add one or more old locations, then choose **Scan old locations**. These locations are scan inputs, not destinations for future tasks.
 
+The converter is reusable at any time and offers two source modes. **Project history** lets you select one or more saved naming versions, which is useful when one download location contains several generations of layouts. **Paste configuration** accepts legacy `.env` naming keys, a complete `ktoolbox.toml`, a `[naming]` table, or a headerless naming fragment. The highlighted editor provides examples and field-level errors; pasted source text is parsed only in memory and is never stored in browser storage, logs, events, or conversion history. Both modes always use the current project naming revision as the read-only target and never overwrite project configuration.
+
 The scan reads the filesystem rather than relying only on task history, and it does not contact Pawchive. KToolBox identifies content from creator directory identities, `creator-indices.ktoolbox`, and `post.json`, without following symbolic links outside the selected locations.
 
 The preview shows each creator's old and new path, work and file counts, total size, skipped items, and conflicts. Every safely convertible creator starts selected, and you can exclude individual creators before applying the change.

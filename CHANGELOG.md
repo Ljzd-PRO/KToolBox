@@ -71,6 +71,8 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Add a localized About page with version, license, runtime, author, and official resource links while omitting author email addresses.
 - Render visible URLs, IP addresses, listener addresses, and URL examples with shared inline-code styling.
 - Add a localized Naming Format page with separate structure/template saves, variable validation, and live directory-tree examples.
+- Preserve normalized project naming revisions so old downloads can be scanned against one or several historical layouts after later configuration changes.
+- Make the old-download converter reusable with project-history and pasted legacy `.env`/TOML source modes, a highlighted in-memory editor, field-level diagnostics, and the current project layout as the immutable target.
 - Add a project default download location inherited by CLI, WebUI, MCP, work downloads, and automatic synchronization unless an entry supplies an explicit output; resolve relative values from the project and allow absolute host paths.
 - Move old locations into a dedicated legacy-conversion tab so they cannot be mistaken for future task destinations; scan the filesystem independently of task history and preview creator, work, file, and byte counts.
 - Apply selected legacy moves as persistent background conversions with an operation journal, pause/continue validation, cancellation rollback, restart recovery, lifecycle events, and empty-source cleanup.

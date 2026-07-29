@@ -23,6 +23,8 @@ L’**emplacement de téléchargement par défaut** appartient aussi au projet. 
 
 Ouvrez l’onglet séparé **Conversion des anciens téléchargements** uniquement si le contenu existant doit adopter le format enregistré. Ajoutez les anciens emplacements, puis lancez leur analyse. Ces emplacements sont des sources de conversion, pas les destinations des futures tâches.
 
+Le convertisseur reste disponible à tout moment et propose deux modes de source. **Historique du projet** permet de sélectionner plusieurs versions de nommage enregistrées lorsqu’un emplacement contient plusieurs générations d’arborescences. **Coller une configuration** accepte les anciennes clés `.env`, un `ktoolbox.toml` complet, une table `[naming]` ou un fragment sans en-tête. L’éditeur avec coloration fournit des exemples et localise les erreurs par champ ; le texte source reste uniquement en mémoire et n’est écrit ni dans le stockage du navigateur, ni dans les journaux, événements ou historiques. Dans les deux modes, la version actuelle du projet reste la cible en lecture seule et n’est jamais remplacée.
+
 L’analyse lit directement le système de fichiers, ne dépend pas uniquement de l’historique des tâches et ne contacte pas Pawchive. Elle utilise l’identité des dossiers d’auteur, `creator-indices.ktoolbox` et `post.json`, sans suivre les liens symboliques hors des emplacements choisis.
 
 La prévisualisation indique anciens et nouveaux chemins, nombres d’œuvres et de fichiers, taille totale, éléments ignorés et conflits. Tous les auteurs convertibles en sécurité sont sélectionnés par défaut.

@@ -84,7 +84,7 @@ Les vérifications privilégient l’horodatage `added` de Pawchive, interprét�
 
 ## Nommage du projet
 
-Le nommage et la sortie par défaut sont enregistrés dans `ktoolbox.toml` et partagés par la CLI, la WebUI, MCP, les téléchargements d’œuvres et la synchronisation automatique. La page **Format de nommage** enregistre séparément structure et modèles. L’onglet de conversion analyse uniquement les anciens emplacements choisis explicitement, sans contacter Pawchive, et prend en charge pause, reprise et restauration. Ces emplacements ne deviennent jamais des destinations futures. Consultez le [guide du nommage](naming.md).
+Le nommage et la sortie par défaut sont enregistrés dans `ktoolbox.toml` et partagés par la CLI, la WebUI, MCP, les téléchargements d’œuvres et la synchronisation automatique. La page **Format de nommage** enregistre séparément structure et modèles. Le convertisseur réutilisable accepte plusieurs formats enregistrés ou une ancienne configuration `.env`/TOML collée, conserve le projet actuel comme cible en lecture seule et ne mémorise pas le texte source. Il analyse uniquement les anciens emplacements choisis explicitement, sans contacter Pawchive, et prend en charge pause, reprise et restauration. Ces emplacements ne deviennent jamais des destinations futures. Consultez le [guide du nommage](naming.md).
 
 ## Modification de la configuration
 
