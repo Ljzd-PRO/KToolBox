@@ -35,6 +35,7 @@ import { TASK_OUTPUT_PATH_SELECTOR } from "../lib/pathSelectors";
 import { useRealtime } from "../lib/realtime";
 import { ExternalChangeAlert } from "./ExternalChangeAlert";
 import { CreatorEditorModal, type CreatorEditorRequest } from "./CreatorEditorModal";
+import { CreatorAvatar } from "./SensitiveMedia";
 import { RemotePathField } from "./RemotePathField";
 import {
   AddressText,
@@ -283,8 +284,13 @@ export function TaskEditor({
                           isSelected={selectedCreators.has(key)}
                           key={key}
                           label={
-                            <span className="flex min-w-0 items-center justify-between gap-3">
-                              <span className="min-w-0">
+                            <span className="flex min-w-0 items-center gap-3">
+                              <CreatorAvatar
+                                asset={creatorAvatar(creator)}
+                                name={creatorDisplayName(creator)}
+                                size="xs"
+                              />
+                              <span className="min-w-0 flex-1">
                                 <span className="block truncate text-sm font-medium">
                                   {creatorDisplayName(creator)}
                                 </span>
@@ -488,4 +494,8 @@ function creatorDisplayName(creator: CreatorReference | CreatorRosterItem): stri
   return "name" in creator && typeof creator.name === "string" && creator.name
     ? creator.name
     : creator.alias || creator.creator_id;
+}
+
+function creatorAvatar(creator: CreatorReference | CreatorRosterItem): CreatorRosterItem["avatar"] {
+  return (creator as CreatorRosterItem).avatar;
 }

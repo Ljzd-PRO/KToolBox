@@ -146,7 +146,7 @@ export const en = {
   },
   "creators": {
     "title": "Creators",
-    "description": "Maintain the project roster and search Pawchive without loading any media.",
+    "description": "Maintain the project creator roster and search Pawchive profiles.",
     "add": "Add creator",
     "edit": "Edit creator",
     "search": "Search Pawchive",

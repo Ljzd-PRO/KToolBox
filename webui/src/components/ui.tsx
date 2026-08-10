@@ -1234,6 +1234,7 @@ export type SelectOption = {
   label: string;
   description?: string;
   icon?: TablerIcon;
+  media?: ReactNode;
   tone?: SelectOptionTone;
 };
 
@@ -1241,6 +1242,7 @@ function SelectOptionContent({ option, compact = false }: { option: SelectOption
   const Icon = option.icon;
   return (
     <span className={cn("select-option-content", compact && "select-option-content-compact")}>
+      {option.media}
       {Icon ? (
         <span className="select-option-icon" data-tone={option.tone ?? "default"}>
           <Icon aria-hidden="true" size={16} stroke={1.8} />

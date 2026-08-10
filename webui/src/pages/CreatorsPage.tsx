@@ -18,6 +18,7 @@ import {
   IconCircleOff as PowerOff,
   IconSearch as Search,
   IconNotes as Notes,
+  IconPhoto as Photo,
   IconRefresh as Sync,
   IconTool as Tools,
   IconTrash as Trash2,
@@ -31,6 +32,7 @@ import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 
 import { CreatorEditorModal, type CreatorEditorRequest } from "../components/CreatorEditorModal";
+import { CreatorAvatar, CreatorBanner } from "../components/SensitiveMedia";
 import {
   BatchActionBar,
   CompactSwitch,
@@ -50,6 +52,7 @@ import {
 } from "../components/ui";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
+import { useSensitiveMediaEnabled } from "../lib/sensitiveMedia";
 import { stableSort } from "../lib/sorting";
 import type { CreatorReference, CreatorRosterItem, CreatorSummary } from "../types";
 
@@ -58,6 +61,7 @@ type CreatorStatusFilter = "all" | "enabled" | "disabled";
 export function CreatorsPage() {
   const { t, i18n } = useTranslation();
   const { session } = useAuth();
+  const sensitiveMediaEnabled = useSensitiveMediaEnabled();
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const roster = useQuery({ queryKey: ["creators"], queryFn: () => api<CreatorRosterItem[]>("/creators") });
@@ -295,12 +299,26 @@ export function CreatorsPage() {
         {results.length ? (
           <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
             {results.map((creator) => (
-              <Surface className="flex min-w-0 items-center gap-3 rounded-lg border border-border p-3" key={`${creator.service}:${creator.id}`}>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">{creator.name || creator.id}</p>
-                  <p className="truncate text-xs text-muted">{creator.service}:{creator.id}</p>
+              <Surface
+                className={sensitiveMediaEnabled
+                  ? "creator-search-media-card min-w-0 overflow-hidden rounded-lg border border-border"
+                  : "flex min-w-0 items-center gap-3 rounded-lg border border-border p-3"}
+                key={`${creator.service}:${creator.id}`}
+              >
+                <CreatorBanner asset={creator.banner} name={creator.name || creator.id} />
+                <div className={sensitiveMediaEnabled ? "flex min-w-0 items-center gap-3 px-3 pb-3" : "flex min-w-0 flex-1 items-center gap-3"}>
+                  <CreatorAvatar
+                    asset={creator.avatar}
+                    className="creator-search-avatar"
+                    name={creator.name || creator.id}
+                    size="md"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{creator.name || creator.id}</p>
+                    <p className="truncate text-xs text-muted">{creator.service}:{creator.id}</p>
+                  </div>
+                  <IconButton icon={UserPlus} label={t("creators.add")} onPress={() => openNew(creator)} />
                 </div>
-                <IconButton icon={UserPlus} label={t("creators.add")} onPress={() => openNew(creator)} />
               </Surface>
             ))}
           </div>
@@ -321,7 +339,7 @@ export function CreatorsPage() {
             onChange={changeStatusFilter}
           />
           <MobileSortControls
-            className="lg:hidden"
+            className="xl:hidden"
             descriptor={sortDescriptor}
             options={sortOptions}
             onChange={(descriptor) => descriptor && setSortDescriptor(descriptor)}
@@ -371,7 +389,7 @@ export function CreatorsPage() {
           <EmptyPanel title={t("creators.empty")} />
         ) : (
           <>
-            <DataTableFrame className="hidden lg:block">
+            <DataTableFrame className="hidden xl:block">
               <Table.Content
                 aria-label={t("creators.roster")}
                 sortDescriptor={sortDescriptor}
@@ -386,6 +404,11 @@ export function CreatorsPage() {
                           onChange={selectAllVisible}
                         />
                       </Table.Column>
+                      {sensitiveMediaEnabled ? (
+                        <Table.Column aria-label={t("sensitiveMedia.label")} className="w-14 text-center">
+                          <Photo aria-hidden="true" className="mx-auto text-accent" size={16} />
+                        </Table.Column>
+                      ) : null}
                       <SortableColumn icon={User} id="name" isRowHeader>{t("creators.creatorName")}</SortableColumn>
                       <SortableColumn icon={Fingerprint} id="creator_id">{t("creators.creatorId")}</SortableColumn>
                       <SortableColumn icon={Cloud} id="service">{t("creators.service")}</SortableColumn>
@@ -403,8 +426,16 @@ export function CreatorsPage() {
                               onChange={(selected) => setCreatorSelected(creator, selected)}
                             />
                           </Table.Cell>
+                          {sensitiveMediaEnabled ? (
+                            <Table.Cell className="w-14">
+                              <CreatorAvatar asset={creator.avatar} name={creator.name || creator.creator_id} size="sm" />
+                            </Table.Cell>
+                          ) : null}
                           <Table.Cell className="font-medium">
-                            <span className="data-cell-label"><User aria-hidden="true" className="data-cell-icon" size={16} />{creator.name || creator.creator_id}</span>
+                            <span className="data-cell-label">
+                              {!sensitiveMediaEnabled ? <User aria-hidden="true" className="data-cell-icon" size={16} /> : null}
+                              {creator.name || creator.creator_id}
+                            </span>
                           </Table.Cell>
                           <Table.Cell className="font-medium">
                             <span className="data-cell-label"><Fingerprint aria-hidden="true" className="data-cell-icon" size={15} /><code className="text-xs">{creator.creator_id}</code></span>
@@ -431,7 +462,7 @@ export function CreatorsPage() {
                     </Table.Body>
               </Table.Content>
             </DataTableFrame>
-            <div className="grid gap-3 lg:hidden">
+            <div className="grid gap-3 md:grid-cols-2 xl:hidden">
               {creators.map((creator) => (
                 <Surface className={`data-mobile-card rounded-lg border border-border p-4${selectedKeys.has(creatorKey(creator)) ? " is-selected" : ""}`} key={creatorKey(creator)}>
                   <div className="flex items-start justify-between gap-3">
@@ -441,8 +472,12 @@ export function CreatorsPage() {
                       label={t("creators.selectCreator", { name: creator.name || creator.creator_id })}
                       onChange={(selected) => setCreatorSelected(creator, selected)}
                     />
+                    <CreatorAvatar asset={creator.avatar} name={creator.name || creator.creator_id} size="md" />
                     <div className="min-w-0 flex-1">
-                      <p className="data-cell-label break-words font-medium"><User aria-hidden="true" className="data-cell-icon" size={16} /><span>{creator.name || creator.creator_id}</span></p>
+                      <p className="data-cell-label break-words font-medium">
+                        {!sensitiveMediaEnabled ? <User aria-hidden="true" className="data-cell-icon" size={16} /> : null}
+                        <span>{creator.name || creator.creator_id}</span>
+                      </p>
                       <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2 text-xs text-muted">
                         <PlatformLabel platform={creator.service} />
                         <span className="data-cell-label"><Fingerprint aria-hidden="true" className="data-cell-icon" size={14} /><code className="break-all">{creator.creator_id}</code></span>

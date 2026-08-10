@@ -112,3 +112,8 @@ export function useSensitiveMedia(): SensitiveMediaContextValue {
   if (!context) throw new Error("useSensitiveMedia must be used inside SensitiveMediaProvider");
   return context;
 }
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function useSensitiveMediaEnabled(): boolean {
+  return useContext(SensitiveMediaContext)?.enabled ?? false;
+}

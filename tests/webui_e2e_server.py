@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import io
 import json
 import os
 import sqlite3
@@ -12,8 +13,9 @@ from pathlib import Path
 from typing import Any, cast
 
 import httpx
+from PIL import Image, ImageDraw
 
-from ktoolbox.api.generated import CreatorProfile, CreatorSummary, Post, Revision
+from ktoolbox.api.generated import CreatorProfile, CreatorSummary, FileReference, Post, Revision
 from ktoolbox.configuration import RuntimeContext
 from ktoolbox.failures import (
     FailureCode,
@@ -26,6 +28,7 @@ from ktoolbox.project_config import ProjectNamingConfiguration
 from ktoolbox.reporting import ProgressReporter
 from ktoolbox.webui.app import create_app
 from ktoolbox.webui.filesystem import FilesystemBrowser
+from ktoolbox.webui.media import MediaProxyService
 from ktoolbox.webui.task_executor import TaskExecutionSnapshot
 from ktoolbox.webui.task_models import SyncTaskSpec, TaskRecord
 from tests.webui_showcase_data import SHOWCASE_CREATOR_BY_KEY, SHOWCASE_CREATORS
@@ -120,6 +123,54 @@ else:
         'creator_dirname_format = "{creator_name} ({service}-{creator_id})"\n'
     )
 PROJECT_ROOT.joinpath("ktoolbox.toml").write_text(project_configuration, encoding="utf-8")
+
+
+def _fixture_image(width: int, height: int, image_format: str, seed: int) -> bytes:
+    palettes = (
+        ((219, 234, 254), (37, 99, 235), (20, 184, 166), (15, 23, 42)),
+        ((220, 252, 231), (5, 150, 105), (234, 179, 8), (20, 83, 45)),
+        ((243, 232, 255), (126, 34, 206), (14, 165, 233), (59, 7, 100)),
+        ((255, 228, 230), (225, 29, 72), (249, 115, 22), (76, 5, 25)),
+    )
+    background, primary, accent, ink = palettes[seed % len(palettes)]
+    image = Image.new("RGB", (width, height), background)
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((0, 0, width * 0.34, height), fill=primary)
+    draw.polygon(
+        ((width * 0.22, height), (width * 0.57, 0), (width * 0.78, 0), (width * 0.43, height)),
+        fill=accent,
+    )
+    bar_height = max(4, height // 28)
+    draw.rectangle((width * 0.68, height * 0.68, width * 0.93, height * 0.68 + bar_height), fill=ink)
+    draw.rectangle((width * 0.76, height * 0.78, width * 0.93, height * 0.78 + bar_height), fill=ink)
+    output = io.BytesIO()
+    image.save(output, format=image_format, quality=84)
+    return output.getvalue()
+
+
+def _fixture_media_response(request: httpx.Request) -> httpx.Response:
+    path = request.url.path
+    seed = sum(path.encode("utf-8"))
+    if path.startswith("/icons/"):
+        content = _fixture_image(160, 160, "JPEG", seed)
+        return httpx.Response(200, content=content, headers={"Content-Type": "application/octet-stream"})
+    if path.startswith("/banners/"):
+        content = _fixture_image(960, 344, "WEBP", seed)
+        return httpx.Response(200, content=content, headers={"Content-Type": "image/webp"})
+    if "broken" in path:
+        return httpx.Response(200, content=b"not-an-image", headers={"Content-Type": "image/jpeg"})
+    if "portrait" in path:
+        content = _fixture_image(900, 1200, "JPEG", seed)
+    elif "hires" in path:
+        content = _fixture_image(4032, 2760, "JPEG", seed)
+    elif "wide" in path:
+        content = _fixture_image(1800, 520, "JPEG", seed)
+    else:
+        content = _fixture_image(1200, 630, "JPEG", seed)
+    return httpx.Response(200, content=content, headers={"Content-Type": "image/jpeg"})
+
+
+fixture_media_client = httpx.AsyncClient(transport=httpx.MockTransport(_fixture_media_response))
 
 LEGACY_FIXTURES = (
     (
@@ -245,6 +296,12 @@ class FixtureClient(AbstractAsyncContextManager["FixtureClient"]):
                 title="Fictional project study",
                 content="Harmless fixture text for browser verification.",
                 published="2026-07-20T08:30:00Z",
+                file=FileReference(name="cover.jpg", path="/data/fixtures/cover-fiction-1001.jpg"),
+                attachments=[
+                    FileReference(name="detail.jpg", path="/data/fixtures/hires-detail.jpg"),
+                    FileReference(name="portrait.jpg", path="/data/fixtures/portrait-detail.jpg"),
+                    FileReference(name="broken.jpg", path="/data/fixtures/broken.jpg"),
+                ],
             )
         ]
 
@@ -418,6 +475,7 @@ app = create_app(
         host_roots=(HOST_ROOT,),
         restrict_host_to_roots=True,
     ),
+    media_proxy=MediaProxyService(fixture_media_client),
 )
 
 

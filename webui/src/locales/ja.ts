@@ -120,7 +120,7 @@ export const ja = {
   },
   creators: {
     title: "クリエイター",
-    description: "メディアを読み込まずに、プロジェクトのクリエイター一覧を管理しPawchiveを検索します。",
+    description: "プロジェクトのクリエイター一覧を管理し、Pawchiveのプロフィールを検索します。",
     add: "クリエイターを追加",
     edit: "クリエイターを編集",
     search: "Pawchiveを検索",

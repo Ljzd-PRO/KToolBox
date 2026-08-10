@@ -67,6 +67,7 @@ import {
   ComboBoxField,
 } from "../components/ui";
 import { RemotePathField } from "../components/RemotePathField";
+import { CreatorAvatar } from "../components/SensitiveMedia";
 import { api, ApiError, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { formatDateTime } from "../lib/format";
@@ -875,6 +876,7 @@ function PlanEditor({
                         creators: selected ? [...draft.creators, key] : draft.creators.filter((value) => value !== key),
                       })}
                     />
+                    <CreatorAvatar asset={creator.avatar} name={creatorLabel(creator)} size="xs" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold">{creatorLabel(creator)}</p>
                       <p className="truncate text-xs text-muted">{creator.service}:{creator.creator_id}</p>

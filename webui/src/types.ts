@@ -25,8 +25,12 @@ export type CreatorReference = {
   enabled: boolean;
 };
 
+export type MediaAsset = WebUIApiSchemas["MediaAssetResponse"];
+
 export type CreatorRosterItem = CreatorReference & {
   name: string | null;
+  avatar?: MediaAsset | null;
+  banner?: MediaAsset | null;
 };
 
 export type BlockerScope = {
@@ -284,6 +288,8 @@ export type CreatorSummary = {
   service: string;
   name?: string | null;
   updated?: string | null;
+  avatar?: MediaAsset | null;
+  banner?: MediaAsset | null;
 };
 
 export type PawchivePost = {

@@ -49,9 +49,11 @@ import {
   SelectField,
 } from "../components/ui";
 import { ExternalChangeAlert } from "../components/ExternalChangeAlert";
+import { CreatorAvatar } from "../components/SensitiveMedia";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { useRealtime } from "../lib/realtime";
+import { useSensitiveMediaEnabled } from "../lib/sensitiveMedia";
 import type {
   BlockerSpec,
   ConditionGroup,
@@ -88,6 +90,7 @@ export function BlockersPage() {
   const { t } = useTranslation();
   const { session } = useAuth();
   const realtime = useRealtime(false);
+  const sensitiveMediaEnabled = useSensitiveMediaEnabled();
   const blockerRevision = realtime?.revisions.blockers ?? 0;
   const queryClient = useQueryClient();
   const blockersQuery = useQuery({
@@ -114,7 +117,10 @@ export function BlockersPage() {
     value: `${creator.service}:${creator.creator_id}`,
     label: creator.name || creator.creator_id,
     description: `${creator.service}:${creator.creator_id}${creator.alias ? ` · ${creator.alias}` : ""}`,
-    icon: UsersRound,
+    icon: sensitiveMediaEnabled ? undefined : UsersRound,
+    media: sensitiveMediaEnabled ? (
+      <CreatorAvatar asset={creator.avatar} name={creator.name || creator.creator_id} size="xs" />
+    ) : undefined,
   }));
 
   async function replaceBlockers(next: BlockerSpec[]) {

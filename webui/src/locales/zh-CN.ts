@@ -148,7 +148,7 @@ export const zhCN = {
   },
   "creators": {
     "title": "作者",
-    "description": "维护项目作者清单，并在不加载媒体的情况下搜索 Pawchive。",
+    "description": "维护项目作者清单，并搜索 Pawchive 作者资料。",
     "add": "添加作者",
     "edit": "编辑作者",
     "search": "搜索 Pawchive",

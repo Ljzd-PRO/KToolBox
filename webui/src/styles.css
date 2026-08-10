@@ -335,6 +335,35 @@ code {
   color: #111827 !important;
 }
 
+.creator-avatar {
+  width: var(--creator-avatar-size);
+  height: var(--creator-avatar-size);
+  border: 1px solid color-mix(in oklab, var(--border-subtle) 78%, var(--accent) 22%);
+  background: color-mix(in oklab, var(--accent-soft) 58%, var(--console-panel) 42%);
+  box-shadow: 0 1px 3px color-mix(in oklab, var(--foreground) 12%, transparent);
+}
+
+.creator-avatar-initial {
+  color: var(--accent-strong);
+  font-size: calc(var(--creator-avatar-size) * 0.38);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.creator-banner {
+  aspect-ratio: 960 / 344;
+  background: color-mix(in oklab, var(--accent-soft) 72%, var(--console-panel) 28%);
+}
+
+.creator-search-media-card .creator-banner {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.creator-search-media-card .creator-search-avatar {
+  margin-top: -1.375rem;
+  border: 3px solid var(--console-panel);
+}
+
 .theme-swatch {
   border: 2px solid transparent;
   background: var(--swatch-color);
