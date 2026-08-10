@@ -33,6 +33,7 @@ describe("TaskEditor", () => {
     expect(screen.getByText(/Synchronize every post from the selected creators/)).toBeInTheDocument();
     expect(screen.getByRole("checkbox", { name: "No start date" })).toBeChecked();
     expect(screen.getByRole("checkbox", { name: "No end date" })).toBeChecked();
+    expect(screen.getByRole("switch", { name: "Download primary file (cover)" })).toBeChecked();
     await user.click(screen.getByRole("button", { name: /^Increase Post offset/ }));
     expect(screen.getByRole("textbox", { name: "Post offset" })).toHaveValue("50");
 
@@ -47,6 +48,7 @@ describe("TaskEditor", () => {
       keywords: ["painting"],
       keywords_exclude: ["daily"],
       output: "/project/downloads",
+      download_file: true,
     }));
   });
 
@@ -87,6 +89,7 @@ describe("TaskEditor", () => {
     await user.type(screen.getByRole("textbox", { name: "Creator ID" }), "42");
     await user.type(screen.getByRole("textbox", { name: "Post ID" }), "99");
     await user.type(screen.getByRole("textbox", { name: "Revision ID" }), "3");
+    await user.click(screen.getByRole("switch", { name: "Download primary file (cover)" }));
     await user.click(screen.getByRole("button", { name: "Create task" }));
 
     expect(onSave).toHaveBeenCalledWith({
@@ -98,6 +101,7 @@ describe("TaskEditor", () => {
       revision_id: "3",
       output: "/project/downloads",
       dump_post_data: true,
+      download_file: false,
     });
   });
 

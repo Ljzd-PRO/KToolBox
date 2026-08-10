@@ -3,6 +3,8 @@ import type { TranslationShape } from "./types";
 const en = {
   title: "Automatic sync",
   description: "Schedule recurring creator synchronizations and review newly discovered works.",
+  downloadPrimaryFile: "Download primary file (cover)",
+  downloadPrimaryFileHint: "Download each work's primary file, which is usually its cover image.",
   newPlan: "New plan",
   editPlan: "Edit plan",
   plans: "Sync plans",
@@ -86,6 +88,7 @@ const en = {
 
 const zhCN = {
   title: "自动同步", description: "定时同步多位作者，并查看最近发现的作品数量。", newPlan: "新建计划", editPlan: "编辑计划", plans: "同步计划", updates: "最近更新", runs: "运行记录",
+  downloadPrimaryFile: "下载主文件（封面）", downloadPrimaryFileHint: "下载每个作品的主文件，该文件通常是作品封面。",
   stats: { active: "活动计划", paused: "暂停计划", running: "正在运行", newWorks: "新增作品" },
   columns: { name: "计划", schedule: "执行时间", creators: "作者", nextRun: "下次运行", status: "状态", actions: "操作", creator: "作者", platform: "平台", newWorks: "新增作品", discovered: "最后发现", trigger: "触发方式", task: "任务", started: "开始时间" },
   statuses: { enabled: "活动", paused: "已暂停", queued: "排队中", running: "运行中", completed: "已完成", failed: "失败", skipped: "已跳过", interrupted: "已中断" },
@@ -104,6 +107,7 @@ const zhCN = {
 
 const zhHant = {
   ...zhCN, title: "自動同步", description: "定時同步多位作者，並查看最近發現的作品數量。", newPlan: "新增計畫", editPlan: "編輯計畫", plans: "同步計畫", runs: "執行記錄",
+  downloadPrimaryFile: "下載主要檔案（封面）", downloadPrimaryFileHint: "下載每個作品的主要檔案，通常是作品封面。",
   stats: { active: "啟用計畫", paused: "暫停計畫", running: "正在執行", newWorks: "新增作品" },
   columns: { name: "計畫", schedule: "執行時間", creators: "作者", nextRun: "下次執行", status: "狀態", actions: "操作", creator: "作者", platform: "平台", newWorks: "新增作品", discovered: "最後發現", trigger: "觸發方式", task: "任務", started: "開始時間" },
   statuses: { enabled: "啟用", paused: "已暫停", queued: "排隊中", running: "執行中", completed: "已完成", failed: "失敗", skipped: "已略過", interrupted: "已中斷" },
@@ -121,6 +125,7 @@ const zhHant = {
 
 const ja = {
   ...en, title: "自動同期", description: "複数のクリエイターを定期同期し、新しく見つかった作品数を確認します。", newPlan: "プランを作成", editPlan: "プランを編集", plans: "同期プラン", updates: "最近の更新", runs: "実行履歴",
+  downloadPrimaryFile: "メインファイル（カバー）をダウンロード", downloadPrimaryFileHint: "各作品のメインファイル（通常はカバー画像）をダウンロードします。",
   stats: { active: "有効なプラン", paused: "一時停止中", running: "実行中", newWorks: "新規作品" },
   columns: { name: "プラン", schedule: "スケジュール", creators: "クリエイター", nextRun: "次回実行", status: "状態", actions: "操作", creator: "クリエイター", platform: "プラットフォーム", newWorks: "新規作品", discovered: "最終検出", trigger: "実行方法", task: "タスク", started: "開始日時" },
   statuses: { enabled: "有効", paused: "一時停止", queued: "待機中", running: "実行中", completed: "完了", failed: "失敗", skipped: "スキップ", interrupted: "中断" }, triggers: { scheduled: "定期実行", immediate: "手動実行" },
@@ -135,6 +140,7 @@ const ja = {
 
 const ko = {
   ...en, title: "자동 동기화", description: "여러 크리에이터를 정기적으로 동기화하고 새 작품 수를 확인합니다.", newPlan: "계획 만들기", editPlan: "계획 편집", plans: "동기화 계획", updates: "최근 업데이트", runs: "실행 기록",
+  downloadPrimaryFile: "기본 파일(표지) 다운로드", downloadPrimaryFileHint: "각 작품의 기본 파일(일반적으로 표지 이미지)을 다운로드합니다.",
   stats: { active: "활성 계획", paused: "일시 중지", running: "실행 중", newWorks: "새 작품" }, columns: { name: "계획", schedule: "일정", creators: "크리에이터", nextRun: "다음 실행", status: "상태", actions: "작업", creator: "크리에이터", platform: "플랫폼", newWorks: "새 작품", discovered: "마지막 발견", trigger: "실행 방식", task: "작업", started: "시작 시각" }, statuses: { enabled: "활성", paused: "일시 중지", queued: "대기 중", running: "실행 중", completed: "완료", failed: "실패", skipped: "건너뜀", interrupted: "중단됨" }, triggers: { scheduled: "예약", immediate: "수동" },
   emptyPlans: "자동 동기화 계획이 없습니다", emptyPlansHint: "계획을 만들어 선택한 크리에이터를 정기적으로 업데이트하세요.", emptyUpdates: "최근 발견된 새 작품이 없습니다", emptyUpdatesHint: "자동 동기화 후 크리에이터별 새 작품 수가 표시됩니다.", emptyRuns: "자동 실행 기록이 없습니다", emptyRunsHint: "지금 실행하거나 다음 예약 시각을 기다리세요.",
   details: "계획 정보", detailsHint: "계획 이름과 업데이트할 크리에이터를 선택합니다.", name: "계획 이름", nameHint: "이 그룹을 알아볼 수 있는 짧은 이름을 사용하세요.", id: "계획 ID", idHint: "영문, 숫자, 점, 하이픈, 밑줄을 쓰는 고정 키입니다.", enabled: "자동 실행 사용", enabledHint: "일시 중지 상태에서도 수동 실행할 수 있습니다.", creators: "크리에이터", creatorsHint: "프로젝트 목록에서 한 명 이상 선택하세요.", searchCreators: "크리에이터 검색", selectAll: "표시된 항목 모두 선택", selected: "{{count}}명 선택됨", noCreators: "일치하는 크리에이터가 없습니다.",
@@ -147,6 +153,7 @@ const ko = {
 
 const fr = {
   ...en, title: "Synchronisation automatique", description: "Planifiez la synchronisation des créateurs et consultez les nouvelles œuvres.", newPlan: "Nouveau plan", editPlan: "Modifier le plan", plans: "Plans de synchronisation", updates: "Mises à jour récentes", runs: "Historique",
+  downloadPrimaryFile: "Télécharger le fichier principal (couverture)", downloadPrimaryFileHint: "Téléchargez le fichier principal de chaque œuvre, généralement son image de couverture.",
   stats: { active: "Plans actifs", paused: "Plans en pause", running: "En cours", newWorks: "Nouvelles œuvres" }, columns: { name: "Plan", schedule: "Planification", creators: "Créateurs", nextRun: "Prochaine exécution", status: "État", actions: "Actions", creator: "Créateur", platform: "Plateforme", newWorks: "Nouvelles œuvres", discovered: "Dernière découverte", trigger: "Déclenchement", task: "Tâche", started: "Début" }, statuses: { enabled: "Actif", paused: "En pause", queued: "En attente", running: "En cours", completed: "Terminé", failed: "Échec", skipped: "Ignoré", interrupted: "Interrompu" }, triggers: { scheduled: "Planifiée", immediate: "Manuelle" },
   emptyPlans: "Aucun plan automatique", emptyPlansHint: "Créez un plan pour actualiser régulièrement les créateurs sélectionnés.", emptyUpdates: "Aucune œuvre récemment découverte", emptyUpdatesHint: "Le nombre de nouvelles œuvres apparaît après une synchronisation réussie.", emptyRuns: "Aucune exécution automatique", emptyRunsHint: "Lancez un plan ou attendez sa prochaine échéance.",
   details: "Informations du plan", detailsHint: "Nommez le plan et choisissez les créateurs à actualiser.", name: "Nom du plan", nameHint: "Utilisez un nom court pour ce groupe.", id: "ID du plan", idHint: "Clé stable composée de lettres, chiffres, points, tirets ou traits de soulignement.", enabled: "Activer les exécutions automatiques", enabledHint: "Un plan en pause peut toujours être lancé manuellement.", creators: "Créateurs", creatorsHint: "Sélectionnez un ou plusieurs créateurs du projet.", searchCreators: "Rechercher des créateurs", selectAll: "Tout sélectionner", selected: "{{count}} créateurs sélectionnés", noCreators: "Aucun créateur correspondant.",
@@ -159,6 +166,7 @@ const fr = {
 
 const ru = {
   ...en, title: "Автоматическая синхронизация", description: "Настройте регулярную синхронизацию авторов и смотрите число новых работ.", newPlan: "Новый план", editPlan: "Изменить план", plans: "Планы синхронизации", updates: "Последние обновления", runs: "История запусков",
+  downloadPrimaryFile: "Скачивать основной файл (обложку)", downloadPrimaryFileHint: "Скачивать основной файл каждой работы, которым обычно является изображение обложки.",
   stats: { active: "Активные планы", paused: "На паузе", running: "Выполняются", newWorks: "Новые работы" }, columns: { name: "План", schedule: "Расписание", creators: "Авторы", nextRun: "Следующий запуск", status: "Статус", actions: "Действия", creator: "Автор", platform: "Платформа", newWorks: "Новые работы", discovered: "Последнее обнаружение", trigger: "Запуск", task: "Задача", started: "Начало" }, statuses: { enabled: "Активен", paused: "На паузе", queued: "В очереди", running: "Выполняется", completed: "Завершён", failed: "Ошибка", skipped: "Пропущен", interrupted: "Прерван" }, triggers: { scheduled: "По расписанию", immediate: "Вручную" },
   emptyPlans: "Планов пока нет", emptyPlansHint: "Создайте план для регулярного обновления выбранных авторов.", emptyUpdates: "Новых работ недавно не найдено", emptyUpdatesHint: "Число новых работ появится после успешной синхронизации.", emptyRuns: "Автоматических запусков пока нет", emptyRunsHint: "Запустите план сейчас или дождитесь расписания.",
   details: "Параметры плана", detailsHint: "Назовите план и выберите обновляемых авторов.", name: "Название плана", nameHint: "Используйте короткое понятное название.", id: "ID плана", idHint: "Постоянный ключ из букв, цифр, точек, дефисов и подчёркиваний.", enabled: "Включить автоматические запуски", enabledHint: "План на паузе можно запускать вручную.", creators: "Авторы", creatorsHint: "Выберите одного или нескольких авторов проекта.", searchCreators: "Поиск авторов", selectAll: "Выбрать всех показанных", selected: "Выбрано авторов: {{count}}", noCreators: "Авторы не найдены.",

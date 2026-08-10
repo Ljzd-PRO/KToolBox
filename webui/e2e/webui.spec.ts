@@ -863,8 +863,13 @@ test("task form serializes one-sided dates and protects regular-expression comma
   await expect(noStartDate).not.toBeChecked();
   await taskDialog.getByRole("group", { name: "Publication date range" }).getByRole("button").click();
   const startCalendar = page.getByRole("application", { name: /Publication date range/ });
-  await expect(startCalendar.getByRole("heading")).toContainText("July 2026");
-  await startCalendar.getByRole("button", { name: "Friday, July 10, 2026" }).click();
+  const now = new Date();
+  const expectedStartDate = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0"),
+  ].join("-");
+  await startCalendar.getByRole("button", { name: /^Today,/ }).click();
   await expect(noStartDate).not.toBeChecked();
   await expect(taskDialog.getByRole("checkbox", { name: "No end date" })).toBeChecked();
   await expect(startCalendar).not.toBeVisible();
@@ -874,6 +879,10 @@ test("task form serializes one-sided dates and protects regular-expression comma
   await keywords.pressSequentially("painting,painting，draft");
   await keywords.press("Enter");
   await taskDialog.getByRole("button", { name: "Remove draft" }).click();
+  const downloadPrimaryFile = taskDialog.getByRole("switch", { name: "Download primary file (cover)" });
+  await expect(downloadPrimaryFile).toBeChecked();
+  await taskDialog.getByText("Download primary file (cover)", { exact: true }).click();
+  await expect(downloadPrimaryFile).not.toBeChecked();
   await taskDialog.getByRole("textbox", { name: "Output directory" }).fill("dated-sync-output");
 
   const requestPromise = page.waitForRequest((request) => request.method() === "POST" && request.url().endsWith("/api/v1/tasks"));
@@ -882,9 +891,10 @@ test("task form serializes one-sided dates and protects regular-expression comma
   expect(createRequest.postDataJSON()).toMatchObject({
     spec: {
       kind: "sync",
-      start_time: "2026-07-10T00:00:00",
+      start_time: `${expectedStartDate}T00:00:00`,
       end_time: null,
       keywords: ["painting"],
+      download_file: false,
       output: "dated-sync-output",
     },
   });

@@ -205,7 +205,7 @@ export const zhCN = {
       "title": "标题",
       "content": "正文",
       "tags": "标签",
-      "fileName": "主文件名",
+      "fileName": "主文件名（封面）",
       "attachmentName": "附件文件名",
       "postId": "作品 ID",
       "service": "平台"
@@ -335,6 +335,8 @@ export const zhCN = {
     "identityPathHint": "各段对应 Pawchive 的 <code>/平台/user/作者 ID/post/作品 ID</code> 地址结构。",
     "dumpMetadata": "保存作品元数据",
     "dumpMetadataHint": "在作品目录中将作品数据保存为 post.json。",
+    "downloadPrimaryFile": "下载主文件（封面）",
+    "downloadPrimaryFileHint": "下载作品的主文件，该文件通常是作品封面。",
     "saveIndex": "保存作者索引",
     "saveIndexHint": "同步完成后保存作品与目录索引；混合保存模式下不会生成索引。",
     "empty": "任务队列为空",

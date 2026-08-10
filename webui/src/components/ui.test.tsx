@@ -1,5 +1,5 @@
 import { Table } from "@heroui/react";
-import { parseDate, type DateValue } from "@internationalized/date";
+import { getLocalTimeZone, parseDate, today, type DateValue } from "@internationalized/date";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { IconCalendar as Calendar, IconSearch as Search, IconTags as Tags } from "@tabler/icons-react";
@@ -227,9 +227,10 @@ describe("OptionalDateRangeField", () => {
 
     await user.click(screen.getByRole("button", { name: /Publication range/ }));
     const calendar = await screen.findByRole("application", { name: /Publication range/ });
-    await user.click(within(calendar).getByRole("button", { name: /July 12, 2026/ }));
+    const selected = today(getLocalTimeZone());
+    await user.click(within(calendar).getByRole("button", { name: /^Today,/ }));
 
-    expect(screen.getByTestId("date-state")).toHaveTextContent("2026-07-12|none|false|true");
+    expect(screen.getByTestId("date-state")).toHaveTextContent(`${selected.toString()}|none|false|true`);
     await waitFor(() => expect(screen.queryByRole("application", { name: /Publication range/ })).not.toBeInTheDocument());
   });
 });

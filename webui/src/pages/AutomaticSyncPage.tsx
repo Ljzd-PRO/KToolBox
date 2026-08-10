@@ -21,6 +21,7 @@ import {
   IconHistory,
   IconPlayerPause,
   IconPlayerPlay,
+  IconPhoto,
   IconPlus,
   IconRefresh,
   IconSearch,
@@ -97,6 +98,7 @@ type PlanDraft = {
     output: string;
     save_creator_indices: boolean;
     mix_posts: boolean | null;
+    download_file: boolean;
     keywords: string[];
       keywords_exclude: string[];
   };
@@ -128,6 +130,7 @@ function blankPlan(): PlanDraft {
       output: "",
       save_creator_indices: false,
       mix_posts: null,
+      download_file: true,
       keywords: [],
       keywords_exclude: [],
     },
@@ -156,6 +159,7 @@ function normalizePlan(plan: AutomaticSyncPlan): PlanDraft {
       output: plan.options?.output ?? "",
       save_creator_indices: plan.options?.save_creator_indices ?? false,
       mix_posts: plan.options?.mix_posts ?? null,
+      download_file: plan.options?.download_file ?? true,
       keywords: [...(plan.options?.keywords ?? [])],
       keywords_exclude: [...(plan.options?.keywords_exclude ?? [])],
     },
@@ -1050,6 +1054,7 @@ function PlanEditor({
             onChange={(output) => patch({ options: { ...draft.options, output } })}
           />
           <div className="grid gap-3 md:grid-cols-2">
+            <FormSwitchField icon={IconPhoto} isSelected={draft.options.download_file} label={t("automaticSync.downloadPrimaryFile")} description={t("automaticSync.downloadPrimaryFileHint")} onChange={(download_file) => patch({ options: { ...draft.options, download_file } })} />
             <FormSwitchField icon={IconHistory} isSelected={draft.options.save_creator_indices} label={t("automaticSync.saveIndex")} description={t("automaticSync.saveIndexHint")} onChange={(save_creator_indices) => patch({ options: { ...draft.options, save_creator_indices } })} />
             <SelectField
               icon={IconFolder}

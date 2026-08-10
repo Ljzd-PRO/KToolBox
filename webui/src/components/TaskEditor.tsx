@@ -17,6 +17,7 @@ import {
   IconList as ListStart,
   IconListSearch as ListFilter,
   IconPlus as Plus,
+  IconPhoto as Photo,
   IconRefresh as RefreshCw,
   IconTags as Tags,
   IconToggleLeft as ToggleLeft,
@@ -81,6 +82,7 @@ export function TaskEditor({
   );
   const [saveIndices, setSaveIndices] = useState(initialSync?.save_creator_indices ?? false);
   const [mixPosts, setMixPosts] = useState(initialSync?.mix_posts === null || initialSync?.mix_posts === undefined ? "inherit" : String(initialSync.mix_posts));
+  const [syncDownloadFile, setSyncDownloadFile] = useState(initialSync?.download_file ?? true);
   const [offset, setOffset] = useState(initialSync?.offset ?? 0);
   const [length, setLength] = useState(initialSync?.length?.toString() ?? "");
   const [keywords, setKeywords] = useState(initialSync?.keywords ?? []);
@@ -101,6 +103,7 @@ export function TaskEditor({
   const [postId, setPostId] = useState(initialDownload?.post_id ?? "");
   const [revisionId, setRevisionId] = useState(initialDownload?.revision_id ?? "");
   const [dumpMetadata, setDumpMetadata] = useState(initialDownload?.dump_post_data ?? true);
+  const [postDownloadFile, setPostDownloadFile] = useState(initialDownload?.download_file ?? true);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -123,6 +126,7 @@ export function TaskEditor({
         revision_id: revisionId.trim() || null,
         output,
         dump_post_data: dumpMetadata,
+        download_file: postDownloadFile,
       } satisfies DownloadTaskSpec;
     }
     const selected = allEnabled
@@ -143,6 +147,7 @@ export function TaskEditor({
       output,
       save_creator_indices: saveIndices,
       mix_posts: mixPosts === "inherit" ? null : mixPosts === "true",
+      download_file: syncDownloadFile,
       start_time: startUnlimited || !startDate ? null : `${startDate.toString()}T00:00:00`,
       end_time: endUnlimited || !endDate ? null : `${endDate.toString()}T23:59:59`,
       offset,
@@ -290,7 +295,10 @@ export function TaskEditor({
                 onChange={setMixPosts}
               />
             </div>
-            <FormSwitchField description={t("tasks.saveIndexHint")} icon={BookOpenCheck} isSelected={saveIndices} label={t("tasks.saveIndex")} onChange={setSaveIndices} />
+            <div className="grid gap-3 md:grid-cols-2">
+              <FormSwitchField description={t("tasks.downloadPrimaryFileHint")} icon={Photo} isSelected={syncDownloadFile} label={t("tasks.downloadPrimaryFile")} onChange={setSyncDownloadFile} />
+              <FormSwitchField description={t("tasks.saveIndexHint")} icon={BookOpenCheck} isSelected={saveIndices} label={t("tasks.saveIndex")} onChange={setSaveIndices} />
+            </div>
             <section className="grid gap-4 border-t border-border pt-5">
               <div className="flex items-start gap-2">
                 <Filter aria-hidden="true" className="mt-0.5 shrink-0 text-accent" size={18} />
@@ -377,7 +385,10 @@ export function TaskEditor({
               value={revisionId}
               onChange={setRevisionId}
             />
-            <FormSwitchField description={t("tasks.dumpMetadataHint")} icon={FileJson} isSelected={dumpMetadata} label={t("tasks.dumpMetadata")} onChange={setDumpMetadata} />
+            <div className="grid gap-3 md:grid-cols-2">
+              <FormSwitchField description={t("tasks.downloadPrimaryFileHint")} icon={Photo} isSelected={postDownloadFile} label={t("tasks.downloadPrimaryFile")} onChange={setPostDownloadFile} />
+              <FormSwitchField description={t("tasks.dumpMetadataHint")} icon={FileJson} isSelected={dumpMetadata} label={t("tasks.dumpMetadata")} onChange={setDumpMetadata} />
+            </div>
           </Tabs.Panel>
         </Tabs>
         <RemotePathField

@@ -203,7 +203,7 @@ export const en = {
       "title": "Title",
       "content": "Body text",
       "tags": "Tags",
-      "fileName": "Primary file name",
+      "fileName": "Primary file name (cover)",
       "attachmentName": "Attachment file name",
       "postId": "Post ID",
       "service": "Platform"
@@ -333,6 +333,8 @@ export const en = {
     "identityPathHint": "The segments follow Pawchive's <code>/platform/user/creator ID/post/post ID</code> URL structure.",
     "dumpMetadata": "Save post metadata",
     "dumpMetadataHint": "Write the post data to post.json inside the post directory.",
+    "downloadPrimaryFile": "Download primary file (cover)",
+    "downloadPrimaryFileHint": "Download the work's primary file, which is usually its cover image.",
     "saveIndex": "Save creator indices",
     "saveIndexHint": "Save the post-to-directory index after synchronization. Mixed post files do not generate an index.",
     "empty": "The task queue is empty",

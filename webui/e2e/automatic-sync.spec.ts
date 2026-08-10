@@ -68,6 +68,7 @@ test("automatic sync editor supports creator selection and both schedule modes",
   await expect(dialog.getByRole("textbox", { name: "Repeat every" })).toHaveValue("24");
   await expect(dialog.getByRole("button", { name: /Hours/ })).toBeVisible();
   await expect(dialog.getByRole("switch", { name: "No start date" })).not.toBeChecked();
+  await expect(dialog.getByRole("switch", { name: "Download primary file (cover)" })).toBeChecked();
 
   await dialog.getByRole("button", { name: "Cancel", exact: true }).click();
   await expect(dialog).toBeHidden();

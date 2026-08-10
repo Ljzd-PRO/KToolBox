@@ -32,6 +32,7 @@ const plan = {
     output: "downloads",
     save_creator_indices: true,
     mix_posts: null,
+    download_file: false,
     keywords: [],
     keywords_exclude: [],
   },
@@ -144,6 +145,7 @@ describe("automatic synchronization page", () => {
     const idInput = within(dialog).getByLabelText("Plan ID");
     expect(idInput).toHaveAttribute("readonly");
     expect((idInput as HTMLInputElement).value).toMatch(/^auto-[a-f0-9-]+$/u);
+    expect(within(dialog).getByRole("switch", { name: "Download primary file (cover)" })).toBeChecked();
     expect(within(dialog).getByText("Next three runs", { exact: true })).toBeInTheDocument();
     expect(within(dialog).getAllByRole("listitem")).toHaveLength(3);
 
