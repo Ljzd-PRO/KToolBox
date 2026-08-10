@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from "./lib/auth";
 import { normalizeLanguage, reactAriaLocale } from "./lib/i18n";
 import { queryClient } from "./lib/query";
 import { RealtimeProvider } from "./lib/realtime";
+import { SensitiveMediaProvider } from "./lib/sensitiveMedia";
 import { ThemeProvider } from "./lib/theme";
 import { DashboardPage } from "./pages/DashboardPage";
 import { AboutPage } from "./pages/AboutPage";
@@ -39,7 +40,7 @@ function AuthenticatedApplication() {
   }
   return (
     <RealtimeProvider>
-      <>
+      <SensitiveMediaProvider>
         <Routes>
           <Route element={<AppShell />}>
             <Route index element={<DashboardPage />} />
@@ -57,7 +58,7 @@ function AuthenticatedApplication() {
           </Route>
         </Routes>
         <StartupNoticeCenter />
-      </>
+      </SensitiveMediaProvider>
     </RealtimeProvider>
   );
 }

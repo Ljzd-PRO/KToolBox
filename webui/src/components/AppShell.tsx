@@ -32,6 +32,11 @@ import { useAuth } from "../lib/auth";
 import { useRealtime } from "../lib/realtime";
 import { useTheme, type ThemeColor } from "../lib/theme";
 import { LanguageSelector } from "./LanguageSelector";
+import {
+  SensitiveMediaDrawerControl,
+  SensitiveMediaInlineControl,
+  SensitiveMediaPopoverControl,
+} from "./SensitiveMediaControl";
 import { AddressText, IconButton } from "./ui";
 
 type NavigationItem = {
@@ -392,9 +397,13 @@ export function AppShell() {
             </div>
             <div className="hidden min-w-0 items-center gap-2 xl:flex">
               <ThemeControls />
+              <SensitiveMediaInlineControl />
               <SecurityNotice />
             </div>
             <RealtimeStatusControl />
+            <div className="xl:hidden">
+              <SensitiveMediaPopoverControl />
+            </div>
             <div className="xl:hidden">
               <SecurityNotice compact />
             </div>
@@ -440,6 +449,7 @@ export function AppShell() {
                 <Navigation compact onSelect={drawer.close} />
               </Drawer.Body>
               <div className="grid gap-3 border-t border-border p-3">
+                <SensitiveMediaDrawerControl />
                 <CompactAppearanceControl />
                 <LanguageSelector compact={false} />
                 <div className="flex min-w-0 items-center gap-2 px-2 text-xs font-medium text-muted">

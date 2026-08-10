@@ -2,6 +2,7 @@ import type { TranslationShape } from "./types";
 import { en } from "./en";
 import { namingTranslations } from "./naming";
 import { automaticSyncTranslations } from "./automaticSync";
+import { sensitiveMediaTranslations } from "./sensitiveMedia";
 
 export const ko = {
   brand: "KToolBox",
@@ -53,6 +54,7 @@ export const ko = {
   nav: { overview: "개요", tasks: "작업", automaticSync: "자동 동기화", creators: "크리에이터", posts: "작품", blockers: "제외 규칙", naming: "이름 형식", configuration: "전역 설정", mcp: "MCP", system: "시스템", about: "정보" },
   naming: namingTranslations.ko,
   automaticSync: automaticSyncTranslations.ko,
+  sensitiveMedia: sensitiveMediaTranslations.ko,
   shell: {
     menu: "탐색 열기", closeMenu: "탐색 닫기", navigation: "탐색", light: "라이트 테마 사용", dark: "다크 테마 사용", theme: "테마", themeSystem: "시스템 테마 따르기", themeLight: "라이트 테마 사용", themeDark: "다크 테마 사용",
     themeColors: { blue: "파란색 강조색 사용", emerald: "에메랄드 강조색 사용", violet: "보라색 강조색 사용", rose: "장미색 강조색 사용", amber: "황색 강조색 사용" },

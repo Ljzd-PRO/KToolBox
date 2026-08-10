@@ -2,6 +2,7 @@ import type { TranslationShape } from "./types";
 import { en } from "./en";
 import { namingTranslations } from "./naming";
 import { automaticSyncTranslations } from "./automaticSync";
+import { sensitiveMediaTranslations } from "./sensitiveMedia";
 
 export const fr = {
   brand: "KToolBox",
@@ -15,6 +16,7 @@ export const fr = {
   nav: { overview: "Aperçu", tasks: "Tâches", automaticSync: "Synchronisation automatique", creators: "Créateurs", posts: "Œuvres", blockers: "Règles d’exclusion", naming: "Format de nommage", configuration: "Configuration globale", mcp: "MCP", system: "Système", about: "À propos" },
   naming: namingTranslations.fr,
   automaticSync: automaticSyncTranslations.fr,
+  sensitiveMedia: sensitiveMediaTranslations.fr,
   shell: {
     menu: "Ouvrir la navigation", closeMenu: "Fermer la navigation", navigation: "Navigation", light: "Utiliser le thème clair", dark: "Utiliser le thème sombre", theme: "Thème", themeSystem: "Suivre le thème du système", themeLight: "Utiliser le thème clair", themeDark: "Utiliser le thème sombre", themeColors: { blue: "Utiliser l’accent bleu", emerald: "Utiliser l’accent émeraude", violet: "Utiliser l’accent violet", rose: "Utiliser l’accent rose", amber: "Utiliser l’accent ambre" }, themeSettings: "Modifier l’apparence", themeCurrent: "{{color}} · {{mode}}", themeColorsLabel: "Couleur d’accent", themeModeLabel: "Mode de couleur", themeColorNames: { blue: "Bleu", emerald: "Émeraude", violet: "Violet", rose: "Rose", amber: "Ambre" }, themeModeNames: { system: "Système", light: "Clair", dark: "Sombre" }, language: "Choisir la langue", logout: "Se déconnecter", primaryNavigation: "Navigation principale", securityTitle: "À utiliser uniquement sur un réseau de confiance", securityBody: "Cette session utilise HTTP. Les identifiants et les données des tâches ne sont pas chiffrés pendant le transfert.", securityAdvice: "Si le réseau n’est pas totalement fiable, utilisez HTTPS ou liez la WebUI uniquement à 127.0.0.1.",
   },

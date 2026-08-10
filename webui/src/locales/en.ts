@@ -1,5 +1,6 @@
 import { namingTranslations } from "./naming";
 import { automaticSyncTranslations } from "./automaticSync";
+import { sensitiveMediaTranslations } from "./sensitiveMedia";
 
 export const en = {
   "brand": "KToolBox",
@@ -240,6 +241,7 @@ export const en = {
   },
   "naming": namingTranslations.en,
   "automaticSync": automaticSyncTranslations.en,
+  "sensitiveMedia": sensitiveMediaTranslations.en,
   "configuration": {
     "title": "Global configuration",
     "description": "Edit typed settings with documentation sourced from KToolBox configuration classes.",

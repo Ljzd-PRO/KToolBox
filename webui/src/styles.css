@@ -302,6 +302,39 @@ code {
   box-shadow: var(--surface-shadow);
 }
 
+.sensitive-media-inline {
+  border: 1px solid var(--border-subtle);
+  background: var(--console-panel);
+  box-shadow: var(--surface-shadow);
+}
+
+.sensitive-media-status-icon {
+  background: var(--default);
+  color: var(--muted);
+}
+
+.sensitive-media-status-icon.is-enabled,
+.sensitive-media-trigger-enabled {
+  background: var(--warning-soft) !important;
+  color: var(--warning-soft-foreground) !important;
+}
+
+.sensitive-media-switch.is-enabled {
+  --switch-control-bg-checked: var(--ktoolbox-yellow);
+  --switch-control-bg-checked-hover: color-mix(in oklab, var(--ktoolbox-yellow) 86%, black 14%);
+}
+
+.sensitive-media-switch:not(.is-enabled) {
+  --switch-control-bg: color-mix(in oklab, var(--control-track-off) 72%, var(--foreground) 28%);
+  --switch-control-bg-hover: color-mix(in oklab, var(--control-track-off-hover) 68%, var(--foreground) 32%);
+  --switch-control-bg-pressed: var(--switch-control-bg-hover);
+}
+
+.sensitive-media-confirm-action {
+  background: var(--ktoolbox-yellow) !important;
+  color: #111827 !important;
+}
+
 .theme-swatch {
   border: 2px solid transparent;
   background: var(--swatch-color);

@@ -2,6 +2,7 @@ import type { TranslationShape } from "./types";
 import { en } from "./en";
 import { namingTranslations } from "./naming";
 import { automaticSyncTranslations } from "./automaticSync";
+import { sensitiveMediaTranslations } from "./sensitiveMedia";
 
 export const zhCN = {
   "brand": "KToolBox",
@@ -242,6 +243,7 @@ export const zhCN = {
   },
   "naming": namingTranslations["zh-CN"],
   "automaticSync": automaticSyncTranslations["zh-CN"],
+  "sensitiveMedia": sensitiveMediaTranslations["zh-CN"],
   "configuration": {
     "title": "全局配置",
     "description": "使用来自 KToolBox 配置类文档的说明编辑类型化设置。",

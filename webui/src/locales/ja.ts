@@ -2,6 +2,7 @@ import type { TranslationShape } from "./types";
 import { en } from "./en";
 import { namingTranslations } from "./naming";
 import { automaticSyncTranslations } from "./automaticSync";
+import { sensitiveMediaTranslations } from "./sensitiveMedia";
 
 export const ja = {
   brand: "KToolBox",
@@ -77,6 +78,7 @@ export const ja = {
   nav: { overview: "概要", tasks: "タスク", automaticSync: "自動同期", creators: "クリエイター", posts: "作品", blockers: "除外ルール", naming: "命名形式", configuration: "グローバル設定", mcp: "MCP", system: "システム", about: "このアプリについて" },
   naming: namingTranslations.ja,
   automaticSync: automaticSyncTranslations.ja,
+  sensitiveMedia: sensitiveMediaTranslations.ja,
   shell: {
     menu: "ナビゲーションを開く",
     closeMenu: "ナビゲーションを閉じる",

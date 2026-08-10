@@ -2,6 +2,7 @@ import type { TranslationShape } from "./types";
 import { en } from "./en";
 import { namingTranslations } from "./naming";
 import { automaticSyncTranslations } from "./automaticSync";
+import { sensitiveMediaTranslations } from "./sensitiveMedia";
 
 export const zhHant = {
   brand: "KToolBox",
@@ -14,6 +15,7 @@ export const zhHant = {
   nav: { overview: "概覽", tasks: "工作", automaticSync: "自動同步", creators: "作者", posts: "作品", blockers: "忽略規則", naming: "命名格式", configuration: "全域設定", mcp: "MCP", system: "系統", about: "關於" },
   naming: namingTranslations["zh-Hant"],
   automaticSync: automaticSyncTranslations["zh-Hant"],
+  sensitiveMedia: sensitiveMediaTranslations["zh-Hant"],
   shell: { menu: "開啟導覽", closeMenu: "關閉導覽", navigation: "選單", light: "切換淺色模式", dark: "切換深色模式", theme: "主題", themeSystem: "跟隨系統主題", themeLight: "切換為淺色主題", themeDark: "切換為深色主題", themeColors: { blue: "切換為藍色主題", emerald: "切換為綠色主題", violet: "切換為紫色主題", rose: "切換為玫紅主題", amber: "切換為琥珀主題" }, themeSettings: "調整外觀", themeCurrent: "{{color}} · {{mode}}", themeColorsLabel: "主題色", themeModeLabel: "明暗模式", themeColorNames: { blue: "藍色", emerald: "綠色", violet: "紫色", rose: "玫紅", amber: "琥珀" }, themeModeNames: { system: "跟隨系統", light: "淺色", dark: "深色" }, language: "切換語言", logout: "登出", primaryNavigation: "主要導覽", securityTitle: "僅限受信任的網路", securityBody: "目前工作階段使用 HTTP，認證資料與工作資料在傳輸過程中不會加密。", securityAdvice: "網路並非完全可信時，請使用 HTTPS，或將 WebUI 僅繫結至 127.0.0.1。" },
   overview: { eyebrow: "專案工作區", title: "概覽", description: "查看佇列、維護作者規則，並快速開始下一次同步。", active: "執行中的工作", queued: "等待中", completed: "已完成", creators: "已啟用作者", recent: "最近工作", empty: "尚無工作", openTasks: "開啟工作佇列", newSync: "建立同步工作", projectPath: "專案目錄", statistics: "工作統計" },
   creators: {

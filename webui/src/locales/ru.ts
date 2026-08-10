@@ -2,6 +2,7 @@ import type { TranslationShape } from "./types";
 import { en } from "./en";
 import { namingTranslations } from "./naming";
 import { automaticSyncTranslations } from "./automaticSync";
+import { sensitiveMediaTranslations } from "./sensitiveMedia";
 
 export const ru = {
   brand: "KToolBox",
@@ -14,6 +15,7 @@ export const ru = {
   nav: { overview: "Обзор", tasks: "Задачи", automaticSync: "Автосинхронизация", creators: "Авторы", posts: "Работы", blockers: "Правила исключения", naming: "Формат имён", configuration: "Глобальные настройки", mcp: "MCP", system: "Система", about: "О программе" },
   naming: namingTranslations.ru,
   automaticSync: automaticSyncTranslations.ru,
+  sensitiveMedia: sensitiveMediaTranslations.ru,
   shell: { menu: "Открыть навигацию", closeMenu: "Закрыть навигацию", navigation: "Навигация", light: "Включить светлую тему", dark: "Включить тёмную тему", theme: "Тема", themeSystem: "Следовать системной теме", themeLight: "Использовать светлую тему", themeDark: "Использовать тёмную тему", themeColors: { blue: "Использовать синий акцент", emerald: "Использовать изумрудный акцент", violet: "Использовать фиолетовый акцент", rose: "Использовать розовый акцент", amber: "Использовать янтарный акцент" }, themeSettings: "Изменить оформление", themeCurrent: "{{color}} · {{mode}}", themeColorsLabel: "Цвет акцента", themeModeLabel: "Цветовой режим", themeColorNames: { blue: "Синий", emerald: "Изумрудный", violet: "Фиолетовый", rose: "Розовый", amber: "Янтарный" }, themeModeNames: { system: "Системный", light: "Светлый", dark: "Тёмный" }, language: "Выбрать язык", logout: "Выйти", primaryNavigation: "Основная навигация", securityTitle: "Только для доверенных сетей", securityBody: "Этот сеанс использует HTTP. Учётные данные и сведения о задачах передаются без шифрования.", securityAdvice: "Если сеть не полностью доверенная, используйте HTTPS или привяжите WebUI только к 127.0.0.1." },
   overview: { eyebrow: "Рабочее пространство проекта", title: "Обзор", description: "Контролируйте очередь, поддерживайте правила авторов и запускайте следующую синхронизацию.", active: "Активные задачи", queued: "Ожидают", completed: "Завершены", creators: "Активные авторы", recent: "Недавние задачи", empty: "Задач пока нет", openTasks: "Открыть очередь задач", newSync: "Создать задачу синхронизации", projectPath: "Каталог проекта", statistics: "Статистика задач" },
   creators: {
