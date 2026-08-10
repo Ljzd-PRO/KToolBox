@@ -1,7 +1,9 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import { QueryClientProvider } from "@tanstack/react-query";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { queryClient } from "../lib/query";
 import type { TaskRecord, TaskSpec } from "../types";
 import { TaskEditor } from "./TaskEditor";
 
@@ -9,14 +11,16 @@ const noopSave: (spec: TaskSpec) => Promise<void> = async () => undefined;
 
 function renderEditor({ task, onSave = vi.fn(noopSave) }: { task?: TaskRecord; onSave?: (spec: TaskSpec) => Promise<void> } = {}) {
   render(
-    <TaskEditor
-      creators={[]}
-      defaultOutput="/project/downloads"
-      saving={false}
-      task={task}
-      onClose={() => undefined}
-      onSave={onSave}
-    />,
+    <QueryClientProvider client={queryClient}>
+      <TaskEditor
+        creators={[]}
+        defaultOutput="/project/downloads"
+        saving={false}
+        task={task}
+        onClose={() => undefined}
+        onSave={onSave}
+      />
+    </QueryClientProvider>,
   );
   return onSave;
 }
@@ -68,6 +72,50 @@ describe("TaskEditor", () => {
     expect(await screen.findByText("Choose a start date or select No start date.")).toBeInTheDocument();
   });
 
+  it("adds a task-only creator through the shared secondary creator modal", async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn(noopSave);
+    renderEditor({ onSave });
+
+    await user.click(screen.getByRole("switch", { name: "All enabled creators" }));
+    await user.click(screen.getByRole("button", { name: "Add temporary creator" }));
+
+    expect(screen.getAllByRole("dialog", { hidden: true })).toHaveLength(2);
+    const temporaryDialog = screen.getByRole("dialog", { name: "Add temporary creator" });
+    expect(
+      within(temporaryDialog).getByText(/only be included in the current sync task/),
+    ).toBeInTheDocument();
+
+    await user.type(
+      within(temporaryDialog).getByRole("textbox", { name: "Pawchive creator URL" }),
+      "https://pawchive.pw/patreon/user/temporary-42",
+    );
+    await user.type(
+      within(temporaryDialog).getByRole("textbox", { name: "Note" }),
+      "Guest studio",
+    );
+    await user.click(within(temporaryDialog).getByRole("button", { name: "Add to task" }));
+
+    expect(screen.getAllByRole("dialog")).toHaveLength(1);
+    expect(screen.getByText("Temporary")).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: /Guest studio/ })).toBeChecked();
+
+    await user.click(screen.getByRole("button", { name: "Create task" }));
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: "sync",
+        creators: [
+          {
+            service: "patreon",
+            creator_id: "temporary-42",
+            alias: "Guest studio",
+            enabled: true,
+          },
+        ],
+      }),
+    );
+  });
+
   it("submits the composed Pawchive path without changing the REST task shape", async () => {
     const user = userEvent.setup();
     const onSave = vi.fn(noopSave);
@@ -108,13 +156,15 @@ describe("TaskEditor", () => {
   it("defaults new downloads to URL parsing while preserving manual fields for existing tasks", async () => {
     const user = userEvent.setup();
     const { unmount } = render(
-      <TaskEditor
-        creators={[]}
-        defaultOutput="/project/downloads"
-        saving={false}
-        onClose={() => undefined}
-        onSave={noopSave}
-      />,
+      <QueryClientProvider client={queryClient}>
+        <TaskEditor
+          creators={[]}
+          defaultOutput="/project/downloads"
+          saving={false}
+          onClose={() => undefined}
+          onSave={noopSave}
+        />
+      </QueryClientProvider>,
     );
 
     await user.click(screen.getByRole("tab", { name: "Download post" }));

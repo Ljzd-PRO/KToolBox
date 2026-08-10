@@ -20,8 +20,10 @@ import {
   IconPhoto as Photo,
   IconRefresh as RefreshCw,
   IconTags as Tags,
+  IconTrash as Trash,
   IconToggleLeft as ToggleLeft,
   IconToggleRight as ToggleRight,
+  IconUserPlus as UserPlus,
   IconUsersGroup as UsersRound,
   IconX as X,
 } from "@tabler/icons-react";
@@ -29,10 +31,11 @@ import { useState, type FormEvent } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { parseDate, type DateValue } from "@internationalized/date";
 
-import type { CreatorRosterItem, DownloadTaskSpec, SyncTaskSpec, TaskRecord, TaskSpec } from "../types";
+import type { CreatorReference, CreatorRosterItem, DownloadTaskSpec, SyncTaskSpec, TaskRecord, TaskSpec } from "../types";
 import { TASK_OUTPUT_PATH_SELECTOR } from "../lib/pathSelectors";
 import { useRealtime } from "../lib/realtime";
 import { ExternalChangeAlert } from "./ExternalChangeAlert";
+import { CreatorEditorModal, type CreatorEditorRequest } from "./CreatorEditorModal";
 import { RemotePathField } from "./RemotePathField";
 import {
   AddressText,
@@ -41,6 +44,7 @@ import {
   FormField,
   FormModal,
   FormSwitchField,
+  IconButton,
   InlineCode,
   NumberInput,
   OptionalDateRangeField,
@@ -77,9 +81,20 @@ export function TaskEditor({
 
   const initialSync = initial?.kind === "sync" ? initial : undefined;
   const [allEnabled, setAllEnabled] = useState(!initialSync || initialSync.creators.length === 0);
+  const [temporaryCreators, setTemporaryCreators] = useState<CreatorReference[]>(() =>
+    (initialSync?.creators ?? []).filter(
+      (candidate) =>
+        !creators.some(
+          (creator) =>
+            creator.service === candidate.service &&
+            creator.creator_id === candidate.creator_id,
+        ),
+    ),
+  );
   const [selectedCreators, setSelectedCreators] = useState(
     new Set((initialSync?.creators ?? []).map((creator) => `${creator.service}:${creator.creator_id}`)),
   );
+  const [creatorEditorRequest, setCreatorEditorRequest] = useState<CreatorEditorRequest | null>(null);
   const [saveIndices, setSaveIndices] = useState(initialSync?.save_creator_indices ?? false);
   const [mixPosts, setMixPosts] = useState(initialSync?.mix_posts === null || initialSync?.mix_posts === undefined ? "inherit" : String(initialSync.mix_posts));
   const [syncDownloadFile, setSyncDownloadFile] = useState(initialSync?.download_file ?? true);
@@ -104,6 +119,17 @@ export function TaskEditor({
   const [revisionId, setRevisionId] = useState(initialDownload?.revision_id ?? "");
   const [dumpMetadata, setDumpMetadata] = useState(initialDownload?.dump_post_data ?? true);
   const [postDownloadFile, setPostDownloadFile] = useState(initialDownload?.download_file ?? true);
+  const availableCreators = [
+    ...creators,
+    ...temporaryCreators.filter(
+      (candidate) =>
+        !creators.some(
+          (creator) =>
+            creator.service === candidate.service &&
+            creator.creator_id === candidate.creator_id,
+        ),
+    ),
+  ];
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -131,7 +157,7 @@ export function TaskEditor({
     }
     const selected = allEnabled
       ? []
-      : creators
+      : availableCreators
           .filter((creator) =>
             selectedCreators.has(`${creator.service}:${creator.creator_id}`),
           )
@@ -173,6 +199,25 @@ export function TaskEditor({
     });
   }
 
+  function addTemporaryCreator(creator: CreatorReference) {
+    const key = `${creator.service}:${creator.creator_id}`;
+    if (!availableCreators.some((candidate) => `${candidate.service}:${candidate.creator_id}` === key)) {
+      setTemporaryCreators((current) => [...current, creator]);
+    }
+    setSelectedCreators((current) => new Set(current).add(key));
+  }
+
+  function removeTemporaryCreator(key: string) {
+    setTemporaryCreators((current) =>
+      current.filter((creator) => `${creator.service}:${creator.creator_id}` !== key),
+    );
+    setSelectedCreators((current) => {
+      const next = new Set(current);
+      next.delete(key);
+      return next;
+    });
+  }
+
   const taskRevision = task ? (realtime?.taskDefinitionRevisions[task.id] ?? 0) : 0;
   const connectionRevision = realtime?.revisions.tasks ?? 0;
   const dirty = Boolean(task && JSON.stringify(buildSpec()) !== JSON.stringify(task.spec));
@@ -184,23 +229,27 @@ export function TaskEditor({
   );
 
   return (
-    <FormModal
-      actions={
-        <>
-          <Button variant="ghost" onPress={onClose}><X aria-hidden="true" size={17} />{t("common.cancel")}</Button>
-          <Button form="task-editor-form" isPending={saving} type="submit" variant="primary">
-            {task ? <Check aria-hidden="true" size={17} /> : <Plus aria-hidden="true" size={17} />}
-            {task ? t("common.save") : t("tasks.create")}
-          </Button>
-        </>
-      }
-      isWide
-      open
-      size="lg"
-      title={task ? t("tasks.edit") : t("tasks.create")}
-      onOpenChange={(open) => !open && onClose()}
-    >
-      <form className="grid gap-6" id="task-editor-form" onSubmit={submit}>
+    <>
+      <FormModal
+        actions={
+          <>
+            <Button variant="ghost" onPress={onClose}>
+              <X aria-hidden="true" size={17} />
+              {t("common.cancel")}
+            </Button>
+            <Button form="task-editor-form" isPending={saving} type="submit" variant="primary">
+              {task ? <Check aria-hidden="true" size={17} /> : <Plus aria-hidden="true" size={17} />}
+              {task ? t("common.save") : t("tasks.create")}
+            </Button>
+          </>
+        }
+        isWide
+        open
+        size="lg"
+        title={task ? t("tasks.edit") : t("tasks.create")}
+        onOpenChange={(open) => !open && onClose()}
+      >
+        <form className="grid gap-6" id="task-editor-form" onSubmit={submit}>
         <ExternalChangeAlert
           visible={externallyChanged}
           onKeepEditing={() => {
@@ -225,27 +274,61 @@ export function TaskEditor({
                 onChange={setAllEnabled}
               />
               {!allEnabled ? (
-                <Surface className="grid max-h-56 gap-1 overflow-y-auto rounded-lg border border-border p-3">
-                  {creators.map((creator) => {
-                    const key = `${creator.service}:${creator.creator_id}`;
-                    return (
-                      <FormCheckbox
-                        className="w-full"
-                        isSelected={selectedCreators.has(key)}
-                        key={key}
-                        label={
-                          <span className="flex min-w-0 items-center justify-between gap-3">
-                            <span className="min-w-0">
-                              <span className="block truncate text-sm font-medium">{creator.name || creator.creator_id}</span>
-                              <span className="block truncate text-xs text-muted">{key}</span>
-                            </span>
-                            {!creator.enabled ? <Chip className="shrink-0" size="sm" variant="soft">{t("common.disabled")}</Chip> : null}
-                          </span>
-                        }
-                        onChange={(selected) => toggleCreator(key, selected)}
-                      />
-                    );
-                  })}
+                <Surface className="overflow-hidden rounded-lg border border-border">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-[var(--surface-secondary)] px-3 py-2.5">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-foreground">{t("tasks.syncTargets")}</p>
+                      <p className="mt-0.5 text-xs leading-relaxed text-muted">
+                        {t("tasks.temporaryCreatorListHint", { count: selectedCreators.size })}
+                      </p>
+                    </div>
+                    <Button size="sm" variant="outline" onPress={() => setCreatorEditorRequest({ kind: "create" })}>
+                      <UserPlus aria-hidden="true" size={16} />
+                      {t("tasks.addTemporaryCreator")}
+                    </Button>
+                  </div>
+                  <div className="grid max-h-56 gap-1 overflow-y-auto p-2">
+                    {availableCreators.length ? availableCreators.map((creator) => {
+                      const key = `${creator.service}:${creator.creator_id}`;
+                      const temporary = temporaryCreators.some(
+                        (candidate) => `${candidate.service}:${candidate.creator_id}` === key,
+                      );
+                      return (
+                        <div className="flex min-w-0 items-center gap-1" key={key}>
+                          <FormCheckbox
+                            className="min-w-0 flex-1"
+                            isSelected={selectedCreators.has(key)}
+                            label={
+                              <span className="flex min-w-0 items-center justify-between gap-3">
+                                <span className="min-w-0">
+                                  <span className="block truncate text-sm font-medium">
+                                    {creatorDisplayName(creator)}
+                                  </span>
+                                  <span className="block truncate text-xs text-muted">{key}</span>
+                                </span>
+                                <span className="flex shrink-0 items-center gap-1.5">
+                                  {temporary ? <Chip color="accent" size="sm" variant="soft">{t("tasks.temporaryCreator")}</Chip> : null}
+                                  {!creator.enabled ? <Chip size="sm" variant="soft">{t("common.disabled")}</Chip> : null}
+                                </span>
+                              </span>
+                            }
+                            onChange={(selected) => toggleCreator(key, selected)}
+                          />
+                          {temporary ? (
+                            <IconButton
+                              className="size-10 min-w-10"
+                              icon={Trash}
+                              label={t("tasks.removeTemporaryCreator", { creator: creator.alias || creator.creator_id })}
+                              variant="danger-soft"
+                              onPress={() => removeTemporaryCreator(key)}
+                            />
+                          ) : null}
+                        </div>
+                      );
+                    }) : (
+                      <p className="px-2 py-5 text-center text-sm text-muted">{t("creators.empty")}</p>
+                    )}
+                  </div>
                 </Surface>
               ) : null}
             </section>
@@ -400,8 +483,17 @@ export function TaskEditor({
           value={output}
           onChange={setOutput}
         />
-      </form>
-    </FormModal>
+        </form>
+      </FormModal>
+      {creatorEditorRequest ? (
+        <CreatorEditorModal
+          temporary
+          request={creatorEditorRequest}
+          onClose={() => setCreatorEditorRequest(null)}
+          onSaved={addTemporaryCreator}
+        />
+      ) : null}
+    </>
   );
 }
 
@@ -416,4 +508,10 @@ function PanelIntroduction({ icon: Icon, text }: { icon: typeof RefreshCw; text:
 
 function taskDate(value: string | null | undefined): DateValue | null {
   return value ? parseDate(value.slice(0, 10)) : null;
+}
+
+function creatorDisplayName(creator: CreatorReference | CreatorRosterItem): string {
+  return "name" in creator && typeof creator.name === "string" && creator.name
+    ? creator.name
+    : creator.alias || creator.creator_id;
 }
