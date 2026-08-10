@@ -135,6 +135,7 @@ async def download(
     revision_id: str | None = None,
     output: Annotated[Path | None, Parameter(name=("--output", "-o", "--path"))] = None,
     dump_post_data: bool = True,
+    download_file: bool | None = None,
 ) -> int:
     """Download one post or revision."""
     if post is None and not all((service, creator_id, post_id)):
@@ -157,6 +158,7 @@ async def download(
         revision_id=revision_id,
         path=resolve_project_output(project_root, project, output),
         dump_post_data=dump_post_data,
+        download_file=download_file,
         naming=project.naming,
         reporter=_progress_reporter(),
     )
@@ -171,6 +173,7 @@ async def sync(
     output: Annotated[Path | None, Parameter(name=("--output", "-o", "--path"))] = None,
     save_creator_indices: bool = False,
     mix_posts: bool | None = None,
+    download_file: bool | None = None,
     start_time: Annotated[str | None, Parameter(name=("--start-time", "--start"))] = None,
     end_time: Annotated[str | None, Parameter(name=("--end-time", "--end"))] = None,
     offset: int = 0,
@@ -194,6 +197,7 @@ async def sync(
             output=resolve_project_output(project_root, project, output),
             save_creator_indices=save_creator_indices,
             mix_posts=mix_posts,
+            download_file=download_file,
             start_time=datetime.strptime(start_time, "%Y-%m-%d") if start_time else None,
             end_time=datetime.strptime(end_time, "%Y-%m-%d") if end_time else None,
             offset=offset,

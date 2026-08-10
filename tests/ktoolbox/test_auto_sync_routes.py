@@ -72,6 +72,7 @@ def plan_payload() -> dict[str, object]:
             "output": "downloads",
             "save_creator_indices": True,
             "mix_posts": None,
+            "download_file": False,
             "keywords": [],
             "keywords_exclude": [],
         },

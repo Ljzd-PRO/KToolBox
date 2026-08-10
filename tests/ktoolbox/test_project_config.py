@@ -182,6 +182,7 @@ def test_automatic_sync_plan_round_trip_and_lifecycle(tmp_path: Path) -> None:
         options=AutomaticSyncOptions(
             output=Path("downloads"),
             save_creator_indices=True,
+            download_file=False,
             keywords={"illustration", "comic"},
         ),
     )
@@ -194,6 +195,7 @@ def test_automatic_sync_plan_round_trip_and_lifecycle(tmp_path: Path) -> None:
     assert 'timezone = "Asia/Shanghai"' in content
     assert "initial_start_date = 2026-07-01" in content
     assert 'output = "downloads"' in content
+    assert "download_file = false" in content
     assert store.load().automatic_sync == configuration.automatic_sync
 
     updated = plan.model_copy(

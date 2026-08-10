@@ -198,6 +198,7 @@ class AutoSyncScheduler:
             output=output,
             save_creator_indices=plan.options.save_creator_indices,
             mix_posts=plan.options.mix_posts,
+            download_file=plan.options.download_file,
             keywords=plan.options.keywords,
             keywords_exclude=plan.options.keywords_exclude,
         )

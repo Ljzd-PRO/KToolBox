@@ -115,6 +115,21 @@ async def test_create_post_jobs_respects_allow_list_and_flat_mode(tmp_path: Path
 
 
 @pytest.mark.asyncio
+async def test_create_post_jobs_can_override_primary_file_setting(tmp_path: Path) -> None:
+    config.job.download_attachments = False
+    item = post()
+    item.file = FileReference(name="cover.jpg", path="/cover.jpg")
+
+    config.job.download_file = False
+    enabled_jobs = await create_job_from_post(item, tmp_path / "enabled", download_file=True)
+    assert [job.type for job in enabled_jobs] == [PostFileTypeEnum.File]
+
+    config.job.download_file = True
+    disabled_jobs = await create_job_from_post(item, tmp_path / "disabled", download_file=False)
+    assert disabled_jobs == []
+
+
+@pytest.mark.asyncio
 async def test_create_post_jobs_fetches_missing_post_and_revision_content(tmp_path: Path) -> None:
     config.job.download_attachments = False
     config.job.download_file = False

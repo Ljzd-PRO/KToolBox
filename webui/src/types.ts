@@ -166,6 +166,7 @@ export type DownloadTaskSpec = {
   revision_id?: string | null;
   output: string;
   dump_post_data: boolean;
+  download_file?: boolean | null;
 };
 
 export type SyncTaskSpec = {
@@ -174,6 +175,7 @@ export type SyncTaskSpec = {
   output: string;
   save_creator_indices: boolean;
   mix_posts?: boolean | null;
+  download_file?: boolean | null;
   start_time?: string | null;
   end_time?: string | null;
   offset: number;

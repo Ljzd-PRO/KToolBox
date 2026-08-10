@@ -62,6 +62,7 @@ class DownloadTaskSpec(BaseModel):
         description="Optional task output override. Omit it to use the project default output directory.",
     )
     dump_post_data: bool = True
+    download_file: bool | None = None
 
     @model_validator(mode="after")
     def validate_identity(self) -> DownloadTaskSpec:
@@ -84,6 +85,7 @@ class SyncTaskSpec(BaseModel):
     )
     save_creator_indices: bool = False
     mix_posts: bool | None = None
+    download_file: bool | None = None
     start_time: datetime | None = None
     end_time: datetime | None = None
     offset: int = Field(default=0, ge=0)

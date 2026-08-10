@@ -97,6 +97,7 @@ class CoreTaskExecutor:
                     post_path,
                     naming=project.naming,
                     dump_post_data=spec.dump_post_data,
+                    download_file=spec.download_file,
                     client=client,
                 )
                 if revision_id is None and config.job.include_revisions:
@@ -118,6 +119,7 @@ class CoreTaskExecutor:
                                 revision_path,
                                 naming=project.naming,
                                 dump_post_data=spec.dump_post_data,
+                                download_file=spec.download_file,
                                 client=client,
                             )
                         )
@@ -177,6 +179,7 @@ class CoreTaskExecutor:
                     output=spec.output,
                     save_creator_indices=spec.save_creator_indices,
                     mix_posts=spec.mix_posts,
+                    download_file=spec.download_file,
                     start_time=spec.start_time,
                     end_time=spec.end_time,
                     offset=spec.offset,

@@ -205,6 +205,7 @@ class AutomaticSyncOptions(BaseModel):
     output: Path | None = None
     save_creator_indices: bool = False
     mix_posts: bool | None = None
+    download_file: bool | None = None
     keywords: set[str] = Field(default_factory=set)
     keywords_exclude: set[str] = Field(default_factory=set)
 

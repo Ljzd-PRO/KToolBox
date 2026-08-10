@@ -187,6 +187,7 @@ class KToolBoxCli:
         path: Path | str = Path("."),
         *,
         dump_post_data: bool = True,
+        download_file: bool | None = None,
         naming: ProjectNamingConfiguration | None = None,
         reporter: ProgressReporter | None = None,
     ) -> str | None:
@@ -219,6 +220,7 @@ class KToolBoxCli:
                     post_path,
                     naming=naming,
                     dump_post_data=dump_post_data,
+                    download_file=download_file,
                     client=client,
                 )
 
@@ -237,6 +239,7 @@ class KToolBoxCli:
                                 revision_path,
                                 naming=naming,
                                 dump_post_data=dump_post_data,
+                                download_file=download_file,
                                 client=client,
                             )
                         )
@@ -256,6 +259,7 @@ class KToolBoxCli:
         *,
         save_creator_indices: bool = False,
         mix_posts: bool | None = None,
+        download_file: bool | None = None,
         naming: ProjectNamingConfiguration | None = None,
         start_time: str | None = None,
         end_time: str | None = None,
@@ -306,6 +310,7 @@ class KToolBoxCli:
                     length=length,
                     save_creator_indices=save_creator_indices,
                     mix_posts=mix_posts,
+                    download_file=download_file,
                     start_time=datetime.strptime(start_time, "%Y-%m-%d") if start_time else None,
                     end_time=datetime.strptime(end_time, "%Y-%m-%d") if end_time else None,
                     keywords=keyword_set,

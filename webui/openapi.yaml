@@ -3356,6 +3356,11 @@ components:
           - type: boolean
           - type: 'null'
           title: Mix Posts
+        download_file:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Download File
         keywords:
           items:
             type: string
@@ -3968,6 +3973,11 @@ components:
           type: boolean
           title: Dump Post Data
           default: true
+        download_file:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Download File
       additionalProperties: false
       type: object
       title: DownloadTaskSpec
@@ -5750,6 +5760,11 @@ components:
           - type: boolean
           - type: 'null'
           title: Mix Posts
+        download_file:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Download File
         start_time:
           anyOf:
           - type: string

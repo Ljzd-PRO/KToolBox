@@ -79,7 +79,7 @@ async def test_run_now_builds_baseline_task_and_rejects_duplicate_active_run(tmp
         id="daily",
         name="Daily",
         creators=["fanbox:creator"],
-        options=AutomaticSyncOptions(output=Path("downloads")),
+        options=AutomaticSyncOptions(output=Path("downloads"), download_file=False),
     )
     scheduler, automatic, tasks = await scheduler_fixture(tmp_path, MutableClock(now), plan)
 
@@ -91,6 +91,7 @@ async def test_run_now_builds_baseline_task_and_rejects_duplicate_active_run(tmp
     assert task.automatic_origin.windows[0].baseline is True
     assert task.automatic_origin.windows[0].start_at is None
     assert task.spec.output == tmp_path / "downloads"
+    assert task.spec.download_file is False
     assert (await automatic.active_run("daily")).task_id == task_id  # type: ignore[union-attr]
     with pytest.raises(AutomaticSyncConflictError) as caught:
         await scheduler.run_now("daily")

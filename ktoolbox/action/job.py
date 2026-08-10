@@ -43,6 +43,7 @@ async def create_job_from_post(
     naming: ProjectNamingConfiguration | None = None,
     post_dir: bool = True,
     dump_post_data: bool = True,
+    download_file: bool | None = None,
     client: PawchiveClient | None = None,
 ) -> list[Job]:
     """
@@ -52,6 +53,7 @@ async def create_job_from_post(
     :param post_path: Path of the post directory, which needs to be sanitized
     :param post_dir: Whether to create post directory
     :param dump_post_data: Whether to dump post data (post.json) in post directory
+    :param download_file: Whether to download the primary file (usually the cover); inherit global settings if omitted
     :raise FetchInterruptError: If fetching post content fails
     """
     naming = naming or ProjectNamingConfiguration()
@@ -112,7 +114,8 @@ async def create_job_from_post(
                 )
 
     # Filter and create jobs for ``Post.file``
-    if config.job.download_file and post.file and post.file.path:
+    selected_download_file = config.job.download_file if download_file is None else download_file
+    if selected_download_file and post.file and post.file.path:
         post_file_name = (
             Path(post.file.name)
             if post.file.name and is_valid_filename(post.file.name)
@@ -262,6 +265,7 @@ async def create_job_from_creator(
     length: int | None = 50,
     save_creator_indices: bool = False,
     mix_posts: bool | None = None,
+    download_file: bool | None = None,
     start_time: datetime | None,
     end_time: datetime | None,
     keywords: set[str] | None = None,
@@ -282,6 +286,7 @@ async def create_job_from_creator(
     :param save_creator_indices: Record ``CreatorIndices`` data.
     :param mix_posts: Save all files from different posts at same path, \
      ``save_creator_indices`` will be ignored if enabled
+    :param download_file: Whether to download each post's primary file (usually the cover)
     :param start_time: Start time of the time range
     :param end_time: End time of the time range
     :param keywords: Set of keywords to filter posts by title (case-insensitive)
@@ -307,6 +312,7 @@ async def create_job_from_creator(
         length=length,
         save_creator_indices=save_creator_indices,
         mix_posts=mix_posts,
+        download_file=download_file,
         start_time=start_time,
         end_time=end_time,
         keywords=keywords,
@@ -332,6 +338,7 @@ async def produce_jobs_from_creator(
     length: int | None = 50,
     save_creator_indices: bool = False,
     mix_posts: bool | None = None,
+    download_file: bool | None = None,
     start_time: datetime | None,
     end_time: datetime | None,
     keywords: set[str] | None = None,
@@ -355,6 +362,7 @@ async def produce_jobs_from_creator(
                 length=length,
                 save_creator_indices=save_creator_indices,
                 mix_posts=mix_posts,
+                download_file=download_file,
                 start_time=start_time,
                 end_time=end_time,
                 keywords=keywords,
@@ -425,6 +433,7 @@ async def produce_jobs_from_creator(
                         naming=naming,
                         post_dir=not selected_mix_posts,
                         dump_post_data=not selected_mix_posts,
+                        download_file=download_file,
                         client=client,
                     )
                 except FetchInterruptError as error:
@@ -442,6 +451,7 @@ async def produce_jobs_from_creator(
                             sink,
                             summary,
                             naming,
+                            download_file,
                         )
                     except FetchInterruptError as error:
                         return action_error(error.error)
@@ -512,6 +522,7 @@ async def _emit_revision_jobs(
     sink: JobSink,
     summary: CreatorJobGeneration,
     naming: ProjectNamingConfiguration,
+    download_file: bool | None,
 ) -> None:
     try:
         revisions = await client.list_post_revisions(service, creator_id, post.id)
@@ -522,6 +533,7 @@ async def _emit_revision_jobs(
                 post_path=revision_path,
                 naming=naming,
                 dump_post_data=True,
+                download_file=download_file,
                 client=client,
             )
             await _emit_jobs(revision_jobs, sink, summary)

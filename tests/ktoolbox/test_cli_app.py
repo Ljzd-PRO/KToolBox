@@ -90,12 +90,14 @@ def test_download_uses_friendly_option_names(tmp_path: Path) -> None:
                     "https://pawchive.pw/fanbox/user/1/post/2",
                     "--output",
                     "downloads",
+                    "--no-download-file",
                 ]
             )
             == 0
         )
     download.assert_awaited_once()
     assert download.await_args.kwargs["path"] == tmp_path / "downloads"
+    assert download.await_args.kwargs["download_file"] is False
 
 
 def test_download_inherits_project_default_output(tmp_path: Path) -> None:

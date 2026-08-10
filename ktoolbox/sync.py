@@ -31,6 +31,7 @@ class SyncOptions:
     output: Path = Path(".")
     save_creator_indices: bool = False
     mix_posts: bool | None = None
+    download_file: bool | None = None
     start_time: datetime | None = None
     end_time: datetime | None = None
     offset: int = 0
@@ -179,6 +180,7 @@ class SyncCoordinator:
                     length=options.length,
                     save_creator_indices=options.save_creator_indices,
                     mix_posts=options.mix_posts,
+                    download_file=options.download_file,
                     start_time=options.start_time,
                     end_time=options.end_time,
                     keywords=options.keywords,

@@ -1423,6 +1423,8 @@ export interface components {
             save_creator_indices: boolean;
             /** Mix Posts */
             mix_posts?: boolean | null;
+            /** Download File */
+            download_file?: boolean | null;
             /** Keywords */
             keywords?: string[];
             /** Keywords Exclude */
@@ -1767,6 +1769,8 @@ export interface components {
              * @default true
              */
             dump_post_data: boolean;
+            /** Download File */
+            download_file?: boolean | null;
         };
         /**
          * FailureCode
@@ -2798,6 +2802,8 @@ export interface components {
             save_creator_indices: boolean;
             /** Mix Posts */
             mix_posts?: boolean | null;
+            /** Download File */
+            download_file?: boolean | null;
             /** Start Time */
             start_time?: string | null;
             /** End Time */

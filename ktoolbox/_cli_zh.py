@@ -97,7 +97,8 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             url: str,
             path: Union[Path, str] = Path("."),
             *,
-            dump_post_data=True
+            dump_post_data=True,
+            download_file: bool | None = None,
     ):
         """
         下载指定作品或修订版本（通过 URL）
@@ -105,6 +106,7 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
         :param url: 作品链接
         :param path: 下载路径，默认为当前目录
         :param dump_post_data: 是否在作品目录中保存 post.json 数据
+        :param download_file: 是否下载主文件（封面）；留空时继承全局配置
         """
         ...
 
@@ -117,7 +119,8 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             revision_id: str = None,
             path: Union[Path, str] = Path("."),
             *,
-            dump_post_data=True
+            dump_post_data=True,
+            download_file: bool | None = None,
     ):
         """
         下载指定作品或修订版本（通过参数）
@@ -128,6 +131,7 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
         :param revision_id: 修订版本 ID（可选）
         :param path: 下载路径，默认为当前目录
         :param dump_post_data: 是否在作品目录中保存 post.json 数据
+        :param download_file: 是否下载主文件（封面）；留空时继承全局配置
         """
         ...
 
@@ -140,7 +144,8 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             revision_id: str = None,
             path: Union[Path, str] = Path("."),
             *,
-            dump_post_data=True
+            dump_post_data=True,
+            download_file: bool | None = None,
     ):
         """
         下载指定作品或修订版本
@@ -152,6 +157,7 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
         :param revision_id: 修订版本 ID（可选）
         :param path: 下载路径，默认为当前目录
         :param dump_post_data: 是否在作品目录中保存 post.json 数据
+        :param download_file: 是否下载主文件（封面）；留空时继承全局配置
         """
         return await super().download_post(
             url=url,
@@ -160,7 +166,8 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             post_id=post_id,
             revision_id=revision_id,
             path=path,
-            dump_post_data=dump_post_data
+            dump_post_data=dump_post_data,
+            download_file=download_file,
         )
 
     @staticmethod
@@ -171,6 +178,7 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             *,
             save_creator_indices: bool = True,
             mix_posts: bool = None,
+            download_file: bool | None = None,
             start_time: str = None,
             end_time: str = None,
             keywords: str = None,
@@ -183,6 +191,7 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
         :param path: 下载路径，默认为当前目录
         :param save_creator_indices: 是否记录 CreatorIndices 数据
         :param mix_posts: 是否将不同作品的所有文件保存到同一路径
+        :param download_file: 是否下载每个作品的主文件（封面）；留空时继承全局配置
         :param start_time: 作品发布时间范围起始
         :param end_time: 作品发布时间范围结束
         :param keywords: 按标题过滤作品，逗号分隔关键词
@@ -199,6 +208,7 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             *,
             save_creator_indices: bool = True,
             mix_posts: bool = None,
+            download_file: bool | None = None,
             start_time: str = None,
             end_time: str = None,
             keywords: str = None,
@@ -212,6 +222,7 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
         :param path: 下载路径，默认为当前目录
         :param save_creator_indices: 是否记录 CreatorIndices 数据
         :param mix_posts: 是否将不同作品的所有文件保存到同一路径
+        :param download_file: 是否下载每个作品的主文件（封面）；留空时继承全局配置
         :param start_time: 作品发布时间范围起始
         :param end_time: 作品发布时间范围结束
         :param keywords: 按标题过滤作品，逗号分隔关键词
@@ -228,6 +239,7 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             *,
             save_creator_indices: bool = False,
             mix_posts: bool = None,
+            download_file: bool | None = None,
             start_time: str = None,
             end_time: str = None,
             offset: int = 0,
@@ -248,6 +260,7 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
         :param path: 下载路径，默认为当前目录
         :param save_creator_indices: 是否记录 CreatorIndices 数据
         :param mix_posts: 是否将不同作品的所有文件保存到同一路径
+        :param download_file: 是否下载每个作品的主文件（封面）；留空时继承全局配置
         :param start_time: 作品发布时间范围起始，格式 ``%Y-%m-%d``
         :param end_time: 作品发布时间范围结束，格式 ``%Y-%m-%d``
         :param offset: 结果偏移量
@@ -262,6 +275,7 @@ class KToolBoxCli(ktoolbox.cli.KToolBoxCli):
             path=path,
             save_creator_indices=save_creator_indices,
             mix_posts=mix_posts,
+            download_file=download_file,
             start_time=start_time,
             end_time=end_time,
             offset=offset,
