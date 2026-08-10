@@ -20,7 +20,6 @@ import {
   IconPhoto as Photo,
   IconRefresh as RefreshCw,
   IconTags as Tags,
-  IconTrash as Trash,
   IconToggleLeft as ToggleLeft,
   IconToggleRight as ToggleRight,
   IconUserPlus as UserPlus,
@@ -44,7 +43,6 @@ import {
   FormField,
   FormModal,
   FormSwitchField,
-  IconButton,
   InlineCode,
   NumberInput,
   OptionalDateRangeField,
@@ -81,7 +79,7 @@ export function TaskEditor({
 
   const initialSync = initial?.kind === "sync" ? initial : undefined;
   const [allEnabled, setAllEnabled] = useState(!initialSync || initialSync.creators.length === 0);
-  const [temporaryCreators, setTemporaryCreators] = useState<CreatorReference[]>(() =>
+  const [additionalCreators, setAdditionalCreators] = useState<CreatorReference[]>(() =>
     (initialSync?.creators ?? []).filter(
       (candidate) =>
         !creators.some(
@@ -121,7 +119,7 @@ export function TaskEditor({
   const [postDownloadFile, setPostDownloadFile] = useState(initialDownload?.download_file ?? true);
   const availableCreators = [
     ...creators,
-    ...temporaryCreators.filter(
+    ...additionalCreators.filter(
       (candidate) =>
         !creators.some(
           (creator) =>
@@ -199,23 +197,12 @@ export function TaskEditor({
     });
   }
 
-  function addTemporaryCreator(creator: CreatorReference) {
+  function addCreator(creator: CreatorReference) {
     const key = `${creator.service}:${creator.creator_id}`;
     if (!availableCreators.some((candidate) => `${candidate.service}:${candidate.creator_id}` === key)) {
-      setTemporaryCreators((current) => [...current, creator]);
+      setAdditionalCreators((current) => [...current, creator]);
     }
     setSelectedCreators((current) => new Set(current).add(key));
-  }
-
-  function removeTemporaryCreator(key: string) {
-    setTemporaryCreators((current) =>
-      current.filter((creator) => `${creator.service}:${creator.creator_id}` !== key),
-    );
-    setSelectedCreators((current) => {
-      const next = new Set(current);
-      next.delete(key);
-      return next;
-    });
   }
 
   const taskRevision = task ? (realtime?.taskDefinitionRevisions[task.id] ?? 0) : 0;
@@ -279,51 +266,39 @@ export function TaskEditor({
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-foreground">{t("tasks.syncTargets")}</p>
                       <p className="mt-0.5 text-xs leading-relaxed text-muted">
-                        {t("tasks.temporaryCreatorListHint", { count: selectedCreators.size })}
+                        {t("tasks.creatorSelectionHint", { count: selectedCreators.size })}
                       </p>
                     </div>
                     <Button size="sm" variant="outline" onPress={() => setCreatorEditorRequest({ kind: "create" })}>
                       <UserPlus aria-hidden="true" size={16} />
-                      {t("tasks.addTemporaryCreator")}
+                      {t("creators.add")}
                     </Button>
                   </div>
                   <div className="grid max-h-56 gap-1 overflow-y-auto p-2">
                     {availableCreators.length ? availableCreators.map((creator) => {
                       const key = `${creator.service}:${creator.creator_id}`;
-                      const temporary = temporaryCreators.some(
-                        (candidate) => `${candidate.service}:${candidate.creator_id}` === key,
-                      );
                       return (
-                        <div className="flex min-w-0 items-center gap-1" key={key}>
-                          <FormCheckbox
-                            className="min-w-0 flex-1"
-                            isSelected={selectedCreators.has(key)}
-                            label={
-                              <span className="flex min-w-0 items-center justify-between gap-3">
-                                <span className="min-w-0">
-                                  <span className="block truncate text-sm font-medium">
-                                    {creatorDisplayName(creator)}
-                                  </span>
-                                  <span className="block truncate text-xs text-muted">{key}</span>
+                        <FormCheckbox
+                          className="w-full"
+                          isSelected={selectedCreators.has(key)}
+                          key={key}
+                          label={
+                            <span className="flex min-w-0 items-center justify-between gap-3">
+                              <span className="min-w-0">
+                                <span className="block truncate text-sm font-medium">
+                                  {creatorDisplayName(creator)}
                                 </span>
-                                <span className="flex shrink-0 items-center gap-1.5">
-                                  {temporary ? <Chip color="accent" size="sm" variant="soft">{t("tasks.temporaryCreator")}</Chip> : null}
-                                  {!creator.enabled ? <Chip size="sm" variant="soft">{t("common.disabled")}</Chip> : null}
-                                </span>
+                                <span className="block truncate text-xs text-muted">{key}</span>
                               </span>
-                            }
-                            onChange={(selected) => toggleCreator(key, selected)}
-                          />
-                          {temporary ? (
-                            <IconButton
-                              className="size-10 min-w-10"
-                              icon={Trash}
-                              label={t("tasks.removeTemporaryCreator", { creator: creator.alias || creator.creator_id })}
-                              variant="danger-soft"
-                              onPress={() => removeTemporaryCreator(key)}
-                            />
-                          ) : null}
-                        </div>
+                              {!creator.enabled ? (
+                                <Chip className="shrink-0" size="sm" variant="soft">
+                                  {t("common.disabled")}
+                                </Chip>
+                              ) : null}
+                            </span>
+                          }
+                          onChange={(selected) => toggleCreator(key, selected)}
+                        />
                       );
                     }) : (
                       <p className="px-2 py-5 text-center text-sm text-muted">{t("creators.empty")}</p>
@@ -487,10 +462,9 @@ export function TaskEditor({
       </FormModal>
       {creatorEditorRequest ? (
         <CreatorEditorModal
-          temporary
           request={creatorEditorRequest}
           onClose={() => setCreatorEditorRequest(null)}
-          onSaved={addTemporaryCreator}
+          onSaved={addCreator}
         />
       ) : null}
     </>

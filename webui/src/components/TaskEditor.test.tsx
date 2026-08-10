@@ -1,19 +1,27 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { queryClient } from "../lib/query";
-import type { TaskRecord, TaskSpec } from "../types";
+import type { CreatorRosterItem, TaskRecord, TaskSpec } from "../types";
 import { TaskEditor } from "./TaskEditor";
 
 const noopSave: (spec: TaskSpec) => Promise<void> = async () => undefined;
 
-function renderEditor({ task, onSave = vi.fn(noopSave) }: { task?: TaskRecord; onSave?: (spec: TaskSpec) => Promise<void> } = {}) {
+function renderEditor({
+  creators = [],
+  task,
+  onSave = vi.fn(noopSave),
+}: {
+  creators?: CreatorRosterItem[];
+  task?: TaskRecord;
+  onSave?: (spec: TaskSpec) => Promise<void>;
+} = {}) {
   render(
     <QueryClientProvider client={queryClient}>
       <TaskEditor
-        creators={[]}
+        creators={creators}
         defaultOutput="/project/downloads"
         saving={false}
         task={task}
@@ -72,33 +80,24 @@ describe("TaskEditor", () => {
     expect(await screen.findByText("Choose a start date or select No start date.")).toBeInTheDocument();
   });
 
-  it("adds a task-only creator through the shared secondary creator modal", async () => {
+  it("submits selected project creators when full-roster sync is disabled", async () => {
     const user = userEvent.setup();
     const onSave = vi.fn(noopSave);
-    renderEditor({ onSave });
+    renderEditor({
+      creators: [
+        {
+          service: "patreon",
+          creator_id: "creator-42",
+          alias: "Guest studio",
+          enabled: true,
+          name: "Guest Studio",
+        },
+      ],
+      onSave,
+    });
 
     await user.click(screen.getByRole("switch", { name: "All enabled creators" }));
-    await user.click(screen.getByRole("button", { name: "Add temporary creator" }));
-
-    expect(screen.getAllByRole("dialog", { hidden: true })).toHaveLength(2);
-    const temporaryDialog = screen.getByRole("dialog", { name: "Add temporary creator" });
-    expect(
-      within(temporaryDialog).getByText(/only be included in the current sync task/),
-    ).toBeInTheDocument();
-
-    await user.type(
-      within(temporaryDialog).getByRole("textbox", { name: "Pawchive creator URL" }),
-      "https://pawchive.pw/patreon/user/temporary-42",
-    );
-    await user.type(
-      within(temporaryDialog).getByRole("textbox", { name: "Note" }),
-      "Guest studio",
-    );
-    await user.click(within(temporaryDialog).getByRole("button", { name: "Add to task" }));
-
-    expect(screen.getAllByRole("dialog")).toHaveLength(1);
-    expect(screen.getByText("Temporary")).toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: /Guest studio/ })).toBeChecked();
+    await user.click(screen.getByRole("checkbox", { name: /Guest Studio/ }));
 
     await user.click(screen.getByRole("button", { name: "Create task" }));
     expect(onSave).toHaveBeenCalledWith(
@@ -107,7 +106,7 @@ describe("TaskEditor", () => {
         creators: [
           {
             service: "patreon",
-            creator_id: "temporary-42",
+            creator_id: "creator-42",
             alias: "Guest studio",
             enabled: true,
           },

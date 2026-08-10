@@ -6,7 +6,6 @@ import {
   IconLink as Link,
   IconNotes as Notes,
   IconPower as Power,
-  IconUserPlus as UserPlus,
   IconX as X,
 } from "@tabler/icons-react";
 import { useId, useState, type FormEvent } from "react";
@@ -35,18 +34,15 @@ export type CreatorEditorRequest =
 
 export function CreatorEditorModal({
   request,
-  temporary = false,
   onClose,
   onSaved,
 }: {
   request: CreatorEditorRequest;
-  temporary?: boolean;
   onClose: () => void;
   onSaved?: (creator: CreatorReference) => void | Promise<void>;
 }) {
   const { t } = useTranslation();
-  const auth = useAuth(false);
-  const session = auth?.session;
+  const { session } = useAuth();
   const queryClient = useQueryClient();
   const realtime = useRealtime(false);
   const formId = `creator-editor-${useId().replaceAll(":", "")}`;
@@ -89,25 +85,21 @@ export function CreatorEditorModal({
 
     setSaving(true);
     try {
-      if (temporary) {
-        await onSaved?.({ ...creator, enabled: true });
-      } else {
-        if (!session) return;
-        const saved = originalKey
-          ? await api<CreatorReference>(`/creators/${originalKey}`, {
-              method: "PUT",
-              body: { alias: creator.alias || null, enabled: creator.enabled },
-              csrfToken: session.csrf_token,
-            })
-          : await api<CreatorReference>("/creators", {
-              method: "POST",
-              body: creator,
-              csrfToken: session.csrf_token,
-            });
-        toast.success(originalKey ? t("creators.updated") : t("creators.added"));
-        await queryClient.invalidateQueries({ queryKey: ["creators"] });
-        await onSaved?.(saved);
-      }
+      if (!session) return;
+      const saved = originalKey
+        ? await api<CreatorReference>(`/creators/${originalKey}`, {
+            method: "PUT",
+            body: { alias: creator.alias || null, enabled: creator.enabled },
+            csrfToken: session.csrf_token,
+          })
+        : await api<CreatorReference>("/creators", {
+            method: "POST",
+            body: creator,
+            csrfToken: session.csrf_token,
+          });
+      toast.success(originalKey ? t("creators.updated") : t("creators.added"));
+      await queryClient.invalidateQueries({ queryKey: ["creators"] });
+      await onSaved?.(saved);
       onClose();
     } catch (error) {
       toast.danger(t("common.error"), { description: errorText(error) });
@@ -125,29 +117,16 @@ export function CreatorEditorModal({
             {t("common.cancel")}
           </Button>
           <Button form={formId} isPending={saving} type="submit" variant="primary">
-            {temporary ? (
-              <UserPlus aria-hidden="true" size={17} />
-            ) : (
-              <Check aria-hidden="true" size={17} />
-            )}
-            {temporary ? t("tasks.addTemporaryCreatorAction") : t("common.save")}
+            <Check aria-hidden="true" size={17} />
+            {t("common.save")}
           </Button>
         </>
       }
       open
-      title={
-        temporary
-          ? t("tasks.addTemporaryCreator")
-          : originalKey
-            ? t("creators.edit")
-            : t("creators.add")
-      }
+      title={originalKey ? t("creators.edit") : t("creators.add")}
       onOpenChange={(open) => !open && onClose()}
     >
       <form className="grid gap-5" id={formId} onSubmit={saveCreator}>
-        {temporary ? (
-          <p className="text-sm leading-relaxed text-muted">{t("tasks.temporaryCreatorModalHint")}</p>
-        ) : null}
         <ExternalChangeAlert
           visible={Boolean(
             originalKey &&
@@ -212,21 +191,19 @@ export function CreatorEditorModal({
           />
         )}
         <FormField
-          description={temporary ? t("tasks.temporaryCreatorAliasHint") : t("creators.aliasHint")}
+          description={t("creators.aliasHint")}
           icon={Notes}
           label={t("creators.alias")}
           value={editor.alias ?? ""}
           onChange={(alias) => setEditor({ ...editor, alias: alias || null })}
         />
-        {!temporary ? (
-          <FormSwitchField
-            description={t("creators.enabledHint")}
-            icon={Power}
-            isSelected={editor.enabled}
-            label={t("creators.enabled")}
-            onChange={(enabled) => setEditor({ ...editor, enabled })}
-          />
-        ) : null}
+        <FormSwitchField
+          description={t("creators.enabledHint")}
+          icon={Power}
+          isSelected={editor.enabled}
+          label={t("creators.enabled")}
+          onChange={(enabled) => setEditor({ ...editor, enabled })}
+        />
       </form>
     </FormModal>
   );

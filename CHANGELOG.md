@@ -82,7 +82,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Apply selected legacy moves as persistent background conversions with an operation journal, pause/continue validation, cancellation rollback, restart recovery, lifecycle events, and empty-source cleanup.
 - Detect legacy dotenv naming fields without mutating files at startup; after login, guide users through field-level comparison, explicit backed-up atomic migration, and a separate manually triggered directory scan.
 - Add project-scoped automatic synchronization plans with five-field Cron or fixed intervals, IANA time zones, future-run previews, pause and immediate-run controls, per-creator checkpoints, overlap-safe work deduplication, and privacy-preserving recent-update counts.
-- Allow sync tasks to add task-only creators from the shared creator editor without changing the project roster, with URL parsing, automatic selection, clear temporary labels, and removable entries.
+- Allow sync tasks to create and automatically select project roster authors from the shared creator editor without leaving the task form.
 
 ## Testing and quality
 
