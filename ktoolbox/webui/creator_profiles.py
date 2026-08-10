@@ -17,6 +17,7 @@ from ktoolbox.configuration import RuntimeContext
 from ktoolbox.project_config import CreatorReference, ProjectConfigStore
 from ktoolbox.webui.database import WebUIDatabase, utc_now
 from ktoolbox.webui.event_store import WebUIEventStore
+from ktoolbox.webui.media import creator_asset
 from ktoolbox.webui.models import CreatorRosterItemResponse
 
 
@@ -132,6 +133,8 @@ class CreatorRosterService:
             CreatorRosterItemResponse(
                 **creator.model_dump(),
                 name=(entry.name if (entry := cached.get(_creator_key(creator.service, creator.creator_id))) else None),
+                avatar=creator_asset(creator.service, creator.creator_id, "avatar"),
+                banner=creator_asset(creator.service, creator.creator_id, "banner"),
             )
             for creator in creators
         ]

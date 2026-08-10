@@ -6,6 +6,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+from ktoolbox.api.generated import CreatorSummary, Post, Revision
 from ktoolbox.blocker.model import BlockerSpec
 from ktoolbox.project_config import CreatorReference, ProjectConfiguration
 
@@ -161,8 +162,38 @@ class CreatorUpdateRequest(BaseModel):
     enabled: bool = True
 
 
+class MediaAssetResponse(BaseModel):
+    kind: Literal["avatar", "banner", "cover", "attachment", "content"]
+    thumbnail_url: str
+    preview_url: str
+    original_url: str
+
+
 class CreatorRosterItemResponse(CreatorReference):
     name: str | None = None
+    avatar: MediaAssetResponse
+    banner: MediaAssetResponse
+
+
+class CreatorSearchItemResponse(CreatorSummary):
+    avatar: MediaAssetResponse
+    banner: MediaAssetResponse
+
+
+class PawchivePostSummaryResponse(Post):
+    cover: MediaAssetResponse | None = None
+
+
+class PawchivePostDetailResponse(PawchivePostSummaryResponse):
+    media: list[MediaAssetResponse] = Field(default_factory=list)
+
+
+class PawchiveRevisionSummaryResponse(Revision):
+    cover: MediaAssetResponse | None = None
+
+
+class PawchiveRevisionDetailResponse(PawchiveRevisionSummaryResponse):
+    media: list[MediaAssetResponse] = Field(default_factory=list)
 
 
 class BlockerListResponse(BaseModel):

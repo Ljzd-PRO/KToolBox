@@ -352,6 +352,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/creators/{platform}/{creator_id}/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Load a creator avatar
+         * @description Return a validated same-origin creator avatar for an authenticated WebUI session.
+         */
+        get: operations["creator_avatar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/creators/{platform}/{creator_id}/banner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Load a creator banner
+         * @description Return a validated same-origin creator banner for an authenticated WebUI session.
+         */
+        get: operations["creator_banner"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Load a Pawchive image
+         * @description Return a validated thumbnail, preview, or original image from the configured Pawchive file host.
+         */
+        get: operations["media_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/tasks": {
         parameters: {
             query?: never;
@@ -1670,9 +1730,11 @@ export interface components {
             enabled: boolean;
             /** Name */
             name?: string | null;
+            avatar: components["schemas"]["MediaAssetResponse"];
+            banner: components["schemas"]["MediaAssetResponse"];
         };
-        /** CreatorSummary */
-        CreatorSummary: {
+        /** CreatorSearchItemResponse */
+        CreatorSearchItemResponse: {
             /** Favorited */
             favorited: number;
             /** Id */
@@ -1685,6 +1747,8 @@ export interface components {
             service: string;
             /** Updated */
             updated: number | string;
+            avatar: components["schemas"]["MediaAssetResponse"];
+            banner: components["schemas"]["MediaAssetResponse"];
         } & {
             [key: string]: unknown;
         };
@@ -2152,6 +2216,20 @@ export interface components {
             /** Open World */
             open_world: boolean;
         };
+        /** MediaAssetResponse */
+        MediaAssetResponse: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "avatar" | "banner" | "cover" | "attachment" | "content";
+            /** Thumbnail Url */
+            thumbnail_url: string;
+            /** Preview Url */
+            preview_url: string;
+            /** Original Url */
+            original_url: string;
+        };
         /** NamingApplyRequest */
         NamingApplyRequest: {
             /** Preview Id */
@@ -2438,6 +2516,242 @@ export interface components {
              * @enum {string}
              */
             value_mode: "absolute" | "project_relative";
+        };
+        /** PawchivePostDetailResponse */
+        PawchivePostDetailResponse: {
+            /** Id */
+            id: string;
+            /** User */
+            user: string;
+            /** Service */
+            service: string;
+            /** Title */
+            title?: string | null;
+            /** Content */
+            content?: string | null;
+            /** Substring */
+            substring?: string | null;
+            /** Embed */
+            embed?: {
+                [key: string]: unknown;
+            } | null;
+            /** Shared File */
+            shared_file?: boolean | null;
+            /** Added */
+            added?: string | null;
+            /** Published */
+            published?: string | null;
+            /** Edited */
+            edited?: string | null;
+            file?: components["schemas"]["FileReference"] | null;
+            /** Attachments */
+            attachments?: components["schemas"]["FileReference"][] | null;
+            /** Poll */
+            poll?: {
+                [key: string]: unknown;
+            } | null;
+            /** Captions */
+            captions?: unknown[] | null;
+            /** Tags */
+            tags?: string | unknown[] | null;
+            /** Origin */
+            origin?: string | null;
+            /** Preview State */
+            preview_state?: string | null;
+            /** Has Full */
+            has_full?: boolean | null;
+            /** Preview Attempts */
+            preview_attempts?: number | null;
+            /** Detail Fetched */
+            detail_fetched?: boolean | null;
+            /** Import Size Cap Gb */
+            import_size_cap_gb?: number | null;
+            /** Next */
+            next?: string | null;
+            /** Prev */
+            prev?: string | null;
+            cover?: components["schemas"]["MediaAssetResponse"] | null;
+            /** Media */
+            media?: components["schemas"]["MediaAssetResponse"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** PawchivePostSummaryResponse */
+        PawchivePostSummaryResponse: {
+            /** Id */
+            id: string;
+            /** User */
+            user: string;
+            /** Service */
+            service: string;
+            /** Title */
+            title?: string | null;
+            /** Content */
+            content?: string | null;
+            /** Substring */
+            substring?: string | null;
+            /** Embed */
+            embed?: {
+                [key: string]: unknown;
+            } | null;
+            /** Shared File */
+            shared_file?: boolean | null;
+            /** Added */
+            added?: string | null;
+            /** Published */
+            published?: string | null;
+            /** Edited */
+            edited?: string | null;
+            file?: components["schemas"]["FileReference"] | null;
+            /** Attachments */
+            attachments?: components["schemas"]["FileReference"][] | null;
+            /** Poll */
+            poll?: {
+                [key: string]: unknown;
+            } | null;
+            /** Captions */
+            captions?: unknown[] | null;
+            /** Tags */
+            tags?: string | unknown[] | null;
+            /** Origin */
+            origin?: string | null;
+            /** Preview State */
+            preview_state?: string | null;
+            /** Has Full */
+            has_full?: boolean | null;
+            /** Preview Attempts */
+            preview_attempts?: number | null;
+            /** Detail Fetched */
+            detail_fetched?: boolean | null;
+            /** Import Size Cap Gb */
+            import_size_cap_gb?: number | null;
+            /** Next */
+            next?: string | null;
+            /** Prev */
+            prev?: string | null;
+            cover?: components["schemas"]["MediaAssetResponse"] | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** PawchiveRevisionDetailResponse */
+        PawchiveRevisionDetailResponse: {
+            /** Id */
+            id: string;
+            /** User */
+            user: string;
+            /** Service */
+            service: string;
+            /** Title */
+            title?: string | null;
+            /** Content */
+            content?: string | null;
+            /** Substring */
+            substring?: string | null;
+            /** Embed */
+            embed?: {
+                [key: string]: unknown;
+            } | null;
+            /** Shared File */
+            shared_file?: boolean | null;
+            /** Added */
+            added?: string | null;
+            /** Published */
+            published?: string | null;
+            /** Edited */
+            edited?: string | null;
+            file?: components["schemas"]["FileReference"] | null;
+            /** Attachments */
+            attachments?: components["schemas"]["FileReference"][] | null;
+            /** Poll */
+            poll?: {
+                [key: string]: unknown;
+            } | null;
+            /** Captions */
+            captions?: unknown[] | null;
+            /** Tags */
+            tags?: string | unknown[] | null;
+            /** Origin */
+            origin?: string | null;
+            /** Preview State */
+            preview_state?: string | null;
+            /** Has Full */
+            has_full?: boolean | null;
+            /** Preview Attempts */
+            preview_attempts?: number | null;
+            /** Detail Fetched */
+            detail_fetched?: boolean | null;
+            /** Import Size Cap Gb */
+            import_size_cap_gb?: number | null;
+            /** Next */
+            next?: string | null;
+            /** Prev */
+            prev?: string | null;
+            /** Revision Id */
+            revision_id: number;
+            cover?: components["schemas"]["MediaAssetResponse"] | null;
+            /** Media */
+            media?: components["schemas"]["MediaAssetResponse"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** PawchiveRevisionSummaryResponse */
+        PawchiveRevisionSummaryResponse: {
+            /** Id */
+            id: string;
+            /** User */
+            user: string;
+            /** Service */
+            service: string;
+            /** Title */
+            title?: string | null;
+            /** Content */
+            content?: string | null;
+            /** Substring */
+            substring?: string | null;
+            /** Embed */
+            embed?: {
+                [key: string]: unknown;
+            } | null;
+            /** Shared File */
+            shared_file?: boolean | null;
+            /** Added */
+            added?: string | null;
+            /** Published */
+            published?: string | null;
+            /** Edited */
+            edited?: string | null;
+            file?: components["schemas"]["FileReference"] | null;
+            /** Attachments */
+            attachments?: components["schemas"]["FileReference"][] | null;
+            /** Poll */
+            poll?: {
+                [key: string]: unknown;
+            } | null;
+            /** Captions */
+            captions?: unknown[] | null;
+            /** Tags */
+            tags?: string | unknown[] | null;
+            /** Origin */
+            origin?: string | null;
+            /** Preview State */
+            preview_state?: string | null;
+            /** Has Full */
+            has_full?: boolean | null;
+            /** Preview Attempts */
+            preview_attempts?: number | null;
+            /** Detail Fetched */
+            detail_fetched?: boolean | null;
+            /** Import Size Cap Gb */
+            import_size_cap_gb?: number | null;
+            /** Next */
+            next?: string | null;
+            /** Prev */
+            prev?: string | null;
+            /** Revision Id */
+            revision_id: number;
+            cover?: components["schemas"]["MediaAssetResponse"] | null;
+        } & {
+            [key: string]: unknown;
         };
         /** Post */
         Post: {
@@ -3694,7 +4008,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CreatorSummary"][];
+                    "application/json": components["schemas"]["CreatorSearchItemResponse"][];
                 };
             };
             /** @description Validation Error */
@@ -3729,7 +4043,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Post"][];
+                    "application/json": components["schemas"]["PawchivePostSummaryResponse"][];
                 };
             };
             /** @description Validation Error */
@@ -3764,7 +4078,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Post"] | components["schemas"]["Revision"];
+                    "application/json": components["schemas"]["PawchivePostDetailResponse"] | components["schemas"]["PawchiveRevisionDetailResponse"];
                 };
             };
             /** @description Validation Error */
@@ -3797,7 +4111,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Revision"][];
+                    "application/json": components["schemas"]["PawchiveRevisionSummaryResponse"][];
                 };
             };
             /** @description Validation Error */
@@ -3827,6 +4141,115 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SiteVersionResponse"];
+                };
+            };
+        };
+    };
+    creator_avatar: {
+        parameters: {
+            query: {
+                variant: "thumbnail" | "preview" | "original";
+            };
+            header?: never;
+            path: {
+                platform: string;
+                creator_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Validated image bytes. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/webp": unknown;
+                    "image/jpeg": unknown;
+                    "image/png": unknown;
+                    "image/gif": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    creator_banner: {
+        parameters: {
+            query: {
+                variant: "thumbnail" | "preview" | "original";
+            };
+            header?: never;
+            path: {
+                platform: string;
+                creator_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Validated image bytes. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/webp": unknown;
+                    "image/jpeg": unknown;
+                    "image/png": unknown;
+                    "image/gif": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    media_file: {
+        parameters: {
+            query: {
+                path: string;
+                variant: "thumbnail" | "preview" | "original";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Validated image bytes. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/webp": unknown;
+                    "image/jpeg": unknown;
+                    "image/png": unknown;
+                    "image/gif": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

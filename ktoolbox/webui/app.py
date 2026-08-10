@@ -37,6 +37,8 @@ from ktoolbox.webui.filesystem_routes import create_filesystem_router
 from ktoolbox.webui.mcp_routes import create_mcp_router
 from ktoolbox.webui.mcp_server import create_mcp_server
 from ktoolbox.webui.mcp_tokens import MCPTokenStore
+from ktoolbox.webui.media import MediaProxyService
+from ktoolbox.webui.media_routes import create_media_router
 from ktoolbox.webui.models import (
     AboutResponse,
     HealthResponse,
@@ -62,6 +64,7 @@ def create_app(
     task_executor: TaskExecutor | None = None,
     creator_client_factory: CreatorClientFactory | None = None,
     filesystem_browser: FilesystemBrowser | None = None,
+    media_proxy: MediaProxyService | None = None,
 ) -> FastAPI:
     database = WebUIDatabase(context.project_root / ".ktoolbox" / "webui.sqlite3")
     internal_token = f"mcp-internal-{secrets.token_urlsafe(36)}"
@@ -93,6 +96,7 @@ def create_app(
         CreatorProfileCache(database, event_store),
         client_factory=creator_client_factory,
     )
+    media_service = media_proxy or MediaProxyService()
     project_lock = ProjectProcessLock(context.project_root / ".ktoolbox" / "webui.lock")
     config_monitor = ConfigurationChangeMonitor(
         context.project_root,
@@ -107,6 +111,7 @@ def create_app(
         try:
             await database.initialize()
             await naming_service.start()
+            await media_service.start()
             await config_monitor.start()
             await task_scheduler.start()
             await automatic_sync_scheduler.start()
@@ -115,6 +120,7 @@ def create_app(
             await automatic_sync_scheduler.stop()
             await task_scheduler.stop()
             await config_monitor.stop()
+            await media_service.stop()
             await naming_service.stop()
             await project_lock.release()
 
@@ -136,6 +142,7 @@ def create_app(
     app.state.automatic_sync_store = automatic_sync_store
     app.state.automatic_sync_scheduler = automatic_sync_scheduler
     app.state.naming_service = naming_service
+    app.state.media_proxy = media_service
     app.state.task_scheduler = task_scheduler
     app.state.config_monitor = config_monitor
     browser = filesystem_browser or FilesystemBrowser(context.project_root)
@@ -143,6 +150,7 @@ def create_app(
     app.include_router(create_project_router(context.project_root, creator_roster, event_store, config_monitor))
     app.include_router(create_filesystem_router(browser, event_store))
     app.include_router(create_pawchive_router())
+    app.include_router(create_media_router())
     app.include_router(create_task_router(context.project_root))
     app.include_router(create_auto_sync_router(context.project_root))
     app.include_router(create_naming_router())
@@ -174,7 +182,9 @@ def create_app(
             "script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'"
         )
         if request.url.path.startswith("/api/"):
-            response.headers["Cache-Control"] = "no-store"
+            response.headers["Cache-Control"] = (
+                "private, no-store" if request.url.path.startswith("/api/v1/media/") else "no-store"
+            )
         return response
 
     @app.get("/api/v1/health", response_model=HealthResponse)

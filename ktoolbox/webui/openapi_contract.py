@@ -176,6 +176,21 @@ OPERATIONS: dict[str, OperationMetadata] = {
         "pawchive",
         mcp=_read("get_pawchive_version", open_world=True),
     ),
+    "creator_avatar": OperationMetadata(
+        "Load a creator avatar",
+        "Return a validated same-origin creator avatar for an authenticated WebUI session.",
+        "media",
+    ),
+    "creator_banner": OperationMetadata(
+        "Load a creator banner",
+        "Return a validated same-origin creator banner for an authenticated WebUI session.",
+        "media",
+    ),
+    "media_file": OperationMetadata(
+        "Load a Pawchive image",
+        "Return a validated thumbnail, preview, or original image from the configured Pawchive file host.",
+        "media",
+    ),
     "list_tasks": OperationMetadata(
         "List tasks",
         "Return the persistent task queue in scheduling order.",
@@ -596,6 +611,7 @@ def build_openapi_schema(app: FastAPI) -> dict[str, Any]:
             "description": "Recurring creator synchronization plans, runs, and recent update counts.",
         },
         {"name": "pawchive", "description": "Public Pawchive search and work data."},
+        {"name": "media", "description": "Authenticated same-origin previews of Pawchive image media."},
         {"name": "filesystem", "description": "WebUI filesystem path picker."},
         {"name": "system", "description": "Service status."},
         {"name": "mcp", "description": "MCP status, connection metadata, and access tokens."},

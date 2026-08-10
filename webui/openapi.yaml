@@ -815,7 +815,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CreatorSummary'
+                  $ref: '#/components/schemas/CreatorSearchItemResponse'
                 title: Response Creators
         '422':
           description: Validation Error
@@ -887,7 +887,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Post'
+                  $ref: '#/components/schemas/PawchivePostSummaryResponse'
                 title: Response Posts
         '422':
           description: Validation Error
@@ -944,8 +944,8 @@ paths:
             application/json:
               schema:
                 anyOf:
-                - $ref: '#/components/schemas/Post'
-                - $ref: '#/components/schemas/Revision'
+                - $ref: '#/components/schemas/PawchivePostDetailResponse'
+                - $ref: '#/components/schemas/PawchiveRevisionDetailResponse'
                 title: Response Post Details
         '422':
           description: Validation Error
@@ -995,7 +995,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Revision'
+                  $ref: '#/components/schemas/PawchiveRevisionSummaryResponse'
                 title: Response Post Revisions
         '422':
           description: Validation Error
@@ -1036,6 +1036,156 @@ paths:
         scope: mcp:read
         safety: read
         openWorld: true
+  /api/v1/media/creators/{platform}/{creator_id}/avatar:
+    get:
+      summary: Load a creator avatar
+      operationId: creator_avatar
+      parameters:
+      - name: platform
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Platform
+      - name: creator_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Creator Id
+      - name: variant
+        in: query
+        required: true
+        schema:
+          enum:
+          - thumbnail
+          - preview
+          - original
+          type: string
+          title: Variant
+      responses:
+        '200':
+          description: Validated image bytes.
+          content:
+            image/webp: {}
+            image/jpeg: {}
+            image/png: {}
+            image/gif: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Return a validated same-origin creator avatar for an authenticated WebUI session.
+      tags:
+      - media
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: creator_avatar
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/media/creators/{platform}/{creator_id}/banner:
+    get:
+      summary: Load a creator banner
+      operationId: creator_banner
+      parameters:
+      - name: platform
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Platform
+      - name: creator_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Creator Id
+      - name: variant
+        in: query
+        required: true
+        schema:
+          enum:
+          - thumbnail
+          - preview
+          - original
+          type: string
+          title: Variant
+      responses:
+        '200':
+          description: Validated image bytes.
+          content:
+            image/webp: {}
+            image/jpeg: {}
+            image/png: {}
+            image/gif: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Return a validated same-origin creator banner for an authenticated WebUI session.
+      tags:
+      - media
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: creator_banner
+        scope: null
+        safety: null
+        openWorld: false
+  /api/v1/media/files:
+    get:
+      summary: Load a Pawchive image
+      operationId: media_file
+      parameters:
+      - name: path
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Path
+      - name: variant
+        in: query
+        required: true
+        schema:
+          enum:
+          - thumbnail
+          - preview
+          - original
+          type: string
+          title: Variant
+      responses:
+        '200':
+          description: Validated image bytes.
+          content:
+            image/webp: {}
+            image/jpeg: {}
+            image/png: {}
+            image/gif: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Return a validated thumbnail, preview, or original image from the configured Pawchive file host.
+      tags:
+      - media
+      security:
+      - WebUISession: []
+      x-ktoolbox-mcp:
+        enabled: false
+        name: media_file
+        scope: null
+        safety: null
+        openWorld: false
   /api/v1/tasks:
     get:
       tags:
@@ -3819,13 +3969,19 @@ components:
           - type: string
           - type: 'null'
           title: Name
+        avatar:
+          $ref: '#/components/schemas/MediaAssetResponse'
+        banner:
+          $ref: '#/components/schemas/MediaAssetResponse'
       additionalProperties: false
       type: object
       required:
       - service
       - creator_id
+      - avatar
+      - banner
       title: CreatorRosterItemResponse
-    CreatorSummary:
+    CreatorSearchItemResponse:
       properties:
         favorited:
           type: integer
@@ -3853,6 +4009,10 @@ components:
           - type: string
             format: date-time
           title: Updated
+        avatar:
+          $ref: '#/components/schemas/MediaAssetResponse'
+        banner:
+          $ref: '#/components/schemas/MediaAssetResponse'
       additionalProperties: true
       type: object
       required:
@@ -3862,7 +4022,9 @@ components:
       - name
       - service
       - updated
-      title: CreatorSummary
+      - avatar
+      - banner
+      title: CreatorSearchItemResponse
     CreatorTaskExecutionResult:
       properties:
         creator_key:
@@ -4708,6 +4870,33 @@ components:
       - safety
       - open_world
       title: MCPToolResponse
+    MediaAssetResponse:
+      properties:
+        kind:
+          type: string
+          enum:
+          - avatar
+          - banner
+          - cover
+          - attachment
+          - content
+          title: Kind
+        thumbnail_url:
+          type: string
+          title: Thumbnail Url
+        preview_url:
+          type: string
+          title: Preview Url
+        original_url:
+          type: string
+          title: Original Url
+      type: object
+      required:
+      - kind
+      - thumbnail_url
+      - preview_url
+      - original_url
+      title: MediaAssetResponse
     NamingApplyRequest:
       properties:
         preview_id:
@@ -5176,6 +5365,580 @@ components:
       - scope
       - value_mode
       title: PathSelectorResponse
+    PawchivePostDetailResponse:
+      properties:
+        id:
+          type: string
+          minLength: 1
+          title: Id
+        user:
+          type: string
+          minLength: 1
+          title: User
+        service:
+          type: string
+          minLength: 1
+          title: Service
+        title:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+        content:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Content
+        substring:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Substring
+        embed:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Embed
+        shared_file:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Shared File
+        added:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Added
+        published:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Published
+        edited:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Edited
+        file:
+          anyOf:
+          - $ref: '#/components/schemas/FileReference'
+          - type: 'null'
+        attachments:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/FileReference'
+            type: array
+          - type: 'null'
+          title: Attachments
+        poll:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Poll
+        captions:
+          anyOf:
+          - items: {}
+            type: array
+          - type: 'null'
+          title: Captions
+        tags:
+          anyOf:
+          - type: string
+          - items: {}
+            type: array
+          - type: 'null'
+          title: Tags
+        origin:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Origin
+        preview_state:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Preview State
+        has_full:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Full
+        preview_attempts:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Preview Attempts
+        detail_fetched:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Detail Fetched
+        import_size_cap_gb:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Import Size Cap Gb
+        next:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next
+        prev:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Prev
+        cover:
+          anyOf:
+          - $ref: '#/components/schemas/MediaAssetResponse'
+          - type: 'null'
+        media:
+          items:
+            $ref: '#/components/schemas/MediaAssetResponse'
+          type: array
+          title: Media
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - user
+      - service
+      title: PawchivePostDetailResponse
+    PawchivePostSummaryResponse:
+      properties:
+        id:
+          type: string
+          minLength: 1
+          title: Id
+        user:
+          type: string
+          minLength: 1
+          title: User
+        service:
+          type: string
+          minLength: 1
+          title: Service
+        title:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+        content:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Content
+        substring:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Substring
+        embed:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Embed
+        shared_file:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Shared File
+        added:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Added
+        published:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Published
+        edited:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Edited
+        file:
+          anyOf:
+          - $ref: '#/components/schemas/FileReference'
+          - type: 'null'
+        attachments:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/FileReference'
+            type: array
+          - type: 'null'
+          title: Attachments
+        poll:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Poll
+        captions:
+          anyOf:
+          - items: {}
+            type: array
+          - type: 'null'
+          title: Captions
+        tags:
+          anyOf:
+          - type: string
+          - items: {}
+            type: array
+          - type: 'null'
+          title: Tags
+        origin:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Origin
+        preview_state:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Preview State
+        has_full:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Full
+        preview_attempts:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Preview Attempts
+        detail_fetched:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Detail Fetched
+        import_size_cap_gb:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Import Size Cap Gb
+        next:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next
+        prev:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Prev
+        cover:
+          anyOf:
+          - $ref: '#/components/schemas/MediaAssetResponse'
+          - type: 'null'
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - user
+      - service
+      title: PawchivePostSummaryResponse
+    PawchiveRevisionDetailResponse:
+      properties:
+        id:
+          type: string
+          minLength: 1
+          title: Id
+        user:
+          type: string
+          minLength: 1
+          title: User
+        service:
+          type: string
+          minLength: 1
+          title: Service
+        title:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+        content:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Content
+        substring:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Substring
+        embed:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Embed
+        shared_file:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Shared File
+        added:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Added
+        published:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Published
+        edited:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Edited
+        file:
+          anyOf:
+          - $ref: '#/components/schemas/FileReference'
+          - type: 'null'
+        attachments:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/FileReference'
+            type: array
+          - type: 'null'
+          title: Attachments
+        poll:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Poll
+        captions:
+          anyOf:
+          - items: {}
+            type: array
+          - type: 'null'
+          title: Captions
+        tags:
+          anyOf:
+          - type: string
+          - items: {}
+            type: array
+          - type: 'null'
+          title: Tags
+        origin:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Origin
+        preview_state:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Preview State
+        has_full:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Full
+        preview_attempts:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Preview Attempts
+        detail_fetched:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Detail Fetched
+        import_size_cap_gb:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Import Size Cap Gb
+        next:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next
+        prev:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Prev
+        revision_id:
+          type: integer
+          title: Revision Id
+        cover:
+          anyOf:
+          - $ref: '#/components/schemas/MediaAssetResponse'
+          - type: 'null'
+        media:
+          items:
+            $ref: '#/components/schemas/MediaAssetResponse'
+          type: array
+          title: Media
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - user
+      - service
+      - revision_id
+      title: PawchiveRevisionDetailResponse
+    PawchiveRevisionSummaryResponse:
+      properties:
+        id:
+          type: string
+          minLength: 1
+          title: Id
+        user:
+          type: string
+          minLength: 1
+          title: User
+        service:
+          type: string
+          minLength: 1
+          title: Service
+        title:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+        content:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Content
+        substring:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Substring
+        embed:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Embed
+        shared_file:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Shared File
+        added:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Added
+        published:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Published
+        edited:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Edited
+        file:
+          anyOf:
+          - $ref: '#/components/schemas/FileReference'
+          - type: 'null'
+        attachments:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/FileReference'
+            type: array
+          - type: 'null'
+          title: Attachments
+        poll:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Poll
+        captions:
+          anyOf:
+          - items: {}
+            type: array
+          - type: 'null'
+          title: Captions
+        tags:
+          anyOf:
+          - type: string
+          - items: {}
+            type: array
+          - type: 'null'
+          title: Tags
+        origin:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Origin
+        preview_state:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Preview State
+        has_full:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Full
+        preview_attempts:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Preview Attempts
+        detail_fetched:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Detail Fetched
+        import_size_cap_gb:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Import Size Cap Gb
+        next:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next
+        prev:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Prev
+        revision_id:
+          type: integer
+          title: Revision Id
+        cover:
+          anyOf:
+          - $ref: '#/components/schemas/MediaAssetResponse'
+          - type: 'null'
+      additionalProperties: true
+      type: object
+      required:
+      - id
+      - user
+      - service
+      - revision_id
+      title: PawchiveRevisionSummaryResponse
     Post:
       properties:
         id:
@@ -6312,6 +7075,8 @@ tags:
   description: Recurring creator synchronization plans, runs, and recent update counts.
 - name: pawchive
   description: Public Pawchive search and work data.
+- name: media
+  description: Authenticated same-origin previews of Pawchive image media.
 - name: filesystem
   description: WebUI filesystem path picker.
 - name: system
