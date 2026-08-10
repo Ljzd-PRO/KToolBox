@@ -489,7 +489,7 @@ export const en = {
   },
   "posts": {
     "title": "Posts",
-    "description": "Search typed Pawchive metadata and create download tasks without automatically loading remote media.",
+    "description": "Search typed Pawchive metadata and create download tasks; image previews follow the NSFW mode.",
     "search": "Search posts",
     "creatorId": "Creator ID",
     "postId": "Post ID",

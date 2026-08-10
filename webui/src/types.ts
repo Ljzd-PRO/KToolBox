@@ -301,6 +301,8 @@ export type PawchivePost = {
   published?: string | null;
   edited?: string | null;
   attachments?: unknown[] | null;
+  cover?: MediaAsset | null;
+  media?: MediaAsset[] | null;
   [key: string]: unknown;
 };
 

@@ -491,7 +491,7 @@ export const zhCN = {
   },
   "posts": {
     "title": "作品",
-    "description": "搜索类型化 Pawchive 元数据并创建下载任务，不会自动加载远程媒体。",
+    "description": "搜索类型化 Pawchive 元数据并创建下载任务；图片预览由 NSFW 模式控制。",
     "search": "搜索作品",
     "creatorId": "作者 ID",
     "postId": "作品 ID",

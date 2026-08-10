@@ -294,13 +294,20 @@ class FixtureClient(AbstractAsyncContextManager["FixtureClient"]):
                 user=creator_id,
                 service=service,
                 title="Fictional project study",
-                content="Harmless fixture text for browser verification.",
+                content=(
+                    "Harmless fixture text for browser verification. "
+                    '<img src="https://file.pawchive.pw/data/fixtures/wide-content.jpg">'
+                ),
                 published="2026-07-20T08:30:00Z",
                 file=FileReference(name="cover.jpg", path="/data/fixtures/cover-fiction-1001.jpg"),
                 attachments=[
                     FileReference(name="detail.jpg", path="/data/fixtures/hires-detail.jpg"),
                     FileReference(name="portrait.jpg", path="/data/fixtures/portrait-detail.jpg"),
                     FileReference(name="broken.jpg", path="/data/fixtures/broken.jpg"),
+                    *[
+                        FileReference(name=f"study-{index}.jpg", path=f"/data/fixtures/study-{index}.jpg")
+                        for index in range(1, 11)
+                    ],
                 ],
             )
         ]

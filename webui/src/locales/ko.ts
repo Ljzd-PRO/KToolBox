@@ -100,7 +100,7 @@ export const ko = {
     statuses: { queued: "대기열에 있음", blocked: "리소스 대기", running: "실행 중", pause_requested: "일시 중지 중", paused: "일시 중지됨", stop_requested: "중지 중", stopped: "중지됨", completed: "완료", failed: "실패", interrupted: "중단됨" },
   },
   posts: {
-    title: "작품", description: "원격 미디어를 자동으로 불러오지 않고 형식화된 Pawchive 메타데이터를 검색해 다운로드 작업을 만듭니다.", search: "작품 검색", creatorId: "크리에이터 ID", postId: "작품 ID", creatorName: "크리에이터 이름", service: "플랫폼", query: "검색어", results: "검색 결과", searchHint: "플랫폼, 크리에이터 ID 또는 크리에이터 이름으로 작품 메타데이터를 검색합니다.", searchReady: "Pawchive를 검색할 준비가 되었습니다", empty: "작품을 찾지 못했습니다", post: "작품", published: "게시일", details: "작품 세부 정보", contentHidden: "작품 본문은 기본적으로 접혀 있습니다", showContent: "본문 표시", hideContent: "본문 숨기기", createDownload: "다운로드 작업 만들기", revision: "리비전", currentRevision: "현재 작품", revisionLabel: "리비전 {{id}}", mediaSafeTitle: "원격 미디어는 불러오지 않습니다", mediaSafeBody: "이 화면에는 메타데이터만 표시됩니다. 첨부 파일과 표지 파일은 자동으로 불러오지 않습니다.",
+    title: "작품", description: "형식화된 Pawchive 메타데이터를 검색해 다운로드 작업을 만듭니다. 이미지 미리보기는 NSFW 모드로 제어합니다.", search: "작품 검색", creatorId: "크리에이터 ID", postId: "작품 ID", creatorName: "크리에이터 이름", service: "플랫폼", query: "검색어", results: "검색 결과", searchHint: "플랫폼, 크리에이터 ID 또는 크리에이터 이름으로 작품 메타데이터를 검색합니다.", searchReady: "Pawchive를 검색할 준비가 되었습니다", empty: "작품을 찾지 못했습니다", post: "작품", published: "게시일", details: "작품 세부 정보", contentHidden: "작품 본문은 기본적으로 접혀 있습니다", showContent: "본문 표시", hideContent: "본문 숨기기", createDownload: "다운로드 작업 만들기", revision: "리비전", currentRevision: "현재 작품", revisionLabel: "리비전 {{id}}", mediaSafeTitle: "원격 미디어는 불러오지 않습니다", mediaSafeBody: "이 화면에는 메타데이터만 표시됩니다. 첨부 파일과 표지 파일은 자동으로 불러오지 않습니다.",
   },
   mcp: {
     title: "MCP",

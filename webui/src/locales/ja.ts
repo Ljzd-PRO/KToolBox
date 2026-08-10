@@ -436,7 +436,7 @@ export const ja = {
   },
   posts: {
     title: "作品",
-    description: "リモートメディアを自動で読み込まずに、型付きPawchiveメタデータを検索してダウンロードタスクを作成します。",
+    description: "型付きPawchiveメタデータを検索してダウンロードタスクを作成します。画像プレビューはNSFWモードで制御します。",
     search: "作品を検索",
     creatorId: "クリエイターID",
     postId: "作品ID",
