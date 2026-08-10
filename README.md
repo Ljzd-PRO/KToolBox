@@ -129,6 +129,8 @@ Naming and the default download location are project-specific. The **Naming form
 
 The **Automatic sync** page runs multiple creator synchronization plans with Cron or fixed intervals. It previews the next three executions, supports pausing and immediate runs, advances checkpoints independently for successful creators, and summarizes recently discovered works without loading titles or media. See the [automatic synchronization guide](https://ktoolbox.readthedocs.io/latest/automatic-sync/).
 
+Optional NSFW previews are off by default and remain a browser-local display preference. Enabling them requires confirmation and loads creator avatars, banners, work covers, and supported image attachments only through the authenticated same-origin proxy. The proxy verifies decoded bitmaps and rejects redirects, SVG, non-images, damaged files, and oversized resources. See the [WebUI guide](https://ktoolbox.readthedocs.io/latest/webui/#optional-sensitive-media-previews).
+
 Failed tasks retain a redacted, stage-specific report with the affected creator or file, retryability, safe field paths, and recovery guidance. The compact mobile shell uses a 64px workbar and 12px page spacing; its appearance controls move into a small Popover, and the MCP tool catalog collapses by category.
 
 Creator profiles supply the primary roster name with a resilient 24-hour cache. Data tables support locale-aware sorting, dashboard statistics link to filtered views, and every platform field uses a HeroUI ComboBox with Patreon, Pixiv, and Fanbox suggestions plus custom values.

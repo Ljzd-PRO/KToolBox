@@ -83,6 +83,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Detect legacy dotenv naming fields without mutating files at startup; after login, guide users through field-level comparison, explicit backed-up atomic migration, and a separate manually triggered directory scan.
 - Add project-scoped automatic synchronization plans with five-field Cron or fixed intervals, IANA time zones, future-run previews, pause and immediate-run controls, per-creator checkpoints, overlap-safe work deduplication, and privacy-preserving recent-update counts.
 - Allow sync tasks to create and automatically select project roster authors from the shared creator editor without leaving the task form.
+- Add an opt-in browser-local NSFW mode that keeps the default interface text-only, proxies authenticated Pawchive images through same-origin validation, and adds stable creator avatars, banners, work covers, paginated galleries, and keyboard-accessible viewing without affecting downloads.
 
 ## Testing and quality
 
@@ -178,6 +179,7 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 使用持久操作日志在后台执行选中的旧目录转换，支持暂停/继续校验、取消回滚、重启恢复、生命周期事件和空源目录清理。
 - 启动阶段只检测旧 dotenv 命名字段而不修改文件；登录后通过逐字段对比、明确确认的带备份原子迁移和独立的手动目录扫描引导用户完成升级。
 - 新增项目级自动同步计划，支持五段 Cron 或固定间隔、IANA 时区、未来执行预览、暂停与立即执行、按作者推进检查点、重叠窗口作品去重，以及不加载标题和媒体的最近更新统计。
+- 新增浏览器本地可选的 NSFW 模式：默认界面继续保持纯文本，经同源认证与图片校验代理加载 Pawchive 媒体，并提供稳定的作者头像、横幅、作品封面、分页画廊及键盘查看器，不影响实际下载行为。
 
 ## 测试与质量
 

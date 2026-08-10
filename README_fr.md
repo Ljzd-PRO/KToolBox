@@ -129,6 +129,8 @@ Le nommage et l’emplacement de téléchargement par défaut appartiennent au p
 
 La page **Synchronisation automatique** gère plusieurs plans Cron ou à intervalle fixe, prévisualise les trois prochaines exécutions et permet la pause ou l'exécution immédiate. Les points de contrôle avancent par créateur et les mises à jour récentes ne chargent ni titres ni médias. Consultez le [guide de synchronisation automatique](https://ktoolbox.readthedocs.io/latest/fr/automatic-sync/).
 
+Les aperçus NSFW facultatifs sont désactivés par défaut et enregistrés uniquement comme préférence d’affichage du navigateur actuel. Leur activation demande confirmation ; avatars, bannières, couvertures et images compatibles passent exclusivement par le proxy authentifié de même origine. Celui-ci vérifie le bitmap décodé et refuse redirections, SVG, fichiers non graphiques, endommagés ou hors limites. Consultez le [guide WebUI](https://ktoolbox.readthedocs.io/latest/fr/webui/#aperçus-facultatifs-de-médias-sensibles).
+
 Une tâche en échec conserve un rapport expurgé par étape avec le créateur ou fichier concerné, la possibilité de réessayer, les chemins de champs sûrs et l'action recommandée. L'interface mobile compacte utilise une barre de 64px et un espacement de 12px, place l'apparence dans un petit Popover et replie le catalogue MCP par catégorie.
 
 Après la connexion, une seule connexion SSE synchronise automatiquement les tâches, créateurs, règles d'exclusion, configurations, jetons MCP et répertoires distants ouverts entre les onglets. En cas de coupure, seules les données locales sont actualisées toutes les 10 secondes, sans interroger les recherches Pawchive ni les détails d'œuvres ; les brouillons non enregistrés restent protégés des mises à jour externes.

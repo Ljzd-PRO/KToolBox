@@ -62,7 +62,7 @@ The main areas are:
 - **Tasks:** create, edit, pause, resume, stop, rerun, delete, and inspect synchronization or single-work downloads. Select multiple rows for compatible bulk actions; only the readable target link opens details, so controls never trigger navigation.
 - **Automatic sync:** create multiple recurring creator plans, inspect recent update counts and run history, pause schedules, or run a plan immediately.
 - **Creators:** search Pawchive and add, annotate, enable, disable, or remove roster entries, including bulk enable, disable, and removal.
-- **Posts:** search without rendering remote media or expanded body text, inspect revisions, and create a download task.
+- **Posts:** search works, inspect revisions, and create a download task. Image previews appear only after explicitly enabling NSFW mode; body text remains collapsed by default.
 - **Blockers:** order and scope `field-match` blockers and compose nested `any`/`all`, contains, equals, regular expression, and existence conditions.
 - **Global configuration:** edit `.env`, `prod.env`, and `ktoolbox.toml` through typed forms or advanced text views.
 - **System:** inspect the project and application versions and download an example environment file.
@@ -79,6 +79,16 @@ Platform fields use a HeroUI ComboBox with Patreon, Pixiv, and Fanbox suggestion
 Creator rows lead with the profile name returned by Pawchive. Names are cached for 24 hours, stale values remain available when refresh fails, and the creator ID is the fallback when no profile has ever loaded. The optional roster note remains independent and empty by default. When editing an existing creator, its platform and creator ID remain visible but read-only because they identify the stored roster entry.
 
 Overview recent tasks, task queues, creator rosters, and post results support controlled HeroUI column sorting. Text uses locale-aware natural ordering, while counts, progress, speeds, states, and timestamps use their real values. Mobile cards expose the same sort field and direction. Task sorting changes presentation only and never changes scheduler order.
+
+## Optional sensitive-media previews
+
+NSFW mode is off in every new browser. While it is off, creator and work pages remain text-only and do not create image requests or reserve empty media space. Enabling it requires confirmation each time; the enabled preference then stays in that browser until it is switched off and is synchronized across tabs.
+
+Media is fetched through the authenticated same-origin WebUI proxy, never directly by the browser from Pawchive hosts. The proxy verifies the decoded bitmap, rejects redirects, SVG, non-images, damaged files, resources over 32 MiB or 50 MP, and creates bounded thumbnails. Creator avatars and banners, work covers, image attachments, and supported content images can be shown. Galleries load 12 entries at a time, and the viewer supports arrow keys and Escape. Videos, archives, and other attachments remain text-only.
+
+![Creator avatars with NSFW mode enabled](../assets/webui/46-creators-nsfw-preview-light.png)
+
+![Work cover and paginated media gallery](../assets/webui/47-post-media-gallery-light.png)
 
 ## Automatic synchronization
 
