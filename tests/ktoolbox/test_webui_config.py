@@ -312,7 +312,20 @@ async def test_project_creator_and_blocker_endpoints(tmp_path: Path) -> None:
         duplicate = await client.post("/api/v1/creators", headers={CSRF_HEADER: csrf}, json=creator)
         assert duplicate.status_code == 422
         listed = await client.get("/api/v1/creators")
-        assert listed.json() == [{**creator, "name": "API Example"}]
+        listed_creator = listed.json()[0]
+        assert {key: listed_creator[key] for key in (*creator, "name")} == {**creator, "name": "API Example"}
+        assert listed_creator["avatar"] == {
+            "kind": "avatar",
+            "thumbnail_url": "/api/v1/media/creators/fanbox/42/avatar?variant=thumbnail",
+            "preview_url": "/api/v1/media/creators/fanbox/42/avatar?variant=preview",
+            "original_url": "/api/v1/media/creators/fanbox/42/avatar?variant=original",
+        }
+        assert listed_creator["banner"] == {
+            "kind": "banner",
+            "thumbnail_url": "/api/v1/media/creators/fanbox/42/banner?variant=thumbnail",
+            "preview_url": "/api/v1/media/creators/fanbox/42/banner?variant=preview",
+            "original_url": "/api/v1/media/creators/fanbox/42/banner?variant=original",
+        }
 
         updated = await client.put(
             "/api/v1/creators/fanbox/42",

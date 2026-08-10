@@ -233,7 +233,8 @@ describe("project workflows", () => {
     expect(screen.getAllByRole("button", { name: "Edit fanbox:42" }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole("button", { name: "Remove fanbox:42" }).length).toBeGreaterThan(0);
     expect(screen.queryByRole("button", { name: /Actions Studio Sample/ })).not.toBeInTheDocument();
-    expect(container.querySelector(".list-switch-cell")).toContainElement(screen.getAllByRole("switch")[0]);
+    const desktopSwitchCell = container.querySelector(".list-switch-cell");
+    expect(screen.getAllByRole("switch", { name: "Enabled" }).some((control) => desktopSwitchCell?.contains(control))).toBe(true);
 
     await user.click(screen.getAllByRole("checkbox", { name: "Select Studio Sample" })[0]);
     await user.click(screen.getByRole("button", { name: "Disable 1" }));

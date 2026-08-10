@@ -325,7 +325,8 @@ describe("task and post workflows", () => {
     expect((await screen.findAllByText("Fictional fixture")).length).toBeGreaterThan(0);
     await user.click(screen.getAllByRole("button", { name: "Post details" })[0]);
 
-    expect(await screen.findByText("Remote media stays unloaded")).toBeInTheDocument();
+    expect(document.querySelectorAll("img")).toHaveLength(0);
+    expect(fetchMock.mock.calls.some(([input]) => String(input).includes("/media/"))).toBe(false);
     await user.click(screen.getByRole("button", { name: "Create download task" }));
     expect(await screen.findByRole("heading", { name: "Task details" })).toBeInTheDocument();
     const createCall = fetchMock.mock.calls.find(([input, init]) => String(input).endsWith("/tasks") && init?.method === "POST");
