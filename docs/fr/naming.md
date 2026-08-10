@@ -7,7 +7,7 @@ Dans KToolBox v1, le nommage appartient au projet. La CLI et la WebUI lisent la 
 La page **Format de nommage** permet de définir :
 
 - les modèles de dossiers d’auteur, d’œuvre, de révision, d’année et de mois ;
-- les modèles du fichier principal et des pièces jointes ;
+- les modèles du fichier principal (couverture) et des pièces jointes ;
 - les noms internes des pièces jointes, révisions, contenus et liens externes ;
 - le classement annuel ou mensuel, le mélange des œuvres et la numérotation des pièces jointes.
 

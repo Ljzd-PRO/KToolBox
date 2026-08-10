@@ -7,7 +7,7 @@ Naming is project-specific in KToolBox v1. The CLI and WebUI read the same `[nam
 Open **Naming format** in the WebUI to configure:
 
 - creator, work, revision, year, and month directory templates;
-- primary-file and attachment-file templates;
+- primary-file (cover) and attachment-file templates;
 - attachment, revision, content, and external-link names inside each work;
 - year/month grouping, mixed-work layout, and sequential attachment names.
 

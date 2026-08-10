@@ -35,6 +35,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Retain resumable downloads, filters, progress reporting, metadata output, file-size limits, and optional hard-link bucket storage under the new models.
 - Preserve bounded structured creator and file failures across synchronization, download workers, CLI summaries, WebUI attempts, and task events.
 - Handle terminal interrupts and expected startup refusals at one global CLI boundary, with concise Loguru messages, stable exit codes, and no traceback or configuration input values.
+- Allow single-work downloads, manual creator synchronization, and automatic-sync plans to override whether primary files (covers) are downloaded; expose the same choice through `--download-file` and `--no-download-file` in the CLI.
 
 ## HeroUI WebUI
 

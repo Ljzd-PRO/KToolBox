@@ -42,6 +42,7 @@ Pawchive 게시물 URL 또는 `--service`, `--creator-id`, `--post-id`를 모두
 | `--revision-id` | 문자열 | 생략 | 개정판 목록에서 이 개정판을 선택. |
 | `-o`, `--output`, `--path` | 경로 | `.` | 출력 루트. |
 | `--dump-post-data` / `--no-dump-post-data` | 불리언 | 활성화 | 검증된 메타데이터를 `post.json`에 저장. |
+| `--download-file` / `--no-download-file` | 불리언 | 환경 설정 | 이 작업의 기본 파일(표지) 다운로드 설정 재정의. |
 
 `download`는 의도적으로 목록 제외 규칙을 적용하지 않습니다.
 
@@ -56,6 +57,7 @@ Pawchive 게시물 URL 또는 `--service`, `--creator-id`, `--post-id`를 모두
 | `-o`, `--output`, `--path` | 경로 | `.` | 출력 루트. |
 | `--save-creator-indices` | 불리언 | 비활성화 | 성공적으로 생산한 후 크리에이터 인덱스를 원자적으로 저장. |
 | `--mix-posts` / `--no-mix-posts` | 불리언 | 환경 설정 | `job.mix_posts` 재정의. |
+| `--download-file` / `--no-download-file` | 불리언 | 환경 설정 | 각 작품의 기본 파일(표지) 다운로드 설정 재정의. |
 | `--start-time`, `--start` | 날짜 | 생략 | 게시 날짜의 포함 하한, `YYYY-MM-DD`. |
 | `--end-time`, `--end` | 날짜 | 생략 | 게시 날짜의 포함 상한, `YYYY-MM-DD`. |
 | `--offset` | 정수 | `0` | 첫 게시물 인덱스. |

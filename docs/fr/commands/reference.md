@@ -42,6 +42,7 @@ Fournissez une URL de publication Pawchive, ou l'ensemble de `--service`, `--cre
 | `--revision-id` | chaîne | omis | Choisir cette révision dans la liste. |
 | `-o`, `--output`, `--path` | chemin | `.` | Racine de sortie. |
 | `--dump-post-data` / `--no-dump-post-data` | booléen | activé | Enregistrer les métadonnées validées dans `post.json`. |
+| `--download-file` / `--no-download-file` | booléen | configuration d'environnement | Remplacer le téléchargement du fichier principal (couverture) pour cette tâche. |
 
 `download` n'applique volontairement pas les règles d'exclusion de la liste.
 
@@ -56,6 +57,7 @@ Chaque `TARGET` peut être une URL de créateur Pawchive, une identité `service
 | `-o`, `--output`, `--path` | chemin | `.` | Racine de sortie. |
 | `--save-creator-indices` | booléen | désactivé | Enregistrer atomiquement l'index du créateur après une production réussie. |
 | `--mix-posts` / `--no-mix-posts` | booléen | configuration d'environnement | Remplacer `job.mix_posts`. |
+| `--download-file` / `--no-download-file` | booléen | configuration d'environnement | Remplacer le téléchargement du fichier principal (couverture) de chaque œuvre. |
 | `--start-time`, `--start` | date | omis | Borne inférieure inclusive de publication, `YYYY-MM-DD`. |
 | `--end-time`, `--end` | date | omis | Borne supérieure inclusive de publication, `YYYY-MM-DD`. |
 | `--offset` | entier | `0` | Index de la première publication. |

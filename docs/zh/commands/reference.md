@@ -42,6 +42,7 @@
 | `--revision-id` | 字符串 | 省略 | 从修订列表选择此 ID。 |
 | `-o`、`--output`、`--path` | 路径 | `.` | 输出根目录。 |
 | `--dump-post-data` / `--no-dump-post-data` | 布尔值 | 启用 | 将已校验元数据保存到 `post.json`。 |
+| `--download-file` / `--no-download-file` | 布尔值 | 环境配置 | 覆盖当前任务是否下载主文件（封面）。 |
 
 `download` 有意不应用作者清单忽略规则。
 
@@ -56,6 +57,7 @@
 | `-o`、`--output`、`--path` | 路径 | `.` | 输出根目录。 |
 | `--save-creator-indices` | 布尔值 | 禁用 | 作者生产成功后原子保存索引。 |
 | `--mix-posts` / `--no-mix-posts` | 布尔值 | 环境配置 | 覆盖 `job.mix_posts`。 |
+| `--download-file` / `--no-download-file` | 布尔值 | 环境配置 | 覆盖是否下载每个作品的主文件（封面）。 |
 | `--start-time`、`--start` | 日期 | 省略 | 包含边界的发布日期下限，`YYYY-MM-DD`。 |
 | `--end-time`、`--end` | 日期 | 省略 | 包含边界的发布日期上限，`YYYY-MM-DD`。 |
 | `--offset` | 整数 | `0` | 起始作品索引。 |

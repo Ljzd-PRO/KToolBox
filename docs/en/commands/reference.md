@@ -42,6 +42,7 @@ Provide a Pawchive post URL, or all of `--service`, `--creator-id`, and `--post-
 | `--revision-id` | string | omitted | Select this revision from the revision list. |
 | `-o`, `--output`, `--path` | path | `.` | Output root. |
 | `--dump-post-data` / `--no-dump-post-data` | boolean | enabled | Save validated metadata to `post.json`. |
+| `--download-file` / `--no-download-file` | boolean | environment config | Override downloading the primary file (cover) for this task. |
 
 `download` intentionally does not apply roster blockers.
 
@@ -56,6 +57,7 @@ Each `TARGET` may be a Pawchive creator URL, `service:id`, or roster alias. Expl
 | `-o`, `--output`, `--path` | path | `.` | Output root. |
 | `--save-creator-indices` | boolean | disabled | Atomically save the creator index after successful production. |
 | `--mix-posts` / `--no-mix-posts` | boolean | environment config | Override `job.mix_posts`. |
+| `--download-file` / `--no-download-file` | boolean | environment config | Override downloading each work's primary file (cover). |
 | `--start-time`, `--start` | date | omitted | Inclusive publication lower bound, `YYYY-MM-DD`. |
 | `--end-time`, `--end` | date | omitted | Inclusive publication upper bound, `YYYY-MM-DD`. |
 | `--offset` | integer | `0` | First post index. |

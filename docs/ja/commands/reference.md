@@ -42,6 +42,7 @@ Pawchive 投稿 URL、または `--service`、`--creator-id`、`--post-id` の�
 | `--revision-id` | 文字列 | 省略 | 改訂一覧からこの改訂を選択。 |
 | `-o`, `--output`, `--path` | パス | `.` | 出力ルート。 |
 | `--dump-post-data` / `--no-dump-post-data` | 真偽値 | 有効 | 検証済みメタデータを `post.json` に保存。 |
+| `--download-file` / `--no-download-file` | 真偽値 | 環境設定 | このタスクのメインファイル（カバー）ダウンロードを上書き。 |
 
 `download` は意図的に一覧の除外ルールを適用しません。
 
@@ -56,6 +57,7 @@ Pawchive 投稿 URL、または `--service`、`--creator-id`、`--post-id` の�
 | `-o`, `--output`, `--path` | パス | `.` | 出力ルート。 |
 | `--save-creator-indices` | 真偽値 | 無効 | 生成成功後、クリエイター索引をアトミックに保存。 |
 | `--mix-posts` / `--no-mix-posts` | 真偽値 | 環境設定 | `job.mix_posts` を上書き。 |
+| `--download-file` / `--no-download-file` | 真偽値 | 環境設定 | 各作品のメインファイル（カバー）ダウンロードを上書き。 |
 | `--start-time`, `--start` | 日付 | 省略 | 公開日の包含下限、`YYYY-MM-DD`。 |
 | `--end-time`, `--end` | 日付 | 省略 | 公開日の包含上限、`YYYY-MM-DD`。 |
 | `--offset` | 整数 | `0` | 最初の投稿インデックス。 |
