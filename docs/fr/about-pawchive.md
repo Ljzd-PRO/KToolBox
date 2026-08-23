@@ -21,3 +21,9 @@ Les cinq opérations sur les favoris nécessitent un compte Pawchive connecté e
 ## Utilisation responsable
 
 Respectez les lois applicables, les conditions de la plateforme, les droits des créateurs et les limites de stockage. Lors du premier essai d'un créateur, utilisez une synchronisation limitée (`--length`) et des limites de taille de fichier.
+
+## Guides associés
+
+- Revenez au [démarrage](index.md) pour effectuer un premier téléchargement limité.
+- Poursuivez avec le [guide des commandes](commands/guide.md) pour télécharger ou synchroniser du contenu.
+- Consultez la [référence de l'API Python](api.md) pour intégrer directement `PawchiveClient`.

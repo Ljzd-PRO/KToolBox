@@ -2,6 +2,31 @@
 
 KToolBox est un outil de téléchargement asynchrone en ligne de commande, un panneau de projet HeroUI et un client Python typé pour les données publiques de [Pawchive](https://pawchive.pw/). La version 1 prend exclusivement en charge Pawchive et nécessite Python 3.10 à 3.14.
 
+!!! warning "La v1 est une nouvelle version majeure"
+    Cette série n'a pas encore été suffisamment validée en usage réel. Commencez par un téléchargement limité, conservez une sauvegarde de la configuration existante et signalez tout comportement inattendu. Kemono n'étant plus disponible, KToolBox utilise par défaut le miroir Pawchive.
+
+## Choisir votre parcours
+
+<div class="grid cards" markdown>
+
+-   :material-console-line: **Commencer en ligne de commande**
+
+    Installez KToolBox, exécutez un téléchargement limité, puis poursuivez avec le [guide des commandes](commands/guide.md).
+
+-   :material-view-dashboard-outline: **Gérer un projet dans le navigateur**
+
+    Installez le panneau facultatif et suivez le [guide de la WebUI](webui.md) pour la connexion, la sécurité, les tâches et les paramètres du projet.
+
+-   :material-update: **Mettre à niveau depuis la v0**
+
+    Sauvegardez les anciens fichiers dotenv et suivez la [migration vers v1](migration-v1.md) avant de modifier les téléchargements existants.
+
+-   :material-calendar-sync: **Maintenir les créateurs à jour**
+
+    Constituez d'abord une liste, puis utilisez la [synchronisation automatique](automatic-sync.md) pour les vérifications périodiques.
+
+</div>
+
 ## Fonctionnalités
 
 - Télécharge une publication ou synchronise en parallèle une liste de créateurs.
@@ -64,11 +89,16 @@ ktoolbox sync
 
 Les fichiers existants sont ignorés lors des exécutions suivantes. Un fichier incomplet avec le suffixe temporaire configuré reprend si le serveur prend en charge les plages d'octets.
 
-## Pour continuer
+Sans `--output`, les téléchargements utilisent l'emplacement par défaut du projet : `downloads` sous le répertoire du projet, sauf modification.
 
-- [Guide des commandes](commands/guide.md)
-- [Guide de la WebUI](webui.md)
-- [Guide de configuration](configuration/guide.md)
-- [API Python](api.md)
-- [Migration vers v1](migration-v1.md)
-- [FAQ](faq.md)
+## Carte de la documentation
+
+| Objectif | À lire |
+| --- | --- |
+| Apprendre les commandes courantes | [Guide des commandes](commands/guide.md) et [référence des commandes](commands/reference.md) |
+| Exécuter le panneau dans le navigateur | [Guide de la WebUI](webui.md) |
+| Planifier des vérifications périodiques | [Synchronisation automatique](automatic-sync.md) |
+| Contrôler les répertoires et noms | [Format de nommage](naming.md) |
+| Comprendre tous les paramètres | [Guide de configuration](configuration/guide.md) et [référence de configuration](configuration/reference.md) |
+| Connecter une autre application | [MCP](mcp.md) ou [API Python](api.md) |
+| Mettre à niveau ou résoudre un problème | [Migration vers v1](migration-v1.md) et [FAQ](faq.md) |

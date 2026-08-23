@@ -2,6 +2,31 @@
 
 KToolBox は公開 [Pawchive](https://pawchive.pw/) データ向けの非同期コマンドラインダウンローダー、HeroUI プロジェクトパネル、型付き Python クライアントです。バージョン 1 が対応するのは Pawchive のみで、Python 3.10～3.14 が必要です。
 
+!!! warning "v1 は新しいメジャーバージョンです"
+    このリリース系列は、まだ十分な実利用検証を受けていません。まず範囲を制限したダウンロードを行い、既存設定をバックアップして、想定外の動作を報告してください。Kemono が利用できなくなったため、KToolBox は既定で Pawchive ミラーを使用します。
+
+## 利用方法を選ぶ
+
+<div class="grid cards" markdown>
+
+-   :material-console-line: **コマンドラインから始める**
+
+    KToolBox をインストールし、範囲を制限したダウンロードを 1 回実行してから[コマンドガイド](commands/guide.md)へ進みます。
+
+-   :material-view-dashboard-outline: **ブラウザでプロジェクトを管理する**
+
+    オプションのパネルをインストールし、[WebUI ガイド](webui.md)に沿ってログイン、セキュリティ、タスク、プロジェクト設定を確認します。
+
+-   :material-update: **v0 からアップグレードする**
+
+    古い dotenv ファイルをバックアップし、既存ダウンロードを変更する前に [v1 への移行](migration-v1.md)を確認します。
+
+-   :material-calendar-sync: **クリエイターを定期更新する**
+
+    先に一覧を作成し、[自動同期](automatic-sync.md)で定期チェックを設定します。
+
+</div>
+
 ## 主な機能
 
 - 1 件の投稿をダウンロード、またはクリエイター一覧を並行して同期。
@@ -64,11 +89,16 @@ ktoolbox sync
 
 再実行時には既存ファイルをスキップします。設定された一時サフィックスを持つ未完了ファイルは、ファイルサーバーがバイト範囲に対応していれば再開されます。
 
-## 次のステップ
+`--output` を指定しない場合、ダウンロードはプロジェクトの既定場所を使用します。設定を変更していなければ、プロジェクト内の `downloads` です。
 
-- [コマンドガイド](commands/guide.md)
-- [WebUI ガイド](webui.md)
-- [設定ガイド](configuration/guide.md)
-- [Python API](api.md)
-- [v1 への移行](migration-v1.md)
-- [よくある質問](faq.md)
+## ドキュメントマップ
+
+| 目的 | 読むページ |
+| --- | --- |
+| 日常的なコマンドを学ぶ | [コマンドガイド](commands/guide.md)と[コマンドリファレンス](commands/reference.md) |
+| ブラウザパネルを実行する | [WebUI ガイド](webui.md) |
+| 定期チェックを設定する | [自動同期](automatic-sync.md) |
+| ディレクトリとファイル名を制御する | [命名形式](naming.md) |
+| すべての設定を理解する | [設定ガイド](configuration/guide.md)と[設定リファレンス](configuration/reference.md) |
+| 別のアプリケーションを接続する | [MCP](mcp.md)または [Python API](api.md) |
+| アップグレードまたは問題を解決する | [v1 への移行](migration-v1.md)と[よくある質問](faq.md) |

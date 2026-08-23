@@ -50,12 +50,16 @@ Options are displayed as `--creator-id`, not Python-style underscores. Old under
 
 CLI failures now use process status: `0` success, `1` remote/creator/download failure, `2` argument/configuration failure, and `130` interruption. JSON and tables use stdout; progress and logs use stderr.
 
-## Project roster and blockers
+## Project settings, roster, and blockers
 
-Create `ktoolbox.toml` only when you need a reusable roster or structured blockers. A missing file is a valid empty project.
+`ktoolbox.toml` is now the project-level home for the default download directory, naming format, automatic sync plans, reusable creator roster, and structured blockers. The CLI can still start from built-in defaults when the file is absent; WebUI creates a minimal project file after a warning.
 
 ```toml
 schema_version = 5
+default_output = "downloads"
+
+[naming]
+sequential_filename = true
 
 [[creators]]
 service = "fanbox"
@@ -63,6 +67,8 @@ creator_id = "123"
 alias = "studio-a"
 enabled = true
 ```
+
+Relative output paths are resolved from the project directory. Review the [naming format](naming.md) before moving existing downloads, and use [automatic sync](automatic-sync.md) only after the roster and output location are correct.
 
 Move non-empty `KTOOLBOX_JOB__KEYWORDS_EXCLUDE` values to a global `field-match` title condition. The old setting remains active as an implicit blocker and warns, but KToolBox will not rewrite local files. See the [configuration guide](configuration/guide.md#post-blockers).
 

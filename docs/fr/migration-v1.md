@@ -50,12 +50,16 @@ Les options s'affichent sous la forme `--creator-id`, sans les traits de soulign
 
 Les échecs de la CLI utilisent désormais l'état du processus : `0` pour le succès, `1` pour un échec distant, de créateur ou de téléchargement, `2` pour un échec d'argument ou de configuration et `130` pour une interruption. Les données JSON et les tableaux utilisent stdout ; la progression et les journaux utilisent stderr.
 
-## Liste des créateurs et règles d'exclusion
+## Paramètres du projet, créateurs et règles d'exclusion
 
-Créez `ktoolbox.toml` uniquement si vous avez besoin d'une liste réutilisable ou de règles d'exclusion structurées. L'absence du fichier représente un projet vide valide.
+`ktoolbox.toml` regroupe désormais le dossier de téléchargement par défaut, le format de nommage, les plans de synchronisation automatique, la liste réutilisable des créateurs et les règles d'exclusion structurées. En son absence, la CLI peut démarrer avec les valeurs intégrées ; WebUI crée un fichier de projet minimal après un avertissement.
 
 ```toml
 schema_version = 5
+default_output = "downloads"
+
+[naming]
+sequential_filename = true
 
 [[creators]]
 service = "fanbox"
@@ -63,6 +67,8 @@ creator_id = "123"
 alias = "studio-a"
 enabled = true
 ```
+
+Les chemins de sortie relatifs sont résolus depuis le dossier du projet. Consultez le [format de nommage](naming.md) avant de déplacer les téléchargements existants et ne configurez la [synchronisation automatique](automatic-sync.md) qu'après avoir vérifié la liste et le dossier de sortie.
 
 Déplacez les valeurs non vides de `KTOOLBOX_JOB__KEYWORDS_EXCLUDE` vers une condition de titre `field-match` globale. L'ancien réglage reste actif comme règle implicite et affiche un avertissement, mais KToolBox ne réécrit pas les fichiers locaux. Consultez le [guide de configuration](configuration/guide.md#post-blockers).
 

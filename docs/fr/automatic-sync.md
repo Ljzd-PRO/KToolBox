@@ -31,3 +31,9 @@ L'heure de fin est figée au démarrage. KToolBox privilégie l'horodatage `adde
 ## Pause, conflits et arrêts
 
 Mettre un plan en pause bloque les futurs déclenchements sans arrêter la tâche courante. Les exécutions manquées pendant l'arrêt de KToolBox ne sont pas rejouées.
+
+## Guides associés
+
+- Consultez le [guide WebUI](webui.md) pour l'installation, l'authentification et le suivi des tâches.
+- Vérifiez le [guide de configuration](configuration/guide.md) avant d'ajuster les téléchargements simultanés.
+- Confirmez le [format de nommage](naming.md) avant la première exécution sans surveillance.

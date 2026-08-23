@@ -71,3 +71,9 @@ API 固有のエラーはすべて `PawchiveError` を継承します。
 生成済みモデルは `ktoolbox.api.generated` にあり、Pydantic の `extra="allow"` によって未知のレスポンスフィールドを保持します。クライアントはそのフィールドパスを `drift_reporter` に渡します。テレメトリーを統合するときは独自のコールバックを指定できます。
 
 変更していない元の契約は `k_generator/pawchive_openapi.json` です。監査可能な互換性修正は `k_generator/pawchive_openapi.overrides.json` に保存され、`k_generator/pawchive_openapi.normalized.json` と決定的な生成モデルを作成します。
+
+## 関連ガイド
+
+- バックエンドの範囲とプライバシー境界は [Pawchive について](about-pawchive.md)を参照してください。
+- WebUI 経由の認証済みツール接続は [MCP ガイド](mcp.md)を参照してください。
+- エンドユーザー向けの対応フローは[コマンドガイド](commands/guide.md)を参照してください。

@@ -40,7 +40,7 @@
 | `--creator-id` | 字串 | 省略 | 創作者 ID。 |
 | `--post-id` | 字串 | 省略 | 作品 ID。 |
 | `--revision-id` | 字串 | 省略 | 從修訂清單選擇此修訂。 |
-| `-o`, `--output`, `--path` | 路徑 | `.` | 輸出根目錄。 |
+| `-o`, `--output`, `--path` | 路徑 | 專案預設值 | 覆寫目前工作使用的專案下載根目錄。 |
 | `--dump-post-data` / `--no-dump-post-data` | 布林值 | 啟用 | 將驗證後的中繼資料儲存到 `post.json`。 |
 | `--download-file` / `--no-download-file` | 布林值 | 環境設定 | 覆寫目前工作是否下載主要檔案（封面）。 |
 
@@ -54,7 +54,7 @@
 | --- | --- | --- | --- |
 | `TARGET ...` | 字串 | 已啟用清單 | 零位或多位創作者。 |
 | `--service` + `--creator-id` | 字串 | 省略 | 加入一位明確創作者；兩者必須同時提供。 |
-| `-o`, `--output`, `--path` | 路徑 | `.` | 輸出根目錄。 |
+| `-o`, `--output`, `--path` | 路徑 | 專案預設值 | 覆寫目前工作使用的專案下載根目錄。 |
 | `--save-creator-indices` | 布林值 | 停用 | 成功生產後以原子方式儲存創作者索引。 |
 | `--mix-posts` / `--no-mix-posts` | 布林值 | 環境設定 | 覆寫 `job.mix_posts`。 |
 | `--download-file` / `--no-download-file` | 布林值 | 環境設定 | 覆寫是否下載每個作品的主要檔案（封面）。 |

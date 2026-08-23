@@ -1,19 +1,22 @@
 # Project Information
 
-## Development branch
+## Release status
 
-The Pawchive v1 work is maintained on the [`pawchive`](https://github.com/Ljzd-PRO/KToolBox/tree/pawchive) branch until it is ready to become the default release line.
+KToolBox v1 is the new Pawchive-based release line. It is a breaking upgrade from v0 and has not yet received enough real-world validation, so test a bounded download before relying on a large synchronization. Start with [Migrating to v1](migration-v1.md) when upgrading an existing installation.
 
-Changes are split into focused commits covering the contract, client, project migration, tests, documentation, and release metadata. The original Pawchive OpenAPI file remains untouched so generated-code changes can be audited against the normalized contract.
+Kemono is no longer available, and Pawchive is the only supported backend. The original Pawchive OpenAPI file remains untouched so generated-client changes can be audited against the normalized contract.
 
-## Quality policy
+## Support and resources
 
-The default test suite is fully offline and blocks accidental network access. The handwritten API layer must retain 100% line and branch coverage, generated models are excluded from statistics, and the full project must remain at or above 85% coverage.
+Use the documentation search and [FAQ](faq.md) before leaving the documentation site. If the answer is missing, use these intentional project links:
 
-CI also validates the OpenAPI document, deterministic model generation, Ruff, strict API-layer Mypy, Python bytecode compilation, package builds, and strict MkDocs builds on supported Python versions.
+- [Issue tracker](https://github.com/Ljzd-PRO/KToolBox/issues) for reproducible defects;
+- [Discussions](https://github.com/Ljzd-PRO/KToolBox/discussions) for questions and proposals;
+- [Releases](https://github.com/Ljzd-PRO/KToolBox/releases) for published notes and artifacts; and
+- [Source repository](https://github.com/Ljzd-PRO/KToolBox) for code and contribution history.
 
-## License
+## Quality and license
 
-KToolBox is licensed under the [BSD 3-Clause License](https://github.com/Ljzd-PRO/KToolBox/blob/master/LICENSE).
+The default test suite is fully offline and blocks accidental network access. CI validates the OpenAPI contracts, deterministic generation, tests, Ruff, Mypy, Python bytecode compilation, package artifacts, WebUI builds, and strict MkDocs builds.
 
-Copyright © 2023 by Ljzd-PRO.
+KToolBox uses the [BSD 3-Clause License](https://opensource.org/license/bsd-3-clause). Copyright © 2023 by Ljzd-PRO.

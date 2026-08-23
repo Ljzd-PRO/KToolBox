@@ -40,7 +40,7 @@
 | `--creator-id` | 字符串 | 省略 | 作者 ID。 |
 | `--post-id` | 字符串 | 省略 | 作品 ID。 |
 | `--revision-id` | 字符串 | 省略 | 从修订列表选择此 ID。 |
-| `-o`、`--output`、`--path` | 路径 | `.` | 输出根目录。 |
+| `-o`、`--output`、`--path` | 路径 | 项目默认值 | 覆盖当前任务使用的项目下载根目录。 |
 | `--dump-post-data` / `--no-dump-post-data` | 布尔值 | 启用 | 将已校验元数据保存到 `post.json`。 |
 | `--download-file` / `--no-download-file` | 布尔值 | 环境配置 | 覆盖当前任务是否下载主文件（封面）。 |
 
@@ -54,7 +54,7 @@
 | --- | --- | --- | --- |
 | `TARGET ...` | 多个字符串 | 已启用清单 | 零个或多个作者。 |
 | `--service` + `--creator-id` | 字符串 | 省略 | 添加一个显式作者；二者必须同时使用。 |
-| `-o`、`--output`、`--path` | 路径 | `.` | 输出根目录。 |
+| `-o`、`--output`、`--path` | 路径 | 项目默认值 | 覆盖当前任务使用的项目下载根目录。 |
 | `--save-creator-indices` | 布尔值 | 禁用 | 作者生产成功后原子保存索引。 |
 | `--mix-posts` / `--no-mix-posts` | 布尔值 | 环境配置 | 覆盖 `job.mix_posts`。 |
 | `--download-file` / `--no-download-file` | 布尔值 | 环境配置 | 覆盖是否下载每个作品的主文件（封面）。 |

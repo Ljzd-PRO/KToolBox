@@ -21,3 +21,9 @@ KToolBox 實作了已發佈 OpenAPI 文件中不需要 `cookieAuth` 的全部 14
 ## 負責任地使用
 
 請遵守適用法律、平台條款、創作者權利與儲存空間限制。第一次測試創作者時，請使用有數量限制的同步（`--length`）與檔案大小限制。
+
+## 相關指南
+
+- 返回[快速開始](index.md)，完成一次有界限的首次下載。
+- 繼續閱讀[命令指南](commands/guide.md)，下載作品或同步創作者。
+- 直接整合 `PawchiveClient` 時，請參閱 [Python API 參考](api.md)。

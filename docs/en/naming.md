@@ -56,3 +56,9 @@ The migration guide appears only when KToolBox detects legacy naming keys in `.e
 Closing or choosing **Ignore** dismisses only the current dialog. As long as legacy keys remain, refreshing or signing in again shows it again. Configuration migration and directory conversion are separate: after configuration succeeds, review one or more old locations and explicitly choose **Scan old locations**. No scan or file move occurs merely by opening the conversion tool.
 
 The CLI uses the project naming configuration too. When a legacy project still needs migration, start its WebUI and confirm the backed-up atomic migration. Legacy values supplied only through the process environment cannot be deleted; KToolBox ignores them for project naming and keeps warning until they are removed from the launching environment.
+
+## Related guides
+
+- Open the [WebUI guide](webui.md) for the naming page and conversion workflow.
+- Use the [configuration guide](configuration/guide.md) for global network and downloader settings.
+- Follow the [v1 migration guide](migration-v1.md) when upgrading an existing project.

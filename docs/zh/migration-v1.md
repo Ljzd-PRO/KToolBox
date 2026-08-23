@@ -50,12 +50,16 @@ KTOOLBOX_DOWNLOADER__FILE_PATH_PREFIX=/data
 
 CLI 失败改用进程状态：`0` 成功，`1` 远程/作者/下载失败，`2` 参数/配置失败，`130` 中断。JSON 与表格写入 stdout，进度与日志写入 stderr。
 
-## 项目清单与忽略规则
+## 项目设置、作者清单与忽略规则
 
-仅在需要可复用清单或结构化忽略规则时创建 `ktoolbox.toml`；缺失文件表示有效的空项目。
+`ktoolbox.toml` 现在统一保存项目默认下载目录、命名格式、自动同步计划、可复用作者清单和结构化忽略规则。文件缺失时 CLI 仍可使用内置默认值启动；WebUI 会在警告后创建最小项目文件。
 
 ```toml
 schema_version = 5
+default_output = "downloads"
+
+[naming]
+sequential_filename = true
 
 [[creators]]
 service = "fanbox"
@@ -63,6 +67,8 @@ creator_id = "123"
 alias = "studio-a"
 enabled = true
 ```
+
+相对输出路径以项目目录为基准解析。移动既有下载前请先阅读[命名格式](naming.md)，并在确认作者清单和输出位置后再配置[自动同步](automatic-sync.md)。
 
 请将非空 `KTOOLBOX_JOB__KEYWORDS_EXCLUDE` 迁移为全局 `field-match` 标题条件。旧设置仍会作为隐式忽略规则生效并发出警告，但 KToolBox 不会改写本地文件。详见[配置指南](configuration/guide.md#post-blockers)。
 

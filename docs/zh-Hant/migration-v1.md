@@ -50,12 +50,16 @@ KTOOLBOX_DOWNLOADER__FILE_PATH_PREFIX=/data
 
 CLI 失敗現在使用處理程序狀態：`0` 成功、`1` 遠端/創作者/下載失敗、`2` 引數/設定失敗、`130` 中斷。JSON 與表格使用 stdout；進度與記錄使用 stderr。
 
-## 專案清單與忽略規則
+## 專案設定、創作者清單與忽略規則
 
-只有在需要可重複使用的清單或結構化忽略規則時才建立 `ktoolbox.toml`。缺少此檔案代表有效的空專案。
+`ktoolbox.toml` 現在統一保存專案預設下載目錄、命名格式、自動同步計畫、可重複使用的創作者清單及結構化忽略規則。缺少檔案時，CLI 仍可使用內建預設值啟動；WebUI 會在警告後建立最小專案檔案。
 
 ```toml
 schema_version = 5
+default_output = "downloads"
+
+[naming]
+sequential_filename = true
 
 [[creators]]
 service = "fanbox"
@@ -63,6 +67,8 @@ creator_id = "123"
 alias = "studio-a"
 enabled = true
 ```
+
+相對輸出路徑以專案目錄為基準解析。移動現有下載前請先閱讀[命名格式](naming.md)，並在確認創作者清單與輸出位置後再設定[自動同步](automatic-sync.md)。
 
 將非空的 `KTOOLBOX_JOB__KEYWORDS_EXCLUDE` 值移至全域 `field-match` 標題條件。舊設定仍會作為隱含忽略規則生效並顯示警告，但 KToolBox 不會改寫本機檔案。請參閱[設定指南](configuration/guide.md#post-blockers)。
 

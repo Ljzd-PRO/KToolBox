@@ -33,3 +33,9 @@ Each run fixes its end time before synchronization starts. KToolBox prefers Pawc
 Pausing a plan prevents future automatic triggers but does not stop its current task. A paused plan can still be run manually. If the same plan already has an active task, a scheduled trigger is recorded as skipped and **Run now** links to the existing task.
 
 Runs missed while KToolBox is stopped are not replayed. On startup, the scheduler calculates the first future execution time.
+
+## Related guides
+
+- Use the [WebUI guide](webui.md) for installation, authentication, and task monitoring.
+- Check the [configuration guide](configuration/guide.md) before tuning download concurrency.
+- Confirm the [naming format](naming.md) before the first unattended run.

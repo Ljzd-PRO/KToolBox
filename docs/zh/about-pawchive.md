@@ -22,3 +22,8 @@ KToolBox 实现了 OpenAPI 文档中全部 14 个不需要 `cookieAuth` 的操�
 
 请遵守适用法律、平台条款与创作者权益。首次同步某位创作者时，建议使用 `--length` 限制作品数量，并配置文件大小上限。
 
+## 相关指南
+
+- 返回[快速开始](index.md)，完成一次有边界的首次下载。
+- 继续阅读[命令指南](commands/guide.md)，下载作品或同步作者。
+- 直接集成 `PawchiveClient` 时，请参阅 [Python API 参考](api.md)。

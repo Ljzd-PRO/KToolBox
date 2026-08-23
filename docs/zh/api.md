@@ -71,3 +71,9 @@ OpenAPI 中受 `cookieAuth` 保护的 5 个操作明确排除：列出账号收�
 生成模型位于 `ktoolbox.api.generated`，通过 Pydantic 的 `extra="allow"` 保留未知响应字段。客户端会将字段路径交给 `drift_reporter`；集成监控时可传入自定义回调。
 
 未经修改的原始契约为 `k_generator/pawchive_openapi.json`。可审查的兼容修正存放在 `k_generator/pawchive_openapi.overrides.json`，由此生成 `k_generator/pawchive_openapi.normalized.json` 和确定性的模型。
+
+## 相关指南
+
+- 阅读[关于 Pawchive](about-pawchive.md)，了解后端范围与隐私边界。
+- 通过 [MCP 指南](mcp.md)配置 WebUI 的认证工具访问。
+- 面向最终用户的支持流程请参阅[命令指南](commands/guide.md)。

@@ -40,7 +40,7 @@ Pawchive 投稿 URL、または `--service`、`--creator-id`、`--post-id` の�
 | `--creator-id` | 文字列 | 省略 | クリエイター ID。 |
 | `--post-id` | 文字列 | 省略 | 投稿 ID。 |
 | `--revision-id` | 文字列 | 省略 | 改訂一覧からこの改訂を選択。 |
-| `-o`, `--output`, `--path` | パス | `.` | 出力ルート。 |
+| `-o`, `--output`, `--path` | パス | プロジェクト既定値 | このタスクで使うプロジェクトのダウンロードルートを上書き。 |
 | `--dump-post-data` / `--no-dump-post-data` | 真偽値 | 有効 | 検証済みメタデータを `post.json` に保存。 |
 | `--download-file` / `--no-download-file` | 真偽値 | 環境設定 | このタスクのメインファイル（カバー）ダウンロードを上書き。 |
 
@@ -54,7 +54,7 @@ Pawchive 投稿 URL、または `--service`、`--creator-id`、`--post-id` の�
 | --- | --- | --- | --- |
 | `TARGET ...` | 文字列 | 有効な一覧 | 0 人以上のクリエイター。 |
 | `--service` + `--creator-id` | 文字列 | 省略 | 1 人の明示的クリエイターを追加。両方を同時に指定。 |
-| `-o`, `--output`, `--path` | パス | `.` | 出力ルート。 |
+| `-o`, `--output`, `--path` | パス | プロジェクト既定値 | このタスクで使うプロジェクトのダウンロードルートを上書き。 |
 | `--save-creator-indices` | 真偽値 | 無効 | 生成成功後、クリエイター索引をアトミックに保存。 |
 | `--mix-posts` / `--no-mix-posts` | 真偽値 | 環境設定 | `job.mix_posts` を上書き。 |
 | `--download-file` / `--no-download-file` | 真偽値 | 環境設定 | 各作品のメインファイル（カバー）ダウンロードを上書き。 |

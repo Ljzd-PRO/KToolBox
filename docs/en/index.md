@@ -2,6 +2,31 @@
 
 KToolBox is an asynchronous command-line downloader, HeroUI project panel, and typed Python client for public [Pawchive](https://pawchive.pw/) data. Version 1 supports Pawchive exclusively and requires Python 3.10 through 3.14.
 
+!!! warning "v1 is a new major version"
+    This release line has not yet received enough real-world validation. Begin with a bounded download, keep a backup of existing configuration, and report unexpected behavior. Because Kemono is no longer available, KToolBox uses the Pawchive mirror by default.
+
+## Choose your path
+
+<div class="grid cards" markdown>
+
+-   :material-console-line: **Start with the command line**
+
+    Install KToolBox, run one bounded download, and continue with the [Command Guide](commands/guide.md).
+
+-   :material-view-dashboard-outline: **Manage a project in your browser**
+
+    Install the optional panel and follow the [WebUI Guide](webui.md) for login, security, tasks, and project settings.
+
+-   :material-update: **Upgrade from v0**
+
+    Back up the old dotenv files and follow [Migrating to v1](migration-v1.md) before changing existing downloads.
+
+-   :material-calendar-sync: **Keep creators up to date**
+
+    Build a roster first, then use [Automatic synchronization](automatic-sync.md) for recurring checks.
+
+</div>
+
 ## What it does
 
 - Downloads one post or concurrently synchronizes a roster of creators.
@@ -64,11 +89,16 @@ ktoolbox sync
 
 Existing files are skipped on repeat runs. An incomplete file with the configured temporary suffix is resumed when the file server supports byte ranges.
 
-## Next steps
+Without `--output`, downloads use the project's default location: `downloads` under the project directory unless you changed it.
 
-- [Command guide](commands/guide.md)
-- [WebUI guide](webui.md)
-- [Configuration guide](configuration/guide.md)
-- [Python API](api.md)
-- [Migrating to v1](migration-v1.md)
-- [FAQ](faq.md)
+## Documentation map
+
+| Goal | Read |
+| --- | --- |
+| Learn everyday commands | [Command Guide](commands/guide.md) and [Command Reference](commands/reference.md) |
+| Run the browser panel | [WebUI Guide](webui.md) |
+| Schedule recurring checks | [Automatic synchronization](automatic-sync.md) |
+| Control directories and filenames | [Naming format](naming.md) |
+| Understand every setting | [Configuration Guide](configuration/guide.md) and [Configuration Reference](configuration/reference.md) |
+| Connect another application | [MCP](mcp.md) or [Python API](api.md) |
+| Upgrade or solve a problem | [Migrating to v1](migration-v1.md) and [FAQ](faq.md) |

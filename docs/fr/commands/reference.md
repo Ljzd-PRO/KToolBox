@@ -40,7 +40,7 @@ Fournissez une URL de publication Pawchive, ou l'ensemble de `--service`, `--cre
 | `--creator-id` | chaîne | omis | ID du créateur. |
 | `--post-id` | chaîne | omis | ID de la publication. |
 | `--revision-id` | chaîne | omis | Choisir cette révision dans la liste. |
-| `-o`, `--output`, `--path` | chemin | `.` | Racine de sortie. |
+| `-o`, `--output`, `--path` | chemin | valeur du projet | Remplace la racine de téléchargement du projet pour cette tâche. |
 | `--dump-post-data` / `--no-dump-post-data` | booléen | activé | Enregistrer les métadonnées validées dans `post.json`. |
 | `--download-file` / `--no-download-file` | booléen | configuration d'environnement | Remplacer le téléchargement du fichier principal (couverture) pour cette tâche. |
 
@@ -54,7 +54,7 @@ Chaque `TARGET` peut être une URL de créateur Pawchive, une identité `service
 | --- | --- | --- | --- |
 | `TARGET ...` | chaînes | liste activée | Zéro ou plusieurs créateurs. |
 | `--service` + `--creator-id` | chaînes | omis | Ajouter un créateur explicite ; les deux sont nécessaires ensemble. |
-| `-o`, `--output`, `--path` | chemin | `.` | Racine de sortie. |
+| `-o`, `--output`, `--path` | chemin | valeur du projet | Remplace la racine de téléchargement du projet pour cette tâche. |
 | `--save-creator-indices` | booléen | désactivé | Enregistrer atomiquement l'index du créateur après une production réussie. |
 | `--mix-posts` / `--no-mix-posts` | booléen | configuration d'environnement | Remplacer `job.mix_posts`. |
 | `--download-file` / `--no-download-file` | booléen | configuration d'environnement | Remplacer le téléchargement du fichier principal (couverture) de chaque œuvre. |

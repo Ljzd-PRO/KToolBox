@@ -50,12 +50,16 @@ KTOOLBOX_DOWNLOADER__FILE_PATH_PREFIX=/data
 
 CLI の失敗はプロセスステータスを使います。`0` は成功、`1` はリモート・クリエイター・ダウンロードの失敗、`2` は引数・設定の失敗、`130` は中断です。JSON と表は stdout、進捗とログは stderr を使います。
 
-## プロジェクト一覧と除外ルール
+## プロジェクト設定、クリエイター一覧、除外ルール
 
-再利用可能な一覧や構造化された除外ルールが必要な場合にだけ `ktoolbox.toml` を作成してください。ファイルがない状態は有効な空のプロジェクトです。
+`ktoolbox.toml` は、プロジェクトの既定ダウンロード先、命名形式、自動同期プラン、再利用可能なクリエイター一覧、構造化された除外ルールをまとめて保存します。ファイルがなくても CLI は組み込みの既定値で起動でき、WebUI は警告後に最小構成のプロジェクトファイルを作成します。
 
 ```toml
 schema_version = 5
+default_output = "downloads"
+
+[naming]
+sequential_filename = true
 
 [[creators]]
 service = "fanbox"
@@ -63,6 +67,8 @@ creator_id = "123"
 alias = "studio-a"
 enabled = true
 ```
+
+相対出力パスはプロジェクトディレクトリを基準に解決されます。既存ダウンロードを移動する前に[命名形式](naming.md)を確認し、一覧と出力先を確認してから[自動同期](automatic-sync.md)を設定してください。
 
 空でない `KTOOLBOX_JOB__KEYWORDS_EXCLUDE` の値は、グローバルな `field-match` タイトル条件へ移してください。旧設定は暗黙の除外ルールとして引き続き動作して警告を表示しますが、KToolBox がローカルファイルを書き換えることはありません。[設定ガイド](configuration/guide.md#post-blockers)を参照してください。
 

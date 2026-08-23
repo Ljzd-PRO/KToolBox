@@ -1,19 +1,22 @@
 # プロジェクト情報
 
-## 開発ブランチ
+## リリース状況
 
-Pawchive v1 の作業は、既定のリリース系列になる準備が整うまで [`pawchive`](https://github.com/Ljzd-PRO/KToolBox/tree/pawchive) ブランチで管理されます。
+KToolBox v1 は Pawchive を基盤とする新しいリリース系列です。v0 からの破壊的なアップグレードであり、まだ十分な実利用検証を受けていないため、大規模同期に依存する前に範囲を制限したダウンロードを試してください。既存環境を更新する場合は [v1 への移行](migration-v1.md)から始めます。
 
-変更は契約、クライアント、プロジェクト移行、テスト、ドキュメント、リリースメタデータごとの集約されたコミットに分けられています。正規化済み契約に対して生成コードの変更を監査できるよう、元の Pawchive OpenAPI ファイルは変更しません。
+Kemono は利用できなくなり、Pawchive が唯一の対応バックエンドです。生成クライアントの変更を正規化済み契約と比較できるよう、元の Pawchive OpenAPI ファイルは変更しません。
 
-## 品質方針
+## サポートとリソース
 
-既定のテストスイートは完全にオフラインで、意図しないネットワークアクセスを禁止します。手書きの API レイヤーは行と分岐のカバレッジを 100% に維持し、生成済みモデルは統計から除外し、プロジェクト全体では 85% 以上を維持する必要があります。
+ドキュメントサイトを離れる前に、サイト内検索と[よくある質問](faq.md)を使用してください。答えがない場合は、目的が明確な次の外部リンクを利用できます。
 
-CI は対応する Python バージョン上で OpenAPI 文書、決定的なモデル生成、Ruff、API レイヤーの厳格な Mypy、Python バイトコードのコンパイル、パッケージビルド、厳格な MkDocs ビルドも検証します。
+- 再現可能な不具合は [Issue トラッカー](https://github.com/Ljzd-PRO/KToolBox/issues)へ報告します。
+- 質問や提案は [Discussions](https://github.com/Ljzd-PRO/KToolBox/discussions)に投稿します。
+- 公開ノートと成果物は [Releases](https://github.com/Ljzd-PRO/KToolBox/releases)で確認します。
+- コードと貢献履歴は[ソースリポジトリ](https://github.com/Ljzd-PRO/KToolBox)で確認します。
 
-## ライセンス
+## 品質とライセンス
 
-KToolBox は [BSD 3-Clause License](https://github.com/Ljzd-PRO/KToolBox/blob/master/LICENSE) の下で提供されます。
+既定のテストスイートは完全にオフラインで、意図しないネットワークアクセスを禁止します。CI は OpenAPI 契約、決定的な生成、テスト、Ruff、Mypy、Python バイトコード、パッケージ成果物、WebUI ビルド、厳格な MkDocs ビルドを検証します。
 
-Copyright © 2023 by Ljzd-PRO.
+KToolBox は [BSD 3-Clause License](https://opensource.org/license/bsd-3-clause) の下で提供されます。Copyright © 2023 by Ljzd-PRO.

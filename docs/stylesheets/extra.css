@@ -1,6 +1,6 @@
-.md-content img[src*="assets/webui/"] {
+.md-content img[src*="assets/"]:not(.twemoji) {
   display: block;
-  width: min(100%, 70rem);
+  width: auto;
   max-width: 100%;
   max-height: min(76vh, 52rem);
   object-fit: contain;
@@ -18,10 +18,53 @@
   max-height: none;
 }
 
+.md-content img[src*="cli-overview"] {
+  width: min(100%, 56rem);
+}
+
+.md-typeset .grid.cards > ul > li,
+.md-typeset .grid.cards > ol > li {
+  border-color: var(--md-default-fg-color--lightest);
+  border-radius: 0.4rem;
+  background: color-mix(in srgb, var(--md-default-bg-color) 94%, var(--md-primary-fg-color) 6%);
+  box-shadow: 0 0.15rem 0.45rem rgb(0 0 0 / 5%);
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease;
+}
+
+.md-typeset .grid.cards > ul > li:hover,
+.md-typeset .grid.cards > ol > li:hover,
+.md-typeset .grid.cards > ul > li:focus-within,
+.md-typeset .grid.cards > ol > li:focus-within {
+  border-color: color-mix(in srgb, var(--md-primary-fg-color) 52%, transparent);
+  box-shadow: 0 0.3rem 0.9rem rgb(0 0 0 / 9%);
+  transform: translateY(-0.08rem);
+}
+
+.md-typeset__table {
+  width: 100%;
+}
+
+.md-typeset__table table:not([class]) {
+  display: table;
+  min-width: min(100%, 38rem);
+}
+
 @media screen and (max-width: 44.984375rem) {
-  .md-content img[src*="assets/webui/"] {
+  .md-content img[src*="assets/"]:not(.twemoji) {
     margin-block: 1rem;
     border-radius: 0.375rem;
     box-shadow: 0 0.25rem 0.8rem rgb(0 0 0 / 10%);
+  }
+
+  .md-typeset .grid.cards > ul,
+  .md-typeset .grid.cards > ol {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .md-typeset__table table:not([class]) {
+    min-width: 32rem;
   }
 }

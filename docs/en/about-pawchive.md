@@ -22,3 +22,8 @@ The five account-favorites operations require a signed-in Pawchive account and a
 
 Respect applicable laws, platform terms, creator rights, and storage limits. Use bounded synchronization (`--length`) and file-size limits when first testing a creator.
 
+## Related guides
+
+- Return to [Getting started](index.md) for a bounded first download.
+- Continue with the [command guide](commands/guide.md) to download or synchronize content.
+- Read the [Python API reference](api.md) when integrating `PawchiveClient` directly.

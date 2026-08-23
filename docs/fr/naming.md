@@ -56,3 +56,9 @@ L’assistant n’apparaît que si KToolBox détecte d’anciennes clés de nomm
 Fermer ou choisir **Ignorer** ne masque que cette occurrence. Tant que les anciennes clés existent, l’assistant réapparaît après actualisation ou reconnexion. Migration de configuration et conversion de répertoires sont distinctes : vérifiez les anciens emplacements puis lancez explicitement leur analyse. Ouvrir l’outil ne déclenche ni analyse ni déplacement.
 
 La CLI utilise également le nommage du projet. Pour un ancien projet, confirmez dans la WebUI la migration atomique avec sauvegarde. Les anciennes valeurs présentes uniquement dans l’environnement du processus ne peuvent pas être supprimées : elles sont ignorées pour le nommage et restent signalées jusqu’à leur retrait de l’environnement de lancement.
+
+## Guides associés
+
+- Consultez le [guide WebUI](webui.md) pour la page de nommage et le processus de conversion.
+- Utilisez le [guide de configuration](configuration/guide.md) pour les réglages globaux du réseau et du téléchargeur.
+- Suivez le [guide de migration v1](migration-v1.md) lors de la mise à niveau d'un projet existant.

@@ -40,7 +40,7 @@ Pawchive 게시물 URL 또는 `--service`, `--creator-id`, `--post-id`를 모두
 | `--creator-id` | 문자열 | 생략 | 크리에이터 ID. |
 | `--post-id` | 문자열 | 생략 | 게시물 ID. |
 | `--revision-id` | 문자열 | 생략 | 개정판 목록에서 이 개정판을 선택. |
-| `-o`, `--output`, `--path` | 경로 | `.` | 출력 루트. |
+| `-o`, `--output`, `--path` | 경로 | 프로젝트 기본값 | 이 작업에서 사용할 프로젝트 다운로드 루트를 재정의합니다. |
 | `--dump-post-data` / `--no-dump-post-data` | 불리언 | 활성화 | 검증된 메타데이터를 `post.json`에 저장. |
 | `--download-file` / `--no-download-file` | 불리언 | 환경 설정 | 이 작업의 기본 파일(표지) 다운로드 설정 재정의. |
 
@@ -54,7 +54,7 @@ Pawchive 게시물 URL 또는 `--service`, `--creator-id`, `--post-id`를 모두
 | --- | --- | --- | --- |
 | `TARGET ...` | 문자열 | 활성화된 목록 | 0명 이상의 크리에이터. |
 | `--service` + `--creator-id` | 문자열 | 생략 | 명시적 크리에이터 한 명 추가. 두 값을 함께 제공해야 함. |
-| `-o`, `--output`, `--path` | 경로 | `.` | 출력 루트. |
+| `-o`, `--output`, `--path` | 경로 | 프로젝트 기본값 | 이 작업에서 사용할 프로젝트 다운로드 루트를 재정의합니다. |
 | `--save-creator-indices` | 불리언 | 비활성화 | 성공적으로 생산한 후 크리에이터 인덱스를 원자적으로 저장. |
 | `--mix-posts` / `--no-mix-posts` | 불리언 | 환경 설정 | `job.mix_posts` 재정의. |
 | `--download-file` / `--no-download-file` | 불리언 | 환경 설정 | 각 작품의 기본 파일(표지) 다운로드 설정 재정의. |

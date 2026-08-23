@@ -71,3 +71,9 @@ Toutes les erreurs propres à l'API dérivent de `PawchiveError` :
 Les modèles générés se trouvent dans `ktoolbox.api.generated` et conservent les champs inconnus des réponses grâce à l'option Pydantic `extra="allow"`. Le client transmet leur chemin à `drift_reporter` ; fournissez une fonction de rappel personnalisée lors de l'intégration de la télémétrie.
 
 Le contrat source non modifié est `k_generator/pawchive_openapi.json`. Les corrections de compatibilité vérifiables sont stockées dans `k_generator/pawchive_openapi.overrides.json` et produisent `k_generator/pawchive_openapi.normalized.json` ainsi que des modèles générés de manière déterministe.
+
+## Guides associés
+
+- Lisez [À propos de Pawchive](about-pawchive.md) pour connaître le périmètre du backend et les limites de confidentialité.
+- Utilisez le [guide MCP](mcp.md) pour l'accès authentifié aux outils depuis la WebUI.
+- Consultez le [guide des commandes](commands/guide.md) pour les parcours destinés aux utilisateurs.

@@ -71,3 +71,9 @@ asyncio.run(main())
 생성된 모델은 `ktoolbox.api.generated`에 있으며 Pydantic의 `extra="allow"`를 통해 알 수 없는 응답 필드를 보존합니다. 클라이언트는 해당 필드 경로를 `drift_reporter`로 전달합니다. 원격 측정을 통합할 때 사용자 지정 콜백을 전달할 수 있습니다.
 
 수정하지 않은 원본 계약은 `k_generator/pawchive_openapi.json`입니다. 감사 가능한 호환성 수정은 `k_generator/pawchive_openapi.overrides.json`에 저장되며, 이를 통해 `k_generator/pawchive_openapi.normalized.json`과 결정적 생성 모델을 만듭니다.
+
+## 관련 가이드
+
+- 백엔드 범위와 개인정보 경계는 [Pawchive 소개](about-pawchive.md)를 읽어 보세요.
+- WebUI를 통한 인증 도구 연결은 [MCP 가이드](mcp.md)를 사용하세요.
+- 최종 사용자 작업 흐름은 [명령 가이드](commands/guide.md)를 참조하세요.
