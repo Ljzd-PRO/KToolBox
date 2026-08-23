@@ -249,16 +249,81 @@ async def test_retry_reports_completed_retries_and_http_status(tmp_path: Path) -
         return partial_response(request, headers={"Content-Range": "bytes 0-3/4"})
 
     progress = RecordingProgress()
+    post = Post(id="safe-post-id", user="creator", service="fanbox", title="sensitive title")
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
         downloader = Downloader(
-            "https://files.example.test/file.bin",
+            "https://files.example.test/private-path/file.bin?token=secret",
             tmp_path,
             client,
             server_path="/file.bin",
+            post=post,
+        )
+        with patch("ktoolbox.downloader.downloader.logger.warning") as warning:
+            result = await downloader.run(progress=progress)
+
+    assert result.code == RetCodeEnum.Success
+    assert progress.retries == [(0, 503)]
+    warning_message = warning.call_args.args[0]
+    assert "status_code: 503" in warning_message
+    assert "safe-post-id" in warning_message
+    assert "sensitive title" not in warning_message
+    assert "private-path" not in warning_message
+    assert "token=secret" not in warning_message
+
+
+@pytest.mark.asyncio
+async def test_non_retryable_client_error_is_returned_immediately(tmp_path: Path) -> None:
+    config.downloader.retry_times = 10
+    config.downloader.retry_interval = 0
+    config.downloader.tps_limit = 10_000
+    requests = 0
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal requests
+        requests += 1
+        return partial_response(request, status=404)
+
+    progress = RecordingProgress()
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        downloader = Downloader(
+            "https://files.example.test/missing.bin",
+            tmp_path,
+            client,
+            server_path="/missing.bin",
         )
         result = await downloader.run(progress=progress)
 
-    assert result.code == RetCodeEnum.Success
+    assert result.code == RetCodeEnum.GeneralFailure
+    assert result.status_code == 404
+    assert requests == 1
+    assert progress.retries == []
+
+
+@pytest.mark.asyncio
+async def test_exhausted_retryable_status_returns_the_last_response(tmp_path: Path) -> None:
+    config.downloader.retry_times = 2
+    config.downloader.retry_interval = 0
+    config.downloader.tps_limit = 10_000
+    requests = 0
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal requests
+        requests += 1
+        return partial_response(request, status=503)
+
+    progress = RecordingProgress()
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        downloader = Downloader(
+            "https://files.example.test/unavailable.bin",
+            tmp_path,
+            client,
+            server_path="/unavailable.bin",
+        )
+        result = await downloader.run(progress=progress)
+
+    assert result.code == RetCodeEnum.GeneralFailure
+    assert result.status_code == 503
+    assert requests == 2
     assert progress.retries == [(0, 503)]
 
 

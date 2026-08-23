@@ -112,7 +112,9 @@ def test_http_result_generic_failure_and_report_are_bounded() -> None:
     report = failure_report([limited, missing, generic] * 40, creator_failures=1, file_failures=2)
 
     assert limited.code is FailureCode.rate_limited
-    assert missing.code is FailureCode.http_error
+    assert missing.code is FailureCode.resource_not_found
+    assert missing.retryable is False
+    assert missing.http_status == 404
     assert len(generic.message) == 500
     assert len(report.items) == 100
     assert report.summary == "Task finished with 1 creator failures and 2 file failures"

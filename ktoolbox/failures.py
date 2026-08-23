@@ -193,7 +193,11 @@ def failure_from_http_status(
     stage: FailureStage,
     file_name: str | None = None,
 ) -> FailureItem:
-    if status == 429:
+    if status == 404:
+        code = FailureCode.resource_not_found
+        message = "The requested file was not found on the file server"
+        retryable = False
+    elif status == 429:
         code = FailureCode.rate_limited
         message = "The file server rate-limited the request"
         retryable = True

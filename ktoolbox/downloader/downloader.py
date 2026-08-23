@@ -3,7 +3,7 @@ from asyncio import CancelledError, Lock
 from collections.abc import Awaitable, Callable
 from functools import cached_property, partial
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from urllib.parse import unquote, urlparse
 
 import aiofiles  # type: ignore[import-untyped]
@@ -23,6 +23,26 @@ from ktoolbox.reporting import DownloadProgressObserver
 from ktoolbox.utils import generate_msg
 
 __all__ = ["Downloader"]
+
+
+def _retryable_result(result: DownloaderRet[str]) -> bool:
+    if result or result.code == RetCodeEnum.FileExisted:
+        return False
+    if result.status_code is None:
+        return True
+    return result.status_code == 429 or result.status_code >= 500
+
+
+def _last_result_or_raise(state: RetryCallState) -> DownloaderRet[str]:
+    outcome = state.outcome
+    if outcome is None:
+        raise RuntimeError("Download retry finished without an outcome")
+    if outcome.failed:
+        error = outcome.exception()
+        if error is None:
+            raise RuntimeError("Download retry failed without an exception")
+        raise error
+    return cast(DownloaderRet[str], outcome.result())
 
 
 class Downloader:
@@ -167,9 +187,10 @@ class Downloader:
                 stop_never if config.downloader.retry_stop_never else stop_after_attempt(config.downloader.retry_times)
             ),
             wait=wait_fixed(config.downloader.retry_interval),
-            retry=retry_if_result(lambda result: not result and result.code != RetCodeEnum.FileExisted)
+            retry=retry_if_result(_retryable_result)
             | retry_if_exception(lambda error: isinstance(error, httpx.HTTPError)),
             before_sleep=partial(self._before_retry, progress=progress),
+            retry_error_callback=_last_result_or_raise,
             reraise=True,
         )
         return await retrying(
@@ -193,15 +214,14 @@ class Downloader:
                 status_code = getattr(response, "status_code", None)
             else:
                 status_code = outcome.result().status_code
+        exception = outcome.exception() if outcome is not None and outcome.failed else None
         logger.warning(
             generate_msg(
                 f"Retrying ({state.attempt_number})",
                 file=self.filename,
-                post_name=self.post.title if self.post else None,
                 post_id=self.post.id if self.post else None,
-                message=(outcome.result().message if outcome is not None and not outcome.failed else None),
-                exception=(outcome.exception() if outcome is not None else None),
-                url=self.url,
+                status_code=status_code,
+                error_type=type(exception).__name__ if exception is not None else None,
             )
         )
         if progress is not None:
