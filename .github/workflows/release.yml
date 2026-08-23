@@ -41,6 +41,14 @@ jobs:
               continue
             fi
 
+            case "$dir_name" in
+              ktoolbox-Windows-*) ;;
+              *)
+                chmod +x "$dir/ktoolbox"
+                test -x "$dir/ktoolbox"
+                ;;
+            esac
+
             archive="${GITHUB_WORKSPACE}/release-assets/${dir_name}-${release_tag}.zip"
             (cd "$dir" && zip -9 -r "$archive" .)
           done
