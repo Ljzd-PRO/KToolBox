@@ -56,6 +56,7 @@ def test_parse_env_uses_legacy_defaults_instead_of_target_values() -> None:
 
     assert parsed.naming.post_dirname_format == "{title}"
     assert parsed.naming.mix_posts is False
+    assert parsed.naming.sequential_filename is False
     assert parsed.naming.filename_format == "{id}_{}"
     assert "post_dirname_format" in parsed.defaulted_fields
 
@@ -161,7 +162,7 @@ def test_parse_digest_is_deterministic_and_reflects_normalized_source() -> None:
     )
     second = parse_naming_source(
         "toml",
-        '[naming]\npost_dirname_format = "{title}"\nmix_posts = true\n',
+        '[naming]\npost_dirname_format = "{title}"\nmix_posts = true\nsequential_filename = false\n',
         target=ProjectNamingConfiguration(),
     )
 

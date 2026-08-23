@@ -6178,7 +6178,7 @@ components:
         sequential_filename:
           type: boolean
           title: Sequential Filename
-          default: false
+          default: true
         sequential_filename_excludes:
           items:
             type: string

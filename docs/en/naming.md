@@ -11,6 +11,8 @@ Open **Naming format** in the WebUI to configure:
 - attachment, revision, content, and external-link names inside each work;
 - year/month grouping, mixed-work layout, and sequential attachment names.
 
+Sequential attachment naming is enabled by default because Pawchive often exposes opaque storage names. Disable it only when the original filenames are meaningful and should be preserved.
+
 Template fields accept only the variable chips shown beside them, such as `{creator_name}`, `{creator_id}`, `{service}`, `{title}`, `{post_id}`, `{revision_id}`, `{year}`, and `{month}`. Path separators, parent traversal, unknown variables, and unsafe names are rejected before scanning.
 
 **Directory structure** and **Naming templates** have separate save buttons. Saving changes future downloads immediately. Old files are never moved merely because a naming setting was saved.

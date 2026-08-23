@@ -23,7 +23,10 @@ _BOOLEAN_FIELDS = {
     "group_by_month",
 }
 _SET_FIELDS = {"sequential_filename_excludes"}
-_LEGACY_ENV_DEFAULT_OVERRIDES = {"post_dirname_format": "{title}"}
+_LEGACY_ENV_DEFAULT_OVERRIDES = {
+    "post_dirname_format": "{title}",
+    "sequential_filename": False,
+}
 
 
 @dataclass(frozen=True, slots=True)

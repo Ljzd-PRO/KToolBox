@@ -2889,7 +2889,7 @@ export interface components {
             mix_posts: boolean;
             /**
              * Sequential Filename
-             * @default false
+             * @default true
              */
             sequential_filename: boolean;
             /** Sequential Filename Excludes */

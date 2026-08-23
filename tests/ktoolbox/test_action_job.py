@@ -109,9 +109,22 @@ async def test_create_post_jobs_respects_allow_list_and_flat_mode(tmp_path: Path
 
     config.job.extract_content_images = True
     jobs = await create_job_from_post(item, tmp_path, post_dir=False, dump_post_data=False)
-    assert [job.alt_filename for job in jobs] == ["keep.png"]
+    assert [job.alt_filename for job in jobs] == ["1.png"]
     assert jobs[0].path == tmp_path
     assert not (tmp_path / "post.json").exists()
+
+
+@pytest.mark.asyncio
+async def test_create_post_jobs_use_readable_sequential_names_by_default(tmp_path: Path) -> None:
+    item = post()
+    item.attachments = [
+        FileReference(name=None, path="/data/a1/7f34cda12e5b4d9e.png"),
+        FileReference(name=None, path="/data/b2/846be97fb83141a4.jpg"),
+    ]
+
+    jobs = await create_job_from_post(item, tmp_path / "post")
+
+    assert [job.alt_filename for job in jobs] == ["1.png", "2.jpg"]
 
 
 @pytest.mark.asyncio

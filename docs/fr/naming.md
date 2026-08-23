@@ -11,6 +11,8 @@ La page **Format de nommage** permet de définir :
 - les noms internes des pièces jointes, révisions, contenus et liens externes ;
 - le classement annuel ou mensuel, le mélange des œuvres et la numérotation des pièces jointes.
 
+La numérotation séquentielle des pièces jointes est activée par défaut, car Pawchive fournit souvent des noms de stockage illisibles. Désactivez-la uniquement lorsque les noms d’origine sont significatifs et doivent être conservés.
+
 Seules les variables affichées à côté du champ sont acceptées, par exemple `{creator_name}`, `{creator_id}`, `{service}`, `{title}`, `{post_id}`, `{revision_id}`, `{year}` et `{month}`. Les séparateurs de chemin, remontées parent, variables inconnues et noms dangereux sont refusés avant l’analyse.
 
 **Structure des répertoires** et **Modèles de nommage** disposent de boutons d’enregistrement distincts. L’enregistrement s’applique immédiatement aux futurs téléchargements, sans jamais déplacer les anciens fichiers.

@@ -29,6 +29,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Add hidden compatibility aliases for the seven v0 command names with one deprecation warning per invocation.
 - Add project-level `ktoolbox.toml` with an enabled/disabled creator roster, aliases, comment-preserving atomic writes, path discovery, validation, and Urwid editor support.
 - Upgrade project configuration to Schema v5 with project-scoped naming, automatic-sync plans, a default output directory, and one path-generation contract shared by CLI and WebUI.
+- Enable sequential attachment filenames by default so opaque Pawchive storage names are saved and displayed as readable names such as `1.png`, `2.png`, and `3.png`.
 - Add extensible asynchronous post blockers with ordered global/creator scopes, recursive any/all rules, negation, safe nested field selectors, and contains/equals/regex/exists operations.
 - Add multi-creator synchronization with bounded concurrent producers, fair per-creator queue rotation, streaming startup, one shared client and download pool, partial-failure summaries, and stable creator directories.
 - Replace tqdm and the handwritten ANSI progress layer with Rich live progress, per-file and aggregate transfer speeds, Rich-aware logging, and deterministic plain output for non-TTY, `NO_COLOR`, and `--plain` environments.

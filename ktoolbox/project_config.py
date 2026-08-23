@@ -153,7 +153,7 @@ class ProjectNamingConfiguration(BaseModel):
     revision_dirname_format: str = "{revision_id}"
     post_structure: ProjectPostStructureConfiguration = Field(default_factory=ProjectPostStructureConfiguration)
     mix_posts: bool = False
-    sequential_filename: bool = False
+    sequential_filename: bool = True
     sequential_filename_excludes: set[str] = Field(default_factory=set)
     filename_format: str = "{}"
     group_by_year: bool = False
