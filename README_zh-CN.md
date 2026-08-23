@@ -18,7 +18,7 @@
 >
 > 由于 Kemono 站点已不再可用，本项目现已默认适配其镜像站 Pawchive。
 >
-> 升级前请阅读 [v1.0.0 发布说明](RELEASE_NOTES.md)和[迁移指南](docs/zh/migration-v1.md)。
+> 升级前请阅读 [v1.0.0 发布说明](https://github.com/Ljzd-PRO/KToolBox/releases/tag/v1.0.0)和[迁移指南](https://github.com/Ljzd-PRO/KToolBox/blob/master/docs/zh/migration-v1.md)。
 
 KToolBox v1 仅支持 Pawchive 后端。项目对 Pawchive OpenAPI 文档中的全部公开操作提供类型化访问，并明确排除需要账号登录的收藏操作。
 

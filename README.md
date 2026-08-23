@@ -18,7 +18,7 @@ An asynchronous CLI, HeroUI management panel, and Python client for downloading 
 >
 > Because the Kemono site is no longer available, KToolBox now targets the Pawchive mirror by default.
 >
-> Read the [v1.0.0 release notes](RELEASE_NOTES.md) and [migration guide](docs/en/migration-v1.md) before upgrading.
+> Read the [v1.0.0 release notes](https://github.com/Ljzd-PRO/KToolBox/releases/tag/v1.0.0) and [migration guide](https://github.com/Ljzd-PRO/KToolBox/blob/master/docs/en/migration-v1.md) before upgrading.
 
 KToolBox v1 uses Pawchive as its only supported backend. It provides typed access to every public operation in the Pawchive OpenAPI document and keeps account-authenticated favorites operations out of scope.
 

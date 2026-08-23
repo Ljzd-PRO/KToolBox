@@ -18,7 +18,7 @@
 >
 > Kemono 사이트를 더 이상 사용할 수 없으므로 KToolBox는 이제 미러 사이트인 Pawchive를 기본 대상으로 사용합니다.
 >
-> 업그레이드하기 전에 [v1.0.0 릴리스 노트](RELEASE_NOTES.md)와 [마이그레이션 가이드](docs/ko/migration-v1.md)를 확인하세요.
+> 업그레이드하기 전에 [v1.0.0 릴리스 노트](https://github.com/Ljzd-PRO/KToolBox/releases/tag/v1.0.0)와 [마이그레이션 가이드](https://github.com/Ljzd-PRO/KToolBox/blob/master/docs/ko/migration-v1.md)를 확인하세요.
 
 KToolBox v1은 Pawchive만 백엔드로 지원합니다. Pawchive OpenAPI 문서의 모든 공개 작업에 형식이 지정된 접근을 제공하며, 계정 인증이 필요한 즐겨찾기 작업은 지원 범위에서 제외합니다.
 
