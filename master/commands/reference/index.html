@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Documentation for KToolBox">
+        <meta name="description" content="Guides and reference documentation for KToolBox">
       
       
       
@@ -16,13 +16,23 @@
         <link rel="prev" href="../guide/">
       
       
-        <link rel="next" href="../../configuration/guide/">
+        <link rel="next" href="../../webui/">
       
       
         
           <link rel="alternate" href="./" hreflang="en">
         
           <link rel="alternate" href="../../zh/commands/reference/" hreflang="zh">
+        
+          <link rel="alternate" href="../../zh-Hant/commands/reference/" hreflang="zh-Hant">
+        
+          <link rel="alternate" href="../../ru/commands/reference/" hreflang="ru">
+        
+          <link rel="alternate" href="../../ja/commands/reference/" hreflang="ja">
+        
+          <link rel="alternate" href="../../ko/commands/reference/" hreflang="ko">
+        
+          <link rel="alternate" href="../../fr/commands/reference/" hreflang="fr">
         
       
       
@@ -31,7 +41,7 @@
     
     
       
-        <title>Reference - KToolBox</title>
+        <title>Command Reference - KToolBox</title>
       
     
     
@@ -57,7 +67,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -94,7 +104,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#reference" class="md-skip">
+        <a href="#command-reference" class="md-skip">
           Skip to content
         </a>
       
@@ -102,10 +112,6 @@
     <div data-md-component="announce">
       
     </div>
-    
-      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
-        
-      </div>
     
     
       
@@ -132,7 +138,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Reference
+              Command Reference
             
           </span>
         </div>
@@ -145,9 +151,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
       </label>
     
@@ -155,9 +161,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_2" hidden>
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -165,9 +171,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
     
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -196,7 +202,37 @@
         
           <li class="md-select__item">
             <a href="../../zh/commands/reference/" hreflang="zh" class="md-select__link">
-              中文（简体）
+              简体中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../zh-Hant/commands/reference/" hreflang="zh-Hant" class="md-select__link">
+              繁體中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../ru/commands/reference/" hreflang="ru" class="md-select__link">
+              Русский
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../ja/commands/reference/" hreflang="ja" class="md-select__link">
+              日本語
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../ko/commands/reference/" hreflang="ko" class="md-select__link">
+              한국어
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../fr/commands/reference/" hreflang="fr" class="md-select__link">
+              Français
             </a>
           </li>
         
@@ -318,7 +354,7 @@
   
     
   
-  Commands
+  Use KToolBox
 
         </a>
       </li>
@@ -340,7 +376,7 @@
   
     
   
-  Configuration
+  Configure
 
         </a>
       </li>
@@ -353,17 +389,20 @@
   
   
   
-    <li class="md-tabs__item">
-      <a href="../../shortcut/" class="md-tabs__link">
-        
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../mcp/" class="md-tabs__link">
+          
   
   
     
   
-  iOS Shortcuts
+  Integrate
 
-      </a>
-    </li>
+        </a>
+      </li>
+    
   
 
       
@@ -372,55 +411,20 @@
   
   
   
-    <li class="md-tabs__item">
-      <a href="../../coomer/" class="md-tabs__link">
-        
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../faq/" class="md-tabs__link">
+          
   
   
     
   
-  Coomer
+  Help & Project
 
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../faq/" class="md-tabs__link">
-        
-  
-  
+        </a>
+      </li>
     
-  
-  FAQ
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../api/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  API Documentation
-
-      </a>
-    </li>
   
 
       
@@ -545,14 +549,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../about-kemono/" class="md-nav__link">
+      <a href="../../migration-v1/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    About Kemono
+    Migrating to v1
   
 
     
@@ -573,14 +577,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../more/" class="md-nav__link">
+      <a href="../../about-pawchive/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    More
+    About Pawchive
   
 
     
@@ -616,6 +620,12 @@
       
         
       
+        
+      
+        
+      
+        
+      
     
     
     
@@ -640,7 +650,7 @@
   <span class="md-ellipsis">
     
   
-    Commands
+    Use KToolBox
   
 
     
@@ -656,7 +666,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Commands
+    Use KToolBox
   
 
           </label>
@@ -676,7 +686,7 @@
   <span class="md-ellipsis">
     
   
-    Guide
+    Command Guide
   
 
     
@@ -713,7 +723,7 @@
   <span class="md-ellipsis">
     
   
-    Reference
+    Command Reference
   
 
     
@@ -731,7 +741,7 @@
   <span class="md-ellipsis">
     
   
-    Reference
+    Command Reference
   
 
     
@@ -757,10 +767,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli" class="md-nav__link">
+  <a href="#global-options" class="md-nav__link">
     <span class="md-ellipsis">
       
-        KToolBoxCli
+        Global options
       
     </span>
   </a>
@@ -768,10 +778,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.config_editor" class="md-nav__link">
+  <a href="#command-tree" class="md-nav__link">
     <span class="md-ellipsis">
       
-        config_editor
+        Command tree
       
     </span>
   </a>
@@ -779,10 +789,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.download_post" class="md-nav__link">
+  <a href="#download" class="md-nav__link">
     <span class="md-ellipsis">
       
-        download_post
+        download
       
     </span>
   </a>
@@ -790,10 +800,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.example_env" class="md-nav__link">
+  <a href="#sync" class="md-nav__link">
     <span class="md-ellipsis">
       
-        example_env
+        sync
       
     </span>
   </a>
@@ -801,10 +811,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.get_post" class="md-nav__link">
+  <a href="#creator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        get_post
+        creator
       
     </span>
   </a>
@@ -812,10 +822,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.search_creator" class="md-nav__link">
+  <a href="#post" class="md-nav__link">
     <span class="md-ellipsis">
       
-        search_creator
+        post
       
     </span>
   </a>
@@ -823,10 +833,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.search_creator_post" class="md-nav__link">
+  <a href="#config" class="md-nav__link">
     <span class="md-ellipsis">
       
-        search_creator_post
+        config
       
     </span>
   </a>
@@ -834,43 +844,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.site_version" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        site_version
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.sync_creator" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        sync_creator
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.version" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        version
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.webui" class="md-nav__link">
+  <a href="#webui" class="md-nav__link">
     <span class="md-ellipsis">
       
         webui
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compatibility-aliases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compatibility aliases
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exit-codes-and-streams" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exit codes and streams
       
     </span>
   </a>
@@ -881,6 +880,242 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebUI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    WebUI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/project-workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/tasks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tasks and Realtime
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../automatic-sync/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automatic Sync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../naming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Naming Format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -927,7 +1162,7 @@
   <span class="md-ellipsis">
     
   
-    Configuration
+    Configure
   
 
     
@@ -943,7 +1178,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Configuration
+    Configure
   
 
           </label>
@@ -1018,15 +1253,71 @@
   
   
   
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrate
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integrate
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../../shortcut/" class="md-nav__link">
+      <a href="../../mcp/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    iOS Shortcuts
+    MCP
   
 
     
@@ -1038,22 +1329,23 @@
     </li>
   
 
-    
-      
-      
+              
+            
+              
+                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../../coomer/" class="md-nav__link">
+      <a href="../../api/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Coomer
+    Python API
   
 
     
@@ -1065,9 +1357,73 @@
     </li>
   
 
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
     
       
       
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Help & Project
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Help & Project
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
   
   
   
@@ -1092,22 +1448,23 @@
     </li>
   
 
-    
-      
-      
+              
+            
+              
+                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../../api/" class="md-nav__link">
+      <a href="../../more/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    API Documentation
+    Project Information
   
 
     
@@ -1116,6 +1473,14 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1147,10 +1512,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli" class="md-nav__link">
+  <a href="#global-options" class="md-nav__link">
     <span class="md-ellipsis">
       
-        KToolBoxCli
+        Global options
       
     </span>
   </a>
@@ -1158,10 +1523,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.config_editor" class="md-nav__link">
+  <a href="#command-tree" class="md-nav__link">
     <span class="md-ellipsis">
       
-        config_editor
+        Command tree
       
     </span>
   </a>
@@ -1169,10 +1534,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.download_post" class="md-nav__link">
+  <a href="#download" class="md-nav__link">
     <span class="md-ellipsis">
       
-        download_post
+        download
       
     </span>
   </a>
@@ -1180,10 +1545,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.example_env" class="md-nav__link">
+  <a href="#sync" class="md-nav__link">
     <span class="md-ellipsis">
       
-        example_env
+        sync
       
     </span>
   </a>
@@ -1191,10 +1556,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.get_post" class="md-nav__link">
+  <a href="#creator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        get_post
+        creator
       
     </span>
   </a>
@@ -1202,10 +1567,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.search_creator" class="md-nav__link">
+  <a href="#post" class="md-nav__link">
     <span class="md-ellipsis">
       
-        search_creator
+        post
       
     </span>
   </a>
@@ -1213,10 +1578,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.search_creator_post" class="md-nav__link">
+  <a href="#config" class="md-nav__link">
     <span class="md-ellipsis">
       
-        search_creator_post
+        config
       
     </span>
   </a>
@@ -1224,43 +1589,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.site_version" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        site_version
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.sync_creator" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        sync_creator
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.version" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        version
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ktoolbox.cli.KToolBoxCli.webui" class="md-nav__link">
+  <a href="#webui" class="md-nav__link">
     <span class="md-ellipsis">
       
         webui
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compatibility-aliases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compatibility aliases
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exit-codes-and-streams" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exit codes and streams
       
     </span>
   </a>
@@ -1313,7 +1667,7 @@
         <a href="../guide/" class="md-path__link">
           
   <span class="md-ellipsis">
-    Commands
+    Use KToolBox
   </span>
 
         </a>
@@ -1332,840 +1686,444 @@
 
 
   
-    <a href="https://github.com/Ljzd-PRO/KToolBox/edit/master/docs/en/commands/reference.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
-<h1 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h1>
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<a id="ktoolbox.cli.KToolBoxCli"></a>
-    <div class="doc doc-contents first">
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="ktoolbox.cli.KToolBoxCli.config_editor" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">config_editor</span></code>
-
-<a href="#ktoolbox.cli.KToolBoxCli.config_editor" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Launch graphical KToolBox configuration editor</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="ktoolbox.cli.KToolBoxCli.download_post" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">download_post</span></code>
-
-<a href="#ktoolbox.cli.KToolBoxCli.download_post" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Download a specific post or revision</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>url</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The post URL</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>service</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The service name</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>creator_id</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The creator's ID</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>post_id</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The post ID</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>revision_id</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The revision ID (optional, for revision posts)</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>path</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Union" href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Download path, default is current directory</p>
-              </div>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>(&#39;.&#39;)</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>dump_post_data</code></td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Whether to dump post data (post.json) in post directory</p>
-              </div>
-            </td>
-            <td>
-                  <code>True</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="ktoolbox.cli.KToolBoxCli.example_env" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">example_env</span></code>
-
-<a href="#ktoolbox.cli.KToolBoxCli.example_env" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Generate an example configuration <code>.env</code> file.</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="ktoolbox.cli.KToolBoxCli.get_post" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">get_post</span></code>
-
-<a href="#ktoolbox.cli.KToolBoxCli.get_post" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Get a specific post or revision</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>service</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The service name</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>creator_id</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The creator's ID</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>post_id</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The post ID</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>revision_id</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The revision ID (optional, for revision posts)</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>dump</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Dump the result to a JSON file</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="ktoolbox.cli.KToolBoxCli.search_creator" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">search_creator</span></code>
-
-<a href="#ktoolbox.cli.KToolBoxCli.search_creator" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Search creator, you can use multiple parameters as keywords.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>id</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The ID of the creator</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>name</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The name of the creator</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>service</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The service for the creator</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>dump</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Dump the result to a JSON file</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="ktoolbox.cli.KToolBoxCli.search_creator_post" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">search_creator_post</span></code>
-
-<a href="#ktoolbox.cli.KToolBoxCli.search_creator_post" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Search posts from creator, you can use multiple parameters as keywords.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>id</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The ID of the creator</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>name</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The name of the creator</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>service</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The service for the creator</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>q</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Search query</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>o</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Result offset, stepping of 50 is enforced</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>dump</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Dump the result to a JSON file</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="ktoolbox.cli.KToolBoxCli.site_version" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">site_version</span></code>
-
-<a href="#ktoolbox.cli.KToolBoxCli.site_version" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Show current Kemono site app commit hash</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="ktoolbox.cli.KToolBoxCli.sync_creator" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">sync_creator</span></code>
-
-<a href="#ktoolbox.cli.KToolBoxCli.sync_creator" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Sync posts from a creator</p>
-<p>You can update the directory anytime after download finished,         such as to update after creator published new posts.</p>
-<ul>
-<li><code>start_time</code> &amp; <code>end_time</code> example: <code>2023-12-7</code>, <code>2023-12-07</code></li>
-</ul>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>url</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The post URL</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>service</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The service where the post is located</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>creator_id</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The ID of the creator</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>path</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Union" href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Download path, default is current directory</p>
-              </div>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>(&#39;.&#39;)</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>save_creator_indices</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Record <code>CreatorIndices</code> data</p>
-              </div>
-            </td>
-            <td>
-                  <code>False</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>mix_posts</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Save all_pages files from different posts at same path,             <code>save_creator_indices</code> will be ignored if enabled</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>start_time</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Start time of the published time range for posts downloading.             Set to <code>0</code> if <code>None</code> was given.             Time format: <code>%Y-%m-%d</code></p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>end_time</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>End time of the published time range for posts downloading.             Set to latest time (infinity) if <code>None</code> was given.             Time format: <code>%Y-%m-%d</code></p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>offset</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Result offset (or start offset)</p>
-              </div>
-            </td>
-            <td>
-                  <code>0</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>length</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The number of posts to fetch, defaults to fetching all posts after <code>offset</code>.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>keywords</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Tuple" href="https://docs.python.org/3/library/typing.html#typing.Tuple">Tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Comma-separated keywords to filter posts by title (case-insensitive)</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>keywords_exclude</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Tuple" href="https://docs.python.org/3/library/typing.html#typing.Tuple">Tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Comma-separated keywords to exclude posts by title (case-insensitive)</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="ktoolbox.cli.KToolBoxCli.version" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">version</span></code>
-
-<a href="#ktoolbox.cli.KToolBoxCli.version" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Show KToolBox version</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="ktoolbox.cli.KToolBoxCli.webui" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">webui</span></code>
-
-<a href="#ktoolbox.cli.KToolBoxCli.webui" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Launch the local KToolBox WebUI panel.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>host</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Host to bind, defaults to <code>0.0.0.0</code> for LAN access</p>
-              </div>
-            </td>
-            <td>
-                  <code>&#39;0.0.0.0&#39;</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>port</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Port to bind</p>
-              </div>
-            </td>
-            <td>
-                  <code>8789</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>token</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Access token; generated automatically when omitted</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>no_auth</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Disable token authentication</p>
-              </div>
-            </td>
-            <td>
-                  <code>False</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
+<h1 id="command-reference">Command Reference<a class="headerlink" href="#command-reference" title="Permanent link">&para;</a></h1>
+<p>Run <code>ktoolbox COMMAND --help</code> for the authoritative Cyclopts help. Command and option names use hyphens; legacy underscore spellings are still parsed for hidden compatibility commands.</p>
+<p>On narrow screens, swipe tables horizontally to inspect every column.</p>
+<h2 id="global-options">Global options<a class="headerlink" href="#global-options" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-h</code>, <code>--help</code></td>
+<td>Print help directly without a pager.</td>
+</tr>
+<tr>
+<td><code>--version</code></td>
+<td>Print the installed KToolBox version.</td>
+</tr>
+<tr>
+<td><code>--install-completion</code></td>
+<td>Install completion for the detected shell.</td>
+</tr>
+<tr>
+<td><code>--config PATH</code></td>
+<td>Select a project file. Resolution order is this option, <code>KTOOLBOX_PROJECT_CONFIG</code>, then <code>./ktoolbox.toml</code>.</td>
+</tr>
+<tr>
+<td><code>--verbose</code></td>
+<td>Include diagnostic logs.</td>
+</tr>
+<tr>
+<td><code>--quiet</code></td>
+<td>Suppress progress and ordinary logs.</td>
+</tr>
+<tr>
+<td><code>--plain</code></td>
+<td>Force stable line-oriented progress. Non-TTY output and <code>NO_COLOR</code> use this automatically.</td>
+</tr>
+<tr>
+<td><code>--no-color</code></td>
+<td>Disable ANSI colors.</td>
+</tr>
+</tbody>
+</table>
+<p>Running <code>ktoolbox</code> without arguments prints root help and exits successfully.</p>
+<h2 id="command-tree">Command tree<a class="headerlink" href="#command-tree" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>download</code></td>
+<td>Download one post or selected revision.</td>
+</tr>
+<tr>
+<td><code>sync [TARGET ...]</code></td>
+<td>Synchronize explicit creators, or all enabled roster creators when no target is given.</td>
+</tr>
+<tr>
+<td><code>creator list/add/remove/enable/disable/search</code></td>
+<td>Manage the roster or search Pawchive creators.</td>
+</tr>
+<tr>
+<td><code>post show/search</code></td>
+<td>Inspect a post or search creator posts.</td>
+</tr>
+<tr>
+<td><code>config edit/example/validate/path</code></td>
+<td>Edit or inspect environment and project configuration.</td>
+</tr>
+<tr>
+<td><code>site-version</code></td>
+<td>Print the Pawchive application version.</td>
+</tr>
+<tr>
+<td><code>webui [PROJECT_DIR]</code></td>
+<td>Run the optional HeroUI panel for one project.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="download"><code>download</code><a class="headerlink" href="#download" title="Permanent link">&para;</a></h2>
+<p>Provide a Pawchive post URL, or all of <code>--service</code>, <code>--creator-id</code>, and <code>--post-id</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Argument or option</th>
+<th>Type</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td>string</td>
+<td>omitted</td>
+<td>Pawchive post or revision URL.</td>
+</tr>
+<tr>
+<td><code>--service</code></td>
+<td>string</td>
+<td>omitted</td>
+<td>Creator service.</td>
+</tr>
+<tr>
+<td><code>--creator-id</code></td>
+<td>string</td>
+<td>omitted</td>
+<td>Creator ID.</td>
+</tr>
+<tr>
+<td><code>--post-id</code></td>
+<td>string</td>
+<td>omitted</td>
+<td>Post ID.</td>
+</tr>
+<tr>
+<td><code>--revision-id</code></td>
+<td>string</td>
+<td>omitted</td>
+<td>Select this revision from the revision list.</td>
+</tr>
+<tr>
+<td><code>-o</code>, <code>--output</code>, <code>--path</code></td>
+<td>path</td>
+<td>project default</td>
+<td>Override the project download root for this task.</td>
+</tr>
+<tr>
+<td><code>--dump-post-data</code> / <code>--no-dump-post-data</code></td>
+<td>boolean</td>
+<td>enabled</td>
+<td>Save validated metadata to <code>post.json</code>.</td>
+</tr>
+<tr>
+<td><code>--download-file</code> / <code>--no-download-file</code></td>
+<td>boolean</td>
+<td>environment config</td>
+<td>Override downloading the primary file (cover) for this task.</td>
+</tr>
+</tbody>
+</table>
+<p><code>download</code> intentionally does not apply roster blockers.</p>
+<h2 id="sync"><code>sync</code><a class="headerlink" href="#sync" title="Permanent link">&para;</a></h2>
+<p>Each <code>TARGET</code> may be a Pawchive creator URL, <code>service:id</code>, or roster alias. Explicit targets run even when disabled in the roster. With no targets, every enabled roster creator runs.</p>
+<table>
+<thead>
+<tr>
+<th>Argument or option</th>
+<th>Type</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TARGET ...</code></td>
+<td>strings</td>
+<td>enabled roster</td>
+<td>Zero or more creators.</td>
+</tr>
+<tr>
+<td><code>--service</code> + <code>--creator-id</code></td>
+<td>strings</td>
+<td>omitted</td>
+<td>Add one explicit creator; both are required together.</td>
+</tr>
+<tr>
+<td><code>-o</code>, <code>--output</code>, <code>--path</code></td>
+<td>path</td>
+<td>project default</td>
+<td>Override the project download root for this task.</td>
+</tr>
+<tr>
+<td><code>--save-creator-indices</code></td>
+<td>boolean</td>
+<td>disabled</td>
+<td>Atomically save the creator index after successful production.</td>
+</tr>
+<tr>
+<td><code>--mix-posts</code> / <code>--no-mix-posts</code></td>
+<td>boolean</td>
+<td>environment config</td>
+<td>Override <code>job.mix_posts</code>.</td>
+</tr>
+<tr>
+<td><code>--download-file</code> / <code>--no-download-file</code></td>
+<td>boolean</td>
+<td>environment config</td>
+<td>Override downloading each work's primary file (cover).</td>
+</tr>
+<tr>
+<td><code>--start-time</code>, <code>--start</code></td>
+<td>date</td>
+<td>omitted</td>
+<td>Inclusive publication lower bound, <code>YYYY-MM-DD</code>.</td>
+</tr>
+<tr>
+<td><code>--end-time</code>, <code>--end</code></td>
+<td>date</td>
+<td>omitted</td>
+<td>Inclusive publication upper bound, <code>YYYY-MM-DD</code>.</td>
+</tr>
+<tr>
+<td><code>--offset</code></td>
+<td>integer</td>
+<td><code>0</code></td>
+<td>First post index.</td>
+</tr>
+<tr>
+<td><code>--length</code></td>
+<td>integer</td>
+<td>all</td>
+<td>Maximum accepted posts per creator.</td>
+</tr>
+<tr>
+<td><code>--keywords</code></td>
+<td>repeated string</td>
+<td>environment config</td>
+<td>Include titles containing any value.</td>
+</tr>
+<tr>
+<td><code>--keywords-exclude</code></td>
+<td>repeated string</td>
+<td>environment config</td>
+<td>Deprecated title exclusion compatibility input.</td>
+</tr>
+</tbody>
+</table>
+<p><code>job.creator_concurrency</code> limits creator production, while <code>job.count</code> limits shared file workers.</p>
+<h2 id="creator"><code>creator</code><a class="headerlink" href="#creator" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Arguments and options</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>creator list</code></td>
+<td><code>--json</code></td>
+<td>List roster entries as a Rich table or JSON.</td>
+</tr>
+<tr>
+<td><code>creator add TARGET</code></td>
+<td><code>--alias NAME</code>, <code>--disabled</code></td>
+<td>Add a URL or <code>service:id</code>.</td>
+</tr>
+<tr>
+<td><code>creator remove TARGET</code></td>
+<td></td>
+<td>Remove by alias, URL, or identity.</td>
+</tr>
+<tr>
+<td><code>creator enable TARGET</code></td>
+<td></td>
+<td>Enable a saved creator.</td>
+</tr>
+<tr>
+<td><code>creator disable TARGET</code></td>
+<td></td>
+<td>Disable a saved creator.</td>
+</tr>
+<tr>
+<td><code>creator search</code></td>
+<td><code>--name</code>, <code>--creator-id</code>/<code>--id</code>, <code>--service</code>, <code>--dump</code>, <code>--json</code></td>
+<td>Filter the public creator list.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="post"><code>post</code><a class="headerlink" href="#post" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Arguments and options</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>post search</code></td>
+<td><code>--creator-id</code>/<code>--id</code>, <code>--name</code>, <code>--service</code>, <code>-q</code>/<code>--query</code>, <code>-o</code>/<code>--offset</code>, <code>--dump</code>, <code>--json</code></td>
+<td>Search posts for selected creators. A direct API query is at least 3 characters and an API offset is divisible by 50.</td>
+</tr>
+<tr>
+<td><code>post show SERVICE CREATOR_ID POST_ID [REVISION_ID]</code></td>
+<td><code>--dump</code>, <code>--json</code></td>
+<td>Show current post metadata or one selected revision.</td>
+</tr>
+</tbody>
+</table>
+<p>Without <code>--json</code>, query commands deliberately omit post body text from terminal tables.</p>
+<h2 id="config"><code>config</code><a class="headerlink" href="#config" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>config path</code></td>
+<td>Print the resolved project path without line wrapping.</td>
+</tr>
+<tr>
+<td><code>config validate</code></td>
+<td>Validate schema version, creator uniqueness, blocker types, scopes, conditions, and regular expressions.</td>
+</tr>
+<tr>
+<td><code>config example</code></td>
+<td>Render all dotenv settings from configuration model docstrings.</td>
+</tr>
+<tr>
+<td><code>config edit</code></td>
+<td>Open the optional Urwid editor and validate before saving.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="webui"><code>webui</code><a class="headerlink" href="#webui" title="Permanent link">&para;</a></h2>
+<p>Install <code>ktoolbox[webui]</code> before using these commands. The default command accepts a project directory and creates a missing <code>ktoolbox.toml</code> after printing a warning. If account settings are absent, it prints an <code>admin</code> username and random password for that process run; configure the WebUI fields to use stable custom credentials.</p>
+<table>
+<thead>
+<tr>
+<th>Argument or option</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PROJECT_DIR</code></td>
+<td><code>.</code></td>
+<td>Fixed synchronization project served by this process.</td>
+</tr>
+<tr>
+<td><code>--host</code></td>
+<td><code>webui.host</code></td>
+<td>Override the listen interface.</td>
+</tr>
+<tr>
+<td><code>--port</code></td>
+<td><code>webui.port</code></td>
+<td>Override the TCP port.</td>
+</tr>
+<tr>
+<td><code>--no-open</code></td>
+<td>disabled</td>
+<td>Do not open the local URL in the default browser.</td>
+</tr>
+<tr>
+<td><code>webui hash-password</code></td>
+<td></td>
+<td>Prompt twice through hidden terminal input and print an Argon2id hash.</td>
+</tr>
+</tbody>
+</table>
+<p>The built-in server prints an HTTP security warning. See the <a href="../../webui/">WebUI guide</a> before exposing it beyond localhost.</p>
+<h2 id="compatibility-aliases">Compatibility aliases<a class="headerlink" href="#compatibility-aliases" title="Permanent link">&para;</a></h2>
+<p>These aliases are hidden from help and emit one deprecation warning per invocation:</p>
+<table>
+<thead>
+<tr>
+<th>Legacy</th>
+<th>Replacement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>download-post</code></td>
+<td><code>download</code></td>
+</tr>
+<tr>
+<td><code>sync-creator</code></td>
+<td><code>sync</code></td>
+</tr>
+<tr>
+<td><code>search-creator</code></td>
+<td><code>creator search</code></td>
+</tr>
+<tr>
+<td><code>search-creator-post</code></td>
+<td><code>post search</code></td>
+</tr>
+<tr>
+<td><code>get-post</code></td>
+<td><code>post show</code></td>
+</tr>
+<tr>
+<td><code>config-editor</code></td>
+<td><code>config edit</code></td>
+</tr>
+<tr>
+<td><code>example-env</code></td>
+<td><code>config example</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="exit-codes-and-streams">Exit codes and streams<a class="headerlink" href="#exit-codes-and-streams" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0</code></td>
+<td>Success.</td>
+</tr>
+<tr>
+<td><code>1</code></td>
+<td>Remote, creator, or download failure, including partial multi-creator success.</td>
+</tr>
+<tr>
+<td><code>2</code></td>
+<td>Invalid arguments or configuration.</td>
+</tr>
+<tr>
+<td><code>130</code></td>
+<td>User interruption.</td>
+</tr>
+</tbody>
+</table>
+<p>Tables and JSON use stdout. Logs, progress, warnings, and errors use stderr.</p>
 
 
 
@@ -2253,7 +2211,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../guide/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Guide">
+          <a href="../guide/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Command Guide">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2263,20 +2221,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Guide
+                Command Guide
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../configuration/guide/" class="md-footer__link md-footer__link--next" aria-label="Next: Guide">
+          <a href="../../webui/" class="md-footer__link md-footer__link--next" aria-label="Next: Overview">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Guide
+                Overview
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -2317,7 +2275,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.action.edit"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.code.copy", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>

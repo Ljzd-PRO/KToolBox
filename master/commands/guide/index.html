@@ -6,14 +6,14 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Documentation for KToolBox">
+        <meta name="description" content="Guides and reference documentation for KToolBox">
       
       
       
         <link rel="canonical" href="https://ktoolbox.readthedocs.io/master/commands/guide/">
       
       
-        <link rel="prev" href="../../more/">
+        <link rel="prev" href="../../about-pawchive/">
       
       
         <link rel="next" href="../reference/">
@@ -24,6 +24,16 @@
         
           <link rel="alternate" href="../../zh/commands/guide/" hreflang="zh">
         
+          <link rel="alternate" href="../../zh-Hant/commands/guide/" hreflang="zh-Hant">
+        
+          <link rel="alternate" href="../../ru/commands/guide/" hreflang="ru">
+        
+          <link rel="alternate" href="../../ja/commands/guide/" hreflang="ja">
+        
+          <link rel="alternate" href="../../ko/commands/guide/" hreflang="ko">
+        
+          <link rel="alternate" href="../../fr/commands/guide/" hreflang="fr">
+        
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -31,7 +41,7 @@
     
     
       
-        <title>Guide - KToolBox</title>
+        <title>Command Guide - KToolBox</title>
       
     
     
@@ -57,7 +67,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -94,7 +104,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#guide" class="md-skip">
+        <a href="#command-guide" class="md-skip">
           Skip to content
         </a>
       
@@ -102,10 +112,6 @@
     <div data-md-component="announce">
       
     </div>
-    
-      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
-        
-      </div>
     
     
       
@@ -132,7 +138,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Guide
+              Command Guide
             
           </span>
         </div>
@@ -145,9 +151,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
       </label>
     
@@ -155,9 +161,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_2" hidden>
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -165,9 +171,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
     
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -196,7 +202,37 @@
         
           <li class="md-select__item">
             <a href="../../zh/commands/guide/" hreflang="zh" class="md-select__link">
-              中文（简体）
+              简体中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../zh-Hant/commands/guide/" hreflang="zh-Hant" class="md-select__link">
+              繁體中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../ru/commands/guide/" hreflang="ru" class="md-select__link">
+              Русский
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../ja/commands/guide/" hreflang="ja" class="md-select__link">
+              日本語
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../ko/commands/guide/" hreflang="ko" class="md-select__link">
+              한국어
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../fr/commands/guide/" hreflang="fr" class="md-select__link">
+              Français
             </a>
           </li>
         
@@ -318,7 +354,7 @@
   
     
   
-  Commands
+  Use KToolBox
 
         </a>
       </li>
@@ -340,7 +376,7 @@
   
     
   
-  Configuration
+  Configure
 
         </a>
       </li>
@@ -353,17 +389,20 @@
   
   
   
-    <li class="md-tabs__item">
-      <a href="../../shortcut/" class="md-tabs__link">
-        
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../mcp/" class="md-tabs__link">
+          
   
   
     
   
-  iOS Shortcuts
+  Integrate
 
-      </a>
-    </li>
+        </a>
+      </li>
+    
   
 
       
@@ -372,55 +411,20 @@
   
   
   
-    <li class="md-tabs__item">
-      <a href="../../coomer/" class="md-tabs__link">
-        
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../faq/" class="md-tabs__link">
+          
   
   
     
   
-  Coomer
+  Help & Project
 
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../faq/" class="md-tabs__link">
-        
-  
-  
+        </a>
+      </li>
     
-  
-  FAQ
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../api/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  API Documentation
-
-      </a>
-    </li>
   
 
       
@@ -545,14 +549,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../about-kemono/" class="md-nav__link">
+      <a href="../../migration-v1/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    About Kemono
+    Migrating to v1
   
 
     
@@ -573,14 +577,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../more/" class="md-nav__link">
+      <a href="../../about-pawchive/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    More
+    About Pawchive
   
 
     
@@ -616,6 +620,12 @@
       
         
       
+        
+      
+        
+      
+        
+      
     
     
     
@@ -640,7 +650,7 @@
   <span class="md-ellipsis">
     
   
-    Commands
+    Use KToolBox
   
 
     
@@ -656,7 +666,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Commands
+    Use KToolBox
   
 
           </label>
@@ -685,7 +695,7 @@
   <span class="md-ellipsis">
     
   
-    Guide
+    Command Guide
   
 
     
@@ -703,7 +713,7 @@
   <span class="md-ellipsis">
     
   
-    Guide
+    Command Guide
   
 
     
@@ -729,10 +739,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#get-general-help" class="md-nav__link">
+  <a href="#download-one-post" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Get general help
+        Download one post
       
     </span>
   </a>
@@ -740,10 +750,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#get-help-of-a-command" class="md-nav__link">
+  <a href="#synchronize-creators" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Get help of a command
+        Synchronize creators
       
     </span>
   </a>
@@ -751,10 +761,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#launch-the-graphical-configuration-editor" class="md-nav__link">
+  <a href="#maintain-a-roster" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Launch the graphical configuration editor
+        Maintain a roster
       
     </span>
   </a>
@@ -762,10 +772,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#launch-the-webui-panel" class="md-nav__link">
+  <a href="#exclude-non-work-posts" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Launch the WebUI panel
+        Exclude non-work posts
       
     </span>
   </a>
@@ -773,10 +783,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#generate-an-example-configuration-file-envprodenv" class="md-nav__link">
+  <a href="#inspect-public-data" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Generate an example configuration file (.env/prod.env)
+        Inspect public data
       
     </span>
   </a>
@@ -784,10 +794,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#download-a-specific-post" class="md-nav__link">
+  <a href="#configuration-utilities" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Download a specific post
+        Configuration utilities
       
     </span>
   </a>
@@ -795,10 +805,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#download-all-posts-from-a-creator" class="md-nav__link">
+  <a href="#run-the-optional-project-panel" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Download all posts from a creator
+        Run the optional project panel
       
     </span>
   </a>
@@ -806,41 +816,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#download-a-specified-number-of-posts-from-the-creator" class="md-nav__link">
+  <a href="#exit-status" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Download a specified number of posts from the creator
+        Exit status
       
     </span>
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#download-posts-that-published-within-the-specified-time-range" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Download posts that published within the specified time range
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Download posts that published within the specified time range">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#time-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Time Format
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -867,7 +849,243 @@
   <span class="md-ellipsis">
     
   
-    Reference
+    Command Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebUI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    WebUI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/project-workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/tasks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tasks and Realtime
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../automatic-sync/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automatic Sync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../naming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Naming Format
   
 
     
@@ -922,7 +1140,7 @@
   <span class="md-ellipsis">
     
   
-    Configuration
+    Configure
   
 
     
@@ -938,7 +1156,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Configuration
+    Configure
   
 
           </label>
@@ -1013,15 +1231,71 @@
   
   
   
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrate
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integrate
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../../shortcut/" class="md-nav__link">
+      <a href="../../mcp/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    iOS Shortcuts
+    MCP
   
 
     
@@ -1033,22 +1307,23 @@
     </li>
   
 
-    
-      
-      
+              
+            
+              
+                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../../coomer/" class="md-nav__link">
+      <a href="../../api/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Coomer
+    Python API
   
 
     
@@ -1060,9 +1335,73 @@
     </li>
   
 
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
     
       
       
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Help & Project
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Help & Project
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
   
   
   
@@ -1087,22 +1426,23 @@
     </li>
   
 
-    
-      
-      
+              
+            
+              
+                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../../api/" class="md-nav__link">
+      <a href="../../more/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    API Documentation
+    Project Information
   
 
     
@@ -1111,6 +1451,14 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1142,10 +1490,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#get-general-help" class="md-nav__link">
+  <a href="#download-one-post" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Get general help
+        Download one post
       
     </span>
   </a>
@@ -1153,10 +1501,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#get-help-of-a-command" class="md-nav__link">
+  <a href="#synchronize-creators" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Get help of a command
+        Synchronize creators
       
     </span>
   </a>
@@ -1164,10 +1512,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#launch-the-graphical-configuration-editor" class="md-nav__link">
+  <a href="#maintain-a-roster" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Launch the graphical configuration editor
+        Maintain a roster
       
     </span>
   </a>
@@ -1175,10 +1523,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#launch-the-webui-panel" class="md-nav__link">
+  <a href="#exclude-non-work-posts" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Launch the WebUI panel
+        Exclude non-work posts
       
     </span>
   </a>
@@ -1186,10 +1534,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#generate-an-example-configuration-file-envprodenv" class="md-nav__link">
+  <a href="#inspect-public-data" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Generate an example configuration file (.env/prod.env)
+        Inspect public data
       
     </span>
   </a>
@@ -1197,10 +1545,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#download-a-specific-post" class="md-nav__link">
+  <a href="#configuration-utilities" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Download a specific post
+        Configuration utilities
       
     </span>
   </a>
@@ -1208,10 +1556,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#download-all-posts-from-a-creator" class="md-nav__link">
+  <a href="#run-the-optional-project-panel" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Download all posts from a creator
+        Run the optional project panel
       
     </span>
   </a>
@@ -1219,41 +1567,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#download-a-specified-number-of-posts-from-the-creator" class="md-nav__link">
+  <a href="#exit-status" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Download a specified number of posts from the creator
+        Exit status
       
     </span>
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#download-posts-that-published-within-the-specified-time-range" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Download posts that published within the specified time range
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Download posts that published within the specified time range">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#time-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Time Format
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1303,7 +1623,7 @@
         <a href="./" class="md-path__link">
           
   <span class="md-ellipsis">
-    Commands
+    Use KToolBox
   </span>
 
         </a>
@@ -1322,93 +1642,105 @@
 
 
   
-    <a href="https://github.com/Ljzd-PRO/KToolBox/edit/master/docs/en/commands/guide.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
-<h1 id="guide">Guide<a class="headerlink" href="#guide" title="Permanent link">&para;</a></h1>
-<p>Check <a href="../reference/">Reference</a> for all commands and their flags / parameters.</p>
-<h2 id="get-general-help">Get general help<a class="headerlink" href="#get-general-help" title="Permanent link">&para;</a></h2>
-<ul>
-<li><code>--help</code>, <code>-h</code></li>
-</ul>
-<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>-h
+<h1 id="command-guide">Command Guide<a class="headerlink" href="#command-guide" title="Permanent link">&para;</a></h1>
+<p>KToolBox uses Cyclopts commands with conventional hyphenated options and Rich help. Help is printed directly and never opens a pager.</p>
+<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>--help
+ktoolbox<span class="w"> </span>sync<span class="w"> </span>--help
 </code></pre></div>
-<h2 id="get-help-of-a-command">Get help of a command<a class="headerlink" href="#get-help-of-a-command" title="Permanent link">&para;</a></h2>
-<ul>
-<li><code>--help</code>, <code>-h</code></li>
-</ul>
-<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>download-post<span class="w"> </span>-h
+<p><img alt="KToolBox command overview" src="../../assets/cli-overview.png" /></p>
+<p>Global options may appear before or after a command:</p>
+<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>--config<span class="w"> </span>./ktoolbox.toml<span class="w"> </span>--plain<span class="w"> </span>sync
+ktoolbox<span class="w"> </span>creator<span class="w"> </span>list<span class="w"> </span>--json<span class="w"> </span>--config<span class="w"> </span>./ktoolbox.toml
 </code></pre></div>
-<h2 id="launch-the-graphical-configuration-editor">Launch the graphical configuration editor<a class="headerlink" href="#launch-the-graphical-configuration-editor" title="Permanent link">&para;</a></h2>
-<p><code>config-editor</code></p>
-<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>config-editor
-</code></pre></div>
-<h2 id="launch-the-webui-panel">Launch the WebUI panel<a class="headerlink" href="#launch-the-webui-panel" title="Permanent link">&para;</a></h2>
-<p><code>webui</code></p>
-<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>webui
-</code></pre></div>
-<p>By default it binds to <code>0.0.0.0:8789</code> and prints a tokenized access URL.</p>
-<h2 id="generate-an-example-configuration-file-envprodenv">Generate an example configuration file (<code>.env</code>/<code>prod.env</code>)<a class="headerlink" href="#generate-an-example-configuration-file-envprodenv" title="Permanent link">&para;</a></h2>
-<p><code>example-env</code></p>
-<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>example-env
-</code></pre></div>
-<h2 id="download-a-specific-post">Download a specific post<a class="headerlink" href="#download-a-specific-post" title="Permanent link">&para;</a></h2>
-<p><code>download-post</code></p>
-<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>download-post<span class="w"> </span>https://kemono.su/fanbox/user/49494721/post/6608808
-</code></pre></div>
-<details class="info">
-<summary>If some files failed to download</summary>
-<p>If some files failed to download, you can try to execute the command line again, 
-the downloaded files will be <strong>skipped</strong>.</p>
-</details>
-<h2 id="download-all-posts-from-a-creator">Download all posts from a creator<a class="headerlink" href="#download-all-posts-from-a-creator" title="Permanent link">&para;</a></h2>
-<p><code>sync-creator</code></p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Download all posts of the creator/artist</span>
-ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016
-</code></pre></div>
-<details class="tip">
-<summary>Update creator directory</summary>
-<p>You can rerun the command, files with the same filename will be skipped.</p>
-</details>
-<h2 id="download-a-specified-number-of-posts-from-the-creator">Download a specified number of posts from the creator<a class="headerlink" href="#download-a-specified-number-of-posts-from-the-creator" title="Permanent link">&para;</a></h2>
-<p><code>sync-creator</code></p>
-<ul>
-<li><code>--offset</code>: Posts result offset (or start offset)</li>
-<li><code>--length</code>: The number of posts to fetch, defaults to fetching all posts</li>
-</ul>
-<div class="highlight"><pre><span></span><code><span class="c1"># Download latest 10 posts of the creator/artist</span>
-ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--length<span class="o">=</span><span class="m">10</span>
+<p>Use <code>--verbose</code> for diagnostic logs, <code>--quiet</code> to suppress progress and ordinary logs, <code>--plain</code> for stable line-oriented progress, and <code>--no-color</code> to retain the interactive layout without ANSI color.</p>
+<h2 id="download-one-post">Download one post<a class="headerlink" href="#download-one-post" title="Permanent link">&para;</a></h2>
+<p>Pass either a Pawchive page URL or the three identity values:</p>
+<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>download<span class="w"> </span>https://pawchive.pw/fanbox/user/6570768/post/1836570
 
-<span class="c1"># Download latest No.11-No.15 posts of the creator/artist</span>
-ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/9016<span class="w"> </span>--offset<span class="o">=</span><span class="m">10</span><span class="w"> </span>--length<span class="o">=</span><span class="m">5</span>
+ktoolbox<span class="w"> </span>download<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--service<span class="w"> </span>fanbox<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--creator-id<span class="w"> </span><span class="m">6570768</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--post-id<span class="w"> </span><span class="m">1836570</span>
 </code></pre></div>
-<h2 id="download-posts-that-published-within-the-specified-time-range">Download posts that published within the specified time range<a class="headerlink" href="#download-posts-that-published-within-the-specified-time-range" title="Permanent link">&para;</a></h2>
-<p><code>sync-creator</code></p>
-<ul>
-<li><code>--start-time</code>: Start time of the published time range for posts downloading.</li>
-<li><code>--end-time</code>: End time of the published time range for posts downloading.</li>
-</ul>
-<div class="highlight"><pre><span></span><code><span class="c1"># From 2023-8-5 to 2023-12-6</span>
-ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/641955<span class="w"> </span>--start-time<span class="o">=</span><span class="m">2023</span>-8-5<span class="w"> </span>--end-time<span class="o">=</span><span class="m">2023</span>-12-6
+<p>Without <code>--output</code>, KToolBox uses the project's default download location. Pass <code>--output</code> only to override it for this run; absolute paths outside the project are allowed.</p>
+<p>Use <code>--revision-id</code> to select one revision. KToolBox fetches the revision list and matches that ID because Pawchive has no single-revision detail endpoint. Set <code>KTOOLBOX_JOB__INCLUDE_REVISIONS=True</code> to include all revisions when downloading the current post.</p>
+<p>Rerun the same command after an interruption. Complete files are skipped and compatible temporary files resume through HTTP Range requests. Explicit <code>download</code> does not apply synchronization blockers.</p>
+<h2 id="synchronize-creators">Synchronize creators<a class="headerlink" href="#synchronize-creators" title="Permanent link">&para;</a></h2>
+<p><code>sync</code> accepts any number of creator URLs, <code>service:id</code> identities, or aliases saved in the project roster:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># One bounded creator sync.</span>
+ktoolbox<span class="w"> </span>sync<span class="w"> </span>fanbox:123<span class="w"> </span>--length<span class="w"> </span><span class="m">1</span>
 
-<span class="c1"># From 2023-8-5 to now</span>
-ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/641955<span class="w"> </span>--start-time<span class="o">=</span><span class="m">2023</span>-8-5
-
-<span class="c1"># Before 2023-8-5</span>
-ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemono.su/fanbox/user/641955<span class="w"> </span>--end-time<span class="o">=</span><span class="m">2023</span>-8-5
+<span class="c1"># Multiple creators share one concurrent download pool.</span>
+ktoolbox<span class="w"> </span>sync<span class="w"> </span>fanbox:123<span class="w"> </span>patreon:456<span class="w"> </span>studio-c<span class="w"> </span>--length<span class="w"> </span><span class="m">10</span>
 </code></pre></div>
-<h3 id="time-format">Time Format<a class="headerlink" href="#time-format" title="Permanent link">&para;</a></h3>
-<p>The time value should match <code>%Y-%m-%d</code>, for example:</p>
-<ul>
-<li><code>2023-12-7</code></li>
-<li><code>2023-12-07</code></li>
-<li><code>2023-12-31</code></li>
-</ul>
+<p>Omitting <code>--length</code> follows every available page. <code>--offset</code> is a post index at the CLI boundary; KToolBox translates it to Pawchive's 50-item page offsets.</p>
+<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>sync<span class="w"> </span>fanbox:123<span class="w"> </span>--offset<span class="w"> </span><span class="m">10</span><span class="w"> </span>--length<span class="w"> </span><span class="m">5</span>
+ktoolbox<span class="w"> </span>sync<span class="w"> </span>fanbox:123<span class="w"> </span>--start-time<span class="w"> </span><span class="m">2025</span>-01-01<span class="w"> </span>--end-time<span class="w"> </span><span class="m">2025</span>-03-01
+</code></pre></div>
+<p>Each creator is stored as <code>Creator name [service-creator_id]</code>. Creator producers run up to <code>job.creator_concurrency</code> at once. Their bounded queues feed one fair round-robin scheduler, while <code>job.count</code> controls file-transfer concurrency. Downloads begin as soon as the first jobs exist instead of waiting for all creators.</p>
+<p>One creator failure does not discard completed work from other creators. Failed creators keep their previous index, and the final command exits with status <code>1</code> after printing a summary.</p>
+<h2 id="maintain-a-roster">Maintain a roster<a class="headerlink" href="#maintain-a-roster" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>creator<span class="w"> </span>add<span class="w"> </span>fanbox:123<span class="w"> </span>--alias<span class="w"> </span>studio-a
+ktoolbox<span class="w"> </span>creator<span class="w"> </span>add<span class="w"> </span>https://pawchive.pw/patreon/user/456<span class="w"> </span>--alias<span class="w"> </span>studio-b
+ktoolbox<span class="w"> </span>creator<span class="w"> </span>disable<span class="w"> </span>studio-b
+ktoolbox<span class="w"> </span>creator<span class="w"> </span>list
+ktoolbox<span class="w"> </span>creator<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>studio-b
+ktoolbox<span class="w"> </span>creator<span class="w"> </span>remove<span class="w"> </span>studio-b
+</code></pre></div>
+<p>Run <code>ktoolbox sync</code> without targets to synchronize every enabled roster entry. An explicitly named disabled creator still runs. <code>service:id</code> identities are unique, aliases are optional and unique, and configuration writes preserve comments.</p>
+<h2 id="exclude-non-work-posts">Exclude non-work posts<a class="headerlink" href="#exclude-non-work-posts" title="Permanent link">&para;</a></h2>
+<p>Define ordered field blockers in <code>ktoolbox.toml</code>. They can apply globally or only to selected <code>service:id</code> creators and can inspect titles, content, tags, file names, IDs, and nested list paths. The first matching blocker excludes the post before detail, revision, metadata, directory, or download work is created.</p>
+<p>See the <a href="../../configuration/guide/#post-blockers">configuration guide</a> for complete examples. <code>KTOOLBOX_JOB__KEYWORDS_EXCLUDE</code> remains a deprecated global title blocker for migration only.</p>
+<h2 id="inspect-public-data">Inspect public data<a class="headerlink" href="#inspect-public-data" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>creator<span class="w"> </span>search<span class="w"> </span>--name<span class="w"> </span>example<span class="w"> </span>--service<span class="w"> </span>fanbox
+ktoolbox<span class="w"> </span>post<span class="w"> </span>search<span class="w"> </span>--creator-id<span class="w"> </span><span class="m">6570768</span><span class="w"> </span>--service<span class="w"> </span>fanbox<span class="w"> </span>--query<span class="w"> </span>preview<span class="w"> </span>--offset<span class="w"> </span><span class="m">0</span>
+ktoolbox<span class="w"> </span>post<span class="w"> </span>show<span class="w"> </span>fanbox<span class="w"> </span><span class="m">6570768</span><span class="w"> </span><span class="m">1836570</span>
+</code></pre></div>
+<p>Query commands use compact Rich tables by default. Add <code>--json</code> for machine-readable stdout; logs and progress remain on stderr. <code>--dump path.json</code> additionally writes validated models to a file.</p>
+<h2 id="configuration-utilities">Configuration utilities<a class="headerlink" href="#configuration-utilities" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>config<span class="w"> </span>path
+ktoolbox<span class="w"> </span>config<span class="w"> </span>validate
+ktoolbox<span class="w"> </span>config<span class="w"> </span>example
+ktoolbox<span class="w"> </span>config<span class="w"> </span>edit
+ktoolbox<span class="w"> </span>site-version
+</code></pre></div>
+<p>The editor needs the <code>urwid</code> optional dependency. It edits both dotenv settings and the roster/blocker project document, then validates before saving.</p>
+<h2 id="run-the-optional-project-panel">Run the optional project panel<a class="headerlink" href="#run-the-optional-project-panel" title="Permanent link">&para;</a></h2>
+<p>After installing <code>ktoolbox[webui]</code>, bind the panel to a project directory. You may configure an account first, or use the <code>admin</code> username and random password printed in the terminal for that run. A missing <code>ktoolbox.toml</code> is created automatically after a terminal warning:</p>
+<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>webui<span class="w"> </span>.<span class="w"> </span>--host<span class="w"> </span><span class="m">127</span>.0.0.1
+</code></pre></div>
+<p>The panel exposes the same download, synchronization, roster, blocker, query, and configuration workflows as managed project actions, with persistent task progress and controls. See the <a href="../../webui/">WebUI guide</a> before listening on a network interface.</p>
+<h2 id="exit-status">Exit status<a class="headerlink" href="#exit-status" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0</code></td>
+<td>Command completed successfully.</td>
+</tr>
+<tr>
+<td><code>1</code></td>
+<td>A remote operation, creator, or file download failed; partial files are retained.</td>
+</tr>
+<tr>
+<td><code>2</code></td>
+<td>Arguments or configuration are invalid.</td>
+</tr>
+<tr>
+<td><code>130</code></td>
+<td>The user interrupted the command.</td>
+</tr>
+</tbody>
+</table>
+<p>Expected failures are printed without a Python traceback.</p>
 
 
 
@@ -1496,7 +1828,7 @@ ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemo
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../more/" class="md-footer__link md-footer__link--prev" aria-label="Previous: More">
+          <a href="../../about-pawchive/" class="md-footer__link md-footer__link--prev" aria-label="Previous: About Pawchive">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1506,20 +1838,20 @@ ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemo
                 Previous
               </span>
               <div class="md-ellipsis">
-                More
+                About Pawchive
               </div>
             </div>
           </a>
         
         
           
-          <a href="../reference/" class="md-footer__link md-footer__link--next" aria-label="Next: Reference">
+          <a href="../reference/" class="md-footer__link md-footer__link--next" aria-label="Next: Command Reference">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Reference
+                Command Reference
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1560,7 +1892,7 @@ ktoolbox<span class="w"> </span>sync-creator<span class="w"> </span>https://kemo
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.action.edit"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.code.copy", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>

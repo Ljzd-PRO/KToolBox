@@ -13,16 +13,26 @@
         <link rel="canonical" href="https://ktoolbox.readthedocs.io/master/zh/faq/">
       
       
-        <link rel="prev" href="../coomer/">
+        <link rel="prev" href="../api/">
       
       
-        <link rel="next" href="../api/">
+        <link rel="next" href="../more/">
       
       
         
           <link rel="alternate" href="../../faq/" hreflang="en">
         
           <link rel="alternate" href="./" hreflang="zh">
+        
+          <link rel="alternate" href="../../zh-Hant/faq/" hreflang="zh-Hant">
+        
+          <link rel="alternate" href="../../ru/faq/" hreflang="ru">
+        
+          <link rel="alternate" href="../../ja/faq/" hreflang="ja">
+        
+          <link rel="alternate" href="../../ko/faq/" hreflang="ko">
+        
+          <link rel="alternate" href="../../fr/faq/" hreflang="fr">
         
       
       
@@ -57,9 +67,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
-    
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -105,10 +113,6 @@
       
     </div>
     
-      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
-        
-      </div>
-    
     
       
 
@@ -147,9 +151,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换至深色模式"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换至浅色模式"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="切换至深色模式" for="__palette_1" hidden>
+      <label class="md-header__button md-icon" title="切换至浅色模式" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
       </label>
     
@@ -157,9 +161,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换至自动"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换至深色模式"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="切换至自动" for="__palette_2" hidden>
+      <label class="md-header__button md-icon" title="切换至深色模式" for="__palette_2" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -167,9 +171,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换至浅色模式"  type="radio" name="__palette" id="__palette_2">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换至跟随系统"  type="radio" name="__palette" id="__palette_2">
     
-      <label class="md-header__button md-icon" title="切换至浅色模式" for="__palette_0" hidden>
+      <label class="md-header__button md-icon" title="切换至跟随系统" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -198,7 +202,37 @@
         
           <li class="md-select__item">
             <a href="./" hreflang="zh" class="md-select__link">
-              中文（简体）
+              简体中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../zh-Hant/faq/" hreflang="zh-Hant" class="md-select__link">
+              繁體中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../ru/faq/" hreflang="ru" class="md-select__link">
+              Русский
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../ja/faq/" hreflang="ja" class="md-select__link">
+              日本語
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../ko/faq/" hreflang="ko" class="md-select__link">
+              한국어
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../fr/faq/" hreflang="fr" class="md-select__link">
+              Français
             </a>
           </li>
         
@@ -318,7 +352,7 @@
   
     
   
-  命令
+  使用 KToolBox
 
         </a>
       </li>
@@ -353,36 +387,20 @@
   
   
   
-    <li class="md-tabs__item">
-      <a href="../shortcut/" class="md-tabs__link">
-        
+    
+    
+      <li class="md-tabs__item">
+        <a href="../mcp/" class="md-tabs__link">
+          
   
   
     
   
-  iOS 快捷指令
+  集成
 
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../coomer/" class="md-tabs__link">
-        
-  
-  
+        </a>
+      </li>
     
-  
-  Coomer
-
-      </a>
-    </li>
   
 
       
@@ -393,36 +411,20 @@
     
   
   
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="./" class="md-tabs__link">
-        
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
   
   
     
   
-  常见问题
+  帮助与项目
 
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../api/" class="md-tabs__link">
-        
-  
-  
+        </a>
+      </li>
     
-  
-  API 文档
-
-      </a>
-    </li>
   
 
       
@@ -547,14 +549,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../about-kemono/" class="md-nav__link">
+      <a href="../migration-v1/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    关于 Kemono
+    迁移至 v1
   
 
     
@@ -575,14 +577,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../more/" class="md-nav__link">
+      <a href="../about-pawchive/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    更多
+    关于 Pawchive
   
 
     
@@ -616,6 +618,12 @@
       
         
       
+        
+      
+        
+      
+        
+      
     
     
     
@@ -637,7 +645,7 @@
   <span class="md-ellipsis">
     
   
-    命令
+    使用 KToolBox
   
 
     
@@ -653,7 +661,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    命令
+    使用 KToolBox
   
 
           </label>
@@ -673,7 +681,7 @@
   <span class="md-ellipsis">
     
   
-    向导
+    命令指南
   
 
     
@@ -701,7 +709,243 @@
   <span class="md-ellipsis">
     
   
-    参考
+    命令参考
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebUI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    WebUI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../webui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../webui/project-workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    项目工作流
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../webui/tasks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    任务与实时更新
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../webui/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    部署参考
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../automatic-sync/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    自动同步
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../naming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    命名格式
   
 
     
@@ -847,15 +1091,71 @@
   
   
   
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    集成
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    集成
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../shortcut/" class="md-nav__link">
+      <a href="../mcp/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    iOS 快捷指令
+    MCP
   
 
     
@@ -867,22 +1167,23 @@
     </li>
   
 
-    
-      
-      
+              
+            
+              
+                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../coomer/" class="md-nav__link">
+      <a href="../api/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Coomer
+    Python API
   
 
     
@@ -894,9 +1195,78 @@
     </li>
   
 
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
     
       
       
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    帮助与项目
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    帮助与项目
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
   
   
     
@@ -962,38 +1332,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#uvloopwinloop" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        如何解决 uvloop/winloop 安装失败的问题？
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="如何解决 uvloop/winloop 安装失败的问题？">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        安装事件循环优化
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#attachments" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        我不需要帖子目录下的 attachments 文件夹
+        为什么没有账号收藏功能？
       
     </span>
   </a>
@@ -1001,65 +1343,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        如何关闭封面图功能？
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#-_" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        命令和标志（选项）应当使用 - 还是 _ 作为分隔符？
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        文件名过长
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        如何配置代理？
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        图形化配置编辑器无法打开
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#kemono-api" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Kemono API 调用失败
+        API 调用失败时怎么办？
       
     </span>
   </a>
@@ -1070,7 +1357,51 @@
   <a href="#403" class="md-nav__link">
     <span class="md-ellipsis">
       
-        下载时频繁出现 403 错误
+        文件下载为什么返回 403？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        如何继续中断的下载？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        如何禁用封面或附件？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        能否把附件直接放进作品目录？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        如何避免文件名过长？
       
     </span>
   </a>
@@ -1081,7 +1412,7 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        杀毒软件将可执行文件标记为病毒/威胁
+        如何配置代理？
       
     </span>
   </a>
@@ -1092,7 +1423,7 @@
   <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
       
-        帖子标题太长导致无法创建目录或下载文件
+        为什么配置编辑器无法打开？
       
     </span>
   </a>
@@ -1103,7 +1434,106 @@
   <a href="#_9" class="md-nav__link">
     <span class="md-ellipsis">
       
-        我在哪里可以找到更多帮助？
+        如何定期同步很多作者？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        如何为不同作者排除不同主题？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么重定向日志中的进度显示不同？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#webui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么 WebUI 拒绝启动？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#webui_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        可以安全地把 WebUI 暴露到网络吗？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#webui_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WebUI 任务在服务重启后会怎样？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#webui_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        删除 WebUI 任务会误删无关文件吗？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        如何确认同步失败的真正原因？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uvloop-winloop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        uvloop 或 winloop 是必需的吗？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么杀毒软件可能标记打包后的可执行文件？
       
     </span>
   </a>
@@ -1117,22 +1547,23 @@
     </li>
   
 
-    
-      
-      
+              
+            
+              
+                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
+      <a href="../more/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    API 文档
+    项目信息
   
 
     
@@ -1141,6 +1572,14 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1172,38 +1611,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#uvloopwinloop" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        如何解决 uvloop/winloop 安装失败的问题？
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="如何解决 uvloop/winloop 安装失败的问题？">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        安装事件循环优化
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#attachments" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        我不需要帖子目录下的 attachments 文件夹
+        为什么没有账号收藏功能？
       
     </span>
   </a>
@@ -1211,65 +1622,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        如何关闭封面图功能？
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#-_" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        命令和标志（选项）应当使用 - 还是 _ 作为分隔符？
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        文件名过长
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        如何配置代理？
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        图形化配置编辑器无法打开
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#kemono-api" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Kemono API 调用失败
+        API 调用失败时怎么办？
       
     </span>
   </a>
@@ -1280,7 +1636,51 @@
   <a href="#403" class="md-nav__link">
     <span class="md-ellipsis">
       
-        下载时频繁出现 403 错误
+        文件下载为什么返回 403？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        如何继续中断的下载？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        如何禁用封面或附件？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        能否把附件直接放进作品目录？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        如何避免文件名过长？
       
     </span>
   </a>
@@ -1291,7 +1691,7 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        杀毒软件将可执行文件标记为病毒/威胁
+        如何配置代理？
       
     </span>
   </a>
@@ -1302,7 +1702,7 @@
   <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
       
-        帖子标题太长导致无法创建目录或下载文件
+        为什么配置编辑器无法打开？
       
     </span>
   </a>
@@ -1313,7 +1713,106 @@
   <a href="#_9" class="md-nav__link">
     <span class="md-ellipsis">
       
-        我在哪里可以找到更多帮助？
+        如何定期同步很多作者？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        如何为不同作者排除不同主题？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么重定向日志中的进度显示不同？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#webui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么 WebUI 拒绝启动？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#webui_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        可以安全地把 WebUI 暴露到网络吗？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#webui_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WebUI 任务在服务重启后会怎样？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#webui_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        删除 WebUI 任务会误删无关文件吗？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        如何确认同步失败的真正原因？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uvloop-winloop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        uvloop 或 winloop 是必需的吗？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么杀毒软件可能标记打包后的可执行文件？
       
     </span>
   </a>
@@ -1338,6 +1837,46 @@
   
 
 
+  <nav class="md-path" aria-label="导航栏" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../" class="md-path__link">
+        
+  <span class="md-ellipsis">
+    欢迎使用 KToolBox
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="./" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    帮助与项目
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
               
               <article class="md-content__inner md-typeset">
                 
@@ -1345,177 +1884,93 @@
 
 
   
-    <a href="https://github.com/Ljzd-PRO/KToolBox/edit/master/docs/zh/faq.md" title="编辑此页" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="_1">常见问题<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<h2 id="uvloopwinloop">如何解决 uvloop/winloop 安装失败的问题？<a class="headerlink" href="#uvloopwinloop" title="Permanent link">&para;</a></h2>
-<div class="admonition info">
-<p class="admonition-title">这是可选的</p>
-<p>事件循环优化（uvloop/winloop）可以提高并发性能，但它是 <strong>可选的</strong>。如果你不想安装这些包，你可以跳过这个步骤。</p>
-</div>
-<p>KToolBox 现在支持平台特定的事件循环优化：</p>
+<h2 id="_2">为什么没有账号收藏功能？<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>KToolBox v1 实现 Pawchive 中无需登录的 14 个操作。OpenAPI 中受 <code>cookieAuth</code> 保护的 5 个操作明确排除，因此 API 客户端不会接受或发送账号会话。</p>
+<p>作品标记是独立的公开操作，已经实现。请有意识地调用：成功标记会改变服务端状态，重复标记可能抛出 <code>PawchiveConflictError</code>。</p>
+<h2 id="api">API 调用失败时怎么办？<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
+<p>CLI 会报告类型化的 Pawchive 错误，不会返回只解析了一部分的响应。常见类型包括传输、HTTP、认证、未找到、冲突和响应校验错误。</p>
 <ul>
-<li><strong>Windows</strong>: 使用 <code>winloop</code> 来提升性能</li>
-<li><strong>Linux/macOS</strong>: 使用 <code>uvloop</code> 来提升性能</li>
+<li>检查 URL 或 <code>service</code>、作者 ID、作品 ID 是否正确。</li>
+<li>网络较慢时增大 <code>KTOOLBOX_API__TIMEOUT</code>。</li>
+<li>对临时传输错误、<code>429</code> 或 <code>5xx</code>，调整 <code>KTOOLBOX_API__RETRY_TIMES</code> 与 <code>KTOOLBOX_API__RETRY_INTERVAL</code>。</li>
+<li>不要向 API 配置添加账号 Cookie；API 请求不会使用它。</li>
 </ul>
-<h3 id="_2">安装事件循环优化<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Windows</label><label for="__tabbed_1_2">Linux/macOS</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>ktoolbox<span class="o">[</span>winloop<span class="o">]</span>
+<p>重定向、普通 <code>4xx</code>、冲突和非法响应数据不会重试。</p>
+<h2 id="403">文件下载为什么返回 403？<a class="headerlink" href="#403" title="Permanent link">&para;</a></h2>
+<p>若文件主机要求特定资源携带会话，可设置只属于下载器的密钥：</p>
+<div class="highlight"><pre><span></span><code>KTOOLBOX_DOWNLOADER__SESSION_KEY=xxxxx
 </code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>ktoolbox<span class="o">[</span>uvloop<span class="o">]</span>
-</code></pre></div>
-</div>
-</div>
-</div>
-<p>如果你在 Linux 或 macOS 安装 uvloop 失败， 
-你可以尝试用例如 <strong>apt</strong>、<strong>yum</strong>、<strong>brew</strong> 的系统包管理器安装，包管理器提供构建好的 uvloop 包。</p>
-<ul>
-<li>使用 apt 安装
-    <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3-uvloop
-</code></pre></div></li>
-</ul>
-<h2 id="attachments">我不需要帖子目录下的 <code>attachments</code> 文件夹<a class="headerlink" href="#attachments" title="Permanent link">&para;</a></h2>
-<p>你可以设置配置选项 <code>job.post_structure.attachments</code> 为 <code>./</code></p>
-<p>通过 dotenv 文件 <code>prod.env</code> 或系统环境变量来设置配置：
-<div class="highlight"><pre><span></span><code>KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-</code></pre></div></p>
-<p><code>./</code> 表示附件文件将会直接下载到帖子目录下。</p>
-<div class="admonition info">
-<p class="admonition-title">提示</p>
-<p>更多详情，请参考 <a href="../configuration/guide/">配置-向导</a> 页面。</p>
-</div>
-<h2 id="_3">如何关闭封面图功能？<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>你可以设置配置选项 <code>job.download_file</code> 为 <code>False</code> 来关闭封面图（文件）下载功能。</p>
-<p>通过 dotenv 文件 <code>prod.env</code> 或系统环境变量来设置配置：
-<div class="highlight"><pre><span></span><code># 关闭封面图下载
+<p>该 Cookie 仅用于文件下载请求，不会发送到 Pawchive API。请将 <code>.env</code> 和 <code>prod.env</code> 视作可能包含密钥的本地文件，不要提交。</p>
+<h2 id="_3">如何继续中断的下载？<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>重新运行相同命令即可。KToolBox 会跳过完整的目标文件。如果存在带 <code>downloader.temp_suffix</code> 的未完成文件，且服务器支持范围请求，下载器会请求剩余字节并校验合并后的大小。</p>
+<h2 id="_4">如何禁用封面或附件？<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code># 只下载附件。
 KTOOLBOX_JOB__DOWNLOAD_FILE=False
+KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 
-# 如果你也想关闭附件下载，可以设置
+# 只下载封面。
+#KTOOLBOX_JOB__DOWNLOAD_FILE=True
 #KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=False
-</code></pre></div></p>
-<p>这样设置后，KToolBox 将只下载附件（attachments），跳过封面图（file）下载。这对于有些作者的图片名称是乱码、需要依赖重命名功能按网页顺序排序的情况很有用。</p>
-<div class="admonition info">
-<p class="admonition-title">提示</p>
-<ul>
-<li><code>download_file</code>: 控制是否下载帖子文件（通常为封面图片）</li>
-<li><code>download_attachments</code>: 控制是否下载帖子附件</li>
-<li>两个选项都默认为 <code>True</code>，确保向后兼容性</li>
-</ul>
-</div>
-<h2 id="-_">命令和标志（选项）应当使用 <code>-</code> 还是 <code>_</code> 作为分隔符？<a class="headerlink" href="#-_" title="Permanent link">&para;</a></h2>
-<p>两者都支持，推荐使用 <code>-</code>。</p>
-<h2 id="_4">文件名过长<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<p>在一些情况下，文件名或帖子目录名过长而导致下载失败。为了解决这个问题，你可以设置 <strong>序列化文件名</strong> 或使用 <strong>自定义帖子目录名</strong></p>
-<p>通过 dotenv 文件 <code>prod.env</code> 或系统环境变量来设置配置：
-<div class="highlight"><pre><span></span><code># 按照数字顺序重命名附件, 例如 `1.png`, `2.png`, ...
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
-
-# 设置帖子目录名为其发布日期和ID，例如 `[2024-1-1]11223344`
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{id}
-</code></pre></div></p>
-<h2 id="_5">如何配置代理？<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p>可以通过设置 <code>HTTPS_PROXY</code>, <code>HTTP_PROXY</code>, <code>ALL_PROXY</code> 环境变量实现</p>
-<p>参考：<a href="https://www.python-httpx.org/environment_variables/#http_proxy-https_proxy-all_proxy">HTTPX - Environment Variables</a></p>
-<p>例如这样设置：</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Unix Shell</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">HTTPS_PROXY</span><span class="o">=</span>http://127.0.0.1:7897
+</code></pre></div>
+<p><code>download_file</code> 指作品主文件，通常为封面。两个选项默认均为 <code>True</code>。</p>
+<h2 id="_5">能否把附件直接放进作品目录？<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>不能。项目 Schema v5 要求每个内部路径都是安全且非空的相对名称。请在“命名格式”中选择附件子目录，避免附件与主文件（封面）或元数据发生冲突。</p>
+<h2 id="_6">如何避免文件名过长？<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<p>在项目 <code>[naming]</code> 中使用顺序命名或格式精度限制：</p>
+<div class="highlight"><pre><span></span><code><span class="k">[naming]</span>
+<span class="n">sequential_filename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">post_dirname_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;[{published}]{post_id}_{title:.30}&quot;</span>
+<span class="n">filename_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{title:.30}_{}&quot;</span>
+</code></pre></div>
+<p>转换已有下载前请先阅读<a href="../naming/">命名格式指南</a>。</p>
+<h2 id="_7">如何配置代理？<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<p>HTTPX 会读取标准代理环境变量：</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">HTTPS_PROXY</span><span class="o">=</span>http://127.0.0.1:7897
 <span class="nb">export</span><span class="w"> </span><span class="nv">HTTP_PROXY</span><span class="o">=</span>http://127.0.0.1:7897
 <span class="nb">export</span><span class="w"> </span><span class="nv">ALL_PROXY</span><span class="o">=</span>socks5://127.0.0.1:7897
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c"># Windows PowerShell</span>
-<span class="nv">$env:HTTP_PROXY</span><span class="p">=</span><span class="s2">&quot;http://127.0.0.1:7897&quot;</span><span class="p">;</span> <span class="nv">$env:HTTPS_PROXY</span><span class="p">=</span><span class="s2">&quot;http://127.0.0.1:7897&quot;</span>
+<p>PowerShell：</p>
+<div class="highlight"><pre><span></span><code><span class="nv">$env:HTTP_PROXY</span><span class="p">=</span><span class="s2">&quot;http://127.0.0.1:7897&quot;</span>
+<span class="nv">$env:HTTPS_PROXY</span><span class="p">=</span><span class="s2">&quot;http://127.0.0.1:7897&quot;</span>
 </code></pre></div>
-<h2 id="_6">图形化配置编辑器无法打开<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<div class="admonition warning">
-<p class="admonition-title">注意</p>
-<p><a href="https://pypi.org/project/ktoolbox-pure-py/"><code>ktoolbox-pure-py</code></a> 不支持图形化配置编辑器</p>
-</div>
-<p>默认情况下，图形化配置编辑器的相关依赖不会被安装，可使用以下命令附带安装：</p>
-<div class="highlight"><pre><span></span><code>pip3<span class="w"> </span>install<span class="w"> </span>ktoolbox<span class="o">[</span>urwid<span class="o">]</span>
+<h2 id="_8">为什么配置编辑器无法打开？<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<p>安装可选的终端 UI 依赖：</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;ktoolbox[urwid]&quot;</span>
+<span class="c1"># 或</span>
+pipx<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;ktoolbox[urwid]&quot;</span><span class="w"> </span>--force
 </code></pre></div>
-<p>如果你用的是 pipx：</p>
-<div class="highlight"><pre><span></span><code>pipx<span class="w"> </span>install<span class="w"> </span>ktoolbox<span class="o">[</span>urwid<span class="o">]</span><span class="w"> </span>--force
+<h2 id="_9">如何定期同步很多作者？<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
+<p>将每位作者加入项目清单，可选设置短别名，然后执行无目标 <code>sync</code>：</p>
+<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>creator<span class="w"> </span>add<span class="w"> </span>fanbox:123<span class="w"> </span>--alias<span class="w"> </span>studio-a
+ktoolbox<span class="w"> </span>creator<span class="w"> </span>add<span class="w"> </span>patreon:456<span class="w"> </span>--alias<span class="w"> </span>studio-b
+ktoolbox<span class="w"> </span>sync
 </code></pre></div>
-<h2 id="kemono-api">Kemono API 调用失败<a class="headerlink" href="#kemono-api" title="Permanent link">&para;</a></h2>
-<p>例如：</p>
-<div class="highlight"><pre><span></span><code>ktoolbox sync-creator &quot;https://coomer.su/onlyfans/user/hollyharper11&quot; --start-time=&quot;2020-05-01&quot; --end-time=&quot;2025-01-01&quot;
-
-2024-05-12 12:52:51.477 | INFO     | ktoolbox.cli:sync_creator:271 - Got creator information - {&#39;name&#39;: &#39;hollyharper11&#39;, &#39;id&#39;: &#39;hollyharper11&#39;}
-2024-05-12 12:52:51.479 | INFO     | ktoolbox.action.job:create_job_from_creator:148 - Start fetching posts from creator hollyharper11
-2024-05-12 12:52:56.477 | ERROR    | ktoolbox.api.base:_retry_error_callback:37 - Kemono API call failed - {&#39;ret&#39;: APIRet(code=1002, message=&quot;1 validation error for Response\n  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value=&#39;&lt;!DOCTYPE html&gt;\\n&lt;html&gt;\\...&gt;\\n  &lt;/body&gt;\\n&lt;/html&gt;\\n&#39;, input_type=str]\n    For further information visit https://errors.pydantic.dev/2.7/v/json_invalid&quot;, exception=1 validation error for Response
-  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value=&#39;&lt;!DOCTYPE html&gt;\n&lt;html&gt;\...&gt;\n  &lt;/body&gt;\n&lt;/html&gt;\n&#39;, input_type=str]
-    For further information visit https://errors.pydantic.dev/2.7/v/json_invalid, data=None)}
-1 validation error for Response
-  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value=&#39;&lt;!DOCTYPE html&gt;\n&lt;html&gt;\...&gt;\n  &lt;/body&gt;\n&lt;/html&gt;\n&#39;, input_type=str]
-    For further information visit https://errors.pydantic.dev/2.7/v/json_invalid
+<p>使用 <code>creator disable</code> 可保留作者但不加入无目标同步；仍可显式同步已禁用别名。作者准备与文件传输使用不同并发限制，因此大型作者不会长期占据全部已就绪下载。</p>
+<h2 id="_10">如何为不同作者排除不同主题？<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
+<p>在 <code>ktoolbox.toml</code> 中添加不同 <code>[[blockers]]</code>。所有作者共享的规则使用 <code>scope.mode = "global"</code>；特定作者规则使用 <code>scope.mode = "creators"</code> 并填写精确 <code>service:id</code>。忽略规则按文件顺序求值，第一个命中后停止。</p>
+<p>长时间同步前先校验正则与作用域：</p>
+<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>config<span class="w"> </span>validate
 </code></pre></div>
-<ol>
-<li>
-<p>确保更新到了 <a href="https://github.com/Ljzd-PRO/KToolBox/releases/tag/v0.14.0">v0.14.0</a> 或以上版本</p>
-</li>
-<li>
-<p>一般可能是因为请求频繁导致，你可以尝试设置更多的 API 重试次数
-    <div class="highlight"><pre><span></span><code># .env / prod.env
-KTOOLBOX_API__RETRY_TIMES=10
-</code></pre></div></p>
-</li>
-<li>
-<p>你可以尝试设置下载所用的 <strong>session key</strong> （登录成功后可在 Cookies 中查看）
-    <div class="highlight"><pre><span></span><code># .env / prod.env
-KTOOLBOX_API__SESSION_KEY=&quot;xxxxxxx&quot;
-</code></pre></div></p>
-</li>
-</ol>
-<p>你也可以通过图形化配置编辑器设置：<code>API - retry_times</code> 和 <code>API -&gt; session_key</code>.</p>
-<h2 id="403">下载时频繁出现 403 错误<a class="headerlink" href="#403" title="Permanent link">&para;</a></h2>
-<p>解决方法同上</p>
-<h2 id="_7">杀毒软件将可执行文件标记为病毒/威胁<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
-<p>这是**误报**。KToolBox 是完全安全的开源软件。</p>
-<p><strong>为什么会发生这种情况：</strong>
-- PyInstaller 可执行文件由于其打包方法经常被杀毒引擎标记
-- 从网络下载的可执行文件通常被怀疑对待
-- 一些启发式引擎会标记任何"下载管理器"类型的软件</p>
-<p><strong>解决方案：</strong>
-1. <strong>在杀毒软件中添加例外</strong> 对 KToolBox 可执行文件
-2. <strong>使用 pipx 或 pip 安装</strong>
-3. <strong>从源码构建</strong> 如果你仍有顾虑：
-   <div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Ljzd-PRO/KToolBox.git
-<span class="nb">cd</span><span class="w"> </span>KToolBox
-poetry<span class="w"> </span>install<span class="w"> </span>--with<span class="w"> </span>pyinstaller
-poetry<span class="w"> </span>run<span class="w"> </span>pyinstaller<span class="w"> </span>ktoolbox.spec
-</code></pre></div></p>
-<p><strong>安全保证：</strong>
-- 所有发布版本都使用 GitHub Actions 自动构建（公开可见）
-- 源代码完全开放且可审计
-- 此项目中不存在恶意代码</p>
-<h2 id="_8">帖子标题太长导致无法创建目录或下载文件<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
-<div class="admonition tip">
-<p class="admonition-title">提示</p>
-<p>Python 格式规格迷你语言的更多信息，请参考 <a href="https://docs.python.org/zh-cn/3.13/library/string.html#format-specification-mini-language">格式规格迷你语言</a></p>
-</div>
-<p>在某些情况下，帖子标题过长会导致下载失败。为了解决这个问题，你可以在 <strong>自定义帖子目录名格式</strong> 中使用 Python 格式规格迷你语言对标题进行长度限制。</p>
-<p>通过图形化配置编辑器或 dotenv 文件 <code>.env</code> 和系统环境变量来设置配置：
-<div class="highlight"><pre><span></span><code># 设置帖子目录名为其标题的前 30 个字符
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT={title:.30}
-
-# 如果你需要在自定义的文件名格式中添加标题，也可以进行长度限制
-KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
-</code></pre></div></p>
-<h2 id="_9">我在哪里可以找到更多帮助？<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
-<ul>
-<li>向导：用 <strong>AI（Copilot Spaces）</strong> 获取命令参数和配置帮助：<a href="https://github.com/Ljzd-PRO/KToolBox/issues/304">#304</a></li>
-<li>一个社区分享的使用向导：<a href="https://github.com/Ljzd-PRO/KToolBox/issues/141">#141</a></li>
-</ul>
+<h2 id="_11">为什么重定向日志中的进度显示不同？<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
+<p>Rich 实时进度仅用于交互终端。界面会显示每个活动文件的速度与预计剩余时间，并在 <code>Files</code> 总体行显示所有活动下载的速度总和。管道、CI、<code>NO_COLOR</code> 与 <code>--plain</code> 使用稳定逐行输出，日志不会破坏 ANSI 实时区域。需要无颜色交互布局时使用 <code>--no-color</code>，完全隐藏进度与普通日志时使用 <code>--quiet</code>。</p>
+<h2 id="webui">为什么 WebUI 拒绝启动？<a class="headerlink" href="#webui" title="Permanent link">&para;</a></h2>
+<p>请安装 <code>ktoolbox[webui]</code> 并传入项目目录。账户配置可留空，此时终端会输出本次运行使用的 <code>admin</code> 用户名和随机密码。显式配置的密码哈希仍必须是有效的 Argon2 值。若缺少 <code>ktoolbox.toml</code>，程序会在终端警告后自动创建；同一项目已经运行另一个 WebUI 时，项目锁仍会拒绝启动。</p>
+<h2 id="webui_1">可以安全地把 WebUI 暴露到网络吗？<a class="headerlink" href="#webui_1" title="Permanent link">&para;</a></h2>
+<p>默认服务是明文 HTTP，因此只应在可信局域网使用 <code>0.0.0.0</code>。本机使用请绑定 <code>127.0.0.1</code>，远程访问则应置于 HTTPS 反向代理之后。认证、CSRF、严格 Cookie、速率限制和安全响应头能保护应用本身，但无法加密 HTTP 网络链路。</p>
+<h2 id="webui_2">WebUI 任务在服务重启后会怎样？<a class="headerlink" href="#webui_2" title="Permanent link">&para;</a></h2>
+<p>排队任务仍保持排队。原本正在运行的任务会标记为 <code>interrupted</code>，不会静默自动重启，因为配置与远端状态可能已经变化；请检查后手动恢复。已完成文件与可续传临时文件会保留。</p>
+<h2 id="webui_3">删除 WebUI 任务会误删无关文件吗？<a class="headerlink" href="#webui_3" title="Permanent link">&para;</a></h2>
+<p>普通删除只移除任务历史。删除输出必须先预览并再次确认，随后会核对任务的输出归属记录和文件元数据；既存、已修改、共享、非普通文件和符号链接路径都会跳过。</p>
+<h2 id="_12">如何确认同步失败的真正原因？<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h2>
+<p>打开失败任务并查看“任务失败原因”。KToolBox 会指出对应作者或文件、失败阶段、重试是否可能有效以及建议操作。若提示响应格式不兼容，通常表示 Pawchive 改变了某个字段的数据形状；请先更新 KToolBox，再提交面板中显示的安全操作名与字段路径。网络、超时和限流错误可稍后重试。诊断报告经过脱敏，不会包含上游响应正文、作品标题、Cookie 或完整下载 URL。</p>
+<h2 id="uvloop-winloop">uvloop 或 winloop 是必需的吗？<a class="headerlink" href="#uvloop-winloop" title="Permanent link">&para;</a></h2>
+<p>不是。它们只是可选的事件循环优化。Linux/macOS 使用 <code>ktoolbox[uvloop]</code>，Windows 使用 <code>ktoolbox[winloop]</code>。两者都未安装时，KToolBox 会继续使用 Python 标准 asyncio 循环。</p>
+<h2 id="_13">为什么杀毒软件可能标记打包后的可执行文件？<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h2>
+<p>部分启发式扫描会标记 PyInstaller 包或下载管理器。发布包通过仓库中公开的自动化流程构建；也可以改用 <code>pipx</code> 安装，或审查源码后自行构建。</p>
 
 
 
@@ -1603,7 +2058,7 @@ KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
       <nav class="md-footer__inner md-grid" aria-label="页脚" >
         
           
-          <a href="../coomer/" class="md-footer__link md-footer__link--prev" aria-label="上一页: Coomer">
+          <a href="../api/" class="md-footer__link md-footer__link--prev" aria-label="上一页: Python API">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1613,20 +2068,20 @@ KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
                 上一页
               </span>
               <div class="md-ellipsis">
-                Coomer
+                Python API
               </div>
             </div>
           </a>
         
         
           
-          <a href="../api/" class="md-footer__link md-footer__link--next" aria-label="下一页: API 文档">
+          <a href="../more/" class="md-footer__link md-footer__link--next" aria-label="下一页: 项目信息">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 下一页
               </span>
               <div class="md-ellipsis">
-                API 文档
+                项目信息
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1667,7 +2122,7 @@ KTOOLBOX_JOB__FILENAME_FORMAT={title:.30}_{}
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.action.edit"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.code.copy", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>

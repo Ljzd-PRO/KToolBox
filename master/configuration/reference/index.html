@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Documentation for KToolBox">
+        <meta name="description" content="Guides and reference documentation for KToolBox">
       
       
       
@@ -16,13 +16,23 @@
         <link rel="prev" href="../guide/">
       
       
-        <link rel="next" href="../../shortcut/">
+        <link rel="next" href="../../mcp/">
       
       
         
           <link rel="alternate" href="./" hreflang="en">
         
           <link rel="alternate" href="../../zh/configuration/reference/" hreflang="zh">
+        
+          <link rel="alternate" href="../../zh-Hant/configuration/reference/" hreflang="zh-Hant">
+        
+          <link rel="alternate" href="../../ru/configuration/reference/" hreflang="ru">
+        
+          <link rel="alternate" href="../../ja/configuration/reference/" hreflang="ja">
+        
+          <link rel="alternate" href="../../ko/configuration/reference/" hreflang="ko">
+        
+          <link rel="alternate" href="../../fr/configuration/reference/" hreflang="fr">
         
       
       
@@ -57,7 +67,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -94,7 +104,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#reference" class="md-skip">
+        <a href="#configuration-reference" class="md-skip">
           Skip to content
         </a>
       
@@ -102,10 +112,6 @@
     <div data-md-component="announce">
       
     </div>
-    
-      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
-        
-      </div>
     
     
       
@@ -145,9 +151,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
       </label>
     
@@ -155,9 +161,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_2" hidden>
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -165,9 +171,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
     
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -196,7 +202,37 @@
         
           <li class="md-select__item">
             <a href="../../zh/configuration/reference/" hreflang="zh" class="md-select__link">
-              中文（简体）
+              简体中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../zh-Hant/configuration/reference/" hreflang="zh-Hant" class="md-select__link">
+              繁體中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../ru/configuration/reference/" hreflang="ru" class="md-select__link">
+              Русский
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../ja/configuration/reference/" hreflang="ja" class="md-select__link">
+              日本語
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../ko/configuration/reference/" hreflang="ko" class="md-select__link">
+              한국어
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../fr/configuration/reference/" hreflang="fr" class="md-select__link">
+              Français
             </a>
           </li>
         
@@ -316,7 +352,7 @@
   
     
   
-  Commands
+  Use KToolBox
 
         </a>
       </li>
@@ -340,7 +376,7 @@
   
     
   
-  Configuration
+  Configure
 
         </a>
       </li>
@@ -353,17 +389,20 @@
   
   
   
-    <li class="md-tabs__item">
-      <a href="../../shortcut/" class="md-tabs__link">
-        
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../mcp/" class="md-tabs__link">
+          
   
   
     
   
-  iOS Shortcuts
+  Integrate
 
-      </a>
-    </li>
+        </a>
+      </li>
+    
   
 
       
@@ -372,55 +411,20 @@
   
   
   
-    <li class="md-tabs__item">
-      <a href="../../coomer/" class="md-tabs__link">
-        
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../faq/" class="md-tabs__link">
+          
   
   
     
   
-  Coomer
+  Help & Project
 
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../faq/" class="md-tabs__link">
-        
-  
-  
+        </a>
+      </li>
     
-  
-  FAQ
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../api/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  API Documentation
-
-      </a>
-    </li>
   
 
       
@@ -545,14 +549,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../about-kemono/" class="md-nav__link">
+      <a href="../../migration-v1/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    About Kemono
+    Migrating to v1
   
 
     
@@ -573,14 +577,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../more/" class="md-nav__link">
+      <a href="../../about-pawchive/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    More
+    About Pawchive
   
 
     
@@ -614,6 +618,12 @@
       
         
       
+        
+      
+        
+      
+        
+      
     
     
     
@@ -635,7 +645,7 @@
   <span class="md-ellipsis">
     
   
-    Commands
+    Use KToolBox
   
 
     
@@ -651,7 +661,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Commands
+    Use KToolBox
   
 
           </label>
@@ -671,7 +681,7 @@
   <span class="md-ellipsis">
     
   
-    Guide
+    Command Guide
   
 
     
@@ -699,7 +709,243 @@
   <span class="md-ellipsis">
     
   
-    Reference
+    Command Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebUI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    WebUI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/project-workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/tasks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tasks and Realtime
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../automatic-sync/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automatic Sync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../naming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Naming Format
   
 
     
@@ -759,7 +1005,7 @@
   <span class="md-ellipsis">
     
   
-    Configuration
+    Configure
   
 
     
@@ -775,7 +1021,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Configuration
+    Configure
   
 
           </label>
@@ -876,10 +1122,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.configuration.Configuration" class="md-nav__link">
+  <a href="#root" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration
+        Root
       
     </span>
   </a>
@@ -887,10 +1133,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.configuration.APIConfiguration" class="md-nav__link">
+  <a href="#api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        APIConfiguration
+        api
       
     </span>
   </a>
@@ -898,10 +1144,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.configuration.DownloaderConfiguration" class="md-nav__link">
+  <a href="#downloader" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DownloaderConfiguration
+        downloader
       
     </span>
   </a>
@@ -909,10 +1155,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.configuration.PostStructureConfiguration" class="md-nav__link">
+  <a href="#job" class="md-nav__link">
     <span class="md-ellipsis">
       
-        PostStructureConfiguration
+        job
       
     </span>
   </a>
@@ -920,10 +1166,60 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.configuration.JobConfiguration" class="md-nav__link">
+  <a href="#project-ktoolboxtoml" class="md-nav__link">
     <span class="md-ellipsis">
       
-        JobConfiguration
+        Project ktoolbox.toml
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Project ktoolbox.toml">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#root_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Root
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creator-entry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creator entry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blocker-entry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blocker entry
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#webui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        webui
       
     </span>
   </a>
@@ -931,10 +1227,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.configuration.LoggerConfiguration" class="md-nav__link">
+  <a href="#logger" class="md-nav__link">
     <span class="md-ellipsis">
       
-        LoggerConfiguration
+        logger
       
     </span>
   </a>
@@ -963,15 +1259,71 @@
   
   
   
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrate
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integrate
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../../shortcut/" class="md-nav__link">
+      <a href="../../mcp/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    iOS Shortcuts
+    MCP
   
 
     
@@ -983,22 +1335,23 @@
     </li>
   
 
-    
-      
-      
+              
+            
+              
+                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../../coomer/" class="md-nav__link">
+      <a href="../../api/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Coomer
+    Python API
   
 
     
@@ -1010,9 +1363,73 @@
     </li>
   
 
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
     
       
       
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Help & Project
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Help & Project
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
   
   
   
@@ -1037,22 +1454,23 @@
     </li>
   
 
-    
-      
-      
+              
+            
+              
+                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../../api/" class="md-nav__link">
+      <a href="../../more/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    API Documentation
+    Project Information
   
 
     
@@ -1061,6 +1479,14 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1092,10 +1518,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.configuration.Configuration" class="md-nav__link">
+  <a href="#root" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration
+        Root
       
     </span>
   </a>
@@ -1103,10 +1529,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.configuration.APIConfiguration" class="md-nav__link">
+  <a href="#api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        APIConfiguration
+        api
       
     </span>
   </a>
@@ -1114,10 +1540,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.configuration.DownloaderConfiguration" class="md-nav__link">
+  <a href="#downloader" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DownloaderConfiguration
+        downloader
       
     </span>
   </a>
@@ -1125,10 +1551,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.configuration.PostStructureConfiguration" class="md-nav__link">
+  <a href="#job" class="md-nav__link">
     <span class="md-ellipsis">
       
-        PostStructureConfiguration
+        job
       
     </span>
   </a>
@@ -1136,10 +1562,60 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.configuration.JobConfiguration" class="md-nav__link">
+  <a href="#project-ktoolboxtoml" class="md-nav__link">
     <span class="md-ellipsis">
       
-        JobConfiguration
+        Project ktoolbox.toml
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Project ktoolbox.toml">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#root_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Root
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creator-entry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creator entry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blocker-entry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blocker entry
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#webui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        webui
       
     </span>
   </a>
@@ -1147,10 +1623,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ktoolbox.configuration.LoggerConfiguration" class="md-nav__link">
+  <a href="#logger" class="md-nav__link">
     <span class="md-ellipsis">
       
-        LoggerConfiguration
+        logger
       
     </span>
   </a>
@@ -1203,7 +1679,7 @@
         <a href="../guide/" class="md-path__link">
           
   <span class="md-ellipsis">
-    Configuration
+    Configure
   </span>
 
         </a>
@@ -1222,1486 +1698,556 @@
 
 
   
-    <a href="https://github.com/Ljzd-PRO/KToolBox/edit/master/docs/en/configuration/reference.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
-<h1 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h1>
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ktoolbox.configuration.Configuration" class="doc doc-heading">
-            <code>Configuration</code>
-
-
-<a href="#ktoolbox.configuration.Configuration" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-    <div class="doc doc-contents first">
-
-
-        <p>KToolBox Configuration</p>
-
-
-<style>
-.md-grid {
-  max-width: 1920px !important;
-}
-</style>
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>api</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.APIConfiguration" href="../../api/#ktoolbox.configuration.APIConfiguration">APIConfiguration</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Kemono API Configuration</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      APIConfiguration()
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>downloader</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.DownloaderConfiguration" href="../../api/#ktoolbox.configuration.DownloaderConfiguration">DownloaderConfiguration</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>File Downloader Configuration</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      DownloaderConfiguration()
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>job</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.JobConfiguration" href="../../api/#ktoolbox.configuration.JobConfiguration">JobConfiguration</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Download jobs Configuration</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      JobConfiguration()
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>logger</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.LoggerConfiguration" href="../../api/#ktoolbox.configuration.LoggerConfiguration">LoggerConfiguration</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Logger configuration</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      LoggerConfiguration()
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>ssl_verify</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Enable SSL certificate verification for Kemono API server and download server</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      True
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>json_dump_indent</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Indent of JSON file dump</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      4
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>use_uvloop</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Use uvloop/winloop for asyncio performance optimization     Uses winloop on Windows and uvloop on Unix-like systems for better concurrent performance.     Install winloop on Windows with <code>pip install ktoolbox[winloop]</code>     or uvloop on Unix with <code>pip install ktoolbox[uvloop]</code>.</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      True
-              </code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ktoolbox.configuration.APIConfiguration" class="doc doc-heading">
-            <code>APIConfiguration</code>
-
-
-<a href="#ktoolbox.configuration.APIConfiguration" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-    <div class="doc doc-contents first">
-
-
-        <p>Kemono API Configuration</p>
-
-
-<style>
-.md-grid {
-  max-width: 1920px !important;
-}
-</style>
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>scheme</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>[&#39;http&#39;, &#39;https&#39;]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Kemono API URL scheme</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      &#39;https&#39;
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>netloc</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Kemono API URL netloc</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      &#39;kemono.cr&#39;
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>statics_netloc</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>URL netloc of Kemono server for static files (e.g. images)</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      &#39;img.kemono.cr&#39;
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>files_netloc</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>URL netloc of Kemono server for post files</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      &#39;kemono.cr&#39;
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>path</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Kemono API URL root path</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      &#39;/api/v1&#39;
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>timeout</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>API request timeout</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      5.0
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>retry_times</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>API request retry times (when request failed)</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      3
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>retry_interval</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Seconds of API request retry interval</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      2.0
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>session_key</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Session key that can be found in cookies after a successful login</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      &#39;&#39;
-              </code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ktoolbox.configuration.DownloaderConfiguration" class="doc doc-heading">
-            <code>DownloaderConfiguration</code>
-
-
-<a href="#ktoolbox.configuration.DownloaderConfiguration" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-    <div class="doc doc-contents first">
-
-
-        <p>File Downloader Configuration</p>
-
-
-<style>
-.md-grid {
-  max-width: 1920px !important;
-}
-</style>
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>scheme</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>[&#39;http&#39;, &#39;https&#39;]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Downloader URL scheme</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      &#39;https&#39;
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>timeout</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Downloader request timeout</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      30.0
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>encoding</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Charset for filename parsing and post <code>content</code>, <code>external_links</code> saving</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      &#39;utf-8&#39;
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>buffer_size</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Number of bytes of file I/O buffer for each downloading file</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      20480
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>chunk_size</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Number of bytes of chunk of downloader stream</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      1024
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>temp_suffix</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Temp filename suffix of downloading files</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      &#39;tmp&#39;
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>retry_times</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Downloader retry times (when download failed)</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      10
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>retry_stop_never</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Never stop downloader from retrying (when download failed)     (<code>retry_times</code> will be ignored when enabled)</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      False
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>retry_interval</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Seconds of downloader retry interval</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      3.0
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>tps_limit</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Maximum connections established per second</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      5.0
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>use_bucket</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Enable local storage bucket mode</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      False
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>bucket_path</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Path of local storage bucket</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      Path(&#39;./.ktoolbox/bucket_storage&#39;)
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>reverse_proxy</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Reverse proxy format for download URL.     Customize the filename format by inserting an empty <code>{}</code> to represent the original URL.     For example: <code>https://example.com/{}</code> will be <code>https://example.com/https://n1.kemono.su/data/66/83/xxxxx.jpg</code>;      <code>https://example.com/?url={}</code> will be <code>https://example.com/?url=https://n1.kemono.su/data/66/83/xxxxx.jpg</code></p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      &#39;{}&#39;
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>keep_metadata</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Keep the file metadata when downloading files (e.g. last modified time, etc.)</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      True
-              </code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ktoolbox.configuration.PostStructureConfiguration" class="doc doc-heading">
-            <code>PostStructureConfiguration</code>
-
-
-<a href="#ktoolbox.configuration.PostStructureConfiguration" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-    <div class="doc doc-contents first">
-
-
-        <p>Post path structure model</p>
-<ul>
-<li>
-<p>Default:
-<div class="highlight"><pre><span></span><code>..
-├─ content.txt
-├─ external_links.txt
-├─ {id}_{}.png (file)
-├─ post.json (metadata)
-├─ attachments
-│    ├─ 1.png
-│    └─ 2.png
-└─ revisions
-     ├─ &lt;PostStructure&gt;
-     │    ├─ ...
-     │    └─ ...
-     └─ &lt;PostStructure&gt;
-          ├─ ...
-          └─ ...
-</code></pre></div></p>
-</li>
-<li>
-<p>Available properties for <code>file</code></p>
+<h1 id="configuration-reference">Configuration Reference<a class="headerlink" href="#configuration-reference" title="Permanent link">&para;</a></h1>
+<p>Environment names start with <code>KTOOLBOX_</code> and join nested model fields with <code>__</code>. Types shown as <code>path</code>, <code>set</code>, or <code>list</code> are parsed by Pydantic; use JSON arrays for collections in dotenv files.</p>
+<p>On narrow screens, swipe tables horizontally to inspect every column.</p>
+<h2 id="root">Root<a class="headerlink" href="#root" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Property</th>
+<th>Field</th>
 <th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ssl_verify</code></td>
+<td>boolean</td>
+<td><code>True</code></td>
+<td>Verify TLS certificates for API and download requests.</td>
+</tr>
+<tr>
+<td><code>json_dump_indent</code></td>
+<td>integer</td>
+<td><code>4</code></td>
+<td>Indentation used for JSON output.</td>
+</tr>
+<tr>
+<td><code>use_uvloop</code></td>
+<td>boolean</td>
+<td><code>True</code></td>
+<td>Use uvloop on Unix or winloop on Windows when installed.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="api"><code>api</code><a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>scheme</code></td>
+<td><code>http</code> / <code>https</code></td>
+<td><code>https</code></td>
+<td>API URL scheme.</td>
+</tr>
+<tr>
+<td><code>netloc</code></td>
+<td>string</td>
+<td><code>pawchive.pw</code></td>
+<td>API host.</td>
+</tr>
+<tr>
+<td><code>statics_netloc</code></td>
+<td>string</td>
+<td><code>pawchive.pw</code></td>
+<td>Static creator-asset host.</td>
+</tr>
+<tr>
+<td><code>path</code></td>
+<td>string</td>
+<td><code>/api/v1</code></td>
+<td>API root path.</td>
+</tr>
+<tr>
+<td><code>timeout</code></td>
+<td>float</td>
+<td><code>5.0</code></td>
+<td>Per-request timeout in seconds.</td>
+</tr>
+<tr>
+<td><code>retry_times</code></td>
+<td>integer</td>
+<td><code>3</code></td>
+<td>Additional attempts for transport, <code>429</code>, and <code>5xx</code> failures.</td>
+</tr>
+<tr>
+<td><code>retry_interval</code></td>
+<td>float</td>
+<td><code>2.0</code></td>
+<td>Delay between API attempts in seconds.</td>
+</tr>
+</tbody>
+</table>
+<p>The API group intentionally contains no session key.</p>
+<h2 id="downloader"><code>downloader</code><a class="headerlink" href="#downloader" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>scheme</code></td>
+<td><code>http</code> / <code>https</code></td>
+<td><code>https</code></td>
+<td>File URL scheme.</td>
+</tr>
+<tr>
+<td><code>files_netloc</code></td>
+<td>string</td>
+<td><code>file.pawchive.pw</code></td>
+<td>Pawchive file host.</td>
+</tr>
+<tr>
+<td><code>file_path_prefix</code></td>
+<td>string</td>
+<td><code>/data</code></td>
+<td>Prefix added to API file paths.</td>
+</tr>
+<tr>
+<td><code>session_key</code></td>
+<td>string</td>
+<td>empty</td>
+<td>Optional cookie sent only to file requests.</td>
+</tr>
+<tr>
+<td><code>timeout</code></td>
+<td>float</td>
+<td><code>30.0</code></td>
+<td>File-request timeout in seconds.</td>
+</tr>
+<tr>
+<td><code>encoding</code></td>
+<td>string</td>
+<td><code>utf-8</code></td>
+<td>Encoding for names and extracted text.</td>
+</tr>
+<tr>
+<td><code>buffer_size</code></td>
+<td>integer</td>
+<td><code>20480</code></td>
+<td>Buffered file I/O size in bytes.</td>
+</tr>
+<tr>
+<td><code>chunk_size</code></td>
+<td>integer</td>
+<td><code>1024</code></td>
+<td>Stream chunk size in bytes.</td>
+</tr>
+<tr>
+<td><code>temp_suffix</code></td>
+<td>string</td>
+<td><code>tmp</code></td>
+<td>Suffix for incomplete downloads.</td>
+</tr>
+<tr>
+<td><code>retry_times</code></td>
+<td>integer</td>
+<td><code>10</code></td>
+<td>Additional download attempts.</td>
+</tr>
+<tr>
+<td><code>retry_stop_never</code></td>
+<td>boolean</td>
+<td><code>False</code></td>
+<td>Retry forever and ignore <code>retry_times</code>.</td>
+</tr>
+<tr>
+<td><code>retry_interval</code></td>
+<td>float</td>
+<td><code>3.0</code></td>
+<td>Delay between download attempts in seconds.</td>
+</tr>
+<tr>
+<td><code>tps_limit</code></td>
+<td>float</td>
+<td><code>5.0</code></td>
+<td>Maximum new connections per second.</td>
+</tr>
+<tr>
+<td><code>use_bucket</code></td>
+<td>boolean</td>
+<td><code>False</code></td>
+<td>Enable content-addressed local hard-link storage.</td>
+</tr>
+<tr>
+<td><code>bucket_path</code></td>
+<td>path</td>
+<td><code>.ktoolbox/bucket_storage</code></td>
+<td>Local bucket directory.</td>
+</tr>
+<tr>
+<td><code>reverse_proxy</code></td>
+<td>string</td>
+<td><code>{}</code></td>
+<td>Download URL template; <code>{}</code> is replaced by the source URL.</td>
+</tr>
+<tr>
+<td><code>keep_metadata</code></td>
+<td>boolean</td>
+<td><code>True</code></td>
+<td>Preserve remote modification metadata when available.</td>
+</tr>
+</tbody>
+</table>
+<p>Bucket mode disables itself when the target filesystem cannot create hard links.</p>
+<h2 id="job"><code>job</code><a class="headerlink" href="#job" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>count</code></td>
+<td>integer</td>
+<td><code>4</code></td>
+<td>Concurrent download workers.</td>
+</tr>
+<tr>
+<td><code>creator_concurrency</code></td>
+<td>integer</td>
+<td><code>4</code></td>
+<td>Concurrent creator producers feeding the shared file workers.</td>
+</tr>
+<tr>
+<td><code>include_revisions</code></td>
+<td>boolean</td>
+<td><code>False</code></td>
+<td>Include all known revisions for a current post.</td>
+</tr>
+<tr>
+<td><code>allow_list</code></td>
+<td>set</td>
+<td>empty</td>
+<td>Unix shell filename patterns to include.</td>
+</tr>
+<tr>
+<td><code>block_list</code></td>
+<td>set</td>
+<td>empty</td>
+<td>Unix shell filename patterns to exclude.</td>
+</tr>
+<tr>
+<td><code>extract_content</code></td>
+<td>boolean</td>
+<td><code>False</code></td>
+<td>Save post text separately.</td>
+</tr>
+<tr>
+<td><code>extract_content_images</code></td>
+<td>boolean</td>
+<td><code>False</code></td>
+<td>Download images referenced in post content.</td>
+</tr>
+<tr>
+<td><code>extract_external_links</code></td>
+<td>boolean</td>
+<td><code>False</code></td>
+<td>Save matching external links from content.</td>
+</tr>
+<tr>
+<td><code>external_link_patterns</code></td>
+<td>list</td>
+<td>built in</td>
+<td>Regular expressions used for external-link extraction.</td>
+</tr>
+<tr>
+<td><code>keywords</code></td>
+<td>set</td>
+<td>empty</td>
+<td>Case-insensitive title terms to include.</td>
+</tr>
+<tr>
+<td><code>keywords_exclude</code></td>
+<td>set</td>
+<td>empty</td>
+<td>Deprecated title exclusions, converted to an implicit global blocker.</td>
+</tr>
+<tr>
+<td><code>download_file</code></td>
+<td>boolean</td>
+<td><code>True</code></td>
+<td>Download the main post file, usually the cover.</td>
+</tr>
+<tr>
+<td><code>download_attachments</code></td>
+<td>boolean</td>
+<td><code>True</code></td>
+<td>Download attachments.</td>
+</tr>
+<tr>
+<td><code>min_file_size</code></td>
+<td>integer / omitted</td>
+<td>omitted</td>
+<td>Skip files smaller than this byte count.</td>
+</tr>
+<tr>
+<td><code>max_file_size</code></td>
+<td>integer / omitted</td>
+<td>omitted</td>
+<td>Skip files larger than this byte count.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="project-ktoolboxtoml">Project <code>ktoolbox.toml</code><a class="headerlink" href="#project-ktoolboxtoml" title="Permanent link">&para;</a></h2>
+<p>The project document is separate from environment configuration. Its path resolves from global <code>--config</code>, then <code>KTOOLBOX_PROJECT_CONFIG</code>, then <code>./ktoolbox.toml</code>.</p>
+<h3 id="root_1">Root<a class="headerlink" href="#root_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>schema_version</code></td>
+<td>literal <code>5</code></td>
+<td><code>5</code></td>
+<td>Project schema version; older documents upgrade when saved.</td>
+</tr>
+<tr>
+<td><code>creators</code></td>
+<td>table array</td>
+<td>empty</td>
+<td>Saved creator roster.</td>
+</tr>
+<tr>
+<td><code>blockers</code></td>
+<td>table array</td>
+<td>empty</td>
+<td>Ordered blocker specifications.</td>
+</tr>
+<tr>
+<td><code>default_output</code></td>
+<td>string</td>
+<td><code>downloads</code></td>
+<td>Default download directory. Relative paths resolve from the project root; absolute paths may point outside the project.</td>
+</tr>
+<tr>
+<td><code>naming</code></td>
+<td>table</td>
+<td>project defaults</td>
+<td>Directory layout and filename templates. Old locations are entered only in the conversion tool. See the <a href="../../naming/">naming guide</a>.</td>
+</tr>
+<tr>
+<td><code>automatic_sync</code></td>
+<td>table array</td>
+<td>empty</td>
+<td>Scheduled creator synchronization plans. See the <a href="../../automatic-sync/">automatic-sync guide</a>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="creator-entry">Creator entry<a class="headerlink" href="#creator-entry" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>service</code></td>
+<td>non-empty string</td>
+<td>required</td>
+<td>Pawchive service.</td>
+</tr>
+<tr>
+<td><code>creator_id</code></td>
+<td>non-empty string</td>
+<td>required</td>
+<td>Pawchive creator ID.</td>
+</tr>
+<tr>
+<td><code>alias</code></td>
+<td>string / omitted</td>
+<td>omitted</td>
+<td>Unique CLI target; <code>:</code> is forbidden.</td>
+</tr>
+<tr>
+<td><code>enabled</code></td>
+<td>boolean</td>
+<td><code>True</code></td>
+<td>Included by targetless <code>sync</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="blocker-entry">Blocker entry<a class="headerlink" href="#blocker-entry" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>id</code></td>
-<td>String</td>
+<td>identifier</td>
+<td>required</td>
+<td>Unique ID matching letters, numbers, <code>.</code>, <code>_</code>, or <code>-</code>.</td>
 </tr>
 <tr>
-<td><code>user</code></td>
-<td>String</td>
+<td><code>type</code></td>
+<td>string</td>
+<td><code>field-match</code></td>
+<td>Registered blocker implementation. Unknown types are rejected.</td>
 </tr>
 <tr>
-<td><code>service</code></td>
-<td>String</td>
+<td><code>enabled</code></td>
+<td>boolean</td>
+<td><code>True</code></td>
+<td>Whether this blocker participates.</td>
 </tr>
 <tr>
-<td><code>title</code></td>
-<td>String</td>
+<td><code>scope.mode</code></td>
+<td><code>global</code> / <code>creators</code></td>
+<td><code>global</code></td>
+<td>Apply globally or to selected identities.</td>
 </tr>
 <tr>
-<td><code>added</code></td>
-<td>Date</td>
+<td><code>scope.creators</code></td>
+<td>list of <code>service:id</code></td>
+<td>empty</td>
+<td>Required and non-empty for creator scope; forbidden for global scope.</td>
 </tr>
 <tr>
-<td><code>published</code></td>
-<td>Date</td>
-</tr>
-<tr>
-<td><code>edited</code></td>
-<td>Date</td>
+<td><code>options.rule</code></td>
+<td>condition group</td>
+<td>required for <code>field-match</code></td>
+<td>Root recursive rule.</td>
 </tr>
 </tbody>
 </table>
-</li>
-</ul>
-
-
-<style>
-.md-grid {
-  max-width: 1920px !important;
-}
-</style>
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>attachments</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Sub path of attachment directory</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      Path(&#39;attachments&#39;)
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>content</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Sub path of post content file</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      Path(&#39;content.txt&#39;)
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>external_links</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Sub path of external links file (for cloud storage links found in content)</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      Path(&#39;external_links.txt&#39;)
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>file</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The format of the post <code>file</code> filename (<code>file</code> is not <code>attachment</code>, each post has only one <code>file</code>, usually the cover image)     Customize the filename format by inserting an empty <code>{}</code> to represent the basic filename.     You can use some of the <a class="autorefs autorefs-internal" href="../../api/#ktoolbox.configuration.JobConfiguration">properties</a>     in Post. For example: <code>{title}_{}</code> could result in filenames like     <code>TheTitle_Stelle_lv5_logo.gif</code>, <code>TheTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg</code>, etc.     Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example:     <code>{title:.6}_{}</code> could shorten the title length to 6 characters like     <code>HiEveryoneThisIsALongTitle_ScxHjZIdxt5cnjaAwf3ql2p7.jpg</code> to <code>HiEver_ScxHjZIdxt5cnjaAwf3ql2p7.jpg</code></p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      &#39;{id}_{}&#39;
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>revisions</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Sub path of revisions directory</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      Path(&#39;revisions&#39;)
-              </code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ktoolbox.configuration.JobConfiguration" class="doc doc-heading">
-            <code>JobConfiguration</code>
-
-
-<a href="#ktoolbox.configuration.JobConfiguration" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-    <div class="doc doc-contents first">
-
-
-        <p>Download jobs Configuration</p>
-<ul>
-<li>
-<p>Available properties for <code>post_dirname_format</code> and <code>filename_format</code></p>
+<p>Condition groups use <code>kind = "group"</code>, <code>mode = "any"</code> or <code>"all"</code>, a non-empty <code>conditions</code> list, and optional <code>negate</code>. Field conditions use <code>kind = "field"</code>, a safe dotted <code>field</code>, one of <code>contains</code>, <code>equals</code>, <code>regex</code>, or <code>exists</code>, and optional <code>case_sensitive</code>, <code>negate</code>, or <code>expected</code>. Non-<code>exists</code> operators require a non-empty <code>values</code> list; <code>exists</code> forbids <code>values</code>.</p>
+<h2 id="webui"><code>webui</code><a class="headerlink" href="#webui" title="Permanent link">&para;</a></h2>
+<p>These settings are needed only when <code>ktoolbox[webui]</code> is installed. They are optional for startup: an empty username becomes <code>admin</code>, and when both password forms are empty the server generates a random password, prints the effective credentials in the terminal, and keeps them only for that process run.</p>
 <table>
 <thead>
 <tr>
-<th>Property</th>
+<th>Field</th>
 <th>Type</th>
+<th>Default</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>id</code></td>
-<td>String</td>
+<td><code>host</code></td>
+<td>string</td>
+<td><code>0.0.0.0</code></td>
+<td>HTTP listen interface. Prefer <code>127.0.0.1</code> outside a trusted LAN.</td>
 </tr>
 <tr>
-<td><code>user</code></td>
-<td>String</td>
+<td><code>port</code></td>
+<td>integer</td>
+<td><code>8789</code></td>
+<td>HTTP listen port, from 1 through 65535.</td>
 </tr>
 <tr>
-<td><code>service</code></td>
-<td>String</td>
+<td><code>open_browser</code></td>
+<td>boolean</td>
+<td><code>True</code></td>
+<td>Open the local panel URL after startup.</td>
 </tr>
 <tr>
-<td><code>title</code></td>
-<td>String</td>
+<td><code>username</code></td>
+<td>string</td>
+<td>empty</td>
+<td>Optional username; startup uses <code>admin</code> when empty.</td>
 </tr>
 <tr>
-<td><code>added</code></td>
-<td>Date</td>
+<td><code>password_hash</code></td>
+<td>secret string</td>
+<td>empty</td>
+<td>Preferred stable Argon2id password hash.</td>
 </tr>
 <tr>
-<td><code>published</code></td>
-<td>Date</td>
+<td><code>password</code></td>
+<td>secret string</td>
+<td>empty</td>
+<td>Plaintext fallback; startup generates one when both password forms are empty.</td>
 </tr>
 <tr>
-<td><code>edited</code></td>
-<td>Date</td>
+<td><code>max_active_tasks</code></td>
+<td>integer</td>
+<td><code>2</code></td>
+<td>Concurrent top-level tasks, from 1 through 16.</td>
+</tr>
+<tr>
+<td><code>session_idle_hours</code></td>
+<td>integer</td>
+<td><code>24</code></td>
+<td>Session expiry measured from last use.</td>
+</tr>
+<tr>
+<td><code>session_absolute_hours</code></td>
+<td>integer</td>
+<td><code>168</code></td>
+<td>Maximum session lifetime measured from login.</td>
 </tr>
 </tbody>
 </table>
-</li>
-<li>
-<p>Available properties for <code>year_dirname_format</code> and <code>month_dirname_format</code></p>
+<p>All names use the normal prefix, for example <code>KTOOLBOX_WEBUI__PASSWORD_HASH</code>. Generate a hash with <code>ktoolbox webui hash-password</code>; quote it in dotenv files because Argon2 hashes contain <code>$</code> characters. Command-line <code>--host</code>, <code>--port</code>, and <code>--no-open</code> override the corresponding settings for one launch.</p>
+<h2 id="logger"><code>logger</code><a class="headerlink" href="#logger" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Property</th>
+<th>Field</th>
 <th>Type</th>
+<th>Default</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>year</code></td>
-<td>String</td>
+<td><code>path</code></td>
+<td>path / omitted</td>
+<td>omitted</td>
+<td>Log-file path; omitted disables file logging.</td>
 </tr>
 <tr>
-<td><code>month</code></td>
-<td>String</td>
+<td><code>level</code></td>
+<td>string / integer</td>
+<td><code>DEBUG</code></td>
+<td>Minimum log level.</td>
+</tr>
+<tr>
+<td><code>rotation</code></td>
+<td>string / integer / time</td>
+<td><code>1 week</code></td>
+<td>Loguru rotation condition.</td>
 </tr>
 </tbody>
 </table>
-</li>
-<li>
-<p>Python Format Specification Mini-Language reference:</p>
-<p>https://docs.python.org/3.13/library/string.html#format-specification-mini-language</p>
-</li>
-</ul>
-
-
-<style>
-.md-grid {
-  max-width: 1920px !important;
-}
-</style>
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>count</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Number of coroutines for concurrent download</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      4
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>include_revisions</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Include and download revision posts when available</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      False
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>post_dirname_format</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Customize the post directory name format, you can use some of the     <a class="autorefs autorefs-internal" href="../../api/#ktoolbox.configuration.JobConfiguration">properties</a> in <code>Post</code>.     e.g. <code>[{published}]{id}</code> could result dirname <code>[2024-1-1]123123</code>,     <code>{user}_{published}_{title}</code> could result dirname like <code>234234_2024-1-1_TheTitle</code>.     Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example:     <code>{title:.6}</code> could shorten the title length to 6 characters like <code>HiEveryoneThisIsALongTitle</code> to <code>HiEver</code></p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      &#39;{title}&#39;
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>post_structure</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ktoolbox.configuration.PostStructureConfiguration" href="../../api/#ktoolbox.configuration.PostStructureConfiguration">PostStructureConfiguration</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Post path structure</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      PostStructureConfiguration()
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>mix_posts</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Save all files from different posts at same path in creator directory.     It would not create any post directory, and <code>CreatorIndices</code> would not been recorded.</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      False
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>sequential_filename</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Rename attachments in numerical order, e.g. <code>1.png</code>, <code>2.png</code>, ...</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      False
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>sequential_filename_excludes</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Set" href="https://docs.python.org/3/library/typing.html#typing.Set">Set</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>File extensions to exclude from sequential naming when <code>sequential_filename</code> is enabled.     Files with these extensions will keep their original names. e.g. <code>[".psd", ".zip", ".mp4"]</code></p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      Field(default_factory=set)
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>filename_format</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Customize the filename format by inserting an empty <code>{}</code> to represent the basic filename. Similar to post_dirname_format, you can use some of the <a class="autorefs autorefs-internal" href="../../api/#ktoolbox.configuration.JobConfiguration">properties</a>     in Post. For example: <code>{title}_{}</code> could result in filenames like     <code>TheTitle_b4b41de2-8736-480d-b5c3-ebf0d917561b</code>, <code>TheTitle_af349b25-ac08-46d7-98fb-6ce99a237b90</code>, etc.     You can also use it with <code>sequential_filename</code>. For instance,     <code>[{published}]_{}</code> could result in filenames like <code>[2024-1-1]_1.png</code>, <code>[2024-1-1]_2.png</code>, etc.     Meanwhile, you can also use the formatting feature of the Python Format Specification Mini-Language, for example:     <code>{title:.6}</code> could shorten the title length to 6 characters like <code>HiEveryoneThisIsALongTitle</code> to <code>HiEver</code></p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      &#39;{}&#39;
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>allow_list</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Set" href="https://docs.python.org/3/library/typing.html#typing.Set">Set</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Download files which match these patterns (Unix shell-style), e.g. <code>["*.png"]</code></p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      Field(default_factory=set)
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>block_list</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Set" href="https://docs.python.org/3/library/typing.html#typing.Set">Set</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Not to download files which match these patterns (Unix shell-style), e.g. <code>["*.psd","*.zip"]</code></p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      Field(default_factory=set)
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>extract_content</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Extract post content and save to separate file (filename was defined in <code>config.job.post_structure.content</code>)</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      False
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>extract_content_images</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Extract images from post content and download them.</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      False
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>extract_external_links</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Extract external file sharing links from post content and save to separate file     (filename was defined in <code>config.job.post_structure.external_links</code>)</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      False
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>external_link_patterns</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.List" href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Regex patterns for extracting external links.</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      [&#39;https?://drive\\.google\\.com/[^\\s]+&#39;, &#39;https?://docs\\.google\\.com/[^\\s]+&#39;, &#39;https?://mega\\.nz/[^\\s]+&#39;, &#39;https?://mega\\.co\\.nz/[^\\s]+&#39;, &#39;https?://(?:www\\.)?dropbox\\.com/[^\\s]+&#39;, &#39;https?://db\\.tt/[^\\s]+&#39;, &#39;https?://onedrive\\.live\\.com/[^\\s]+&#39;, &#39;https?://1drv\\.ms/[^\\s]+&#39;, &#39;https?://(?:www\\.)?mediafire\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?wetransfer\\.com/[^\\s]+&#39;, &#39;https?://we\\.tl/[^\\s]+&#39;, &#39;https?://(?:www\\.)?sendspace\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?4shared\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?zippyshare\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?uploadfiles\\.io/[^\\s]+&#39;, &#39;https?://(?:www\\.)?box\\.com/[^\\s]+&#39;, &#39;https?://(?:www\\.)?pcloud\\.com/[^\\s]+&#39;, &#39;https?://disk\\.yandex\\.[a-z]+/[^\\s]+&#39;, &#39;https?://[^\\s]*(?:file|upload|share|download|drive|storage)[^\\s]*\\.[a-z]{2,4}/[^\\s]+&#39;]
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>group_by_year</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Group posts by year in separate directories based on published date</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      False
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>group_by_month</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Group posts by month in separate directories based on published date (requires group_by_year)</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      False
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>year_dirname_format</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Customize the year directory name format. Available properties: <code>year</code>.     e.g. <code>{year}</code> &gt; <code>2024</code>, <code>Year_{year}</code> &gt; <code>Year_2024</code></p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      &#39;{year}&#39;
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>month_dirname_format</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Customize the month directory name format. Available properties: <code>year</code>, <code>month</code>.     e.g. <code>{year}-{month}</code> &gt; <code>2024-01</code>, <code>{year}_{month}</code> &gt; <code>2024_01</code></p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      &#39;{year}-{month:02d}&#39;
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>keywords</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Set" href="https://docs.python.org/3/library/typing.html#typing.Set">Set</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>keywords to filter posts by title (case-insensitive)</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      Field(default_factory=set)
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>keywords_exclude</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Set" href="https://docs.python.org/3/library/typing.html#typing.Set">Set</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>keywords to exclude posts by title (case-insensitive)</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      Field(default_factory=set)
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>download_file</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Download post file (usually cover image). Set to False to skip file downloads.</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      True
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>download_attachments</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Download post attachments. Set to False to skip attachment downloads.</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      True
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>min_file_size</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Minimum file size in bytes to download. Files smaller than this will be skipped.     Set to None to disable minimum size filtering.</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      None
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>max_file_size</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Maximum file size in bytes to download. Files larger than this will be skipped.     Set to None to disable maximum size filtering.</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      None
-              </code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ktoolbox.configuration.LoggerConfiguration" class="doc doc-heading">
-            <code>LoggerConfiguration</code>
-
-
-<a href="#ktoolbox.configuration.LoggerConfiguration" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-    <div class="doc doc-contents first">
-
-
-        <p>Logger configuration</p>
-
-
-<style>
-.md-grid {
-  max-width: 1920px !important;
-}
-</style>
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>path</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Optional" href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Path to save logs, <code>None</code> for disable log file output</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      None
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>level</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Union" href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Log filter level</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      logging.getLevelName(logging.DEBUG)
-              </code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>rotation</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Union" href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, <a class="autorefs autorefs-external" title="datetime.time" href="https://docs.python.org/3/library/datetime.html#datetime.time">time</a>, <a class="autorefs autorefs-external" title="datetime.timedelta" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta">timedelta</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Log rotation</p>
-              </div>
-            </td>
-            <td>
-              <code>
-                      &#39;1 week&#39;
-              </code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
 
 
 
@@ -2806,13 +2352,13 @@
         
         
           
-          <a href="../../shortcut/" class="md-footer__link md-footer__link--next" aria-label="Next: iOS Shortcuts">
+          <a href="../../mcp/" class="md-footer__link md-footer__link--next" aria-label="Next: MCP">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                iOS Shortcuts
+                MCP
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -2853,7 +2399,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.action.edit"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.code.copy", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>

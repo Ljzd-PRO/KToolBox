@@ -1,0 +1,1916 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation de KToolBox">
+      
+      
+      
+        <link rel="canonical" href="https://ktoolbox.readthedocs.io/master/fr/configuration/guide/">
+      
+      
+        <link rel="prev" href="../../naming/">
+      
+      
+        <link rel="next" href="../reference/">
+      
+      
+        
+          <link rel="alternate" href="../../../configuration/guide/" hreflang="en">
+        
+          <link rel="alternate" href="../../../zh/configuration/guide/" hreflang="zh">
+        
+          <link rel="alternate" href="../../../zh-Hant/configuration/guide/" hreflang="zh-Hant">
+        
+          <link rel="alternate" href="../../../ru/configuration/guide/" hreflang="ru">
+        
+          <link rel="alternate" href="../../../ja/configuration/guide/" hreflang="ja">
+        
+          <link rel="alternate" href="../../../ko/configuration/guide/" hreflang="ko">
+        
+          <link rel="alternate" href="./" hreflang="fr">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Guide - KToolBox</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-LLM6CEJEH3"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-LLM6CEJEH3",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-LLM6CEJEH3",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#guide-de-configuration" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href="../../" title="KToolBox" class="md-header__button md-logo" aria-label="KToolBox" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            KToolBox
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Passer au mode clair"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Passer au mode clair" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Passer au mode sombre"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Passer au mode sombre" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Utiliser le réglage du système"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Utiliser le réglage du système" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Sélectionner la langue">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../configuration/guide/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../zh/configuration/guide/" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../zh-Hant/configuration/guide/" hreflang="zh-Hant" class="md-select__link">
+              繁體中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../ru/configuration/guide/" hreflang="ru" class="md-select__link">
+              Русский
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../ja/configuration/guide/" hreflang="ja" class="md-select__link">
+              日本語
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../ko/configuration/guide/" hreflang="ko" class="md-select__link">
+              한국어
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="fr" class="md-select__link">
+              Français
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Rechercher" placeholder="Rechercher" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Recherche">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Partager" aria-label="Partager" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Effacer" aria-label="Effacer" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Ljzd-PRO/KToolBox" title="Aller au dépôt" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Ljzd-PRO/KToolBox
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Onglets" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Bien démarrer
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../commands/guide/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Utiliser KToolBox
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Configurer
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../mcp/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Intégrations
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../faq/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Aide et projet
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="KToolBox" class="md-nav__button md-logo" aria-label="KToolBox" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    KToolBox
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Ljzd-PRO/KToolBox" title="Aller au dépôt" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Ljzd-PRO/KToolBox
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bien démarrer
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1" id="__nav_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Bien démarrer
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../migration-v1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration vers v1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about-pawchive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    À propos de Pawchive
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utiliser KToolBox
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Utiliser KToolBox
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../commands/guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide des commandes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../commands/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Référence des commandes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebUI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    WebUI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vue d'ensemble
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/project-workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parcours du projet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/tasks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tâches et mises à jour
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Référence de déploiement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../automatic-sync/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Synchronisation automatique
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../naming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Format de nommage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configurer
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configurer
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#generer-ou-modifier-la-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Générer ou modifier la configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#liste-des-createurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Liste des créateurs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#post-blockers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Règles d'exclusion des publications
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adresses-pawchive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adresses Pawchive
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#collections-et-chemins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Collections et chemins
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modeles-de-nommage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modèles de nommage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limiter-les-telechargements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limiter les téléchargements
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Référence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intégrations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Intégrations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mcp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Python
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Aide et projet
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Aide et projet
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Questions fréquentes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../more/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Informations sur le projet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#generer-ou-modifier-la-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Générer ou modifier la configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#liste-des-createurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Liste des créateurs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#post-blockers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Règles d'exclusion des publications
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adresses-pawchive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adresses Pawchive
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#collections-et-chemins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Collections et chemins
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modeles-de-nommage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modèles de nommage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limiter-les-telechargements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limiter les téléchargements
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../../" class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Bienvenue dans KToolBox
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="./" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Configurer
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="guide-de-configuration">Guide de configuration<a class="headerlink" href="#guide-de-configuration" title="Permanent link">&para;</a></h1>
+<p>KToolBox possède deux niveaux de configuration :</p>
+<ul>
+<li><code>.env</code>, <code>prod.env</code> et les variables du processus contrôlent l'API, les transferts et le comportement global des téléchargements.</li>
+<li><code>ktoolbox.toml</code> conserve le nommage, la liste des créateurs, les plans de synchronisation automatique et les règles ordonnées d'exclusion du projet.</li>
+</ul>
+<p>KToolBox lit <code>.env</code>, puis <code>prod.env</code>, depuis le répertoire de travail actuel. Les valeurs de <code>prod.env</code> remplacent les valeurs correspondantes de <code>.env</code>, tandis que les variables d'environnement du processus ont la priorité la plus élevée.</p>
+<p>Les champs imbriqués utilisent deux traits de soulignement. Par exemple, <code>KTOOLBOX_API__TIMEOUT</code> correspond à <code>config.api.timeout</code>.</p>
+<div class="highlight"><pre><span></span><code># Requêtes de l&#39;API Pawchive.
+KTOOLBOX_API__TIMEOUT=10
+KTOOLBOX_API__RETRY_TIMES=4
+KTOOLBOX_API__RETRY_INTERVAL=2
+
+# Transferts de fichiers.
+KTOOLBOX_DOWNLOADER__TIMEOUT=30
+KTOOLBOX_DOWNLOADER__TPS_LIMIT=5
+
+# Tâches de téléchargement.
+KTOOLBOX_JOB__COUNT=4
+KTOOLBOX_JOB__CREATOR_CONCURRENCY=4
+KTOOLBOX_JOB__DOWNLOAD_FILE=True
+KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
+</code></pre></div>
+<p>Tous les réglages sont facultatifs. Consultez la <a href="../reference/">référence de configuration</a> pour les valeurs par défaut.</p>
+<h2 id="generer-ou-modifier-la-configuration">Générer ou modifier la configuration<a class="headerlink" href="#generer-ou-modifier-la-configuration" title="Permanent link">&para;</a></h2>
+<p>Générez toutes les clés dotenv disponibles à partir du modèle actuel :</p>
+<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>config<span class="w"> </span>example
+</code></pre></div>
+<p>L'éditeur de terminal facultatif peut afficher les descriptions de champs extraites des chaînes de documentation du modèle :</p>
+<div class="highlight"><pre><span></span><code>pipx<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;ktoolbox[urwid]&quot;</span><span class="w"> </span>--force
+ktoolbox<span class="w"> </span>config<span class="w"> </span>edit
+</code></pre></div>
+<p>La <a href="../../webui/">WebUI</a> facultative présente des libellés et descriptions localisés dans les sept langues prises en charge, ainsi que la source des valeurs finales, le masquage des secrets, la modification directe de dotenv/TOML, la validation, l'aperçu des différences et la protection contre les conflits ETag. Les docstrings anglaises restent la source des champs et de leur sens ; la couverture de chaque chemin est vérifiée dans les autres catalogues.</p>
+<p>Les choix fixes, comme le niveau de journalisation, utilisent Select ; les champs avec des valeurs conseillées mais acceptant du texte personnalisé utilisent ComboBox. Le sélecteur de chemin est réservé aux vrais fichiers et répertoires ; les noms internes comme <code>attachments</code> et <code>external_links.txt</code> restent de simples champs texte.</p>
+<p>Examinez ou validez le fichier du projet sans ouvrir l'éditeur :</p>
+<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>config<span class="w"> </span>path
+ktoolbox<span class="w"> </span>config<span class="w"> </span>validate
+</code></pre></div>
+<p>Le chemin du projet est résolu dans l'ordre suivant : l'option globale <code>--config</code>, <code>KTOOLBOX_PROJECT_CONFIG</code>, puis <code>./ktoolbox.toml</code>. Les écritures utilisent un fichier temporaire dans le même répertoire et un remplacement atomique ; TomlKit conserve les commentaires.</p>
+<h2 id="liste-des-createurs">Liste des créateurs<a class="headerlink" href="#liste-des-createurs" title="Permanent link">&para;</a></h2>
+<p>Chaque document de projet commence par <code>schema_version = 5</code>. Le Schema v5 stocke le nommage et les plans de synchronisation automatique ; les anciens emplacements servent uniquement à l’outil de conversion. <code>default_output = "downloads"</code> définit la destination commune du projet, tandis qu’un chemin absolu peut viser l’extérieur du projet. Consultez le <a href="../../naming/">guide du nommage</a>. Les créateurs sont uniques par <code>service:id</code> sans distinction de casse ; les alias facultatifs sont également uniques.</p>
+<div class="highlight"><pre><span></span><code><span class="n">schema_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+
+<span class="k">[[creators]]</span>
+<span class="n">service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;fanbox&quot;</span>
+<span class="n">creator_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;123&quot;</span>
+<span class="n">alias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;studio-a&quot;</span>
+<span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+
+<span class="k">[[creators]]</span>
+<span class="n">service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;patreon&quot;</span>
+<span class="n">creator_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;456&quot;</span>
+<span class="n">alias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;studio-b&quot;</span>
+<span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+</code></pre></div>
+<p>Utilisez <code>creator add</code>, <code>remove</code>, <code>enable</code> et <code>disable</code> plutôt que de modifier à la main les entrées simples. <code>sync</code> sans cible utilise toutes les entrées activées ; les alias ou identités explicites s'exécutent indépendamment de <code>enabled</code>.</p>
+<h2 id="post-blockers">Règles d'exclusion des publications<a class="headerlink" href="#post-blockers" title="Permanent link">&para;</a></h2>
+<p>Les règles s'exécutent dans l'ordre du TOML et la première correspondance exclut la publication. Une règle globale s'applique à tous les créateurs synchronisés ; une portée par créateur répertorie les valeurs <code>service:id</code> exactes. Les règles désactivées restent configurées mais ne s'exécutent pas.</p>
+<div class="highlight"><pre><span></span><code><span class="k">[[blockers]]</span>
+<span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;skip-life-updates&quot;</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;field-match&quot;</span>
+<span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">mode</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;global&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">creators</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[]</span><span class="w"> </span><span class="p">}</span>
+<span class="n">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">rule</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">kind</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;group&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">mode</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;any&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">conditions</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="n">kind</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;field&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">field</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;title&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">operator</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;contains&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;life update&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;daily note&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">kind</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;field&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">field</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;tags[*]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">operator</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;equals&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;personal&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}]</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+
+<span class="k">[[blockers]]</span>
+<span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;studio-a-progress&quot;</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;field-match&quot;</span>
+<span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">mode</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;creators&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">creators</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;fanbox:123&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+<span class="n">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">rule</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">kind</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;group&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">mode</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;all&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">conditions</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="n">kind</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;field&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">field</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;title&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">operator</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;regex&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;progress|practice&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">kind</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;field&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">field</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;attachments[*].name&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">operator</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;exists&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">expected</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">}]</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p><code>field-match</code> prend en charge les groupes récursifs <code>any</code>/<code>all</code> et <code>negate</code> sur un groupe ou une condition. Les conditions acceptent :</p>
+<table>
+<thead>
+<tr>
+<th>Opérateur</th>
+<th>Comportement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>contains</code></td>
+<td>L'une des valeurs scalaires choisies contient une valeur configurée.</td>
+</tr>
+<tr>
+<td><code>equals</code></td>
+<td>L'une des valeurs scalaires choisies est égale à une valeur configurée.</td>
+</tr>
+<tr>
+<td><code>regex</code></td>
+<td>L'une des valeurs scalaires choisies correspond à une expression régulière. Les motifs sont compilés lors de la validation.</td>
+</tr>
+<tr>
+<td><code>exists</code></td>
+<td>Le chemin choisi existe et n'est pas nul ; <code>expected = false</code> inverse cette attente.</td>
+</tr>
+</tbody>
+</table>
+<p>Les comparaisons ne tiennent pas compte de la casse, sauf si <code>case_sensitive = true</code>. Les chemins sûrs à points peuvent inclure des sélecteurs de liste <code>[*]</code>, par exemple <code>tags[*]</code>, <code>file.name</code> et <code>attachments[*].name</code>. Un chemin absent ne correspond pas. Les expressions Python et le code arbitraire ne sont jamais évalués.</p>
+<p>Les règles évaluent la réponse de la liste avant les détails, révisions, répertoires, métadonnées ou tâches de téléchargement. Les publications et révisions exclues n'entrent pas dans l'index du créateur, et le texte correspondant n'est pas affiché. L'interface asynchrone <code>PostBlocker</code> et son registre permettent d'ajouter de futurs types sans modifier le coordinateur de synchronisation.</p>
+<p><code>KTOOLBOX_JOB__KEYWORDS_EXCLUDE</code> reste accepté comme ancienne règle globale implicite « le titre contient ». KToolBox ne le réécrit pas automatiquement ; transférez-le vers <code>ktoolbox.toml</code>.</p>
+<h2 id="adresses-pawchive">Adresses Pawchive<a class="headerlink" href="#adresses-pawchive" title="Permanent link">&para;</a></h2>
+<p>Les valeurs par défaut de v1 ne nécessitent normalement aucune modification :</p>
+<div class="highlight"><pre><span></span><code>KTOOLBOX_API__SCHEME=https
+KTOOLBOX_API__NETLOC=pawchive.pw
+KTOOLBOX_API__STATICS_NETLOC=pawchive.pw
+KTOOLBOX_API__PATH=/api/v1
+KTOOLBOX_DOWNLOADER__SCHEME=https
+KTOOLBOX_DOWNLOADER__FILES_NETLOC=file.pawchive.pw
+KTOOLBOX_DOWNLOADER__FILE_PATH_PREFIX=/data
+</code></pre></div>
+<p><code>KTOOLBOX_DOWNLOADER__SESSION_KEY</code> est facultatif et n'est joint qu'aux requêtes du téléchargeur de fichiers. Il n'est jamais envoyé par <code>PawchiveClient</code>, qui ne prend pas en charge les sessions de compte.</p>
+<h2 id="collections-et-chemins">Collections et chemins<a class="headerlink" href="#collections-et-chemins" title="Permanent link">&para;</a></h2>
+<p>Utilisez des tableaux JSON pour les ensembles et les listes dans les fichiers dotenv :</p>
+<div class="highlight"><pre><span></span><code>KTOOLBOX_JOB__ALLOW_LIST=&#39;[&quot;*.jpg&quot;, &quot;*.png&quot;]&#39;
+KTOOLBOX_JOB__BLOCK_LIST=&#39;[&quot;*.zip&quot;, &quot;*.psd&quot;]&#39;
+</code></pre></div>
+<p>Les chemins relatifs de sortie et de stockage sont résolus depuis le répertoire de travail.</p>
+<h2 id="modeles-de-nommage">Modèles de nommage<a class="headerlink" href="#modeles-de-nommage" title="Permanent link">&para;</a></h2>
+<p>Les modèles et noms internes des œuvres ne sont plus des réglages dotenv globaux. Configurez la table <code>[naming]</code> du projet dans la page <strong>Format de nommage</strong> de la WebUI. Après la migration sauvegardée du premier démarrage, les anciennes clés sont refusées. Consultez le <a href="../../naming/">guide du nommage</a> pour les variables, la validation, l'analyse et la conversion.</p>
+<h2 id="limiter-les-telechargements">Limiter les téléchargements<a class="headerlink" href="#limiter-les-telechargements" title="Permanent link">&para;</a></h2>
+<p>Les limites de taille sont exprimées en octets et s'appliquent avant la mise en file d'un fichier. Omettez une variable pour désactiver la borne correspondante.</p>
+<div class="highlight"><pre><span></span><code># Minimum de 1 Kio et maximum de 1 Mio.
+KTOOLBOX_JOB__MIN_FILE_SIZE=1024
+KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
+
+# Récupérer uniquement la couverture, sans pièces jointes.
+KTOOLBOX_JOB__DOWNLOAD_FILE=True
+KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=False
+</code></pre></div>
+<p><code>KTOOLBOX_JOB__CREATOR_CONCURRENCY</code> contrôle les producteurs de créateurs simultanés. <code>KTOOLBOX_JOB__COUNT</code> contrôle séparément les travailleurs de fichiers partagés par tous les créateurs.</p>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  <form class="md-feedback" name="feedback" hidden>
+    <fieldset>
+      <legend class="md-feedback__title">
+        Cette page vous a-t-elle été utile ?
+      </legend>
+      <div class="md-feedback__inner">
+        <div class="md-feedback__list">
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="Cette page a été utile" data-md-value="1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81"/></svg>
+            </button>
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="Cette page peut être améliorée" data-md-value="0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14"/></svg>
+            </button>
+          
+        </div>
+        <div class="md-feedback__note">
+          
+            <div data-md-value="1" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Merci pour votre avis !
+            </div>
+          
+            <div data-md-value="0" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Merci pour votre avis ! Vous pouvez proposer des améliorations dans les Issues ou Discussions de notre dépôt GitHub.
+            </div>
+          
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Retour en haut de la page
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Pied de page" >
+        
+          
+          <a href="../../naming/" class="md-footer__link md-footer__link--prev" aria-label="Précédent: Format de nommage">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Précédent
+              </span>
+              <div class="md-ellipsis">
+                Format de nommage
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../reference/" class="md-footer__link md-footer__link--next" aria-label="Suivant: Référence">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Suivant
+              </span>
+              <div class="md-ellipsis">
+                Référence
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright © 2023 by Ljzd-PRO
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

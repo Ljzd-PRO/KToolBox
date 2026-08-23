@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://ktoolbox.readthedocs.io/master/zh/configuration/guide/">
       
       
-        <link rel="prev" href="../../commands/reference/">
+        <link rel="prev" href="../../naming/">
       
       
         <link rel="next" href="../reference/">
@@ -23,6 +23,16 @@
           <link rel="alternate" href="../../../configuration/guide/" hreflang="en">
         
           <link rel="alternate" href="./" hreflang="zh">
+        
+          <link rel="alternate" href="../../../zh-Hant/configuration/guide/" hreflang="zh-Hant">
+        
+          <link rel="alternate" href="../../../ru/configuration/guide/" hreflang="ru">
+        
+          <link rel="alternate" href="../../../ja/configuration/guide/" hreflang="ja">
+        
+          <link rel="alternate" href="../../../ko/configuration/guide/" hreflang="ko">
+        
+          <link rel="alternate" href="../../../fr/configuration/guide/" hreflang="fr">
         
       
       
@@ -57,9 +67,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
-    
-      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
     
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -105,10 +113,6 @@
       
     </div>
     
-      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
-        
-      </div>
-    
     
       
 
@@ -147,9 +151,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换至深色模式"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换至浅色模式"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="切换至深色模式" for="__palette_1" hidden>
+      <label class="md-header__button md-icon" title="切换至浅色模式" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
       </label>
     
@@ -157,9 +161,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换至自动"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换至深色模式"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="切换至自动" for="__palette_2" hidden>
+      <label class="md-header__button md-icon" title="切换至深色模式" for="__palette_2" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -167,9 +171,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换至浅色模式"  type="radio" name="__palette" id="__palette_2">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换至跟随系统"  type="radio" name="__palette" id="__palette_2">
     
-      <label class="md-header__button md-icon" title="切换至浅色模式" for="__palette_0" hidden>
+      <label class="md-header__button md-icon" title="切换至跟随系统" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -198,7 +202,37 @@
         
           <li class="md-select__item">
             <a href="./" hreflang="zh" class="md-select__link">
-              中文（简体）
+              简体中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../zh-Hant/configuration/guide/" hreflang="zh-Hant" class="md-select__link">
+              繁體中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../ru/configuration/guide/" hreflang="ru" class="md-select__link">
+              Русский
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../ja/configuration/guide/" hreflang="ja" class="md-select__link">
+              日本語
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../ko/configuration/guide/" hreflang="ko" class="md-select__link">
+              한국어
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../fr/configuration/guide/" hreflang="fr" class="md-select__link">
+              Français
             </a>
           </li>
         
@@ -318,7 +352,7 @@
   
     
   
-  命令
+  使用 KToolBox
 
         </a>
       </li>
@@ -355,17 +389,20 @@
   
   
   
-    <li class="md-tabs__item">
-      <a href="../../shortcut/" class="md-tabs__link">
-        
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../mcp/" class="md-tabs__link">
+          
   
   
     
   
-  iOS 快捷指令
+  集成
 
-      </a>
-    </li>
+        </a>
+      </li>
+    
   
 
       
@@ -374,55 +411,20 @@
   
   
   
-    <li class="md-tabs__item">
-      <a href="../../coomer/" class="md-tabs__link">
-        
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../faq/" class="md-tabs__link">
+          
   
   
     
   
-  Coomer
+  帮助与项目
 
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../faq/" class="md-tabs__link">
-        
-  
-  
+        </a>
+      </li>
     
-  
-  常见问题
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../api/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  API 文档
-
-      </a>
-    </li>
   
 
       
@@ -547,14 +549,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../about-kemono/" class="md-nav__link">
+      <a href="../../migration-v1/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    关于 Kemono
+    迁移至 v1
   
 
     
@@ -575,14 +577,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../more/" class="md-nav__link">
+      <a href="../../about-pawchive/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    更多
+    关于 Pawchive
   
 
     
@@ -616,6 +618,12 @@
       
         
       
+        
+      
+        
+      
+        
+      
     
     
     
@@ -637,7 +645,7 @@
   <span class="md-ellipsis">
     
   
-    命令
+    使用 KToolBox
   
 
     
@@ -653,7 +661,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    命令
+    使用 KToolBox
   
 
           </label>
@@ -673,7 +681,7 @@
   <span class="md-ellipsis">
     
   
-    向导
+    命令指南
   
 
     
@@ -701,7 +709,243 @@
   <span class="md-ellipsis">
     
   
-    参考
+    命令参考
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebUI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    WebUI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/project-workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    项目工作流
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/tasks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    任务与实时更新
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webui/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    部署参考
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../automatic-sync/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    自动同步
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../naming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    命名格式
   
 
     
@@ -850,10 +1094,76 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#env-prodenv" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        .env / prod.env 文件示例
+        生成或编辑配置
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        作者清单
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#post-blockers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        作品忽略规则
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pawchive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pawchive 端点
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        集合与路径
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        命名模板
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        限制下载
       
     </span>
   </a>
@@ -910,15 +1220,71 @@
   
   
   
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    集成
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    集成
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../../shortcut/" class="md-nav__link">
+      <a href="../../mcp/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    iOS 快捷指令
+    MCP
   
 
     
@@ -930,22 +1296,23 @@
     </li>
   
 
-    
-      
-      
+              
+            
+              
+                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../../coomer/" class="md-nav__link">
+      <a href="../../api/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Coomer
+    Python API
   
 
     
@@ -957,9 +1324,73 @@
     </li>
   
 
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
     
       
       
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    帮助与项目
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    帮助与项目
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
   
   
   
@@ -984,22 +1415,23 @@
     </li>
   
 
-    
-      
-      
+              
+            
+              
+                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../../api/" class="md-nav__link">
+      <a href="../../more/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    API 文档
+    项目信息
   
 
     
@@ -1008,6 +1440,14 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1039,10 +1479,76 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#env-prodenv" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        .env / prod.env 文件示例
+        生成或编辑配置
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        作者清单
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#post-blockers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        作品忽略规则
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pawchive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pawchive 端点
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        集合与路径
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        命名模板
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        限制下载
       
     </span>
   </a>
@@ -1114,74 +1620,141 @@
 
 
   
-    <a href="https://github.com/Ljzd-PRO/KToolBox/edit/master/docs/zh/configuration/guide.md" title="编辑此页" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
-<h1 id="_1">向导<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<div class="admonition tip">
-<p class="admonition-title">图形化配置编辑器</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">用法</label><label for="__tabbed_1_2">截图</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<p>运行 <code>ktoolbox config-editor</code> 来启动，这会使配置编辑变得简单方便。</p>
+<h1 id="_1">配置向导<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>KToolBox 使用两层配置：</p>
 <ul>
-<li>按下 <code>&lt;Esc&gt;</code> 来返回，按 <code>&lt;Enter&gt;</code> 来选择 </li>
-<li>你也可以通过鼠标使用这个 GUI</li>
+<li><code>.env</code>、<code>prod.env</code> 与进程变量控制 API、传输及全局下载行为。</li>
+<li><code>ktoolbox.toml</code> 保存项目命名、作者清单、自动同步计划与有序作品忽略规则。</li>
 </ul>
-</div>
-<div class="tabbed-block">
-<p><img alt="KToolBox 配置编辑器" loading="lazy" src="https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-2.png" />
-<img alt="KToolBox 配置编辑器" loading="lazy" src="https://cdn.jsdelivr.net/gh/Ljzd-PRO/KToolBox@latest/static/preview-3.png" /></p>
-</div>
-</div>
-</div>
-</div>
-<div class="admonition tip">
-<p class="admonition-title">生成示例 <code>.env</code> 文件</p>
-<p>运行 <code>ktoolbox example-env</code> 来生成完整的配置文件样例。</p>
-</div>
-<ul>
-<li>KToolBox 读取 <strong>工作目录</strong> 下的 <strong><code>.env</code> 或 <code>prod.env</code> 文件</strong> 或 <strong>环境变量</strong> 来设定配置</li>
-<li>工作目录指的是你执行 <code>ktoolbox</code> 命令的目录位置，<strong>不一定是 <code>ktoolbox</code> 可执行文件所在的目录</strong>。在哪里执行就在哪里读取。</li>
-<li>前往 <a href="../reference/">参考</a> 查看所有配置选项</li>
-<li>用 <code>__</code> 来指定子选项, 例如 <code>KTOOLBOX_API__SCHEME</code> 相当于 <code>api.scheme</code></li>
-<li>所有配置选项都是可选的</li>
-</ul>
-<h2 id="env-prodenv"><code>.env</code> / <code>prod.env</code> 文件示例<a class="headerlink" href="#env-prodenv" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>##############################################################################
-#  推荐使用图形化配置编辑器进行编辑。                                         #
-#  运行 `ktoolbox config-editor` 启动编辑器。                                #
-##############################################################################
+<p>KToolBox 会从当前工作目录先读取 <code>.env</code>，再读取 <code>prod.env</code>。<code>prod.env</code> 中的同名值会覆盖 <code>.env</code>，进程环境变量优先级最高。</p>
+<p>嵌套字段使用双下划线。例如，<code>KTOOLBOX_API__TIMEOUT</code> 对应 <code>config.api.timeout</code>。</p>
+<div class="highlight"><pre><span></span><code># Pawchive API 请求。
+KTOOLBOX_API__TIMEOUT=10
+KTOOLBOX_API__RETRY_TIMES=4
+KTOOLBOX_API__RETRY_INTERVAL=2
 
-# （可选）会话密钥，可在成功登录后的 cookies 中找到
-# 403 错误时使用
-#KTOOLBOX_API__SESSION_KEY=xxxxx
+# 文件传输。
+KTOOLBOX_DOWNLOADER__TIMEOUT=30
+KTOOLBOX_DOWNLOADER__TPS_LIMIT=5
 
-# 同时下载 10 个文件。
-KTOOLBOX_JOB__COUNT=10
-
-# 设置帖子附件目录路径为 `./`，表示将所有附件文件保存在帖子目录下
-# 不会为附件单独创建子目录
-KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
-
-# 附件按数字顺序重命名，例如 `1.png`、`2.png`、……
-KTOOLBOX_JOB__SEQUENTIAL_FILENAME=True
-
-# 通过插入空的 `{}` 自定义文件名格式，表示基础文件名。
-# 类似于 `post_dirname_format`，可以使用 `Post` 中的一些属性。
-# 例如：`{title}_{}` &gt; `HelloWorld_b4b41de2-8736-480d-b5c3-ebf0d917561b` 等。
-# 也可以与 `sequential_filename` 一起使用。例如，
-# `[{published}]_{}` &gt; `[2024-1-1]_1.png`、`[2024-1-1]_2.png` 等。
-KTOOLBOX_JOB__FILENAME_FORMAT=[{published}]_{title}_{id}_{}
-
-# 帖子目录名以发布时间作为前缀，例如 `[2024-1-1]HelloWorld`
-KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title}
+# 下载任务。
+KTOOLBOX_JOB__COUNT=4
+KTOOLBOX_JOB__CREATOR_CONCURRENCY=4
+KTOOLBOX_JOB__DOWNLOAD_FILE=True
+KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 </code></pre></div>
+<p>所有配置均为可选项。默认值见<a href="../reference/">配置参考</a>。</p>
+<h2 id="_2">生成或编辑配置<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>根据当前模型生成全部 dotenv 配置键：</p>
+<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>config<span class="w"> </span>example
+</code></pre></div>
+<p>可选的终端编辑器能够展示从配置模型 docstring 正确解析的字段说明：</p>
+<div class="highlight"><pre><span></span><code>pipx<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;ktoolbox[urwid]&quot;</span><span class="w"> </span>--force
+ktoolbox<span class="w"> </span>config<span class="w"> </span>edit
+</code></pre></div>
+<p>可选 <a href="../../webui/">WebUI</a> 会在类型化控件中显示七种语言的标签与说明，并提供最终值来源、秘密遮蔽、dotenv/TOML 原文编辑、校验、差异预览和 ETag 冲突保护。英文配置 docstring 仍是字段与语义来源，其余语言目录会接受完整字段路径检查。</p>
+<p>日志级别等固定选项显示为 Select；具有推荐值但仍允许自定义的字段显示为 ComboBox。路径选择器只用于真正的文件或目录位置，<code>attachments</code>、<code>external_links.txt</code> 等内部产物名称保持普通文本字段。</p>
+<p>无需打开编辑器即可查看或校验项目文件：</p>
+<div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>config<span class="w"> </span>path
+ktoolbox<span class="w"> </span>config<span class="w"> </span>validate
+</code></pre></div>
+<p>项目路径优先级为全局 <code>--config</code>、<code>KTOOLBOX_PROJECT_CONFIG</code>、<code>./ktoolbox.toml</code>。写入时使用同目录临时文件和原子替换，TomlKit 会保留注释。</p>
+<h2 id="_3">作者清单<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>每份项目文档都以 <code>schema_version = 5</code> 开始。Schema v5 保存项目命名格式与自动同步计划；旧下载位置仅属于命名转换工具。<code>default_output = "downloads"</code> 设置项目默认下载目录，也可以填写项目外的绝对路径。详见<a href="../../naming/">命名格式指南</a>。作者按不区分大小写的 <code>service:id</code> 唯一，可选别名也必须唯一。</p>
+<div class="highlight"><pre><span></span><code><span class="n">schema_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+
+<span class="k">[[creators]]</span>
+<span class="n">service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;fanbox&quot;</span>
+<span class="n">creator_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;123&quot;</span>
+<span class="n">alias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;studio-a&quot;</span>
+<span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+
+<span class="k">[[creators]]</span>
+<span class="n">service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;patreon&quot;</span>
+<span class="n">creator_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;456&quot;</span>
+<span class="n">alias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;studio-b&quot;</span>
+<span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+</code></pre></div>
+<p>简单清单项建议通过 <code>creator add</code>、<code>remove</code>、<code>enable</code>、<code>disable</code> 管理。无目标 <code>sync</code> 使用全部已启用项；显式别名或身份无论 <code>enabled</code> 状态都会运行。</p>
+<h2 id="post-blockers">作品忽略规则<a class="headerlink" href="#post-blockers" title="Permanent link">&para;</a></h2>
+<p>忽略规则按 TOML 顺序执行，第一个命中项会排除作品。全局作用域应用于每位同步作者；作者作用域列出精确 <code>service:id</code>。禁用忽略规则会保留配置但不运行。</p>
+<div class="highlight"><pre><span></span><code><span class="k">[[blockers]]</span>
+<span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;skip-life-updates&quot;</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;field-match&quot;</span>
+<span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">mode</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;global&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">creators</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[]</span><span class="w"> </span><span class="p">}</span>
+<span class="n">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">rule</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">kind</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;group&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">mode</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;any&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">conditions</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="n">kind</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;field&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">field</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;title&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">operator</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;contains&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;life update&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;daily note&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">kind</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;field&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">field</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;tags[*]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">operator</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;equals&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;personal&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}]</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+
+<span class="k">[[blockers]]</span>
+<span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;studio-a-progress&quot;</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;field-match&quot;</span>
+<span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">mode</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;creators&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">creators</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;fanbox:123&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+<span class="n">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">rule</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">kind</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;group&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">mode</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;all&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">conditions</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="n">kind</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;field&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">field</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;title&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">operator</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;regex&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;progress|practice&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">kind</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;field&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">field</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;attachments[*].name&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">operator</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;exists&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">expected</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">}]</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p><code>field-match</code> 支持递归 <code>any</code>/<code>all</code> 条件组，组与条件都可设置 <code>negate</code>。条件操作符如下：</p>
+<table>
+<thead>
+<tr>
+<th>操作符</th>
+<th>行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>contains</code></td>
+<td>任一所选标量包含任一配置值。</td>
+</tr>
+<tr>
+<td><code>equals</code></td>
+<td>任一所选标量等于任一配置值。</td>
+</tr>
+<tr>
+<td><code>regex</code></td>
+<td>任一所选标量匹配任一正则；配置校验时预编译。</td>
+</tr>
+<tr>
+<td><code>exists</code></td>
+<td>所选路径存在且非空；设置 <code>expected = false</code> 可反转预期。</td>
+</tr>
+</tbody>
+</table>
+<p>比较默认不区分大小写，设置 <code>case_sensitive = true</code> 后区分。安全点路径可带 <code>[*]</code> 列表选择器，例如 <code>tags[*]</code>、<code>file.name</code>、<code>attachments[*].name</code>。缺失路径不匹配，永远不会执行 Python 表达式或任意代码。</p>
+<p>忽略规则在列表响应阶段执行，早于详情、修订、目录、元数据和下载任务。被排除作品及其修订不会进入作者索引，也不会打印匹配文本。异步 <code>PostBlocker</code> 接口与注册表允许未来新增忽略规则类型而无需修改同步协调器。</p>
+<p><code>KTOOLBOX_JOB__KEYWORDS_EXCLUDE</code> 仍作为弃用的隐式全局标题包含忽略规则接受。KToolBox 不会自动改写，请手动迁移到 <code>ktoolbox.toml</code>。</p>
+<h2 id="pawchive">Pawchive 端点<a class="headerlink" href="#pawchive" title="Permanent link">&para;</a></h2>
+<p>v1 默认值通常不需要覆盖：</p>
+<div class="highlight"><pre><span></span><code>KTOOLBOX_API__SCHEME=https
+KTOOLBOX_API__NETLOC=pawchive.pw
+KTOOLBOX_API__STATICS_NETLOC=pawchive.pw
+KTOOLBOX_API__PATH=/api/v1
+KTOOLBOX_DOWNLOADER__SCHEME=https
+KTOOLBOX_DOWNLOADER__FILES_NETLOC=file.pawchive.pw
+KTOOLBOX_DOWNLOADER__FILE_PATH_PREFIX=/data
+</code></pre></div>
+<p><code>KTOOLBOX_DOWNLOADER__SESSION_KEY</code> 为可选配置，只会附加到文件下载器发出的请求。它绝不会由不提供账号会话能力的 <code>PawchiveClient</code> 发送。</p>
+<h2 id="_4">集合与路径<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>dotenv 文件中的集合和列表使用 JSON 数组：</p>
+<div class="highlight"><pre><span></span><code>KTOOLBOX_JOB__ALLOW_LIST=&#39;[&quot;*.jpg&quot;, &quot;*.png&quot;]&#39;
+KTOOLBOX_JOB__BLOCK_LIST=&#39;[&quot;*.zip&quot;, &quot;*.psd&quot;]&#39;
+</code></pre></div>
+<p>相对输出路径和存储桶路径基于当前工作目录解析。</p>
+<h2 id="_5">命名模板<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>命名模板和作品内部名称不再属于全局 dotenv 设置。请通过 WebUI“命名格式”页配置项目 <code>[naming]</code>；首次启动完成备份迁移后，旧命名键会被拒绝。变量、校验、扫描与转换详见<a href="../../naming/">命名格式指南</a>。</p>
+<h2 id="_6">限制下载<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<p>大小限制以字节为单位，在文件加入队列前生效。省略对应变量即可禁用该边界。</p>
+<div class="highlight"><pre><span></span><code># 最小 1 KiB，最大 1 MiB。
+KTOOLBOX_JOB__MIN_FILE_SIZE=1024
+KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
+
+# 只下载作品封面，不下载附件。
+KTOOLBOX_JOB__DOWNLOAD_FILE=True
+KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=False
+</code></pre></div>
+<p><code>KTOOLBOX_JOB__CREATOR_CONCURRENCY</code> 控制并发作者生产者；<code>KTOOLBOX_JOB__COUNT</code> 独立控制全部作者共享的文件工作器。</p>
 
 
 
@@ -1269,7 +1842,7 @@ KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title}
       <nav class="md-footer__inner md-grid" aria-label="页脚" >
         
           
-          <a href="../../commands/reference/" class="md-footer__link md-footer__link--prev" aria-label="上一页: 参考">
+          <a href="../../naming/" class="md-footer__link md-footer__link--prev" aria-label="上一页: 命名格式">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1279,7 +1852,7 @@ KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title}
                 上一页
               </span>
               <div class="md-ellipsis">
-                参考
+                命名格式
               </div>
             </div>
           </a>
@@ -1333,7 +1906,7 @@ KTOOLBOX_JOB__POST_DIRNAME_FORMAT=[{published}]{title}
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.action.edit"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["search.suggest", "search.highlight", "search.share", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
     
     
       <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>

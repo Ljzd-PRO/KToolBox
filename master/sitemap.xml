@@ -2,156 +2,1430 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/"/>
     </url>
     <url>
-        <loc>https://ktoolbox.readthedocs.io/master/about-kemono/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <loc>https://ktoolbox.readthedocs.io/master/about-pawchive/</loc>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/about-kemono/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/about-kemono/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/about-pawchive/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/api/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/api/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/api/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/api/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/api/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/api/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/api/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/api/"/>
     </url>
     <url>
-        <loc>https://ktoolbox.readthedocs.io/master/coomer/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <loc>https://ktoolbox.readthedocs.io/master/automatic-sync/</loc>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/coomer/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/coomer/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/automatic-sync/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/faq/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/faq/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/faq/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/faq/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/faq/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/mcp/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/mcp/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/migration-v1/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/migration-v1/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/more/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/more/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/more/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/more/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/more/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/more/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/more/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/more/"/>
     </url>
     <url>
-        <loc>https://ktoolbox.readthedocs.io/master/shortcut/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <loc>https://ktoolbox.readthedocs.io/master/naming/</loc>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/shortcut/"/>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/shortcut/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/naming/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/naming/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/naming/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/naming/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/webui/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/webui/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/commands/guide/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/commands/guide/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/commands/guide/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/commands/reference/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/commands/reference/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/commands/reference/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/configuration/guide/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/configuration/guide/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/configuration/guide/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/configuration/reference/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/configuration/reference/"/>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/configuration/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/webui/project-workflows/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/project-workflows/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/webui/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/webui/tasks/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/tasks/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/"/>
     </url>
     <url>
-        <loc>https://ktoolbox.readthedocs.io/master/zh/about-kemono/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/about-pawchive/</loc>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/about-kemono/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterabout-kemono/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterabout-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/about-pawchive/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/api/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/api/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterapi/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/api/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/api/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/api/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/api/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/api/"/>
     </url>
     <url>
-        <loc>https://ktoolbox.readthedocs.io/master/zh/coomer/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/automatic-sync/</loc>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/coomer/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercoomer/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterautomatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/automatic-sync/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/faq/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/faq/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterfaq/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/faq/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/faq/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/mcp/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermcp/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/mcp/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/migration-v1/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermigration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/migration-v1/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/more/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/more/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermore/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/more/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/more/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/more/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/more/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/more/"/>
     </url>
     <url>
-        <loc>https://ktoolbox.readthedocs.io/master/zh/shortcut/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/naming/</loc>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/shortcut/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastershortcut/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/naming/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masternaming/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/naming/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/naming/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/webui/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/webui/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/commands/guide/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/commands/guide/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercommands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/commands/guide/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/commands/reference/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/commands/reference/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercommands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/commands/reference/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/configuration/guide/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/configuration/guide/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/configuration/guide/"/>
     </url>
     <url>
         <loc>https://ktoolbox.readthedocs.io/master/zh/configuration/reference/</loc>
-        <lastmod>2026-07-20</lastmod>
+        <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/configuration/reference/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/configuration/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/webui/project-workflows/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/project-workflows/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/webui/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh/webui/tasks/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/master/zh/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/tasks/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/about-pawchive/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterabout-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/about-pawchive/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/api/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/api/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterapi/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/api/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/api/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/api/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/api/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/api/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/automatic-sync/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterautomatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/automatic-sync/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/faq/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/faq/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterfaq/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/faq/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/faq/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/mcp/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermcp/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/mcp/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/migration-v1/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermigration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/migration-v1/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/more/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/more/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermore/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/more/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/more/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/more/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/more/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/more/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/naming/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/naming/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masternaming/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/naming/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/naming/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/webui/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/webui/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/commands/guide/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercommands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/commands/guide/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/commands/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercommands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/commands/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/configuration/guide/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/guide/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/configuration/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/webui/project-workflows/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/project-workflows/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/webui/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/zh-Hant/webui/tasks/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/master/zh-Hant/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/tasks/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/about-pawchive/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterabout-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/about-pawchive/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/api/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/api/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterapi/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/api/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/api/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/api/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/api/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/api/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/automatic-sync/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterautomatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/automatic-sync/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/faq/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/faq/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterfaq/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/faq/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/faq/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/faq/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/mcp/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermcp/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/mcp/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/migration-v1/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermigration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/migration-v1/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/more/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/more/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermore/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/more/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/more/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/more/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/more/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/more/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/naming/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/naming/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masternaming/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/naming/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/naming/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/naming/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/webui/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/webui/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/commands/guide/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercommands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/commands/guide/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/commands/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercommands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/commands/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/configuration/guide/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/configuration/guide/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/configuration/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/configuration/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/webui/project-workflows/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/project-workflows/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/webui/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ru/webui/tasks/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/master/ru/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/tasks/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/about-pawchive/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterabout-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/about-pawchive/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/api/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/api/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterapi/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/api/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/api/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/api/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/api/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/api/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/automatic-sync/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterautomatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/automatic-sync/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/faq/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/faq/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterfaq/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/faq/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/faq/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/faq/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/mcp/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermcp/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/mcp/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/migration-v1/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermigration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/migration-v1/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/more/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/more/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermore/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/more/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/more/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/more/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/more/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/more/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/naming/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/naming/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masternaming/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/naming/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/naming/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/naming/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/webui/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/webui/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/commands/guide/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercommands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/commands/guide/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/commands/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercommands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/commands/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/configuration/guide/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/configuration/guide/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/configuration/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/configuration/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/webui/project-workflows/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/project-workflows/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/webui/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ja/webui/tasks/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/master/ja/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/tasks/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/about-pawchive/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterabout-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/about-pawchive/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/api/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/api/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterapi/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/api/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/api/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/api/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/api/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/api/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/automatic-sync/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterautomatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/automatic-sync/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/faq/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/faq/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterfaq/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/faq/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/faq/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/faq/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/mcp/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermcp/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/mcp/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/migration-v1/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermigration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/migration-v1/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/more/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/more/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermore/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/more/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/more/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/more/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/more/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/more/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/naming/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/naming/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masternaming/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/naming/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/naming/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/naming/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/webui/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/webui/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/commands/guide/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercommands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/commands/guide/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/commands/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercommands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/commands/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/configuration/guide/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/configuration/guide/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/configuration/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/configuration/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/webui/project-workflows/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/project-workflows/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/webui/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/ko/webui/tasks/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/master/ko/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/masterfr/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/tasks/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/master"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/about-pawchive/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterabout-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/about-pawchive/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/about-pawchive/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/api/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/api/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterapi/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/api/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/api/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/api/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/api/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/api/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/automatic-sync/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterautomatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/automatic-sync/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/automatic-sync/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/faq/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/faq/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterfaq/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/faq/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/faq/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/faq/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/faq/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/mcp/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermcp/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/mcp/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/mcp/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/migration-v1/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermigration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/migration-v1/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/migration-v1/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/more/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/more/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastermore/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/more/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/more/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/more/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/more/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/more/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/naming/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/naming/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masternaming/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/naming/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/naming/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/naming/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/naming/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/webui/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/webui/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/commands/guide/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercommands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/commands/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/commands/guide/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/commands/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/mastercommands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/commands/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/commands/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/configuration/guide/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/guide/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/configuration/guide/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/configuration/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterconfiguration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/configuration/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/configuration/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/webui/project-workflows/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/project-workflows/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/project-workflows/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/webui/reference/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/reference/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/reference/"/>
+    </url>
+    <url>
+        <loc>https://ktoolbox.readthedocs.io/master/fr/webui/tasks/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://ktoolbox.readthedocs.io/master/fr/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ktoolbox.readthedocs.io/masterwebui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ktoolbox.readthedocs.io/masterja/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ko" href="https://ktoolbox.readthedocs.io/masterko/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://ktoolbox.readthedocs.io/masterru/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://ktoolbox.readthedocs.io/masterzh/webui/tasks/"/>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://ktoolbox.readthedocs.io/masterzh-Hant/webui/tasks/"/>
     </url>
 </urlset>
