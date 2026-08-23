@@ -45,6 +45,9 @@ jobs:
       - name: Build package with Poetry
         run: poetry build
 
+      - name: Verify wheel contains the production WebUI
+        run: poetry run python scripts/check_webui_wheel.py
+
       - name: Upload Wheels
         uses: actions/upload-artifact@v7
         with:
@@ -54,6 +57,7 @@ jobs:
   create-executable:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           # Windows builds
@@ -72,53 +76,34 @@ jobs:
             arch: x64
             python-arch: "x64"
           
-          # Linux builds with QEMU support
+          # Linux builds
           - os: ubuntu-latest
             arch: x64
             python-arch: "x64"
-            qemu: false
-          - os: ubuntu-latest
+          - os: ubuntu-24.04-arm
             arch: arm64
-            python-arch: "x64"
-            qemu: true
-            qemu-arch: aarch64
+            python-arch: "arm64"
 
     steps:
       - uses: actions/checkout@v6
 
-      - name: Set up QEMU
-        if: matrix.qemu == true
-        uses: docker/setup-qemu-action@v4
-        with:
-          platforms: ${{ matrix.qemu-arch }}
-
       - name: Setup Python environment
-        if: matrix.qemu != true
         uses: ./.github/actions/setup-python
         with:
           python-version: "3.14"
           architecture: ${{ matrix.python-arch }}
           poetry-install-arguments: "--with pyinstaller --extras urwid --extras webui"
 
-      - name: Create Executable (Native)
-        if: matrix.qemu != true
+      - name: Create executable
         uses: ./.github/actions/pyinstaller
 
-      - name: Create Executable (QEMU)
-        if: matrix.qemu == true
-        run: |
-          # For QEMU builds, we need to build inside an emulated container
-          docker run --rm --platform linux/${{ matrix.qemu-arch }} \
-            -v ${{ github.workspace }}:/workspace \
-            -w /workspace \
-            python:3.13-slim-bullseye \
-            bash -c "
-              apt-get update && apt-get install -y git binutils &&
-              pip install poetry==2.4.1 &&
-              poetry install --with pyinstaller --extras urwid --extras webui --extras uvloop &&
-              poetry run pyinstaller ktoolbox.spec --distpath dist &&
-              cp README*.md example.env LICENSE dist/
-            "
+      - name: Smoke-test executable (Unix)
+        if: runner.os != 'Windows'
+        run: poetry run python scripts/smoke_test_executable.py dist/ktoolbox
+
+      - name: Smoke-test executable (Windows)
+        if: runner.os == 'Windows'
+        run: poetry run python scripts/smoke_test_executable.py dist/ktoolbox.exe
 
       - name: Upload Executable
         uses: actions/upload-artifact@v7

@@ -110,6 +110,7 @@ jobs:
           ktoolbox/webui
           scripts/export_webui_openapi.py
           scripts/check_webui_wheel.py
+          scripts/smoke_test_executable.py
           tests/webui_e2e_server.py
 
       - name: Compile Python sources

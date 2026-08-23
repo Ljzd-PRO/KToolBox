@@ -3,7 +3,7 @@
 import pkg_resources
 import sys
 from pathlib import Path
-from PyInstaller.utils.hooks import collect_submodules
+from PyInstaller.utils.hooks import collect_submodules, copy_metadata
 
 template_dir = pkg_resources.resource_filename('settings_doc', 'templates')
 webui_static_dir = pkg_resources.resource_filename('ktoolbox.webui', 'static')
@@ -12,11 +12,15 @@ a = Analysis(
     ['ktoolbox/__main__.py'],
     pathex=[],
     binaries=[],
-    datas=[
-        (template_dir + '/*', 'settings_doc/templates'),
-        (webui_static_dir, 'ktoolbox/webui/static'),
-        (str(Path('webui/openapi.yaml').resolve()), 'webui'),
-    ],
+    datas=(
+        [
+            (template_dir + '/*', 'settings_doc/templates'),
+            (webui_static_dir, 'ktoolbox/webui/static'),
+            (str(Path('webui/openapi.yaml').resolve()), 'webui'),
+        ]
+        + copy_metadata('fastmcp')
+        + copy_metadata('fastmcp-slim')
+    ),
     hiddenimports=(['winloop._noop'] if sys.platform == 'win32' else []) + collect_submodules('ktoolbox.webui'),
     hookspath=[],
     hooksconfig={},

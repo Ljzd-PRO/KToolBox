@@ -21,25 +21,44 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Download executable
+      - name: Download release artifacts
         uses: actions/download-artifact@v8
         with:
           path: artifact
 
-      - name: Compress Directories
+      - name: Prepare release assets
         run: |
-          cd artifact
-          for dir in */; do
-            dir_name=$(basename "$dir")
-            zip_file_name="${dir_name}-$(basename ${{ github.ref }}).zip"
-            zip -r "${zip_file_name}" "${dir}"
+          set -euo pipefail
+          release_tag="${GITHUB_REF_NAME}"
+          mkdir -p release-assets
+
+          for dir in artifact/*; do
+            dir_name="$(basename "$dir")"
+            if [ "$dir_name" = "ktoolbox-wheels" ]; then
+              find "$dir" -maxdepth 1 -type f \
+                \( -name '*.whl' -o -name '*.tar.gz' \) \
+                -exec cp {} release-assets/ \;
+              continue
+            fi
+
+            archive="${GITHUB_WORKSPACE}/release-assets/${dir_name}-${release_tag}.zip"
+            (cd "$dir" && zip -9 -r "$archive" .)
           done
-          cd ..
+
+          test -n "$(find release-assets -maxdepth 1 -type f -name '*.whl' -print -quit)"
+          test -n "$(find release-assets -maxdepth 1 -type f -name '*.tar.gz' -print -quit)"
+          test "$(find release-assets -maxdepth 1 -type f -name '*.zip' | wc -l)" -eq 6
+          (cd release-assets && sha256sum * > SHA256SUMS)
+
+      - name: List release assets
+        run: ls -lh release-assets
 
       - name: Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          body_path: CHANGELOG.md
-          files: artifact/*.zip
+          name: KToolBox ${{ github.ref_name }}
+          body_path: RELEASE_NOTES.md
+          files: release-assets/*
+          fail_on_unmatched_files: true
           prerelease: ${{ contains(github.ref, 'beta') }}
