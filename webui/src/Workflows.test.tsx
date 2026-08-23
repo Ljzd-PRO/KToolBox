@@ -77,6 +77,7 @@ describe("project workflows", () => {
   });
 
   it("explains structured task failures without exposing raw event JSON", async () => {
+    const user = userEvent.setup();
     window.history.replaceState({}, "", "/tasks/task-failed");
     const failure = {
       code: "response_incompatible",
@@ -90,6 +91,18 @@ describe("project workflows", () => {
       operation: "list_creator_posts",
       fields: ["items.8.tags"],
     };
+    const fileFailures = Array.from({ length: 6 }, (_, index) => ({
+      code: "resource_not_found",
+      stage: "file_request",
+      message: "The upstream file is unavailable.",
+      retryable: false,
+      platform: "fanbox",
+      creator_id: "demo-studio",
+      file_name: `cover-${index + 1}.jpg`,
+      http_status: 404,
+      operation: null,
+      fields: [],
+    }));
     const task = {
       id: "task-failed",
       kind: "sync",
@@ -127,8 +140,8 @@ describe("project workflows", () => {
       failure: {
         summary: "1 creator failed, 0 files failed.",
         creator_failures: 1,
-        file_failures: 0,
-        items: [failure],
+        file_failures: fileFailures.length,
+        items: [failure, ...fileFailures],
       },
       blocked_by: null,
       created_at: "2026-07-23T00:00:00Z",
@@ -162,6 +175,14 @@ describe("project workflows", () => {
     expect(screen.getAllByText("Pawchive returned data in an unsupported format.").length).toBeGreaterThan(0);
     expect(screen.getByText("items.8.tags", { exact: false })).toBeInTheDocument();
     expect(screen.getByText(/Update KToolBox/)).toBeInTheDocument();
+    expect(screen.getByText("cover-1.jpg")).toBeInTheDocument();
+    expect(screen.getByText("cover-3.jpg")).toBeInTheDocument();
+    expect(screen.queryByText("cover-4.jpg")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Show 3 more file details" }));
+    expect(screen.getByText("cover-4.jpg")).toBeInTheDocument();
+    expect(screen.getByText("cover-6.jpg")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Collapse file details" }));
+    expect(screen.queryByText("cover-4.jpg")).not.toBeInTheDocument();
     expect(await screen.findByText("Creator finished")).toBeInTheDocument();
     expect(screen.queryByText(/"code":/)).not.toBeInTheDocument();
   });
@@ -562,5 +583,175 @@ describe("project workflows", () => {
     expect(within(dialog).getByText(/Only files recorded as created by this task/)).toBeInTheDocument();
     expect(within(dialog).queryByText(/task-uuid-readable/)).not.toBeInTheDocument();
     expect(screen.queryByText(/task-uuid-readable/)).not.toBeInTheDocument();
+  });
+
+  it("identifies completed automatic syncs without offering incompatible actions", async () => {
+    window.history.replaceState({}, "", "/tasks/task-auto");
+    const task = {
+      id: "task-auto",
+      kind: "sync",
+      status: "completed",
+      spec: {
+        kind: "sync",
+        creators: [{ service: "fanbox", creator_id: "42", alias: null, enabled: true }],
+        output: "downloads",
+        save_creator_indices: true,
+        mix_posts: null,
+        download_file: false,
+        start_time: null,
+        end_time: null,
+        offset: 0,
+        length: 20,
+        keywords: [],
+        keywords_exclude: [],
+      },
+      presentation: null,
+      automatic_origin: {
+        plan_id: "daily",
+        plan_name: "Daily sync",
+        run_id: "run-1",
+        windows: [{
+          creator_key: "fanbox:42",
+          start_at: null,
+          end_at: "2026-07-26T00:00:00Z",
+          timezone: "UTC",
+          baseline: true,
+        }],
+      },
+      position: 1,
+      revision: 1,
+      progress: {
+        queued_files: 0,
+        processed_files: 0,
+        completed_files: 0,
+        existing_files: 0,
+        failed_files: 0,
+        transferred_bytes: 0,
+        total_bytes: null,
+        speed_bps: 0,
+        eta_seconds: null,
+        active_creators: [],
+        active_downloads: {},
+        waiting_retries: {},
+      },
+      error: null,
+      failure: null,
+      blocked_by: null,
+      created_at: "2026-07-26T00:00:00Z",
+      updated_at: "2026-07-26T00:01:00Z",
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const path = String(input);
+        if (path.endsWith("/session")) return json(session);
+        if (path.endsWith("/project")) return json(projectSummary);
+        if (path.endsWith("/tasks")) return json([task]);
+        if (path.endsWith("/creators")) {
+          return json([{ service: "fanbox", creator_id: "42", alias: null, enabled: true, name: "Readable Creator" }]);
+        }
+        if (path.includes("/tasks/task-auto/events")) {
+          return json([{
+            id: 1,
+            task_id: "task-auto",
+            event_type: "creator.finished",
+            data: {
+              creator: "fanbox:42",
+              fetched_posts: 20,
+              accepted_posts: 20,
+              queued_files: 0,
+              completed_files: 0,
+              existing_files: 0,
+              failed_files: 0,
+            },
+            created_at: "2026-07-26T00:00:30Z",
+          }]);
+        }
+        if (path.endsWith("/tasks/task-auto/attempts")) return json([]);
+        throw new Error(`Unexpected request: ${path}`);
+      }),
+    );
+
+    render(<BrowserRouter><App /></BrowserRouter>);
+
+    const automaticSync = await screen.findByRole("link", { name: "Automatic sync: Daily sync" });
+    expect(automaticSync).toHaveAttribute("href", "/auto-sync");
+    expect(screen.getByRole("progressbar", { name: /Overall progress/ })).toHaveAttribute("aria-valuenow", "100");
+    expect(await screen.findByText(/checked 20 works · accepted 20/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Rerun" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Edit" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Delete" })).toBeInTheDocument();
+  });
+
+  it("keeps streaming creator discovery indeterminate while the queue is still growing", async () => {
+    window.history.replaceState({}, "", "/tasks/task-streaming");
+    const task = {
+      id: "task-streaming",
+      kind: "sync",
+      status: "running",
+      spec: {
+        kind: "sync",
+        creators: [
+          { service: "fanbox", creator_id: "1", alias: null, enabled: true },
+          { service: "fanbox", creator_id: "2", alias: null, enabled: true },
+        ],
+        output: "downloads",
+        save_creator_indices: true,
+        mix_posts: null,
+        download_file: true,
+        start_time: null,
+        end_time: null,
+        offset: 0,
+        length: 20,
+        keywords: [],
+        keywords_exclude: [],
+      },
+      presentation: null,
+      automatic_origin: null,
+      position: 1,
+      revision: 1,
+      progress: {
+        queued_files: 70,
+        processed_files: 50,
+        completed_files: 47,
+        existing_files: 0,
+        failed_files: 3,
+        transferred_bytes: 304087040,
+        total_bytes: 335544320,
+        speed_bps: 1572864,
+        eta_seconds: 20,
+        active_creators: ["fanbox:1", "fanbox:2"],
+        active_downloads: {},
+        waiting_retries: {},
+      },
+      error: null,
+      failure: null,
+      blocked_by: null,
+      created_at: "2026-07-26T00:00:00Z",
+      updated_at: "2026-07-26T00:01:00Z",
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const path = String(input);
+        if (path.endsWith("/session")) return json(session);
+        if (path.endsWith("/project")) return json(projectSummary);
+        if (path.endsWith("/tasks")) return json([task]);
+        if (path.endsWith("/creators")) {
+          return json([
+            { service: "fanbox", creator_id: "1", alias: null, enabled: true, name: "Creator One" },
+            { service: "fanbox", creator_id: "2", alias: null, enabled: true, name: "Creator Two" },
+          ]);
+        }
+        if (path.includes("/tasks/task-streaming/events")) return json([]);
+        if (path.endsWith("/tasks/task-streaming/attempts")) return json([]);
+        throw new Error(`Unexpected request: ${path}`);
+      }),
+    );
+
+    render(<BrowserRouter><App /></BrowserRouter>);
+
+    expect(await screen.findByText("50 / 70")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar", { name: /Overall progress/ })).not.toHaveAttribute("aria-valuenow");
   });
 });

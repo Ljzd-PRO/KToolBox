@@ -81,7 +81,7 @@ test("generate documentation showcase screenshots", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "任务详情", exact: true })).toBeVisible();
   await expect(page.getByText("运行中", { exact: true })).toBeVisible();
   await expect(page.getByRole("region", { name: "活动下载" })).toContainText(
-    "Oeg5AiNkge3N7kDPHqve3zFR.jpeg",
+    "fanbox:",
     { timeout: 10_000 },
   );
   const taskDetailsUrl = page.url();

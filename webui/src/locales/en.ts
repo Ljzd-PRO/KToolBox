@@ -375,6 +375,7 @@ export const en = {
       "failed": "Failed"
     },
     "eventDetails": {
+      "creatorWorkSummary": "{{creator}} · checked {{fetched}} works · accepted {{accepted}} · queued {{queued}} files · completed {{completed}} · existing {{existing}} · failed {{failed}}",
       "creatorSummary": "{{creator}} · queued {{queued}} · completed {{completed}} · existing {{existing}} · failed {{failed}}",
       "transferStarted": "{{file}} · {{creator}} · {{completed}} / {{total}}",
       "transferFinished": "{{file}} · {{creator}} · {{outcome}} · {{completed}} / {{total}} · {{duration}} · {{speed}}"
@@ -422,6 +423,8 @@ export const en = {
       "creatorGroup": "Creators",
       "fileGroup": "Files",
       "otherGroup": "Other steps",
+      "showMoreFiles": "Show {{count}} more file details",
+      "collapseFiles": "Collapse file details",
       "moreFiles": "{{count}} more file failures are hidden.",
       "retryable": "Retry may succeed",
       "notRetryable": "Action required",
@@ -437,6 +440,7 @@ export const en = {
         "disk_full": "There is not enough free disk space.",
         "download_failed": "The file could not be downloaded.",
         "resource_not_found": "The requested creator, post, or file was not found.",
+        "resource_not_found_file": "The file is missing from the Pawchive file host.",
         "unknown": "An unexpected error stopped this operation."
       },
       "stages": {
@@ -456,7 +460,8 @@ export const en = {
         "response_incompatible": "Update KToolBox. If it is current, report the operation and field path.",
         "permission_denied": "Choose a writable output directory or correct its permissions.",
         "disk_full": "Free disk space or select another output directory.",
-        "resource_not_found": "Verify the platform and IDs before retrying."
+        "resource_not_found": "Verify the platform and IDs before retrying.",
+        "resource_not_found_file": "The upstream file is unavailable. Retry later or leave this file skipped."
       }
     },
     "events": {
@@ -738,6 +743,7 @@ export const en = {
     "disabled": "Disabled",
     "search": "Search",
     "refresh": "Refresh",
+    "loadMore": "Load more",
     "confirm": "Confirm",
     "undo": "Undo",
     "back": "Back",

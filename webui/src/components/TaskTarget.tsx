@@ -1,10 +1,12 @@
 import { Button, Chip, Tooltip } from "@heroui/react";
 import {
   IconAlertTriangle as AlertTriangle,
+  IconCalendarRepeat as CalendarRepeat,
   IconDownload as Download,
   IconRefresh as RefreshCw,
 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 import { failureMessage, primaryFailure } from "../lib/taskFailures";
 import { syncTaskCreatorNames } from "../lib/taskPresentation";
@@ -43,19 +45,34 @@ export function TaskTarget({
         <span className="task-kind-icon" data-kind="sync"><RefreshCw aria-hidden="true" size={18} /></span>
         <div className="min-w-0 flex-1">
           <SyncTaskTitle names={names} onOpen={onOpen} />
-          <div className="mt-1 flex min-w-0 items-center gap-2">
+          <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
             <Chip className="shrink-0" size="sm" variant="soft">
               <RefreshCw aria-hidden="true" size={13} stroke={2} />
               {t("common.sync")}
             </Chip>
+            {task.automatic_origin ? (
+              <Link
+                aria-label={`${t("automaticSync.title")}: ${task.automatic_origin.plan_name}`}
+                className="shrink-0 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                title={task.automatic_origin.plan_name}
+                to="/auto-sync"
+              >
+                <Chip color="warning" size="sm" variant="soft">
+                  <CalendarRepeat aria-hidden="true" size={13} stroke={2} />
+                  {t("automaticSync.title")}
+                </Chip>
+              </Link>
+            ) : null}
             {showRosterTooltip && roster ? (
-              <Tooltip>
-                <Button className="h-auto min-h-0 w-full min-w-0 justify-start p-0 text-left text-xs font-normal text-muted" size="sm" variant="ghost">
-                  <span className="min-w-0 truncate">{summary}</span>
-                </Button>
-                <Tooltip.Content className="max-w-sm whitespace-pre-line">{roster}</Tooltip.Content>
-              </Tooltip>
-            ) : <p className="truncate text-xs text-muted">{summary}</p>}
+              <div className="min-w-0 flex-1">
+                <Tooltip>
+                  <Button className="h-auto min-h-0 w-full min-w-0 justify-start p-0 text-left text-xs font-normal text-muted" size="sm" variant="ghost">
+                    <span className="min-w-0 truncate">{summary}</span>
+                  </Button>
+                  <Tooltip.Content className="max-w-sm whitespace-pre-line">{roster}</Tooltip.Content>
+                </Tooltip>
+              </div>
+            ) : <p className="min-w-0 flex-1 truncate text-xs text-muted">{summary}</p>}
           </div>
           {failureText ? <FailureLine text={failureText} /> : null}
         </div>

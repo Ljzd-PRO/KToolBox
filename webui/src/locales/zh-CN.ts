@@ -377,6 +377,7 @@ export const zhCN = {
       "failed": "失败"
     },
     "eventDetails": {
+      "creatorWorkSummary": "{{creator}} · 检查 {{fetched}} 个作品 · 接受 {{accepted}} 个 · 入队 {{queued}} 个文件 · 完成 {{completed}} · 已存在 {{existing}} · 失败 {{failed}}",
       "creatorSummary": "{{creator}} · 入队 {{queued}} · 完成 {{completed}} · 已存在 {{existing}} · 失败 {{failed}}",
       "transferStarted": "{{file}} · {{creator}} · {{completed}} / {{total}}",
       "transferFinished": "{{file}} · {{creator}} · {{outcome}} · {{completed}} / {{total}} · {{duration}} · {{speed}}"
@@ -424,6 +425,8 @@ export const zhCN = {
       "creatorGroup": "作者",
       "fileGroup": "文件",
       "otherGroup": "其他阶段",
+      "showMoreFiles": "展开另外 {{count}} 条文件详情",
+      "collapseFiles": "收起文件详情",
       "moreFiles": "另有 {{count}} 个文件失败未展开。",
       "retryable": "重试可能成功",
       "notRetryable": "需要处理",
@@ -439,6 +442,7 @@ export const zhCN = {
         "disk_full": "磁盘剩余空间不足。",
         "download_failed": "文件下载失败。",
         "resource_not_found": "没有找到指定的作者、作品或文件。",
+        "resource_not_found_file": "Pawchive 文件服务器中缺少此文件。",
         "unknown": "意外错误中断了此操作。"
       },
       "stages": {
@@ -458,7 +462,8 @@ export const zhCN = {
         "response_incompatible": "请更新 KToolBox；若已是最新版，请报告操作名称和字段路径。",
         "permission_denied": "选择可写的输出目录，或修正目录权限。",
         "disk_full": "释放磁盘空间，或选择其他输出目录。",
-        "resource_not_found": "核对平台和 ID 后再重试。"
+        "resource_not_found": "核对平台和 ID 后再重试。",
+        "resource_not_found_file": "上游文件当前不可用，可稍后重试或跳过此文件。"
       }
     },
     "events": {
@@ -740,6 +745,7 @@ export const zhCN = {
     "disabled": "已停用",
     "search": "搜索",
     "refresh": "刷新",
+    "loadMore": "加载更多",
     "confirm": "确认",
     "undo": "撤销",
     "back": "返回",

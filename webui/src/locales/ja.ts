@@ -333,6 +333,7 @@ export const ja = {
       failed: "失敗",
     },
     eventDetails: {
+      creatorWorkSummary: "{{creator}} · 作品 {{fetched}} 件を確認 · {{accepted}} 件を採用 · ファイル {{queued}} 件をキュー · 完了 {{completed}} · 既存 {{existing}} · 失敗 {{failed}}",
       creatorSummary: "{{creator}} · キュー {{queued}} · 完了 {{completed}} · 既存 {{existing}} · 失敗 {{failed}}",
       transferStarted: "{{file}} · {{creator}} · {{completed}} / {{total}}",
       transferFinished: "{{file}} · {{creator}} · {{outcome}} · {{completed}} / {{total}} · {{duration}} · {{speed}}",
@@ -380,6 +381,8 @@ export const ja = {
       creatorGroup: "クリエイター",
       fileGroup: "ファイル",
       otherGroup: "その他の処理",
+      showMoreFiles: "ファイル詳細をあと{{count}}件表示",
+      collapseFiles: "ファイル詳細を折りたたむ",
       moreFiles: "ほか{{count}}件のファイル失敗は省略されています。",
       retryable: "再試行できる可能性があります",
       notRetryable: "対応が必要です",
@@ -395,6 +398,7 @@ export const ja = {
         disk_full: "ディスクの空き容量が不足しています。",
         download_failed: "ファイルをダウンロードできませんでした。",
         resource_not_found: "指定したクリエイター、作品、またはファイルが見つかりません。",
+        resource_not_found_file: "Pawchiveのファイルホストにこのファイルがありません。",
         unknown: "予期しないエラーにより処理が停止しました。",
       },
       stages: {
@@ -415,6 +419,7 @@ export const ja = {
         permission_denied: "書き込み可能な出力先を選ぶか、権限を修正してください。",
         disk_full: "空き容量を増やすか、別の出力先を選択してください。",
         resource_not_found: "プラットフォームとIDを確認してから再試行してください。",
+        resource_not_found_file: "上流ファイルは現在利用できません。後で再試行するか、このファイルをスキップしてください。",
       },
     },
     events: {
@@ -557,6 +562,6 @@ export const ja = {
   },
   errors: { requestFailed: "リクエストを完了できませんでした。", network: "KToolBoxからサーバーに接続できません。接続を確認して再試行してください。", codes: { auth_rate_limited: "ログイン試行回数が多すぎます。しばらく待ってから再試行してください。", auth_invalid_credentials: "ユーザー名またはパスワードが正しくありません。", auth_required: "続行するには再度ログインしてください。", auth_session_expired: "セッションの有効期限が切れました。再度ログインしてください。", auth_csrf_invalid: "セキュリティトークンが無効です。ページを再読み込みして再試行してください。", auth_origin_rejected: "信頼されていない送信元からのリクエストは拒否されました。", precondition_required: "最新のファイル版が必要です。再読み込みして再試行してください。", config_conflict: "設定が別の場所で変更されました。再読み込みしてから保存してください。", config_invalid: "設定が無効です。該当項目を確認して再試行してください。", creator_not_found: "このクリエイターはプロジェクトに存在しません。", revision_not_found: "指定したリビジョンが見つかりません。", task_not_found: "タスクが見つかりません。削除された可能性があります。", invalid_event_id: "タスクイベントの位置が無効です。アクティビティストリームに再接続してください。", task_output_invalid: "タスクの出力先はプロジェクトディレクトリ内にしてください。", no_enabled_creators: "同期できる有効なクリエイターがいません。", post_identity_invalid: "有効なPawchive作品URLを入力するか、プラットフォーム、クリエイターID、作品IDをすべて入力してください。", date_range_invalid: "開始日は終了日より後にできません。", presentation_invalid: "保存されたタスク表示情報が対象と一致しません。", task_duplicate: "同じ実行中タスクがすでに存在します。", task_state_conflict: "現在のタスク状態ではこの操作を実行できません。", validation_failed: "入力値の一部が無効です。フォームを確認して再試行してください。", permission_denied: "KToolBoxにはこの操作を実行する権限がありません。", resource_not_found: "要求されたリソースが見つかりません。", conflict: "リクエストが現在の状態と競合しています。再読み込みして再試行してください。", rate_limited: "リクエスト回数が多すぎます。しばらく待ってから再試行してください。", server_error: "サーバーがリクエストを完了できませんでした。しばらくしてから再試行してください。", request_failed: "リクエストを完了できませんでした。" } },
   common: {
-    loading: "読み込み中", retry: "再試行", status: "状態", type: "種類", created: "作成日時", actions: "操作", sync: "同期", download: "ダウンロード", unknown: "不明", save: "保存", saving: "保存中", cancel: "キャンセル", close: "閉じる", edit: "編集", delete: "削除", remove: "削除", add: "追加", enabled: "有効", disabled: "無効", search: "検索", refresh: "更新", confirm: "確認", undo: "元に戻す", back: "戻る", none: "なし", error: "操作に失敗しました", showPassword: "パスワードを表示", hidePassword: "パスワードを隠す", increase: "増やす", decrease: "減らす", select: "選択", selectAllVisible: "表示中をすべて選択", selectedCount: "{{count}}件を選択中", batchActions: "一括操作", clearSelection: "選択を解除", showOptions: "候補を表示", searchWithin: "{{label}}を検索", clearSearch: "検索をクリア", removeValue: "{{value}}を削除", sortBy: "並べ替え項目", ascending: "昇順", descending: "降順", changeSortDirection: "{{direction}}に変更",
+    loading: "読み込み中", retry: "再試行", status: "状態", type: "種類", created: "作成日時", actions: "操作", sync: "同期", download: "ダウンロード", unknown: "不明", save: "保存", saving: "保存中", cancel: "キャンセル", close: "閉じる", edit: "編集", delete: "削除", remove: "削除", add: "追加", enabled: "有効", disabled: "無効", search: "検索", refresh: "更新", loadMore: "さらに読み込む", confirm: "確認", undo: "元に戻す", back: "戻る", none: "なし", error: "操作に失敗しました", showPassword: "パスワードを表示", hidePassword: "パスワードを隠す", increase: "増やす", decrease: "減らす", select: "選択", selectAllVisible: "表示中をすべて選択", selectedCount: "{{count}}件を選択中", batchActions: "一括操作", clearSelection: "選択を解除", showOptions: "候補を表示", searchWithin: "{{label}}を検索", clearSearch: "検索をクリア", removeValue: "{{value}}を削除", sortBy: "並べ替え項目", ascending: "昇順", descending: "降順", changeSortDirection: "{{direction}}に変更",
   },
 } as const satisfies TranslationShape<typeof en>;

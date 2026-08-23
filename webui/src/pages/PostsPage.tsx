@@ -70,6 +70,7 @@ export function PostsPage() {
   const [query, setQuery] = useState("");
   const [offset, setOffset] = useState(0);
   const [results, setResults] = useState<PawchivePost[]>([]);
+  const [visibleCount, setVisibleCount] = useState(20);
   const [searched, setSearched] = useState(false);
   const [searching, setSearching] = useState(false);
   const [selected, setSelected] = useState<PawchivePost | null>(null);
@@ -108,6 +109,7 @@ export function PostsPage() {
       if (query.trim()) parameters.set("query", query.trim());
       if (offset) parameters.set("offset", String(offset));
       setResults(await api<PawchivePost[]>(`/pawchive/posts?${parameters.toString()}`));
+      setVisibleCount(20);
       setSearched(true);
     } catch (error) {
       toast.danger(t("common.error"), { description: errorText(error) });
@@ -201,6 +203,7 @@ export function PostsPage() {
     { value: "service", label: t("posts.service") },
     { value: "published", label: t("posts.published") },
   ];
+  const visibleResults = sortedResults.slice(0, visibleCount);
 
   if (projectQuery.isLoading) return <PageLoading />;
 
@@ -256,7 +259,7 @@ export function PostsPage() {
                       <Table.Column>{t("common.actions")}</Table.Column>
                     </Table.Header>
                     <Table.Body>
-                      {sortedResults.map((post) => (
+                      {visibleResults.map((post) => (
                         <Table.Row id={`${post.service}:${post.user}:${post.id}`} key={`${post.service}:${post.user}:${post.id}`}>
                           {mediaEnabled ? (
                             <Table.Cell>
@@ -279,7 +282,7 @@ export function PostsPage() {
               </Table.Content>
             </DataTableFrame>
             <div className="grid gap-3 lg:hidden">
-              {sortedResults.map((post) => (
+              {visibleResults.map((post) => (
                 <Surface className="data-mobile-card grid gap-3 rounded-lg border border-border p-4" key={`${post.service}:${post.user}:${post.id}`}>
                   {mediaEnabled ? (
                     <WorkCover
@@ -297,6 +300,14 @@ export function PostsPage() {
                 </Surface>
               ))}
             </div>
+            {visibleCount < sortedResults.length ? (
+              <div className="flex justify-center pt-1">
+                <Button variant="secondary" onPress={() => setVisibleCount((count) => count + 20)}>
+                  <ChevronDown aria-hidden="true" size={17} />
+                  {t("common.loadMore")}
+                </Button>
+              </div>
+            ) : null}
           </>
         ) : null}
       </section>

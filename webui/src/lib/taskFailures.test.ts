@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import i18n from "./i18n";
 import {
+  compactActivityEvents,
   eventMessage,
   failureAdvice,
   failureMessage,
@@ -31,6 +32,20 @@ describe("task failure presentation", () => {
     expect(failureMessage(i18n.t, incompatible)).toContain("数据格式");
     expect(failureSubject(incompatible)).toBe("fanbox:demo-studio");
     expect(failureAdvice(i18n.t, incompatible)).toContain("更新");
+    const missingFile: FailureItem = {
+      ...incompatible,
+      code: "resource_not_found",
+      stage: "file_request",
+      message: "The requested file was not found on the file server",
+      platform: null,
+      creator_id: null,
+      file_name: "missing.bin",
+      http_status: 404,
+      operation: null,
+      fields: [],
+    };
+    expect(failureMessage(i18n.t, missingFile)).toContain("文件服务器");
+    expect(failureAdvice(i18n.t, missingFile)).toContain("稍后重试或跳过");
     expect(failureSummary(i18n.t, {
       summary: "Backend-only English summary",
       creator_failures: 1,
@@ -105,5 +120,37 @@ describe("task failure presentation", () => {
         average_speed_bps: 512,
       },
     })).toContain("512 B/s");
+  });
+
+  it("keeps only the latest retry for each download in the activity view", () => {
+    const retry = (id: number, key: string, retryCount: number): TaskEvent => ({
+      id,
+      task_id: "fixture",
+      event_type: "download.retrying",
+      data: { key, retry_count: retryCount, status_code: 503 },
+      created_at: `2026-07-23T00:00:0${id}Z`,
+    });
+    const finished: TaskEvent = {
+      id: 4,
+      task_id: "fixture",
+      event_type: "download.finished",
+      data: { key: "one", outcome: "failed" },
+      created_at: "2026-07-23T00:00:04Z",
+    };
+    const existed: TaskEvent = {
+      id: 5,
+      task_id: "fixture",
+      event_type: "download.finished",
+      data: { key: "existing", outcome: "existed" },
+      created_at: "2026-07-23T00:00:05Z",
+    };
+
+    expect(compactActivityEvents([
+      retry(1, "one", 0),
+      retry(2, "two", 0),
+      retry(3, "one", 1),
+      finished,
+      existed,
+    ]).map((event) => event.id)).toEqual([2, 3, 4]);
   });
 });

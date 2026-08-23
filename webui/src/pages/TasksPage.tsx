@@ -15,6 +15,8 @@ import {
   IconAlertTriangle as AlertTriangle,
   IconCalendarTime as CalendarTime,
   IconChartBar as ChartBar,
+  IconChevronDown as ChevronDown,
+  IconChevronUp as ChevronUp,
   IconCircleCheck as CircleCheck,
   IconCircleDot as Status,
   IconClock as Clock,
@@ -61,6 +63,7 @@ import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { formatBytes, formatDateTime, formatDuration, taskPercent } from "../lib/format";
 import {
+  compactActivityEvents,
   eventLabel,
   eventMessage,
   failureAdvice,
@@ -486,12 +489,7 @@ function TaskList({
         if (column === "target") return taskTargetSortText(task, creators);
         if (column === "status") return taskStatusRank(task.status);
         if (column === "progress") {
-          return taskPercent(
-            task.progress.processed_files,
-            task.progress.queued_files,
-            task.progress.transferred_bytes,
-            task.progress.total_bytes,
-          );
+          return taskDisplayPercent(task);
         }
         if (column === "speed") return taskDownloadSpeed(task);
         if (column === "output") return task.spec.output;
@@ -504,7 +502,9 @@ function TaskList({
   const allVisibleSelected = visibleTasks.length > 0 && selectedTasks.length === visibleTasks.length;
   const pauseCandidates = selectedTasks.filter((task) => pausable.has(task.status));
   const resumeCandidates = selectedTasks.filter((task) => resumable.has(task.status));
-  const rerunCandidates = selectedTasks.filter((task) => task.kind === "sync" && task.status === "completed");
+  const rerunCandidates = selectedTasks.filter(
+    (task) => task.kind === "sync" && task.status === "completed" && !task.automatic_origin,
+  );
   const stopCandidates = selectedTasks.filter((task) => stoppable.has(task.status));
   const deleteCandidates = selectedTasks.filter((task) => deletable.has(task.status));
   const globalSpeed = totalDownloadSpeed(tasks);
@@ -769,19 +769,31 @@ function TaskList({
 }
 
 function TaskProgressSummary({ task }: { task: TaskRecord }) {
-  const percent = taskPercent(
+  const { t } = useTranslation();
+  const discovering = task.status === "running" && task.progress.active_creators.length > 0;
+  const percent = taskDisplayPercent(task);
+  return (
+    <div className="grid gap-1.5">
+      <div className="h-1.5 overflow-hidden rounded-full bg-default">
+        <div
+          className={`h-full bg-accent ${discovering ? "w-1/3 animate-pulse" : "transition-[width]"}`}
+          style={discovering ? undefined : { width: `${Math.min(100, percent)}%` }}
+        />
+      </div>
+      <span className="text-xs tabular-nums text-muted">
+        {discovering ? t("common.loading") : `${Math.round(percent)}%`} · {task.progress.processed_files}/{task.progress.queued_files}
+      </span>
+    </div>
+  );
+}
+
+function taskDisplayPercent(task: TaskRecord): number {
+  if (task.status === "completed") return 100;
+  return taskPercent(
     task.progress.processed_files,
     task.progress.queued_files,
     task.progress.transferred_bytes,
     task.progress.total_bytes,
-  );
-  return (
-    <div className="grid gap-1.5">
-      <div className="h-1.5 overflow-hidden rounded-full bg-default">
-        <div className="h-full bg-accent transition-[width]" style={{ width: `${Math.min(100, percent)}%` }} />
-      </div>
-      <span className="text-xs tabular-nums text-muted">{task.progress.processed_files}/{task.progress.queued_files}</span>
-    </div>
   );
 }
 
@@ -810,9 +822,9 @@ function TaskActions({
   const { t } = useTranslation();
   const canPause = pausable.has(task.status);
   const canResume = resumable.has(task.status);
-  const canRerun = task.kind === "sync" && task.status === "completed";
+  const canRerun = task.kind === "sync" && task.status === "completed" && !task.automatic_origin;
   const canStop = stoppable.has(task.status);
-  const canEdit = editable.has(task.status);
+  const canEdit = editable.has(task.status) && !task.automatic_origin;
   const canDelete = deletable.has(task.status);
   const status = t(`tasks.statuses.${task.status}`);
   const unavailable = (action: string) => t("tasks.actionUnavailable", { action, status });
@@ -857,8 +869,10 @@ function TaskDetails({
 }) {
   const { t, i18n } = useTranslation();
   const progress = task.progress;
-  const percent = taskPercent(progress.processed_files, progress.queued_files, progress.transferred_bytes, progress.total_bytes);
+  const discovering = task.status === "running" && progress.active_creators.length > 0;
+  const percent = taskDisplayPercent(task);
   const waitingRetries = Object.entries(progress.waiting_retries ?? {});
+  const displayedEvents = eventView === "activity" ? compactActivityEvents(events) : events;
   const eventViewOptions = [
     { value: "activity", label: t("tasks.eventViews.activity"), icon: Activity },
     { value: "transfers", label: t("tasks.eventViews.transfers"), icon: Gauge },
@@ -875,9 +889,9 @@ function TaskDetails({
             <Button variant="outline" onPress={onBack}><ArrowLeft aria-hidden="true" size={17} />{t("common.back")}</Button>
             {pausable.has(task.status) ? <Button className="semantic-action-button action-tone-pause" variant="outline" onPress={() => handlers.pause(task)}><Pause aria-hidden="true" size={17} />{t("tasks.pause")}</Button> : null}
             {resumable.has(task.status) ? <Button className="semantic-action-button action-tone-resume" variant="outline" onPress={() => handlers.resume(task)}><Play aria-hidden="true" size={17} />{t("tasks.resume")}</Button> : null}
-            {task.kind === "sync" && task.status === "completed" ? <Button className="semantic-action-button action-tone-resume" variant="outline" onPress={() => handlers.rerun(task)}><Refresh aria-hidden="true" size={17} />{t("tasks.rerun")}</Button> : null}
+            {task.kind === "sync" && task.status === "completed" && !task.automatic_origin ? <Button className="semantic-action-button action-tone-resume" variant="outline" onPress={() => handlers.rerun(task)}><Refresh aria-hidden="true" size={17} />{t("tasks.rerun")}</Button> : null}
             {stoppable.has(task.status) ? <Button className="semantic-action-button action-tone-stop" variant="outline" onPress={() => handlers.stop(task)}><Square aria-hidden="true" size={17} />{t("tasks.stop")}</Button> : null}
-            {editable.has(task.status) ? <Button variant="outline" onPress={() => handlers.edit(task)}><Pencil aria-hidden="true" size={17} />{t("common.edit")}</Button> : null}
+            {editable.has(task.status) && !task.automatic_origin ? <Button variant="outline" onPress={() => handlers.edit(task)}><Pencil aria-hidden="true" size={17} />{t("common.edit")}</Button> : null}
             {deletable.has(task.status) ? <Button className="text-danger" variant="outline" onPress={() => handlers.remove(task)}><Trash2 aria-hidden="true" size={17} />{t("common.delete")}</Button> : null}
           </div>
         }
@@ -891,8 +905,8 @@ function TaskDetails({
         report={task.failure ?? attempts[attempts.length - 1]?.failure}
       />
       <Surface className="grid gap-5 rounded-lg border border-border p-5">
-        <ProgressMeter isIndeterminate={task.status === "running" && !progress.total_bytes && !progress.queued_files} label={t("tasks.progress")} value={percent} />
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <ProgressMeter isIndeterminate={discovering || (task.status === "running" && !progress.total_bytes && !progress.queued_files)} label={t("tasks.progress")} value={percent} />
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
           <Metric label={t("tasks.totalSpeed")} value={formatBytes(taskDownloadSpeed(task), "/s")} />
           <Metric label={t("tasks.transferred")} value={`${formatBytes(progress.transferred_bytes)} / ${formatBytes(progress.total_bytes)}`} />
           <Metric label={t("tasks.files")} value={`${progress.processed_files} / ${progress.queued_files}`} />
@@ -984,7 +998,7 @@ function TaskDetails({
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
           <div className="flex items-center gap-3">
             <h2 className="font-semibold">{t("tasks.logs")}</h2>
-            <Chip size="sm" variant="soft">{events.length}</Chip>
+            <Chip size="sm" variant="soft">{displayedEvents.length}</Chip>
           </div>
           <div className="w-full sm:w-56">
             <SelectField
@@ -1002,7 +1016,7 @@ function TaskDetails({
           role="region"
           tabIndex={0}
         >
-          {events.length ? events.map((event) => (
+          {displayedEvents.length ? displayedEvents.map((event) => (
             <div className="task-event-row grid grid-cols-1 gap-0.5 border-b border-border py-1.5 last:border-0 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-3 sm:py-1" key={event.id}>
               <time className="text-muted">{formatDateTime(event.created_at, i18n.language)}</time>
               <span className="min-w-0 break-words">
@@ -1018,7 +1032,7 @@ function TaskDetails({
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
-  return <div className="min-w-0 rounded-lg bg-default p-4"><p className="text-xs text-muted">{label}</p><p className="mt-1 truncate font-semibold tabular-nums" title={value}>{value}</p></div>;
+  return <div className="min-w-0 rounded-lg bg-default p-3 sm:p-4"><p className="text-xs text-muted">{label}</p><p className="mt-1 truncate font-semibold tabular-nums" title={value}>{value}</p></div>;
 }
 
 function TaskFailurePanel({
@@ -1029,14 +1043,17 @@ function TaskFailurePanel({
   fallback: string | null;
 }) {
   const { t } = useTranslation();
+  const [filesExpanded, setFilesExpanded] = useState(false);
   const items = taskFailureItems(report);
   if (!report && !fallback) return null;
 
   const creatorItems = items.filter((item) => item.creator_id && !item.file_name);
   const fileItems = items.filter((item) => item.file_name);
   const otherItems = items.filter((item) => !item.creator_id && !item.file_name);
-  const visibleFileItems = fileItems.slice(0, 20);
-  const hiddenFileCount = fileItems.length - visibleFileItems.length;
+  const boundedFileItems = fileItems.slice(0, 20);
+  const visibleFileItems = filesExpanded ? boundedFileItems : boundedFileItems.slice(0, 3);
+  const expandableFileCount = Math.max(0, boundedFileItems.length - 3);
+  const hiddenFileCount = Math.max(0, fileItems.length - boundedFileItems.length);
 
   return (
     <Surface
@@ -1076,6 +1093,20 @@ function TaskFailurePanel({
             items={visibleFileItems}
             title={t("tasks.failures.fileGroup")}
           />
+          {expandableFileCount > 0 ? (
+            <div className="flex flex-wrap items-center gap-3 px-4 pb-4">
+              <Button
+                size="sm"
+                variant="ghost"
+                onPress={() => setFilesExpanded((current) => !current)}
+              >
+                {filesExpanded ? <ChevronUp aria-hidden="true" size={16} /> : <ChevronDown aria-hidden="true" size={16} />}
+                {filesExpanded
+                  ? t("tasks.failures.collapseFiles")
+                  : t("tasks.failures.showMoreFiles", { count: expandableFileCount })}
+              </Button>
+            </div>
+          ) : null}
           {hiddenFileCount > 0 ? (
             <p className="px-4 pb-4 text-sm text-muted">
               {t("tasks.failures.moreFiles", { count: hiddenFileCount })}

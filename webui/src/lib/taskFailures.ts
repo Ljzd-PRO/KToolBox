@@ -34,6 +34,9 @@ const failureStages = new Set<FailureStage>([
 ]);
 
 export function failureMessage(t: TFunction, item: FailureItem): string {
+  if (item.code === "resource_not_found" && item.stage === "file_request") {
+    return t("tasks.failures.codes.resource_not_found_file");
+  }
   const fallback = item.code === "unknown" && item.message.trim()
     ? item.message.trim()
     : t("tasks.failures.codes.unknown");
@@ -48,6 +51,9 @@ export function failureStageLabel(t: TFunction, stage: FailureStage): string {
 }
 
 export function failureAdvice(t: TFunction, item: FailureItem): string {
+  if (item.code === "resource_not_found" && item.stage === "file_request") {
+    return t("tasks.failures.advice.resource_not_found_file");
+  }
   const specific = new Set<FailureCode>([
     "rate_limited",
     "response_incompatible",
@@ -99,6 +105,21 @@ export function eventLabel(t: TFunction, eventType: string): string {
   return t(`tasks.events.${eventType}`, { defaultValue: eventType });
 }
 
+export function compactActivityEvents(events: TaskEvent[]): TaskEvent[] {
+  const latestRetries = new Set<string>();
+  return [...events].reverse().filter((event) => {
+    if (
+      event.event_type === "download.finished"
+      && (event.data.outcome === "existed" || event.data.status === "existed")
+    ) return false;
+    if (event.event_type !== "download.retrying") return true;
+    const key = typeof event.data.key === "string" ? event.data.key : "";
+    if (!key || latestRetries.has(key)) return false;
+    latestRetries.add(key);
+    return true;
+  }).reverse();
+}
+
 export function eventMessage(t: TFunction, event: TaskEvent): string {
   const report = parseFailureReport(event.data.failure_report);
   if (report) {
@@ -125,13 +146,21 @@ export function eventMessage(t: TFunction, event: TaskEvent): string {
     event.event_type === "creator.finished"
     && typeof event.data.creator === "string"
   ) {
-    return t("tasks.eventDetails.creatorSummary", {
+    const counts = {
       creator: event.data.creator,
       queued: eventNumber(event.data.queued_files),
       completed: eventNumber(event.data.completed_files),
       existing: eventNumber(event.data.existing_files),
       failed: eventNumber(event.data.failed_files),
-    });
+    };
+    if (typeof event.data.fetched_posts === "number" && typeof event.data.accepted_posts === "number") {
+      return t("tasks.eventDetails.creatorWorkSummary", {
+        ...counts,
+        fetched: eventNumber(event.data.fetched_posts),
+        accepted: eventNumber(event.data.accepted_posts),
+      });
+    }
+    return t("tasks.eventDetails.creatorSummary", counts);
   }
   if (
     event.event_type === "download.started"
