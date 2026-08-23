@@ -4230,6 +4230,11 @@ components:
       title: FailureStage
     FileReference:
       properties:
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
         name:
           anyOf:
           - type: string
@@ -4245,6 +4250,11 @@ components:
           - type: boolean
           - type: 'null'
           title: Deferred
+        preview_only:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Preview Only
       additionalProperties: true
       type: object
       title: FileReference
@@ -6154,7 +6164,7 @@ components:
         post_dirname_format:
           type: string
           title: Post Dirname Format
-          default: '{title}'
+          default: '{title} [{post_id}]'
         revision_dirname_format:
           type: string
           title: Revision Dirname Format

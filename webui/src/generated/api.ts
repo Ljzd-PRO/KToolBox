@@ -1872,12 +1872,16 @@ export interface components {
         FailureStage: "creator_profile" | "work_list" | "work_detail" | "revisions" | "job_generation" | "file_request" | "file_write" | "index_write";
         /** FileReference */
         FileReference: {
+            /** Id */
+            id?: string | null;
             /** Name */
             name?: string | null;
             /** Path */
             path?: string | null;
             /** Deferred */
             deferred?: boolean | null;
+            /** Preview Only */
+            preview_only?: boolean | null;
         } & {
             [key: string]: unknown;
         };
@@ -2869,7 +2873,7 @@ export interface components {
             creator_dirname_format: string;
             /**
              * Post Dirname Format
-             * @default {title}
+             * @default {title} [{post_id}]
              */
             post_dirname_format: string;
             /**
