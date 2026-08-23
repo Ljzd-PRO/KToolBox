@@ -43,7 +43,6 @@ def test_stop_process_tree_gracefully_stops_posix_group(monkeypatch: pytest.Monk
 def test_stop_process_tree_forces_windows_children_after_timeout(monkeypatch: pytest.MonkeyPatch) -> None:
     process = ProcessStub(timeout_once=True)
     taskkill_calls: list[tuple[list[str], dict[str, Any]]] = []
-    monkeypatch.setattr(signal, "CTRL_BREAK_EVENT", 1, raising=False)
     monkeypatch.setattr(
         smoke_test_executable.subprocess,
         "run",

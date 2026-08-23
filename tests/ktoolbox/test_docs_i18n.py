@@ -35,9 +35,7 @@ HEADING_RE = re.compile(r"^(#{1,6}) ", re.MULTILINE)
 TABLE_SEPARATOR_RE = re.compile(r"^\|(?:\s*:?-+:?\s*\|)+$", re.MULTILINE)
 FENCED_CODE_RE = re.compile(r"^```.*?^```$", re.MULTILINE | re.DOTALL)
 INLINE_CODE_RE = re.compile(r"(?<!`)`([^`\n]+)`(?!`)")
-GITHUB_DOCS_SOURCE_RE = re.compile(
-    r"https://github\.com/Ljzd-PRO/KToolBox/(?:blob|tree)/[^)\s]+/docs/"
-)
+GITHUB_DOCS_SOURCE_RE = re.compile(r"https://github\.com/Ljzd-PRO/KToolBox/(?:blob|tree)/[^)\s]+/docs/")
 REQUIRED_DOCS_ROUTES = (
     "",
     "commands/guide/",

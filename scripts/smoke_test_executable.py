@@ -14,6 +14,9 @@ from urllib.request import urlopen
 
 from ktoolbox import __version__
 
+_WINDOWS_CTRL_BREAK_EVENT = 1
+_WINDOWS_CREATE_NEW_PROCESS_GROUP = 0x00000200
+
 
 def _available_loopback_port() -> int:
     with socket.socket() as listener:
@@ -57,7 +60,7 @@ def _stop_process_tree(process: subprocess.Popen[str], *, windows: bool | None =
     is_windows = os.name == "nt" if windows is None else windows
     try:
         if is_windows:
-            process.send_signal(signal.CTRL_BREAK_EVENT)
+            process.send_signal(_WINDOWS_CTRL_BREAK_EVENT)
         else:
             os.killpg(process.pid, signal.SIGTERM)
         process.communicate(timeout=20)
@@ -125,7 +128,7 @@ def main() -> int:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
-            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0,
+            creationflags=_WINDOWS_CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0,
             start_new_session=os.name != "nt",
         )
         try:
