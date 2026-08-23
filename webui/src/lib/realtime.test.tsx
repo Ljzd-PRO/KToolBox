@@ -182,8 +182,10 @@ describe("RealtimeProvider", () => {
         progress: { ...progress, transferred_bytes: 90, speed_bps: 20 },
       }));
     });
-    expect(screen.getByLabelText("task-status")).toHaveTextContent("running");
-    expect(screen.getByLabelText("speed")).toHaveTextContent("20");
+    await waitFor(() => {
+      expect(screen.getByLabelText("task-status")).toHaveTextContent("running");
+      expect(screen.getByLabelText("speed")).toHaveTextContent("20");
+    });
 
     act(() => {
       source.emit("download.progress", taskEvent(1, "download.progress", {
