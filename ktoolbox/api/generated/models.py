@@ -20,9 +20,11 @@ class FileReference(BaseModel):
     model_config = ConfigDict(
         extra="allow",
     )
+    id: str | None = None
     name: str | None = None
     path: str | None = None
     deferred: bool | None = None
+    preview_only: bool | None = None
 
 
 class CreatorSummary(BaseModel):

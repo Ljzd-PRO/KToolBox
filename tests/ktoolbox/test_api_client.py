@@ -37,7 +37,15 @@ POST_DATA = {
     "service": "fanbox",
     "title": "Example",
     "tags": "single-tag",
-    "attachments": [{"name": "file", "path": "/hash", "deferred": True}],
+    "attachments": [
+        {
+            "id": "attachment-1",
+            "name": "file",
+            "path": "/hash",
+            "deferred": True,
+            "preview_only": False,
+        }
+    ],
 }
 
 
@@ -114,6 +122,8 @@ async def test_all_fourteen_public_operations_and_request_contract() -> None:
     assert isinstance(recent[0], Post)
     assert recent[0].tags == "single-tag"
     assert recent[0].attachments and recent[0].attachments[0].deferred is True
+    assert recent[0].attachments[0].preview_only is False
+    assert recent[0].attachments[0].id == "attachment-1"
     assert isinstance(profile, CreatorProfile)
     assert isinstance(creator_posts[0], Post)
     assert isinstance(announcements[0], Announcement)
@@ -285,6 +295,7 @@ def test_observed_post_metadata_variants_are_explicit_model_fields() -> None:
     assert string_tags.tags == "single-tag"
     assert list_tags.tags == ["one", {"name": "two"}]
     assert string_tags.attachments and string_tags.attachments[0].deferred is True
+    assert string_tags.attachments[0].id == "attachment-1"
     assert string_tags.attachments[0].model_extra == {}
 
 

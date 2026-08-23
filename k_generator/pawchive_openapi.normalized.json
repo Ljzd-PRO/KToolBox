@@ -1076,6 +1076,10 @@
         "type": "object",
         "description": "A file name and Pawchive data path.",
         "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
           "name": {
             "type": "string",
             "nullable": true
@@ -1085,6 +1089,10 @@
             "nullable": true
           },
           "deferred": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "preview_only": {
             "type": "boolean",
             "nullable": true
           }
@@ -1696,7 +1704,7 @@
     "The top-level contact object belongs under info.contact.",
     "Post detail returns a Post directly rather than a post/props wrapper.",
     "Post, creator profile, and comment responses contain named fields absent from the raw schema.",
-    "Post tags may be returned as either a string or an array, and file references may include a deferred flag.",
+    "Post tags may be returned as either a string or an array, and file references may include an attachment id plus deferred and preview-only flags.",
     "The app_version response is arbitrary text and is not guaranteed to be a 40-character hash.",
     "Unknown response fields are retained by generated models for drift reporting."
   ]
