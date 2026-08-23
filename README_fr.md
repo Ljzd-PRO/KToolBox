@@ -18,7 +18,9 @@ Un outil en ligne de commande asynchrone, un panneau de gestion HeroUI et un cli
 >
 > Le site Kemono n'étant plus disponible, KToolBox utilise désormais par défaut son site miroir Pawchive.
 >
-> Consultez les [notes de version v1.0.0](https://github.com/Ljzd-PRO/KToolBox/releases/tag/v1.0.0) et le [guide de migration](https://github.com/Ljzd-PRO/KToolBox/blob/master/docs/fr/migration-v1.md) avant la mise à niveau.
+> Consultez les [notes de version v1.0.0](https://github.com/Ljzd-PRO/KToolBox/releases/tag/v1.0.0) et le [guide de migration du site de documentation](https://ktoolbox.readthedocs.io/latest/fr/migration-v1/) avant la mise à niveau.
+
+**Documentation :** [Bien démarrer](https://ktoolbox.readthedocs.io/latest/fr/) · [CLI](https://ktoolbox.readthedocs.io/latest/fr/commands/guide/) · [WebUI](https://ktoolbox.readthedocs.io/latest/fr/webui/) · [Migration](https://ktoolbox.readthedocs.io/latest/fr/migration-v1/) · [Dépannage](https://ktoolbox.readthedocs.io/latest/fr/faq/)
 
 KToolBox v1 utilise Pawchive comme seul serveur pris en charge. Il fournit un accès typé à toutes les opérations publiques du document OpenAPI de Pawchive et exclut volontairement les opérations sur les favoris qui nécessitent l'authentification d'un compte.
 

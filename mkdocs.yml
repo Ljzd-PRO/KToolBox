@@ -1,7 +1,7 @@
 #file: noinspection SpellCheckingInspection
 site_name: KToolBox
 site_url: https://ktoolbox.readthedocs.io/
-site_description: Documentation for KToolBox
+site_description: Guides and reference documentation for KToolBox
 repo_url: https://github.com/Ljzd-PRO/KToolBox
 repo_name: Ljzd-PRO/KToolBox
 copyright: Copyright © 2023 by Ljzd-PRO
@@ -15,21 +15,23 @@ hooks:
 nav:
   - Get Started:
     - Welcome to KToolBox: index.md
-    - About Pawchive: about-pawchive.md
     - Migrating to v1: migration-v1.md
-    - More: more.md
-  - Commands:
-    - Guide: commands/guide.md
-    - Reference: commands/reference.md
-  - WebUI: webui.md
-  - MCP: mcp.md
-  - Automatic Sync: automatic-sync.md
-  - Naming Format: naming.md
-  - Configuration:
+    - About Pawchive: about-pawchive.md
+  - Use KToolBox:
+    - Command Guide: commands/guide.md
+    - Command Reference: commands/reference.md
+    - WebUI: webui.md
+    - Automatic Sync: automatic-sync.md
+    - Naming Format: naming.md
+  - Configure:
     - Guide: configuration/guide.md
     - Reference: configuration/reference.md
-  - FAQ: faq.md
-  - API Documentation: api.md
+  - Integrate:
+    - MCP: mcp.md
+    - Python API: api.md
+  - Help & Project:
+    - FAQ: faq.md
+    - Project Information: more.md
 
 plugins:
   - tags
@@ -50,16 +52,21 @@ plugins:
             Welcome to KToolBox: 欢迎使用 KToolBox
             About Pawchive: 关于 Pawchive
             Migrating to v1: 迁移至 v1
-            More: 更多
-            Commands: 命令
+            Use KToolBox: 使用 KToolBox
+            Command Guide: 命令指南
+            Command Reference: 命令参考
             WebUI: WebUI
             Automatic Sync: 自动同步
             Naming Format: 命名格式
-            Configuration: 配置
+            Configure: 配置
             Guide: 向导
             Reference: 参考
+            Integrate: 集成
+            MCP: MCP
+            Python API: Python API
+            Help & Project: 帮助与项目
             FAQ: 常见问题
-            API Documentation: API 文档
+            Project Information: 项目信息
 
           site_description: "KToolBox 文档"
 
@@ -68,17 +75,17 @@ plugins:
               - media: "(prefers-color-scheme)"
                 toggle:
                   icon: material/brightness-auto
-                  name: 切换至深色模式
+                  name: 切换至浅色模式
               - media: "(prefers-color-scheme: light)"
                 scheme: default
                 toggle:
                   icon: material/brightness-7
-                  name: 切换至自动
+                  name: 切换至深色模式
               - media: "(prefers-color-scheme: dark)"
                 scheme: slate
                 toggle:
                   icon: material/brightness-4
-                  name: 切换至浅色模式
+                  name: 切换至跟随系统
           extra:
             analytics:
               provider: google
@@ -105,16 +112,21 @@ plugins:
             Welcome to KToolBox: 歡迎使用 KToolBox
             About Pawchive: 關於 Pawchive
             Migrating to v1: 遷移至 v1
-            More: 更多
-            Commands: 命令
+            Use KToolBox: 使用 KToolBox
+            Command Guide: 命令指南
+            Command Reference: 命令參考
             WebUI: WebUI
             Automatic Sync: 自動同步
             Naming Format: 命名格式
-            Configuration: 設定
+            Configure: 設定
             Guide: 指南
             Reference: 參考
+            Integrate: 整合
+            MCP: MCP
+            Python API: Python API
+            Help & Project: 說明與專案
             FAQ: 常見問題
-            API Documentation: API 文件
+            Project Information: 專案資訊
 
           site_description: "KToolBox 文件"
 
@@ -123,17 +135,17 @@ plugins:
               - media: "(prefers-color-scheme)"
                 toggle:
                   icon: material/brightness-auto
-                  name: 切換至深色模式
+                  name: 切換至淺色模式
               - media: "(prefers-color-scheme: light)"
                 scheme: default
                 toggle:
                   icon: material/brightness-7
-                  name: 切換至系統偏好設定
+                  name: 切換至深色模式
               - media: "(prefers-color-scheme: dark)"
                 scheme: slate
                 toggle:
                   icon: material/brightness-4
-                  name: 切換至淺色模式
+                  name: 跟隨系統偏好設定
           extra:
             analytics:
               provider: google
@@ -160,16 +172,21 @@ plugins:
             Welcome to KToolBox: Добро пожаловать в KToolBox
             About Pawchive: О Pawchive
             Migrating to v1: Переход на v1
-            More: Дополнительно
-            Commands: Команды
+            Use KToolBox: Работа с KToolBox
+            Command Guide: Руководство по командам
+            Command Reference: Справочник команд
             WebUI: WebUI
             Automatic Sync: Автоматическая синхронизация
             Naming Format: Формат имён
-            Configuration: Конфигурация
+            Configure: Настройка
             Guide: Руководство
             Reference: Справочник
+            Integrate: Интеграция
+            MCP: MCP
+            Python API: Python API
+            Help & Project: Помощь и проект
             FAQ: Частые вопросы
-            API Documentation: Документация API
+            Project Information: Информация о проекте
 
           site_description: "Документация KToolBox"
 
@@ -178,17 +195,17 @@ plugins:
               - media: "(prefers-color-scheme)"
                 toggle:
                   icon: material/brightness-auto
-                  name: Переключиться на тёмную тему
+                  name: Переключиться на светлую тему
               - media: "(prefers-color-scheme: light)"
                 scheme: default
                 toggle:
                   icon: material/brightness-7
-                  name: Использовать системную тему
+                  name: Переключиться на тёмную тему
               - media: "(prefers-color-scheme: dark)"
                 scheme: slate
                 toggle:
                   icon: material/brightness-4
-                  name: Переключиться на светлую тему
+                  name: Использовать системную тему
           extra:
             analytics:
               provider: google
@@ -215,16 +232,21 @@ plugins:
             Welcome to KToolBox: KToolBox へようこそ
             About Pawchive: Pawchive について
             Migrating to v1: v1 への移行
-            More: その他
-            Commands: コマンド
+            Use KToolBox: KToolBox を使う
+            Command Guide: コマンドガイド
+            Command Reference: コマンドリファレンス
             WebUI: WebUI
             Automatic Sync: 自動同期
             Naming Format: 命名形式
-            Configuration: 設定
+            Configure: 設定
             Guide: ガイド
             Reference: リファレンス
+            Integrate: 連携
+            MCP: MCP
+            Python API: Python API
+            Help & Project: ヘルプとプロジェクト
             FAQ: よくある質問
-            API Documentation: API ドキュメント
+            Project Information: プロジェクト情報
 
           site_description: "KToolBox ドキュメント"
 
@@ -233,17 +255,17 @@ plugins:
               - media: "(prefers-color-scheme)"
                 toggle:
                   icon: material/brightness-auto
-                  name: ダークモードに切り替え
+                  name: ライトモードに切り替え
               - media: "(prefers-color-scheme: light)"
                 scheme: default
                 toggle:
                   icon: material/brightness-7
-                  name: システム設定に切り替え
+                  name: ダークモードに切り替え
               - media: "(prefers-color-scheme: dark)"
                 scheme: slate
                 toggle:
                   icon: material/brightness-4
-                  name: ライトモードに切り替え
+                  name: システム設定に切り替え
           extra:
             analytics:
               provider: google
@@ -270,16 +292,21 @@ plugins:
             Welcome to KToolBox: KToolBox에 오신 것을 환영합니다
             About Pawchive: Pawchive 소개
             Migrating to v1: v1로 마이그레이션
-            More: 더 보기
-            Commands: 명령
+            Use KToolBox: KToolBox 사용
+            Command Guide: 명령 가이드
+            Command Reference: 명령 참조
             WebUI: WebUI
             Automatic Sync: 자동 동기화
             Naming Format: 이름 형식
-            Configuration: 설정
+            Configure: 설정
             Guide: 가이드
             Reference: 참조
+            Integrate: 연동
+            MCP: MCP
+            Python API: Python API
+            Help & Project: 도움말 및 프로젝트
             FAQ: 자주 묻는 질문
-            API Documentation: API 문서
+            Project Information: 프로젝트 정보
 
           site_description: "KToolBox 문서"
 
@@ -288,17 +315,17 @@ plugins:
               - media: "(prefers-color-scheme)"
                 toggle:
                   icon: material/brightness-auto
-                  name: 다크 모드로 전환
+                  name: 라이트 모드로 전환
               - media: "(prefers-color-scheme: light)"
                 scheme: default
                 toggle:
                   icon: material/brightness-7
-                  name: 시스템 설정으로 전환
+                  name: 다크 모드로 전환
               - media: "(prefers-color-scheme: dark)"
                 scheme: slate
                 toggle:
                   icon: material/brightness-4
-                  name: 라이트 모드로 전환
+                  name: 시스템 설정으로 전환
           extra:
             analytics:
               provider: google
@@ -325,16 +352,21 @@ plugins:
             Welcome to KToolBox: Bienvenue dans KToolBox
             About Pawchive: À propos de Pawchive
             Migrating to v1: Migration vers v1
-            More: Plus d'informations
-            Commands: Commandes
+            Use KToolBox: Utiliser KToolBox
+            Command Guide: Guide des commandes
+            Command Reference: Référence des commandes
             WebUI: WebUI
             Automatic Sync: Synchronisation automatique
             Naming Format: Format de nommage
-            Configuration: Configuration
+            Configure: Configurer
             Guide: Guide
             Reference: Référence
+            Integrate: Intégrations
+            MCP: MCP
+            Python API: API Python
+            Help & Project: Aide et projet
             FAQ: Questions fréquentes
-            API Documentation: Documentation de l'API
+            Project Information: Informations sur le projet
 
           site_description: "Documentation de KToolBox"
 
@@ -343,17 +375,17 @@ plugins:
               - media: "(prefers-color-scheme)"
                 toggle:
                   icon: material/brightness-auto
-                  name: Passer au mode sombre
+                  name: Passer au mode clair
               - media: "(prefers-color-scheme: light)"
                 scheme: default
                 toggle:
                   icon: material/brightness-7
-                  name: Utiliser le réglage du système
+                  name: Passer au mode sombre
               - media: "(prefers-color-scheme: dark)"
                 scheme: slate
                 toggle:
                   icon: material/brightness-4
-                  name: Passer au mode clair
+                  name: Utiliser le réglage du système
           extra:
             analytics:
               provider: google
@@ -384,28 +416,29 @@ theme:
     - navigation.indexes
     - navigation.top
     - navigation.footer
-    - content.action.edit
+    - content.code.copy
+    - toc.follow
   palette:
 
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"
       toggle:
         icon: material/brightness-auto
-        name: Switch to dark mode
+        name: Switch to light mode
 
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
       toggle:
         icon: material/brightness-7
-        name: Switch to system preference
+        name: Switch to dark mode
 
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       toggle:
         icon: material/brightness-4
-        name: Switch to light mode
+        name: Switch to system preference
 
 extra_css:
   - stylesheets/extra.css

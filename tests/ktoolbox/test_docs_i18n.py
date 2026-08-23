@@ -35,6 +35,16 @@ HEADING_RE = re.compile(r"^(#{1,6}) ", re.MULTILINE)
 TABLE_SEPARATOR_RE = re.compile(r"^\|(?:\s*:?-+:?\s*\|)+$", re.MULTILINE)
 FENCED_CODE_RE = re.compile(r"^```.*?^```$", re.MULTILINE | re.DOTALL)
 INLINE_CODE_RE = re.compile(r"(?<!`)`([^`\n]+)`(?!`)")
+GITHUB_DOCS_SOURCE_RE = re.compile(
+    r"https://github\.com/Ljzd-PRO/KToolBox/(?:blob|tree)/[^)\s]+/docs/"
+)
+REQUIRED_DOCS_ROUTES = (
+    "",
+    "commands/guide/",
+    "webui/",
+    "migration-v1/",
+    "faq/",
+)
 
 
 def _manifest(locale: str) -> set[Path]:
@@ -92,6 +102,28 @@ def test_readmes_have_complete_language_navigation_and_localized_docs_links() ->
         ]
         assert docs_links
         assert all(target.startswith(DOCS_URL_PREFIX[locale]) for target in docs_links)
+        for route in REQUIRED_DOCS_ROUTES:
+            assert f"{DOCS_URL_PREFIX[locale]}{route}" in docs_links
+
+
+def test_documentation_links_do_not_bypass_the_built_site() -> None:
+    markdown_files = [PROJECT_ROOT / filename for filename in README_BY_LOCALE.values()]
+    markdown_files.extend(DOCS_ROOT.glob("*/**/*.md"))
+
+    for markdown_file in markdown_files:
+        markdown = markdown_file.read_text(encoding="utf-8")
+        assert not GITHUB_DOCS_SOURCE_RE.search(markdown), markdown_file.relative_to(PROJECT_ROOT)
+
+
+def test_absolute_documentation_links_map_to_local_pages() -> None:
+    for locale, filename in README_BY_LOCALE.items():
+        markdown = (PROJECT_ROOT / filename).read_text(encoding="utf-8")
+        for target in MARKDOWN_LINK_RE.findall(markdown):
+            if not target.startswith(DOCS_URL_PREFIX[locale]):
+                continue
+            route = target.removeprefix(DOCS_URL_PREFIX[locale]).split("#", 1)[0].split("?", 1)[0]
+            source = DOCS_ROOT / locale / (f"{route.rstrip('/')}.md" if route else "index.md")
+            assert source.exists(), f"{filename} -> {target}"
 
 
 def test_localized_page_trees_and_markdown_structure_match_english() -> None:

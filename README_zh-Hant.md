@@ -18,7 +18,9 @@
 >
 > 由於 Kemono 網站已無法使用，本專案現在預設支援其鏡像站 Pawchive。
 >
-> 升級前請閱讀 [v1.0.0 發行說明](https://github.com/Ljzd-PRO/KToolBox/releases/tag/v1.0.0)與[遷移指南](https://github.com/Ljzd-PRO/KToolBox/blob/master/docs/zh-Hant/migration-v1.md)。
+> 升級前請閱讀 [v1.0.0 發行說明](https://github.com/Ljzd-PRO/KToolBox/releases/tag/v1.0.0)與文件站中的[遷移指南](https://ktoolbox.readthedocs.io/latest/zh-Hant/migration-v1/)。
+
+**文件導覽：** [開始使用](https://ktoolbox.readthedocs.io/latest/zh-Hant/) · [命令列](https://ktoolbox.readthedocs.io/latest/zh-Hant/commands/guide/) · [WebUI](https://ktoolbox.readthedocs.io/latest/zh-Hant/webui/) · [版本遷移](https://ktoolbox.readthedocs.io/latest/zh-Hant/migration-v1/) · [問題排解](https://ktoolbox.readthedocs.io/latest/zh-Hant/faq/)
 
 KToolBox v1 僅支援 Pawchive 後端。專案對 Pawchive OpenAPI 文件中的所有公開操作提供型別化存取，並明確排除需要帳號驗證的收藏操作。
 

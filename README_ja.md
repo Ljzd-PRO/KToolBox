@@ -18,7 +18,9 @@
 >
 > Kemono サイトが利用できなくなったため、KToolBox は現在、そのミラーサイトである Pawchive にデフォルトで対応しています。
 >
-> アップグレード前に [v1.0.0 リリースノート](https://github.com/Ljzd-PRO/KToolBox/releases/tag/v1.0.0)と[移行ガイド](https://github.com/Ljzd-PRO/KToolBox/blob/master/docs/ja/migration-v1.md)をお読みください。
+> アップグレード前に [v1.0.0 リリースノート](https://github.com/Ljzd-PRO/KToolBox/releases/tag/v1.0.0)とドキュメントサイトの[移行ガイド](https://ktoolbox.readthedocs.io/latest/ja/migration-v1/)をお読みください。
+
+**ドキュメント：** [はじめに](https://ktoolbox.readthedocs.io/latest/ja/) · [CLI](https://ktoolbox.readthedocs.io/latest/ja/commands/guide/) · [WebUI](https://ktoolbox.readthedocs.io/latest/ja/webui/) · [移行](https://ktoolbox.readthedocs.io/latest/ja/migration-v1/) · [トラブルシューティング](https://ktoolbox.readthedocs.io/latest/ja/faq/)
 
 KToolBox v1 が対応するバックエンドは Pawchive のみです。Pawchive OpenAPI 文書に含まれるすべての公開操作へ型付きでアクセスでき、アカウント認証が必要なお気に入り操作は対象外です。
 

@@ -18,7 +18,9 @@
 >
 > Поскольку сайт Kemono больше недоступен, KToolBox теперь по умолчанию работает с его зеркалом Pawchive.
 >
-> Перед обновлением прочитайте [примечания к выпуску v1.0.0](https://github.com/Ljzd-PRO/KToolBox/releases/tag/v1.0.0) и [руководство по миграции](https://github.com/Ljzd-PRO/KToolBox/blob/master/docs/ru/migration-v1.md).
+> Перед обновлением прочитайте [примечания к выпуску v1.0.0](https://github.com/Ljzd-PRO/KToolBox/releases/tag/v1.0.0) и [руководство по миграции на сайте документации](https://ktoolbox.readthedocs.io/latest/ru/migration-v1/).
+
+**Документация:** [Начало работы](https://ktoolbox.readthedocs.io/latest/ru/) · [CLI](https://ktoolbox.readthedocs.io/latest/ru/commands/guide/) · [WebUI](https://ktoolbox.readthedocs.io/latest/ru/webui/) · [Миграция](https://ktoolbox.readthedocs.io/latest/ru/migration-v1/) · [Устранение неполадок](https://ktoolbox.readthedocs.io/latest/ru/faq/)
 
 KToolBox v1 использует Pawchive как единственный поддерживаемый сервер. Проект предоставляет типизированный доступ ко всем общедоступным операциям из документа OpenAPI Pawchive и намеренно не поддерживает операции с избранным, требующие аутентификации учётной записи.
 
