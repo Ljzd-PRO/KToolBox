@@ -2,6 +2,8 @@
 
 Les noms d'environnement commencent par `KTOOLBOX_` et relient les champs imbriqués du modèle avec `__`. Les types indiqués comme `path`, `set` ou `list` sont analysés par Pydantic ; utilisez des tableaux JSON pour les collections dans dotenv.
 
+Sur un écran étroit, faites défiler les tableaux horizontalement pour consulter toutes les colonnes.
+
 ## Racine
 
 | Champ | Type | Valeur par défaut | Description |

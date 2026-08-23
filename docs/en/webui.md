@@ -2,6 +2,24 @@
 
 KToolBox WebUI is a project-bound management panel built with React and HeroUI. It edits the same configuration and calls the same Python services as the CLI; it does not launch or parse CLI subprocesses. Tasks, attempts, logs, and ownership records are persisted in `.ktoolbox/webui.sqlite3` inside the selected project.
 
+## Continue by task
+
+<div class="grid cards" markdown>
+
+-   :material-arrow-right-circle-outline: **Manage project data**
+
+    Work with creators, works, naming, configuration, and optional media in [Project workflows](webui/project-workflows.md).
+
+-   :material-arrow-right-circle-outline: **Monitor downloads**
+
+    Create, diagnose, pause, resume, rerun, and safely remove work in [Tasks and live updates](webui/tasks.md).
+
+-   :material-arrow-right-circle-outline: **Deploy and maintain**
+
+    Review environment variables, backups, runtime information, and locale coverage in the [Deployment reference](webui/reference.md).
+
+</div>
+
 ## Install and start
 
 Install the optional runtime and create a project directory:
@@ -45,151 +63,3 @@ The built-in server speaks HTTP. Its default LAN listener is appropriate only on
 Only one scheduler may open a project at a time. A project lock prevents two WebUI processes from racing over its queue and outputs.
 
 The remote path picker runs with the filesystem permissions of the KToolBox process. Project-scoped task, post, and download-structure fields cannot leave the bound project, including through symbolic links. The storage-bucket and log-directory fields are explicitly host-scoped and may reveal names and metadata anywhere that account can traverse. The picker APIs list metadata, create directories, and remove explicitly confirmed empty directories. Deletion uses a non-recursive operation: files, symbolic links, project roots, home roots, and directories containing any item are never removed. The picker does not read file contents, upload, download, rename, or delete files. Entering a new filename selects a path and does not create an empty file. Treat WebUI access as sensitive host access and do not expose it to untrusted users.
-
-## Project workflows
-
-The interface follows the browser language on first use and supports persistent selection of Simplified Chinese, Traditional Chinese, English, Japanese, Korean, French, or Russian. Changing language also updates React Aria dates, number formatting, natural sorting, configuration metadata, validation, and known server errors. Theme follows the operating system until light or dark mode is selected. Blue, emerald, violet, rose, and amber accent palettes are available; form switches stay blue when enabled so their state remains consistent across palettes. Desktop uses a compact sidebar; narrow screens use a Drawer.
-
-![Seven-language selector](../assets/webui/23-language-menu-seven-locales.png)
-
-![Light configuration editor](../assets/webui/09-configuration-light.png)
-
-Editable areas use a muted secondary surface with distinct field backgrounds. Field icons aid scanning, while form switches and checkboxes remain left-aligned with their labels instead of resembling centered action buttons. Switches use a gray track when off and a blue track when on; checkboxes render their indicator only when selected or indeterminate. Editable modal content and its fixed action bar share one continuous surface.
-
-The main areas are:
-
-- **Overview:** project path, queue health, active transfer totals, and recent tasks. Each statistic is a keyboard-accessible link to the corresponding filtered task or creator view.
-- **Tasks:** create, edit, pause, resume, stop, rerun, delete, and inspect synchronization or single-work downloads. Select multiple rows for compatible bulk actions; only the readable target link opens details, so controls never trigger navigation.
-- **Automatic sync:** create multiple recurring creator plans, inspect recent update counts and run history, pause schedules, or run a plan immediately.
-- **Creators:** search Pawchive and add, annotate, enable, disable, or remove roster entries, including bulk enable, disable, and removal.
-- **Posts:** search works, inspect revisions, and create a download task. Image previews appear only after explicitly enabling NSFW mode; body text remains collapsed by default.
-- **Blockers:** order and scope `field-match` blockers and compose nested `any`/`all`, contains, equals, regular expression, and existence conditions.
-- **Global configuration:** edit `.env`, `prod.env`, and `ktoolbox.toml` through typed forms or advanced text views.
-- **System:** inspect the project and application versions and download an example environment file.
-- **About:** inspect the KToolBox version, license, runtime, author, documentation, repository, and issue tracker without exposing author email addresses.
-
-![Task editor on a narrow screen](../assets/webui/19-task-form-mobile-light-zh.png)
-
-![Pawchive creator roster](../assets/webui/41-creators-showcase-desktop-light.png)
-
-Task creation uses two fixed tabs without overflow controls. Synchronization dates remain one official HeroUI range field in `year/month/day - year/month/day` form, while “No start date” and “No end date” independently clear either boundary. The post offset control advances in steps of 50. Title filters use removable HeroUI Chips created with a comma or Enter. Single-work downloads and new roster entries use independent HeroUI fields separated by code-styled Pawchive path fragments such as `/platform/user/creator/post/post`; the separators are never simulated inputs.
-
-Platform fields use a HeroUI ComboBox with Patreon, Pixiv, and Fanbox suggestions while still accepting any custom platform value. Compact enumerations use icon-enhanced HeroUI options; semantic colors are reserved for actual status, warning, and danger meanings.
-
-Creator rows lead with the profile name returned by Pawchive. Names are cached for 24 hours, stale values remain available when refresh fails, and the creator ID is the fallback when no profile has ever loaded. The optional roster note remains independent and empty by default. When editing an existing creator, its platform and creator ID remain visible but read-only because they identify the stored roster entry.
-
-Overview recent tasks, task queues, creator rosters, and post results support controlled HeroUI column sorting. Text uses locale-aware natural ordering, while counts, progress, speeds, states, and timestamps use their real values. Mobile cards expose the same sort field and direction. Task sorting changes presentation only and never changes scheduler order.
-
-## Optional sensitive-media previews
-
-NSFW mode is off in every new browser. While it is off, creator and work pages remain text-only and do not create image requests or reserve empty media space. Enabling it requires confirmation each time; the enabled preference then stays in that browser until it is switched off and is synchronized across tabs.
-
-Media is fetched through the authenticated same-origin WebUI proxy, never directly by the browser from Pawchive hosts. The proxy verifies the decoded bitmap, rejects redirects, SVG, non-images, damaged files, resources over 32 MiB or 50 MP, and creates bounded thumbnails. Creator avatars and banners, work covers, image attachments, and supported content images can be shown. Galleries load 12 entries at a time, and the viewer supports arrow keys and Escape. Videos, archives, and other attachments remain text-only.
-
-![Creator avatars with NSFW mode enabled](../assets/webui/46-creators-nsfw-preview-light.png)
-
-![Work cover and paginated media gallery](../assets/webui/47-post-media-gallery-light.png)
-
-## Automatic synchronization
-
-The **Automatic sync** page supports multiple plans, selected creators, five-field Cron schedules, and anchored intervals of at least 15 minutes. Each plan has an IANA time zone, a first-run boundary, output options, and a preview of its next three runs. A manual run uses the same task queue and advances successful creator checkpoints without shifting an interval schedule.
-
-Automatic checks prefer Pawchive's UTC-like `added` time, overlap the previous successful checkpoint by 24 hours, and deduplicate works across all plans in the project. A first unlimited run establishes a baseline instead of reporting the entire archive as new. Missed runs while KToolBox is stopped are skipped, and an active run for the same plan prevents a duplicate trigger. See the [automatic synchronization guide](automatic-sync.md) for scheduling, checkpoint, and recovery details.
-
-## Project naming
-
-Naming and the default output are stored in the project's `ktoolbox.toml` and shared by CLI, WebUI, MCP, work downloads, and automatic synchronization. The **Naming format** page saves directory structure and templates independently. Its reusable legacy converter accepts multiple saved layouts or pasted legacy `.env`/TOML, always uses the current project format as its read-only target, and never persists the pasted source. It scans explicitly selected old locations without contacting Pawchive, shows per-creator statistics, and supports pause, continuation, or rollback. Old locations are never future download destinations. See the [naming guide](naming.md) for inheritance, guided legacy migration, and recovery.
-
-## Configuration editing
-
-Form labels and descriptions are explicit localized text, not Python identifiers. English configuration-class `:ivar field:` docstrings remain the semantic field source; checked locale catalogs provide complete labels and explanations for all seven languages, while Pydantic supplies types, defaults, ranges, and secret metadata.
-
-Fixed choices such as log level use icon-enhanced HeroUI Select controls. Fields with useful presets but valid custom values use ComboBox controls. Internal names such as `attachments`, `content.txt`, and `external_links.txt` remain ordinary text fields; only real filesystem locations expose the remote path picker.
-
-The `.env` and `prod.env` tabs show each final effective value and a source Chip. Values overridden by the process environment are read-only. Secret values are masked by default. Advanced text editing displays an additional warning because it can expose secrets.
-
-Filesystem-backed fields retain manual editing and add a browse button. The dialog shows the remote computer running KToolBox rather than the browser device, with localized quick locations, breadcrumbs, search, a labelled hidden-item control, pagination, an explicit new-folder dialog, and confirmed empty-folder deletion. Project-relative configuration values remain relative after selection; absolute task and post output paths remain absolute. Environment-sourced read-only values cannot open the picker.
-
-Before a save, the server parses and validates the proposed file and returns a semantic diff. Saving uses an ETag to reject stale edits and atomically replaces the file. The TOML editor uses the existing TomlKit/Pydantic store so comments survive structured roster and blocker changes.
-
-![Dark configuration editor](../assets/webui/20-configuration-1024-dark-zh.png)
-
-![Global configuration log-level choices](../assets/webui/30-global-configuration-log-level-light.png)
-
-![Scoped blocker editor](../assets/webui/17-blocker-form-1024-light-zh.png)
-
-## Task lifecycle
-
-`sync` and `download` tasks preserve the complete corresponding CLI inputs. A targetless synchronization resolves the currently enabled roster when the task is created. Each attempt then receives an immutable, redacted configuration snapshot; later configuration edits affect only future attempts.
-
-Each task also stores a presentation-only snapshot with its normalized target key and optional post title and creator name. It remains readable offline and never affects execution, deduplication, or resource locking. Queue rows lead with that target instead of an output path, and details, pause/resume, stop, edit, ordering, and delete controls remain directly visible.
-
-![Desktop task queue with readable targets](../assets/webui/43-task-queue-showcase-desktop-light.png)
-
-![Mobile task queue with direct actions](../assets/webui/22-task-queue-mobile-light-zh.png)
-
-![Dark task editor](../assets/webui/18-task-form-1024-dark-zh.png)
-
-The top-level queue runs two tasks by default (`KTOOLBOX_WEBUI__MAX_ACTIVE_TASKS`) while each task retains its configured creator and file concurrency. Identical active tasks resolve to the existing task. Tasks with overlapping normalized outputs, creators, or posts wait in `blocked` until the resource lock is released.
-
-Live events use SSE with reconnect support. REST task state remains authoritative, and only a `task.status` event can change it; a completed file never marks its parent task complete. Aggregate download speed uses a five-second rolling window with a short hand-off grace period, so switching between files does not flash to zero. The overview and task page both show the speed summed across genuinely running tasks.
-
-![Overview with aggregate download speed](../assets/webui/40-overview-showcase-desktop-light.png)
-
-The detail view reports prepared creators, files, bytes, overall progress, aggregate and per-file speeds, ETA, skipped/failed counts, active creators, active downloads, waiting retries, and structured logs. The three live panels have stable heights and their own scroll areas, so changing concurrency does not move the log or the page. The default activity view omits byte-level progress and ordinary queue noise; transfer and complete diagnostic views remain available when needed.
-
-![Stable live task panels](../assets/webui/44-task-live-showcase-desktop-dark.png)
-
-Failed attempts persist a bounded, redacted diagnostic report instead of only a failure count. The task row shows the first useful cause; details group failures by creator and file and identify the stage, retryability, safe field paths, and a suggested recovery action. Upstream response bodies, post titles, cookies, and complete download URLs are never stored in this report. On narrow screens, the 64px workbar, 12px page spacing, and compact appearance Popover expose more useful content without shrinking form text below 16px. The MCP tool catalog uses collapsible HeroUI groups and automatically expands matching groups during search or permission filtering.
-
-![Structured task failure explanation](../assets/webui/26-task-failure-1440-light-zh.png)
-
-![Compact mobile appearance controls](../assets/webui/27-appearance-mobile-dark-zh.png)
-
-![Live task progress on a mobile screen](../assets/webui/45-task-live-showcase-mobile-dark.png)
-
-Pause is cooperative: active network streams close, completed files and resumable temporary files remain, and resume creates a new attempt. Stop keeps the task definition so it can be edited and rerun. Resume is available only for paused, stopped, failed, or interrupted work. A completed synchronization instead offers **Rerun**, which reuses the task record and creates a new attempt; a completed single-work download does not. A process restart marks formerly running work as `interrupted`, clears stale live progress, and requires explicit recovery.
-
-Deleting a task normally removes only its queue record, attempts, and logs. “Delete outputs” first shows the readable target, output directory, file and byte totals, and an expandable relative-path preview; internal task UUIDs are not displayed. Confirmation removes only unchanged, regular files recorded as created by that task; symbolic links, pre-existing files, modified files, and shared files are never followed or removed.
-
-![Readable task cleanup preview](../assets/webui/31-task-delete-preview-light.png)
-
-![Completed synchronization with rerun](../assets/webui/33-task-rerun-light.png)
-
-## About
-
-The About page gathers package and runtime information with safe links to documentation, source, and issue reporting. URLs and listener addresses are displayed in inline code styling, and external links open in a new tab with isolation attributes.
-
-![About page on a narrow dark screen](../assets/webui/32-about-mobile-dark.png)
-
-## Automatic refresh
-
-One authenticated SSE connection keeps tasks, creators, ignore rules, configuration, MCP tokens, and open remote-directory views synchronized across browser tabs. Structural changes normally appear within one second, while task progress updates the local query cache directly instead of repeatedly downloading the complete task list.
-
-If the live connection is unavailable for more than five seconds, the WebUI shows a compact warning and refreshes local project queries every 10 seconds. It stops fallback polling and refreshes once as soon as SSE recovers. Pawchive searches, work details, and version checks remain on demand and are never requested by the fallback loop.
-
-The System page reports the current update method and last signal time and provides explicit refresh and reconnect actions. When another tab or MCP client changes data while a form contains unsaved edits, KToolBox preserves the draft and asks whether to reload the new data or continue editing; the normal ETag and state-conflict checks still apply when saving.
-
-## WebUI environment reference
-
-| Variable | Default | Meaning |
-| --- | --- | --- |
-| `KTOOLBOX_WEBUI__HOST` | `0.0.0.0` | Listen interface. |
-| `KTOOLBOX_WEBUI__PORT` | `8789` | Listen port, 1–65535. |
-| `KTOOLBOX_WEBUI__OPEN_BROWSER` | `True` | Open the local URL after startup. |
-| `KTOOLBOX_WEBUI__USERNAME` | empty → `admin` at startup | Optional single-account username. |
-| `KTOOLBOX_WEBUI__PASSWORD_HASH` | empty | Preferred stable Argon2id hash. |
-| `KTOOLBOX_WEBUI__PASSWORD` | empty → random per startup | Plaintext fallback; ignored when a hash exists. |
-| `KTOOLBOX_WEBUI__MAX_ACTIVE_TASKS` | `2` | Concurrent top-level tasks, 1–16. |
-| `KTOOLBOX_WEBUI__SESSION_IDLE_HOURS` | `24` | Session lifetime since last use. |
-| `KTOOLBOX_WEBUI__SESSION_ABSOLUTE_HOURS` | `168` | Maximum session lifetime since login. |
-
-Back up `ktoolbox.toml`, local dotenv files, and `.ktoolbox/webui.sqlite3` together when task history matters. Do not copy the database while the WebUI is running.
-
-## Multilingual browser verification
-
-The seven locale catalogs are exercised on desktop and mobile in light and dark themes. Representative verified states are shown below; user content and filesystem paths remain in their original form.
-
-![French configuration on mobile](../assets/webui/24-configuration-mobile-fr.png)
-
-![Russian remote path picker on mobile](../assets/webui/25-path-picker-mobile-ru.png)

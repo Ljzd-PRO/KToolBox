@@ -82,6 +82,7 @@ def test_mkdocs_config_builds_every_locale_without_fallback() -> None:
     config = (PROJECT_ROOT / "mkdocs.yml").read_text(encoding="utf-8")
 
     assert "fallback_to_default: false" in config
+    assert "provider: mike" not in config
     positions = [config.index(f"- locale: {locale}") for locale in LOCALES]
     assert positions == sorted(positions)
 
@@ -128,7 +129,7 @@ def test_absolute_documentation_links_map_to_local_pages() -> None:
 
 def test_localized_page_trees_and_markdown_structure_match_english() -> None:
     english_manifest = _manifest("en")
-    assert len(english_manifest) == 14
+    assert len(english_manifest) == 17
 
     for locale in LOCALES[1:]:
         assert _manifest(locale) == english_manifest

@@ -2,6 +2,8 @@
 
 Environment names start with `KTOOLBOX_` and join nested model fields with `__`. Types shown as `path`, `set`, or `list` are parsed by Pydantic; use JSON arrays for collections in dotenv files.
 
+On narrow screens, swipe tables horizontally to inspect every column.
+
 ## Root
 
 | Field | Type | Default | Description |

@@ -2,6 +2,24 @@
 
 La WebUI de KToolBox est un panneau de gestion lié à un projet, construit avec React et HeroUI. Elle modifie la même configuration et appelle les mêmes services Python que la CLI ; elle ne lance ni n'analyse de sous-processus CLI. Les tâches, tentatives, journaux et enregistrements de propriété sont conservés dans `.ktoolbox/webui.sqlite3` au sein du projet choisi.
 
+## Poursuivre selon votre objectif
+
+<div class="grid cards" markdown>
+
+-   :material-arrow-right-circle-outline: **Gérer les données du projet**
+
+    Gérez les créateurs, les œuvres, le nommage, la configuration et les médias facultatifs dans les [parcours du projet](webui/project-workflows.md).
+
+-   :material-arrow-right-circle-outline: **Surveiller les téléchargements**
+
+    Créez, diagnostiquez, mettez en pause, reprenez, relancez et supprimez en sécurité dans [Tâches et mises à jour](webui/tasks.md).
+
+-   :material-arrow-right-circle-outline: **Déployer et maintenir**
+
+    Consultez les variables, sauvegardes, informations d'exécution et langues dans la [référence de déploiement](webui/reference.md).
+
+</div>
+
 ## Installation et démarrage
 
 Installez les composants facultatifs et créez un répertoire de projet :
@@ -45,147 +63,3 @@ Le serveur intégré utilise HTTP. Son écoute par défaut sur le réseau local 
 Un seul planificateur peut ouvrir un projet à la fois. Un verrou empêche deux processus WebUI de se concurrencer sur la file et les sorties.
 
 Le sélecteur de chemin distant utilise les droits du processus KToolBox. Les champs de tâche, de publication et de structure de téléchargement limités au projet ne peuvent pas sortir du projet lié, y compris via un lien symbolique. Les champs du répertoire de stockage et des journaux couvrent explicitement l'hôte et peuvent révéler les noms et métadonnées accessibles à ce compte. Les API du sélecteur se limitent à lister les métadonnées et à créer des répertoires : elles ne lisent pas le contenu, ne transfèrent, ne renomment et ne suppriment aucun fichier. Saisir un nouveau nom sélectionne un chemin sans créer de fichier vide. Considérez l'accès WebUI comme un accès sensible à l'hôte et ne l'accordez pas à des utilisateurs non fiables.
-
-## Processus du projet
-
-L'interface suit la langue du navigateur lors de la première utilisation et conserve le choix du chinois simplifié, du chinois traditionnel, de l'anglais, du japonais, du coréen, du français ou du russe. Changer de langue actualise aussi les dates React Aria, les formats numériques, le tri naturel, les métadonnées de configuration, la validation et les erreurs serveur connues. Le thème suit le système d'exploitation jusqu'au choix du mode clair ou sombre. Des accents bleu, émeraude, violet, rose et ambre sont proposés ; les interrupteurs activés restent bleus afin que leur état soit cohérent. L'ordinateur utilise une barre latérale compacte et les écrans étroits un Drawer.
-
-![Sélecteur des sept langues](../assets/webui/23-language-menu-seven-locales.png)
-
-![Éditeur de configuration clair](../assets/webui/09-configuration-light.png)
-
-Les zones modifiables utilisent une surface secondaire discrète avec des arrière-plans de champs distincts. Les icônes facilitent le repérage, tandis que les interrupteurs et cases restent alignés à gauche avec leur libellé au lieu de ressembler à des boutons centrés. La piste est grise à l'arrêt et bleue en marche ; les cases n'affichent un indicateur que lorsqu'elles sont cochées ou indéterminées. Le contenu de la fenêtre modifiable et sa barre d'actions fixe partagent une surface continue.
-
-Les zones principales sont :
-
-- **Vue d'ensemble :** chemin du projet, état de la file, totaux des transferts actifs et tâches récentes.
-- **Tâches :** créer, modifier, mettre en pause, reprendre, arrêter, relancer, supprimer et examiner des synchronisations ou téléchargements uniques. Seul le lien de cible lisible ouvre le détail, afin qu'un contrôle ne déclenche jamais la navigation ; la sélection multiple permet les actions groupées compatibles.
-- **Synchronisation automatique :** créer plusieurs plans récurrents par créateur, consulter les mises à jour récentes et l’historique, suspendre ou exécuter immédiatement.
-- **Créateurs :** rechercher dans Pawchive et ajouter, modifier la note, activer, désactiver ou retirer des entrées, y compris par actions groupées.
-- **Publications :** rechercher des œuvres, examiner les révisions et créer une tâche de téléchargement. Les aperçus d’images n’apparaissent qu’après activation explicite du mode NSFW ; le texte reste replié par défaut.
-- **Règles d'exclusion :** ordonner et limiter `field-match`, composer des groupes `any`/`all` imbriqués et des conditions de contenu, égalité, expression régulière et existence.
-- **Configuration globale :** modifier `.env`, `prod.env` et `ktoolbox.toml` dans des formulaires typés ou des vues de texte avancées.
-- **Système :** examiner les versions du projet et de l'application et télécharger un exemple d'environnement.
-- **À propos :** consulter la version, la licence, l'environnement, l'auteur, la documentation, le dépôt et le suivi des problèmes sans exposer l'adresse électronique de l'auteur.
-
-![Éditeur de tâche sur un écran étroit](../assets/webui/19-task-form-mobile-light-zh.png)
-
-![Liste des créateurs Pawchive](../assets/webui/41-creators-showcase-desktop-light.png)
-
-La création d'une tâche utilise deux onglets fixes sans commandes de débordement. Les dates de synchronisation restent dans un unique champ de plage HeroUI officiel au format `year/month/day - year/month/day`, tandis que « Aucune date de début » et « Aucune date de fin » effacent indépendamment la limite correspondante. Le décalage des publications progresse par pas de 50. Les filtres de titre utilisent des HeroUI Chip supprimables, créés avec une virgule ou Entrée. Le téléchargement d'une œuvre unique et l'ajout d'un créateur utilisent des champs HeroUI indépendants, séparés par des fragments de chemin Pawchive au style de code, tels que `/platform/user/creator/post/post` ; les séparateurs ne sont jamais simulés comme des champs de saisie.
-
-L'identifiant du créateur est placé en premier dans les lignes de bureau comme dans les entrées mobiles. La note facultative de la liste est affichée séparément et ne remplace jamais cet identifiant. Lors de la modification d'un créateur existant, sa plateforme et son identifiant restent visibles, mais en lecture seule, car ils identifient ensemble l'entrée enregistrée.
-
-## Aperçus facultatifs de médias sensibles
-
-Le mode NSFW est désactivé dans tout nouveau navigateur. Tant qu’il est désactivé, les pages des créateurs et des œuvres restent textuelles, sans requête d’image ni espace multimédia vide. Chaque activation demande une confirmation ; l’état reste ensuite dans ce navigateur, synchronisé entre les onglets, jusqu’à sa désactivation.
-
-Le navigateur récupère les médias uniquement par le proxy WebUI authentifié de même origine, jamais directement depuis les hôtes de fichiers Pawchive. Le proxy décode et vérifie entièrement le bitmap, refuse les redirections, SVG, fichiers non graphiques ou endommagés et les ressources de plus de 32 Mio ou 50 MP, puis crée des miniatures bornées. Il peut afficher avatars, bannières, couvertures, pièces jointes image et images de contenu compatibles. La galerie charge 12 éléments à la fois et la visionneuse accepte les flèches et Échap. Vidéos, archives et autres pièces jointes restent textuelles.
-
-![Avatars avec le mode NSFW activé](../assets/webui/46-creators-nsfw-preview-light.png)
-
-![Couverture et galerie multimédia paginée](../assets/webui/47-post-media-gallery-light.png)
-
-## Synchronisation automatique
-
-La page **Synchronisation automatique** prend en charge plusieurs plans, plusieurs créateurs, les expressions Cron à cinq champs et les intervalles ancrés d’au moins 15 minutes. Chaque plan définit un fuseau IANA, une limite de première exécution, les options de sortie et un aperçu des trois prochaines exécutions. Une exécution immédiate utilise la même file et avance les points de contrôle des créateurs réussis sans déplacer l’axe de l’intervalle.
-
-Les vérifications privilégient l’horodatage `added` de Pawchive, interprété comme UTC, et recouvrent de 24 heures le dernier point de contrôle réussi. La déduplication au niveau du projet évite de compter deux fois la même œuvre entre plusieurs plans. Une première exécution sans date établit uniquement une base et ne marque pas toutes les archives comme nouvelles. Les exécutions manquées pendant l’arrêt sont ignorées, tout comme les déclenchements en double lorsqu’un plan est déjà actif. Consultez le [guide de synchronisation automatique](automatic-sync.md).
-
-## Nommage du projet
-
-Le nommage et la sortie par défaut sont enregistrés dans `ktoolbox.toml` et partagés par la CLI, la WebUI, MCP, les téléchargements d’œuvres et la synchronisation automatique. La page **Format de nommage** enregistre séparément structure et modèles. Le convertisseur réutilisable accepte plusieurs formats enregistrés ou une ancienne configuration `.env`/TOML collée, conserve le projet actuel comme cible en lecture seule et ne mémorise pas le texte source. Il analyse uniquement les anciens emplacements choisis explicitement, sans contacter Pawchive, et prend en charge pause, reprise et restauration. Ces emplacements ne deviennent jamais des destinations futures. Consultez le [guide du nommage](naming.md).
-
-## Modification de la configuration
-
-Les libellés et descriptions sont du texte explicitement localisé, pas des identifiants Python. Les docstrings `:ivar field:` de la classe anglaise restent la source sémantique des champs ; les catalogues dont la complétude est vérifiée fournissent tous les libellés et explications dans les sept langues. Pydantic fournit les types, valeurs par défaut, plages et métadonnées secrètes.
-
-Les choix fixes comme le niveau de journal utilisent un Select HeroUI enrichi d’icônes, tandis que les champs proposant des valeurs recommandées tout en acceptant une saisie personnalisée utilisent ComboBox. Les noms internes `attachments`, `content.txt` et `external_links.txt` restent des champs de texte ordinaires ; seuls les véritables emplacements du système de fichiers proposent le sélecteur de chemin.
-
-Les onglets `.env` et `prod.env` affichent la valeur effective finale et une puce de provenance. Les valeurs remplacées par l'environnement du processus sont en lecture seule. Les secrets sont masqués par défaut. L'édition avancée du texte affiche un avertissement supplémentaire, car elle peut dévoiler des secrets.
-
-Les champs liés au système de fichiers conservent la saisie manuelle et ajoutent un bouton de navigation. La boîte de dialogue affiche l'ordinateur distant qui exécute KToolBox, et non l'appareil du navigateur, avec emplacements rapides, fil d'Ariane, recherche, éléments cachés, pagination et création de répertoire. Les valeurs de configuration relatives au projet restent relatives après sélection ; les sorties absolues des tâches et publications restent absolues. Les valeurs en lecture seule provenant de l'environnement ne peuvent pas ouvrir le sélecteur.
-
-Avant l'enregistrement, le serveur analyse et valide le fichier proposé, puis renvoie une différence sémantique. Un ETag refuse les modifications obsolètes et le fichier est remplacé atomiquement. L'éditeur TOML utilise le stockage TomlKit/Pydantic existant, les commentaires survivent donc aux changements structurés.
-
-![Éditeur de configuration sombre](../assets/webui/20-configuration-1024-dark-zh.png)
-
-![Choix du niveau de journal dans la configuration globale](../assets/webui/30-global-configuration-log-level-light.png)
-
-![Éditeur de règle à portée limitée](../assets/webui/17-blocker-form-1024-light-zh.png)
-
-## Cycle de vie des tâches
-
-Les tâches `sync` et `download` conservent toutes les entrées de la CLI correspondante. Une synchronisation sans cible résout la liste actuellement activée lors de la création. Chaque tentative reçoit ensuite un instantané immuable et expurgé de la configuration ; les modifications ultérieures n'affectent que les tentatives futures.
-
-Chaque tâche conserve aussi un instantané réservé à la présentation avec sa clé cible normalisée, ainsi que les titre et nom du créateur facultatifs. Il reste lisible hors ligne et n'affecte jamais l'exécution, la déduplication ou les verrous. Les lignes commencent par cette cible plutôt que le chemin de sortie, et les détails, la pause/reprise, l'arrêt, la modification, le classement et la suppression restent visibles directement.
-
-![File de tâches de bureau avec des cibles lisibles](../assets/webui/43-task-queue-showcase-desktop-light.png)
-
-![File mobile avec actions directes](../assets/webui/22-task-queue-mobile-light-zh.png)
-
-![Éditeur de tâche sombre](../assets/webui/18-task-form-1024-dark-zh.png)
-
-La file principale exécute deux tâches par défaut (`KTOOLBOX_WEBUI__MAX_ACTIVE_TASKS`), tandis que chacune conserve sa simultanéité configurée de créateurs et de fichiers. Les tâches actives identiques renvoient à la tâche existante. Les tâches dont les sorties, créateurs ou publications normalisés se chevauchent attendent dans `blocked` la libération du verrou.
-
-Les événements en direct utilisent SSE avec reconnexion. L'état REST reste la référence et seul un événement `task.status` peut le modifier ; la fin d'un fichier ne termine jamais prématurément sa tâche. La vitesse globale utilise une fenêtre glissante de cinq secondes et un bref délai de transition, ce qui évite un passage furtif à zéro entre deux fichiers. L'aperçu et la page des tâches additionnent la vitesse des tâches réellement actives.
-
-![Aperçu avec vitesse globale](../assets/webui/40-overview-showcase-desktop-light.png)
-
-La vue détaillée indique les créateurs préparés, les fichiers, les octets, la progression totale, les vitesses globale et par fichier, l'heure estimée, les nombres ignorés/échoués, les créateurs actifs, les téléchargements actifs, les nouvelles tentatives en attente et les journaux structurés. Les trois panneaux en direct ont une hauteur stable et leur propre défilement : les changements de simultanéité ne déplacent plus le journal ni la page. La vue d'activité par défaut masque la progression par blocs et le bruit ordinaire de la file ; les vues transferts et diagnostic complet restent disponibles.
-
-![Panneaux de tâche stables](../assets/webui/44-task-live-showcase-desktop-dark.png)
-
-Chaque tentative en échec conserve un rapport de diagnostic borné et expurgé au lieu d'un simple compteur. La ligne de tâche affiche la première cause utile ; le détail regroupe les échecs par créateur et fichier et indique l'étape, la possibilité de réessayer, les chemins de champs sûrs et l'action recommandée. Le corps des réponses amont, les titres d'œuvres, les cookies et les URL complètes de téléchargement ne sont jamais enregistrés. Sur écran étroit, la barre de 64px, l'espacement de page de 12px et le Popover d'apparence compact affichent davantage de contenu sans réduire le texte des formulaires sous 16px. Le catalogue MCP utilise des groupes HeroUI repliables et développe automatiquement les groupes correspondant à une recherche ou à un filtre de permission.
-
-![Explication structurée d'un échec de tâche](../assets/webui/26-task-failure-1440-light-zh.png)
-
-![Contrôles d'apparence mobiles compacts](../assets/webui/27-appearance-mobile-dark-zh.png)
-
-![Progression d'une tâche en direct sur mobile](../assets/webui/45-task-live-showcase-mobile-dark.png)
-
-La pause est coopérative : les flux réseau actifs se ferment, les fichiers terminés et temporaires pouvant reprendre restent, et la reprise crée une nouvelle tentative. Seules les tâches en pause, arrêtées, échouées ou interrompues (`interrupted`) peuvent reprendre. Une synchronisation terminée propose « Relancer », qui conserve l'enregistrement et crée une nouvelle tentative ; un téléchargement unique terminé ne le propose pas.
-
-Supprimer une tâche ne retire normalement que son enregistrement, ses tentatives et ses journaux. « Supprimer les sorties » présente la cible lisible, le répertoire, les totaux et une liste extensible de chemins relatifs sans UUID interne. La confirmation ne retire que les fichiers ordinaires inchangés enregistrés comme créés par cette tâche.
-
-![Aperçu lisible du nettoyage](../assets/webui/31-task-delete-preview-light.png)
-
-![Synchronisation terminée avec relance](../assets/webui/33-task-rerun-light.png)
-
-## À propos
-
-La page À propos regroupe version, licence, environnement et liens officiels. Les URL, adresses IP et adresses d'écoute utilisent un style de code en ligne.
-
-![Page À propos mobile sombre](../assets/webui/32-about-mobile-dark.png)
-
-## Actualisation automatique
-
-Après la connexion, une seule connexion SSE synchronise les tâches, créateurs, règles d'exclusion, configurations, jetons MCP et répertoires distants ouverts entre les onglets du navigateur. Les changements structurels apparaissent normalement en moins d'une seconde ; la progression des tâches met directement à jour le cache local sans retélécharger toute la liste.
-
-Si la connexion en direct reste indisponible plus de cinq secondes, la WebUI affiche un avertissement compact et actualise les données locales du projet toutes les 10 secondes. Dès le rétablissement de SSE, elle arrête ce mode de secours et effectue une actualisation unique. Les recherches Pawchive, détails d'œuvres et vérifications de version restent à la demande et ne sont jamais lancés par le mode de secours.
-
-La page Système indique la méthode d'actualisation et l'heure du dernier signal, avec des actions d'actualisation et de reconnexion. Si un autre onglet ou client MCP modifie les données pendant qu'un formulaire contient des changements non enregistrés, KToolBox conserve le brouillon et propose de recharger ou de poursuivre l'édition ; les contrôles ETag et d'état restent actifs lors de l'enregistrement.
-
-## Référence de l'environnement WebUI
-
-| Variable | Valeur par défaut | Signification |
-| --- | --- | --- |
-| `KTOOLBOX_WEBUI__HOST` | `0.0.0.0` | Interface d'écoute. |
-| `KTOOLBOX_WEBUI__PORT` | `8789` | Port d'écoute, de 1 à 65535. |
-| `KTOOLBOX_WEBUI__OPEN_BROWSER` | `True` | Ouvrir l'URL locale après le démarrage. |
-| `KTOOLBOX_WEBUI__USERNAME` | vide → `admin` au démarrage | Nom facultatif du compte unique. |
-| `KTOOLBOX_WEBUI__PASSWORD_HASH` | vide | Hachage Argon2id stable recommandé. |
-| `KTOOLBOX_WEBUI__PASSWORD` | vide → aléatoire à chaque démarrage | Solution en clair ; ignorée si un hachage existe. |
-| `KTOOLBOX_WEBUI__MAX_ACTIVE_TASKS` | `2` | Tâches principales simultanées, de 1 à 16. |
-| `KTOOLBOX_WEBUI__SESSION_IDLE_HOURS` | `24` | Durée de session depuis la dernière utilisation. |
-| `KTOOLBOX_WEBUI__SESSION_ABSOLUTE_HOURS` | `168` | Durée maximale depuis la connexion. |
-
-Sauvegardez ensemble `ktoolbox.toml`, les fichiers dotenv locaux et `.ktoolbox/webui.sqlite3` lorsque l'historique importe. Ne copiez pas la base pendant l'exécution de la WebUI.
-
-## Vérification multilingue dans le navigateur
-
-Les sept catalogues sont testés réellement sur ordinateur et mobile, en thèmes clair et sombre. Voici deux états représentatifs validés ; le contenu utilisateur et les chemins du système de fichiers conservent leur texte d'origine.
-
-![Configuration française sur mobile](../assets/webui/24-configuration-mobile-fr.png)
-
-![Sélecteur de chemin distant russe sur mobile](../assets/webui/25-path-picker-mobile-ru.png)

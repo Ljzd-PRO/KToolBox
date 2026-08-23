@@ -2,6 +2,8 @@
 
 Exécutez `ktoolbox COMMAND --help` pour obtenir l'aide Cyclopts faisant autorité. Les noms des commandes et options utilisent des traits d'union ; les anciennes graphies avec traits de soulignement sont toujours analysées par les commandes de compatibilité masquées.
 
+Sur un écran étroit, faites défiler les tableaux horizontalement pour consulter toutes les colonnes.
+
 ## Options globales
 
 | Option | Signification |

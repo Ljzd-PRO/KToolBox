@@ -20,7 +20,11 @@ nav:
   - Use KToolBox:
     - Command Guide: commands/guide.md
     - Command Reference: commands/reference.md
-    - WebUI: webui.md
+    - WebUI:
+      - Overview: webui.md
+      - Project Workflows: webui/project-workflows.md
+      - Tasks and Realtime: webui/tasks.md
+      - Deployment Reference: webui/reference.md
     - Automatic Sync: automatic-sync.md
     - Naming Format: naming.md
   - Configure:
@@ -56,6 +60,10 @@ plugins:
             Command Guide: 命令指南
             Command Reference: 命令参考
             WebUI: WebUI
+            Overview: 概览
+            Project Workflows: 项目工作流
+            Tasks and Realtime: 任务与实时更新
+            Deployment Reference: 部署参考
             Automatic Sync: 自动同步
             Naming Format: 命名格式
             Configure: 配置
@@ -116,6 +124,10 @@ plugins:
             Command Guide: 命令指南
             Command Reference: 命令參考
             WebUI: WebUI
+            Overview: 概覽
+            Project Workflows: 專案工作流程
+            Tasks and Realtime: 任務與即時更新
+            Deployment Reference: 部署參考
             Automatic Sync: 自動同步
             Naming Format: 命名格式
             Configure: 設定
@@ -176,6 +188,10 @@ plugins:
             Command Guide: Руководство по командам
             Command Reference: Справочник команд
             WebUI: WebUI
+            Overview: Обзор
+            Project Workflows: Сценарии проекта
+            Tasks and Realtime: Задачи и обновления
+            Deployment Reference: Справочник развёртывания
             Automatic Sync: Автоматическая синхронизация
             Naming Format: Формат имён
             Configure: Настройка
@@ -236,6 +252,10 @@ plugins:
             Command Guide: コマンドガイド
             Command Reference: コマンドリファレンス
             WebUI: WebUI
+            Overview: 概要
+            Project Workflows: プロジェクトワークフロー
+            Tasks and Realtime: タスクとリアルタイム更新
+            Deployment Reference: デプロイリファレンス
             Automatic Sync: 自動同期
             Naming Format: 命名形式
             Configure: 設定
@@ -296,6 +316,10 @@ plugins:
             Command Guide: 명령 가이드
             Command Reference: 명령 참조
             WebUI: WebUI
+            Overview: 개요
+            Project Workflows: 프로젝트 작업 흐름
+            Tasks and Realtime: 작업과 실시간 업데이트
+            Deployment Reference: 배포 참고
             Automatic Sync: 자동 동기화
             Naming Format: 이름 형식
             Configure: 설정
@@ -356,6 +380,10 @@ plugins:
             Command Guide: Guide des commandes
             Command Reference: Référence des commandes
             WebUI: WebUI
+            Overview: Vue d'ensemble
+            Project Workflows: Parcours du projet
+            Tasks and Realtime: Tâches et mises à jour
+            Deployment Reference: Référence de déploiement
             Automatic Sync: Synchronisation automatique
             Naming Format: Format de nommage
             Configure: Configurer
@@ -444,8 +472,6 @@ extra_css:
   - stylesheets/extra.css
 
 extra:
-  version:
-    provider: mike
   analytics:
     provider: google
     property: G-LLM6CEJEH3
