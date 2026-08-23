@@ -365,10 +365,12 @@ class ReporterDownloadObserver:
     task_key: str
     creator_key: str
     filename: str
+    preserve_filename: bool = False
 
     def start(self, filename: str, total: int | None, completed: int) -> None:
-        self.filename = filename
-        self.reporter.download_started(self.task_key, self.creator_key, filename, total, completed)
+        if not self.preserve_filename:
+            self.filename = filename
+        self.reporter.download_started(self.task_key, self.creator_key, self.filename, total, completed)
 
     def advance(self, amount: int) -> None:
         self.reporter.download_advanced(self.task_key, amount)

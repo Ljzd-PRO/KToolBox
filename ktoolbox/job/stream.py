@@ -166,6 +166,7 @@ class DownloadWorkerPool:
                 task_key,
                 queued.creator_key,
                 filename or "unknown",
+                preserve_filename=queued.job.alt_filename is not None,
             )
             try:
                 result = await self._download(queued, client, observer)

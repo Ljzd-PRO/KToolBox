@@ -116,6 +116,59 @@ async def test_download_pool_bounds_concurrency_and_reuses_client(tmp_path: Path
     assert summary.successful
 
 
+async def test_download_pool_reports_configured_filename_in_live_states(tmp_path: Path) -> None:
+    queue = FairJobQueue(lane_size=1)
+    queue.register("fanbox:a")
+    await queue.put(
+        "fanbox:a",
+        Job(
+            path=tmp_path,
+            server_path="/data/7f/7f34cda12e5b4d9e",
+            alt_filename="Readable work [42].jpg",
+        ),
+    )
+    await queue.close("fanbox:a")
+
+    class Reporter(NullProgressReporter):
+        def __init__(self) -> None:
+            self.started: list[str] = []
+            self.retrying: list[str] = []
+
+        def download_started(
+            self,
+            task_key: str,
+            creator_key: str,
+            filename: str,
+            total: int | None,
+            completed: int,
+        ) -> None:
+            self.started.append(filename)
+
+        def download_retrying(
+            self,
+            task_key: str,
+            creator_key: str,
+            filename: str,
+            retry_count: int,
+            status_code: int | None,
+        ) -> None:
+            self.retrying.append(filename)
+
+    reporter = Reporter()
+
+    async def download(queued: QueuedJob, client, observer: ReporterDownloadObserver) -> DownloaderRet[str]:
+        # A remote response must not replace the project-configured display/save name.
+        observer.start("7f34cda12e5b4d9e", 100, 0)
+        observer.retry(0, 503)
+        return DownloaderRet(data=queued.job.alt_filename)
+
+    summary = await DownloadWorkerPool(1, download=download, reporter=reporter).run(queue)
+
+    assert summary.completed == 1
+    assert reporter.started == ["Readable work [42].jpg"]
+    assert reporter.retrying == ["Readable work [42].jpg"]
+
+
 async def test_download_pool_classifies_results_and_exceptions(tmp_path: Path) -> None:
     queue = FairJobQueue(lane_size=4)
     queue.register("fanbox:a")
