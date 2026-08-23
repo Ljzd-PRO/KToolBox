@@ -40,6 +40,7 @@ KToolBox v1 is the first release of the redesigned Pawchive generation. Because 
 
 - `ktoolbox.toml` Schema 升级至 v5，统一保存作者清单、忽略规则、默认输出目录、项目级命名格式和自动同步计划。
 - 默认输出目录为项目下的 `downloads`；任务、CLI、MCP 和自动同步可继承，也可显式保存到项目外的绝对路径。
+- 附件顺序命名默认开启，不可读的 Pawchive 存储名会按项目格式保存并在实时下载、重试和日志中显示为 `1.png`、`2.png` 等最终文件名。
 - 命名格式页面提供目录树预览、历史布局版本及可暂停/继续/取消回滚的旧目录转换。
 - 旧下载转换器支持项目历史格式，以及粘贴旧 `.env` 或 TOML 作为源格式；当前项目配置始终作为只读目标，原始粘贴内容不会持久化。
 - 检测到旧 dotenv 命名字段时不会在启动阶段静默修改文件；登录后通过带备份、逐字段确认的迁移向导处理，目录扫描仍需单独确认。
@@ -208,6 +209,7 @@ KToolBox v1.0.0 is the first release of a breaking Pawchive-focused generation. 
 - A typed asynchronous `PawchiveClient` covers all 14 public OpenAPI operations; the five account-authenticated favorites operations remain intentionally unsupported.
 - The Cyclopts CLI adds conventional hyphenated options, Rich help and progress, aggregate speed, explicit exit codes, multi-creator synchronization, and structured failures.
 - Project Schema v5 stores the creator roster, scoped post blockers, default output, naming layouts, and multiple automatic synchronization plans.
+- Sequential attachment names are enabled by default, and live download, retry, and log views show the final project-configured names instead of opaque Pawchive storage identifiers.
 - The new optional HeroUI WebUI provides a persistent task queue, pause/resume/stop/rerun and bulk operations, global SSE refresh, creator/work search, configuration and naming workflows, safe cleanup previews, and seven interface languages.
 - Project naming migration can scan real download roots, preview statistics, pause or resume conversion, and roll back cancellation. It supports historical project layouts and pasted legacy `.env`/TOML source layouts.
 - Automatic synchronization supports Cron or fixed intervals, IANA time zones, per-creator checkpoints, overlap-safe deduplication, and privacy-preserving recent-update counts.
@@ -225,6 +227,6 @@ KToolBox v1.0.0 is the first release of a breaking Pawchive-focused generation. 
 6. Replace removed library wrappers with an instantiated async `PawchiveClient` and direct Pydantic response models.
 7. Run one bounded creator/work test before a full synchronization.
 
-See the [English migration guide](https://github.com/Ljzd-PRO/KToolBox/blob/v1.0.0/docs/en/migration-v1.md), the [Simplified Chinese migration guide](https://github.com/Ljzd-PRO/KToolBox/blob/v1.0.0/docs/zh/migration-v1.md), and the detailed [CHANGELOG.md](https://github.com/Ljzd-PRO/KToolBox/blob/v1.0.0/CHANGELOG.md).
+See the [English migration guide](https://ktoolbox.readthedocs.io/latest/migration-v1/), the [Simplified Chinese migration guide](https://ktoolbox.readthedocs.io/latest/zh/migration-v1/), and the detailed [CHANGELOG.md](https://github.com/Ljzd-PRO/KToolBox/blob/v1.0.0/CHANGELOG.md).
 
 Please report sanitized problems through [GitHub Issues](https://github.com/Ljzd-PRO/KToolBox/issues). Do not include cookies, downloader sessions, MCP tokens, post content, or private absolute paths.

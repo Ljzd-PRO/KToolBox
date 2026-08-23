@@ -20,7 +20,7 @@ Les événements en direct utilisent SSE avec reconnexion. L'état REST reste la
 
 ![Aperçu avec vitesse globale](../../assets/webui/40-overview-showcase-desktop-light.png)
 
-La vue détaillée indique les créateurs préparés, les fichiers, les octets, la progression totale, les vitesses globale et par fichier, l'heure estimée, les nombres ignorés/échoués, les créateurs actifs, les téléchargements actifs, les nouvelles tentatives en attente et les journaux structurés. Les trois panneaux en direct ont une hauteur stable et leur propre défilement : les changements de simultanéité ne déplacent plus le journal ni la page. La vue d'activité par défaut masque la progression par blocs et le bruit ordinaire de la file ; les vues transferts et diagnostic complet restent disponibles.
+La vue détaillée indique les créateurs préparés, les fichiers, les octets, la progression totale, les vitesses globale et par fichier, l'heure estimée, les nombres ignorés/échoués, les créateurs actifs, les téléchargements actifs, les nouvelles tentatives en attente et les journaux structurés. Les téléchargements actifs, les nouvelles tentatives et les événements de transfert affichent le nom final produit par le format de nommage du projet, et non un identifiant de stockage Pawchive illisible. Les trois panneaux en direct ont une hauteur stable et leur propre défilement : les changements de simultanéité ne déplacent plus le journal ni la page. La vue d'activité par défaut masque la progression par blocs et le bruit ordinaire de la file ; les vues transferts et diagnostic complet restent disponibles.
 
 ![Panneaux de tâche stables](../../assets/webui/44-task-live-showcase-desktop-dark.png)
 

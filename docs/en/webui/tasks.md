@@ -20,7 +20,7 @@ Live events use SSE with reconnect support. REST task state remains authoritativ
 
 ![Overview with aggregate download speed](../../assets/webui/40-overview-showcase-desktop-light.png)
 
-The detail view reports prepared creators, files, bytes, overall progress, aggregate and per-file speeds, ETA, skipped/failed counts, active creators, active downloads, waiting retries, and structured logs. The three live panels have stable heights and their own scroll areas, so changing concurrency does not move the log or the page. The default activity view omits byte-level progress and ordinary queue noise; transfer and complete diagnostic views remain available when needed.
+The detail view reports prepared creators, files, bytes, overall progress, aggregate and per-file speeds, ETA, skipped/failed counts, active creators, active downloads, waiting retries, and structured logs. Active downloads, retries, and transfer events use the final name produced by the project's naming format, not an opaque Pawchive storage identifier. The three live panels have stable heights and their own scroll areas, so changing concurrency does not move the log or the page. The default activity view omits byte-level progress and ordinary queue noise; transfer and complete diagnostic views remain available when needed.
 
 ![Stable live task panels](../../assets/webui/44-task-live-showcase-desktop-dark.png)
 
