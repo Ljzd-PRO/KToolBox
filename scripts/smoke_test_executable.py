@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import os
 import re
+import signal
 import socket
 import subprocess
 import tempfile
@@ -45,6 +46,39 @@ def _wait_for_webui(process: subprocess.Popen[str], base_url: str, timeout: floa
             last_error = exc
             time.sleep(0.25)
     raise TimeoutError(f"WebUI did not start within {timeout:.0f}s: {last_error}")
+
+
+def _stop_process_tree(process: subprocess.Popen[str], *, windows: bool | None = None) -> None:
+    """Stop the packaged server and every child that inherited its output pipe."""
+    if process.poll() is not None:
+        process.communicate()
+        return
+
+    is_windows = os.name == "nt" if windows is None else windows
+    try:
+        if is_windows:
+            process.send_signal(signal.CTRL_BREAK_EVENT)
+        else:
+            os.killpg(process.pid, signal.SIGTERM)
+        process.communicate(timeout=20)
+        return
+    except (OSError, subprocess.TimeoutExpired):
+        pass
+
+    if is_windows:
+        subprocess.run(
+            ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=20,
+        )
+    else:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+    process.communicate(timeout=20)
 
 
 def main() -> int:
@@ -91,17 +125,13 @@ def main() -> int:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
+            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0,
+            start_new_session=os.name != "nt",
         )
         try:
             _wait_for_webui(process, base_url, args.timeout)
         finally:
-            if process.poll() is None:
-                process.terminate()
-            try:
-                process.communicate(timeout=20)
-            except subprocess.TimeoutExpired:
-                process.kill()
-                process.communicate(timeout=10)
+            _stop_process_tree(process)
     print(f"Packaged KToolBox {version} served its embedded WebUI successfully")
     return 0
 

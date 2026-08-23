@@ -488,12 +488,19 @@ test("remote path picker browses the server filesystem from nested forms", async
   await page.getByRole("button", { name: /Configuration section/ }).click();
   await page.getByRole("option", { name: "File downloads" }).click();
   const bucketBrowse = page.getByRole("button", { name: "Browse the remote computer for Storage bucket path" });
+  const bucketBrowseResponse = page.waitForResponse((response) => {
+    const url = new URL(response.url());
+    return response.ok() && response.request().method() === "GET" && url.pathname === "/api/v1/filesystem";
+  });
   await bucketBrowse.click();
+  const bucketBrowsePayload = await (await bucketBrowseResponse).json() as { suggested_name?: string | null };
   const hostPicker = page.getByRole("dialog", { name: "Storage bucket path" });
   await expect(hostPicker.getByText("Remote computer")).toBeVisible();
   const suggestedFolderDialog = page.getByRole("dialog", { name: "New folder" });
-  if (await suggestedFolderDialog.isVisible()) {
+  if (bucketBrowsePayload.suggested_name) {
+    await expect(suggestedFolderDialog).toBeVisible();
     await suggestedFolderDialog.getByRole("button", { name: "Cancel" }).click();
+    await expect(suggestedFolderDialog).not.toBeVisible();
   }
   await hostPicker.getByRole("button", { name: /Quick location/ }).click();
   const homeOption = page.getByRole("option", { name: "Home" });
