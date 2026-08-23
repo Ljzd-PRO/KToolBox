@@ -491,6 +491,11 @@ async def test_task_event_views_filter_before_applying_the_limit(tmp_path: Path)
     )
     await store.add_event(
         task.id,
+        "download.finished",
+        {"outcome": "existed"},
+    )
+    await store.add_event(
+        task.id,
         "task.status",
         {"status": TaskStatus.running.value},
     )
@@ -520,6 +525,20 @@ async def test_task_event_views_filter_before_applying_the_limit(tmp_path: Path)
         "download.progress",
         "download.progress",
     ]
+
+
+@pytest.mark.asyncio
+async def test_task_event_views_load_the_latest_window_in_chronological_order(tmp_path: Path) -> None:
+    database = WebUIDatabase(tmp_path / "webui.sqlite3")
+    await database.initialize()
+    store = TaskStore(database)
+    task = await store.create(DownloadTaskSpec(service="fanbox", creator_id="one", post_id="42", output=tmp_path))
+    for index in range(5):
+        await store.add_event(task.id, "task.log", {"index": index})
+
+    latest = await store.events(task_id=task.id, view="activity", limit=2)
+
+    assert [event.data["index"] for event in latest] == [3, 4]
 
 
 @pytest.mark.asyncio
@@ -750,7 +769,13 @@ async def test_web_reporter_persists_structured_creator_and_file_failures(tmp_pa
     )
 
     reporter.creator_started("fanbox:one")
-    reporter.creator_finished("fanbox:one", creator_failure.message, creator_failure)
+    reporter.creator_finished(
+        "fanbox:one",
+        creator_failure.message,
+        creator_failure,
+        fetched_posts=20,
+        accepted_posts=18,
+    )
     reporter.download_started("one", "fanbox:one", "sample.bin", 100, 0)
     reporter.download_finished("one", "failed", file_failure)
     await reporter.close()
@@ -759,6 +784,8 @@ async def test_web_reporter_persists_structured_creator_and_file_failures(tmp_pa
     creator_event = next(event for event in events if event.event_type == "creator.finished")
     download_event = next(event for event in events if event.event_type == "download.finished")
     assert creator_event.data["failure"]["stage"] == FailureStage.work_list.value
+    assert creator_event.data["fetched_posts"] == 20
+    assert creator_event.data["accepted_posts"] == 18
     assert download_event.data["failure"]["file_name"] == "sample.bin"
     assert download_event.data["outcome"] == "failed"
     assert download_event.data["filename"] == "sample.bin"

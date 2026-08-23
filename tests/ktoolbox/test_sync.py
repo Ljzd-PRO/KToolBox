@@ -217,6 +217,9 @@ async def test_sync_coordinator_cancellation_closes_producers_and_download_pool(
             creator_key: str,
             error: str | None = None,
             failure: FailureItem | None = None,
+            *,
+            fetched_posts: int | None = None,
+            accepted_posts: int | None = None,
         ) -> None:
             assert failure is None
             self.finished.append((creator_key, error))

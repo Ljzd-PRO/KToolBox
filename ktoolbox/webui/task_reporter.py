@@ -77,6 +77,9 @@ class WebTaskReporter(NullProgressReporter):
         creator_key: str,
         error: str | None = None,
         failure: FailureItem | None = None,
+        *,
+        fetched_posts: int | None = None,
+        accepted_posts: int | None = None,
     ) -> None:
         if creator_key in self.progress.active_creators:
             self.progress.active_creators.remove(creator_key)
@@ -87,6 +90,8 @@ class WebTaskReporter(NullProgressReporter):
                 "creator": creator_key,
                 "error": error,
                 "failure": failure.model_dump(mode="json") if failure else None,
+                "fetched_posts": fetched_posts,
+                "accepted_posts": accepted_posts,
                 "queued_files": stats.get("queued", 0),
                 "completed_files": stats.get("completed", 0),
                 "existing_files": stats.get("existed", 0),

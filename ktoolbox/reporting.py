@@ -45,6 +45,9 @@ class ProgressReporter(Protocol):
         creator_key: str,
         error: str | None = None,
         failure: FailureItem | None = None,
+        *,
+        fetched_posts: int | None = None,
+        accepted_posts: int | None = None,
     ) -> None: ...
 
     def job_queued(self, creator_key: str) -> None: ...
@@ -94,6 +97,9 @@ class NullProgressReporter:
         creator_key: str,
         error: str | None = None,
         failure: FailureItem | None = None,
+        *,
+        fetched_posts: int | None = None,
+        accepted_posts: int | None = None,
     ) -> None:
         return None
 
@@ -150,6 +156,9 @@ class PlainProgressReporter(NullProgressReporter):
         creator_key: str,
         error: str | None = None,
         failure: FailureItem | None = None,
+        *,
+        fetched_posts: int | None = None,
+        accepted_posts: int | None = None,
     ) -> None:
         if error or failure:
             self.console.print(f"Creator {creator_key} failed: {failure.message if failure else error}")
@@ -268,6 +277,9 @@ class RichProgressReporter(NullProgressReporter):
         creator_key: str,
         error: str | None = None,
         failure: FailureItem | None = None,
+        *,
+        fetched_posts: int | None = None,
+        accepted_posts: int | None = None,
     ) -> None:
         task_id = self._creator_tasks.pop(creator_key, None)
         if task_id is not None:

@@ -113,6 +113,8 @@ class WebUIEventStore:
         after: int = 0,
         task_id: str | None = None,
         event_types: Collection[str] | None = None,
+        exclude_existing_downloads: bool = False,
+        newest: bool = False,
         limit: int = 200,
     ) -> list[TaskEvent]:
         query = "SELECT * FROM task_events WHERE id > ?"
@@ -125,14 +127,20 @@ class WebUIEventStore:
             placeholders = ",".join("?" for _ in ordered_types)
             query += f" AND event_type IN ({placeholders})"
             parameters.extend(ordered_types)
-        query += " ORDER BY id LIMIT ?"
+        if exclude_existing_downloads:
+            query += (
+                " AND (event_type != 'download.finished' OR "
+                "COALESCE(json_extract(data_json, '$.outcome'), json_extract(data_json, '$.status'), '') != 'existed')"
+            )
+        query += " ORDER BY id DESC LIMIT ?" if newest else " ORDER BY id LIMIT ?"
         parameters.append(limit)
         async with self.database.connect() as connection:
             connection.row_factory = aiosqlite.Row
             cursor = await connection.execute(query, parameters)
             rows = await cursor.fetchall()
             await cursor.close()
-        return [_event_from_row(row) for row in rows]
+        records = [_event_from_row(row) for row in rows]
+        return list(reversed(records)) if newest else records
 
     async def wait_for_events(
         self,

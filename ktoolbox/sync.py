@@ -224,5 +224,11 @@ class SyncCoordinator:
             result.error = result.failure.message
         finally:
             await queue.close(creator.key)
-            self.reporter.creator_finished(creator.key, result.error, result.failure)
+            self.reporter.creator_finished(
+                creator.key,
+                result.error,
+                result.failure,
+                fetched_posts=result.generation.fetched_posts if result.generation is not None else None,
+                accepted_posts=result.generation.accepted_posts if result.generation is not None else None,
+            )
         return result

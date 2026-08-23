@@ -433,6 +433,8 @@ class TaskStore:
             after=after,
             task_id=task_id,
             event_types=event_types,
+            exclude_existing_downloads=view == "activity",
+            newest=after == 0,
             limit=limit,
         )
 

@@ -203,7 +203,7 @@ class CoreTaskExecutor:
             ]
         )
         if not summary.successful:
-            creator_failures = sum(not result.successful for result in summary.creators)
+            creator_failures = sum(result.error is not None for result in summary.creators)
             items = [result.failure for result in summary.creators if result.failure is not None]
             items.extend(summary.downloads.failures)
             report = failure_report(
