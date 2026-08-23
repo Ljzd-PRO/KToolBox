@@ -137,7 +137,7 @@ KTOOLBOX_JOB__GROUP_BY_YEAR=false
 `;
 const namingTomlSample = `[naming]
 creator_dirname_format = "{creator_name} [{service}-{creator_id}]"
-post_dirname_format = "{title}"
+post_dirname_format = "{title} [{post_id}]"
 revision_dirname_format = "{revision_id}"
 filename_format = "{}"
 

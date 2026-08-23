@@ -161,7 +161,7 @@ def test_parse_digest_is_deterministic_and_reflects_normalized_source() -> None:
     )
     second = parse_naming_source(
         "toml",
-        "[naming]\nmix_posts = true\n",
+        '[naming]\npost_dirname_format = "{title}"\nmix_posts = true\n',
         target=ProjectNamingConfiguration(),
     )
 

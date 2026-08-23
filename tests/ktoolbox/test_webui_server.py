@@ -231,7 +231,7 @@ def test_project_root_defers_legacy_values_until_user_confirmation(
     assert _project_root(project_root) == project_root.resolve()
 
     project = ProjectConfigStore(project_root / "ktoolbox.toml").load()
-    assert project.naming.post_dirname_format == "{title}"
+    assert project.naming.post_dirname_format == "{title} [{post_id}]"
     assert "POST_DIRNAME_FORMAT" in dotenv.read_text(encoding="utf-8")
     assert not (project_root / MIGRATION_NOTICE_PATH).exists()
     error_output = capsys.readouterr().err

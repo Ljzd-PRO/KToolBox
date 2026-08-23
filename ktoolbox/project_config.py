@@ -149,7 +149,7 @@ class ProjectNamingConfiguration(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     creator_dirname_format: str = "{creator_name} [{service}-{creator_id}]"
-    post_dirname_format: str = "{title}"
+    post_dirname_format: str = "{title} [{post_id}]"
     revision_dirname_format: str = "{revision_id}"
     post_structure: ProjectPostStructureConfiguration = Field(default_factory=ProjectPostStructureConfiguration)
     mix_posts: bool = False

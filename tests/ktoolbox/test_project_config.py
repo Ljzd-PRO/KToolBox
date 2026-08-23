@@ -120,6 +120,7 @@ def test_schema_v1_loads_with_project_naming_defaults(tmp_path: Path) -> None:
     assert configuration.schema_version == 5
     assert configuration.default_output == Path("downloads")
     assert configuration.naming.creator_dirname_format == "{creator_name} [{service}-{creator_id}]"
+    assert configuration.naming.post_dirname_format == "{title} [{post_id}]"
     assert configuration.naming.post_structure.attachments == Path("attachments")
     assert configuration.automatic_sync == []
 

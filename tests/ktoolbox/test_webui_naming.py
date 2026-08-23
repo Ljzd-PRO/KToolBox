@@ -736,8 +736,8 @@ async def test_only_one_naming_conversion_can_be_active(tmp_path: Path) -> None:
 @pytest.mark.asyncio
 async def test_preview_uses_creator_index_and_detects_duplicate_targets(tmp_path: Path) -> None:
     downloads = tmp_path / "downloads"
-    first = write_downloaded_work(downloads, "First [fanbox-123]", "Work one", "one")
-    second = write_downloaded_work(downloads, "Second [fanbox-456]", "Work two", "two")
+    first = write_downloaded_work(downloads, "First [fanbox-123]", "Work one [one]", "one")
+    second = write_downloaded_work(downloads, "Second [fanbox-456]", "Work two [two]", "two")
     (first / "post.json").unlink()
     first_post = Post(id="one", user="123", service="fanbox", title="Work one")
     index = CreatorIndices(

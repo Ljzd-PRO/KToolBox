@@ -38,8 +38,8 @@ def post(post_id: str, title: str | None = None, date: datetime | None = None, e
 def test_path_and_filename_generation() -> None:
     dated = post("42", "A/B", datetime(2025, 3, 2))
     naming = ProjectNamingConfiguration()
-    assert generate_post_path_name(post("42"), naming) == "42"
-    assert generate_post_path_name(dated, naming) == "AB"
+    assert generate_post_path_name(post("42"), naming) == "42 [42]"
+    assert generate_post_path_name(dated, naming) == "AB [42]"
     assert generate_filename(dated, "cover.jpg", "{id}_{published}_{}") == "42_2025-03-02_cover.jpg"
     assert generate_year_dirname(dated, naming) == "2025"
     assert generate_month_dirname(dated, naming) == "2025-03"
