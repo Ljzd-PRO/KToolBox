@@ -13,6 +13,13 @@
 
 </div>
 
+> [!WARNING]
+> **新大版本預覽：** 目前版本尚未經過充分的實際驗證，部分功能可能無法正常運作，但仍可嘗試使用；如遇到問題，歡迎回報。
+>
+> 由於 Kemono 網站已無法使用，本專案現在預設支援其鏡像站 Pawchive。
+>
+> 升級前請閱讀 [v1.0.0 發行說明](RELEASE_NOTES.md)與[遷移指南](docs/zh-Hant/migration-v1.md)。
+
 KToolBox v1 僅支援 Pawchive 後端。專案對 Pawchive OpenAPI 文件中的所有公開操作提供型別化存取，並明確排除需要帳號驗證的收藏操作。
 
 ## 功能

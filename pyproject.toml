@@ -27,7 +27,7 @@ keywords = ["pawchive", "cli-app", "downloader", "asyncio", "pydantic", "os-inde
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 4 - Beta",
     "Topic :: Terminals",
 ]
 
@@ -62,7 +62,10 @@ webui = [
 
 [tool.poetry]
 packages = [{ include = "ktoolbox" }]
-include = [{ path = "webui/openapi.yaml", format = ["sdist", "wheel"] }]
+include = [
+    { path = "webui/openapi.yaml", format = ["sdist", "wheel"] },
+    { path = "RELEASE_NOTES.md", format = ["sdist"] },
+]
 
 [tool.poetry.group.pyinstaller.dependencies]
 pyinstaller = "==6.15.0"

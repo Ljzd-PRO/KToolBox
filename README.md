@@ -13,6 +13,13 @@ An asynchronous CLI, HeroUI management panel, and Python client for downloading 
 
 </div>
 
+> [!WARNING]
+> **New major version preview:** This version has not yet received sufficient real-world validation. Some features may not work correctly, but you are welcome to try it and report any problems you encounter.
+>
+> Because the Kemono site is no longer available, KToolBox now targets the Pawchive mirror by default.
+>
+> Read the [v1.0.0 release notes](RELEASE_NOTES.md) and [migration guide](docs/en/migration-v1.md) before upgrading.
+
 KToolBox v1 uses Pawchive as its only supported backend. It provides typed access to every public operation in the Pawchive OpenAPI document and keeps account-authenticated favorites operations out of scope.
 
 ## Features

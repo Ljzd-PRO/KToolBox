@@ -2,6 +2,9 @@
 
 KToolBox v1 is a breaking release that moves the project to Pawchive as its only supported backend.
 
+> [!WARNING]
+> This first v1 release has not yet received sufficient real-world validation. Back up existing configuration and downloads, begin with a bounded task, and review the [release notes and migration checklist](RELEASE_NOTES.md) before upgrading.
+
 ## Breaking changes
 
 - Raise the minimum Python version to 3.10 and support Python 3.10 through 3.14.
@@ -94,6 +97,7 @@ KToolBox v1 is a breaking release that moves the project to Pawchive as its only
 - Add browser geometry checks and verified screenshots for single-frame tables, continuous modal actions, centered list switches, responsive tabs, readable task targets, and selected-only checkbox indicators.
 - Add an eight-page mobile visual matrix with route-ready capture conditions and validated horizontal/vertical six-slice review evidence.
 - Add Ruff, Mypy, warnings-as-errors, Python and TypeScript OpenAPI generation checks, Node 24 lockfile builds, wheel/PyInstaller asset checks, `compileall`, package builds, and strict seven-language documentation builds.
+- Build Linux ARM64 executables on a native GitHub runner, launch every standalone package's embedded WebUI during CI, and publish direct wheel/sdist downloads, six architecture archives, and SHA-256 checksums with dedicated release notes.
 
 ## Fixes
 
@@ -190,6 +194,7 @@ KToolBox v1 是一次不兼容升级，项目改为仅支持 Pawchive 后端。
 - 新增浏览器几何检查与实拍截图，覆盖单层表格、连续弹窗操作栏、列表开关居中、响应式标签页、可读任务目标及仅在选中时显示的复选框标记。
 - 新增八页面移动端视觉矩阵、路由就绪后截图条件，以及通过校验的横纵六切片审查证据。
 - 加入 Ruff、Mypy、警告即错误、Python 与 TypeScript OpenAPI 生成一致性检查、Node 24 锁文件构建、wheel/PyInstaller 资源检查、`compileall`、包构建和七语言文档严格构建。
+- 使用 GitHub 原生 ARM64 runner 构建 Linux ARM64 独立程序，在 CI 中实际启动每个平台独立包内嵌的 WebUI，并随专用发布说明提供直接 wheel/sdist 下载、六个架构压缩包和 SHA-256 校验文件。
 
 ## 修复
 
