@@ -70,3 +70,9 @@ jobs:
           files: release-assets/*
           fail_on_unmatched_files: true
           prerelease: ${{ contains(github.ref, 'beta') }}
+
+  publish-python:
+    needs:
+      - release
+    uses: ./.github/workflows/python-publish.yml
+    secrets: inherit
