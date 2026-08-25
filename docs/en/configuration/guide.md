@@ -1,5 +1,8 @@
 # Configuration Guide
 
+!!! tip "Edit settings in the WebUI"
+    The **Global configuration** and **Naming format** pages are the simplest way to change settings. Use this guide when you need manual files, environment variables, or deployment automation. Start with the [WebUI guide](../webui.md) for ordinary setup.
+
 KToolBox has two configuration layers:
 
 - `.env`, `prod.env`, and process variables control API, transfer, and global download behavior.
@@ -43,7 +46,7 @@ pipx install "ktoolbox[urwid]" --force
 ktoolbox config edit
 ```
 
-The optional [WebUI](../webui.md) exposes localized labels and descriptions in all seven supported languages through typed controls, final-value source indicators, secret masking, raw dotenv/TOML editing, validation, diff preview, and ETag conflict protection. English configuration docstrings remain the field and semantic source; the other locale catalogs are checked for complete path coverage.
+The recommended [WebUI](../webui.md) exposes localized labels and descriptions in all seven supported languages through typed controls, final-value source indicators, secret masking, raw dotenv/TOML editing, validation, diff preview, and ETag conflict protection. English configuration docstrings remain the field and semantic source; the other locale catalogs are checked for complete path coverage.
 
 Fixed choices such as log levels render as Select controls; recommended values that still permit custom text render as ComboBoxes. Path pickers are limited to real directories and files, while internal artifact names such as `attachments` and `external_links.txt` remain ordinary text fields.
 

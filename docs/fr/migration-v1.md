@@ -2,6 +2,15 @@
 
 KToolBox v1 introduit des changements incompatibles du serveur et de l'API de la bibliothèque.
 
+## Parcours de migration recommandé
+
+1. Sauvegardez l'ancienne configuration et les répertoires téléchargés.
+2. Installez et démarrez la [WebUI](webui.md) dans le répertoire du projet existant.
+3. Examinez chaque ancien réglage détecté dans l'assistant avant d'accepter une modification.
+4. Prévisualisez la conversion des répertoires, puis lancez une petite synchronisation avant d'activer des programmes ou une archive complète.
+
+La WebUI crée les sauvegardes, vérifie les conflits et sépare la migration de configuration de la conversion facultative des répertoires. Les tableaux détaillés ci-dessous restent utiles aux scripts et intégrations Python.
+
 ## Avant la mise à niveau
 
 1. Sauvegardez votre fichier `.env` ou `prod.env`.
@@ -74,7 +83,7 @@ Déplacez les valeurs non vides de `KTOOLBOX_JOB__KEYWORDS_EXCLUDE` vers une con
 
 `KTOOLBOX_JOB__CREATOR_CONCURRENCY` vaut `4` par défaut et limite les producteurs de créateurs. Le réglage existant `KTOOLBOX_JOB__COUNT` continue de limiter les travailleurs de fichiers.
 
-## WebUI facultative
+## Migrer avec la WebUI
 
 La version 1 ajoute un nouveau panneau HeroUI ; elle ne migre ni ne réutilise l'ancienne branche expérimentale `webui`. Installez `ktoolbox[webui]` et sélectionnez un répertoire de projet. Un fichier `ktoolbox.toml` absent est créé automatiquement après un avertissement. Sans compte configuré, chaque démarrage affiche le nom `admin` et un nouveau mot de passe aléatoire ; configurez un compte unique pour conserver des identifiants stables.
 

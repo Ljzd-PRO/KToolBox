@@ -1,5 +1,8 @@
 # Command Reference
 
+!!! note
+    This is an advanced reference for CLI automation. Most users can create and manage the same work from the [WebUI](../webui.md).
+
 Run `ktoolbox COMMAND --help` for the authoritative Cyclopts help. Command and option names use hyphens; legacy underscore spellings are still parsed for hidden compatibility commands.
 
 On narrow screens, swipe tables horizontally to inspect every column.

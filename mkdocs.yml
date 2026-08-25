@@ -15,18 +15,18 @@ hooks:
 nav:
   - Get Started:
     - Welcome to KToolBox: index.md
-    - Migrating to v1: migration-v1.md
-    - About Pawchive: about-pawchive.md
-  - Use KToolBox:
-    - Command Guide: commands/guide.md
-    - Command Reference: commands/reference.md
     - WebUI:
       - Overview: webui.md
       - Project Workflows: webui/project-workflows.md
       - Tasks and Realtime: webui/tasks.md
       - Deployment Reference: webui/reference.md
+    - Migrating to v1: migration-v1.md
+    - About Pawchive: about-pawchive.md
+  - Use KToolBox:
     - Automatic Sync: automatic-sync.md
     - Naming Format: naming.md
+    - Command Guide: commands/guide.md
+    - Command Reference: commands/reference.md
   - Configure:
     - Guide: configuration/guide.md
     - Reference: configuration/reference.md

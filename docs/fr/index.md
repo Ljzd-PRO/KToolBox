@@ -1,104 +1,61 @@
-# KToolBox
+# Bienvenue dans KToolBox
 
-KToolBox est un outil de téléchargement asynchrone en ligne de commande, un panneau de projet HeroUI et un client Python typé pour les données publiques de [Pawchive](https://pawchive.pw/). La version 1 prend exclusivement en charge Pawchive et nécessite Python 3.10 à 3.14.
+KToolBox télécharge les œuvres publiques de Pawchive. La WebUI est la méthode recommandée : les opérations courantes utilisent des formulaires guidés et leur progression reste visible après un changement de page.
 
-!!! warning "La v1 est une nouvelle version majeure"
-    Cette série n'a pas encore été suffisamment validée en usage réel. Commencez par un téléchargement limité, conservez une sauvegarde de la configuration existante et signalez tout comportement inattendu. Kemono n'étant plus disponible, KToolBox utilise par défaut le miroir Pawchive.
+!!! warning "Nouvelle version majeure"
+    La version 1 manque encore de recul en conditions réelles et certaines fonctions peuvent échouer. Sauvegardez les réglages et téléchargements existants avant une migration et signalez les comportements inattendus.
 
-## Choisir votre parcours
+## Commencer avec la WebUI
+
+1. Installez le paquet WebUI.
+2. Créez un répertoire pour votre projet de synchronisation.
+3. Démarrez KToolBox dans ce répertoire.
+
+```bash
+pipx install "ktoolbox[webui]"
+mkdir ktoolbox-project
+cd ktoolbox-project
+ktoolbox webui .
+```
+
+Le navigateur s'ouvre automatiquement. Connectez-vous avec le nom `admin` et le mot de passe aléatoire affichés dans le terminal, ajoutez un créateur, puis créez votre première tâche. KToolBox crée `ktoolbox.toml` si nécessaire et utilise `downloads` comme sortie par défaut.
+
+![Vue d'ensemble de la WebUI KToolBox](../assets/webui/40-overview-showcase-desktop-light.png)
+
+## Choisir l'étape suivante
 
 <div class="grid cards" markdown>
 
--   :material-console-line: **Commencer en ligne de commande**
+-   :material-account-multiple-plus-outline: **Ajouter des créateurs et télécharger**
 
-    Installez KToolBox, exécutez un téléchargement limité, puis poursuivez avec le [guide des commandes](commands/guide.md).
+    Suivez les [parcours du projet](webui/project-workflows.md) pour ajouter des créateurs, rechercher des œuvres, créer des tâches et régler les exclusions.
 
--   :material-view-dashboard-outline: **Gérer un projet dans le navigateur**
+-   :material-progress-download: **Suivre une tâche**
 
-    Installez le panneau facultatif et suivez le [guide de la WebUI](webui.md) pour la connexion, la sécurité, les tâches et les paramètres du projet.
+    Consultez [tâches et mises à jour](webui/tasks.md) pour la progression, les nouvelles tentatives, la pause, l'arrêt, la relance et le nettoyage sûr.
 
--   :material-update: **Mettre à niveau depuis la v0**
+-   :material-calendar-sync-outline: **Exécuter selon un calendrier**
 
-    Sauvegardez les anciens fichiers dotenv et suivez la [migration vers v1](migration-v1.md) avant de modifier les téléchargements existants.
+    Créez des plans récurrents avec le [guide de synchronisation automatique](automatic-sync.md).
 
--   :material-calendar-sync: **Maintenir les créateurs à jour**
+-   :material-folder-cog-outline: **Choisir les noms et dossiers**
 
-    Constituez d'abord une liste, puis utilisez la [synchronisation automatique](automatic-sync.md) pour les vérifications périodiques.
+    Réglez la sortie par défaut et une structure lisible avec le [guide du nommage](naming.md).
 
 </div>
 
-## Fonctionnalités
+## Parcours avancés
 
-- Télécharge une publication ou synchronise en parallèle une liste de créateurs.
-- Applique des règles d'exclusion ordonnées, globales ou propres à un créateur, avant de créer les tâches de téléchargement.
-- Reprend les fichiers partiels et ignore ceux qui existent déjà.
-- Filtre par date, titre, motif de nom de fichier et taille.
-- Contrôle séparément les couvertures, pièces jointes, images du contenu, métadonnées et liens externes.
-- Fournit une WebUI persistante en sept langues pour configurer le projet, modifier la liste des créateurs et les règles d'exclusion, interroger Pawchive et contrôler le cycle de vie des tâches.
-- Expose les 14 opérations publiques d'OpenAPI Pawchive par l'intermédiaire de modèles Pydantic validés.
+Ces pages ne sont pas nécessaires pour un premier démarrage ordinaire.
 
-Les opérations sur les favoris nécessitant l'authentification d'un compte ne sont volontairement pas mises en œuvre. Une clé de session du téléchargeur, lorsqu'elle est configurée, n'est envoyée qu'au serveur de fichiers.
-
-## Installation
-
-`pipx` permet d'isoler l'application :
-
-```bash
-pipx install ktoolbox
-```
-
-Installer l'éditeur de terminal et l'optimisation de la boucle d'événements facultatifs :
-
-```bash
-# Linux / macOS
-pipx install "ktoolbox[urwid,uvloop]" --force
-
-# Windows
-pipx install "ktoolbox[urwid,winloop]" --force
-```
-
-Installer séparément le panneau pour navigateur si nécessaire :
-
-```bash
-pipx install "ktoolbox[webui]" --force
-```
-
-## Démarrage rapide
-
-```bash
-# Examiner les commandes et leurs options.
-ktoolbox -h
-ktoolbox download -h
-
-# Télécharger une publication.
-ktoolbox download https://pawchive.pw/fanbox/user/6570768/post/1836570
-
-# Commencer par une publication avant de synchroniser une plage plus large.
-ktoolbox sync https://pawchive.pw/fanbox/user/6570768 --length 1
-```
-
-![Aperçu des commandes KToolBox](../assets/cli-overview.png)
-
-Enregistrer plusieurs créateurs et synchroniser toutes les entrées activées :
-
-```bash
-ktoolbox creator add fanbox:123 --alias studio-a
-ktoolbox creator add patreon:456 --alias studio-b
-ktoolbox sync
-```
-
-Les fichiers existants sont ignorés lors des exécutions suivantes. Un fichier incomplet avec le suffixe temporaire configuré reprend si le serveur prend en charge les plages d'octets.
-
-Sans `--output`, les téléchargements utilisent l'emplacement par défaut du projet : `downloads` sous le répertoire du projet, sauf modification.
-
-## Carte de la documentation
-
-| Objectif | À lire |
+| Objectif | Guide |
 | --- | --- |
-| Apprendre les commandes courantes | [Guide des commandes](commands/guide.md) et [référence des commandes](commands/reference.md) |
-| Exécuter le panneau dans le navigateur | [Guide de la WebUI](webui.md) |
-| Planifier des vérifications périodiques | [Synchronisation automatique](automatic-sync.md) |
-| Contrôler les répertoires et noms | [Format de nommage](naming.md) |
-| Comprendre tous les paramètres | [Guide de configuration](configuration/guide.md) et [référence de configuration](configuration/reference.md) |
-| Connecter une autre application | [MCP](mcp.md) ou [API Python](api.md) |
-| Mettre à niveau ou résoudre un problème | [Migration vers v1](migration-v1.md) et [FAQ](faq.md) |
+| Conserver un compte ou déployer sur plusieurs appareils | [Référence de déploiement WebUI](webui/reference.md) |
+| Automatiser depuis un terminal | [Guide CLI](commands/guide.md) et [référence des commandes](commands/reference.md) |
+| Examiner tous les réglages | [Guide de configuration](configuration/guide.md) et [référence](configuration/reference.md) |
+| Connecter un client IA ou un programme Python | [MCP](mcp.md) et [API Python](api.md) |
+| Mettre à niveau un projet ou résoudre un problème | [Guide de migration](migration-v1.md) et [FAQ](faq.md) |
+
+## Valeurs sûres par défaut
+
+La WebUI génère des identifiants, désactive les aperçus de médias sensibles et utilise un dossier de sortie dans le projet. Pour un accès local, liez le service à `127.0.0.1` ; utilisez HTTPS sur un réseau non fiable. KToolBox n'implémente pas les comptes ni les favoris Pawchive.

@@ -105,6 +105,21 @@ def test_readmes_have_complete_language_navigation_and_localized_docs_links() ->
             assert f"{DOCS_URL_PREFIX[locale]}{route}" in docs_links
 
 
+def test_webui_is_the_primary_getting_started_path() -> None:
+    config = (PROJECT_ROOT / "mkdocs.yml").read_text(encoding="utf-8")
+    assert config.index("    - WebUI:") < config.index("    - Command Guide:")
+
+    for locale, filename in README_BY_LOCALE.items():
+        readme = (PROJECT_ROOT / filename).read_text(encoding="utf-8")
+        first_install = readme.index("pipx install")
+        assert readme.index('pipx install "ktoolbox[webui]"') == first_install
+        assert readme.index("ktoolbox webui .") < readme.index("ktoolbox download ")
+
+        index = (DOCS_ROOT / locale / "index.md").read_text(encoding="utf-8")
+        assert index.index("webui/project-workflows.md") < index.index("commands/guide.md")
+        assert "ktoolbox webui ." in index
+
+
 def test_documentation_links_do_not_bypass_the_built_site() -> None:
     markdown_files = [PROJECT_ROOT / filename for filename in README_BY_LOCALE.values()]
     markdown_files.extend(DOCS_ROOT.glob("*/**/*.md"))

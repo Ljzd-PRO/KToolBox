@@ -2,7 +2,7 @@
 
 # KToolBox
 
-An asynchronous CLI, HeroUI management panel, and Python client for downloading public posts from [Pawchive](https://pawchive.pw/).
+An easy-to-use WebUI, CLI, and Python client for downloading public works from [Pawchive](https://pawchive.pw/).
 
 [![PyPI](https://img.shields.io/pypi/v/ktoolbox?logo=python)](https://pypi.org/project/ktoolbox/)
 [![Python](https://img.shields.io/badge/Python-3.10--3.14-blue)](https://www.python.org/)
@@ -14,243 +14,86 @@ An asynchronous CLI, HeroUI management panel, and Python client for downloading 
 </div>
 
 > [!WARNING]
-> **New major version preview:** This version has not yet received sufficient real-world validation. Some features may not work correctly, but you are welcome to try it and report any problems you encounter.
+> KToolBox v1 is a new major version and has not yet received enough real-world validation. Some features may still fail. Please report anything unexpected.
 >
-> Because the Kemono site is no longer available, KToolBox now targets the Pawchive mirror by default.
->
-> Read the [v1.0.0 release notes](https://github.com/Ljzd-PRO/KToolBox/releases/tag/v1.0.0) and the [migration guide on the documentation site](https://ktoolbox.readthedocs.io/latest/migration-v1/) before upgrading.
+> Kemono is no longer available, so KToolBox now uses the Pawchive mirror by default.
 
-**Documentation:** [Start here](https://ktoolbox.readthedocs.io/latest/) · [CLI](https://ktoolbox.readthedocs.io/latest/commands/guide/) · [WebUI](https://ktoolbox.readthedocs.io/latest/webui/) · [Migration](https://ktoolbox.readthedocs.io/latest/migration-v1/) · [Troubleshooting](https://ktoolbox.readthedocs.io/latest/faq/)
+## Start with the WebUI
 
-KToolBox v1 uses Pawchive as its only supported backend. It provides typed access to every public operation in the Pawchive OpenAPI document and keeps account-authenticated favorites operations out of scope.
+The WebUI is the recommended way to use KToolBox. It covers downloads, creator synchronization, automatic schedules, naming, filters, progress, and project configuration without requiring you to edit commands or configuration files first.
 
-## Features
+1. Install KToolBox with the WebUI:
 
-- Download one post or synchronize any number of creators in one command.
-- Keep a reusable, enabled/disabled creator roster in project-local `ktoolbox.toml`.
-- Exclude non-work posts with ordered global or creator-scoped field blockers.
-- Reuse one typed asynchronous `PawchiveClient` across API operations.
-- Resume partial downloads with HTTP Range requests and skip existing files.
-- Limit file sizes, select extensions, filter titles and dates, and control cover/attachment downloads.
-- Customize directory structure, post names, file names, sequential names, and year/month grouping.
-- Save post metadata, creator indices, extracted content, content images, and matching external links.
-- Stream jobs from concurrent creator producers into one fair download pool with stable Rich progress, per-file speeds, and aggregate throughput.
-- Manage one synchronization project through a seven-language, responsive HeroUI panel with persistent tasks, live progress, configuration forms, roster and blocker editors, and light/dark themes.
-- Use a fully offline MockTransport-based test suite; accidental network access is blocked in tests.
+    ```bash
+    pipx install "ktoolbox[webui]"
+    ```
 
-## Requirements
+2. Create a project directory and start it:
 
-- Python 3.10 through 3.14
-- Windows, macOS, or Linux
+    ```bash
+    mkdir ktoolbox-project
+    cd ktoolbox-project
+    ktoolbox webui .
+    ```
 
-## Installation
+3. The browser opens automatically. Sign in with the username and random password printed in the terminal.
+4. Add creators on **Creators**, then create a synchronization or download task on **Tasks**.
 
-Using `pipx` is recommended:
+KToolBox creates `ktoolbox.toml` when it is missing and downloads to the project's `downloads` directory by default.
 
-```bash
-pipx install ktoolbox
-```
+![KToolBox WebUI overview](docs/assets/webui/40-overview-showcase-desktop-light.png)
 
-Optional event-loop and terminal configuration-editor dependencies:
+Read the short [WebUI guide](https://ktoolbox.readthedocs.io/latest/webui/) for the next steps, or open the [documentation home](https://ktoolbox.readthedocs.io/latest/) to choose a specific workflow.
 
-```bash
-# Windows
-pipx install "ktoolbox[urwid,winloop]" --force
+## What the WebUI includes
 
-# Linux / macOS
-pipx install "ktoolbox[urwid,uvloop]" --force
-```
+- Single-work downloads and concurrent synchronization of many creators.
+- A reusable creator roster, filters, naming templates, and automatic synchronization plans.
+- Persistent task history, live progress, aggregate speed, retries, pause, stop, rerun, and safe cleanup.
+- Project-level settings with readable descriptions and filesystem pickers where appropriate.
+- Seven interface languages, responsive layouts, light and dark themes, and optional NSFW media previews.
+- A built-in MCP service for Codex, Claude, Cursor, VS Code, and compatible clients.
 
-Install the optional WebUI runtime:
+## Optional setup
 
-```bash
-pipx install "ktoolbox[webui]" --force
-```
-
-## Quick Start
-
-Show command help:
-
-```bash
-ktoolbox -h
-ktoolbox download -h
-```
-
-![KToolBox command overview](docs/assets/cli-overview.png)
-
-Download one post:
-
-```bash
-ktoolbox download https://pawchive.pw/fanbox/user/6570768/post/1836570
-```
-
-Synchronize one creator while limiting the first run to one post:
-
-```bash
-ktoolbox sync https://pawchive.pw/fanbox/user/6570768 --length 1
-```
-
-Use an offset, date range, or title filters:
-
-```bash
-ktoolbox sync fanbox:123 patreon:456 --length 10
-ktoolbox sync fanbox:123 --start-time 2025-01-01 --end-time 2025-03-01
-```
-
-Save frequently synchronized creators, then run `sync` without targets:
-
-```bash
-ktoolbox creator add fanbox:123 --alias studio-a
-ktoolbox creator add patreon:456 --alias studio-b
-ktoolbox sync
-```
-
-Downloaded files are skipped on later runs. Incomplete temporary files are resumed when the file host supports ranges.
-
-## WebUI
-
-The WebUI binds to one directory containing `ktoolbox.toml`. It can start without account settings; each such launch prints the `admin` username and a new random password in the terminal. To keep stable custom credentials, configure a single account, preferably with an Argon2id hash:
+The generated login is convenient for a first run. For a stable password, generate a hash and add it to the project's `.env`:
 
 ```bash
 ktoolbox webui hash-password
 ```
-
-Add the printed hash and account name to the project's `.env`, then start the panel:
 
 ```dotenv
 KTOOLBOX_WEBUI__USERNAME=owner
 KTOOLBOX_WEBUI__PASSWORD_HASH='$argon2id$...'
 ```
 
-```bash
-ktoolbox webui /path/to/project
-```
+For local-only access, start with `--host 127.0.0.1`. The built-in server uses HTTP, so use a trusted network or an HTTPS reverse proxy for remote access.
 
-![KToolBox global configuration](docs/assets/webui/30-global-configuration-log-level-light.png)
+## Advanced use
 
-The complete interface is available in Simplified Chinese, Traditional Chinese, English, Japanese, Korean, French, and Russian. First use follows the browser language; the language menu persists an explicit choice and updates dates, numbers, sorting, configuration descriptions, validation, and server error messages together.
-
-Task rows preserve readable post titles and creator names in an offline presentation snapshot. Desktop and mobile layouts expose details, lifecycle, editing, ordering, and deletion actions directly, while form switches use gray-off/blue-on tracks and checkboxes show an indicator only when selected.
-
-The **Global configuration** page uses typed Select and ComboBox controls while reserving filesystem pickers for real locations. Completed synchronization tasks offer **Rerun** on the same task record; cleanup confirmation shows a readable target and expandable relative-file preview instead of an internal UUID. The **About** page collects version, license, runtime, and official links, with URLs and listener addresses rendered as inline code.
-
-Naming and the default download location are project-specific. The **Naming format** page saves directory structure and templates independently; relative output defaults resolve from the project, while absolute host paths are also supported. Its reusable **Legacy download conversion** tab can use one or more saved project layouts or parse pasted legacy `.env`/TOML in a highlighted editor; the current project format always remains the read-only target. Scanned moves can pause, continue, or roll back, and pasted source text is never persisted. When old dotenv naming keys are detected, WebUI asks for confirmation before a backed-up configuration migration and never scans directories automatically. See the [naming guide](https://ktoolbox.readthedocs.io/latest/naming/).
-
-The **Automatic sync** page runs multiple creator synchronization plans with Cron or fixed intervals. It previews the next three executions, supports pausing and immediate runs, advances checkpoints independently for successful creators, and summarizes recently discovered works without loading titles or media. See the [automatic synchronization guide](https://ktoolbox.readthedocs.io/latest/automatic-sync/).
-
-Optional NSFW previews are off by default and remain a browser-local display preference. Enabling them requires confirmation and loads creator avatars, banners, work covers, and supported image attachments only through the authenticated same-origin proxy. The proxy verifies decoded bitmaps and rejects redirects, SVG, non-images, damaged files, and oversized resources. See the [WebUI guide](https://ktoolbox.readthedocs.io/latest/webui/#optional-sensitive-media-previews).
-
-Failed tasks retain a redacted, stage-specific report with the affected creator or file, retryability, safe field paths, and recovery guidance. The compact mobile shell uses a 64px workbar and 12px page spacing; its appearance controls move into a small Popover, and the MCP tool catalog collapses by category.
-
-Creator profiles supply the primary roster name with a resilient 24-hour cache. Data tables support locale-aware sorting, dashboard statistics link to filtered views, and every platform field uses a HeroUI ComboBox with Patreon, Pixiv, and Fanbox suggestions plus custom values.
-
-One authenticated SSE connection automatically synchronizes tasks, creators, ignore rules, configuration, MCP tokens, and open remote directories across tabs. A connection outage switches local data to 10-second fallback refresh without polling Pawchive searches or work details, and unsaved form drafts are protected from external updates.
-
-The default `0.0.0.0:8789` listener is convenient on a trusted LAN, but HTTP does not protect credentials or project data in transit. Bind to `127.0.0.1` or put the service behind HTTPS for untrusted networks. When credentials are not configured, KToolBox generates credentials for the current process and prints them only in its terminal. Filesystem-backed path fields can browse the computer running KToolBox; project fields stay inside the bound project, while the storage-bucket and log-directory fields use the server process's host permissions. Empty directories can only be removed through an explicit, non-recursive confirmation. See the [WebUI guide](https://ktoolbox.readthedocs.io/latest/webui/) for task lifecycle, security, and deployment details.
-
-## MCP
-
-Starting WebUI also starts a curated Streamable HTTP MCP service at `/mcp`; the authenticated WebUI REST contract is available as OpenAPI YAML at `/api/v1/openapi.yaml`. Sign in, open **MCP**, and confirm the current account password to create a read-only or management token. The token is displayed once and can be revoked from the same page.
-
-For Codex, store the token outside the repository and reference it from the configuration:
-
-```toml
-[mcp_servers.ktoolbox]
-url = "http://127.0.0.1:8789/mcp"
-bearer_token_env_var = "KTOOLBOX_MCP_TOKEN"
-```
-
-The page also generates configurations for generic HTTP clients, Claude, Cursor, and VS Code. See the [MCP guide](https://ktoolbox.readthedocs.io/latest/mcp/) for permissions, limits, and HTTPS guidance.
-
-## Configuration
-
-KToolBox reads `.env`, then `prod.env`, from the current working directory. Nested fields use `__`:
-
-```dotenv
-# Pawchive defaults; normally no override is needed.
-KTOOLBOX_API__NETLOC=pawchive.pw
-KTOOLBOX_API__STATICS_NETLOC=pawchive.pw
-KTOOLBOX_API__PATH=/api/v1
-KTOOLBOX_DOWNLOADER__FILES_NETLOC=file.pawchive.pw
-KTOOLBOX_DOWNLOADER__FILE_PATH_PREFIX=/data
-
-# Download controls.
-KTOOLBOX_JOB__COUNT=4
-KTOOLBOX_JOB__CREATOR_CONCURRENCY=4
-KTOOLBOX_JOB__DOWNLOAD_FILE=True
-KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
-KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
-```
-
-`KTOOLBOX_DOWNLOADER__SESSION_KEY`, if set, is sent only to file downloads. The API client never sends an account session.
-
-`.env` controls runtime and transfer behavior. A project-level `ktoolbox.toml` stores naming, the creator roster, automatic-sync plans, and blockers:
-
-```toml
-schema_version = 5
-
-[[creators]]
-service = "fanbox"
-creator_id = "123"
-alias = "studio-a"
-enabled = true
-
-[[blockers]]
-id = "skip-progress-updates"
-type = "field-match"
-enabled = true
-scope = { mode = "creators", creators = ["fanbox:123"] }
-options = { rule = { kind = "group", mode = "any", conditions = [{ kind = "field", field = "title", operator = "contains", values = ["progress update"] }] } }
-```
-
-Generate references, validate the project file, or launch the optional terminal editor:
+The command line remains available for scripts and terminal workflows:
 
 ```bash
-ktoolbox config example
-ktoolbox config validate
-ktoolbox config edit
+ktoolbox download https://pawchive.pw/fanbox/user/6570768/post/1836570
+ktoolbox sync fanbox:123 patreon:456 --length 10
 ```
 
-See [Configuration](https://ktoolbox.readthedocs.io/latest/configuration/guide/) and [`example.env`](example.env).
+See the [CLI guide](https://ktoolbox.readthedocs.io/latest/commands/guide/) for commands, the [MCP guide](https://ktoolbox.readthedocs.io/latest/mcp/) for AI clients, and the [Python API guide](https://ktoolbox.readthedocs.io/latest/api/) for integrations.
 
-## Python API
+## Upgrading from v0
 
-```python
-import asyncio
-
-from ktoolbox.api import PawchiveClient
-
-
-async def main() -> None:
-    async with PawchiveClient() as client:
-        profile = await client.get_creator_profile("fanbox", "6570768")
-        posts = await client.list_creator_posts(profile.service, profile.id, offset=0)
-        print(profile.name, len(posts))
-
-
-asyncio.run(main())
-```
-
-Successful calls return Pydantic v2 models. Transport, HTTP status, authentication, not-found, conflict, and response-validation failures use distinct exception classes. See the [API documentation](https://ktoolbox.readthedocs.io/latest/api/).
-
-## Migrating From v0
-
-v1 removes the Kemono/Coomer compatibility layer and the old `BaseAPI`, module-level `get_*`, `APIRet`, and wrapper-response interfaces. Fire commands were replaced by Cyclopts: use `download`, `sync`, `creator`, `post`, and `config`. Hidden aliases remain temporarily available with a deprecation warning. Move `KTOOLBOX_API__SESSION_KEY` to `KTOOLBOX_DOWNLOADER__SESSION_KEY` and review the [v1 migration guide](https://ktoolbox.readthedocs.io/latest/migration-v1/).
-
-The historical `kemono_openapi.json` remains in the repository for reference only; it is not a supported runtime contract.
+Back up `.env`, `prod.env`, and existing downloads before upgrading. WebUI detects legacy naming settings and guides you through configuration and directory conversion. Read the [v1 migration guide](https://ktoolbox.readthedocs.io/latest/migration-v1/) before changing an existing project; see [troubleshooting](https://ktoolbox.readthedocs.io/latest/faq/) if a migration or task fails.
 
 ## Development
 
 ```bash
 poetry install --with test,docs,dev
 poetry run pytest --cov
-poetry run ruff check k_generator ktoolbox/api ktoolbox/blocker ktoolbox/cli.py ktoolbox/cli_app.py ktoolbox/job/stream.py ktoolbox/project_config.py ktoolbox/reporting.py ktoolbox/sync.py tests
-poetry run mypy --strict ktoolbox/api/client.py ktoolbox/api/errors.py ktoolbox/api/parameters.py ktoolbox/api/utils.py ktoolbox/blocker ktoolbox/cli.py ktoolbox/cli_app.py ktoolbox/job/stream.py ktoolbox/project_config.py ktoolbox/reporting.py ktoolbox/sync.py
 poetry run mkdocs build --strict
-cd webui && npm ci && npm run typecheck && npm run lint && npm run test && npm run build && npm run test:e2e
+cd webui && npm ci && npm run test && npm run build
 ```
 
-Default tests are hermetic and must not contact Pawchive or any other remote service.
+Default tests are offline and must not contact Pawchive or any other remote service.
 
 ## License
 

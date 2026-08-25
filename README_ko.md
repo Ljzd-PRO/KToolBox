@@ -2,7 +2,7 @@
 
 # KToolBox
 
-[Pawchive](https://pawchive.pw/)의 공개 게시물을 다운로드하기 위한 비동기 CLI, HeroUI 관리 패널 및 Python 클라이언트입니다.
+[Pawchive](https://pawchive.pw/) 공개 작품을 다운로드하는 사용하기 쉬운 WebUI, CLI 및 Python 클라이언트입니다.
 
 [![PyPI](https://img.shields.io/pypi/v/ktoolbox?logo=python)](https://pypi.org/project/ktoolbox/)
 [![Python](https://img.shields.io/badge/Python-3.10--3.14-blue)](https://www.python.org/)
@@ -14,242 +14,87 @@
 </div>
 
 > [!WARNING]
-> **새 메이저 버전 미리 보기:** 현재 버전은 실제 환경에서 충분히 검증되지 않았으며 일부 기능이 정상적으로 작동하지 않을 수 있습니다. 그래도 시험해 볼 수 있으며, 문제가 발생하면 알려 주세요.
+> KToolBox v1은 새로운 메이저 버전이며 실제 환경 검증이 아직 충분하지 않습니다. 일부 기능이 실패할 수 있으니 문제가 있으면 알려 주세요.
 >
-> Kemono 사이트를 더 이상 사용할 수 없으므로 KToolBox는 이제 미러 사이트인 Pawchive를 기본 대상으로 사용합니다.
->
-> 업그레이드하기 전에 [v1.0.0 릴리스 노트](https://github.com/Ljzd-PRO/KToolBox/releases/tag/v1.0.0)와 문서 사이트의 [마이그레이션 가이드](https://ktoolbox.readthedocs.io/latest/ko/migration-v1/)를 확인하세요.
+> Kemono를 더 이상 사용할 수 없어 KToolBox는 기본적으로 미러 사이트 Pawchive를 사용합니다.
 
-**문서:** [시작하기](https://ktoolbox.readthedocs.io/latest/ko/) · [CLI](https://ktoolbox.readthedocs.io/latest/ko/commands/guide/) · [WebUI](https://ktoolbox.readthedocs.io/latest/ko/webui/) · [마이그레이션](https://ktoolbox.readthedocs.io/latest/ko/migration-v1/) · [문제 해결](https://ktoolbox.readthedocs.io/latest/ko/faq/)
+## WebUI로 시작하기
 
-KToolBox v1은 Pawchive만 백엔드로 지원합니다. Pawchive OpenAPI 문서의 모든 공개 작업에 형식이 지정된 접근을 제공하며, 계정 인증이 필요한 즐겨찾기 작업은 지원 범위에서 제외합니다.
+WebUI는 KToolBox의 권장 사용 방법입니다. 명령이나 설정 파일을 먼저 배우지 않고 작품 다운로드, 크리에이터 동기화, 자동 동기화, 이름 지정, 필터, 진행률 및 프로젝트 설정을 관리할 수 있습니다.
 
-## 기능
+1. WebUI와 함께 KToolBox를 설치합니다.
 
-- 게시물 하나를 다운로드하거나 하나의 명령으로 원하는 수의 크리에이터를 동기화합니다.
-- 프로젝트 로컬 `ktoolbox.toml`에서 재사용 가능하고 활성화/비활성화할 수 있는 크리에이터 목록을 관리합니다.
-- 순서가 있는 전역 또는 크리에이터별 필드 제외 규칙으로 작품이 아닌 게시물을 제외합니다.
-- 여러 API 작업에서 하나의 형식 지정 비동기 `PawchiveClient`를 재사용합니다.
-- HTTP Range 요청으로 부분 다운로드를 재개하고 기존 파일을 건너뜁니다.
-- 파일 크기 제한, 확장자 선택, 제목과 날짜 필터링, 표지와 첨부 파일 다운로드를 개별 제어합니다.
-- 디렉터리 구조, 게시물 이름, 파일 이름, 순차 이름 및 연/월 그룹화를 사용자 지정합니다.
-- 게시물 메타데이터, 크리에이터 색인, 추출한 본문, 본문 이미지 및 일치하는 외부 링크를 저장합니다.
-- 동시에 처리되는 크리에이터의 작업을 하나의 공정한 다운로드 풀로 스트리밍하고, 파일별 속도와 전체 처리량을 안정적인 Rich 진행률로 표시합니다.
-- 7개 언어를 지원하는 반응형 HeroUI 패널에서 영구 작업, 실시간 진행률, 설정 양식, 크리에이터 및 제외 규칙 편집, 라이트/다크 테마와 함께 하나의 동기화 프로젝트를 관리합니다.
-- MockTransport 기반의 완전한 오프라인 테스트 모음을 사용하며 우발적인 네트워크 접근을 차단합니다.
+    ```bash
+    pipx install "ktoolbox[webui]"
+    ```
 
-## 요구 사항
+2. 프로젝트 디렉터리를 만들고 시작합니다.
 
-- Python 3.10~3.14
-- Windows, macOS 또는 Linux
+    ```bash
+    mkdir ktoolbox-project
+    cd ktoolbox-project
+    ktoolbox webui .
+    ```
 
-## 설치
+3. 브라우저가 자동으로 열립니다. 터미널에 표시된 사용자 이름과 무작위 비밀번호로 로그인합니다.
+4. **크리에이터**에서 대상을 추가한 뒤 **작업**에서 동기화 또는 다운로드 작업을 만듭니다.
 
-`pipx` 사용을 권장합니다.
+`ktoolbox.toml`이 없으면 자동으로 생성하며 기본 다운로드 위치는 프로젝트의 `downloads` 디렉터리입니다.
 
-```bash
-pipx install ktoolbox
-```
+![KToolBox WebUI 개요](docs/assets/webui/40-overview-showcase-desktop-light.png)
 
-이벤트 루프 최적화 및 터미널 설정 편집기를 위한 선택적 종속성:
+짧은 [WebUI 가이드](https://ktoolbox.readthedocs.io/latest/ko/webui/)를 계속 읽거나 [문서 홈](https://ktoolbox.readthedocs.io/latest/ko/)에서 원하는 작업을 선택하세요.
 
-```bash
-# Windows
-pipx install "ktoolbox[urwid,winloop]" --force
+## WebUI에서 할 수 있는 일
 
-# Linux / macOS
-pipx install "ktoolbox[urwid,uvloop]" --force
-```
+- 단일 작품 다운로드와 여러 크리에이터 병렬 동기화.
+- 크리에이터 목록, 제외 규칙, 이름 형식 및 여러 자동 동기화 계획 관리.
+- 영구 작업 기록, 실시간 진행률, 총속도, 재시도, 일시 중지, 중지, 재실행 및 안전한 정리.
+- 설명이 있는 양식과 필요한 위치의 경로 선택기로 프로젝트 설정 관리.
+- 7개 언어, 반응형 레이아웃, 밝고 어두운 테마 및 선택적 NSFW 미디어 미리 보기.
+- Codex, Claude, Cursor, VS Code 등에 연결하는 내장 MCP 서비스.
 
-선택적 WebUI 런타임 설치:
+## 선택 설정
 
-```bash
-pipx install "ktoolbox[webui]" --force
-```
-
-## 빠른 시작
-
-명령 도움말 표시:
-
-```bash
-ktoolbox -h
-ktoolbox download -h
-```
-
-![KToolBox 명령 개요](docs/assets/cli-overview.png)
-
-게시물 하나 다운로드:
-
-```bash
-ktoolbox download https://pawchive.pw/fanbox/user/6570768/post/1836570
-```
-
-첫 실행을 게시물 하나로 제한하여 크리에이터 한 명 동기화:
-
-```bash
-ktoolbox sync https://pawchive.pw/fanbox/user/6570768 --length 1
-```
-
-오프셋, 날짜 범위 또는 제목 필터 사용:
-
-```bash
-ktoolbox sync fanbox:123 patreon:456 --length 10
-ktoolbox sync fanbox:123 --start-time 2025-01-01 --end-time 2025-03-01
-```
-
-자주 동기화하는 크리에이터를 저장한 다음 대상 없이 `sync` 실행:
-
-```bash
-ktoolbox creator add fanbox:123 --alias studio-a
-ktoolbox creator add patreon:456 --alias studio-b
-ktoolbox sync
-```
-
-다시 실행하면 기존 파일을 건너뜁니다. 파일 호스트가 Range를 지원하면 완료되지 않은 임시 파일부터 다운로드를 재개합니다.
-
-## WebUI
-
-WebUI는 `ktoolbox.toml`이 포함된 하나의 프로젝트 디렉터리에 연결됩니다. 자격 증명을 생략하면 이번 프로세스에서 사용할 `admin`과 새 무작위 암호가 터미널에 표시됩니다. 고정 자격 증명에는 Argon2id 해시를 권장합니다.
+첫 실행에는 자동 생성 로그인으로 충분합니다. 고정 비밀번호가 필요하면 해시를 생성하여 프로젝트 `.env`에 추가하세요.
 
 ```bash
 ktoolbox webui hash-password
 ```
-
-출력된 해시와 계정 이름을 프로젝트의 `.env`에 추가한 다음 패널을 시작합니다.
 
 ```dotenv
 KTOOLBOX_WEBUI__USERNAME=owner
 KTOOLBOX_WEBUI__PASSWORD_HASH='$argon2id$...'
 ```
 
-```bash
-ktoolbox webui /path/to/project
-```
+이 컴퓨터에서만 사용할 때는 `--host 127.0.0.1`을 지정할 수 있습니다. 내장 서버는 HTTP를 사용하므로 원격 접근에는 신뢰할 수 있는 네트워크 또는 HTTPS 리버스 프록시를 사용하세요.
 
-![KToolBox 전역 설정](docs/assets/webui/30-global-configuration-log-level-light.png)
+## 고급 사용
 
-전체 인터페이스는 중국어 간체, 중국어 번체, 영어, 일본어, 한국어, 프랑스어, 러시아어를 지원합니다. 처음에는 브라우저 언어를 따르며, 수동 선택은 저장되고 날짜, 숫자, 정렬, 설정 설명, 입력 검증 및 서버 오류도 함께 전환됩니다.
-
-작업 행은 오프라인 표시 스냅샷에 읽기 쉬운 게시물 제목과 크리에이터 이름을 보존합니다. 데스크톱과 모바일 레이아웃에서 세부 정보, 수명 주기, 편집, 순서 변경 및 삭제를 바로 사용할 수 있습니다. 양식 스위치는 꺼짐일 때 회색, 켜짐일 때 파란색이며 체크박스는 선택된 경우에만 표시됩니다.
-
-전역 설정 페이지는 필드 의미에 따라 Select 또는 ComboBox를 사용하고 실제 위치 필드에만 경로 선택기를 제공합니다. 완료된 동기화는 같은 작업 기록에서 다시 실행할 수 있으며 삭제 확인은 내부 UUID 대신 읽기 쉬운 대상과 펼칠 수 있는 상대 파일 목록을 보여 줍니다. 정보 페이지는 버전, 라이선스, 실행 환경과 공식 링크를 모아 표시하고 URL과 수신 주소를 인라인 코드로 렌더링합니다.
-
-이름 설정과 기본 다운로드 위치는 프로젝트별로 저장됩니다. **이름 형식** 페이지에서 디렉터리 구조와 템플릿을 각각 저장하고, 상대 출력은 프로젝트 기준으로 해석하며 프로젝트 밖의 절대 경로도 지원합니다. 언제든 사용할 수 있는 이전 다운로드 변환기는 여러 프로젝트 기록을 선택하거나 구문 강조 편집기에 이전 `.env`/TOML을 붙여 넣을 수 있습니다. 현재 프로젝트 형식은 항상 읽기 전용 대상이며 붙여 넣은 원문은 저장되지 않습니다. 변환은 일시 중지, 계속 및 롤백을 지원합니다. 이전 dotenv 이름 키가 감지되면 WebUI는 백업된 설정 마이그레이션을 먼저 확인하고 디렉터리를 자동 스캔하지 않습니다. [이름 형식 가이드](https://ktoolbox.readthedocs.io/latest/ko/naming/)를 참조하세요.
-
-**자동 동기화** 페이지는 여러 Cron 또는 고정 간격 계획, 다음 3회 실행 미리보기, 일시 중지 및 즉시 실행을 지원합니다. 성공 체크포인트는 크리에이터별로 진행되며 최근 업데이트는 제목이나 미디어를 불러오지 않고 수량만 집계합니다. [자동 동기화 가이드](https://ktoolbox.readthedocs.io/latest/ko/automatic-sync/)를 참조하세요.
-
-선택적 NSFW 미리보기는 기본적으로 꺼져 있고 현재 브라우저의 표시 설정으로만 저장됩니다. 활성화에는 확인이 필요하며 아바타, 배너, 작품 표지와 지원 이미지 첨부는 인증된 동일 출처 프록시를 통해서만 불러옵니다. 프록시는 디코딩된 비트맵을 검증하고 리디렉션, SVG, 비이미지, 손상 또는 제한 초과 리소스를 거부합니다. [WebUI 가이드](https://ktoolbox.readthedocs.io/latest/ko/webui/#선택적-민감-미디어-미리보기)를 참조하세요.
-
-실패한 작업에는 관련 크리에이터 또는 파일, 재시도 가능성, 안전한 필드 경로와 권장 조치가 포함된 단계별 비식별 진단 보고서가 남습니다. 간결한 모바일 화면은 64px 작업 표시줄과 12px 페이지 여백을 사용하고 외관 제어를 작은 Popover에 넣으며 MCP 도구 목록을 범주별로 접습니다.
-
-로그인 후에는 하나의 SSE 연결만 사용하여 작업, 크리에이터, 제외 규칙, 설정, MCP 토큰 및 열린 원격 디렉터리를 탭 사이에서 자동으로 동기화합니다. 연결이 끊기면 로컬 데이터만 10초마다 새로 고치며 Pawchive 검색이나 작품 상세 정보는 폴링하지 않습니다. 저장하지 않은 양식 초안도 외부 업데이트로부터 보호됩니다.
-
-기본 `0.0.0.0:8789` 리스너는 신뢰할 수 있는 LAN에서 편리하지만, HTTP는 전송 중인 자격 증명이나 프로젝트 데이터를 보호하지 않습니다. 신뢰할 수 없는 네트워크에서는 `127.0.0.1`에 바인딩하거나 HTTPS 리버스 프록시 뒤에 배치하세요. 설정되지 않은 자격 증명은 현재 프로세스에서만 생성되고 터미널에만 표시됩니다. 작업 수명 주기, 보안 및 배포에 대해서는 [WebUI 가이드](https://ktoolbox.readthedocs.io/latest/ko/webui/)를 참조하세요.
-
-## MCP
-
-WebUI를 시작하면 선별된 Streamable HTTP MCP 서비스도 `/mcp`에서 시작됩니다. 인증된 WebUI REST OpenAPI YAML은 `/api/v1/openapi.yaml`에서 받을 수 있습니다. 로그인 후 **MCP** 페이지에서 현재 계정 암호를 다시 확인하여 읽기 전용 또는 관리 토큰을 만들 수 있습니다. 원문 토큰은 한 번만 표시되며 같은 페이지에서 취소할 수 있습니다.
-
-Codex 설정 예:
-
-```toml
-[mcp_servers.ktoolbox]
-url = "http://127.0.0.1:8789/mcp"
-bearer_token_env_var = "KTOOLBOX_MCP_TOKEN"
-```
-
-페이지는 일반 HTTP, Claude, Cursor 및 VS Code 설정도 생성합니다. 권한, 반환 한도 및 HTTPS 지침은 [MCP 가이드](https://ktoolbox.readthedocs.io/latest/ko/mcp/)를 참조하세요.
-
-## 설정
-
-KToolBox는 현재 작업 디렉터리에서 `.env`, 그다음 `prod.env`를 읽습니다. 중첩 필드는 `__`를 사용합니다.
-
-```dotenv
-# Pawchive 기본값이며 일반적으로 변경할 필요가 없습니다.
-KTOOLBOX_API__NETLOC=pawchive.pw
-KTOOLBOX_API__STATICS_NETLOC=pawchive.pw
-KTOOLBOX_API__PATH=/api/v1
-KTOOLBOX_DOWNLOADER__FILES_NETLOC=file.pawchive.pw
-KTOOLBOX_DOWNLOADER__FILE_PATH_PREFIX=/data
-
-# 다운로드 제어.
-KTOOLBOX_JOB__COUNT=4
-KTOOLBOX_JOB__CREATOR_CONCURRENCY=4
-KTOOLBOX_JOB__DOWNLOAD_FILE=True
-KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
-KTOOLBOX_JOB__MAX_FILE_SIZE=1048576
-```
-
-`KTOOLBOX_DOWNLOADER__SESSION_KEY`를 설정하면 파일 다운로드에만 전송됩니다. API 클라이언트는 계정 세션을 전송하지 않습니다.
-
-`.env`는 런타임과 전송 동작을 제어하고, 프로젝트 수준 `ktoolbox.toml`은 이름 형식, 크리에이터 목록, 자동 동기화 계획과 제외 규칙을 저장합니다.
-
-```toml
-schema_version = 5
-
-[[creators]]
-service = "fanbox"
-creator_id = "123"
-alias = "studio-a"
-enabled = true
-
-[[blockers]]
-id = "skip-progress-updates"
-type = "field-match"
-enabled = true
-scope = { mode = "creators", creators = ["fanbox:123"] }
-options = { rule = { kind = "group", mode = "any", conditions = [{ kind = "field", field = "title", operator = "contains", values = ["진행 상황 공유"] }] } }
-```
-
-설정 참조 생성, 프로젝트 파일 검증 또는 선택적 터미널 편집기 실행:
+스크립트와 터미널 작업에는 CLI도 사용할 수 있습니다.
 
 ```bash
-ktoolbox config example
-ktoolbox config validate
-ktoolbox config edit
+ktoolbox download https://pawchive.pw/fanbox/user/6570768/post/1836570
+ktoolbox sync fanbox:123 patreon:456 --length 10
 ```
 
-자세한 내용은 [설정 가이드](https://ktoolbox.readthedocs.io/latest/ko/configuration/guide/)와 [`example.env`](example.env)를 참조하세요.
+명령은 [CLI 가이드](https://ktoolbox.readthedocs.io/latest/ko/commands/guide/), AI 클라이언트는 [MCP 가이드](https://ktoolbox.readthedocs.io/latest/ko/mcp/), 프로그램 통합은 [Python API](https://ktoolbox.readthedocs.io/latest/ko/api/)를 참고하세요.
 
-## Python API
+## v0에서 업그레이드
 
-```python
-import asyncio
-
-from ktoolbox.api import PawchiveClient
-
-
-async def main() -> None:
-    async with PawchiveClient() as client:
-        profile = await client.get_creator_profile("fanbox", "6570768")
-        posts = await client.list_creator_posts(profile.service, profile.id, offset=0)
-        print(profile.name, len(posts))
-
-
-asyncio.run(main())
-```
-
-성공한 호출은 Pydantic v2 모델을 반환합니다. 전송, HTTP 상태, 인증, 찾을 수 없음, 충돌 및 응답 검증 실패에는 각각 다른 예외 클래스가 사용됩니다. [API 문서](https://ktoolbox.readthedocs.io/latest/ko/api/)를 참조하세요.
-
-## v0에서 마이그레이션
-
-v1은 Kemono/Coomer 호환 계층과 이전 `BaseAPI`, 모듈 수준 `get_*`, `APIRet`, 래퍼 응답 인터페이스를 제거했습니다. Fire 명령은 Cyclopts로 대체되었으므로 `download`, `sync`, `creator`, `post`, `config`를 사용하세요. 숨겨진 이전 별칭은 사용 중단 경고와 함께 일시적으로 제공됩니다. `KTOOLBOX_API__SESSION_KEY`를 `KTOOLBOX_DOWNLOADER__SESSION_KEY`로 옮기고 [v1 마이그레이션 가이드](https://ktoolbox.readthedocs.io/latest/ko/migration-v1/)를 확인하세요.
-
-이전 `kemono_openapi.json`은 참고용으로 저장소에 남아 있지만 지원되는 런타임 계약은 아닙니다.
+업그레이드 전에 `.env`, `prod.env` 및 기존 다운로드를 백업하세요. WebUI는 이전 이름 설정을 감지하고 설정과 디렉터리 변환을 안내합니다. 기존 프로젝트를 변경하기 전에 [v1 마이그레이션 가이드](https://ktoolbox.readthedocs.io/latest/ko/migration-v1/)를 읽고, 실패하면 [문제 해결](https://ktoolbox.readthedocs.io/latest/ko/faq/)을 확인하세요.
 
 ## 개발
 
 ```bash
 poetry install --with test,docs,dev
 poetry run pytest --cov
-poetry run ruff check k_generator ktoolbox/api ktoolbox/blocker ktoolbox/cli.py ktoolbox/cli_app.py ktoolbox/job/stream.py ktoolbox/project_config.py ktoolbox/reporting.py ktoolbox/sync.py tests
-poetry run mypy --strict ktoolbox/api/client.py ktoolbox/api/errors.py ktoolbox/api/parameters.py ktoolbox/api/utils.py ktoolbox/blocker ktoolbox/cli.py ktoolbox/cli_app.py ktoolbox/job/stream.py ktoolbox/project_config.py ktoolbox/reporting.py ktoolbox/sync.py
 poetry run mkdocs build --strict
-cd webui && npm ci && npm run typecheck && npm run lint && npm run test && npm run build && npm run test:e2e
+cd webui && npm ci && npm run test && npm run build
 ```
 
-기본 테스트는 완전히 오프라인이어야 하며 Pawchive나 다른 원격 서비스에 연결해서는 안 됩니다.
+기본 테스트는 완전히 오프라인이며 Pawchive나 다른 원격 서비스에 접속하면 안 됩니다.
 
 ## 라이선스
 
-KToolBox는 [BSD 3-Clause License](LICENSE)에 따라 배포됩니다.
+KToolBox는 [BSD 3-Clause License](LICENSE)로 배포됩니다.

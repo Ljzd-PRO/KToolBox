@@ -1,5 +1,8 @@
 # Référence de configuration
 
+!!! note
+    Ceci est la référence bas niveau complète. Préférez les formulaires localisés de la [WebUI](../webui.md), sauf si vous avez précisément besoin de variables d'environnement ou de configuration générée.
+
 Les noms d'environnement commencent par `KTOOLBOX_` et relient les champs imbriqués du modèle avec `__`. Les types indiqués comme `path`, `set` ou `list` sont analysés par Pydantic ; utilisez des tableaux JSON pour les collections dans dotenv.
 
 Sur un écran étroit, faites défiler les tableaux horizontalement pour consulter toutes les colonnes.

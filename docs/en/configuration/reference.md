@@ -1,5 +1,8 @@
 # Configuration Reference
 
+!!! note
+    This is the complete low-level reference. Prefer the localized forms in [WebUI](../webui.md) unless you specifically need environment variables or generated configuration.
+
 Environment names start with `KTOOLBOX_` and join nested model fields with `__`. Types shown as `path`, `set`, or `list` are parsed by Pydantic; use JSON arrays for collections in dotenv files.
 
 On narrow screens, swipe tables horizontally to inspect every column.

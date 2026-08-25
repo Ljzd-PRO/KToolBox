@@ -1,5 +1,8 @@
 # Python API
 
+!!! note
+    This page is for application developers. To download or synchronize without writing code, use the [WebUI](webui.md). For AI clients, use [MCP](mcp.md).
+
 `PawchiveClient` is an instantiated asynchronous client. Reuse one instance for related requests and close it with an asynchronous context manager:
 
 ```python

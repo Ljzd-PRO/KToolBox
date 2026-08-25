@@ -1,5 +1,8 @@
 # Guide des commandes
 
+!!! tip "WebUI recommandée"
+    Pour les téléchargements et synchronisations ordinaires, commencez par la [WebUI](../webui.md). Utilisez la ligne de commande pour les scripts, l'automatisation Shell ou un parcours exclusivement en terminal.
+
 KToolBox utilise des commandes Cyclopts avec des options conventionnelles à traits d'union et l'aide Rich. L'aide est affichée directement et n'ouvre jamais d'afficheur paginé.
 
 ```bash

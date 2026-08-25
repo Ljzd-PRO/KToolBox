@@ -1,5 +1,8 @@
 # Command Guide
 
+!!! tip "WebUI is recommended"
+    For normal downloads and synchronization, start with the [WebUI](../webui.md). Use the command line when you need scripts, shell automation, or a terminal-only workflow.
+
 KToolBox uses Cyclopts commands with conventional hyphenated options and Rich help. Help is printed directly and never opens a pager.
 
 ```bash

@@ -2,6 +2,15 @@
 
 KToolBox v1 is a breaking backend and library-API release.
 
+## Recommended migration path
+
+1. Back up the old configuration and download directories.
+2. Install and start the [WebUI](webui.md) for the existing project directory.
+3. Review the detected legacy settings in the migration dialog before accepting any change.
+4. Preview directory conversion, then run one small synchronization before enabling schedules or a full archive.
+
+The WebUI creates backups, validates conflicts, and keeps configuration migration separate from optional directory conversion. The detailed tables below remain useful for scripts and Python integrations.
+
 ## Before upgrading
 
 1. Back up your `.env` or `prod.env` file.
@@ -74,7 +83,7 @@ Move non-empty `KTOOLBOX_JOB__KEYWORDS_EXCLUDE` values to a global `field-match`
 
 `KTOOLBOX_JOB__CREATOR_CONCURRENCY` defaults to `4` and limits creator producers. Existing `KTOOLBOX_JOB__COUNT` continues to limit file workers.
 
-## Optional WebUI
+## Migrate with WebUI
 
 v1 adds a new HeroUI panel; it does not migrate or reuse the historical experimental `webui` branch. Install `ktoolbox[webui]` and select a project directory. A missing `ktoolbox.toml` is created automatically after a warning. If no account is configured, each launch prints an `admin` username and a new random password; configure a single account when stable credentials are required.
 

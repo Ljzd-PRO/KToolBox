@@ -1,5 +1,8 @@
 # Python API
 
+!!! note
+    本頁面向應用程式開發者。不撰寫程式碼即可下載或同步時，請使用 [WebUI](webui.md)；連接 AI 用戶端請使用 [MCP](mcp.md)。
+
 `PawchiveClient` 是需要實例化的非同步用戶端。相關請求應重複使用同一個實例，並透過非同步內容管理器關閉：
 
 ```python

@@ -1,104 +1,61 @@
-# KToolBox
+# KToolBox へようこそ
 
-KToolBox は公開 [Pawchive](https://pawchive.pw/) データ向けの非同期コマンドラインダウンローダー、HeroUI プロジェクトパネル、型付き Python クライアントです。バージョン 1 が対応するのは Pawchive のみで、Python 3.10～3.14 が必要です。
+KToolBox は Pawchive の公開作品をダウンロードします。推奨される使い方は WebUI です。一般的な操作は案内付きフォームで行え、ページを移動しても進捗を確認できます。
 
-!!! warning "v1 は新しいメジャーバージョンです"
-    このリリース系列は、まだ十分な実利用検証を受けていません。まず範囲を制限したダウンロードを行い、既存設定をバックアップして、想定外の動作を報告してください。Kemono が利用できなくなったため、KToolBox は既定で Pawchive ミラーを使用します。
+!!! warning "新しいメジャーバージョン"
+    v1 は実環境での検証がまだ十分ではなく、一部の機能が失敗する可能性があります。移行前に既存の設定とダウンロードをバックアップし、予期しない動作を報告してください。
 
-## 利用方法を選ぶ
+## WebUI から始める
+
+1. WebUI 版をインストールします。
+2. 同期プロジェクト用のディレクトリを作成します。
+3. そのディレクトリで KToolBox を起動します。
+
+```bash
+pipx install "ktoolbox[webui]"
+mkdir ktoolbox-project
+cd ktoolbox-project
+ktoolbox webui .
+```
+
+ブラウザーが自動的に開きます。端末に表示された `admin` とランダムパスワードでログインし、クリエイターを追加して最初のタスクを作成します。必要なら KToolBox が `ktoolbox.toml` を自動作成し、既定では `downloads` に保存します。
+
+![KToolBox WebUI の概要](../assets/webui/40-overview-showcase-desktop-light.png)
+
+## 次の操作を選ぶ
 
 <div class="grid cards" markdown>
 
--   :material-console-line: **コマンドラインから始める**
+-   :material-account-multiple-plus-outline: **クリエイターを追加してダウンロード**
 
-    KToolBox をインストールし、範囲を制限したダウンロードを 1 回実行してから[コマンドガイド](commands/guide.md)へ進みます。
+    [プロジェクトの操作](webui/project-workflows.md)に従って、クリエイターの追加、作品検索、タスク作成、除外ルールの調整を行います。
 
--   :material-view-dashboard-outline: **ブラウザでプロジェクトを管理する**
+-   :material-progress-download: **タスクを確認**
 
-    オプションのパネルをインストールし、[WebUI ガイド](webui.md)に沿ってログイン、セキュリティ、タスク、プロジェクト設定を確認します。
+    [タスクとリアルタイム更新](webui/tasks.md)で、進捗、再試行、一時停止、停止、再実行、安全な削除を確認します。
 
--   :material-update: **v0 からアップグレードする**
+-   :material-calendar-sync-outline: **定期実行**
 
-    古い dotenv ファイルをバックアップし、既存ダウンロードを変更する前に [v1 への移行](migration-v1.md)を確認します。
+    [自動同期ガイド](automatic-sync.md)で繰り返しプランを作成します。
 
--   :material-calendar-sync: **クリエイターを定期更新する**
+-   :material-folder-cog-outline: **名前とフォルダーを設定**
 
-    先に一覧を作成し、[自動同期](automatic-sync.md)で定期チェックを設定します。
+    [命名形式ガイド](naming.md)で既定の出力先と読みやすい構造を設定します。
 
 </div>
 
-## 主な機能
+## 高度な入口
 
-- 1 件の投稿をダウンロード、またはクリエイター一覧を並行して同期。
-- ダウンロード作業を作成する前に、順序付きのグローバルまたはクリエイター単位の除外ルールを適用。
-- 部分ファイルの再開と、既存ファイルのスキップ。
-- 日付、タイトル、ファイル名パターン、ファイルサイズで絞り込み。
-- カバー、添付ファイル、本文画像、メタデータ、外部リンクの出力を個別に制御。
-- プロジェクト設定、クリエイター一覧と除外ルールの編集、Pawchive 検索、タスクのライフサイクル制御に使える、7 言語対応の永続 WebUI。
-- 検証済み Pydantic モデルで Pawchive OpenAPI の 14 の公開操作をすべて提供。
+通常の初回利用では、以下のページを読む必要はありません。
 
-アカウント認証が必要なお気に入り操作は意図的に実装していません。ダウンローダーのセッションキーを設定しても、ファイルホストだけに送信されます。
-
-## インストール
-
-`pipx` を使うとアプリケーションを分離できます。
-
-```bash
-pipx install ktoolbox
-```
-
-オプションのターミナルエディターと最適化されたイベントループをインストール：
-
-```bash
-# Linux / macOS
-pipx install "ktoolbox[urwid,uvloop]" --force
-
-# Windows
-pipx install "ktoolbox[urwid,winloop]" --force
-```
-
-必要な場合はブラウザパネルを別途インストール：
-
-```bash
-pipx install "ktoolbox[webui]" --force
-```
-
-## クイックスタート
-
-```bash
-# コマンドとオプションを確認。
-ktoolbox -h
-ktoolbox download -h
-
-# 1 件の投稿をダウンロード。
-ktoolbox download https://pawchive.pw/fanbox/user/6570768/post/1836570
-
-# 広い範囲を同期する前に、まず 1 件の投稿から開始。
-ktoolbox sync https://pawchive.pw/fanbox/user/6570768 --length 1
-```
-
-![KToolBox コマンドの概要](../assets/cli-overview.png)
-
-複数のクリエイターを保存し、有効な項目をすべて同期：
-
-```bash
-ktoolbox creator add fanbox:123 --alias studio-a
-ktoolbox creator add patreon:456 --alias studio-b
-ktoolbox sync
-```
-
-再実行時には既存ファイルをスキップします。設定された一時サフィックスを持つ未完了ファイルは、ファイルサーバーがバイト範囲に対応していれば再開されます。
-
-`--output` を指定しない場合、ダウンロードはプロジェクトの既定場所を使用します。設定を変更していなければ、プロジェクト内の `downloads` です。
-
-## ドキュメントマップ
-
-| 目的 | 読むページ |
+| 目的 | ガイド |
 | --- | --- |
-| 日常的なコマンドを学ぶ | [コマンドガイド](commands/guide.md)と[コマンドリファレンス](commands/reference.md) |
-| ブラウザパネルを実行する | [WebUI ガイド](webui.md) |
-| 定期チェックを設定する | [自動同期](automatic-sync.md) |
-| ディレクトリとファイル名を制御する | [命名形式](naming.md) |
-| すべての設定を理解する | [設定ガイド](configuration/guide.md)と[設定リファレンス](configuration/reference.md) |
-| 別のアプリケーションを接続する | [MCP](mcp.md)または [Python API](api.md) |
-| アップグレードまたは問題を解決する | [v1 への移行](migration-v1.md)と[よくある質問](faq.md) |
+| 固定ログインまたは別端末への配備 | [WebUI 配備リファレンス](webui/reference.md) |
+| 端末で自動化 | [CLI ガイド](commands/guide.md)と[コマンドリファレンス](commands/reference.md) |
+| すべての設定を確認 | [設定ガイド](configuration/guide.md)と[リファレンス](configuration/reference.md) |
+| AI クライアントまたは Python プログラムを接続 | [MCP](mcp.md) と [Python API](api.md) |
+| 既存プロジェクトを更新または問題を解決 | [移行ガイド](migration-v1.md)と [FAQ](faq.md) |
+
+## 安全な既定値
+
+WebUI はログイン情報を生成し、センシティブなメディア表示を無効にし、プロジェクト内の出力先を使用します。同じ端末だけで使う場合は `127.0.0.1` にバインドし、信頼できないネットワークでは HTTPS を使用してください。KToolBox は Pawchive のアカウント機能やお気に入り操作を実装しません。

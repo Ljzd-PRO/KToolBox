@@ -1,5 +1,8 @@
 # 配置向导
 
+!!! tip "在 WebUI 中编辑配置"
+    “全局配置”和“命名格式”页面是修改设置最简单的方式。只有需要手动文件、环境变量或部署自动化时才需要本指南；普通设置请从 [WebUI 指南](../webui.md)开始。
+
 KToolBox 使用两层配置：
 
 - `.env`、`prod.env` 与进程变量控制 API、传输及全局下载行为。
@@ -43,7 +46,7 @@ pipx install "ktoolbox[urwid]" --force
 ktoolbox config edit
 ```
 
-可选 [WebUI](../webui.md) 会在类型化控件中显示七种语言的标签与说明，并提供最终值来源、秘密遮蔽、dotenv/TOML 原文编辑、校验、差异预览和 ETag 冲突保护。英文配置 docstring 仍是字段与语义来源，其余语言目录会接受完整字段路径检查。
+推荐使用的 [WebUI](../webui.md) 会在类型化控件中显示七种语言的标签与说明，并提供最终值来源、秘密遮蔽、dotenv/TOML 原文编辑、校验、差异预览和 ETag 冲突保护。英文配置 docstring 仍是字段与语义来源，其余语言目录会接受完整字段路径检查。
 
 日志级别等固定选项显示为 Select；具有推荐值但仍允许自定义的字段显示为 ComboBox。路径选择器只用于真正的文件或目录位置，`attachments`、`external_links.txt` 等内部产物名称保持普通文本字段。
 

@@ -1,5 +1,8 @@
 # Python API
 
+!!! note
+    本页面向应用开发者。不编写代码即可下载或同步时，请使用 [WebUI](webui.md)；连接 AI 客户端请使用 [MCP](mcp.md)。
+
 `PawchiveClient` 是需要实例化的异步客户端。相关请求应复用同一个实例，并通过异步上下文管理器关闭：
 
 ```python
