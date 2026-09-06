@@ -1328,15 +1328,53 @@ def _validate_resume_filesystem(
             raise NamingPreviewStaleError(f"download location changed while conversion was paused: {root}")
         if shutil.disk_usage(root).free <= 0:
             raise NamingConversionError(f"download location has no free space: {root}")
+    if any(status not in {"completed", "planned"} for status, _, _ in operations):
+        raise NamingPreviewStaleError("conversion operation state changed while paused")
+
+    def relocated(path: Path, locations: dict[Path, Path | None]) -> Path | None:
+        for parent in (path, *path.parents):
+            if parent in locations:
+                location = locations[parent]
+                return location / path.relative_to(parent) if location is not None else None
+        return path
+
+    def unsafe(path: Path) -> bool:
+        root = next((root for root in roots if path.is_relative_to(root)), None)
+        return root is None or _has_symlink_component(path.relative_to(root), root)
+
+    # Journal paths describe their execution step, not necessarily the paused filesystem.
+    completed_locations: dict[Path, Path | None] = {}
+    for status, source, target in reversed(operations):
+        if status != "completed":
+            continue
+        disk_source = relocated(source, completed_locations)
+        disk_target = relocated(target, completed_locations)
+        if (
+            disk_source is None
+            or disk_target is None
+            or unsafe(disk_source)
+            or unsafe(disk_target)
+            or disk_source.exists()
+            or not disk_target.exists()
+        ):
+            raise NamingPreviewStaleError("completed conversion paths changed while paused")
+        completed_locations[source] = disk_target
+
+    planned_locations: dict[Path, Path | None] = {}
     for status, source, target in operations:
-        if status == "completed":
-            if source.exists() or not target.exists():
-                raise NamingPreviewStaleError("completed conversion paths changed while paused")
-        elif status == "planned":
-            if not source.exists() or target.exists():
-                raise NamingPreviewStaleError("pending conversion paths changed while paused")
-        else:
-            raise NamingPreviewStaleError("conversion operation state changed while paused")
+        if status != "planned":
+            continue
+        disk_source = relocated(source, planned_locations)
+        disk_target = relocated(target, planned_locations)
+        if (
+            disk_source is None
+            or unsafe(disk_source)
+            or not disk_source.exists()
+            or (disk_target is not None and (unsafe(disk_target) or disk_target.exists()))
+        ):
+            raise NamingPreviewStaleError("pending conversion paths changed while paused")
+        planned_locations[source] = None
+        planned_locations[target] = disk_source
 
 
 def _scan_download_roots(
@@ -1644,6 +1682,8 @@ def _work_structure_moves(
     post: Post,
     current: ProjectNamingConfiguration,
     candidate: ProjectNamingConfiguration,
+    *,
+    include_revisions: bool = True,
 ) -> tuple[list[_Move], list[str]]:
     moves: list[_Move] = []
     conflicts: list[str] = []
@@ -1652,16 +1692,28 @@ def _work_structure_moves(
         if source_relative == target_relative:
             return
         original_source = source_work / source_relative
-        if not original_source.exists() or original_source.is_symlink():
+        if not original_source.exists() or _has_symlink_component(source_relative, source_work):
             return
         source = work_base / source_relative
         target = work_base / target_relative
         original_target = source_work / target_relative
-        if original_target.exists() and original_target != original_source:
+        if (
+            (original_target.exists() and original_target != original_source)
+            or _has_symlink_component(target_relative, source_work)
+            or any(
+                (source_work / parent).exists() and not (source_work / parent).is_dir()
+                for parent in target_relative.parents
+            )
+        ):
             conflicts.append(str(target))
         else:
             moves.append(_Move(creator_key, source, target))
 
+    protected_paths = {
+        Path(DataStorageNameEnum.PostData.value),
+        current.post_structure.content,
+        current.post_structure.external_links,
+    }
     primary = post.file
     if primary and primary.path:
         basic = (
@@ -1671,9 +1723,14 @@ def _work_structure_moves(
         )
         old_name = generate_filename(post, basic.name, current.post_structure.file)
         new_name = generate_filename(post, basic.name, candidate.post_structure.file)
+        protected_paths.add(Path(old_name))
         add(Path(old_name), Path(new_name))
 
-    sequence = 1
+    old_directory = current.post_structure.attachments
+    new_directory = candidate.post_structure.attachments
+    # A work root is shared with metadata and covers; never move it as an attachment folder.
+    individual_attachments = Path(".") in (old_directory, new_directory)
+    old_sequence = new_sequence = 1
     for attachment in post.attachments or []:
         if not attachment.path:
             continue
@@ -1682,35 +1739,51 @@ def _work_structure_moves(
             if attachment.name and is_valid_filename(attachment.name)
             else Path(urlparse(attachment.path).path)
         )
-        old_basic, old_sequence = _attachment_basic_name(basic_path, current, sequence)
-        new_basic, new_sequence = _attachment_basic_name(basic_path, candidate, sequence)
+        old_basic, old_sequence = _attachment_basic_name(basic_path, current, old_sequence)
+        new_basic, new_sequence = _attachment_basic_name(basic_path, candidate, new_sequence)
         old_name = generate_filename(post, old_basic, current.filename_format)
         new_name = generate_filename(post, new_basic, candidate.filename_format)
-        add(
-            current.post_structure.attachments / old_name,
-            current.post_structure.attachments / new_name,
-        )
-        sequence = max(old_sequence, new_sequence)
+        source_relative = old_directory / old_name
+        target_relative = (new_directory if individual_attachments else old_directory) / new_name
+        if source_relative in protected_paths:
+            conflicts.append(str(work_base / source_relative))
+        elif (source_work / source_relative).is_file():
+            add(source_relative, target_relative)
 
     revision_root = source_work / current.post_structure.revisions
-    if revision_root.is_dir() and not revision_root.is_symlink():
-        for metadata in revision_root.rglob(DataStorageNameEnum.PostData.value):
+    if (
+        include_revisions
+        and revision_root.is_dir()
+        and not _has_symlink_component(current.post_structure.revisions, source_work)
+    ):
+        for metadata in sorted(revision_root.glob(f"*/{DataStorageNameEnum.PostData.value}")):
             revision_source = metadata.parent
-            if revision_source.parent != revision_root:
+            if _has_symlink_component(metadata.relative_to(source_work), source_work):
                 continue
             try:
                 revision = Post.model_validate_json(metadata.read_text(encoding="utf-8"))
             except (OSError, ValueError):
                 continue
-            add(
-                current.post_structure.revisions / revision_source.name,
-                current.post_structure.revisions / generate_revision_path_name(revision, candidate),
+            revision_target = current.post_structure.revisions / generate_revision_path_name(revision, candidate)
+            add(current.post_structure.revisions / revision_source.name, revision_target)
+            revision_moves, revision_conflicts = _work_structure_moves(
+                creator_key,
+                revision_source,
+                work_base / revision_target,
+                revision,
+                current,
+                candidate,
+                include_revisions=False,
             )
+            moves.extend(revision_moves)
+            conflicts.extend(revision_conflicts)
 
-    add(current.post_structure.attachments, candidate.post_structure.attachments)
+    if not individual_attachments:
+        add(old_directory, new_directory)
     add(current.post_structure.content, candidate.post_structure.content)
     add(current.post_structure.external_links, candidate.post_structure.external_links)
-    add(current.post_structure.revisions, candidate.post_structure.revisions)
+    if include_revisions:
+        add(current.post_structure.revisions, candidate.post_structure.revisions)
     return moves, conflicts
 
 

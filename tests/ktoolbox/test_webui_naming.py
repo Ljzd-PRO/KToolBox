@@ -9,7 +9,7 @@ import httpx
 import pytest
 
 from ktoolbox._enum import DataStorageNameEnum
-from ktoolbox.api.generated import Post
+from ktoolbox.api.generated import FileReference, Post
 from ktoolbox.configuration import Configuration, RuntimeContext
 from ktoolbox.job import CreatorIndices
 from ktoolbox.project_config import (
@@ -431,6 +431,343 @@ async def test_pasted_env_source_converts_files_without_persisting_raw_text(
     assert stored.preview.source.kind == "pasted_config"
     assert "KTOOLBOX_JOB" not in stored.preview.source.model_dump_json()
     await service.stop()
+
+
+def write_flat_attachment_work(root: Path, attachment_dir: str = ".", *, sequential: bool = False) -> Path:
+    work = root / "Artist [fanbox-123]" / "Work one"
+    files = work / attachment_dir
+    files.mkdir(parents=True)
+    post = Post(
+        id="one",
+        user="123",
+        service="fanbox",
+        title="Work one",
+        file=FileReference(name="cover.png", path="/cover.png"),
+        attachments=[
+            FileReference(name="drawing.jpg", path="/drawing.jpg"),
+            FileReference(name="bundle.zip", path="/bundle.zip"),
+            FileReference(name="second.png", path="/second.png"),
+        ],
+    )
+    (work / "post.json").write_text(post.model_dump_json(), encoding="utf-8")
+    (work / "one_cover.png").write_bytes(b"cover")
+    (work / "content.txt").write_bytes(b"body")
+    (work / "external_links.txt").write_bytes(b"links")
+    (work / "notes.keep").write_bytes(b"unrecognized file")
+    (files / ("1.jpg" if sequential else "drawing.jpg")).write_bytes(b"first attachment")
+    (files / "bundle.zip").write_bytes(b"archive attachment")
+    (files / ("2.png" if sequential else "second.png")).write_bytes(b"second attachment")
+    return work
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("old_dir", "new_dir", "sequential"),
+    [(".", "attachments", False), (".", ".", False), ("attachments", ".", False), (".", "files", True)],
+)
+async def test_conversion_moves_root_attachments_without_scooping_up_work_files(
+    tmp_path: Path, old_dir: str, new_dir: str, sequential: bool
+) -> None:
+    downloads = tmp_path / "downloads"
+    source_work = write_flat_attachment_work(downloads, old_dir, sequential=sequential)
+    metadata = (source_work / "post.json").read_bytes()
+    target = ProjectNamingConfiguration.model_validate(
+        {"post_dirname_format": "{post_id}", "post_structure": {"attachments": new_dir}}
+    )
+    ProjectConfigStore(tmp_path / "ktoolbox.toml").save(ProjectConfiguration(naming=target))
+    service, _ = await service_for(tmp_path)
+    try:
+        parsed = await service.parse_source(
+            "env",
+            f"KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS={old_dir}/\n"
+            f"KTOOLBOX_JOB__SEQUENTIAL_FILENAME={str(sequential).lower()}\n"
+            'KTOOLBOX_JOB__SEQUENTIAL_FILENAME_EXCLUDES=[".zip"]\n',
+        )
+        preview = await service.preview(
+            [downloads], PastedConfigConversionSource(format="env", naming=parsed.naming, digest=parsed.digest)
+        )
+        assert preview.creator_count == 1
+        assert preview.work_count == 1
+        assert preview.file_count == 8
+        assert preview.conflict_count == 0
+        conversion = await service.apply(preview.id, [preview.creators[0].key])
+        await wait_for_conversion(service, conversion.id, "completed")
+
+        work = source_work.parent / "one"
+        files = work / new_dir
+        assert (files / "1.jpg").read_bytes() == b"first attachment"
+        assert (files / "2.zip").read_bytes() == b"archive attachment"
+        assert (files / "3.png").read_bytes() == b"second attachment"
+        assert (work / "post.json").read_bytes() == metadata
+        assert (work / "one_cover.png").read_bytes() == b"cover"
+        assert (work / "content.txt").read_bytes() == b"body"
+        assert (work / "external_links.txt").read_bytes() == b"links"
+        assert (work / "notes.keep").read_bytes() == b"unrecognized file"
+        assert not source_work.exists()
+        assert len([path for path in work.rglob("*") if path.is_file()]) == 8
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_root_attachment_conversion_rejects_existing_target_file(tmp_path: Path) -> None:
+    downloads = tmp_path / "downloads"
+    source = write_flat_attachment_work(downloads)
+    (source / "attachments").mkdir()
+    (source / "attachments/1.jpg").write_bytes(b"must not overwrite")
+    ProjectConfigStore(tmp_path / "ktoolbox.toml").save(ProjectConfiguration())
+    service, _ = await service_for(tmp_path)
+    try:
+        parsed = await service.parse_source("env", "KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./\n")
+        preview = await service.preview(
+            [downloads], PastedConfigConversionSource(format="env", naming=parsed.naming, digest=parsed.digest)
+        )
+        assert preview.conflict_count > 0
+        assert not preview.creators[0].selectable
+        with pytest.raises(NamingConversionError):
+            await service.apply(preview.id, [preview.creators[0].key])
+        assert (source / "attachments/1.jpg").read_bytes() == b"must not overwrite"
+        assert (source / "drawing.jpg").read_bytes() == b"first attachment"
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("obstacle", ["symlink", "parent_file", "metadata"])
+async def test_root_attachment_conversion_protects_boundaries_and_metadata(tmp_path: Path, obstacle: str) -> None:
+    downloads = tmp_path / "downloads"
+    source = write_flat_attachment_work(downloads)
+    if obstacle == "symlink":
+        outside = tmp_path / "outside"
+        outside.mkdir()
+        try:
+            (source / "attachments").symlink_to(outside, target_is_directory=True)
+        except OSError:
+            pytest.skip("directory symlinks are unavailable")
+    elif obstacle == "parent_file":
+        (source / "attachments").write_bytes(b"not a directory")
+    else:
+        metadata = source / "post.json"
+        post = Post.model_validate_json(metadata.read_text(encoding="utf-8"))
+        post.attachments = [FileReference(name="post.json", path="/post.json")]
+        metadata.write_text(post.model_dump_json(), encoding="utf-8")
+    original_metadata = (source / "post.json").read_bytes()
+    ProjectConfigStore(tmp_path / "ktoolbox.toml").save(ProjectConfiguration())
+    service, _ = await service_for(tmp_path)
+    try:
+        parsed = await service.parse_source("env", "KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./\n")
+        preview = await service.preview(
+            [downloads], PastedConfigConversionSource(format="env", naming=parsed.naming, digest=parsed.digest)
+        )
+        assert preview.conflict_count > 0
+        with pytest.raises(NamingConversionError):
+            await service.apply(preview.id, [preview.creators[0].key])
+        assert (source / "post.json").read_bytes() == original_metadata
+        if obstacle == "symlink":
+            assert list((tmp_path / "outside").iterdir()) == []
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_webui_routes_parse_preview_and_convert_legacy_root_attachments(tmp_path: Path) -> None:
+    source = write_flat_attachment_work(tmp_path / "downloads")
+    async with authenticated_client(tmp_path) as (client, headers):
+        parsed = await client.post(
+            "/api/v1/naming/source/parse",
+            headers=headers,
+            json={"format": "env", "content": "KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./\n"},
+        )
+        assert parsed.status_code == 200, parsed.text
+        data = parsed.json()
+        assert data["naming"]["post_structure"]["attachments"] == "."
+        preview = await client.post(
+            "/api/v1/naming/preview",
+            headers=headers,
+            json={
+                "roots": ["downloads"],
+                "source": {
+                    "kind": "pasted_config",
+                    "format": "env",
+                    "naming": data["naming"],
+                    "digest": data["digest"],
+                },
+            },
+        )
+        assert preview.status_code == 200, preview.text
+        data = preview.json()
+        assert data["conflict_count"] == 0
+        applied = await client.post(
+            "/api/v1/naming/apply",
+            headers=headers,
+            json={"preview_id": data["id"], "selected_creators": [data["creators"][0]["key"]]},
+        )
+        assert applied.status_code == 202, applied.text
+        for _ in range(200):
+            result = await client.get(f"/api/v1/naming/conversions/{data['id']}")
+            assert result.status_code == 200
+            if result.json()["status"] == "completed":
+                break
+            await asyncio.sleep(0.01)
+        assert result.json()["status"] == "completed", result.text
+        assert (source.parent / "Work one [one]/attachments/1.jpg").read_bytes() == b"first attachment"
+
+
+@pytest.mark.asyncio
+async def test_root_attachment_conversion_uses_creator_index_without_post_json(tmp_path: Path) -> None:
+    downloads = tmp_path / "downloads"
+    source = write_flat_attachment_work(downloads)
+    metadata = source / "post.json"
+    post = Post.model_validate_json(metadata.read_text(encoding="utf-8"))
+    index = CreatorIndices(creator_id="123", service="fanbox", posts={post.id: post})
+    (source.parent / DataStorageNameEnum.CreatorIndicesData.value).write_text(index.model_dump_json(), encoding="utf-8")
+    metadata.unlink()
+    ProjectConfigStore(tmp_path / "ktoolbox.toml").save(ProjectConfiguration())
+    service, _ = await service_for(tmp_path)
+    try:
+        parsed = await service.parse_source("env", "KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./\n")
+        preview = await service.preview(
+            [downloads], PastedConfigConversionSource(format="env", naming=parsed.naming, digest=parsed.digest)
+        )
+        assert preview.work_count == 1
+        conversion = await service.apply(preview.id, [preview.creators[0].key])
+        await wait_for_conversion(service, conversion.id, "completed")
+        target = source.parent / "Work one [one]"
+        assert (target / "attachments/1.jpg").read_bytes() == b"first attachment"
+        assert (target / "notes.keep").is_file()
+        assert not (target / "post.json").exists()
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("pause_after", [None, 1, 6, 9])
+async def test_root_attachment_conversion_includes_revision_files(tmp_path: Path, pause_after: int | None) -> None:
+    downloads = tmp_path / "downloads"
+    source = write_flat_attachment_work(downloads)
+    revision = source / "revisions/7"
+    revision.mkdir(parents=True)
+    for path in source.iterdir():
+        if path.is_file():
+            (revision / path.name).write_bytes(path.read_bytes())
+    metadata = Post.model_validate_json((revision / "post.json").read_text(encoding="utf-8"))
+    metadata = metadata.model_copy(update={"revision_id": 7})
+    (revision / "post.json").write_text(metadata.model_dump_json(), encoding="utf-8")
+    target = ProjectNamingConfiguration.model_validate(
+        {"revision_dirname_format": "v{revision_id}", "post_structure": {"revisions": "history"}}
+    )
+    ProjectConfigStore(tmp_path / "ktoolbox.toml").save(ProjectConfiguration(naming=target))
+    service, _ = await service_for(tmp_path)
+    held = asyncio.Event()
+    release = asyncio.Event()
+    original_mark = service._mark_operation
+    completed = 0
+
+    async def hold_revision_conversion(operation_id: int, status: str) -> None:
+        nonlocal completed
+        await original_mark(operation_id, status)
+        if status == "completed":
+            completed += 1
+            if completed == pause_after:
+                held.set()
+                await release.wait()
+
+    try:
+        parsed = await service.parse_source("env", "KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./\n")
+        preview = await service.preview(
+            [downloads], PastedConfigConversionSource(format="env", naming=parsed.naming, digest=parsed.digest)
+        )
+        assert preview.conflict_count == 0
+        service._mark_operation = hold_revision_conversion  # type: ignore[method-assign]
+        conversion = await service.apply(preview.id, [preview.creators[0].key])
+        if pause_after is not None:
+            await asyncio.wait_for(held.wait(), timeout=2)
+            await service.pause(conversion.id)
+            release.set()
+            await wait_for_conversion(service, conversion.id, "paused")
+            await service.resume(conversion.id)
+        await wait_for_conversion(service, conversion.id, "completed")
+        work = source.parent / "Work one [one]"
+        for directory in (work, work / "history/v7"):
+            assert (directory / "attachments/1.jpg").read_bytes() == b"first attachment"
+            assert (directory / "attachments/2.zip").read_bytes() == b"archive attachment"
+            assert (directory / "attachments/3.png").read_bytes() == b"second attachment"
+            assert (directory / "one_cover.png").read_bytes() == b"cover"
+            assert (directory / "post.json").is_file()
+            assert (directory / "notes.keep").read_bytes() == b"unrecognized file"
+    finally:
+        release.set()
+        await service.stop()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("action", ["resume", "cancel", "failure", "symlink"])
+async def test_root_attachment_conversion_recovers_after_partial_file_moves(tmp_path: Path, action: str) -> None:
+    downloads = tmp_path / "downloads"
+    source = write_flat_attachment_work(downloads)
+    before = {path.relative_to(downloads): path.read_bytes() for path in downloads.rglob("*") if path.is_file()}
+    ProjectConfigStore(tmp_path / "ktoolbox.toml").save(ProjectConfiguration())
+    service, _ = await service_for(tmp_path)
+    held = asyncio.Event()
+    release = asyncio.Event()
+    original_mark = service._mark_operation
+    completed = 0
+
+    async def hold_after_attachment_move(operation_id: int, status: str) -> None:
+        nonlocal completed
+        await original_mark(operation_id, status)
+        if status == "completed":
+            completed += 1
+            if completed == 2:
+                if action == "failure":
+                    raise OSError("simulated disk failure")
+                held.set()
+                await release.wait()
+
+    try:
+        parsed = await service.parse_source("env", "KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./\n")
+        preview = await service.preview(
+            [downloads], PastedConfigConversionSource(format="env", naming=parsed.naming, digest=parsed.digest)
+        )
+        service._mark_operation = hold_after_attachment_move  # type: ignore[method-assign]
+        conversion = await service.apply(preview.id, [preview.creators[0].key])
+        if action == "failure":
+            await wait_for_conversion(service, conversion.id, "failed")
+            assert "simulated disk failure" in ((await service.get(conversion.id)).error or "")
+        else:
+            await asyncio.wait_for(held.wait(), timeout=2)
+            await service.pause(conversion.id)
+            release.set()
+            await wait_for_conversion(service, conversion.id, "paused")
+            await service.stop()
+            service, _ = await service_for(tmp_path)
+            if action == "symlink":
+                attachment_dir = source.parent / "Work one [one]/attachments"
+                outside = tmp_path / "moved-attachments"
+                attachment_dir.rename(outside)
+                try:
+                    attachment_dir.symlink_to(outside, target_is_directory=True)
+                except OSError:
+                    outside.rename(attachment_dir)
+                    pytest.skip("directory symlinks are unavailable")
+                with pytest.raises(NamingPreviewStaleError, match="completed conversion paths changed"):
+                    await service.resume(conversion.id)
+                assert (await service.get(conversion.id)).status == "paused"
+                attachment_dir.unlink()
+                outside.rename(attachment_dir)
+            if action == "resume":
+                await service.resume(conversion.id)
+                await wait_for_conversion(service, conversion.id, "completed")
+                assert (source.parent / "Work one [one]/attachments/3.png").read_bytes() == b"second attachment"
+                return
+            await service.cancel(conversion.id)
+            await wait_for_conversion(service, conversion.id, "cancelled")
+        after = {path.relative_to(downloads): path.read_bytes() for path in downloads.rglob("*") if path.is_file()}
+        assert after == before
+        assert not (source.parent / "Work one [one]").exists()
+    finally:
+        release.set()
+        await service.stop()
 
 
 @pytest.mark.asyncio
