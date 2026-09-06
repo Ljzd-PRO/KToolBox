@@ -1918,7 +1918,11 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 </code></pre></div>
 <p><code>download_file</code> means the main post file, usually the cover. Both options default to <code>True</code>.</p>
 <h2 id="can-attachments-be-stored-directly-in-the-post-directory">Can attachments be stored directly in the post directory?<a class="headerlink" href="#can-attachments-be-stored-directly-in-the-post-directory" title="Permanent link">&para;</a></h2>
-<p>No. Project Schema v5 requires every internal path to be a safe, non-empty relative name. Use <strong>Naming format</strong> to choose an attachment subdirectory; this prevents attachments from colliding with the primary file (cover) or metadata.</p>
+<p>Yes. In <strong>Naming format &gt; Directory structure</strong>, set the attachment directory to <code>.</code> or <code>./</code>. The equivalent project setting is:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[naming.post_structure]</span>
+<span class="n">attachments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.&quot;</span>
+</code></pre></div>
+<p>Choose filenames that do not conflict with the primary file (cover), <code>post.json</code>, or other metadata. To convert old downloads made with <code>KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./</code>, use <strong>Legacy download conversion &gt; Paste configuration</strong>. See the <a href="../naming/">naming guide</a> for the preview and conversion steps. Other internal paths still require a safe, non-empty relative name.</p>
 <h2 id="how-do-i-avoid-long-filenames">How do I avoid long filenames?<a class="headerlink" href="#how-do-i-avoid-long-filenames" title="Permanent link">&para;</a></h2>
 <p>Use sequential names or a format precision limit in the project's <code>[naming]</code> table:</p>
 <div class="highlight"><pre><span></span><code><span class="k">[naming]</span>

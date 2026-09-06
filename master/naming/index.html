@@ -958,6 +958,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#attachments-in-the-work-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attachments in the work directory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#convert-old-download-locations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1468,6 +1479,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#attachments-in-the-work-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attachments in the work directory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#convert-old-download-locations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1594,6 +1616,12 @@
 <p><strong>Directory structure</strong> and <strong>Naming templates</strong> have separate save buttons. Saving changes future downloads immediately. Old files are never moved merely because a naming setting was saved.</p>
 <p>The <strong>Default download location</strong> belongs to the project too. Its default value is <code>downloads</code>, resolved relative to the project root. You may also enter an absolute host path outside the project. A task uses its explicit output first, then an automatic-sync plan's explicit output, and finally this project default. KToolBox stores the resolved absolute path in each created task, so later project changes do not silently relocate it.</p>
 <p><img alt="Directory structure and default output" src="../assets/webui/37-naming-structure-desktop-light.png" /></p>
+<h2 id="attachments-in-the-work-directory">Attachments in the work directory<a class="headerlink" href="#attachments-in-the-work-directory" title="Permanent link">&para;</a></h2>
+<p>Set the attachment directory to <code>.</code> or <code>./</code> in <strong>Directory structure</strong> to save attachments directly beside the work's cover and metadata. This exception applies only to the attachment directory; content, external-link, and revision paths must still have a name.</p>
+<p>Old downloads made with the following v0 setting are supported by <strong>Legacy download conversion &gt; Paste configuration</strong>:</p>
+<div class="highlight"><pre><span></span><code>KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
+</code></pre></div>
+<p>Include any other naming settings you changed in v0, since omitted ENV fields use v0 defaults. The current project format is always the target. Review the scan before confirming: attachments identified by <code>post.json</code> or the creator index are moved individually, including those in recognized revisions. Covers and metadata are not treated as attachments; unrecognized files keep their relative locations inside the work directory. Existing target files and unsafe paths block conversion instead of being overwritten.</p>
 <h2 id="convert-old-download-locations">Convert old download locations<a class="headerlink" href="#convert-old-download-locations" title="Permanent link">&para;</a></h2>
 <p>Open the dedicated <strong>Legacy download conversion</strong> tab only when previously downloaded content needs to follow the saved naming format. Add one or more old locations, then choose <strong>Scan old locations</strong>. These locations are scan inputs, not destinations for future tasks.</p>
 <p>The converter is reusable at any time and offers two source modes. <strong>Project history</strong> lets you select one or more saved naming versions, which is useful when one download location contains several generations of layouts. <strong>Paste configuration</strong> accepts legacy <code>.env</code> naming keys, a complete <code>ktoolbox.toml</code>, a <code>[naming]</code> table, or a headerless naming fragment. The highlighted editor provides examples and field-level errors; pasted source text is parsed only in memory and is never stored in browser storage, logs, events, or conversion history. Both modes always use the current project naming revision as the read-only target and never overwrite project configuration.</p>

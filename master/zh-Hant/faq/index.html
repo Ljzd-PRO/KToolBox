@@ -1918,7 +1918,11 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 </code></pre></div>
 <p><code>download_file</code> 代表主要作品檔案，通常是封面。兩個選項預設均為 <code>True</code>。</p>
 <h2 id="_5">可以將附件直接儲存在作品目錄嗎？<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p>不可以。專案 Schema v5 要求每個內部路徑都是安全且非空的相對名稱。請在「命名格式」中選擇附件子目錄，避免附件與主要檔案（封面）或中繼資料衝突。</p>
+<p>可以。在「命名格式 → 目錄結構」中，將附件目錄設為 <code>.</code> 或 <code>./</code>。對應的專案設定為：</p>
+<div class="highlight"><pre><span></span><code><span class="k">[naming.post_structure]</span>
+<span class="n">attachments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.&quot;</span>
+</code></pre></div>
+<p>請確保附件檔名不與主要檔案（封面）、<code>post.json</code> 或其他中繼資料重名。轉換舊 <code>KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./</code> 設定下載的檔案時，使用「舊下載目錄轉換 → 貼上設定」，依照<a href="../naming/">命名指南</a>預覽後轉換。其他內部路徑仍須使用安全且非空的相對名稱。</p>
 <h2 id="_6">如何避免檔名過長？<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>在專案 <code>[naming]</code> 中使用順序名稱或格式精確度限制：</p>
 <div class="highlight"><pre><span></span><code><span class="k">[naming]</span>

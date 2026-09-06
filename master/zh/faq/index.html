@@ -1918,7 +1918,11 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 </code></pre></div>
 <p><code>download_file</code> 指作品主文件，通常为封面。两个选项默认均为 <code>True</code>。</p>
 <h2 id="_5">能否把附件直接放进作品目录？<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p>不能。项目 Schema v5 要求每个内部路径都是安全且非空的相对名称。请在“命名格式”中选择附件子目录，避免附件与主文件（封面）或元数据发生冲突。</p>
+<p>可以。在“命名格式 → 目录结构”中，将附件目录设为 <code>.</code> 或 <code>./</code>。对应的项目配置为：</p>
+<div class="highlight"><pre><span></span><code><span class="k">[naming.post_structure]</span>
+<span class="n">attachments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.&quot;</span>
+</code></pre></div>
+<p>请确保附件文件名不与主文件（封面）、<code>post.json</code> 或其他元数据重名。转换旧 <code>KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./</code> 配置下载的文件时，使用“旧下载目录转换 → 粘贴配置”，按<a href="../naming/">命名指南</a>预览后转换。其他内部路径仍需使用安全且非空的相对名称。</p>
 <h2 id="_6">如何避免文件名过长？<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>在项目 <code>[naming]</code> 中使用顺序命名或格式精度限制：</p>
 <div class="highlight"><pre><span></span><code><span class="k">[naming]</span>

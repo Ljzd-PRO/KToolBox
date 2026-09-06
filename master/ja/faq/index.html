@@ -1918,7 +1918,11 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 </code></pre></div>
 <p><code>download_file</code> はメイン投稿ファイル、通常はカバーを意味します。両方の既定値は <code>True</code> です。</p>
 <h2 id="_5">添付ファイルを投稿ディレクトリに直接保存できますか？<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p>いいえ。プロジェクト Schema v5 では、内部パスは安全で空でない相対名である必要があります。「命名形式」で添付ファイル用サブディレクトリを選び、メインファイル（カバー）やメタデータとの衝突を防いでください。</p>
+<p>はい。「命名形式 → ディレクトリ構造」で添付ファイルのディレクトリを <code>.</code> または <code>./</code> に設定します。対応するプロジェクト設定は次のとおりです。</p>
+<div class="highlight"><pre><span></span><code><span class="k">[naming.post_structure]</span>
+<span class="n">attachments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.&quot;</span>
+</code></pre></div>
+<p>添付ファイル名がメインファイル（カバー）、<code>post.json</code> などのメタデータと重複しないようにしてください。旧設定 <code>KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./</code> で保存したファイルは「旧ダウンロード変換 → 設定を貼り付け」から変換できます。プレビューと変換の手順は<a href="../naming/">命名ガイド</a>を参照してください。他の内部パスには引き続き安全で空でない相対名が必要です。</p>
 <h2 id="_6">長いファイル名を避けるには？<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>プロジェクトの <code>[naming]</code> で連番名または書式の精度制限を使います。</p>
 <div class="highlight"><pre><span></span><code><span class="k">[naming]</span>

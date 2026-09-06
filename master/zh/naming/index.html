@@ -961,7 +961,7 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        转换旧下载位置
+        将附件保存在作品目录
       
     </span>
   </a>
@@ -972,7 +972,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        转换与恢复
+        转换旧下载位置
       
     </span>
   </a>
@@ -983,7 +983,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        首次启动迁移
+        转换与恢复
       
     </span>
   </a>
@@ -992,6 +992,17 @@
       
         <li class="md-nav__item">
   <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        首次启动迁移
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
         相关指南
@@ -1471,7 +1482,7 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        转换旧下载位置
+        将附件保存在作品目录
       
     </span>
   </a>
@@ -1482,7 +1493,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        转换与恢复
+        转换旧下载位置
       
     </span>
   </a>
@@ -1493,7 +1504,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        首次启动迁移
+        转换与恢复
       
     </span>
   </a>
@@ -1502,6 +1513,17 @@
       
         <li class="md-nav__item">
   <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        首次启动迁移
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
         相关指南
@@ -1594,17 +1616,23 @@
 <p>“目录结构”和“命名模板”分别提供保存按钮。保存后会立即影响未来下载；仅保存命名设置绝不会移动旧文件。</p>
 <p>“默认下载位置”也属于项目配置，默认值为 <code>downloads</code>，相对路径以项目根目录解析，也可以填写项目外的主机绝对路径。创建任务时依次使用：任务显式输出目录、自动同步计划显式输出目录、项目默认下载位置。任务创建后会固化解析出的绝对路径，后续修改项目默认值不会悄然移动既有任务。</p>
 <p><img alt="目录结构与默认下载位置" src="../../assets/webui/37-naming-structure-desktop-light.png" /></p>
-<h2 id="_3">转换旧下载位置<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h2 id="_3">将附件保存在作品目录<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>在“目录结构”中将附件目录设为 <code>.</code> 或 <code>./</code>，即可把附件直接保存在作品封面和元数据旁。此规则仅适用于附件目录；正文、外链文件和修订目录仍需填写名称。</p>
+<p>使用以下 v0 配置下载的旧文件，可以通过“旧下载目录转换 → 粘贴配置”进行转换：</p>
+<div class="highlight"><pre><span></span><code>KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
+</code></pre></div>
+<p>请同时粘贴在 v0 中修改过的其他命名设置，省略的 ENV 字段会按 v0 默认值补齐。转换目标始终是当前项目格式。确认前先查看扫描预览：转换器依据 <code>post.json</code> 或作者索引逐个移动附件，包括可识别修订中的附件；封面和元数据不会被当作附件搬走，无法识别的文件保留在作品目录内原有的相对位置。目标文件已存在或路径不安全时会阻止转换，不会覆盖文件。</p>
+<h2 id="_4">转换旧下载位置<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>只有在以前下载的内容需要采用已保存命名格式时，才需要打开独立的“旧下载目录转换”标签页。添加一个或多个旧位置，再点击“扫描旧下载位置”。这些位置只是转换扫描来源，不是未来任务的下载目录设置。</p>
 <p>转换器可随时使用，并提供两种来源模式。“项目历史”允许多选已保存的命名版本，适合一个下载位置中混有多代目录结构的情况。“粘贴配置”支持旧 <code>.env</code> 命名键、完整 <code>ktoolbox.toml</code>、单独的 <code>[naming]</code> 表或无表头命名片段。带高亮的编辑器提供样例和字段级错误定位；粘贴原文仅在内存中解析，不会写入浏览器存储、日志、事件或转换历史。两种模式都始终把当前项目命名版本作为只读目标，绝不会覆盖项目配置。</p>
 <p>扫描直接读取文件系统，而非仅依赖任务历史，也不会访问 Pawchive。KToolBox 通过作者目录身份、<code>creator-indices.ktoolbox</code> 与 <code>post.json</code> 识别内容，并拒绝跟随越出所选位置的符号链接。</p>
 <p>预览会显示每位作者的新旧路径、作品数、文件数、总大小、跳过项和冲突。所有可安全转换的作者默认选中，也可逐项取消。</p>
 <p><img alt="移动端命名转换预览" src="../../assets/webui/38-naming-conversion-mobile-dark.png" /></p>
 <p>KToolBox 不会覆盖或合并目标目录。扫描结果过期、配置变化、相关任务处于活动状态、目标重复或文件系统变化时，都必须重新扫描。</p>
-<h2 id="_4">转换与恢复<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h2 id="_5">转换与恢复<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <p>KToolBox 会以持久后台作业执行选中的移动。“暂停”会等待当前原子文件操作完成并保留已移动内容；“继续”前会重新校验配置、文件指纹、目标冲突和可用空间。“取消”含义不同，会按相反顺序回滚已完成移动；写入失败或进程中断也会安全回滚。已保存的命名格式继续用于未来下载。</p>
 <p>转换进度和历史保存在 <code>.ktoolbox/webui.sqlite3</code>。成功后会清理临时操作日志，完成记录会保留到用户手动删除。转换会删除已空的旧来源目录，但不会删除无关文件。</p>
-<h2 id="_5">首次启动迁移<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h2 id="_6">首次启动迁移<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>只有检测到 <code>.env</code> 或 <code>prod.env</code> 中存在旧命名键时，才会显示迁移向导。启动阶段只检测并在终端警告，不会提前修改任何文件。登录后，向导会：</p>
 <ol>
 <li>显示每个来源、旧值与当前项目值；</li>
@@ -1616,7 +1644,7 @@
 <p><img alt="旧版命名设置迁移向导" src="../../assets/webui/39-naming-migration-desktop-light.png" /></p>
 <p>关闭或点击“忽略”只会关闭本次弹窗。只要旧键仍然存在，刷新或重新登录后仍会显示。配置迁移与目录转换彼此独立：配置迁移成功后，先核对一个或多个旧位置，再显式点击“扫描旧下载位置”；仅打开转换工具不会自动扫描或移动文件。</p>
 <p>CLI 同样使用项目命名设置。旧项目尚未完成迁移时，请启动该项目的 WebUI 并确认带备份的原子迁移。仅存在于进程环境中的旧值无法由 KToolBox 删除；项目命名会忽略这些值，并持续警告用户从启动环境中移除。</p>
-<h2 id="_6">相关指南<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_7">相关指南<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <ul>
 <li>在 <a href="../webui/">WebUI 指南</a>中查看命名页面和转换流程。</li>
 <li>全局网络与下载器设置请参阅<a href="../configuration/guide/">配置指南</a>。</li>

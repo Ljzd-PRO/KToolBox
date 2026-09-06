@@ -961,7 +961,7 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        以前のダウンロード場所を変換する
+        作品ディレクトリに添付ファイルを保存する
       
     </span>
   </a>
@@ -972,7 +972,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        変換と復旧
+        以前のダウンロード場所を変換する
       
     </span>
   </a>
@@ -983,7 +983,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        初回起動時の移行
+        変換と復旧
       
     </span>
   </a>
@@ -992,6 +992,17 @@
       
         <li class="md-nav__item">
   <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        初回起動時の移行
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
         関連ガイド
@@ -1471,7 +1482,7 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        以前のダウンロード場所を変換する
+        作品ディレクトリに添付ファイルを保存する
       
     </span>
   </a>
@@ -1482,7 +1493,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        変換と復旧
+        以前のダウンロード場所を変換する
       
     </span>
   </a>
@@ -1493,7 +1504,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        初回起動時の移行
+        変換と復旧
       
     </span>
   </a>
@@ -1502,6 +1513,17 @@
       
         <li class="md-nav__item">
   <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        初回起動時の移行
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
         関連ガイド
@@ -1594,17 +1616,23 @@
 <p>**ディレクトリ構造**と**命名テンプレート**には個別の保存ボタンがあります。保存内容は今後のダウンロードへ直ちに反映されますが、既存ファイルが自動的に移動することはありません。</p>
 <p>**既定のダウンロード先**もプロジェクト設定です。既定値は <code>downloads</code> で、相対パスはプロジェクトルート基準、絶対パスはプロジェクト外も指定できます。タスクの明示出力、 自動同期プランの明示出力、プロジェクト既定値の順で使用します。作成時に解決した絶対パスを固定するため、後から既定値を変更しても既存タスクは移動しません。</p>
 <p><img alt="ディレクトリ構造と既定のダウンロード先" src="../../assets/webui/37-naming-structure-desktop-light.png" /></p>
-<h2 id="_3">以前のダウンロード場所を変換する<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h2 id="_3">作品ディレクトリに添付ファイルを保存する<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>「ディレクトリ構造」で添付ファイルのディレクトリを <code>.</code> または <code>./</code> にすると、カバーやメタデータと同じ場所に保存できます。この例外は添付ディレクトリだけに適用され、本文、外部リンク、リビジョンのパスには引き続き名前が必要です。</p>
+<p>次の v0 設定で保存したファイルは「旧ダウンロード変換 → 設定を貼り付け」から変換できます。</p>
+<div class="highlight"><pre><span></span><code>KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
+</code></pre></div>
+<p>省略した ENV 項目には v0 の既定値が使われるため、v0 で変更した他の命名設定も貼り付けてください。変換先は常に現在のプロジェクト形式です。確定前にプレビューを確認してください。<code>post.json</code> またはクリエイター索引で識別できる添付ファイルを、リビジョン内も含めて個別に移動します。カバーやメタデータを添付ファイルとして移動せず、識別できないファイルは作品ディレクトリ内の相対位置を維持します。既存の移動先ファイルや危険なパスがある場合は変換を止め、上書きしません。</p>
+<h2 id="_4">以前のダウンロード場所を変換する<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>保存済み形式へ既存内容を合わせる場合だけ、独立した**以前のダウンロード変換**タブを開きます。以前の場所を追加してスキャンしてください。ここで指定する場所は変換元であり、今後のタスクの保存先ではありません。</p>
 <p>変換ツールはいつでも利用でき、変換元を 2 つの方法で指定できます。**プロジェクト履歴**では保存済みの命名バージョンを複数選択でき、同じ保存先に複数世代の構成が混在している場合にも対応します。**設定を貼り付け**では、旧 <code>.env</code> の命名キー、完全な <code>ktoolbox.toml</code>、<code>[naming]</code> テーブル、見出しのない命名断片を解析できます。ハイライト付きエディターは例とフィールド単位のエラーを表示し、貼り付けた原文はメモリ内だけで解析され、ブラウザーストレージ、ログ、イベント、変換履歴には保存されません。どちらの方法でも現在のプロジェクト命名バージョンが読み取り専用の変換先となり、プロジェクト設定を上書きしません。</p>
 <p>スキャンはファイルシステムを直接読み取り、タスク履歴だけに依存せず、Pawchive にも接続しません。作者ディレクトリの識別情報、<code>creator-indices.ktoolbox</code>、<code>post.json</code> を使い、選択場所の外へ出るシンボリックリンクはたどりません。</p>
 <p>プレビューには作者ごとの新旧パス、作品数、ファイル数、合計サイズ、スキップ、競合が表示されます。安全に変換できる作者はすべて既定で選択されます。</p>
 <p><img alt="モバイルの命名変換プレビュー" src="../../assets/webui/38-naming-conversion-mobile-dark.png" /></p>
 <p>KToolBox は対象を上書きまたは統合しません。古いプレビュー、設定変更、関連する実行中タスク、重複対象、ファイルシステム変更がある場合は再スキャンが必要です。</p>
-<h2 id="_4">変換と復旧<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h2 id="_5">変換と復旧<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <p>KToolBox は選択した移動を永続バックグラウンド処理として実行します。**一時停止**は現在の原子的ファイル操作の完了を待って状態を保持し、**再開**前に設定、ファイル指紋、競合、空き容量を再検証します。**取消**は別の操作で、完了済み移動を逆順に戻します。書き込み失敗やプロセス中断でも安全にロールバックします。</p>
 <p>進捗と履歴は <code>.ktoolbox/webui.sqlite3</code> に保存されます。成功時は一時操作ログを削除し、履歴は手動削除まで保持します。空になった移動元ディレクトリは削除しますが、無関係なファイルは削除しません。</p>
-<h2 id="_5">初回起動時の移行<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h2 id="_6">初回起動時の移行<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p><code>.env</code> または <code>prod.env</code> に旧命名キーが見つかった場合だけ移行ウィザードを表示します。起動時は検出と端末警告だけを行い、ファイルは変更しません。ログイン後のウィザードでは次を行います。</p>
 <ol>
 <li>出所、旧値、現在のプロジェクト値を表示</li>
@@ -1616,7 +1644,7 @@
 <p><img alt="旧命名設定の移行ウィザード" src="../../assets/webui/39-naming-migration-desktop-light.png" /></p>
 <p>閉じる、または**無視**を選んでも、その表示だけを閉じます。旧キーが残る限り、再読み込みや再ログインで再表示されます。設定移行とディレクトリ変換は別工程です。旧場所を確認してから明示的にスキャンを実行し、ツールを開いただけではスキャンも移動も始まりません。</p>
 <p>CLI もプロジェクト命名設定を使用します。旧プロジェクトでは WebUI でバックアップ付きの原子的移行を確認してください。プロセス環境にだけ存在する旧値は削除できないため、KToolBox は命名には使わず、起動環境から削除されるまで警告します。</p>
-<h2 id="_6">関連ガイド<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_7">関連ガイド<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <ul>
 <li>命名ページと変換フローは <a href="../webui/">WebUI ガイド</a>を参照してください。</li>
 <li>グローバルなネットワークとダウンローダー設定は<a href="../configuration/guide/">設定ガイド</a>を参照してください。</li>

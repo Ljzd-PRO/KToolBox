@@ -1918,7 +1918,11 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 </code></pre></div>
 <p><code>download_file</code> désigne le fichier principal de la publication, généralement la couverture. Les deux options valent <code>True</code> par défaut.</p>
 <h2 id="les-pieces-jointes-peuvent-elles-etre-enregistrees-directement-dans-le-repertoire-de-la-publication">Les pièces jointes peuvent-elles être enregistrées directement dans le répertoire de la publication ?<a class="headerlink" href="#les-pieces-jointes-peuvent-elles-etre-enregistrees-directement-dans-le-repertoire-de-la-publication" title="Permanent link">&para;</a></h2>
-<p>Non. Le Schema v5 exige un nom relatif sûr et non vide pour chaque chemin interne. Choisissez un sous-répertoire dans <strong>Format de nommage</strong> afin d'éviter les collisions avec le fichier principal (couverture) ou les métadonnées.</p>
+<p>Oui. Dans <strong>Format de nommage &gt; Structure des répertoires</strong>, indiquez <code>.</code> ou <code>./</code> comme répertoire des pièces jointes. Le réglage équivalent du projet est :</p>
+<div class="highlight"><pre><span></span><code><span class="k">[naming.post_structure]</span>
+<span class="n">attachments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.&quot;</span>
+</code></pre></div>
+<p>Évitez les noms identiques au fichier principal (couverture), à <code>post.json</code> ou aux autres métadonnées. Pour convertir des téléchargements créés avec <code>KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./</code>, utilisez <strong>Conversion des anciens téléchargements &gt; Coller une configuration</strong>. Le <a href="../naming/">guide de nommage</a> décrit la prévisualisation et la conversion. Les autres chemins internes exigent toujours un nom relatif sûr et non vide.</p>
 <h2 id="comment-eviter-les-noms-de-fichiers-trop-longs">Comment éviter les noms de fichiers trop longs ?<a class="headerlink" href="#comment-eviter-les-noms-de-fichiers-trop-longs" title="Permanent link">&para;</a></h2>
 <p>Utilisez des noms séquentiels ou une limite de précision dans la table <code>[naming]</code> du projet :</p>
 <div class="highlight"><pre><span></span><code><span class="k">[naming]</span>

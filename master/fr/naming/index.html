@@ -958,6 +958,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#pieces-jointes-dans-le-dossier-de-luvre" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pièces jointes dans le dossier de l’œuvre
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#convertir-les-anciens-emplacements" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1468,6 +1479,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#pieces-jointes-dans-le-dossier-de-luvre" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pièces jointes dans le dossier de l’œuvre
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#convertir-les-anciens-emplacements" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1594,6 +1616,12 @@
 <p><strong>Structure des répertoires</strong> et <strong>Modèles de nommage</strong> disposent de boutons d’enregistrement distincts. L’enregistrement s’applique immédiatement aux futurs téléchargements, sans jamais déplacer les anciens fichiers.</p>
 <p>L’<strong>emplacement de téléchargement par défaut</strong> appartient aussi au projet. Sa valeur initiale est <code>downloads</code> ; un chemin relatif est résolu depuis la racine du projet et un chemin absolu peut sortir du projet. L’ordre est : sortie explicite de la tâche, sortie explicite du plan de synchronisation automatique, puis valeur par défaut du projet. Chaque tâche conserve le chemin absolu résolu à sa création.</p>
 <p><img alt="Structure et emplacement par défaut" src="../../assets/webui/37-naming-structure-desktop-light.png" /></p>
+<h2 id="pieces-jointes-dans-le-dossier-de-luvre">Pièces jointes dans le dossier de l’œuvre<a class="headerlink" href="#pieces-jointes-dans-le-dossier-de-luvre" title="Permanent link">&para;</a></h2>
+<p>Dans <strong>Structure des répertoires</strong>, indiquez <code>.</code> ou <code>./</code> comme dossier des pièces jointes pour les placer à côté de la couverture et des métadonnées. Cette exception concerne uniquement les pièces jointes ; les chemins du contenu, des liens externes et des révisions doivent toujours porter un nom.</p>
+<p>Les fichiers téléchargés avec ce réglage v0 sont pris en charge dans <strong>Conversion des anciens téléchargements &gt; Coller une configuration</strong> :</p>
+<div class="highlight"><pre><span></span><code>KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
+</code></pre></div>
+<p>Ajoutez les autres réglages de nommage modifiés en v0, car les champs ENV omis utilisent les valeurs par défaut de v0. Le format actuel du projet reste toujours la cible. Vérifiez la prévisualisation avant de confirmer : les pièces jointes identifiées par <code>post.json</code> ou l’index de l’auteur sont déplacées individuellement, y compris dans les révisions reconnues. Couvertures et métadonnées ne sont pas traitées comme des pièces jointes ; les fichiers non identifiés conservent leur emplacement relatif dans l’œuvre. Un fichier cible existant ou un chemin dangereux bloque la conversion sans écrasement.</p>
 <h2 id="convertir-les-anciens-emplacements">Convertir les anciens emplacements<a class="headerlink" href="#convertir-les-anciens-emplacements" title="Permanent link">&para;</a></h2>
 <p>Ouvrez l’onglet séparé <strong>Conversion des anciens téléchargements</strong> uniquement si le contenu existant doit adopter le format enregistré. Ajoutez les anciens emplacements, puis lancez leur analyse. Ces emplacements sont des sources de conversion, pas les destinations des futures tâches.</p>
 <p>Le convertisseur reste disponible à tout moment et propose deux modes de source. <strong>Historique du projet</strong> permet de sélectionner plusieurs versions de nommage enregistrées lorsqu’un emplacement contient plusieurs générations d’arborescences. <strong>Coller une configuration</strong> accepte les anciennes clés <code>.env</code>, un <code>ktoolbox.toml</code> complet, une table <code>[naming]</code> ou un fragment sans en-tête. L’éditeur avec coloration fournit des exemples et localise les erreurs par champ ; le texte source reste uniquement en mémoire et n’est écrit ni dans le stockage du navigateur, ni dans les journaux, événements ou historiques. Dans les deux modes, la version actuelle du projet reste la cible en lecture seule et n’est jamais remplacée.</p>

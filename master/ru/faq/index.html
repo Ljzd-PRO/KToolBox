@@ -1918,7 +1918,11 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 </code></pre></div>
 <p><code>download_file</code> означает основной файл публикации, обычно обложку. Оба параметра по умолчанию равны <code>True</code>.</p>
 <h2 id="_5">Можно ли хранить вложения прямо в каталоге публикации?<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p>Нет. Schema v5 требует безопасного непустого относительного имени для каждого внутреннего пути. Выберите подкаталог на странице <strong>Формат имён</strong>, чтобы вложения не конфликтовали с основным файлом (обложкой) или метаданными.</p>
+<p>Да. На странице <strong>Формат имён &gt; Структура каталогов</strong> укажите <code>.</code> или <code>./</code> для каталога вложений. Соответствующая настройка проекта:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[naming.post_structure]</span>
+<span class="n">attachments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.&quot;</span>
+</code></pre></div>
+<p>Имена вложений не должны совпадать с основным файлом (обложкой), <code>post.json</code> или другими метаданными. Для преобразования загрузок, созданных с <code>KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./</code>, используйте <strong>Преобразование старых загрузок &gt; Вставить конфигурацию</strong>. Порядок предпросмотра и преобразования описан в <a href="../naming/">руководстве по именованию</a>. Для остальных внутренних путей по-прежнему требуется безопасное непустое относительное имя.</p>
 <h2 id="_6">Как избежать слишком длинных имён файлов?<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>Используйте последовательные имена или точность формата в таблице <code>[naming]</code> проекта:</p>
 <div class="highlight"><pre><span></span><code><span class="k">[naming]</span>

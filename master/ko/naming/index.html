@@ -961,7 +961,7 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        이전 다운로드 위치 변환
+        작품 디렉터리에 첨부 파일 저장
       
     </span>
   </a>
@@ -972,7 +972,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        변환 및 복구
+        이전 다운로드 위치 변환
       
     </span>
   </a>
@@ -983,7 +983,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        최초 시작 마이그레이션
+        변환 및 복구
       
     </span>
   </a>
@@ -992,6 +992,17 @@
       
         <li class="md-nav__item">
   <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        최초 시작 마이그레이션
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
         관련 가이드
@@ -1471,7 +1482,7 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        이전 다운로드 위치 변환
+        작품 디렉터리에 첨부 파일 저장
       
     </span>
   </a>
@@ -1482,7 +1493,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        변환 및 복구
+        이전 다운로드 위치 변환
       
     </span>
   </a>
@@ -1493,7 +1504,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        최초 시작 마이그레이션
+        변환 및 복구
       
     </span>
   </a>
@@ -1502,6 +1513,17 @@
       
         <li class="md-nav__item">
   <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        최초 시작 마이그레이션
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
         관련 가이드
@@ -1594,17 +1616,23 @@
 <p>**디렉터리 구조**와 **이름 템플릿**에는 각각 저장 버튼이 있습니다. 저장한 설정은 이후 다운로드에 즉시 적용되지만 기존 파일을 자동으로 이동하지 않습니다.</p>
 <p>**기본 다운로드 위치**도 프로젝트 설정입니다. 기본값은 <code>downloads</code>이며 상대 경로는 프로젝트 루트를 기준으로 해석하고 프로젝트 밖의 절대 경로도 사용할 수 있습니다. 작업의 명시적 출력, 자동 동기화 계획의 명시적 출력, 프로젝트 기본값 순서로 적용합니다. 생성된 작업에는 해석된 절대 경로가 고정되므로 나중에 기본값을 바꿔도 기존 작업은 이동하지 않습니다.</p>
 <p><img alt="디렉터리 구조와 기본 다운로드 위치" src="../../assets/webui/37-naming-structure-desktop-light.png" /></p>
-<h2 id="_3">이전 다운로드 위치 변환<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h2 id="_3">작품 디렉터리에 첨부 파일 저장<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>**디렉터리 구조**에서 첨부 파일 디렉터리를 <code>.</code> 또는 <code>./</code>로 설정하면 표지 및 메타데이터와 같은 위치에 저장됩니다. 이 예외는 첨부 파일 디렉터리에만 적용됩니다. 본문, 외부 링크 파일 및 수정본 디렉터리에는 여전히 이름이 필요합니다.</p>
+<p>다음 v0 설정으로 받은 파일은 **이전 다운로드 변환 &gt; 설정 붙여넣기**에서 변환할 수 있습니다.</p>
+<div class="highlight"><pre><span></span><code>KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
+</code></pre></div>
+<p>생략한 ENV 필드에는 v0 기본값이 적용되므로 v0에서 변경한 다른 이름 설정도 함께 붙여 넣으세요. 변환 대상은 항상 현재 프로젝트 형식입니다. 확인 전에 미리보기를 검토하세요. <code>post.json</code>이나 크리에이터 인덱스로 식별한 첨부 파일은 수정본의 파일까지 개별적으로 이동합니다. 표지와 메타데이터는 첨부 파일로 취급하지 않으며, 식별하지 못한 파일은 작품 디렉터리 안의 기존 상대 위치를 유지합니다. 대상 파일이 이미 있거나 경로가 안전하지 않으면 덮어쓰지 않고 변환을 차단합니다.</p>
+<h2 id="_4">이전 다운로드 위치 변환<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>기존 콘텐츠를 저장된 형식으로 바꿀 때만 별도의 <strong>이전 다운로드 변환</strong> 탭을 사용합니다. 이전 위치를 추가하고 스캔하세요. 이 위치는 변환 원본이며 이후 작업의 다운로드 대상이 아닙니다.</p>
 <p>변환기는 언제든 사용할 수 있으며 두 가지 원본 모드를 제공합니다. **프로젝트 기록**에서는 저장된 이름 버전을 여러 개 선택할 수 있어 한 다운로드 위치에 여러 세대의 구조가 섞인 경우에도 대응합니다. **설정 붙여넣기**에서는 이전 <code>.env</code> 이름 키, 전체 <code>ktoolbox.toml</code>, <code>[naming]</code> 테이블 또는 헤더 없는 이름 조각을 분석할 수 있습니다. 구문 강조 편집기는 예시와 필드별 오류를 표시하며 붙여 넣은 원문은 메모리에서만 분석되고 브라우저 저장소, 로그, 이벤트 또는 변환 기록에 저장되지 않습니다. 두 모드 모두 현재 프로젝트 이름 버전을 읽기 전용 대상으로 사용하며 프로젝트 설정을 덮어쓰지 않습니다.</p>
 <p>스캔은 파일 시스템을 직접 읽고 작업 기록에만 의존하지 않으며 Pawchive에도 연결하지 않습니다. 크리에이터 디렉터리 신원, <code>creator-indices.ktoolbox</code>, <code>post.json</code>을 사용하고 선택 위치 밖으로 나가는 심볼릭 링크를 따르지 않습니다.</p>
 <p>미리보기에는 크리에이터별 이전/새 경로, 작품 수, 파일 수, 전체 크기, 건너뜀 및 충돌이 표시됩니다. 안전하게 변환 가능한 크리에이터가 모두 기본 선택됩니다.</p>
 <p><img alt="모바일 이름 변환 미리보기" src="../../assets/webui/38-naming-conversion-mobile-dark.png" /></p>
 <p>KToolBox는 대상을 덮어쓰거나 합치지 않습니다. 오래된 미리보기, 설정 변경, 관련 활성 작업, 중복 대상 또는 파일 시스템 변경이 있으면 다시 스캔해야 합니다.</p>
-<h2 id="_4">변환 및 복구<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h2 id="_5">변환 및 복구<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <p>KToolBox는 선택한 이동을 영구 백그라운드 작업으로 실행합니다. **일시 중지**는 현재 원자적 파일 작업이 끝난 뒤 상태를 유지하고, **계속**하기 전에 설정, 파일 지문, 충돌 및 여유 공간을 다시 검사합니다. **취소**는 완료된 이동을 역순으로 되돌립니다. 쓰기 실패나 프로세스 중단도 안전하게 롤백됩니다.</p>
 <p>진행률과 기록은 <code>.ktoolbox/webui.sqlite3</code>에 저장됩니다. 성공하면 임시 작업 로그를 지우고 기록은 수동 삭제할 때까지 보존합니다. 비어 있는 이전 디렉터리는 제거하지만 관련 없는 파일은 삭제하지 않습니다.</p>
-<h2 id="_5">최초 시작 마이그레이션<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h2 id="_6">최초 시작 마이그레이션<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p><code>.env</code> 또는 <code>prod.env</code>에서 이전 이름 키가 감지될 때만 마이그레이션 마법사가 표시됩니다. 시작 시에는 감지와 터미널 경고만 수행하며 파일을 변경하지 않습니다. 로그인 후 마법사는 다음을 수행합니다.</p>
 <ol>
 <li>출처, 이전 값, 현재 프로젝트 값을 표시</li>
@@ -1616,7 +1644,7 @@
 <p><img alt="이전 이름 설정 마이그레이션 마법사" src="../../assets/webui/39-naming-migration-desktop-light.png" /></p>
 <p>닫기나 **무시**는 현재 대화상자만 닫습니다. 이전 키가 남아 있으면 새로 고침하거나 다시 로그인할 때 다시 표시됩니다. 설정 마이그레이션과 디렉터리 변환은 별도 단계입니다. 이전 위치를 확인한 뒤 명시적으로 스캔해야 하며 도구를 여는 것만으로는 스캔이나 이동을 시작하지 않습니다.</p>
 <p>CLI도 프로젝트 이름 설정을 사용합니다. 이전 프로젝트는 WebUI에서 백업과 원자적 마이그레이션을 확인하세요. 프로세스 환경에만 있는 이전 값은 삭제할 수 없으므로 이름 설정에서는 무시하고 시작 환경에서 제거될 때까지 경고합니다.</p>
-<h2 id="_6">관련 가이드<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_7">관련 가이드<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <ul>
 <li>이름 설정 페이지와 변환 절차는 <a href="../webui/">WebUI 가이드</a>를 참조하세요.</li>
 <li>전역 네트워크와 다운로더 설정은 <a href="../configuration/guide/">설정 가이드</a>를 사용하세요.</li>

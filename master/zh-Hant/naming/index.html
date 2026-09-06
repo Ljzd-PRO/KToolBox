@@ -961,7 +961,7 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        轉換舊下載位置
+        將附件儲存在作品目錄
       
     </span>
   </a>
@@ -972,7 +972,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        轉換與復原
+        轉換舊下載位置
       
     </span>
   </a>
@@ -983,7 +983,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        首次啟動遷移
+        轉換與復原
       
     </span>
   </a>
@@ -992,6 +992,17 @@
       
         <li class="md-nav__item">
   <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        首次啟動遷移
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
         相關指南
@@ -1471,7 +1482,7 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        轉換舊下載位置
+        將附件儲存在作品目錄
       
     </span>
   </a>
@@ -1482,7 +1493,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        轉換與復原
+        轉換舊下載位置
       
     </span>
   </a>
@@ -1493,7 +1504,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        首次啟動遷移
+        轉換與復原
       
     </span>
   </a>
@@ -1502,6 +1513,17 @@
       
         <li class="md-nav__item">
   <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        首次啟動遷移
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
         相關指南
@@ -1594,17 +1616,23 @@
 <p>「目錄結構」與「命名範本」各自提供儲存按鈕。儲存後會立即影響未來下載；只儲存命名設定絕不會移動舊檔案。</p>
 <p>「預設下載位置」同樣屬於專案設定，預設值為 <code>downloads</code>。相對路徑以專案根目錄解析，也可填入專案外的主機絕對路徑。建立工作時依序使用：工作明確輸出目錄、自動同步計畫明確輸出目錄、專案預設下載位置。建立後會固定解析出的絕對路徑，日後修改專案預設值不會移動既有工作。</p>
 <p><img alt="目錄結構與預設下載位置" src="../../assets/webui/37-naming-structure-desktop-light.png" /></p>
-<h2 id="_3">轉換舊下載位置<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h2 id="_3">將附件儲存在作品目錄<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>在「目錄結構」中將附件目錄設為 <code>.</code> 或 <code>./</code>，即可將附件直接儲存在作品封面和中繼資料旁。此規則僅適用於附件目錄；正文、外連檔案和修訂目錄仍須填寫名稱。</p>
+<p>使用以下 v0 設定下載的舊檔案，可以透過「舊下載目錄轉換 → 貼上設定」進行轉換：</p>
+<div class="highlight"><pre><span></span><code>KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
+</code></pre></div>
+<p>請一併貼上在 v0 中修改過的其他命名設定，省略的 ENV 欄位會以 v0 預設值補齊。轉換目標始終是目前的專案格式。確認前先檢查掃描預覽：轉換器依據 <code>post.json</code> 或作者索引逐一移動附件，包括可辨識修訂中的附件；封面和中繼資料不會被當作附件搬走，無法辨識的檔案保留在作品目錄內原有的相對位置。目的檔案已存在或路徑不安全時會阻止轉換，不會覆寫檔案。</p>
+<h2 id="_4">轉換舊下載位置<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>只有以前下載的內容需要採用已儲存命名格式時，才需開啟獨立的「舊下載目錄轉換」分頁。加入一個或多個舊位置，再按「掃描舊下載位置」。這些位置只是轉換掃描來源，不是未來工作的下載目錄設定。</p>
 <p>轉換器可隨時使用，並提供兩種來源模式。「專案歷程」可多選已儲存的命名版本，適合單一下載位置混有多代目錄結構的情況。「貼上設定」支援舊 <code>.env</code> 命名鍵、完整 <code>ktoolbox.toml</code>、單獨的 <code>[naming]</code> 表格或無表頭命名片段。具高亮顯示的編輯器提供範例與欄位層級錯誤定位；貼上的原文只在記憶體中解析，不會寫入瀏覽器儲存空間、記錄、事件或轉換歷程。兩種模式都固定以目前專案命名版本作為唯讀目標，絕不覆寫專案設定。</p>
 <p>掃描直接讀取檔案系統，不只依賴工作歷程，也不會存取 Pawchive。KToolBox 透過作者目錄身分、<code>creator-indices.ktoolbox</code> 與 <code>post.json</code> 識別內容，並拒絕跟隨越出所選位置的符號連結。</p>
 <p>預覽會顯示每位作者的新舊路徑、作品數、檔案數、總大小、略過項目和衝突。所有可安全轉換的作者預設選取，也可逐項取消。</p>
 <p><img alt="行動版命名轉換預覽" src="../../assets/webui/38-naming-conversion-mobile-dark.png" /></p>
 <p>KToolBox 不會覆寫或合併目標目錄。掃描結果過期、設定變更、相關工作正在活動、目標重複或檔案系統變化時，都必須重新掃描。</p>
-<h2 id="_4">轉換與復原<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h2 id="_5">轉換與復原<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <p>KToolBox 會以持久背景工作執行選取的移動。「暫停」會等待目前原子檔案操作完成並保留已移動內容；「繼續」前會重新驗證設定、檔案指紋、目標衝突與可用空間。「取消」則會反向復原已完成移動；寫入失敗或處理程序中斷也會安全復原。已儲存的命名格式繼續用於未來下載。</p>
 <p>轉換進度與歷程儲存在 <code>.ktoolbox/webui.sqlite3</code>。成功後會清除暫存操作記錄；完成歷程會保留到使用者手動刪除。轉換會移除已空的舊來源目錄，但不會刪除無關檔案。</p>
-<h2 id="_5">首次啟動遷移<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h2 id="_6">首次啟動遷移<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>只有偵測到 <code>.env</code> 或 <code>prod.env</code> 中存在舊命名鍵時才顯示遷移精靈。啟動階段只偵測並於終端機警告，不會預先修改檔案。登入後，精靈會：</p>
 <ol>
 <li>顯示每個來源、舊值與目前專案值；</li>
@@ -1616,7 +1644,7 @@
 <p><img alt="舊版命名設定遷移精靈" src="../../assets/webui/39-naming-migration-desktop-light.png" /></p>
 <p>關閉或選擇「忽略」只會關閉本次視窗。只要舊鍵仍存在，重新整理或重新登入後仍會顯示。設定遷移與目錄轉換彼此獨立：設定完成後先確認一個或多個舊位置，再明確按下「掃描舊下載位置」；僅開啟工具不會自動掃描或移動檔案。</p>
 <p>CLI 同樣使用專案命名設定。舊專案尚未完成遷移時，請啟動 WebUI 並確認具有備份的原子遷移。只存在於處理程序環境中的舊值無法由 KToolBox 刪除；專案命名會忽略它們，並持續警告使用者從啟動環境移除。</p>
-<h2 id="_6">相關指南<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_7">相關指南<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <ul>
 <li>在 <a href="../webui/">WebUI 指南</a>中查看命名頁面與轉換流程。</li>
 <li>全域網路與下載器設定請參閱<a href="../configuration/guide/">設定指南</a>。</li>
