@@ -236,7 +236,9 @@ function sampleTree(naming: NamingDraft): Array<{ depth: number; kind: "folder" 
   const year = formatTemplate(naming.year_dirname_format, values);
   const month = formatTemplate(naming.month_dirname_format, values);
   const primary = formatTemplate(naming.post_structure.file, values, "cover.jpg");
-  const attachment = formatTemplate(naming.filename_format, values, "illustration.png");
+  const numberedAttachment = naming.sequential_filename
+    && !naming.sequential_filename_excludes.includes(".png");
+  const attachment = formatTemplate(naming.filename_format, values, numberedAttachment ? "1.png" : "illustration.png");
   const tree: Array<{ depth: number; kind: "folder" | "file"; name: string }> = [
     { depth: 0, kind: "folder", name: creator },
   ];
@@ -257,8 +259,13 @@ function sampleTree(naming: NamingDraft): Array<{ depth: number; kind: "folder" 
     { depth, kind: "file", name: primary },
     { depth, kind: "file", name: naming.post_structure.content },
     { depth, kind: "file", name: naming.post_structure.external_links },
-    { depth, kind: "folder", name: naming.post_structure.attachments },
-    { depth: depth + 1, kind: "file", name: attachment },
+  );
+  const flatAttachments = naming.mix_posts || isWorkRootPath(naming.post_structure.attachments);
+  if (!flatAttachments) {
+    tree.push({ depth, kind: "folder", name: naming.post_structure.attachments });
+  }
+  tree.push(
+    { depth: flatAttachments ? depth : depth + 1, kind: "file", name: attachment },
     { depth, kind: "folder", name: naming.post_structure.revisions },
     { depth: depth + 1, kind: "folder", name: revision },
   );
@@ -278,8 +285,13 @@ function invalidTemplate(
   return null;
 }
 
-function invalidRelativePath(value: string): boolean {
-  return !value.trim() || value.startsWith("/") || value.split(/[\\/]/u).includes("..");
+function isWorkRootPath(value: string): boolean {
+  return value.split(/[\\/]/u).filter(Boolean).every((part) => part === ".");
+}
+
+function invalidRelativePath(value: string, allowWorkRoot = false): boolean {
+  return !value.trim() || value.startsWith("/") || value.split(/[\\/]/u).includes("..")
+    || (!allowWorkRoot && isWorkRootPath(value));
 }
 
 export function NamingPage() {
@@ -425,7 +437,7 @@ export function NamingPage() {
   const pathProblems = useMemo(() => {
     if (!draft) return [];
     return Object.entries(draft.post_structure)
-      .filter(([name, value]) => name !== "file" && invalidRelativePath(value))
+      .filter(([name, value]) => name !== "file" && invalidRelativePath(value, name === "attachments"))
       .map(([name]) => name);
   }, [draft]);
   const rootProblems = useMemo(() => {
@@ -913,7 +925,7 @@ export function NamingPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField
                   icon={Folder}
-                  isInvalid={invalidRelativePath(draft.post_structure.attachments)}
+                  isInvalid={invalidRelativePath(draft.post_structure.attachments, true)}
                   label={t("naming.attachmentsDirectory")}
                   value={draft.post_structure.attachments}
                   onChange={(value) => updateStructure("attachments", value)}
