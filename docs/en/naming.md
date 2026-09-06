@@ -21,6 +21,18 @@ The **Default download location** belongs to the project too. Its default value 
 
 ![Directory structure and default output](../assets/webui/37-naming-structure-desktop-light.png)
 
+## Attachments in the work directory
+
+Set the attachment directory to `.` or `./` in **Directory structure** to save attachments directly beside the work's cover and metadata. This exception applies only to the attachment directory; content, external-link, and revision paths must still have a name.
+
+Old downloads made with the following v0 setting are supported by **Legacy download conversion > Paste configuration**:
+
+```dotenv
+KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
+```
+
+Include any other naming settings you changed in v0, since omitted ENV fields use v0 defaults. The current project format is always the target. Review the scan before confirming: attachments identified by `post.json` or the creator index are moved individually, including those in recognized revisions. Covers and metadata are not treated as attachments; unrecognized files keep their relative locations inside the work directory. Existing target files and unsafe paths block conversion instead of being overwritten.
+
 ## Convert old download locations
 
 Open the dedicated **Legacy download conversion** tab only when previously downloaded content needs to follow the saved naming format. Add one or more old locations, then choose **Scan old locations**. These locations are scan inputs, not destinations for future tasks.

@@ -21,6 +21,18 @@ L’**emplacement de téléchargement par défaut** appartient aussi au projet. 
 
 ![Structure et emplacement par défaut](../assets/webui/37-naming-structure-desktop-light.png)
 
+## Pièces jointes dans le dossier de l’œuvre
+
+Dans **Structure des répertoires**, indiquez `.` ou `./` comme dossier des pièces jointes pour les placer à côté de la couverture et des métadonnées. Cette exception concerne uniquement les pièces jointes ; les chemins du contenu, des liens externes et des révisions doivent toujours porter un nom.
+
+Les fichiers téléchargés avec ce réglage v0 sont pris en charge dans **Conversion des anciens téléchargements > Coller une configuration** :
+
+```dotenv
+KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./
+```
+
+Ajoutez les autres réglages de nommage modifiés en v0, car les champs ENV omis utilisent les valeurs par défaut de v0. Le format actuel du projet reste toujours la cible. Vérifiez la prévisualisation avant de confirmer : les pièces jointes identifiées par `post.json` ou l’index de l’auteur sont déplacées individuellement, y compris dans les révisions reconnues. Couvertures et métadonnées ne sont pas traitées comme des pièces jointes ; les fichiers non identifiés conservent leur emplacement relatif dans l’œuvre. Un fichier cible existant ou un chemin dangereux bloque la conversion sans écrasement.
+
 ## Convertir les anciens emplacements
 
 Ouvrez l’onglet séparé **Conversion des anciens téléchargements** uniquement si le contenu existant doit adopter le format enregistré. Ajoutez les anciens emplacements, puis lancez leur analyse. Ces emplacements sont des sources de conversion, pas les destinations des futures tâches.

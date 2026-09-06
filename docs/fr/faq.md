@@ -47,7 +47,14 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 
 ## Les pièces jointes peuvent-elles être enregistrées directement dans le répertoire de la publication ?
 
-Non. Le Schema v5 exige un nom relatif sûr et non vide pour chaque chemin interne. Choisissez un sous-répertoire dans **Format de nommage** afin d'éviter les collisions avec le fichier principal (couverture) ou les métadonnées.
+Oui. Dans **Format de nommage > Structure des répertoires**, indiquez `.` ou `./` comme répertoire des pièces jointes. Le réglage équivalent du projet est :
+
+```toml
+[naming.post_structure]
+attachments = "."
+```
+
+Évitez les noms identiques au fichier principal (couverture), à `post.json` ou aux autres métadonnées. Pour convertir des téléchargements créés avec `KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./`, utilisez **Conversion des anciens téléchargements > Coller une configuration**. Le [guide de nommage](naming.md) décrit la prévisualisation et la conversion. Les autres chemins internes exigent toujours un nom relatif sûr et non vide.
 
 ## Comment éviter les noms de fichiers trop longs ?
 

@@ -47,7 +47,14 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 
 ## Can attachments be stored directly in the post directory?
 
-No. Project Schema v5 requires every internal path to be a safe, non-empty relative name. Use **Naming format** to choose an attachment subdirectory; this prevents attachments from colliding with the primary file (cover) or metadata.
+Yes. In **Naming format > Directory structure**, set the attachment directory to `.` or `./`. The equivalent project setting is:
+
+```toml
+[naming.post_structure]
+attachments = "."
+```
+
+Choose filenames that do not conflict with the primary file (cover), `post.json`, or other metadata. To convert old downloads made with `KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./`, use **Legacy download conversion > Paste configuration**. See the [naming guide](naming.md) for the preview and conversion steps. Other internal paths still require a safe, non-empty relative name.
 
 ## How do I avoid long filenames?
 

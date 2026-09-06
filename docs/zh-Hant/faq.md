@@ -47,7 +47,14 @@ KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
 
 ## 可以將附件直接儲存在作品目錄嗎？
 
-不可以。專案 Schema v5 要求每個內部路徑都是安全且非空的相對名稱。請在「命名格式」中選擇附件子目錄，避免附件與主要檔案（封面）或中繼資料衝突。
+可以。在「命名格式 → 目錄結構」中，將附件目錄設為 `.` 或 `./`。對應的專案設定為：
+
+```toml
+[naming.post_structure]
+attachments = "."
+```
+
+請確保附件檔名不與主要檔案（封面）、`post.json` 或其他中繼資料重名。轉換舊 `KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./` 設定下載的檔案時，使用「舊下載目錄轉換 → 貼上設定」，依照[命名指南](naming.md)預覽後轉換。其他內部路徑仍須使用安全且非空的相對名稱。
 
 ## 如何避免檔名過長？
 

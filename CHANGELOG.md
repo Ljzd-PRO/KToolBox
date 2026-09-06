@@ -1,3 +1,13 @@
+# Unreleased
+
+## Fixes
+
+- Restore `.` / `./` attachment-directory support in project naming, pasted ENV/TOML sources, and confirmed v0 configuration migration ([#389](https://github.com/Ljzd-PRO/KToolBox/issues/389)).
+- Convert flat legacy attachments individually, including recognized revision files, while preserving covers, metadata, and unrelated files. Keep source and target sequential counters independent and reject target conflicts and unsafe paths.
+- Validate paused conversion journal paths across parent-directory renames so nested attachment conversions can resume or roll back safely.
+- Show work-root attachments beside the cover in the WebUI directory preview, including the configured sequential filenames.
+- Correct the seven-language FAQ and document how to convert old root-level attachment layouts.
+
 # KToolBox v1.0.0
 
 KToolBox v1 is a breaking release that moves the project to Pawchive as its only supported backend.
