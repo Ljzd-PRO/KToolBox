@@ -161,6 +161,27 @@ def test_naming_configuration_validates_templates_and_paths() -> None:
         ProjectNamingConfiguration(group_by_month=True)
 
 
+@pytest.mark.parametrize("value", [".", "./", Path(".")])
+def test_attachment_directory_accepts_work_root_and_round_trips(tmp_path: Path, value: str | Path) -> None:
+    project = ProjectConfiguration.model_validate({"naming": {"post_structure": {"attachments": value}}})
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    store.save(project)
+
+    assert store.load().naming.post_structure.attachments == Path(".")
+
+
+@pytest.mark.parametrize("value", ["", " ", "..", "../attachments", "/attachments"])
+def test_attachment_directory_still_rejects_empty_or_escaping_paths(value: str) -> None:
+    with pytest.raises(ValueError):
+        ProjectNamingConfiguration.model_validate({"post_structure": {"attachments": value}})
+
+
+@pytest.mark.parametrize("field", ["content", "external_links", "revisions"])
+def test_other_structure_paths_still_require_a_name(field: str) -> None:
+    with pytest.raises(ValueError, match="naming paths cannot be empty"):
+        ProjectNamingConfiguration.model_validate({"post_structure": {field: "./"}})
+
+
 def test_schema_v2_loads_with_automatic_sync_defaults(tmp_path: Path) -> None:
     path = tmp_path / "ktoolbox.toml"
     path.write_text("schema_version = 2\n", encoding="utf-8")

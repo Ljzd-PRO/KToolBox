@@ -61,6 +61,20 @@ def test_parse_env_uses_legacy_defaults_instead_of_target_values() -> None:
     assert "post_dirname_format" in parsed.defaulted_fields
 
 
+@pytest.mark.parametrize("value", [".", "./"])
+def test_parse_sources_accept_attachments_in_the_work_directory(value: str) -> None:
+    target = ProjectNamingConfiguration()
+    env = parse_naming_source("env", f"KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS={value}\n", target=target)
+    toml = parse_naming_source("toml", f'[naming.post_structure]\nattachments = "{value}"\n', target=target)
+
+    for source in (env, toml):
+        assert source.naming.post_structure.attachments == Path(".")
+        assert source.recognized_fields == ("post_structure.attachments",)
+        difference = next(item for item in source.differences if item.path == "post_structure.attachments")
+        assert difference.source_value == "."
+        assert difference.target_value == "attachments"
+
+
 @pytest.mark.parametrize(
     "content",
     [

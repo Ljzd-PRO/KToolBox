@@ -173,6 +173,29 @@ def test_apply_rejects_stale_dotenv_without_modifying_files(tmp_path: Path) -> N
     assert dotenv.read_text(encoding="utf-8") == "KTOOLBOX_JOB__MIX_POSTS=false\n"
 
 
+@pytest.mark.parametrize("source_name", [".env", "prod.env"])
+def test_confirmed_legacy_migration_preserves_root_attachment_directory(tmp_path: Path, source_name: str) -> None:
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    store.save(ProjectConfiguration())
+    content = "KTOOLBOX_JOB__POST_STRUCTURE__ATTACHMENTS=./\n"
+    (tmp_path / source_name).write_text(content, encoding="utf-8")
+
+    preview = preview_legacy_naming(tmp_path)
+    assert preview.fields[0].path == "post_structure.attachments"
+    assert preview.fields[0].legacy_value == "."
+    result = apply_legacy_naming(
+        tmp_path,
+        selected_fields={"post_structure.attachments"},
+        project_revision=preview.project_revision,
+        source_revisions={source.path.name: source.revision for source in preview.sources},
+    )
+
+    assert store.load().naming.post_structure.attachments == Path(".")
+    assert not preview_legacy_naming(tmp_path).pending
+    backup = next(path for path in result.backup_paths if path.name == f"{source_name}.bak")
+    assert backup.read_text(encoding="utf-8") == content
+
+
 def test_migration_does_not_repeat_for_newer_project_schema(tmp_path: Path) -> None:
     project_path = tmp_path / "ktoolbox.toml"
     ProjectConfigStore(project_path).save(ProjectConfiguration())

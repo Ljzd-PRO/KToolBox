@@ -109,10 +109,10 @@ def _validate_component_template(
     return value
 
 
-def _validate_relative_path(value: Path) -> Path:
+def _validate_relative_path(value: Path, *, allow_work_root: bool = False) -> Path:
     if value.is_absolute() or ".." in value.parts:
         raise ValueError("naming paths must stay within their work directory")
-    if not value.parts or str(value) in {"", "."}:
+    if not str(value).strip() or (not value.parts and not allow_work_root):
         raise ValueError("naming paths cannot be empty")
     return value
 
@@ -128,7 +128,20 @@ class ProjectPostStructureConfiguration(BaseModel):
     file: str = "{id}_{}"
     revisions: Path = Path("revisions")
 
-    @field_validator("attachments", "content", "external_links", "revisions")
+    @field_validator("attachments", mode="before")
+    @classmethod
+    def reject_empty_attachment_path(cls, value: Any) -> Any:
+        # Path("") becomes Path("."), but only an explicit work-root value is valid.
+        if isinstance(value, str) and not value.strip():
+            raise ValueError("naming paths cannot be empty")
+        return value
+
+    @field_validator("attachments")
+    @classmethod
+    def validate_attachment_path(cls, value: Path) -> Path:
+        return _validate_relative_path(value, allow_work_root=True)
+
+    @field_validator("content", "external_links", "revisions")
     @classmethod
     def validate_relative_paths(cls, value: Path) -> Path:
         return _validate_relative_path(value)

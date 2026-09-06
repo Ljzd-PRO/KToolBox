@@ -128,6 +128,23 @@ async def test_create_post_jobs_use_readable_sequential_names_by_default(tmp_pat
 
 
 @pytest.mark.asyncio
+async def test_create_post_jobs_support_attachments_in_work_root(tmp_path: Path) -> None:
+    naming = ProjectNamingConfiguration.model_validate({"post_structure": {"attachments": "./"}})
+    item = post()
+    item.attachments = [FileReference(name="drawing.png", path="/drawing.png")]
+    item.file = FileReference(name="cover.png", path="/cover.png")
+
+    jobs = await create_job_from_post(item, tmp_path, naming=naming)
+
+    assert [(job.path, job.alt_filename) for job in jobs] == [
+        (tmp_path, "1.png"),
+        (tmp_path, "post_cover.png"),
+    ]
+    assert (tmp_path / "post.json").is_file()
+    assert not (tmp_path / "attachments").exists()
+
+
+@pytest.mark.asyncio
 async def test_create_post_jobs_can_override_primary_file_setting(tmp_path: Path) -> None:
     config.job.download_attachments = False
     item = post()
