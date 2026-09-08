@@ -214,10 +214,14 @@ class KToolBoxCli:
                 post = await _requested_post(client, service, creator_id, post_id, revision_id)
                 post_path = output_path / generate_post_path_name(post, naming, published_time)
                 if revision_id:
-                    post_path = post_path / naming.post_structure.revisions / generate_revision_path_name(
-                        post,
-                        naming,
-                        published_time,
+                    post_path = (
+                        post_path
+                        / naming.post_structure.revisions
+                        / generate_revision_path_name(
+                            post,
+                            naming,
+                            published_time,
+                        )
                     )
 
                 jobs = await create_job_from_post(

@@ -20,7 +20,7 @@ from pydantic import SecretStr
 from ktoolbox.configuration import RuntimeContext, WebUIConfiguration, load_configuration
 from ktoolbox.exceptions import KToolBoxUserError
 from ktoolbox.naming_migration import detect_legacy_naming
-from ktoolbox.project_config import ProjectConfigStore, ProjectConfiguration
+from ktoolbox.project_initialization import initialize_new_project
 
 DEFAULT_WEBUI_USERNAME = "admin"
 
@@ -223,10 +223,11 @@ def _project_root(project_dir: Path) -> Path:
 
     created = False
     if not project_config.is_file():
-        ProjectConfigStore(project_config).save(ProjectConfiguration())
+        target_timezone = initialize_new_project(root)
         created = True
         print(
-            f"Warning: {project_config} was not found; created a new project configuration.",
+            f"Warning: {project_config} was not found; created a new project configuration "
+            f"with publication target timezone {target_timezone}.",
             file=sys.stderr,
         )
 

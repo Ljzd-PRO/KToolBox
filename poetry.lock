@@ -3857,6 +3857,25 @@ files = [
 ]
 
 [[package]]
+name = "tzlocal"
+version = "5.4.4"
+description = "tzinfo object for the local timezone"
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = [
+    {file = "tzlocal-5.4.4-py3-none-any.whl", hash = "sha256:aae09f0126a8a86fa736be266eb4a471380d26a0de3bc14844e7821fee3e2a15"},
+    {file = "tzlocal-5.4.4.tar.gz", hash = "sha256:8dbb8660838688a7b6ba4fed31d18dedf842afb4d47ca050d6d891c2c15f3be4"},
+]
+
+[package.dependencies]
+tzdata = {version = "*", markers = "platform_system == \"Windows\""}
+
+[package.extras]
+devenv = ["zest.releaser"]
+testing = ["check_manifest", "pyroma", "pytest (>=4.3)", "pytest-cov", "pytest-mock (>=3.3)", "ruff"]
+
+[[package]]
 name = "uncalled-for"
 version = "0.3.2"
 description = "Async dependency injection for Python functions"
@@ -4413,4 +4432,4 @@ winloop = ["winloop"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<=3.14"
-content-hash = "07e6dafeaaf771d4910b68c930e86db9aed7f833bc38b8099557f79b2b6bb60b"
+content-hash = "3c5afdc19ef7594188b14e4c3278994b24f0fb48512697f11efb7f806536685d"

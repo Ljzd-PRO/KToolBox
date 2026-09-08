@@ -43,9 +43,7 @@ def test_path_and_filename_generation() -> None:
     naming = ProjectNamingConfiguration()
     assert generate_post_path_name(post("42"), naming, PUBLISHED_TIME) == "42 [42]"
     assert generate_post_path_name(dated, naming, PUBLISHED_TIME) == "AB [42]"
-    assert generate_filename(dated, "cover.jpg", "{id}_{published}_{}", PUBLISHED_TIME) == (
-        "42_2025-03-02_cover.jpg"
-    )
+    assert generate_filename(dated, "cover.jpg", "{id}_{published}_{}", PUBLISHED_TIME) == ("42_2025-03-02_cover.jpg")
     assert generate_year_dirname(dated, naming, PUBLISHED_TIME) == "2025"
     assert generate_month_dirname(dated, naming, PUBLISHED_TIME) == "2025-03"
     assert generate_year_dirname(post("missing"), naming, PUBLISHED_TIME) == "unknown"

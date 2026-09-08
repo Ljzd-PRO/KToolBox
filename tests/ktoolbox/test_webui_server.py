@@ -7,6 +7,7 @@ import pytest
 import uvicorn
 from pydantic import SecretStr
 
+import ktoolbox.project_initialization as project_initialization_module
 import ktoolbox.webui.server as server_module
 from ktoolbox.configuration import Configuration, WebUIConfiguration
 from ktoolbox.exceptions import KToolBoxUserError
@@ -187,8 +188,13 @@ async def test_run_webui_second_sigint_returns_to_the_global_cli_boundary(
     assert "Expected forced shutdown cancellation" not in caplog.text
 
 
-def test_project_root_creates_missing_configuration(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_project_root_creates_missing_configuration(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     project_root = tmp_path / "new-project"
+    monkeypatch.setattr(project_initialization_module, "get_localzone_name", lambda: "Asia/Shanghai")
 
     assert _project_root(project_root) == project_root.resolve()
 
@@ -198,7 +204,13 @@ def test_project_root_creates_missing_configuration(tmp_path: Path, capsys: pyte
     assert 'default_output = "downloads"' in content
     assert "[naming]" in content
     assert ProjectConfigStore(project_config).load() == ProjectConfiguration()
-    assert capsys.readouterr().err == f"Warning: {project_config} was not found; created a new project configuration.\n"
+    assert (project_root / ".env").read_text(encoding="utf-8") == (
+        "KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE=Asia/Shanghai\n"
+    )
+    assert capsys.readouterr().err == (
+        f"Warning: {project_config} was not found; created a new project configuration "
+        "with publication target timezone Asia/Shanghai.\n"
+    )
 
 
 def test_project_root_preserves_existing_configuration(
@@ -213,6 +225,7 @@ def test_project_root_preserves_existing_configuration(
 
     assert _project_root(tmp_path) == tmp_path.resolve()
     assert project_config.read_text(encoding="utf-8") == original
+    assert not (tmp_path / ".env").exists()
     assert capsys.readouterr().err == ""
 
 
