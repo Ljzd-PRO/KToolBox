@@ -110,6 +110,14 @@ API 群組刻意不包含工作階段金鑰。
 
 條件群組使用 `kind = "group"`、`mode = "any"` 或 `"all"`、非空 `conditions` 清單，以及可選的 `negate`。欄位條件使用 `kind = "field"`、安全的點分 `field`、`contains`、`equals`、`regex` 或 `exists` 之一，以及可選的 `case_sensitive`、`negate` 或 `expected`。非 `exists` 運算子需要非空 `values` 清單；`exists` 禁止 `values`。
 
+## `published_time`
+
+| 欄位 | 型別 | 預設值 | 說明 |
+| --- | --- | --- | --- |
+| `target_timezone` | IANA 時區 | `UTC` | 命名、分組、篩選和 WebUI 顯示使用的目標時區。 |
+| `fallback_service_timezone` | IANA 時區 | `UTC` | Service 沒有單獨設定時，用來解釋無時區 `published` 的時區。 |
+| `service_timezones` | 對應表 | Fanbox 東京、Patreon UTC | 按 Pawchive Service 解釋無時區 `published` 的 IANA 時區。 |
+
 ## `webui`
 
 只有安裝 `ktoolbox[webui]` 時才需要這些設定，啟動本身無需預先設定：使用者名稱留空時使用 `admin`；兩種密碼均留空時，伺服器會產生隨機密碼、在終端機輸出有效憑證，並只在本次處理程序中保留。

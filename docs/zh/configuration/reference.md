@@ -110,6 +110,14 @@ API 配置组有意不包含会话密钥。
 
 条件组使用 `kind = "group"`、`mode = "any"` 或 `"all"`、非空 `conditions` 列表及可选 `negate`。字段条件使用 `kind = "field"`、安全点路径 `field`、`contains`、`equals`、`regex`、`exists` 之一，以及可选 `case_sensitive`、`negate` 或 `expected`。非 `exists` 操作符要求非空 `values`；`exists` 禁止 `values`。
 
+## `published_time`
+
+| 字段 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `target_timezone` | IANA 时区 | `UTC` | 命名、分组、筛选和 WebUI 展示使用的目标时区。 |
+| `fallback_service_timezone` | IANA 时区 | `UTC` | Service 未单独配置时，用来解释无时区 `published` 的时区。 |
+| `service_timezones` | 映射 | Fanbox 东京、Patreon UTC | 按 Pawchive Service 解释无时区 `published` 的 IANA 时区。 |
+
 ## `webui`
 
 仅在安装 `ktoolbox[webui]` 后需要这些配置，启动本身无需预先设置：用户名留空时使用 `admin`；两种密码均留空时，服务会生成随机密码、在终端输出有效凭据，并且只在本次进程中保留。

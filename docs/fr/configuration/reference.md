@@ -110,6 +110,14 @@ Le document de projet est distinct de la configuration d'environnement. Son chem
 
 Les groupes utilisent `kind = "group"`, `mode = "any"` ou `"all"`, une liste `conditions` non vide et un `negate` facultatif. Les conditions de champ utilisent `kind = "field"`, un `field` sûr à points, l'un de `contains`, `equals`, `regex` ou `exists`, et les options `case_sensitive`, `negate` ou `expected`. Les opérateurs autres que `exists` exigent une liste `values` non vide ; `exists` interdit `values`.
 
+## `published_time`
+
+| Champ | Type | Valeur par défaut | Description |
+| --- | --- | --- | --- |
+| `target_timezone` | fuseau IANA | `UTC` | Fuseau cible utilisé pour les noms, le classement, les filtres et la WebUI. |
+| `fallback_service_timezone` | fuseau IANA | `UTC` | Fuseau servant à interpréter `published` sans zone pour les Service non configurés. |
+| `service_timezones` | table | Fanbox Tokyo, Patreon UTC | Fuseaux IANA interprétant `published` sans zone pour chaque Service Pawchive. |
+
 ## `webui`
 
 Ces réglages ne sont nécessaires que lorsque `ktoolbox[webui]` est installé et restent facultatifs au démarrage : un nom vide devient `admin` et, si les deux formes de mot de passe sont vides, le serveur génère un mot de passe aléatoire, affiche les identifiants effectifs dans le terminal et ne les conserve que pour ce processus.

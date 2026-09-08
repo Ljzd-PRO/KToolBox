@@ -110,6 +110,14 @@ API 그룹에는 의도적으로 세션 키가 없습니다.
 
 조건 그룹은 `kind = "group"`, `mode = "any"` 또는 `"all"`, 비어 있지 않은 `conditions` 목록과 선택적 `negate`를 사용합니다. 필드 조건은 `kind = "field"`, 안전한 점 표기 `field`, `contains`, `equals`, `regex`, `exists` 중 하나와 선택적 `case_sensitive`, `negate`, `expected`를 사용합니다. `exists`가 아닌 연산자는 비어 있지 않은 `values` 목록이 필요하고 `exists`는 `values`를 금지합니다.
 
+## `published_time`
+
+| 필드 | 형식 | 기본값 | 설명 |
+| --- | --- | --- | --- |
+| `target_timezone` | IANA 시간대 | `UTC` | 이름, 분류, 필터 및 WebUI 표시에 사용하는 대상 시간대. |
+| `fallback_service_timezone` | IANA 시간대 | `UTC` | 개별 설정이 없는 Service의 시간대 없는 `published` 값을 해석하는 시간대. |
+| `service_timezones` | 매핑 | Fanbox 도쿄, Patreon UTC | Pawchive Service별 시간대 없는 `published` 값을 해석하는 IANA 시간대. |
+
 ## `webui`
 
 이 설정은 `ktoolbox[webui]`를 설치한 경우에만 사용하며 시작에는 필수가 아닙니다. 빈 사용자 이름은 `admin`이 되고 두 암호가 모두 비어 있으면 서버가 무작위 암호를 생성하여 유효 자격 증명을 터미널에 출력하고 해당 프로세스에서만 유지합니다.

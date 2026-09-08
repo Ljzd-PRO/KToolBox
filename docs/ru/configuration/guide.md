@@ -27,9 +27,17 @@ KTOOLBOX_JOB__COUNT=4
 KTOOLBOX_JOB__CREATOR_CONCURRENCY=4
 KTOOLBOX_JOB__DOWNLOAD_FILE=True
 KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
+
+# Нормализация времени публикации.
+KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE=UTC
+KTOOLBOX_PUBLISHED_TIME__FALLBACK_SERVICE_TIMEZONE=UTC
+KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__FANBOX=Asia/Tokyo
+KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__PATREON=UTC
 ```
 
 Все настройки необязательны. Значения по умолчанию приведены в [справочнике конфигурации](reference.md).
+
+При создании нового проекта KToolBox определяет IANA-пояс хоста и один раз явно записывает `KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE` в `.env`. Существующий проект без этого ключа не изменяется при чтении конфигурации или запуске WebUI и продолжает использовать значение модели `UTC`. Пояс расписания автоматической синхронизации определяет время запуска, а пояса Service определяют интерпретацию `published` от Pawchive.
 
 ## Создание или изменение конфигурации
 

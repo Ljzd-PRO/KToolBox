@@ -2,6 +2,8 @@
 
 ## Fixes
 
+- Normalize timezone-less `published` values by Pawchive Service, fixing Fanbox cross-midnight naming, filtering, and legacy-directory matching. The converter distinguishes Kemono UTC, Pawchive raw values, and custom Service timezones ([#390](https://github.com/Ljzd-PRO/KToolBox/issues/390)).
+- Persist the detected host target timezone only when a new project is created. Existing projects are not rewritten during configuration loading or WebUI startup, while WebUI, CLI, and MCP expose the effective publication time and target timezone.
 - Restore `.` / `./` attachment-directory support in project naming, pasted ENV/TOML sources, and confirmed v0 configuration migration ([#389](https://github.com/Ljzd-PRO/KToolBox/issues/389)).
 - Convert flat legacy attachments individually, including recognized revision files, while preserving covers, metadata, and unrelated files. Keep source and target sequential counters independent and reject target conflicts and unsafe paths.
 - Validate paused conversion journal paths across parent-directory renames so nested attachment conversions can resume or roll back safely.

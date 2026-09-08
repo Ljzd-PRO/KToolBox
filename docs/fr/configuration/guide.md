@@ -27,9 +27,17 @@ KTOOLBOX_JOB__COUNT=4
 KTOOLBOX_JOB__CREATOR_CONCURRENCY=4
 KTOOLBOX_JOB__DOWNLOAD_FILE=True
 KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
+
+# Normalisation de l'heure de publication.
+KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE=UTC
+KTOOLBOX_PUBLISHED_TIME__FALLBACK_SERVICE_TIMEZONE=UTC
+KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__FANBOX=Asia/Tokyo
+KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__PATREON=UTC
 ```
 
 Tous les réglages sont facultatifs. Consultez la [référence de configuration](reference.md) pour les valeurs par défaut.
+
+À la création d’un nouveau projet, KToolBox détecte le fuseau IANA de l’hôte et écrit explicitement `KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE` dans `.env` une seule fois. Un projet existant sans cette clé n’est jamais modifié lors du chargement ou du démarrage de la WebUI et conserve la valeur par défaut `UTC`. Le fuseau d’un planning automatique détermine son heure d’exécution ; les fuseaux Service déterminent l’interprétation de `published` dans Pawchive.
 
 ## Générer ou modifier la configuration
 

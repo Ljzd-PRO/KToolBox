@@ -110,6 +110,14 @@ The project document is separate from environment configuration. Its path resolv
 
 Condition groups use `kind = "group"`, `mode = "any"` or `"all"`, a non-empty `conditions` list, and optional `negate`. Field conditions use `kind = "field"`, a safe dotted `field`, one of `contains`, `equals`, `regex`, or `exists`, and optional `case_sensitive`, `negate`, or `expected`. Non-`exists` operators require a non-empty `values` list; `exists` forbids `values`.
 
+## `published_time`
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `target_timezone` | IANA timezone | `UTC` | Target timezone used for naming, grouping, filters, and WebUI display. |
+| `fallback_service_timezone` | IANA timezone | `UTC` | Timezone used to interpret naive `published` values for a Service without an explicit mapping. |
+| `service_timezones` | mapping | Fanbox Tokyo, Patreon UTC | IANA timezones used to interpret naive `published` values by Pawchive Service. |
+
 ## `webui`
 
 These settings are needed only when `ktoolbox[webui]` is installed. They are optional for startup: an empty username becomes `admin`, and when both password forms are empty the server generates a random password, prints the effective credentials in the terminal, and keeps them only for that process run.

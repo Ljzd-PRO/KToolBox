@@ -27,9 +27,17 @@ KTOOLBOX_JOB__COUNT=4
 KTOOLBOX_JOB__CREATOR_CONCURRENCY=4
 KTOOLBOX_JOB__DOWNLOAD_FILE=True
 KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
+
+# 게시 시간 정규화.
+KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE=UTC
+KTOOLBOX_PUBLISHED_TIME__FALLBACK_SERVICE_TIMEZONE=UTC
+KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__FANBOX=Asia/Tokyo
+KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__PATREON=UTC
 ```
 
 모든 설정은 선택 사항입니다. 기본값은 [설정 참조](reference.md)를 확인하세요.
+
+새 프로젝트를 만들 때 KToolBox는 호스트의 IANA 시간대를 감지하고 생성 시 한 번만 `KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE`을 `.env`에 명시적으로 기록합니다. 기존 프로젝트에 설정이 없더라도 설정 로드나 WebUI 시작 중에는 파일을 변경하지 않고 모델 기본값 `UTC`를 사용합니다. 자동 동기화 일정의 시간대는 실행 시각을 정하며, 여기의 Service 시간대는 Pawchive `published` 값을 해석하는 방법을 정합니다.
 
 ## 설정 생성 또는 편집
 
