@@ -1649,8 +1649,15 @@ KTOOLBOX_JOB__COUNT=4
 KTOOLBOX_JOB__CREATOR_CONCURRENCY=4
 KTOOLBOX_JOB__DOWNLOAD_FILE=True
 KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
+
+# Normalisation de l&#39;heure de publication.
+KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE=UTC
+KTOOLBOX_PUBLISHED_TIME__FALLBACK_SERVICE_TIMEZONE=UTC
+KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__FANBOX=Asia/Tokyo
+KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__PATREON=UTC
 </code></pre></div>
 <p>Tous les réglages sont facultatifs. Consultez la <a href="../reference/">référence de configuration</a> pour les valeurs par défaut.</p>
+<p>À la création d’un nouveau projet, KToolBox détecte le fuseau IANA de l’hôte et écrit explicitement <code>KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE</code> dans <code>.env</code> une seule fois. Un projet existant sans cette clé n’est jamais modifié lors du chargement ou du démarrage de la WebUI et conserve la valeur par défaut <code>UTC</code>. Le fuseau d’un planning automatique détermine son heure d’exécution ; les fuseaux Service déterminent l’interprétation de <code>published</code> dans Pawchive.</p>
 <h2 id="generer-ou-modifier-la-configuration">Générer ou modifier la configuration<a class="headerlink" href="#generer-ou-modifier-la-configuration" title="Permanent link">&para;</a></h2>
 <p>Générez toutes les clés dotenv disponibles à partir du modèle actuel :</p>
 <div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>config<span class="w"> </span>example

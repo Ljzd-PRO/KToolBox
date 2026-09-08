@@ -1216,6 +1216,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#published_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        published_time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#webui" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1608,6 +1619,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#published_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        published_time
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2152,6 +2174,37 @@
 </tbody>
 </table>
 <p>Группы условий используют <code>kind = "group"</code>, <code>mode = "any"</code> или <code>"all"</code>, непустой список <code>conditions</code> и необязательный <code>negate</code>. Условия полей используют <code>kind = "field"</code>, безопасный точечный <code>field</code>, один из <code>contains</code>, <code>equals</code>, <code>regex</code> или <code>exists</code>, а также необязательные <code>case_sensitive</code>, <code>negate</code> или <code>expected</code>. Операторам кроме <code>exists</code> нужен непустой список <code>values</code>; <code>exists</code> запрещает <code>values</code>.</p>
+<h2 id="published_time"><code>published_time</code><a class="headerlink" href="#published_time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Тип</th>
+<th>По умолчанию</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>target_timezone</code></td>
+<td>часовой пояс IANA</td>
+<td><code>UTC</code></td>
+<td>Целевой пояс для имён, группировки, фильтров и отображения WebUI.</td>
+</tr>
+<tr>
+<td><code>fallback_service_timezone</code></td>
+<td>часовой пояс IANA</td>
+<td><code>UTC</code></td>
+<td>Пояс для интерпретации <code>published</code> без зоны у Service без отдельной настройки.</td>
+</tr>
+<tr>
+<td><code>service_timezones</code></td>
+<td>отображение</td>
+<td>Fanbox Tokyo, Patreon UTC</td>
+<td>Пояса IANA для интерпретации <code>published</code> без зоны по Service Pawchive.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="webui"><code>webui</code><a class="headerlink" href="#webui" title="Permanent link">&para;</a></h2>
 <p>Эти параметры нужны только при установке <code>ktoolbox[webui]</code> и необязательны для запуска: пустое имя становится <code>admin</code>, а если обе формы пароля пусты, сервер создаёт случайный пароль, выводит итоговые данные в терминале и хранит их только в этом процессе.</p>
 <table>

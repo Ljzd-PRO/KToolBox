@@ -1649,8 +1649,15 @@ KTOOLBOX_JOB__COUNT=4
 KTOOLBOX_JOB__CREATOR_CONCURRENCY=4
 KTOOLBOX_JOB__DOWNLOAD_FILE=True
 KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
+
+# Нормализация времени публикации.
+KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE=UTC
+KTOOLBOX_PUBLISHED_TIME__FALLBACK_SERVICE_TIMEZONE=UTC
+KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__FANBOX=Asia/Tokyo
+KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__PATREON=UTC
 </code></pre></div>
 <p>Все настройки необязательны. Значения по умолчанию приведены в <a href="../reference/">справочнике конфигурации</a>.</p>
+<p>При создании нового проекта KToolBox определяет IANA-пояс хоста и один раз явно записывает <code>KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE</code> в <code>.env</code>. Существующий проект без этого ключа не изменяется при чтении конфигурации или запуске WebUI и продолжает использовать значение модели <code>UTC</code>. Пояс расписания автоматической синхронизации определяет время запуска, а пояса Service определяют интерпретацию <code>published</code> от Pawchive.</p>
 <h2 id="_2">Создание или изменение конфигурации<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>Создайте все доступные ключи dotenv из текущей модели:</p>
 <div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>config<span class="w"> </span>example

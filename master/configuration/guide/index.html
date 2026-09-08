@@ -1649,8 +1649,15 @@ KTOOLBOX_JOB__COUNT=4
 KTOOLBOX_JOB__CREATOR_CONCURRENCY=4
 KTOOLBOX_JOB__DOWNLOAD_FILE=True
 KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
+
+# Publication time normalization.
+KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE=UTC
+KTOOLBOX_PUBLISHED_TIME__FALLBACK_SERVICE_TIMEZONE=UTC
+KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__FANBOX=Asia/Tokyo
+KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__PATREON=UTC
 </code></pre></div>
 <p>All settings are optional. See the <a href="../reference/">configuration reference</a> for defaults.</p>
+<p>When KToolBox creates a new project, it detects the host's IANA timezone and writes <code>KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE</code> to <code>.env</code> once. Existing projects are never modified merely because the setting is absent; they continue to use the model default <code>UTC</code>. An automatic-sync schedule timezone controls when a plan runs, while these Service timezones control how Pawchive <code>published</code> values are interpreted.</p>
 <h2 id="generate-or-edit-configuration">Generate or edit configuration<a class="headerlink" href="#generate-or-edit-configuration" title="Permanent link">&para;</a></h2>
 <p>Generate every available dotenv key from the current model:</p>
 <div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>config<span class="w"> </span>example

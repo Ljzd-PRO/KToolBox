@@ -1625,6 +1625,7 @@
 <h2 id="_4">轉換舊下載位置<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>只有以前下載的內容需要採用已儲存命名格式時，才需開啟獨立的「舊下載目錄轉換」分頁。加入一個或多個舊位置，再按「掃描舊下載位置」。這些位置只是轉換掃描來源，不是未來工作的下載目錄設定。</p>
 <p>轉換器可隨時使用，並提供兩種來源模式。「專案歷程」可多選已儲存的命名版本，適合單一下載位置混有多代目錄結構的情況。「貼上設定」支援舊 <code>.env</code> 命名鍵、完整 <code>ktoolbox.toml</code>、單獨的 <code>[naming]</code> 表格或無表頭命名片段。具高亮顯示的編輯器提供範例與欄位層級錯誤定位；貼上的原文只在記憶體中解析，不會寫入瀏覽器儲存空間、記錄、事件或轉換歷程。兩種模式都固定以目前專案命名版本作為唯讀目標，絕不覆寫專案設定。</p>
+<p>每個已儲存版面也會凍結當時的發布時間策略。修正前的專案版本會標示為「直接使用 Pawchive 原值」；貼上 v0 <code>.env</code> 預設使用「Kemono UTC」，貼上 TOML 可選擇 Kemono UTC、Pawchive 原值或自訂 Service 時區。例如 Fanbox 的 <code>2025-12-21T00:35:43</code> 會先依 <code>Asia/Tokyo</code> 解讀，UTC 目標下得到 <code>2025-12-20T15:35:43+00:00</code>，因此使用 <code>{published}</code> 的路徑會由 <code>2025-12-21</code> 轉換為 <code>2025-12-20</code>。<code>post.json</code> 仍保留 Pawchive 原始值。</p>
 <p>掃描直接讀取檔案系統，不只依賴工作歷程，也不會存取 Pawchive。KToolBox 透過作者目錄身分、<code>creator-indices.ktoolbox</code> 與 <code>post.json</code> 識別內容，並拒絕跟隨越出所選位置的符號連結。</p>
 <p>預覽會顯示每位作者的新舊路徑、作品數、檔案數、總大小、略過項目和衝突。所有可安全轉換的作者預設選取，也可逐項取消。</p>
 <p><img alt="行動版命名轉換預覽" src="../../assets/webui/38-naming-conversion-mobile-dark.png" /></p>

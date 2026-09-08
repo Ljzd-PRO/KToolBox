@@ -1216,6 +1216,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#published_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        published_time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#webui" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1608,6 +1619,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#published_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        published_time
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2152,6 +2174,37 @@
 </tbody>
 </table>
 <p>条件组使用 <code>kind = "group"</code>、<code>mode = "any"</code> 或 <code>"all"</code>、非空 <code>conditions</code> 列表及可选 <code>negate</code>。字段条件使用 <code>kind = "field"</code>、安全点路径 <code>field</code>、<code>contains</code>、<code>equals</code>、<code>regex</code>、<code>exists</code> 之一，以及可选 <code>case_sensitive</code>、<code>negate</code> 或 <code>expected</code>。非 <code>exists</code> 操作符要求非空 <code>values</code>；<code>exists</code> 禁止 <code>values</code>。</p>
+<h2 id="published_time"><code>published_time</code><a class="headerlink" href="#published_time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>target_timezone</code></td>
+<td>IANA 时区</td>
+<td><code>UTC</code></td>
+<td>命名、分组、筛选和 WebUI 展示使用的目标时区。</td>
+</tr>
+<tr>
+<td><code>fallback_service_timezone</code></td>
+<td>IANA 时区</td>
+<td><code>UTC</code></td>
+<td>Service 未单独配置时，用来解释无时区 <code>published</code> 的时区。</td>
+</tr>
+<tr>
+<td><code>service_timezones</code></td>
+<td>映射</td>
+<td>Fanbox 东京、Patreon UTC</td>
+<td>按 Pawchive Service 解释无时区 <code>published</code> 的 IANA 时区。</td>
+</tr>
+</tbody>
+</table>
 <h2 id="webui"><code>webui</code><a class="headerlink" href="#webui" title="Permanent link">&para;</a></h2>
 <p>仅在安装 <code>ktoolbox[webui]</code> 后需要这些配置，启动本身无需预先设置：用户名留空时使用 <code>admin</code>；两种密码均留空时，服务会生成随机密码、在终端输出有效凭据，并且只在本次进程中保留。</p>
 <table>

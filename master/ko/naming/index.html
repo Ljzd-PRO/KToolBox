@@ -1625,6 +1625,7 @@
 <h2 id="_4">이전 다운로드 위치 변환<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>기존 콘텐츠를 저장된 형식으로 바꿀 때만 별도의 <strong>이전 다운로드 변환</strong> 탭을 사용합니다. 이전 위치를 추가하고 스캔하세요. 이 위치는 변환 원본이며 이후 작업의 다운로드 대상이 아닙니다.</p>
 <p>변환기는 언제든 사용할 수 있으며 두 가지 원본 모드를 제공합니다. **프로젝트 기록**에서는 저장된 이름 버전을 여러 개 선택할 수 있어 한 다운로드 위치에 여러 세대의 구조가 섞인 경우에도 대응합니다. **설정 붙여넣기**에서는 이전 <code>.env</code> 이름 키, 전체 <code>ktoolbox.toml</code>, <code>[naming]</code> 테이블 또는 헤더 없는 이름 조각을 분석할 수 있습니다. 구문 강조 편집기는 예시와 필드별 오류를 표시하며 붙여 넣은 원문은 메모리에서만 분석되고 브라우저 저장소, 로그, 이벤트 또는 변환 기록에 저장되지 않습니다. 두 모드 모두 현재 프로젝트 이름 버전을 읽기 전용 대상으로 사용하며 프로젝트 설정을 덮어쓰지 않습니다.</p>
+<p>저장된 각 레이아웃에는 당시의 게시 시간 정책도 고정됩니다. 수정 전 프로젝트 버전은 “Pawchive 원본 값 사용”으로 표시됩니다. 붙여 넣은 v0 <code>.env</code>는 기본적으로 “Kemono UTC”를 사용하고, TOML은 Kemono UTC, Pawchive 원본 값 또는 사용자 지정 Service 시간대를 선택할 수 있습니다. 예를 들어 Fanbox <code>2025-12-21T00:35:43</code>은 <code>Asia/Tokyo</code>로 해석되고 UTC 대상에서는 <code>2025-12-20T15:35:43+00:00</code>이 되므로 <code>{published}</code> 경로가 <code>2025-12-21</code>에서 <code>2025-12-20</code>으로 이동합니다. <code>post.json</code>의 Pawchive 원본 값은 유지됩니다.</p>
 <p>스캔은 파일 시스템을 직접 읽고 작업 기록에만 의존하지 않으며 Pawchive에도 연결하지 않습니다. 크리에이터 디렉터리 신원, <code>creator-indices.ktoolbox</code>, <code>post.json</code>을 사용하고 선택 위치 밖으로 나가는 심볼릭 링크를 따르지 않습니다.</p>
 <p>미리보기에는 크리에이터별 이전/새 경로, 작품 수, 파일 수, 전체 크기, 건너뜀 및 충돌이 표시됩니다. 안전하게 변환 가능한 크리에이터가 모두 기본 선택됩니다.</p>
 <p><img alt="모바일 이름 변환 미리보기" src="../../assets/webui/38-naming-conversion-mobile-dark.png" /></p>

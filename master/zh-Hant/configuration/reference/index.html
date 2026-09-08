@@ -1216,6 +1216,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#published_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        published_time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#webui" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1608,6 +1619,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#published_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        published_time
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2152,6 +2174,37 @@
 </tbody>
 </table>
 <p>條件群組使用 <code>kind = "group"</code>、<code>mode = "any"</code> 或 <code>"all"</code>、非空 <code>conditions</code> 清單，以及可選的 <code>negate</code>。欄位條件使用 <code>kind = "field"</code>、安全的點分 <code>field</code>、<code>contains</code>、<code>equals</code>、<code>regex</code> 或 <code>exists</code> 之一，以及可選的 <code>case_sensitive</code>、<code>negate</code> 或 <code>expected</code>。非 <code>exists</code> 運算子需要非空 <code>values</code> 清單；<code>exists</code> 禁止 <code>values</code>。</p>
+<h2 id="published_time"><code>published_time</code><a class="headerlink" href="#published_time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>欄位</th>
+<th>型別</th>
+<th>預設值</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>target_timezone</code></td>
+<td>IANA 時區</td>
+<td><code>UTC</code></td>
+<td>命名、分組、篩選和 WebUI 顯示使用的目標時區。</td>
+</tr>
+<tr>
+<td><code>fallback_service_timezone</code></td>
+<td>IANA 時區</td>
+<td><code>UTC</code></td>
+<td>Service 沒有單獨設定時，用來解釋無時區 <code>published</code> 的時區。</td>
+</tr>
+<tr>
+<td><code>service_timezones</code></td>
+<td>對應表</td>
+<td>Fanbox 東京、Patreon UTC</td>
+<td>按 Pawchive Service 解釋無時區 <code>published</code> 的 IANA 時區。</td>
+</tr>
+</tbody>
+</table>
 <h2 id="webui"><code>webui</code><a class="headerlink" href="#webui" title="Permanent link">&para;</a></h2>
 <p>只有安裝 <code>ktoolbox[webui]</code> 時才需要這些設定，啟動本身無需預先設定：使用者名稱留空時使用 <code>admin</code>；兩種密碼均留空時，伺服器會產生隨機密碼、在終端機輸出有效憑證，並只在本次處理程序中保留。</p>
 <table>

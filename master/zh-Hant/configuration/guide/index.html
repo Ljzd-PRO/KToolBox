@@ -1649,8 +1649,15 @@ KTOOLBOX_JOB__COUNT=4
 KTOOLBOX_JOB__CREATOR_CONCURRENCY=4
 KTOOLBOX_JOB__DOWNLOAD_FILE=True
 KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
+
+# 發布時間正規化。
+KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE=UTC
+KTOOLBOX_PUBLISHED_TIME__FALLBACK_SERVICE_TIMEZONE=UTC
+KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__FANBOX=Asia/Tokyo
+KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__PATREON=UTC
 </code></pre></div>
 <p>所有設定均可省略。預設值請參閱<a href="../reference/">設定參考</a>。</p>
+<p>建立新專案時，KToolBox 會偵測主機的 IANA 時區，且只在建立當下將 <code>KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE</code> 明文寫入 <code>.env</code>。既有專案即使缺少此設定，也不會在讀取設定或啟動 WebUI 時被自動修改，而會繼續使用模型預設值 <code>UTC</code>。自動同步計畫的時區只決定何時執行；此處的 Service 時區則決定如何解讀 Pawchive 的 <code>published</code>。</p>
 <h2 id="_2">產生或編輯設定<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>從目前模型產生所有可用的 dotenv 金鑰：</p>
 <div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>config<span class="w"> </span>example

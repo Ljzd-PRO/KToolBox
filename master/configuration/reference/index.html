@@ -1216,6 +1216,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#published_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        published_time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#webui" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1608,6 +1619,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#published_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        published_time
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2152,6 +2174,37 @@
 </tbody>
 </table>
 <p>Condition groups use <code>kind = "group"</code>, <code>mode = "any"</code> or <code>"all"</code>, a non-empty <code>conditions</code> list, and optional <code>negate</code>. Field conditions use <code>kind = "field"</code>, a safe dotted <code>field</code>, one of <code>contains</code>, <code>equals</code>, <code>regex</code>, or <code>exists</code>, and optional <code>case_sensitive</code>, <code>negate</code>, or <code>expected</code>. Non-<code>exists</code> operators require a non-empty <code>values</code> list; <code>exists</code> forbids <code>values</code>.</p>
+<h2 id="published_time"><code>published_time</code><a class="headerlink" href="#published_time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>target_timezone</code></td>
+<td>IANA timezone</td>
+<td><code>UTC</code></td>
+<td>Target timezone used for naming, grouping, filters, and WebUI display.</td>
+</tr>
+<tr>
+<td><code>fallback_service_timezone</code></td>
+<td>IANA timezone</td>
+<td><code>UTC</code></td>
+<td>Timezone used to interpret naive <code>published</code> values for a Service without an explicit mapping.</td>
+</tr>
+<tr>
+<td><code>service_timezones</code></td>
+<td>mapping</td>
+<td>Fanbox Tokyo, Patreon UTC</td>
+<td>IANA timezones used to interpret naive <code>published</code> values by Pawchive Service.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="webui"><code>webui</code><a class="headerlink" href="#webui" title="Permanent link">&para;</a></h2>
 <p>These settings are needed only when <code>ktoolbox[webui]</code> is installed. They are optional for startup: an empty username becomes <code>admin</code>, and when both password forms are empty the server generates a random password, prints the effective credentials in the terminal, and keeps them only for that process run.</p>
 <table>

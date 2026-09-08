@@ -1625,6 +1625,7 @@
 <h2 id="_4">转换旧下载位置<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>只有在以前下载的内容需要采用已保存命名格式时，才需要打开独立的“旧下载目录转换”标签页。添加一个或多个旧位置，再点击“扫描旧下载位置”。这些位置只是转换扫描来源，不是未来任务的下载目录设置。</p>
 <p>转换器可随时使用，并提供两种来源模式。“项目历史”允许多选已保存的命名版本，适合一个下载位置中混有多代目录结构的情况。“粘贴配置”支持旧 <code>.env</code> 命名键、完整 <code>ktoolbox.toml</code>、单独的 <code>[naming]</code> 表或无表头命名片段。带高亮的编辑器提供样例和字段级错误定位；粘贴原文仅在内存中解析，不会写入浏览器存储、日志、事件或转换历史。两种模式都始终把当前项目命名版本作为只读目标，绝不会覆盖项目配置。</p>
+<p>每个已保存布局也会冻结当时的发布时间策略。修复前的项目版本会标记为“直接使用 Pawchive 原值”；粘贴 v0 <code>.env</code> 默认采用“Kemono UTC”，粘贴 TOML 可选择 Kemono UTC、Pawchive 原值或自定义 Service 时区。例如 Fanbox 的 <code>2025-12-21T00:35:43</code> 会先按 <code>Asia/Tokyo</code> 解释，UTC 目标下得到 <code>2025-12-20T15:35:43+00:00</code>，因此使用 <code>{published}</code> 的路径会从 <code>2025-12-21</code> 转换到 <code>2025-12-20</code>。<code>post.json</code> 中仍保留 Pawchive 原始值。</p>
 <p>扫描直接读取文件系统，而非仅依赖任务历史，也不会访问 Pawchive。KToolBox 通过作者目录身份、<code>creator-indices.ktoolbox</code> 与 <code>post.json</code> 识别内容，并拒绝跟随越出所选位置的符号链接。</p>
 <p>预览会显示每位作者的新旧路径、作品数、文件数、总大小、跳过项和冲突。所有可安全转换的作者默认选中，也可逐项取消。</p>
 <p><img alt="移动端命名转换预览" src="../../assets/webui/38-naming-conversion-mobile-dark.png" /></p>

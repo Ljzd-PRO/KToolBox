@@ -1216,6 +1216,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#published_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        published_time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#webui" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1608,6 +1619,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#published_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        published_time
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2152,6 +2174,37 @@
 </tbody>
 </table>
 <p>Les groupes utilisent <code>kind = "group"</code>, <code>mode = "any"</code> ou <code>"all"</code>, une liste <code>conditions</code> non vide et un <code>negate</code> facultatif. Les conditions de champ utilisent <code>kind = "field"</code>, un <code>field</code> sûr à points, l'un de <code>contains</code>, <code>equals</code>, <code>regex</code> ou <code>exists</code>, et les options <code>case_sensitive</code>, <code>negate</code> ou <code>expected</code>. Les opérateurs autres que <code>exists</code> exigent une liste <code>values</code> non vide ; <code>exists</code> interdit <code>values</code>.</p>
+<h2 id="published_time"><code>published_time</code><a class="headerlink" href="#published_time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Type</th>
+<th>Valeur par défaut</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>target_timezone</code></td>
+<td>fuseau IANA</td>
+<td><code>UTC</code></td>
+<td>Fuseau cible utilisé pour les noms, le classement, les filtres et la WebUI.</td>
+</tr>
+<tr>
+<td><code>fallback_service_timezone</code></td>
+<td>fuseau IANA</td>
+<td><code>UTC</code></td>
+<td>Fuseau servant à interpréter <code>published</code> sans zone pour les Service non configurés.</td>
+</tr>
+<tr>
+<td><code>service_timezones</code></td>
+<td>table</td>
+<td>Fanbox Tokyo, Patreon UTC</td>
+<td>Fuseaux IANA interprétant <code>published</code> sans zone pour chaque Service Pawchive.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="webui"><code>webui</code><a class="headerlink" href="#webui" title="Permanent link">&para;</a></h2>
 <p>Ces réglages ne sont nécessaires que lorsque <code>ktoolbox[webui]</code> est installé et restent facultatifs au démarrage : un nom vide devient <code>admin</code> et, si les deux formes de mot de passe sont vides, le serveur génère un mot de passe aléatoire, affiche les identifiants effectifs dans le terminal et ne les conserve que pour ce processus.</p>
 <table>

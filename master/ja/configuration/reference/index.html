@@ -1216,6 +1216,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#published_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        published_time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#webui" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1608,6 +1619,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#published_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        published_time
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2152,6 +2174,37 @@
 </tbody>
 </table>
 <p>条件グループは <code>kind = "group"</code>、<code>mode = "any"</code> または <code>"all"</code>、空でない <code>conditions</code> リスト、オプションの <code>negate</code> を使います。フィールド条件は <code>kind = "field"</code>、安全なドット区切り <code>field</code>、<code>contains</code>、<code>equals</code>、<code>regex</code>、<code>exists</code> のいずれか、オプションの <code>case_sensitive</code>、<code>negate</code>、<code>expected</code> を使います。<code>exists</code> 以外では空でない <code>values</code> リストが必要で、<code>exists</code> では <code>values</code> を禁止します。</p>
+<h2 id="published_time"><code>published_time</code><a class="headerlink" href="#published_time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>フィールド</th>
+<th>型</th>
+<th>既定値</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>target_timezone</code></td>
+<td>IANA タイムゾーン</td>
+<td><code>UTC</code></td>
+<td>命名、分類、フィルター、WebUI 表示に使う対象タイムゾーン。</td>
+</tr>
+<tr>
+<td><code>fallback_service_timezone</code></td>
+<td>IANA タイムゾーン</td>
+<td><code>UTC</code></td>
+<td>個別設定のない Service のタイムゾーンなし <code>published</code> を解釈するタイムゾーン。</td>
+</tr>
+<tr>
+<td><code>service_timezones</code></td>
+<td>マップ</td>
+<td>Fanbox は東京、Patreon は UTC</td>
+<td>Pawchive Service ごとにタイムゾーンなし <code>published</code> を解釈する IANA タイムゾーン。</td>
+</tr>
+</tbody>
+</table>
 <h2 id="webui"><code>webui</code><a class="headerlink" href="#webui" title="Permanent link">&para;</a></h2>
 <p>これらの設定は <code>ktoolbox[webui]</code> をインストールした場合だけ使い、起動には必須ではありません。空のユーザー名は <code>admin</code> になり、両方のパスワードが空ならランダムパスワードを生成し、有効な認証情報をターミナルへ表示してそのプロセス内だけに保持します。</p>
 <table>

@@ -1216,6 +1216,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#published_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        published_time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#webui" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1608,6 +1619,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#published_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        published_time
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2152,6 +2174,37 @@
 </tbody>
 </table>
 <p>조건 그룹은 <code>kind = "group"</code>, <code>mode = "any"</code> 또는 <code>"all"</code>, 비어 있지 않은 <code>conditions</code> 목록과 선택적 <code>negate</code>를 사용합니다. 필드 조건은 <code>kind = "field"</code>, 안전한 점 표기 <code>field</code>, <code>contains</code>, <code>equals</code>, <code>regex</code>, <code>exists</code> 중 하나와 선택적 <code>case_sensitive</code>, <code>negate</code>, <code>expected</code>를 사용합니다. <code>exists</code>가 아닌 연산자는 비어 있지 않은 <code>values</code> 목록이 필요하고 <code>exists</code>는 <code>values</code>를 금지합니다.</p>
+<h2 id="published_time"><code>published_time</code><a class="headerlink" href="#published_time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>필드</th>
+<th>형식</th>
+<th>기본값</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>target_timezone</code></td>
+<td>IANA 시간대</td>
+<td><code>UTC</code></td>
+<td>이름, 분류, 필터 및 WebUI 표시에 사용하는 대상 시간대.</td>
+</tr>
+<tr>
+<td><code>fallback_service_timezone</code></td>
+<td>IANA 시간대</td>
+<td><code>UTC</code></td>
+<td>개별 설정이 없는 Service의 시간대 없는 <code>published</code> 값을 해석하는 시간대.</td>
+</tr>
+<tr>
+<td><code>service_timezones</code></td>
+<td>매핑</td>
+<td>Fanbox 도쿄, Patreon UTC</td>
+<td>Pawchive Service별 시간대 없는 <code>published</code> 값을 해석하는 IANA 시간대.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="webui"><code>webui</code><a class="headerlink" href="#webui" title="Permanent link">&para;</a></h2>
 <p>이 설정은 <code>ktoolbox[webui]</code>를 설치한 경우에만 사용하며 시작에는 필수가 아닙니다. 빈 사용자 이름은 <code>admin</code>이 되고 두 암호가 모두 비어 있으면 서버가 무작위 암호를 생성하여 유효 자격 증명을 터미널에 출력하고 해당 프로세스에서만 유지합니다.</p>
 <table>

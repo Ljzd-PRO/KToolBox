@@ -1649,8 +1649,15 @@ KTOOLBOX_JOB__COUNT=4
 KTOOLBOX_JOB__CREATOR_CONCURRENCY=4
 KTOOLBOX_JOB__DOWNLOAD_FILE=True
 KTOOLBOX_JOB__DOWNLOAD_ATTACHMENTS=True
+
+# 发布时间规范化。
+KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE=UTC
+KTOOLBOX_PUBLISHED_TIME__FALLBACK_SERVICE_TIMEZONE=UTC
+KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__FANBOX=Asia/Tokyo
+KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__PATREON=UTC
 </code></pre></div>
 <p>所有配置均为可选项。默认值见<a href="../reference/">配置参考</a>。</p>
+<p>创建新项目时，KToolBox 会检测主机的 IANA 时区，并且只在这次创建过程中把 <code>KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE</code> 明文写入 <code>.env</code>。已有项目即使缺少此项，也不会在读取配置或启动 WebUI 时被自动修改，而是继续使用模型默认值 <code>UTC</code>。自动同步计划的时区只决定计划何时执行；这里的 Service 时区决定如何解释 Pawchive 的 <code>published</code>。</p>
 <h2 id="_2">生成或编辑配置<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>根据当前模型生成全部 dotenv 配置键：</p>
 <div class="highlight"><pre><span></span><code>ktoolbox<span class="w"> </span>config<span class="w"> </span>example
