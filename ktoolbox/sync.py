@@ -23,6 +23,7 @@ from ktoolbox.project_config import (
     ProjectNamingConfiguration,
     parse_creator_reference,
 )
+from ktoolbox.publication_time import PublishedTimePolicy
 from ktoolbox.reporting import NullProgressReporter, ProgressReporter
 
 
@@ -90,6 +91,7 @@ class SyncCoordinator:
         client: PawchiveClient,
         *,
         naming: ProjectNamingConfiguration | None = None,
+        published_time: PublishedTimePolicy | None = None,
         blocker_engine: BlockerEngine | None = None,
         creator_concurrency: int = 4,
         download_pool: DownloadWorkerPool | None = None,
@@ -100,6 +102,7 @@ class SyncCoordinator:
             raise ValueError("creator concurrency must be positive")
         self.client = client
         self.naming = naming or ProjectNamingConfiguration()
+        self.published_time = published_time or config.published_time.policy()
         self.blocker_engine = blocker_engine or BlockerEngine()
         self.creator_concurrency = creator_concurrency
         self.reporter = reporter or NullProgressReporter()
@@ -175,6 +178,7 @@ class SyncCoordinator:
                     creator_path,
                     enqueue,
                     naming=self.naming,
+                    published_time=self.published_time,
                     all_pages=options.length is None,
                     offset=options.offset,
                     length=options.length,

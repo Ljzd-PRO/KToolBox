@@ -40,6 +40,7 @@ from ktoolbox.project_config import (
     ProjectNamingConfiguration,
     resolve_project_output,
 )
+from ktoolbox.publication_time import PublishedTimePolicy
 from ktoolbox.webui.config_store import content_revision
 from ktoolbox.webui.database import WebUIDatabase, utc_now
 from ktoolbox.webui.event_store import WebUIEventStore
@@ -68,6 +69,8 @@ from ktoolbox.webui.naming_models import (
 )
 from ktoolbox.webui.task_models import ACTIVE_TASK_STATUSES
 from ktoolbox.webui.task_store import TaskStore
+
+_LEGACY_PUBLISHED_TIME = PublishedTimePolicy.legacy_raw()
 
 
 class NamingConversionError(ValueError):
@@ -1426,8 +1429,15 @@ def _scan_download_roots(
             moves: list[_Move] = []
             conflicts: list[str] = []
             for source_work, post in works:
-                target_work = generate_grouped_post_path(post, target_creator, candidate) / generate_post_path_name(
-                    post, candidate
+                target_work = generate_grouped_post_path(
+                    post,
+                    target_creator,
+                    candidate,
+                    _LEGACY_PUBLISHED_TIME,
+                ) / generate_post_path_name(
+                    post,
+                    candidate,
+                    _LEGACY_PUBLISHED_TIME,
                 )
                 work_base = source_work
                 if source_work != target_work:
@@ -1556,8 +1566,8 @@ def _add_indexed_works(
                     for source in sources
                     if not source.mix_posts
                     and (
-                        path := generate_grouped_post_path(post, creator, source)
-                        / generate_post_path_name(post, source)
+                        path := generate_grouped_post_path(post, creator, source, _LEGACY_PUBLISHED_TIME)
+                        / generate_post_path_name(post, source, _LEGACY_PUBLISHED_TIME)
                     ).is_dir()
                     and not path.is_symlink()
                 ),
@@ -1584,7 +1594,9 @@ def _source_naming_for_creator(
         matching_works = sum(
             1
             for work_path, post in works
-            if generate_grouped_post_path(post, creator, source) / generate_post_path_name(post, source) == work_path
+            if generate_grouped_post_path(post, creator, source, _LEGACY_PUBLISHED_TIME)
+            / generate_post_path_name(post, source, _LEGACY_PUBLISHED_TIME)
+            == work_path
         )
         identity = _creator_identity_from_template(
             creator.name,
@@ -1721,8 +1733,8 @@ def _work_structure_moves(
             if primary.name and is_valid_filename(primary.name)
             else Path(urlparse(primary.path).path)
         )
-        old_name = generate_filename(post, basic.name, current.post_structure.file)
-        new_name = generate_filename(post, basic.name, candidate.post_structure.file)
+        old_name = generate_filename(post, basic.name, current.post_structure.file, _LEGACY_PUBLISHED_TIME)
+        new_name = generate_filename(post, basic.name, candidate.post_structure.file, _LEGACY_PUBLISHED_TIME)
         protected_paths.add(Path(old_name))
         add(Path(old_name), Path(new_name))
 
@@ -1741,8 +1753,8 @@ def _work_structure_moves(
         )
         old_basic, old_sequence = _attachment_basic_name(basic_path, current, old_sequence)
         new_basic, new_sequence = _attachment_basic_name(basic_path, candidate, new_sequence)
-        old_name = generate_filename(post, old_basic, current.filename_format)
-        new_name = generate_filename(post, new_basic, candidate.filename_format)
+        old_name = generate_filename(post, old_basic, current.filename_format, _LEGACY_PUBLISHED_TIME)
+        new_name = generate_filename(post, new_basic, candidate.filename_format, _LEGACY_PUBLISHED_TIME)
         source_relative = old_directory / old_name
         target_relative = (new_directory if individual_attachments else old_directory) / new_name
         if source_relative in protected_paths:
@@ -1764,7 +1776,11 @@ def _work_structure_moves(
                 revision = Post.model_validate_json(metadata.read_text(encoding="utf-8"))
             except (OSError, ValueError):
                 continue
-            revision_target = current.post_structure.revisions / generate_revision_path_name(revision, candidate)
+            revision_target = current.post_structure.revisions / generate_revision_path_name(
+                revision,
+                candidate,
+                _LEGACY_PUBLISHED_TIME,
+            )
             add(current.post_structure.revisions / revision_source.name, revision_target)
             revision_moves, revision_conflicts = _work_structure_moves(
                 creator_key,

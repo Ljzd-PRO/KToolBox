@@ -12,6 +12,7 @@ from ktoolbox.project_config import (
     CronAutomaticSyncSchedule,
     IntervalAutomaticSyncSchedule,
 )
+from ktoolbox.publication_time import PublishedTimePolicy, automatic_post_timestamp
 
 
 @dataclass(frozen=True, slots=True)
@@ -20,7 +21,7 @@ class AutomaticSyncWindow:
 
     start_at: datetime | None
     end_at: datetime
-    fallback_timezone: str
+    published_time: PublishedTimePolicy
 
     def __post_init__(self) -> None:
         if self.start_at is not None and self.start_at.tzinfo is None:
@@ -29,30 +30,12 @@ class AutomaticSyncWindow:
             raise ValueError("automatic sync window end must include a timezone")
         if self.start_at is not None and self.start_at > self.end_at:
             raise ValueError("automatic sync window start must not be later than its end")
-        ZoneInfo(self.fallback_timezone)
 
     def includes(self, post: Post) -> bool:
-        timestamp = automatic_post_timestamp(post, self.fallback_timezone)
+        timestamp = automatic_post_timestamp(post, self.published_time)
         if timestamp is None or timestamp > self.end_at.astimezone(timezone.utc):
             return False
         return self.start_at is None or timestamp >= self.start_at.astimezone(timezone.utc)
-
-
-def automatic_post_timestamp(post: Post, fallback_timezone: str) -> datetime | None:
-    """Resolve the best observed timestamp without changing manual date filtering."""
-
-    if post.added is not None:
-        return _as_utc(post.added, timezone.utc)
-    if post.published is not None:
-        return _as_utc(post.published, ZoneInfo(fallback_timezone))
-    return None
-
-
-def _as_utc(value: datetime, default_timezone: ZoneInfo | timezone) -> datetime:
-    if value.tzinfo is None:
-        value = value.replace(tzinfo=default_timezone)
-    return value.astimezone(timezone.utc)
-
 
 def next_automatic_sync_time(schedule: AutomaticSyncSchedule, after: datetime) -> datetime:
     """Return the first scheduled UTC instant strictly after ``after``."""

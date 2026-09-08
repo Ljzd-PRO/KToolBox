@@ -22,6 +22,9 @@ from ktoolbox.action.utils import (
 from ktoolbox.api.generated import Post
 from ktoolbox.job import CreatorIndices
 from ktoolbox.project_config import ProjectNamingConfiguration
+from ktoolbox.publication_time import PublishedTimePolicy
+
+PUBLISHED_TIME = PublishedTimePolicy.legacy_raw()
 
 
 def post(post_id: str, title: str | None = None, date: datetime | None = None, edited: datetime | None = None) -> Post:
@@ -38,19 +41,37 @@ def post(post_id: str, title: str | None = None, date: datetime | None = None, e
 def test_path_and_filename_generation() -> None:
     dated = post("42", "A/B", datetime(2025, 3, 2))
     naming = ProjectNamingConfiguration()
-    assert generate_post_path_name(post("42"), naming) == "42 [42]"
-    assert generate_post_path_name(dated, naming) == "AB [42]"
-    assert generate_filename(dated, "cover.jpg", "{id}_{published}_{}") == "42_2025-03-02_cover.jpg"
-    assert generate_year_dirname(dated, naming) == "2025"
-    assert generate_month_dirname(dated, naming) == "2025-03"
-    assert generate_year_dirname(post("missing"), naming) == "unknown"
-    assert generate_month_dirname(post("missing"), naming) == "unknown"
+    assert generate_post_path_name(post("42"), naming, PUBLISHED_TIME) == "42 [42]"
+    assert generate_post_path_name(dated, naming, PUBLISHED_TIME) == "AB [42]"
+    assert generate_filename(dated, "cover.jpg", "{id}_{published}_{}", PUBLISHED_TIME) == (
+        "42_2025-03-02_cover.jpg"
+    )
+    assert generate_year_dirname(dated, naming, PUBLISHED_TIME) == "2025"
+    assert generate_month_dirname(dated, naming, PUBLISHED_TIME) == "2025-03"
+    assert generate_year_dirname(post("missing"), naming, PUBLISHED_TIME) == "unknown"
+    assert generate_month_dirname(post("missing"), naming, PUBLISHED_TIME) == "unknown"
 
-    assert generate_grouped_post_path(dated, Path("root"), naming) == Path("root")
+    assert generate_grouped_post_path(dated, Path("root"), naming, PUBLISHED_TIME) == Path("root")
     yearly = ProjectNamingConfiguration(group_by_year=True)
-    assert generate_grouped_post_path(dated, Path("root"), yearly) == Path("root/2025")
+    assert generate_grouped_post_path(dated, Path("root"), yearly, PUBLISHED_TIME) == Path("root/2025")
     monthly = ProjectNamingConfiguration(group_by_year=True, group_by_month=True)
-    assert generate_grouped_post_path(dated, Path("root"), monthly) == Path("root/2025/2025-03")
+    assert generate_grouped_post_path(dated, Path("root"), monthly, PUBLISHED_TIME) == Path("root/2025/2025-03")
+
+
+def test_fanbox_publication_timezone_drives_every_published_path_value() -> None:
+    item = post("42", "Work", datetime(2025, 12, 21, 0, 35, 43))
+    naming = ProjectNamingConfiguration(
+        post_dirname_format="{published}-{post_id}",
+        revision_dirname_format="{published}-{revision_id}",
+        filename_format="{published}_{}",
+        group_by_year=True,
+        group_by_month=True,
+    )
+    policy = PublishedTimePolicy()
+
+    assert generate_post_path_name(item, naming, policy) == "2025-12-20-42"
+    assert generate_filename(item, "cover.jpg", naming.filename_format, policy) == "2025-12-20_cover.jpg"
+    assert generate_grouped_post_path(item, Path("root"), naming, policy) == Path("root/2025/2025-12")
 
 
 @pytest.mark.parametrize(
@@ -59,22 +80,22 @@ def test_path_and_filename_generation() -> None:
         (
             "post_dirname_format",
             "{invalid}",
-            lambda item, naming: generate_post_path_name(item, naming),
+            lambda item, naming: generate_post_path_name(item, naming, PUBLISHED_TIME),
         ),
         (
             "year_dirname_format",
             "{invalid}",
-            lambda item, naming: generate_year_dirname(item, naming),
+            lambda item, naming: generate_year_dirname(item, naming, PUBLISHED_TIME),
         ),
         (
             "month_dirname_format",
             "{invalid}",
-            lambda item, naming: generate_month_dirname(item, naming),
+            lambda item, naming: generate_month_dirname(item, naming, PUBLISHED_TIME),
         ),
         (
             "filename_format",
             "{invalid}",
-            lambda item, naming: generate_filename(item, "file.jpg", naming.filename_format),
+            lambda item, naming: generate_filename(item, "file.jpg", naming.filename_format, PUBLISHED_TIME),
         ),
     ],
 )
@@ -90,8 +111,8 @@ def test_date_keyword_and_index_filters() -> None:
     undated = post("undated", None)
     posts = [early, late, undated]
 
-    assert list(filter_posts_by_date(posts, datetime(2024, 6, 1), None)) == [late, undated]
-    assert list(filter_posts_by_date(posts, None, datetime(2024, 6, 1))) == [early, undated]
+    assert list(filter_posts_by_date(posts, datetime(2024, 6, 1), None, PUBLISHED_TIME)) == [late, undated]
+    assert list(filter_posts_by_date(posts, None, datetime(2024, 6, 1), PUBLISHED_TIME)) == [early, undated]
     assert match_post_keywords(late, {"release"})
     assert not match_post_keywords(undated, {"release"})
     assert match_post_keywords(undated, set())

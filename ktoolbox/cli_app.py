@@ -214,6 +214,7 @@ async def sync(
             summary = await SyncCoordinator(
                 client,
                 naming=project.naming,
+                published_time=runtime_config.published_time.policy(),
                 blocker_engine=engine,
                 creator_concurrency=runtime_config.job.creator_concurrency,
                 reporter=_progress_reporter(),

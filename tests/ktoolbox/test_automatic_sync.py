@@ -7,8 +7,10 @@ import pytest
 from ktoolbox.api.generated import Post
 from ktoolbox.automatic_sync import AutomaticSyncWindow, automatic_post_timestamp, next_automatic_sync_time
 from ktoolbox.project_config import CronAutomaticSyncSchedule, IntervalAutomaticSyncSchedule
+from ktoolbox.publication_time import PublishedTimePolicy
 
 UTC = timezone.utc
+PUBLISHED_TIME = PublishedTimePolicy()
 
 
 def work(
@@ -31,13 +33,13 @@ def test_automatic_timestamp_treats_added_as_utc_and_prefers_it() -> None:
         published=datetime(2026, 7, 20, 11, 30),
     )
 
-    assert automatic_post_timestamp(item, "Asia/Tokyo") == datetime(2026, 7, 20, 2, 30, tzinfo=UTC)
+    assert automatic_post_timestamp(item, PUBLISHED_TIME) == datetime(2026, 7, 20, 2, 30, tzinfo=UTC)
 
 
-def test_automatic_timestamp_uses_plan_timezone_for_naive_published_fallback() -> None:
+def test_automatic_timestamp_uses_service_timezone_for_naive_published_fallback() -> None:
     item = work(published=datetime(2026, 7, 20, 11, 30))
 
-    assert automatic_post_timestamp(item, "Asia/Tokyo") == datetime(2026, 7, 20, 2, 30, tzinfo=UTC)
+    assert automatic_post_timestamp(item, PUBLISHED_TIME) == datetime(2026, 7, 20, 2, 30, tzinfo=UTC)
 
 
 def test_automatic_window_supports_open_start_and_inclusive_boundaries() -> None:
@@ -45,25 +47,25 @@ def test_automatic_window_supports_open_start_and_inclusive_boundaries() -> None
     window = AutomaticSyncWindow(
         start_at=datetime(2026, 7, 20, 2, tzinfo=UTC),
         end_at=end,
-        fallback_timezone="Asia/Tokyo",
+        published_time=PUBLISHED_TIME,
     )
 
     assert window.includes(work(added=datetime(2026, 7, 20, 2)))
     assert window.includes(work(added=datetime(2026, 7, 20, 3)))
     assert not window.includes(work(added=datetime(2026, 7, 20, 1, 59, 59)))
     assert not window.includes(work(added=datetime(2026, 7, 20, 3, 0, 1)))
-    assert AutomaticSyncWindow(None, end, "UTC").includes(work(added=datetime(2000, 1, 1)))
+    assert AutomaticSyncWindow(None, end, PUBLISHED_TIME).includes(work(added=datetime(2000, 1, 1)))
     assert not window.includes(work())
 
 
 def test_automatic_window_rejects_invalid_ranges_and_naive_boundaries() -> None:
     aware = datetime(2026, 7, 20, tzinfo=UTC)
     with pytest.raises(ValueError, match="start must include"):
-        AutomaticSyncWindow(datetime(2026, 7, 19), aware, "UTC")
+        AutomaticSyncWindow(datetime(2026, 7, 19), aware, PUBLISHED_TIME)
     with pytest.raises(ValueError, match="end must include"):
-        AutomaticSyncWindow(None, datetime(2026, 7, 20), "UTC")
+        AutomaticSyncWindow(None, datetime(2026, 7, 20), PUBLISHED_TIME)
     with pytest.raises(ValueError, match="later"):
-        AutomaticSyncWindow(aware, datetime(2026, 7, 19, tzinfo=UTC), "UTC")
+        AutomaticSyncWindow(aware, datetime(2026, 7, 19, tzinfo=UTC), PUBLISHED_TIME)
 
 
 def test_next_interval_time_preserves_anchor_and_is_strictly_future() -> None:
