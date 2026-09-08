@@ -9,8 +9,15 @@ from pathlib import Path
 from typing import Any, ClassVar, Literal, cast
 
 from loguru import logger
-from pydantic import BaseModel, Field, SecretStr, model_validator
+from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from ktoolbox.publication_time import (
+    DEFAULT_SERVICE_TIMEZONES,
+    PublishedTimePolicy,
+    normalize_service_name,
+    validate_iana_timezone,
+)
 
 __all__ = [
     "config",
@@ -19,6 +26,7 @@ __all__ = [
     "PostStructureConfiguration",
     "JobConfiguration",
     "LoggerConfiguration",
+    "PublishedTimeConfiguration",
     "WebUIConfiguration",
     "Configuration",
     "RuntimeContext",
@@ -300,6 +308,46 @@ class LoggerConfiguration(BaseModel):
     rotation: str | int | datetime.time | datetime.timedelta = "1 week"
 
 
+class PublishedTimeConfiguration(BaseModel):
+    """
+    Pawchive publication time interpretation
+
+    :ivar target_timezone: IANA timezone used by naming, grouping, filtering, and WebUI display
+    :ivar fallback_service_timezone: IANA timezone used when a service has no explicit mapping
+    :ivar service_timezones: IANA timezone mappings for naive ``published`` values by Pawchive service
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    target_timezone: str = "UTC"
+    fallback_service_timezone: str = "UTC"
+    service_timezones: dict[str, str] = Field(default_factory=lambda: dict(DEFAULT_SERVICE_TIMEZONES))
+
+    @field_validator("target_timezone", "fallback_service_timezone")
+    @classmethod
+    def validate_timezone(cls, value: str) -> str:
+        return validate_iana_timezone(value)
+
+    @field_validator("service_timezones", mode="before")
+    @classmethod
+    def merge_service_timezones(cls, value: object) -> dict[str, str]:
+        merged = dict(DEFAULT_SERVICE_TIMEZONES)
+        if value is None:
+            return merged
+        if not isinstance(value, dict):
+            raise ValueError("service timezones must be an object")
+        for service, timezone_name in value.items():
+            merged[normalize_service_name(str(service))] = validate_iana_timezone(str(timezone_name))
+        return merged
+
+    def policy(self) -> PublishedTimePolicy:
+        return PublishedTimePolicy.from_values(
+            target_timezone=self.target_timezone,
+            fallback_service_timezone=self.fallback_service_timezone,
+            service_timezones=self.service_timezones,
+        )
+
+
 class WebUIConfiguration(BaseModel):
     """
     WebUI configuration
@@ -335,6 +383,7 @@ class Configuration(BaseSettings):
     :ivar downloader: File Downloader Configuration
     :ivar job: Download jobs Configuration
     :ivar logger: Logger configuration
+    :ivar published_time: Pawchive publication time interpretation
     :ivar webui: Local WebUI server and account configuration
     :ivar ssl_verify: Enable SSL certificate verification for the Pawchive API and file servers
     :ivar json_dump_indent: Indent of JSON file dump
@@ -348,6 +397,7 @@ class Configuration(BaseSettings):
     downloader: DownloaderConfiguration = DownloaderConfiguration()
     job: JobConfiguration = JobConfiguration()
     logger: LoggerConfiguration = LoggerConfiguration()
+    published_time: PublishedTimeConfiguration = PublishedTimeConfiguration()
     webui: WebUIConfiguration = WebUIConfiguration()
 
     ssl_verify: bool = True

@@ -41,6 +41,41 @@ def test_pawchive_defaults_and_nested_environment(monkeypatch) -> None:
     assert configured.webui.password.get_secret_value() == ""
 
 
+def test_publication_time_defaults_and_service_environment_overrides(monkeypatch) -> None:
+    defaults = Configuration(_env_file=None).published_time
+    assert defaults.target_timezone == "UTC"
+    assert defaults.fallback_service_timezone == "UTC"
+    assert defaults.service_timezones == {"fanbox": "Asia/Tokyo", "patreon": "UTC"}
+
+    monkeypatch.setenv("KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE", "Asia/Shanghai")
+    monkeypatch.setenv("KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__FANBOX", "Asia/Seoul")
+    monkeypatch.setenv("KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__CUSTOM_SERVICE", "Europe/Paris")
+    configured = Configuration(_env_file=None).published_time
+
+    assert configured.target_timezone == "Asia/Shanghai"
+    assert configured.service_timezones == {
+        "custom_service": "Europe/Paris",
+        "fanbox": "Asia/Seoul",
+        "patreon": "UTC",
+    }
+
+
+def test_publication_time_json_map_merges_defaults(monkeypatch) -> None:
+    monkeypatch.setenv(
+        "KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES",
+        '{"custom": "America/New_York"}',
+    )
+    configured = Configuration(_env_file=None).published_time
+    assert configured.service_timezones["fanbox"] == "Asia/Tokyo"
+    assert configured.service_timezones["patreon"] == "UTC"
+    assert configured.service_timezones["custom"] == "America/New_York"
+
+
+def test_publication_time_rejects_unknown_timezones() -> None:
+    with pytest.raises(ValidationError, match="unknown IANA timezone"):
+        Configuration(_env_file=None, published_time={"target_timezone": "Moon/Sea_of_Tranquility"})
+
+
 def test_logger_level_accepts_only_loguru_levels() -> None:
     assert Configuration(_env_file=None, logger={"level": "SUCCESS"}).logger.level == "SUCCESS"
     with pytest.raises(ValidationError):

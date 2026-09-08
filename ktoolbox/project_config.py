@@ -8,7 +8,6 @@ from string import Formatter
 from tempfile import NamedTemporaryFile
 from typing import Annotated, Any, Literal
 from urllib.parse import urlparse
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import tomlkit
 from croniter import CroniterBadCronError, croniter
@@ -17,6 +16,7 @@ from tomlkit.items import AoT
 from tomlkit.toml_document import TOMLDocument
 
 from ktoolbox.blocker.model import BlockerSpec
+from ktoolbox.publication_time import validate_iana_timezone
 
 PROJECT_CONFIG_ENV = "KTOOLBOX_PROJECT_CONFIG"
 DEFAULT_PROJECT_CONFIG_PATH = Path("ktoolbox.toml")
@@ -247,11 +247,7 @@ class CronAutomaticSyncSchedule(BaseModel):
     @field_validator("timezone")
     @classmethod
     def validate_timezone(cls, value: str) -> str:
-        try:
-            ZoneInfo(value)
-        except (ZoneInfoNotFoundError, ValueError) as error:
-            raise ValueError(f"unknown IANA timezone: {value}") from error
-        return value
+        return validate_iana_timezone(value)
 
 
 class IntervalAutomaticSyncSchedule(BaseModel):
