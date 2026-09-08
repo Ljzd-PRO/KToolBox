@@ -125,6 +125,53 @@ test("authenticated shell is accessible in desktop and mobile themes", async ({ 
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
   const mobileScan = await new AxeBuilder({ page }).analyze();
   expect(mobileScan.violations).toEqual([]);
+
+  const navigationDrawer = page.getByRole("dialog", { name: "Navigation" });
+  await page.getByRole("button", { name: "Close navigation" }).click();
+  await expect(navigationDrawer).toBeHidden();
+  await page.setViewportSize({ width: 320, height: 700 });
+  const compactWorkbar = page.locator(".app-workbar-inner");
+  const compactHeaderItems = [
+    page.getByRole("button", { name: "Open navigation" }),
+    compactWorkbar.getByRole("heading", { name: "Overview", exact: true }),
+    compactWorkbar.getByRole("status", { name: /Publication target timezone: Asia\/Shanghai · UTC\+08:00/ }),
+    compactWorkbar.getByRole("button", { name: "Switch language" }),
+  ];
+  const compactHeaderBoxes = await Promise.all(compactHeaderItems.map((item) => item.boundingBox()));
+  expect(compactHeaderBoxes.every(Boolean)).toBe(true);
+  for (let left = 0; left < compactHeaderBoxes.length; left += 1) {
+    for (let right = left + 1; right < compactHeaderBoxes.length; right += 1) {
+      const a = compactHeaderBoxes[left]!;
+      const b = compactHeaderBoxes[right]!;
+      const overlap = a.x < b.x + b.width && a.x + a.width > b.x
+        && a.y < b.y + b.height && a.y + a.height > b.y;
+      expect(overlap).toBe(false);
+    }
+  }
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+  await page.getByRole("button", { name: "Open navigation" }).click();
+  const compactDrawer = page.getByRole("dialog", { name: "Navigation" });
+  await expect(compactDrawer.getByRole("switch", { name: "NSFW mode is off" })).toBeVisible();
+  await expect(compactDrawer.getByRole("button", { name: "Trusted networks only" })).toBeVisible();
+});
+
+
+test("publication time uses the configured service and target timezones", async ({ page }) => {
+  await signIn(page);
+
+  await page.getByRole("link", { name: "Posts", exact: true }).click();
+  await page.getByRole("textbox", { name: "Creator ID" }).fill("demo-studio");
+  await page.getByRole("button", { name: "Search posts" }).click();
+  const resultRow = page.getByRole("row").filter({ hasText: "Fictional project study" });
+  await expect(resultRow).toContainText(/Jul 19, 2026.*11:30 PM/);
+
+  await resultRow.getByRole("button", { name: "Post details" }).click();
+  const details = page.getByRole("dialog", { name: "Fictional project study" });
+  await expect(details.getByText("2026-07-20T00:30:00", { exact: true })).toBeVisible();
+  await expect(details).toContainText(
+    "Raw publication time interpreted in Asia/Tokyo → Asia/Shanghai target time",
+  );
+  await details.getByText("Close", { exact: true }).click();
 });
 
 

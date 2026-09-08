@@ -28,6 +28,7 @@ from ktoolbox.project_config import (
     parse_creator_reference,
     resolve_project_output,
 )
+from ktoolbox.publication_time import effective_published, published_service_timezone
 from ktoolbox.reporting import ProgressReporter, create_progress_reporter
 from ktoolbox.sync import SyncCoordinator, SyncOptions, SyncSummary, resolve_sync_targets
 
@@ -388,7 +389,7 @@ async def post_search(
             return _command_error("Post search failed", result, code=2 if not any((creator_id, name, service)) else 1)
     posts: list[Post] = result
     if json_output:
-        _print_json(posts)
+        _print_json([_post_time_payload(post) for post in posts])
         return 0
     if not posts:
         stdout.print("No posts found.")
@@ -399,14 +400,19 @@ async def post_search(
     table.add_column("Post ID")
     table.add_column("Title", overflow="ellipsis")
     table.add_column("Published")
+    if _runtime_options.get().verbose:
+        table.add_column("Pawchive original")
     for post in posts:
-        table.add_row(
+        row = [
             str(post.service),
             str(post.user),
             str(post.id),
             str(post.title or ""),
-            str(post.published or ""),
-        )
+            _effective_published_text(post),
+        ]
+        if _runtime_options.get().verbose:
+            row.append(str(post.published or ""))
+        table.add_row(*row)
     stdout.print(table)
     return 0
 
@@ -427,7 +433,7 @@ async def post_show(
         return _command_error("Post lookup failed", str(result))
     post: Post | Revision = result
     if json_output:
-        _print_json(post)
+        _print_json(_post_time_payload(post))
         return 0
     table = Table(title="Post details", show_header=False)
     table.add_column("Field", style="bold")
@@ -436,10 +442,30 @@ async def post_show(
     table.add_row("Creator ID", str(post.user))
     table.add_row("Post ID", str(post.id))
     table.add_row("Title", str(post.title or ""))
-    table.add_row("Published", str(post.published or ""))
+    table.add_row("Published", _effective_published_text(post))
+    if _runtime_options.get().verbose:
+        table.add_row("Pawchive original", str(post.published or ""))
     table.add_row("Attachments", str(len(post.attachments or ())))
     stdout.print(table)
     return 0
+
+
+def _post_time_payload(post: Post | Revision) -> dict[str, object]:
+    policy = runtime_config.published_time.policy()
+    payload = post.model_dump(mode="json")
+    effective = effective_published(post, policy)
+    payload.update(
+        effective_published=effective.isoformat() if effective is not None else None,
+        published_service_timezone=published_service_timezone(post, policy),
+        published_target_timezone=policy.target_timezone,
+    )
+    return payload
+
+
+def _effective_published_text(post: Post | Revision) -> str:
+    policy = runtime_config.published_time.policy()
+    effective = effective_published(post, policy)
+    return f"{effective.isoformat()} ({policy.target_timezone})" if effective is not None else ""
 
 
 @config_app.command(name="edit")

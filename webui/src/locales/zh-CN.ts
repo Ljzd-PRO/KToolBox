@@ -129,7 +129,9 @@ export const zhCN = {
     "primaryNavigation": "主导航",
     "securityTitle": "仅在可信网络中使用",
     "securityBody": "当前会话使用 HTTP，凭据和任务数据在传输过程中不会加密。",
-    "securityAdvice": "网络并非完全可信时，请使用 HTTPS，或将 WebUI 仅绑定到 127.0.0.1。"
+    "securityAdvice": "网络并非完全可信时，请使用 HTTPS，或将 WebUI 仅绑定到 127.0.0.1。",
+    "timezoneLabel": "发布时间目标时区",
+    "timezoneDescription": "发布时间、命名模板和日期分组均使用这里配置的目标时区。"
   },
   "overview": {
     "eyebrow": "项目工作台",
@@ -278,6 +280,11 @@ export const zhCN = {
     "changedLines": "变更行数",
     "filePath": "文件路径",
     "file": "配置文件",
+    "serviceName": "Service",
+    "serviceTimezone": "Service 时区",
+    "addServiceTimezone": "添加 Service 时区",
+    "removeServiceTimezone": "删除 {{service}} 的时区",
+    "noServiceTimezones": "尚未配置 Service 专属时区。",
     "pendingCount": "{{count}} 项待保存变更",
     "pendingCount_other": "{{count}} 项待保存变更"
   },
@@ -509,6 +516,9 @@ export const zhCN = {
     "empty": "没有找到作品",
     "post": "作品",
     "published": "发布时间",
+    "effectivePublished": "有效发布时间",
+    "rawPublished": "Pawchive 原始值",
+    "publicationConversion": "原始发布时间按 {{serviceTimezone}} 解释 → {{targetTimezone}} 目标时间",
     "details": "作品详情",
     "contentHidden": "作品正文默认折叠",
     "showContent": "显示正文",

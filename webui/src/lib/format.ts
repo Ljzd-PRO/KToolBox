@@ -27,11 +27,19 @@ export function formatDuration(seconds: number | null | undefined): string {
   return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
 }
 
-export function formatDateTime(value: string | null | undefined, locale: string): string {
+export function formatDateTime(
+  value: string | null | undefined,
+  locale: string,
+  timeZone?: string,
+): string {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(date);
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+    ...(timeZone ? { timeZone } : {}),
+  }).format(date);
 }
 
 export function taskPercent(processed: number, queued: number, transferred: number, total: number | null): number {

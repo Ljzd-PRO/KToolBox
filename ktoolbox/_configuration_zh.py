@@ -171,6 +171,18 @@ class LoggerConfiguration(ktoolbox.configuration.LoggerConfiguration):
     ...
 
 
+class PublishedTimeConfiguration(ktoolbox.configuration.PublishedTimeConfiguration):
+    """
+    Pawchive 作品发布时间解释配置
+
+    :ivar target_timezone: 命名、分组、筛选和 WebUI 展示使用的 IANA 目标时区
+    :ivar fallback_service_timezone: 未配置单独 Service 时使用的 IANA 时区
+    :ivar service_timezones: 按 Pawchive Service 解释无时区 ``published`` 值的 IANA 时区映射
+    """
+
+    ...
+
+
 class WebUIConfiguration(ktoolbox.configuration.WebUIConfiguration):
     """
     WebUI 配置
@@ -198,6 +210,7 @@ class Configuration(ktoolbox.configuration.Configuration):
     :ivar downloader: 文件下载器配置
     :ivar job: 下载任务配置
     :ivar logger: 日志配置
+    :ivar published_time: Pawchive 作品发布时间解释配置
     :ivar webui: 本地 WebUI 服务与账户配置
     :ivar ssl_verify: 对 Pawchive API 服务器和下载服务器启用 SSL 证书验证
     :ivar json_dump_indent: JSON 文件保存时的缩进
@@ -211,4 +224,5 @@ class Configuration(ktoolbox.configuration.Configuration):
     downloader: DownloaderConfiguration = DownloaderConfiguration()
     job: JobConfiguration = JobConfiguration()
     logger: LoggerConfiguration = LoggerConfiguration()
+    published_time: PublishedTimeConfiguration = PublishedTimeConfiguration()
     webui: WebUIConfiguration = WebUIConfiguration()

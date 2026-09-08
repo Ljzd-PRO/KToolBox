@@ -6,6 +6,8 @@ const e2ePython = process.env.KTOOLBOX_E2E_PYTHON ?? "poetry run python";
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
+  // Every test exercises the same project-backed WebUI process and configuration files.
+  workers: 1,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",

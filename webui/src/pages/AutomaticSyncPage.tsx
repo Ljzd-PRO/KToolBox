@@ -64,10 +64,10 @@ import {
   SelectionCheckbox,
   SortableColumn,
   TableColumnLabel,
-  ComboBoxField,
 } from "../components/ui";
 import { RemotePathField } from "../components/RemotePathField";
 import { CreatorAvatar } from "../components/SensitiveMedia";
+import { TimeZoneComboBox } from "../components/TimeZoneComboBox";
 import { api, ApiError, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { formatDateTime } from "../lib/format";
@@ -106,17 +106,6 @@ type PlanDraft = {
 };
 
 const runStatusOrder = ["running", "queued", "paused", "failed", "interrupted", "completed", "skipped"];
-const timezoneSuggestions = [
-  "Asia/Shanghai",
-  "Asia/Tokyo",
-  "Asia/Seoul",
-  "Europe/Paris",
-  "Europe/Moscow",
-  "America/New_York",
-  "America/Los_Angeles",
-  "UTC",
-];
-
 function blankPlan(): PlanDraft {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
   const suffix = globalThis.crypto?.randomUUID?.().slice(0, 8) ?? Date.now().toString(36);
@@ -767,9 +756,6 @@ function PlanEditor({
   const cronDetails = draft.schedule.kind === "cron"
     ? describeCron(draft.schedule.expression, timezone, i18n.resolvedLanguage ?? i18n.language)
     : null;
-  const timezoneOptions = [...new Set([Intl.DateTimeFormat().resolvedOptions().timeZone, ...timezoneSuggestions])]
-    .filter(Boolean)
-    .map((value) => ({ value, label: value }));
   const weekdayLabels = Array.from({ length: 7 }, (_, day) => {
     const date = new Date(Date.UTC(2026, 6, 26 + day));
     return new Intl.DateTimeFormat(i18n.resolvedLanguage, { weekday: "short", timeZone: "UTC" }).format(date);
@@ -905,11 +891,9 @@ function PlanEditor({
                 : { kind: "interval", every: 24, unit: "hours", anchor_at: null, timezone });
             }}
           />
-          <ComboBoxField
-            icon={IconClock}
+          <TimeZoneComboBox
             label={t("automaticSync.timezone")}
             description={t("automaticSync.timezoneHint")}
-            options={timezoneOptions}
             value={timezone}
             onChange={(next) => patchSchedule({ ...draft.schedule, timezone: next })}
           />

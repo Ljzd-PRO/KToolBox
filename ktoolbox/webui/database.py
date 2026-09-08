@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -306,6 +307,30 @@ class WebUIDatabase:
                 "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)",
                 (13, utc_now().isoformat()),
             )
+            if not await _migration_applied(connection, 14):
+                await _ensure_column(connection, "naming_layout_versions", "published_time_json", "TEXT")
+                await _ensure_column(connection, "naming_layout_state", "source_published_time_json", "TEXT")
+                await _ensure_column(connection, "naming_layout_state", "target_published_time_json", "TEXT")
+                legacy_policy = json.dumps({"mode": "legacy_raw"})
+                await connection.execute(
+                    "UPDATE naming_layout_versions SET published_time_json = ?, origin = 'legacy_raw' "
+                    "WHERE published_time_json IS NULL",
+                    (legacy_policy,),
+                )
+                await connection.execute(
+                    "UPDATE naming_layout_state SET source_published_time_json = ? "
+                    "WHERE source_published_time_json IS NULL",
+                    (legacy_policy,),
+                )
+                await connection.execute(
+                    "UPDATE naming_layout_state SET target_published_time_json = ? "
+                    "WHERE target_published_time_json IS NULL",
+                    (legacy_policy,),
+                )
+                await connection.execute(
+                    "INSERT INTO schema_migrations(version, applied_at) VALUES (?, ?)",
+                    (14, utc_now().isoformat()),
+                )
             await connection.commit()
 
     async def create_session(self, token: str, username: str, csrf_token: str) -> WebUISession:

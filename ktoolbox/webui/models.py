@@ -31,6 +31,7 @@ class ProjectSummaryResponse(BaseModel):
     resolved_default_output: Path
     dotenv_files: list[Path]
     version: str
+    published_target_timezone: str
 
 
 class AboutResponse(BaseModel):
@@ -74,6 +75,7 @@ class ConfigFieldResponse(BaseModel):
     apply_mode: Literal["next_task", "restart"]
     path_selector: PathSelectorResponse | None = None
     choice_mode: Literal["fixed", "suggested"] | None = None
+    editor: Literal["service_timezones"] | None = None
     choices: list[ConfigChoiceResponse] = Field(default_factory=list)
 
 
@@ -182,6 +184,9 @@ class CreatorSearchItemResponse(CreatorSummary):
 
 class PawchivePostSummaryResponse(Post):
     cover: MediaAssetResponse | None = None
+    effective_published: datetime | None = None
+    published_service_timezone: str
+    published_target_timezone: str
 
 
 class PawchivePostDetailResponse(PawchivePostSummaryResponse):
@@ -190,10 +195,25 @@ class PawchivePostDetailResponse(PawchivePostSummaryResponse):
 
 class PawchiveRevisionSummaryResponse(Revision):
     cover: MediaAssetResponse | None = None
+    effective_published: datetime | None = None
+    published_service_timezone: str
+    published_target_timezone: str
 
 
 class PawchiveRevisionDetailResponse(PawchiveRevisionSummaryResponse):
     media: list[MediaAssetResponse] = Field(default_factory=list)
+
+
+class MCPPostResponse(Post):
+    effective_published: datetime | None = None
+    published_service_timezone: str
+    published_target_timezone: str
+
+
+class MCPRevisionResponse(Revision):
+    effective_published: datetime | None = None
+    published_service_timezone: str
+    published_target_timezone: str
 
 
 class BlockerListResponse(BaseModel):

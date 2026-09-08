@@ -1,4 +1,5 @@
-import { Button, Drawer, Popover, Surface, Tooltip, toast, useOverlayState } from "@heroui/react";
+import { Button, Chip, Drawer, Popover, Surface, Tooltip, toast, useOverlayState } from "@heroui/react";
+import { useQuery } from "@tanstack/react-query";
 import {
   IconAdjustmentsHorizontal,
   IconAddressBook,
@@ -20,6 +21,7 @@ import {
   IconSun,
   IconTool,
   IconWifiOff,
+  IconWorld,
   IconX,
   type TablerIcon,
 } from "@tabler/icons-react";
@@ -27,10 +29,12 @@ import { useEffect } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { errorText } from "../lib/api";
+import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { useRealtime } from "../lib/realtime";
 import { useTheme, type ThemeColor } from "../lib/theme";
+import { timeZonePresentation } from "../lib/timezones";
+import type { ProjectSummary } from "../types";
 import { LanguageSelector } from "./LanguageSelector";
 import {
   SensitiveMediaDrawerControl,
@@ -338,11 +342,38 @@ function RealtimeStatusControl() {
   );
 }
 
+function TimeZoneStatus({ timeZone }: { timeZone: string }) {
+  const { t } = useTranslation();
+  const presentation = timeZonePresentation(timeZone);
+  const details = `${timeZone} · ${presentation.offset}`;
+  const ariaLabel = `${t("shell.timezoneLabel")}: ${details}. ${t("shell.timezoneDescription")}`;
+  return (
+    <Tooltip>
+      <span aria-label={ariaLabel} className="inline-flex shrink-0" role="status" tabIndex={0}>
+        <Chip color="accent" size="sm" variant="soft">
+          <IconWorld aria-hidden="true" className="shrink-0 max-[350px]:hidden" size={14} stroke={1.8} />
+          <span className="whitespace-nowrap font-mono text-[0.6875rem] font-semibold">{presentation.abbreviation}</span>
+        </Chip>
+      </span>
+      <Tooltip.Content>
+        <span className="grid max-w-64 gap-1">
+          <strong>{details}</strong>
+          <span>{t("shell.timezoneDescription")}</span>
+        </span>
+      </Tooltip.Content>
+    </Tooltip>
+  );
+}
+
 export function AppShell() {
   const { t } = useTranslation();
   const { session, logout } = useAuth();
   const theme = useTheme();
   const drawer = useOverlayState();
+  const projectQuery = useQuery({
+    queryKey: ["project"],
+    queryFn: () => api<ProjectSummary>("/project"),
+  });
   const location = useLocation();
   const active =
     navigation.find((item) =>
@@ -387,24 +418,27 @@ export function AppShell() {
         <header className="shell-workbar sticky top-0 z-30 border-b border-border">
           <div className="app-workbar-inner mx-auto flex min-h-20 w-full max-w-7xl items-center gap-3 px-4 pl-20 sm:px-6 sm:pl-20 md:px-8 md:pl-8">
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-semibold text-[var(--accent-strong)]">{t("brand")}</p>
+              <p className="truncate text-xs font-semibold text-[var(--accent-strong)] max-[350px]:hidden">{t("brand")}</p>
               <h1 className="mt-1 flex min-w-0 items-center gap-2 text-lg font-bold leading-tight text-foreground sm:text-2xl max-[420px]:gap-0">
                 <span className="page-title-icon grid size-9 shrink-0 place-items-center rounded-lg max-[420px]:hidden">
                   <ActiveIcon aria-hidden="true" size={21} stroke={1.8} />
                 </span>
-                <span className="min-w-0 break-words">{t(`nav.${active.key}`)}</span>
+                <span className="min-w-0 truncate max-[350px]:text-base">{t(`nav.${active.key}`)}</span>
               </h1>
             </div>
+            {projectQuery.data?.published_target_timezone ? (
+              <TimeZoneStatus timeZone={projectQuery.data.published_target_timezone} />
+            ) : null}
             <div className="hidden min-w-0 items-center gap-2 xl:flex">
               <ThemeControls />
               <SensitiveMediaInlineControl />
               <SecurityNotice />
             </div>
             <RealtimeStatusControl />
-            <div className="xl:hidden">
+            <div className="xl:hidden max-[350px]:hidden">
               <SensitiveMediaPopoverControl />
             </div>
-            <div className="xl:hidden">
+            <div className="xl:hidden max-[350px]:hidden">
               <SecurityNotice compact />
             </div>
             <LanguageSelector />
@@ -450,6 +484,9 @@ export function AppShell() {
               </Drawer.Body>
               <div className="grid gap-3 border-t border-border p-3">
                 <SensitiveMediaDrawerControl />
+                <div className="max-[350px]:block min-[351px]:hidden">
+                  <SecurityNotice />
+                </div>
                 <CompactAppearanceControl />
                 <LanguageSelector compact={false} />
                 <div className="flex min-w-0 items-center gap-2 px-2 text-xs font-medium text-muted">

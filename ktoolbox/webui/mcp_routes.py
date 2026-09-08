@@ -5,8 +5,9 @@ from typing import Annotated, Literal, cast
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 
-from ktoolbox.api.generated import Post, Revision
+from ktoolbox.api.generated import Revision
 from ktoolbox.configuration import RuntimeContext
+from ktoolbox.publication_time import PublishedTimeError, effective_published, published_service_timezone
 from ktoolbox.webui.auth import AuthService, client_identifier, require_csrf, require_session
 from ktoolbox.webui.config_monitor import ConfigurationChangeMonitor
 from ktoolbox.webui.config_schema import Locale, build_config_schema
@@ -18,6 +19,8 @@ from ktoolbox.webui.models import (
     ConfigSchemaResponse,
     FilesystemBrowseResponse,
     MCPConfigurationPatchRequest,
+    MCPPostResponse,
+    MCPRevisionResponse,
     MCPStatusResponse,
     MCPTokenCreatedResponse,
     MCPTokenCreateRequest,
@@ -25,7 +28,7 @@ from ktoolbox.webui.models import (
     MCPToolResponse,
 )
 from ktoolbox.webui.openapi_contract import dump_openapi_yaml, mcp_tool_catalog
-from ktoolbox.webui.pawchive_routes import fetch_post
+from ktoolbox.webui.pawchive_routes import fetch_post, publication_time_http_error
 from ktoolbox.webui.task_models import TaskCleanupPreview
 from ktoolbox.webui.task_store import InvalidTaskStateError, TaskNotFoundError, TaskStore
 
@@ -134,7 +137,7 @@ def create_mcp_router() -> APIRouter:
             updated_context = store.patch(name, updates, document.revision)
         except ConfigurationFileError as error:
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from error
-        request.app.state.runtime_context = updated_context
+        await _config_monitor(request).apply_context(updated_context)
         document = store.read(name)
         await _config_monitor(request).publish_change(name, document.revision, source="mcp")
         return build_config_schema(updated_context.configuration, context.project_root, locale)
@@ -152,7 +155,10 @@ def create_mcp_router() -> APIRouter:
         except InvalidTaskStateError as error:
             raise HTTPException(status.HTTP_409_CONFLICT, str(error)) from error
 
-    @router.get("/mcp/pawchive/posts/{service}/{creator_id}/{post_id}", response_model=Post | Revision)
+    @router.get(
+        "/mcp/pawchive/posts/{service}/{creator_id}/{post_id}",
+        response_model=MCPPostResponse | MCPRevisionResponse,
+    )
     async def get_mcp_work(
         service: str,
         creator_id: str,
@@ -162,14 +168,28 @@ def create_mcp_router() -> APIRouter:
         revision_id: str | None = None,
         include_content: bool = False,
         content_limit: int = Query(default=12_000, ge=1, le=20_000),
-    ) -> Post | Revision:
-        post = await fetch_post(_runtime(request).snapshot(), service, creator_id, post_id, revision_id)
+    ) -> MCPPostResponse | MCPRevisionResponse:
+        context = _runtime(request).snapshot()
+        post = await fetch_post(context, service, creator_id, post_id, revision_id)
         content = post.content
         if not include_content:
             content = None
         elif content is not None:
             content = content[:content_limit]
-        return post.model_copy(update={"content": content, "substring": None})
+        policy = context.configuration.published_time.policy()
+        data = post.model_dump()
+        try:
+            data.update(
+                content=content,
+                substring=None,
+                effective_published=effective_published(post, policy),
+                published_service_timezone=published_service_timezone(post, policy),
+                published_target_timezone=policy.target_timezone,
+            )
+        except PublishedTimeError as error:
+            raise publication_time_http_error(error) from error
+        response_model = MCPRevisionResponse if isinstance(post, Revision) else MCPPostResponse
+        return response_model.model_validate(data)
 
     return router
 

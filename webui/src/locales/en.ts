@@ -127,7 +127,9 @@ export const en = {
     "primaryNavigation": "Primary navigation",
     "securityTitle": "Trusted networks only",
     "securityBody": "This session uses HTTP. Credentials and task data are not encrypted in transit.",
-    "securityAdvice": "Use HTTPS or bind the WebUI to 127.0.0.1 when the network is not fully trusted."
+    "securityAdvice": "Use HTTPS or bind the WebUI to 127.0.0.1 when the network is not fully trusted.",
+    "timezoneLabel": "Publication target timezone",
+    "timezoneDescription": "Published dates, naming templates, and date grouping use this configured target timezone."
   },
   "overview": {
     "eyebrow": "Project workspace",
@@ -276,6 +278,11 @@ export const en = {
     "changedLines": "Changed lines",
     "filePath": "File path",
     "file": "Configuration file",
+    "serviceName": "Service",
+    "serviceTimezone": "Service timezone",
+    "addServiceTimezone": "Add Service timezone",
+    "removeServiceTimezone": "Remove the timezone for {{service}}",
+    "noServiceTimezones": "No Service-specific timezones are configured.",
     "pendingCount": "{{count}} pending change",
     "pendingCount_other": "{{count}} pending changes"
   },
@@ -507,6 +514,9 @@ export const en = {
     "empty": "No posts found",
     "post": "Post",
     "published": "Published",
+    "effectivePublished": "Effective publication time",
+    "rawPublished": "Pawchive original value",
+    "publicationConversion": "Raw publication time interpreted in {{serviceTimezone}} → {{targetTimezone}} target time",
     "details": "Post details",
     "contentHidden": "Post body is collapsed by default",
     "showContent": "Show body text",

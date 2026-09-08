@@ -12,6 +12,7 @@ from ktoolbox.publication_time import (
     effective_post_timestamp,
     effective_published,
     localize_wall_time,
+    published_service_timezone,
 )
 
 
@@ -34,6 +35,26 @@ def test_aware_publication_respects_its_offset() -> None:
     )
 
     assert value == datetime(2025, 12, 20, 15, 35, 43, tzinfo=timezone.utc)
+
+
+def test_publication_timezone_label_reports_the_interpretation_actually_used() -> None:
+    policy = PublishedTimePolicy()
+
+    assert published_service_timezone(post("fanbox", datetime(2025, 12, 21)), policy) == "Asia/Tokyo"
+    assert (
+        published_service_timezone(
+            post("fanbox", datetime.fromisoformat("2025-12-21T00:35:43+09:00")),
+            policy,
+        )
+        == "UTC+09:00"
+    )
+    assert (
+        published_service_timezone(
+            post("fanbox", datetime(2025, 12, 21, tzinfo=timezone.utc)),
+            policy,
+        )
+        == "UTC"
+    )
 
 
 def test_custom_service_and_target_timezones() -> None:

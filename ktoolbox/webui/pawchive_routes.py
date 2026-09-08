@@ -10,6 +10,7 @@ from ktoolbox.api.errors import PawchiveError, PawchiveNotFoundError
 from ktoolbox.api.generated import Post, Revision
 from ktoolbox.api.utils import create_pawchive_client
 from ktoolbox.configuration import RuntimeContext
+from ktoolbox.publication_time import PublishedTimeError
 from ktoolbox.webui.auth import require_session
 from ktoolbox.webui.database import WebUISession
 from ktoolbox.webui.media import creator_search_item, post_detail, post_summary, revision_detail, revision_summary
@@ -23,6 +24,19 @@ from ktoolbox.webui.models import (
 )
 
 SessionDependency = Annotated[WebUISession, Depends(require_session)]
+
+
+def publication_time_http_error(error: PublishedTimeError) -> HTTPException:
+    return HTTPException(
+        status_code=status.HTTP_502_BAD_GATEWAY,
+        detail={
+            "code": "response_incompatible",
+            "message": "Pawchive returned an invalid publication time",
+            "service": error.service,
+            "timezone": error.timezone_name,
+            "fields": ["published"],
+        },
+    )
 
 
 def create_pawchive_router() -> APIRouter:
@@ -85,7 +99,11 @@ def create_pawchive_router() -> APIRouter:
                 status_code=code,
                 detail={"code": detail_code, "message": result.message or "post search failed"},
             )
-        return [post_summary(post) for post in result.data or ()]
+        published_time = context.configuration.published_time.policy()
+        try:
+            return [post_summary(post, published_time) for post in result.data or ()]
+        except PublishedTimeError as error:
+            raise publication_time_http_error(error) from error
 
     @router.get(
         "/posts/{service}/{creator_id}/{post_id}",
@@ -100,7 +118,16 @@ def create_pawchive_router() -> APIRouter:
         revision_id: str | None = None,
     ) -> PawchivePostDetailResponse | PawchiveRevisionDetailResponse:
         result = await fetch_post(runtime(request), service, creator_id, post_id, revision_id)
-        return revision_detail(result) if isinstance(result, Revision) else post_detail(result)
+        context = runtime(request)
+        published_time = context.configuration.published_time.policy()
+        try:
+            return (
+                revision_detail(result, published_time)
+                if isinstance(result, Revision)
+                else post_detail(result, published_time)
+            )
+        except PublishedTimeError as error:
+            raise publication_time_http_error(error) from error
 
     @router.get(
         "/posts/{service}/{creator_id}/{post_id}/revisions",
@@ -118,7 +145,11 @@ def create_pawchive_router() -> APIRouter:
             with context.activate():
                 async with create_pawchive_client() as client:
                     revisions = await client.list_post_revisions(service, creator_id, post_id)
-                    return [revision_summary(revision) for revision in revisions]
+                    published_time = context.configuration.published_time.policy()
+                    try:
+                        return [revision_summary(revision, published_time) for revision in revisions]
+                    except PublishedTimeError as error:
+                        raise publication_time_http_error(error) from error
         except PawchiveNotFoundError as error:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,

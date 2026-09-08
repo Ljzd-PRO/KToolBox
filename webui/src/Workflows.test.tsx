@@ -28,6 +28,7 @@ const projectSummary = {
   version: "1.0.0",
   default_output: "downloads",
   resolved_default_output: "/project/downloads",
+  published_target_timezone: "Asia/Shanghai",
 };
 
 afterEach(() => {
@@ -172,6 +173,7 @@ describe("project workflows", () => {
     render(<BrowserRouter><App /></BrowserRouter>);
 
     expect(await screen.findByRole("heading", { name: "Why this task failed" })).toBeInTheDocument();
+    expect(screen.getByRole("status", { name: /Publication target timezone: Asia\/Shanghai · UTC\+08:00/ })).toBeInTheDocument();
     expect(screen.getAllByText("Pawchive returned data in an unsupported format.").length).toBeGreaterThan(0);
     expect(screen.getByText("items.8.tags", { exact: false })).toBeInTheDocument();
     expect(screen.getByText(/Update KToolBox/)).toBeInTheDocument();

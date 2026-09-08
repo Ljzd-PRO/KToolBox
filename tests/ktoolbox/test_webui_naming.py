@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from datetime import datetime
 from pathlib import Path
 
 import httpx
@@ -17,6 +19,7 @@ from ktoolbox.project_config import (
     ProjectConfiguration,
     ProjectNamingConfiguration,
 )
+from ktoolbox.publication_time import PublishedTimePolicy
 from ktoolbox.webui.app import create_app
 from ktoolbox.webui.auth import CSRF_HEADER
 from ktoolbox.webui.config_store import content_revision
@@ -206,6 +209,95 @@ async def test_naming_layout_versions_are_persistent_and_deduplicated(tmp_path: 
 
 
 @pytest.mark.asyncio
+async def test_database_migration_marks_existing_layout_versions_as_legacy_raw(
+    tmp_path: Path,
+) -> None:
+    database = WebUIDatabase(tmp_path / ".ktoolbox" / "webui.sqlite3")
+    await database.initialize()
+    naming = ProjectNamingConfiguration()
+    async with database.connect() as connection:
+        await connection.execute("DELETE FROM schema_migrations WHERE version = 14")
+        await connection.execute(
+            """
+            INSERT INTO naming_layout_versions(
+                id, revision, naming_json, published_time_json, origin, created_at
+            ) VALUES (?, ?, ?, NULL, ?, ?)
+            """,
+            (
+                "legacy-layout",
+                "legacy-revision",
+                naming.model_dump_json(),
+                "project_change",
+                "2026-01-01T00:00:00+00:00",
+            ),
+        )
+        await connection.commit()
+
+    await database.initialize()
+
+    async with database.connect() as connection:
+        row = await (
+            await connection.execute(
+                "SELECT published_time_json, origin FROM naming_layout_versions WHERE id = ?",
+                ("legacy-layout",),
+            )
+        ).fetchone()
+    assert row is not None
+    assert json.loads(str(row[0])) == {"mode": "legacy_raw"}
+    assert row[1] == "legacy_raw"
+
+
+@pytest.mark.asyncio
+async def test_pawchive_raw_layout_converts_fanbox_publication_date_to_target_timezone(
+    tmp_path: Path,
+) -> None:
+    downloads = tmp_path / "downloads"
+    source_work = downloads / "Artist [fanbox-123]" / "2025-12-21"
+    source_work.mkdir(parents=True)
+    post = Post(
+        id="one",
+        user="123",
+        service="fanbox",
+        title="Work one",
+        published=datetime.fromisoformat("2025-12-21T00:35:43"),
+    )
+    (source_work / "post.json").write_text(post.model_dump_json(), encoding="utf-8")
+    (source_work / "asset.bin").write_bytes(b"data")
+    naming = ProjectNamingConfiguration(post_dirname_format="{published}")
+    ProjectConfigStore(tmp_path / "ktoolbox.toml").save(ProjectConfiguration(naming=naming))
+    service, _ = await service_for(tmp_path)
+    try:
+        parsed = await service.parse_source(
+            "toml",
+            '[naming]\npost_dirname_format = "{published}"\n',
+        )
+        preview = await service.preview(
+            [Path("downloads")],
+            PastedConfigConversionSource(
+                format="toml",
+                naming=parsed.naming,
+                digest=parsed.digest,
+                published_time_mode="pawchive_raw",
+            ),
+        )
+
+        assert preview.creator_count == 1
+        assert preview.creators[0].source == source_work.parent
+        assert preview.creators[0].operations == 1
+        conversion = await service.apply(preview.id, [preview.creators[0].key])
+        await wait_for_conversion(service, conversion.id, "completed")
+
+        target_work = downloads / "Artist [fanbox-123]" / "2025-12-20"
+        assert not source_work.exists()
+        assert (target_work / "post.json").is_file()
+        assert (target_work / "asset.bin").read_bytes() == b"data"
+        stored_post = Post.model_validate_json((target_work / "post.json").read_text(encoding="utf-8"))
+        assert stored_post.published == post.published
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
 async def test_layout_version_history_survives_completed_conversion(tmp_path: Path) -> None:
     downloads = tmp_path / "downloads"
     downloads.mkdir()
@@ -385,6 +477,65 @@ async def test_preview_converts_creators_from_multiple_project_layout_versions(
     assert not second_source.parent.exists()
     assert (downloads / "First - 123" / "one" / "asset.bin").is_file()
     assert (downloads / "Second - 456" / "two" / "asset.bin").is_file()
+    await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_pending_layout_sources_keep_individual_publication_policies(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    (tmp_path / "downloads").mkdir()
+    store = ProjectConfigStore(tmp_path / "ktoolbox.toml")
+    store.save(ProjectConfiguration())
+    service, _ = await service_for(tmp_path)
+    original_policy = PublishedTimePolicy.from_values(
+        target_timezone="UTC",
+        fallback_service_timezone="UTC",
+        service_timezones={"fanbox": "Asia/Tokyo", "patreon": "UTC"},
+    )
+    changed_policy = PublishedTimePolicy.from_values(
+        target_timezone="Asia/Shanghai",
+        fallback_service_timezone="UTC",
+        service_timezones={"fanbox": "Asia/Tokyo", "patreon": "UTC"},
+    )
+    changed_naming = ProjectNamingConfiguration(post_dirname_format="{published} [{post_id}]")
+    final_naming = changed_naming.model_copy(update={"creator_dirname_format": "{creator_name} ({creator_id})"})
+
+    await save_naming(service, store, changed_naming)
+    await service.record_published_time_change(original_policy, changed_policy)
+    monkeypatch.setattr(service, "_current_published_time", lambda: changed_policy)
+    await save_naming(service, store, final_naming)
+
+    async with service.database.connect() as connection:
+        row = await (await connection.execute("SELECT sources_json FROM naming_layout_state WHERE id = 1")).fetchone()
+    assert row is not None
+    sources = json.loads(str(row[0]))
+    assert len(sources) == 3
+    assert all(set(source) == {"naming", "published_time"} for source in sources)
+    assert {source["published_time"]["target_timezone"] for source in sources} == {
+        "UTC",
+        "Asia/Shanghai",
+    }
+    assert {source["naming"]["post_dirname_format"] for source in sources} == {
+        ProjectNamingConfiguration().post_dirname_format,
+        changed_naming.post_dirname_format,
+    }
+    changed_naming_sources = [
+        source for source in sources if source["naming"] == changed_naming.model_dump(mode="json")
+    ]
+    assert {source["published_time"]["target_timezone"] for source in changed_naming_sources} == {
+        "UTC",
+        "Asia/Shanghai",
+    }
+
+    versions = await service.layout_versions()
+    source_ids = [version.id for version in versions if not version.is_current]
+    preview = await service.preview(
+        [Path("downloads")],
+        ProjectLayoutConversionSource(version_ids=source_ids),
+    )
+    assert preview.resolves_pending_layout is True
     await service.stop()
 
 

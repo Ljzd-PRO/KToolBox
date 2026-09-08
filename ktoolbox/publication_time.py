@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Protocol
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -141,6 +141,29 @@ def effective_published(post: PublishedPost, policy: PublishedTimePolicy) -> dat
     else:
         localized = post.published
     return localized.astimezone(ZoneInfo(policy.target_timezone))
+
+
+def published_service_timezone(post: PublishedPost, policy: PublishedTimePolicy) -> str:
+    """Return the timezone that actually interprets this post's raw published value."""
+
+    if post.published is None or post.published.tzinfo is None:
+        return policy.service_timezone(post.service)
+    key = getattr(post.published.tzinfo, "key", None)
+    if isinstance(key, str) and key:
+        return key
+    offset = post.published.utcoffset()
+    if offset is None:
+        return policy.service_timezone(post.service)
+    return _format_utc_offset(offset)
+
+
+def _format_utc_offset(offset: timedelta) -> str:
+    total_minutes = round(offset.total_seconds() / 60)
+    if total_minutes == 0:
+        return "UTC"
+    sign = "+" if total_minutes > 0 else "-"
+    hours, minutes = divmod(abs(total_minutes), 60)
+    return f"UTC{sign}{hours:02d}:{minutes:02d}"
 
 
 def effective_post_timestamp(post: PublishedPost, policy: PublishedTimePolicy) -> datetime | None:

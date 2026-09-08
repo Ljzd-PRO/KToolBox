@@ -405,7 +405,7 @@ async def test_task_presentation_database_migration_and_store_round_trip(tmp_pat
         attempt_columns = {str(row[1]) for row in await cursor.fetchall()}
         await cursor.close()
     assert {"failure_json", "result_json"} <= attempt_columns
-    assert versions == list(range(1, 14))
+    assert versions == list(range(1, 15))
 
     store = TaskStore(database)
     spec = DownloadTaskSpec(service="FanBox", creator_id="creator/id", post_id="42", output=tmp_path)

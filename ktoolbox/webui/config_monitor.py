@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
-from collections.abc import Callable
+import inspect
+from collections.abc import Awaitable, Callable
 from pathlib import Path
 
 from ktoolbox.configuration import RuntimeContext
@@ -22,7 +23,7 @@ class ConfigurationChangeMonitor:
         self,
         project_root: Path,
         events: WebUIEventStore,
-        update_context: Callable[[RuntimeContext], None],
+        update_context: Callable[[RuntimeContext], Awaitable[None] | None],
         *,
         interval: float = 2.0,
     ) -> None:
@@ -33,6 +34,11 @@ class ConfigurationChangeMonitor:
         self._revisions: dict[str, str] = {}
         self._task: asyncio.Task[None] | None = None
         self._stopping = asyncio.Event()
+
+    async def apply_context(self, context: RuntimeContext) -> None:
+        result = self.update_context(context)
+        if inspect.isawaitable(result):
+            await result
 
     async def start(self) -> None:
         if self._task is not None:
@@ -79,7 +85,7 @@ class ConfigurationChangeMonitor:
             valid = True
             if name != "project":
                 try:
-                    self.update_context(RuntimeContext.from_project(self.project_root))
+                    await self.apply_context(RuntimeContext.from_project(self.project_root))
                 except (OSError, ValueError):
                     valid = False
             await self.events.publish(

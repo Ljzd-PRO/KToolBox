@@ -14,6 +14,7 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 from ktoolbox.action.utils import extract_content_images
 from ktoolbox.api.generated import CreatorSummary, Post, Revision
 from ktoolbox.configuration import RuntimeContext
+from ktoolbox.publication_time import PublishedTimePolicy, effective_published, published_service_timezone
 from ktoolbox.webui.models import (
     CreatorSearchItemResponse,
     MediaAssetResponse,
@@ -253,26 +254,38 @@ def creator_search_item(creator: CreatorSummary) -> CreatorSearchItemResponse:
     return CreatorSearchItemResponse.model_validate(data)
 
 
-def post_summary(post: Post) -> PawchivePostSummaryResponse:
+def post_summary(post: Post, published_time: PublishedTimePolicy) -> PawchivePostSummaryResponse:
     data = post.model_dump()
     data["cover"] = file_asset(post.file.path, "cover") if post.file and post.file.path else None
+    data["effective_published"] = effective_published(post, published_time)
+    data["published_service_timezone"] = published_service_timezone(post, published_time)
+    data["published_target_timezone"] = published_time.target_timezone
     return PawchivePostSummaryResponse.model_validate(data)
 
 
-def post_detail(post: Post) -> PawchivePostDetailResponse:
-    data = post_summary(post).model_dump()
+def post_detail(post: Post, published_time: PublishedTimePolicy) -> PawchivePostDetailResponse:
+    data = post_summary(post, published_time).model_dump()
     data["media"] = post_media(post)
     return PawchivePostDetailResponse.model_validate(data)
 
 
-def revision_summary(revision: Revision) -> PawchiveRevisionSummaryResponse:
+def revision_summary(
+    revision: Revision,
+    published_time: PublishedTimePolicy,
+) -> PawchiveRevisionSummaryResponse:
     data = revision.model_dump()
     data["cover"] = file_asset(revision.file.path, "cover") if revision.file and revision.file.path else None
+    data["effective_published"] = effective_published(revision, published_time)
+    data["published_service_timezone"] = published_service_timezone(revision, published_time)
+    data["published_target_timezone"] = published_time.target_timezone
     return PawchiveRevisionSummaryResponse.model_validate(data)
 
 
-def revision_detail(revision: Revision) -> PawchiveRevisionDetailResponse:
-    data = revision_summary(revision).model_dump()
+def revision_detail(
+    revision: Revision,
+    published_time: PublishedTimePolicy,
+) -> PawchiveRevisionDetailResponse:
+    data = revision_summary(revision, published_time).model_dump()
     data["media"] = post_media(revision)
     return PawchiveRevisionDetailResponse.model_validate(data)
 

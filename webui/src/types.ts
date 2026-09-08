@@ -78,6 +78,7 @@ export type ConfigField = {
   apply_mode: "next_task" | "restart";
   path_selector?: PathSelector | null;
   choice_mode?: "fixed" | "suggested" | null;
+  editor?: "service_timezones" | null;
   choices?: Array<{
     value: string;
     label: string;
@@ -122,6 +123,8 @@ export type NamingConfigurationResponse = WebUIApiSchemas["NamingConfigurationRe
 export type NamingLegacyContext = WebUIApiSchemas["NamingLegacyContextResponse"];
 
 export type NamingLayoutVersion = WebUIApiSchemas["NamingLayoutVersionResponse"];
+
+export type PublishedTimePolicySnapshot = WebUIApiSchemas["PublishedTimePolicySnapshot"];
 
 export type NamingSourceParse = WebUIApiSchemas["NamingSourceParseResponse"];
 
@@ -299,6 +302,9 @@ export type PawchivePost = {
   title?: string | null;
   content?: string | null;
   published?: string | null;
+  effective_published?: string | null;
+  published_service_timezone: string;
+  published_target_timezone: string;
   edited?: string | null;
   attachments?: unknown[] | null;
   cover?: MediaAsset | null;

@@ -4,10 +4,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from ktoolbox.naming_sources import NamingSourceFormat
 from ktoolbox.project_config import ProjectNamingConfiguration
+from ktoolbox.publication_time import PublishedTimePolicy
 
 NamingConversionStatus = Literal[
     "preview",
@@ -27,13 +28,36 @@ NamingLayoutVersionOrigin = Literal[
     "project_change",
     "legacy_migration",
     "recovered",
+    "legacy_raw",
 ]
+
+
+class PublishedTimePolicySnapshot(BaseModel):
+    mode: Literal["normalized", "legacy_raw", "kemono_utc"] = "normalized"
+    target_timezone: str = "UTC"
+    fallback_service_timezone: str = "UTC"
+    service_timezones: dict[str, str] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_policy(self) -> PublishedTimePolicySnapshot:
+        if self.mode != "normalized":
+            return self
+        policy = PublishedTimePolicy.from_values(
+            target_timezone=self.target_timezone,
+            fallback_service_timezone=self.fallback_service_timezone,
+            service_timezones=self.service_timezones,
+        )
+        self.target_timezone = policy.target_timezone
+        self.fallback_service_timezone = policy.fallback_service_timezone
+        self.service_timezones = dict(policy.service_timezones)
+        return self
 
 
 class NamingConfigurationResponse(BaseModel):
     default_output: Path
     resolved_default_output: Path
     naming: ProjectNamingConfiguration
+    published_time: PublishedTimePolicySnapshot
     revision: str
     conversion_pending: bool = False
 
@@ -54,6 +78,7 @@ class NamingLayoutVersionResponse(BaseModel):
     id: str
     revision: str
     naming: ProjectNamingConfiguration
+    published_time: PublishedTimePolicySnapshot
     origin: NamingLayoutVersionOrigin
     created_at: datetime
     is_current: bool = False
@@ -83,6 +108,7 @@ class NamingSourceParseResponse(BaseModel):
     defaulted_fields: list[str]
     warnings: list[NamingSourceWarningResponse]
     differences: list[NamingSourceDifferenceResponse]
+    default_published_time_mode: Literal["kemono_utc", "pawchive_raw"]
 
 
 class ProjectLayoutConversionSource(BaseModel):
@@ -95,6 +121,8 @@ class PastedConfigConversionSource(BaseModel):
     format: NamingSourceFormat
     naming: ProjectNamingConfiguration
     digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+    published_time_mode: Literal["kemono_utc", "pawchive_raw", "custom"] | None = None
+    published_time: PublishedTimePolicySnapshot | None = None
 
 
 NamingConversionSource = Annotated[
@@ -162,6 +190,7 @@ class NamingCreatorPreview(BaseModel):
 class NamingPreviewResponse(BaseModel):
     id: str
     revision: str
+    target_layout_revision: str = ""
     fingerprint: str
     roots: list[Path]
     creators: list[NamingCreatorPreview]

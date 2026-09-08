@@ -47,7 +47,11 @@ HOST_HOME.mkdir()
 PROJECT_ROOT.joinpath(".env").write_text(
     "KTOOLBOX_WEBUI__USERNAME=playwright\n"
     "KTOOLBOX_WEBUI__PASSWORD=fixture-password\n"
-    "KTOOLBOX_WEBUI__OPEN_BROWSER=false\n",
+    "KTOOLBOX_WEBUI__OPEN_BROWSER=false\n"
+    "KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE=Asia/Shanghai\n"
+    "KTOOLBOX_PUBLISHED_TIME__FALLBACK_SERVICE_TIMEZONE=UTC\n"
+    "KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__FANBOX=Asia/Tokyo\n"
+    "KTOOLBOX_PUBLISHED_TIME__SERVICE_TIMEZONES__PATREON=UTC\n",
     encoding="utf-8",
 )
 if SHOWCASE_MODE:
@@ -182,7 +186,7 @@ LEGACY_FIXTURES = (
             service="fanbox",
             title="Fictional project study",
             content="Harmless fixture text for browser verification.",
-            published="2026-07-20T08:30:00Z",
+            published="2026-07-20T00:30:00",
         ),
     ),
     (
@@ -298,7 +302,7 @@ class FixtureClient(AbstractAsyncContextManager["FixtureClient"]):
                     "Harmless fixture text for browser verification. "
                     '<img src="https://file.pawchive.pw/data/fixtures/wide-content.jpg">'
                 ),
-                published="2026-07-20T08:30:00Z",
+                published="2026-07-20T00:30:00",
                 file=FileReference(name="cover.jpg", path="/data/fixtures/cover-fiction-1001.jpg"),
                 attachments=[
                     FileReference(name="detail.jpg", path="/data/fixtures/hires-detail.jpg"),

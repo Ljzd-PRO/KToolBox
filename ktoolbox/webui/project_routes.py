@@ -58,8 +58,8 @@ def create_project_router(
     def current_context(request: Request) -> RuntimeContext:
         return cast(RuntimeContext, request.app.state.runtime_context)
 
-    def reload_context(request: Request, context: RuntimeContext) -> None:
-        request.app.state.runtime_context = context
+    async def reload_context(context: RuntimeContext) -> None:
+        await config_monitor.apply_context(context)
 
     @router.get("/config/schema", response_model=ConfigSchemaResponse)
     async def config_schema(
@@ -95,7 +95,7 @@ def create_project_router(
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
         except ConfigurationFileError as error:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error)) from error
-        reload_context(request, context)
+        await reload_context(context)
         document = dotenv_store.read(name)
         await config_monitor.publish_change(name, document.revision, source="webui")
         response.headers["ETag"] = f'"{document.revision}"'
@@ -116,7 +116,7 @@ def create_project_router(
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
         except ConfigurationFileError as error:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error)) from error
-        reload_context(request, context)
+        await reload_context(context)
         document = dotenv_store.read(name)
         await config_monitor.publish_change(name, document.revision, source="webui")
         response.headers["ETag"] = f'"{document.revision}"'

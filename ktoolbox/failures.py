@@ -12,6 +12,7 @@ from ktoolbox.api.errors import (
     PawchiveResponseValidationError,
     PawchiveTransportError,
 )
+from ktoolbox.publication_time import PublishedTimeError
 
 
 class FailureCode(str, Enum):
@@ -109,7 +110,13 @@ def classify_failure(
     fields: list[str] = []
     http_status: int | None = None
 
-    if isinstance(error, PawchiveResponseValidationError):
+    if isinstance(error, PublishedTimeError):
+        operation = "normalize_published_time"
+        fields = ["published"]
+        code = FailureCode.response_incompatible
+        message = "Pawchive returned a publication time that is invalid in its Service timezone"
+        retryable = False
+    elif isinstance(error, PawchiveResponseValidationError):
         operation = error.operation
         stage = _OPERATION_STAGES.get(operation, stage)
         fields = [issue.path for issue in error.issues[:20]]

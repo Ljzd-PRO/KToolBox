@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from contextlib import AbstractAsyncContextManager
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
@@ -34,8 +35,20 @@ async def test_pawchive_query_routes_use_typed_client(tmp_path: Path) -> None:
         indexed=0,
         updated=0,
     )
-    post = Post(id="99", user="42", service="fanbox", title="Fixture post")
-    revision = Revision(id="99", user="42", service="fanbox", revision_id=7)
+    post = Post(
+        id="99",
+        user="42",
+        service="fanbox",
+        title="Fixture post",
+        published=datetime(2025, 12, 21, 0, 35, 43),
+    )
+    revision = Revision(
+        id="99",
+        user="42",
+        service="fanbox",
+        revision_id=7,
+        published=datetime(2025, 12, 21, 0, 35, 43, tzinfo=timezone(timedelta(hours=9))),
+    )
     api_client = SimpleNamespace(
         list_creators=AsyncMock(return_value=[creator]),
         list_creator_posts=AsyncMock(return_value=[post]),
@@ -65,12 +78,18 @@ async def test_pawchive_query_routes_use_typed_client(tmp_path: Path) -> None:
                 assert creators.json()[0]["id"] == "42"
                 posts = await client.get("/api/v1/pawchive/posts?service=fanbox&creator_id=42")
                 assert posts.json()[0]["id"] == "99"
+                assert posts.json()[0]["published_service_timezone"] == "Asia/Tokyo"
+                assert posts.json()[0]["effective_published"] == "2025-12-20T15:35:43Z"
                 details = await client.get("/api/v1/pawchive/posts/fanbox/42/99")
                 assert details.json()["title"] == "Fixture post"
+                assert details.json()["published_service_timezone"] == "Asia/Tokyo"
                 selected = await client.get("/api/v1/pawchive/posts/fanbox/42/99?revision_id=7")
                 assert selected.json()["revision_id"] == 7
+                assert selected.json()["published_service_timezone"] == "UTC+09:00"
+                assert selected.json()["effective_published"] == "2025-12-20T15:35:43Z"
                 revisions = await client.get("/api/v1/pawchive/posts/fanbox/42/99/revisions")
                 assert revisions.json()[0]["revision_id"] == 7
+                assert revisions.json()[0]["published_service_timezone"] == "UTC+09:00"
                 missing = await client.get("/api/v1/pawchive/posts/fanbox/42/99?revision_id=8")
                 assert missing.status_code == 404
                 version = await client.get("/api/v1/pawchive/site-version")
@@ -78,3 +97,52 @@ async def test_pawchive_query_routes_use_typed_client(tmp_path: Path) -> None:
 
             invalid = await client.get("/api/v1/pawchive/posts")
             assert invalid.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_pawchive_routes_report_invalid_service_wall_time_without_raw_data(
+    tmp_path: Path,
+) -> None:
+    post = Post(
+        id="99",
+        user="42",
+        service="fanbox",
+        title="Private fixture title",
+        published=datetime(2026, 3, 8, 2, 30),
+    )
+    api_client = SimpleNamespace(list_creator_posts=AsyncMock(return_value=[post]))
+    app = create_app(
+        RuntimeContext(
+            tmp_path,
+            Configuration(
+                _env_file=None,
+                webui={"username": "owner", "password": "secret"},
+                published_time={
+                    "target_timezone": "UTC",
+                    "service_timezones": {"fanbox": "America/New_York"},
+                },
+            ),
+        )
+    )
+    async with app.router.lifespan_context(app):
+        transport = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+            await client.post(
+                "/api/v1/session/login",
+                json={"username": "owner", "password": "secret"},
+            )
+            with patch(
+                "ktoolbox.webui.pawchive_routes.create_pawchive_client",
+                return_value=ClientContext(api_client),
+            ):
+                response = await client.get("/api/v1/pawchive/posts?service=fanbox&creator_id=42")
+
+    assert response.status_code == 502
+    assert response.json()["detail"] == {
+        "code": "response_incompatible",
+        "message": "Pawchive returned an invalid publication time",
+        "service": "fanbox",
+        "timezone": "America/New_York",
+        "fields": ["published"],
+    }
+    assert "Private fixture title" not in response.text

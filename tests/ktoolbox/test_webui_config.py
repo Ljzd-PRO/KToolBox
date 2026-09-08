@@ -12,6 +12,7 @@ import ktoolbox.webui.config_schema as config_schema_module
 import ktoolbox.webui.config_store as config_store_module
 from ktoolbox.api.generated import CreatorProfile
 from ktoolbox.configuration import Configuration, RuntimeContext
+from ktoolbox.project_config import ProjectConfigStore, ProjectConfiguration, ProjectNamingConfiguration
 from ktoolbox.webui.app import create_app
 from ktoolbox.webui.auth import CSRF_HEADER
 from ktoolbox.webui.config_monitor import ConfigurationChangeMonitor
@@ -439,3 +440,50 @@ async def test_configuration_monitor_publishes_only_changed_external_documents(t
         assert len(await events.events()) == 1
     finally:
         await monitor.stop()
+
+
+@pytest.mark.asyncio
+async def test_external_publication_timezone_change_updates_summary_and_layout_state(
+    tmp_path: Path,
+) -> None:
+    project = ProjectConfiguration(
+        naming=ProjectNamingConfiguration(
+            post_dirname_format="{published} [{post_id}]",
+        )
+    )
+    ProjectConfigStore(tmp_path / "ktoolbox.toml").save(project)
+    env_path = tmp_path / ".env"
+    env_path.write_text(
+        "KTOOLBOX_WEBUI__USERNAME=owner\n"
+        "KTOOLBOX_WEBUI__PASSWORD=secret\n"
+        "KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE=UTC\n",
+        encoding="utf-8",
+    )
+    app = create_app(RuntimeContext.from_project(tmp_path))
+    app.state.config_monitor.interval = 60
+
+    async with app.router.lifespan_context(app):
+        transport = httpx.ASGITransport(app=app, client=("127.0.0.1", 1234))
+        async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+            login = await client.post(
+                "/api/v1/session/login",
+                json={"username": "owner", "password": "secret"},
+            )
+            assert login.status_code == 200
+            assert (await client.get("/api/v1/project")).json()["published_target_timezone"] == "UTC"
+
+            env_path.write_text(
+                "KTOOLBOX_WEBUI__USERNAME=owner\n"
+                "KTOOLBOX_WEBUI__PASSWORD=secret\n"
+                "KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE=Asia/Shanghai\n",
+                encoding="utf-8",
+            )
+            await app.state.config_monitor.check_once()
+
+            summary = await client.get("/api/v1/project")
+            naming = await client.get("/api/v1/naming")
+            assert summary.json()["published_target_timezone"] == "Asia/Shanghai"
+            assert naming.json()["published_time"]["target_timezone"] == "Asia/Shanghai"
+            assert naming.json()["conversion_pending"] is True
+            notices = await client.get("/api/v1/startup-notices")
+            assert any(notice["kind"] == "legacy_layout_conversion" for notice in notices.json())

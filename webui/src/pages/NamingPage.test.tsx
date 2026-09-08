@@ -35,6 +35,13 @@ const naming = {
   month_dirname_format: "{month:02d}",
 };
 
+const publishedTime = {
+  mode: "normalized",
+  target_timezone: "UTC",
+  fallback_service_timezone: "UTC",
+  service_timezones: { fanbox: "Asia/Tokyo", patreon: "UTC" },
+};
+
 const preview = {
   id: "preview-1",
   revision: "revision-1",
@@ -90,6 +97,7 @@ const layoutVersions = [
     id: "naming-layout-source",
     revision: "naming-revision-source",
     naming,
+    published_time: { ...publishedTime, mode: "legacy_raw" },
     origin: "project_change",
     created_at: "2026-07-25T00:00:00Z",
     is_current: false,
@@ -101,6 +109,7 @@ const layoutVersions = [
       ...naming,
       post_dirname_format: "{post_id}",
     },
+    published_time: publishedTime,
     origin: "recovered",
     created_at: "2026-07-24T00:00:00Z",
     is_current: false,
@@ -109,6 +118,7 @@ const layoutVersions = [
     id: "naming-layout-current",
     revision: "naming-revision-current",
     naming,
+    published_time: publishedTime,
     origin: "project_current",
     created_at: "2026-07-26T00:00:00Z",
     is_current: true,
@@ -167,7 +177,9 @@ describe("Naming format page", { timeout: 10_000 }, () => {
       if (path.endsWith("/naming/legacy-context")) return json({ roots: ["downloads"], conversion_pending: false });
       if (path.endsWith("/naming")) return json({
         default_output: "downloads",
+        resolved_default_output: "/project/downloads",
         naming: { ...naming, sequential_filename: true, post_structure: { ...naming.post_structure, attachments: directory } },
+        published_time: publishedTime,
         revision: "revision-1",
         conversion_pending: false,
       });
@@ -236,6 +248,7 @@ describe("Naming format page", { timeout: 10_000 }, () => {
             default_output: "downloads",
             resolved_default_output: "/project/downloads",
             naming,
+            published_time: publishedTime,
             revision: "revision-1",
             conversion_pending: true,
           });
@@ -333,6 +346,7 @@ describe("Naming format page", { timeout: 10_000 }, () => {
             recognized_fields: ["post_dirname_format"],
             defaulted_fields: ["creator_dirname_format"],
             warnings: [{ code: "ignored_unknown_entries", count: 1 }],
+            default_published_time_mode: "kemono_utc",
             differences: [
               {
                 path: "post_dirname_format",
@@ -359,6 +373,7 @@ describe("Naming format page", { timeout: 10_000 }, () => {
             default_output: "downloads",
             resolved_default_output: "/project/downloads",
             naming,
+            published_time: publishedTime,
             revision: "revision-1",
             conversion_pending: false,
           });
@@ -400,6 +415,7 @@ describe("Naming format page", { timeout: 10_000 }, () => {
         kind: "pasted_config",
         format: "env",
         digest: "a".repeat(64),
+        published_time_mode: "kemono_utc",
       },
     });
     expect((previewBody?.source as { content?: string }).content).toBeUndefined();
@@ -474,6 +490,7 @@ describe("Naming format page", { timeout: 10_000 }, () => {
             default_output: currentDefaultOutput,
             resolved_default_output: `/project/${currentDefaultOutput}`,
             naming: currentNaming,
+            published_time: publishedTime,
             revision,
             conversion_pending: true,
           });
@@ -483,6 +500,7 @@ describe("Naming format page", { timeout: 10_000 }, () => {
             default_output: currentDefaultOutput,
             resolved_default_output: `/project/${currentDefaultOutput}`,
             naming: currentNaming,
+            published_time: publishedTime,
             revision,
             conversion_pending: false,
           });
@@ -562,6 +580,7 @@ describe("Naming format page", { timeout: 10_000 }, () => {
             default_output: "downloads",
             resolved_default_output: "/project/downloads",
             naming,
+            published_time: publishedTime,
             revision: migrated ? "revision-2" : "revision-1",
             conversion_pending: true,
           });

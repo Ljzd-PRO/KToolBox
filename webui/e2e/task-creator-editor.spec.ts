@@ -98,6 +98,8 @@ test("creates and selects a project creator from the secondary task modal", asyn
 
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.getByRole("link", { name: "Creators", exact: true }).click();
+  await expect(page).toHaveURL(/\/creators$/);
+  await expect(page.getByRole("heading", { name: "Creators", exact: true })).toBeVisible();
   const savedCreatorRow = page
     .locator(".app-table-frame")
     .getByRole("row")

@@ -53,6 +53,7 @@ async def test_plaintext_login_session_project_and_logout(tmp_path: Path) -> Non
         assert session.status_code == 200
         project = await client.get("/api/v1/project")
         assert project.json()["root"] == str(tmp_path)
+        assert project.json()["published_target_timezone"] == "UTC"
         assert project.headers["cache-control"] == "no-store"
         about = await client.get("/api/v1/about")
         assert about.status_code == 200

@@ -4,7 +4,7 @@ import secrets
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, cast
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.exceptions import RequestValidationError
@@ -98,10 +98,19 @@ def create_app(
     )
     media_service = media_proxy or MediaProxyService()
     project_lock = ProjectProcessLock(context.project_root / ".ktoolbox" / "webui.lock")
+
+    async def update_runtime_context(updated: RuntimeContext) -> None:
+        previous = cast(RuntimeContext, app.state.runtime_context)
+        app.state.runtime_context = updated
+        await naming_service.record_published_time_change(
+            previous.configuration.published_time.policy(),
+            updated.configuration.published_time.policy(),
+        )
+
     config_monitor = ConfigurationChangeMonitor(
         context.project_root,
         event_store,
-        lambda updated: setattr(app.state, "runtime_context", updated),
+        update_runtime_context,
     )
 
     @asynccontextmanager
@@ -231,9 +240,11 @@ def create_app(
 
     @app.get("/api/v1/project", response_model=ProjectSummaryResponse)
     async def project(
+        request: Request,
         _: Annotated[WebUISession, Depends(require_session)],
     ) -> ProjectSummaryResponse:
-        root: Path = context.project_root
+        current_context = cast(RuntimeContext, request.app.state.runtime_context).snapshot()
+        root: Path = current_context.project_root
         configuration = ProjectConfigStore(root / "ktoolbox.toml").load()
         return ProjectSummaryResponse(
             name=root.name,
@@ -243,6 +254,7 @@ def create_app(
             resolved_default_output=resolve_project_output(root, configuration),
             dotenv_files=[root / ".env", root / "prod.env"],
             version=__version__,
+            published_target_timezone=current_context.configuration.published_time.target_timezone,
         )
 
     @app.get("/api/v1/about", response_model=AboutResponse)

@@ -27,11 +27,14 @@ import {
   IconSearch as Search,
   IconSettings as Settings2,
   IconShieldExclamation as ShieldAlert,
+  IconPlus as Plus,
+  IconTrash as Trash2,
   IconToggleLeft as ToggleLeft,
+  IconWorld as World,
   IconX as X,
   type TablerIcon,
 } from "@tabler/icons-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 
@@ -51,6 +54,7 @@ import {
 } from "../components/ui";
 import { ExternalChangeAlert } from "../components/ExternalChangeAlert";
 import { RemotePathField } from "../components/RemotePathField";
+import { TimeZoneComboBox } from "../components/TimeZoneComboBox";
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { currentLanguage } from "../lib/i18n";
@@ -472,7 +476,15 @@ function ConfigFieldEditor({
   const inputClassName = configurationAddressPaths.has(field.path)
     ? "font-mono text-[0.8125rem]"
     : undefined;
-  const control = field.path_selector ? (
+  const control = field.editor === "service_timezones" ? (
+    <ServiceTimezoneEditor
+      description={description}
+      isDisabled={disabled}
+      label={field.label}
+      value={value ?? "{}"}
+      onChange={onChange}
+    />
+  ) : field.path_selector ? (
     <RemotePathField
       description={description}
       icon={icon}
@@ -512,6 +524,14 @@ function ConfigFieldEditor({
       step={type === "integer" ? 1 : undefined}
       value={value === "" ? undefined : Number(value)}
       onChange={(next) => onChange(String(next))}
+    />
+  ) : isTimeZonePath(field.path) ? (
+    <TimeZoneComboBox
+      description={description}
+      isDisabled={disabled}
+      label={field.label}
+      value={value ?? "UTC"}
+      onChange={onChange}
     />
   ) : field.choice_mode === "suggested" ? (
     <ComboBoxField
@@ -566,6 +586,94 @@ function ConfigFieldEditor({
   );
 }
 
+function ServiceTimezoneEditor({
+  description,
+  isDisabled,
+  label,
+  value,
+  onChange,
+}: {
+  description: ReactNode;
+  isDisabled: boolean;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const { t } = useTranslation();
+  const entries = parseServiceTimezones(value);
+
+  function update(next: Array<[string, string]>) {
+    onChange(JSON.stringify(Object.fromEntries(next)));
+  }
+
+  function addEntry() {
+    const used = new Set(entries.map(([service]) => service));
+    let index = 1;
+    while (used.has(`custom_service_${index}`)) index += 1;
+    update([...entries, [`custom_service_${index}`, "UTC"]]);
+  }
+
+  return (
+    <fieldset className="grid gap-3">
+      <legend className="flex items-center gap-2 font-semibold text-foreground">
+        <World aria-hidden="true" className="text-[var(--accent-strong)]" size={16} stroke={1.8} />
+        {label}
+      </legend>
+      <div className="text-xs leading-relaxed text-muted">{description}</div>
+      <div className="divide-y divide-border rounded-lg border border-border bg-default px-3">
+        {entries.map(([service, timezone], index) => (
+          <div className="grid gap-3 py-3 sm:grid-cols-[minmax(8rem,0.8fr)_minmax(12rem,1.2fr)_auto] sm:items-end" key={index}>
+            <FormField
+              isDisabled={isDisabled}
+              label={t("configuration.serviceName")}
+              value={service}
+              onChange={(nextService) => update(entries.map((entry, entryIndex) => entryIndex === index ? [nextService, entry[1]] : entry))}
+            />
+            <TimeZoneComboBox
+              isDisabled={isDisabled}
+              label={t("configuration.serviceTimezone")}
+              value={timezone}
+              onChange={(nextTimezone) => update(entries.map((entry, entryIndex) => entryIndex === index ? [entry[0], nextTimezone] : entry))}
+            />
+            <Button
+              isIconOnly
+              aria-label={t("configuration.removeServiceTimezone", { service })}
+              className="size-11 min-w-11 text-danger"
+              isDisabled={isDisabled}
+              variant="ghost"
+              onPress={() => update(entries.filter((_, entryIndex) => entryIndex !== index))}
+            >
+              <Trash2 aria-hidden="true" size={17} />
+            </Button>
+          </div>
+        ))}
+        {!entries.length ? <p className="py-4 text-sm text-muted">{t("configuration.noServiceTimezones")}</p> : null}
+      </div>
+      <div>
+        <Button isDisabled={isDisabled} size="sm" variant="outline" onPress={addEntry}>
+          <Plus aria-hidden="true" size={16} />
+          {t("configuration.addServiceTimezone")}
+        </Button>
+      </div>
+    </fieldset>
+  );
+}
+
+function parseServiceTimezones(value: string): Array<[string, string]> {
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return [];
+    return Object.entries(parsed)
+      .filter((entry): entry is [string, string] => typeof entry[1] === "string");
+  } catch {
+    return [];
+  }
+}
+
+function isTimeZonePath(path: string): boolean {
+  return path === "published_time.target_timezone" || path === "published_time.fallback_service_timezone";
+}
+
 const configurationAddressPaths = new Set([
   "api.netloc",
   "api.statics_netloc",
@@ -618,6 +726,7 @@ function configurationIcon(field: ConfigField, type: string | undefined): Tabler
   if (section === "downloader") return Download;
   if (section === "job") return ListTodo;
   if (section === "webui") return PanelTop;
+  if (section === "published_time") return World;
   return TextCursorInput;
 }
 
@@ -626,6 +735,7 @@ function configurationSectionIcon(section: string): TablerIcon {
   if (section === "downloader") return Download;
   if (section === "job") return ListTodo;
   if (section === "webui") return PanelTop;
+  if (section === "published_time") return World;
   return Settings2;
 }
 

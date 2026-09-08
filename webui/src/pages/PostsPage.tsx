@@ -5,6 +5,7 @@ import {
   IconChevronDown as ChevronDown,
   IconChevronUp as ChevronUp,
   IconCircleCheck as CircleCheck,
+  IconClock as Clock,
   IconCloud as Cloud,
   IconDownload as Download,
   IconEye as Eye,
@@ -191,7 +192,7 @@ export function PostsPage() {
         if (column === "post") return post.title || post.id;
         if (column === "creator") return post.user;
         if (column === "service") return post.service;
-        return post.published ? Date.parse(String(post.published)) : null;
+        return post.effective_published ? Date.parse(String(post.effective_published)) : null;
       },
       i18n.resolvedLanguage ?? i18n.language,
     ),
@@ -274,7 +275,9 @@ export function PostsPage() {
                           <Table.Cell><p className="max-w-md truncate font-medium">{post.title || `#${post.id}`}</p></Table.Cell>
                           <Table.Cell><code className="text-xs">{post.user}</code></Table.Cell>
                           <Table.Cell><Chip size="sm" variant="soft">{post.service}</Chip></Table.Cell>
-                          <Table.Cell className="text-xs text-muted">{formatDateTime(post.published, i18n.language)}</Table.Cell>
+                          <Table.Cell className="text-xs text-muted">
+                            {formatDateTime(post.effective_published, i18n.language, post.published_target_timezone)}
+                          </Table.Cell>
                           <Table.Cell><IconButton icon={Eye} label={t("posts.details")} onPress={() => openPost(post)} /></Table.Cell>
                         </Table.Row>
                       ))}
@@ -296,7 +299,9 @@ export function PostsPage() {
                     <div className="min-w-0"><p className="truncate font-medium">{post.title || `#${post.id}`}</p><p className="mt-1 text-xs text-muted">{post.service}:{post.user}</p></div>
                     <IconButton icon={Eye} label={t("posts.details")} onPress={() => openPost(post)} />
                   </div>
-                  <p className="text-xs text-muted">{formatDateTime(post.published, i18n.language)}</p>
+                  <p className="text-xs text-muted">
+                    {formatDateTime(post.effective_published, i18n.language, post.published_target_timezone)}
+                  </p>
                 </Surface>
               ))}
             </div>
@@ -345,6 +350,30 @@ export function PostsPage() {
                 <Chip size="sm" variant="soft">{details.user}:{details.id}</Chip>
                 {"revision_id" in details ? <Chip color="warning" size="sm" variant="soft">{t("posts.revisionLabel", { id: details.revision_id })}</Chip> : null}
               </div>
+              <section aria-labelledby="post-publication-time" className="grid gap-3 border-t border-border pt-5">
+                <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground" id="post-publication-time">
+                  <Clock aria-hidden="true" className="text-[var(--accent-strong)]" size={17} stroke={1.8} />
+                  {t("posts.effectivePublished")}
+                </h2>
+                <dl className="grid gap-3 text-sm sm:grid-cols-2">
+                  <div className="min-w-0">
+                    <dt className="text-xs text-muted">{t("posts.effectivePublished")}</dt>
+                    <dd className="mt-1 font-medium">
+                      {formatDateTime(details.effective_published, i18n.language, details.published_target_timezone)}
+                    </dd>
+                  </div>
+                  <div className="min-w-0">
+                    <dt className="text-xs text-muted">{t("posts.rawPublished")}</dt>
+                    <dd className="mt-1 min-w-0"><code className="break-all text-xs">{String(details.published ?? "—")}</code></dd>
+                  </div>
+                </dl>
+                <p className="text-xs leading-relaxed text-muted">
+                  {t("posts.publicationConversion", {
+                    serviceTimezone: details.published_service_timezone,
+                    targetTimezone: details.published_target_timezone,
+                  })}
+                </p>
+              </section>
               <section className="grid gap-4 border-t border-border pt-5">
                 <SelectField icon={History} label={t("posts.revision")} options={revisionOptions} value={selectedRevision} onChange={setSelectedRevision} />
                 <RemotePathField

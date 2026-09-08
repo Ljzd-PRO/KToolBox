@@ -38,6 +38,7 @@ import {
   IconPlayerPause as PlayerPause,
   IconPlayerPlay as PlayerPlay,
   IconPlayerStop as PlayerStop,
+  IconPlus as Plus,
   IconRefresh as Refresh,
   IconRestore as Restore,
   IconScan as Scan,
@@ -47,6 +48,7 @@ import {
   IconTrash as Trash,
   IconUser as User,
   IconUsers as Users,
+  IconWorld as World,
   IconX as X,
 } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
@@ -59,6 +61,7 @@ import {
   type LegacyConfigEditorIssue,
 } from "../components/LegacyConfigEditor";
 import { RemotePathField } from "../components/RemotePathField";
+import { TimeZoneComboBox } from "../components/TimeZoneComboBox";
 import {
   BatchActionBar,
   ChipListField,
@@ -72,6 +75,7 @@ import {
   PageHeader,
   PageLoading,
   SelectionCheckbox,
+  SelectField,
   SortableColumn,
   TableColumnLabel,
 } from "../components/ui";
@@ -87,6 +91,7 @@ import type {
   NamingLegacyContext,
   NamingPreview,
   NamingSourceParse,
+  PublishedTimePolicySnapshot,
   ProjectNamingConfiguration,
   StartupNotice,
 } from "../types";
@@ -148,6 +153,16 @@ external_links = "external_links.txt"
 file = "{id}_{}"
 revisions = "revisions"
 `;
+
+const defaultCustomPublishedTime: PublishedTimePolicySnapshot = {
+  mode: "normalized",
+  target_timezone: "UTC",
+  fallback_service_timezone: "UTC",
+  service_timezones: {
+    fanbox: "Asia/Tokyo",
+    patreon: "UTC",
+  },
+};
 
 function normalizeNaming(value: ProjectNamingConfiguration): NamingDraft {
   return {
@@ -337,6 +352,11 @@ export function NamingPage() {
     new Set(),
   );
   const [pastedFormat, setPastedFormat] = useState<"env" | "toml">("env");
+  const [pastedPublishedTimeMode, setPastedPublishedTimeMode] = useState<
+    "kemono_utc" | "pawchive_raw" | "custom"
+  >("kemono_utc");
+  const [customPublishedTime, setCustomPublishedTime] =
+    useState<PublishedTimePolicySnapshot>(defaultCustomPublishedTime);
   const [pastedDrafts, setPastedDrafts] = useState({ env: "", toml: "" });
   const [parsedSource, setParsedSource] = useState<NamingSourceParse | null>(null);
   const [parsingSource, setParsingSource] = useState(false);
@@ -532,6 +552,7 @@ export function NamingPage() {
         csrfToken: session.csrf_token,
       });
       setParsedSource(result);
+      setPastedPublishedTimeMode(result.default_published_time_mode);
       setSourceIssues([]);
       toast.success(t("naming.workflow.parseSuccess"), {
         description: t("naming.workflow.parseSuccessHint", {
@@ -618,6 +639,11 @@ export function NamingPage() {
             format: parsedSource.format,
             naming: parsedSource.naming,
             digest: parsedSource.digest,
+            published_time_mode: pastedPublishedTimeMode,
+            published_time:
+              pastedPublishedTimeMode === "custom"
+                ? { ...customPublishedTime, mode: "normalized" as const }
+                : undefined,
           }
         : null;
     if (!source) return;
@@ -1203,9 +1229,12 @@ export function NamingPage() {
                                 <p className="truncate text-sm font-semibold">
                                   {formatDateTime(version.created_at, i18n.language)}
                                 </p>
-                                <InlineCode className="mt-1 block w-fit max-w-full truncate">
-                                  {version.revision.slice(0, 12)}
-                                </InlineCode>
+                                <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
+                                  <InlineCode className="block w-fit max-w-full truncate">
+                                    {version.revision.slice(0, 12)}
+                                  </InlineCode>
+                                  <PublishedTimeModeChip publishedTime={version.published_time} />
+                                </div>
                               </div>
                               <Chip
                                 color={version.is_current ? "success" : "default"}
@@ -1243,7 +1272,11 @@ export function NamingPage() {
                     selectedKey={pastedFormat}
                     variant="secondary"
                     onSelectionChange={(key) => {
-                      setPastedFormat(String(key) as typeof pastedFormat);
+                      const nextFormat = String(key) as typeof pastedFormat;
+                      setPastedFormat(nextFormat);
+                      setPastedPublishedTimeMode(
+                        nextFormat === "env" ? "kemono_utc" : "pawchive_raw",
+                      );
                       setParsedSource(null);
                       setSourceError(null);
                       setSourceIssues([]);
@@ -1284,6 +1317,43 @@ export function NamingPage() {
                       />
                     </Tabs.Panel>
                   </Tabs>
+                  <SelectField
+                    description={t("naming.workflow.timeSemanticsHint")}
+                    icon={CalendarStats}
+                    label={t("naming.workflow.timeSemantics")}
+                    options={[
+                      {
+                        value: "kemono_utc",
+                        label: t("naming.workflow.timeModes.kemonoUtc"),
+                        description: t("naming.workflow.timeModes.kemonoUtcHint"),
+                        icon: History,
+                      },
+                      {
+                        value: "pawchive_raw",
+                        label: t("naming.workflow.timeModes.pawchiveRaw"),
+                        description: t("naming.workflow.timeModes.pawchiveRawHint"),
+                        icon: FileCode,
+                      },
+                      {
+                        value: "custom",
+                        label: t("naming.workflow.timeModes.custom"),
+                        description: t("naming.workflow.timeModes.customHint"),
+                        icon: World,
+                      },
+                    ]}
+                    value={pastedPublishedTimeMode}
+                    onChange={(value) =>
+                      setPastedPublishedTimeMode(
+                        value as typeof pastedPublishedTimeMode,
+                      )
+                    }
+                  />
+                  {pastedPublishedTimeMode === "custom" ? (
+                    <SourcePublishedTimeEditor
+                      value={customPublishedTime}
+                      onChange={setCustomPublishedTime}
+                    />
+                  ) : null}
                   {sourceError ? (
                     <Alert status="danger">
                       <Alert.Indicator>
@@ -1358,6 +1428,7 @@ export function NamingPage() {
                   {t("naming.workflow.targetRevision")}
                 </span>
                 <InlineCode>{current.revision.slice(0, 12)}</InlineCode>
+                <PublishedTimeModeChip publishedTime={current.published_time} />
               </div>
               <div
                 aria-label={t("naming.directoryPreview")}
@@ -2153,6 +2224,170 @@ function ConversionHistory({
         ))}
       </div>
     </>
+  );
+}
+
+function PublishedTimeModeChip({
+  publishedTime,
+}: {
+  publishedTime: PublishedTimePolicySnapshot;
+}) {
+  const { t } = useTranslation();
+  const mode = publishedTime.mode;
+  const label = t(`naming.workflow.timeModes.${
+    mode === "normalized"
+      ? "normalized"
+      : mode === "kemono_utc"
+        ? "kemonoUtc"
+        : "pawchiveRaw"
+  }`);
+  const detail = mode === "normalized"
+    ? t("naming.workflow.normalizedTimeSummary", {
+        timezone: publishedTime.target_timezone,
+      })
+    : t(`naming.workflow.timeModes.${
+        mode === "kemono_utc" ? "kemonoUtcHint" : "pawchiveRawHint"
+      }`);
+  return (
+    <Tooltip>
+      <Chip
+        color={mode === "normalized" ? "accent" : mode === "legacy_raw" ? "warning" : "default"}
+        size="sm"
+        variant="soft"
+      >
+        <World aria-hidden="true" size={13} />
+        {label}
+      </Chip>
+      <Tooltip.Content>{detail}</Tooltip.Content>
+    </Tooltip>
+  );
+}
+
+function SourcePublishedTimeEditor({
+  value,
+  onChange,
+}: {
+  value: PublishedTimePolicySnapshot;
+  onChange: (value: PublishedTimePolicySnapshot) => void;
+}) {
+  const { t } = useTranslation();
+  const entries = Object.entries(value.service_timezones ?? {});
+
+  function updateServices(next: Array<[string, string]>) {
+    onChange({
+      ...value,
+      mode: "normalized",
+      service_timezones: Object.fromEntries(next),
+    });
+  }
+
+  function addService() {
+    const used = new Set(entries.map(([service]) => service));
+    let index = 1;
+    while (used.has(`custom_service_${index}`)) index += 1;
+    updateServices([...entries, [`custom_service_${index}`, "UTC"]]);
+  }
+
+  return (
+    <fieldset className="grid min-w-0 gap-4 border-t border-border pt-4">
+      <legend className="flex items-center gap-2 pr-3 text-sm font-semibold text-foreground">
+        <World aria-hidden="true" className="text-accent" size={16} />
+        {t("naming.workflow.customTimeTitle")}
+      </legend>
+      <p className="text-xs leading-5 text-muted">
+        {t("naming.workflow.customTimeHint")}
+      </p>
+      <div className="grid min-w-0 gap-3 sm:grid-cols-2">
+        <TimeZoneComboBox
+          description={t("naming.workflow.sourceTargetTimezoneHint")}
+          label={t("naming.workflow.sourceTargetTimezone")}
+          value={value.target_timezone}
+          onChange={(targetTimezone) =>
+            onChange({ ...value, mode: "normalized", target_timezone: targetTimezone })
+          }
+        />
+        <TimeZoneComboBox
+          description={t("naming.workflow.sourceFallbackTimezoneHint")}
+          label={t("naming.workflow.sourceFallbackTimezone")}
+          value={value.fallback_service_timezone}
+          onChange={(fallbackTimezone) =>
+            onChange({
+              ...value,
+              mode: "normalized",
+              fallback_service_timezone: fallbackTimezone,
+            })
+          }
+        />
+      </div>
+      <div className="grid min-w-0 gap-2">
+        <div>
+          <p className="text-sm font-semibold text-foreground">
+            {t("naming.workflow.sourceServiceTimezones")}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-muted">
+            {t("naming.workflow.sourceServiceTimezonesHint")}
+          </p>
+        </div>
+        <div className="divide-y divide-border rounded-lg border border-border bg-default px-3">
+          {entries.map(([service, timezone], index) => (
+            <div
+              className="grid min-w-0 gap-3 py-3 sm:grid-cols-[minmax(8rem,0.8fr)_minmax(12rem,1.2fr)_auto] sm:items-end"
+              key={`${service}:${index}`}
+            >
+              <FormField
+                label={t("naming.workflow.serviceName")}
+                value={service}
+                onChange={(nextService) =>
+                  updateServices(
+                    entries.map((entry, entryIndex) =>
+                      entryIndex === index ? [nextService, entry[1]] : entry,
+                    ),
+                  )
+                }
+              />
+              <TimeZoneComboBox
+                label={t("naming.workflow.serviceTimezone")}
+                value={timezone}
+                onChange={(nextTimezone) =>
+                  updateServices(
+                    entries.map((entry, entryIndex) =>
+                      entryIndex === index ? [entry[0], nextTimezone] : entry,
+                    ),
+                  )
+                }
+              />
+              <Tooltip>
+                <Button
+                  isIconOnly
+                  aria-label={t("naming.workflow.removeServiceTimezone", { service })}
+                  className="size-11 min-w-11 text-danger"
+                  variant="ghost"
+                  onPress={() =>
+                    updateServices(entries.filter((_, entryIndex) => entryIndex !== index))
+                  }
+                >
+                  <Trash aria-hidden="true" size={17} />
+                </Button>
+                <Tooltip.Content>
+                  {t("naming.workflow.removeServiceTimezone", { service })}
+                </Tooltip.Content>
+              </Tooltip>
+            </div>
+          ))}
+          {!entries.length ? (
+            <p className="py-4 text-sm text-muted">
+              {t("naming.workflow.noServiceTimezones")}
+            </p>
+          ) : null}
+        </div>
+        <div>
+          <Button size="sm" variant="outline" onPress={addService}>
+            <Plus aria-hidden="true" size={16} />
+            {t("naming.workflow.addServiceTimezone")}
+          </Button>
+        </div>
+      </div>
+    </fieldset>
   );
 }
 

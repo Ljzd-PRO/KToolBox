@@ -20,6 +20,7 @@ from ktoolbox.configuration import (
     JobConfiguration,
     LoggerConfiguration,
     PostStructureConfiguration,
+    PublishedTimeConfiguration,
     WebUIConfiguration,
 )
 from ktoolbox.webui.config_locale_catalogs import CONFIG_LOCALE_CATALOGS
@@ -39,6 +40,7 @@ _MODEL_TRANSLATIONS: dict[type[BaseModel], type[BaseModel]] = {
     JobConfiguration: configuration_zh.JobConfiguration,
     PostStructureConfiguration: configuration_zh.PostStructureConfiguration,
     LoggerConfiguration: configuration_zh.LoggerConfiguration,
+    PublishedTimeConfiguration: configuration_zh.PublishedTimeConfiguration,
     WebUIConfiguration: configuration_zh.WebUIConfiguration,
 }
 
@@ -99,6 +101,9 @@ _LABELS: dict[str, tuple[str, str]] = {
     "logger.path": ("Log directory", "日志目录"),
     "logger.level": ("Log level", "日志级别"),
     "logger.rotation": ("Log rotation", "日志轮换"),
+    "published_time.target_timezone": ("Target timezone", "目标时区"),
+    "published_time.fallback_service_timezone": ("Fallback Service timezone", "未配置 Service 的时区"),
+    "published_time.service_timezones": ("Service timezones", "Service 时区"),
     "webui.host": ("WebUI listen address", "WebUI 监听地址"),
     "webui.port": ("WebUI port", "WebUI 端口"),
     "webui.open_browser": ("Open browser on startup", "启动时打开浏览器"),
@@ -118,6 +123,7 @@ _SECTION_LABELS: dict[str, tuple[str, str]] = {
     "downloader": ("File downloads", "文件下载"),
     "job": ("Download jobs", "下载任务"),
     "logger": ("Logging", "日志"),
+    "published_time": ("Publication time", "发布时间"),
     "webui": ("WebUI", "WebUI"),
     "general": ("General", "常规"),
 }
@@ -130,6 +136,26 @@ _PATH_SELECTORS: dict[str, PathSelectorResponse] = {
 _SUGGESTED_CHOICES: dict[str, tuple[str, ...]] = {
     "downloader.encoding": ("utf-8", "utf-8-sig", "gb18030", "shift_jis"),
     "logger.rotation": ("1 day", "1 week", "1 month"),
+    "published_time.target_timezone": (
+        "UTC",
+        "Asia/Shanghai",
+        "Asia/Tokyo",
+        "Asia/Seoul",
+        "Europe/Paris",
+        "Europe/Moscow",
+        "America/New_York",
+        "America/Los_Angeles",
+    ),
+    "published_time.fallback_service_timezone": (
+        "UTC",
+        "Asia/Shanghai",
+        "Asia/Tokyo",
+        "Asia/Seoul",
+        "Europe/Paris",
+        "Europe/Moscow",
+        "America/New_York",
+        "America/Los_Angeles",
+    ),
     "webui.host": ("127.0.0.1", "0.0.0.0"),
 }
 _RESTART_PATHS = {
@@ -216,6 +242,7 @@ def _walk_model(
                 apply_mode="restart" if path in _RESTART_PATHS else "next_task",
                 path_selector=_PATH_SELECTORS.get(path),
                 choice_mode=_choice_mode(property_schemas[name], path),
+                editor="service_timezones" if path == "published_time.service_timezones" else None,
                 choices=_choices(property_schemas[name], path),
             )
         )
