@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import sys
+import warnings
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -81,6 +82,23 @@ def test_uvloop_initialization_paths(monkeypatch) -> None:
     with patch("ktoolbox.utils.asyncio.set_event_loop_policy") as setter:
         assert uvloop_init() is True
     setter.assert_called_once_with(policy)
+
+
+def test_uvloop_initialization_ignores_python_314_policy_deprecation(monkeypatch) -> None:
+    def deprecated_policy() -> object:
+        warnings.warn(
+            "'asyncio.AbstractEventLoopPolicy' is deprecated and slated for removal in Python 3.16",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return object()
+
+    config.use_uvloop = True
+    monkeypatch.setattr(sys, "platform", "darwin")
+    monkeypatch.setitem(sys.modules, "uvloop", SimpleNamespace(EventLoopPolicy=deprecated_policy))
+    with patch("ktoolbox.utils.asyncio.set_event_loop_policy") as setter:
+        assert uvloop_init() is True
+    setter.assert_called_once()
 
 
 def test_logger_initialization(tmp_path: Path) -> None:

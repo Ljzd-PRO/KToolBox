@@ -3,6 +3,7 @@ import html
 import logging
 import re
 import sys
+import warnings
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Generic, TypeVar
@@ -150,7 +151,13 @@ def uvloop_init() -> bool:
                     "You can install it with `pip install ktoolbox[winloop]`"
                 )
             else:
-                asyncio.set_event_loop_policy(winloop.EventLoopPolicy())
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        "ignore",
+                        message=r"'asyncio\.AbstractEventLoopPolicy' is deprecated.*",
+                        category=DeprecationWarning,
+                    )
+                    asyncio.set_event_loop_policy(winloop.EventLoopPolicy())
                 logger.success("Set event loop policy to winloop successfully.")
                 return True
         else:
@@ -163,7 +170,13 @@ def uvloop_init() -> bool:
                     "uvloop is not installed, but it's optional. You can install it with `pip install ktoolbox[uvloop]`"
                 )
             else:
-                asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        "ignore",
+                        message=r"'asyncio\.AbstractEventLoopPolicy' is deprecated.*",
+                        category=DeprecationWarning,
+                    )
+                    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
                 logger.success("Set event loop policy to uvloop successfully.")
                 return True
     return False
