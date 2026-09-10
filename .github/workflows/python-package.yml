@@ -68,31 +68,37 @@ jobs:
           - os: windows-latest
             arch: x64
             python-arch: "x64"
+            python-version: "3.14"
             install-event-loop: "true"
           - os: windows-latest
             arch: x86
             python-arch: "x86"
-            # winloop no longer publishes 32-bit Windows wheels.
+            # Current native dependencies and winloop do not publish CPython 3.14 win32 wheels.
+            python-version: "3.13"
             install-event-loop: "false"
           
           # macOS builds  
           - os: macos-latest
             arch: arm64
             python-arch: "arm64"
+            python-version: "3.14"
             install-event-loop: "true"
           - os: macos-15-intel
             arch: x64
             python-arch: "x64"
+            python-version: "3.14"
             install-event-loop: "true"
           
           # Linux builds
           - os: ubuntu-latest
             arch: x64
             python-arch: "x64"
+            python-version: "3.14"
             install-event-loop: "true"
           - os: ubuntu-24.04-arm
             arch: arm64
             python-arch: "arm64"
+            python-version: "3.14"
             install-event-loop: "true"
 
     steps:
@@ -101,7 +107,7 @@ jobs:
       - name: Setup Python environment
         uses: ./.github/actions/setup-python
         with:
-          python-version: "3.14"
+          python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.python-arch }}
           poetry-install-arguments: "--with pyinstaller --extras urwid --extras webui"
           install-event-loop: ${{ matrix.install-event-loop }}
