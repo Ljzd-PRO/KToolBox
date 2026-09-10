@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 import signal
 import subprocess
 from pathlib import Path
@@ -57,6 +58,17 @@ def test_stop_process_tree_forces_windows_children_after_timeout(monkeypatch: py
     assert taskkill_calls[0][0] == ["taskkill", "/PID", "1234", "/T", "/F"]
     assert taskkill_calls[0][1]["timeout"] == 20
     assert process.communicate_calls == 2
+
+
+def test_stop_process_tree_does_not_reread_closed_output_for_exited_process() -> None:
+    process = ProcessStub()
+    process.poll = lambda: 1  # type: ignore[method-assign]
+    process.stdout = io.StringIO()  # type: ignore[attr-defined]
+    process.stdout.close()  # type: ignore[attr-defined]
+
+    smoke_test_executable._stop_process_tree(process)  # type: ignore[arg-type]
+
+    assert process.communicate_calls == 0
 
 
 def test_wheel_check_does_not_import_the_source_package(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

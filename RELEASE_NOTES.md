@@ -40,6 +40,7 @@ UTC 结果：    2025-12-20T15:35:43+00:00
 - README 与文档现在优先引导用户使用功能完整的 WebUI，并保留更精简的 CLI 与 Python API 入口。
 - 修复 Windows 下 `/attachments` 可能被误判为相对路径的问题；POSIX 与 Windows 根路径现在在所有系统上保持一致校验。
 - Python 支持范围修正为 `>=3.10,<3.15`，覆盖完整 Python 3.10 至 3.14 系列，并锁定提供 `cp314` wheel 的 `windows-curses 2.4.2`，使 Windows Python 3.14 可安装可选终端界面。
+- 64 位独立程序更新到兼容 Python 3.14 的 `uvloop`/`winloop`；由于当前 `winloop` 不提供 32 位 wheel，Windows x86 独立程序使用标准 `asyncio` 事件循环。
 - tag 发布流程提供 wheel、sdist、Windows x64/x86、macOS arm64/x64、Linux x64/arm64 和 `SHA256SUMS`。
 
 ## 从 v1.0.0 测试升级
@@ -106,6 +107,7 @@ KToolBox v1.1.0-beta.1 is a prerelease focused on migration correctness after v1
 - Fix [#389](https://github.com/Ljzd-PRO/KToolBox/issues/389) by restoring `.` / `./` attachment layouts and safely converting flat legacy attachments with independent source and target sequence numbering.
 - Harden paused conversion journals, conflict checks, cross-platform rooted-path validation, and old-layout previews.
 - Correct Python metadata to support the complete Python 3.10 through 3.14 range and lock `windows-curses 2.4.2` with Windows CPython 3.14 wheels.
+- Update standalone 64-bit builds to Python 3.14-compatible optimized event loops, with standard `asyncio` on Windows x86 where no current `winloop` wheel exists.
 - Make WebUI the primary getting-started path in the multilingual documentation.
 
 ### Upgrade checklist

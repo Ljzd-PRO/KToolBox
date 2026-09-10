@@ -54,7 +54,8 @@ def _wait_for_webui(process: subprocess.Popen[str], base_url: str, timeout: floa
 def _stop_process_tree(process: subprocess.Popen[str], *, windows: bool | None = None) -> None:
     """Stop the packaged server and every child that inherited its output pipe."""
     if process.poll() is not None:
-        process.communicate()
+        if process.stdout is not None and not process.stdout.closed:
+            process.communicate()
         return
 
     is_windows = os.name == "nt" if windows is None else windows

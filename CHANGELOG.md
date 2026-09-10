@@ -25,6 +25,8 @@ This beta validates the first post-v1 migration fixes before the next stable rel
 - Show work-root attachments beside the cover in WebUI directory previews, including configured sequential filenames.
 - Reject POSIX- and Windows-rooted naming paths consistently on every operating system.
 - Correct the Python requirement to support the full Python 3.14 series rather than only Python 3.14.0, and lock `windows-curses` 2.4.2 so Windows CPython 3.14 can install the optional terminal UI.
+- Update `uvloop` and `winloop` to their Python 3.14-compatible releases for standalone builds; Windows x86 executables use the standard `asyncio` loop because current `winloop` releases do not publish 32-bit wheels.
+- Preserve the original packaged-WebUI startup error when an executable exits early instead of masking it with a second read from a closed output pipe.
 - Correct seven-language migration and FAQ guidance for old root-level attachment layouts and publication-time changes.
 
 **Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v1.0.0...v1.1.0-beta.1

@@ -68,25 +68,32 @@ jobs:
           - os: windows-latest
             arch: x64
             python-arch: "x64"
+            install-event-loop: "true"
           - os: windows-latest
             arch: x86
             python-arch: "x86"
+            # winloop no longer publishes 32-bit Windows wheels.
+            install-event-loop: "false"
           
           # macOS builds  
           - os: macos-latest
             arch: arm64
             python-arch: "arm64"
+            install-event-loop: "true"
           - os: macos-15-intel
             arch: x64
             python-arch: "x64"
+            install-event-loop: "true"
           
           # Linux builds
           - os: ubuntu-latest
             arch: x64
             python-arch: "x64"
+            install-event-loop: "true"
           - os: ubuntu-24.04-arm
             arch: arm64
             python-arch: "arm64"
+            install-event-loop: "true"
 
     steps:
       - uses: actions/checkout@v6
@@ -97,6 +104,7 @@ jobs:
           python-version: "3.14"
           architecture: ${{ matrix.python-arch }}
           poetry-install-arguments: "--with pyinstaller --extras urwid --extras webui"
+          install-event-loop: ${{ matrix.install-event-loop }}
 
       - name: Create executable
         uses: ./.github/actions/pyinstaller
