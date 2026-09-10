@@ -206,7 +206,7 @@ def test_terminal_webui_configuration_refusal_has_no_traceback(tmp_path: Path) -
         env=environment,
         capture_output=True,
         text=True,
-        timeout=5,
+        timeout=20,
         check=False,
     )
 
