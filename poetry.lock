@@ -23,7 +23,7 @@ description = "Asynchronous file operations."
 optional = true
 python-versions = ">=3.11"
 groups = ["main"]
-markers = "python_full_version == \"3.14.0\" and extra == \"webui\""
+markers = "python_version == \"3.14\" and extra == \"webui\""
 files = [
     {file = "aiofile-3.11.1-py3-none-any.whl", hash = "sha256:ce77d14ac07f77bc2b757834a5c129321f3f705c474593deed5ab209079a52c9"},
     {file = "aiofile-3.11.1.tar.gz", hash = "sha256:1f91912c6643d2a4e49ca4ae3514f0bf3867ce948a36d99a6411b8f4755f4cf9"},
@@ -3560,7 +3560,7 @@ files = [
     {file = "rpds_py-2026.6.3-pp311-pypy311_pp73-musllinux_1_2_x86_64.whl", hash = "sha256:8e65860d238379ed982fd9ba690579b5e95af2f4840f99c772816dbe573cb826"},
     {file = "rpds_py-2026.6.3.tar.gz", hash = "sha256:1cebd1337c242e4ec2293e541f712b2da849b29f48f0c293684b71c0632625d4"},
 ]
-markers = {main = "python_full_version == \"3.14.0\" and extra == \"webui\"", dev = "python_full_version == \"3.14.0\""}
+markers = {main = "python_version == \"3.14\" and extra == \"webui\"", dev = "python_version == \"3.14\""}
 
 [[package]]
 name = "ruff"
@@ -4431,5 +4431,5 @@ winloop = ["winloop"]
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.10,<=3.14"
-content-hash = "3c5afdc19ef7594188b14e4c3278994b24f0fb48512697f11efb7f806536685d"
+python-versions = ">=3.10,<3.15"
+content-hash = "b6303924e8f0b0035aa0b7bad294b996a96d6f8a864477bf9da1d85272287de3"

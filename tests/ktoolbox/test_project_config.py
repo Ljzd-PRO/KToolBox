@@ -170,7 +170,20 @@ def test_attachment_directory_accepts_work_root_and_round_trips(tmp_path: Path, 
     assert store.load().naming.post_structure.attachments == Path(".")
 
 
-@pytest.mark.parametrize("value", ["", " ", "..", "../attachments", "/attachments"])
+@pytest.mark.parametrize(
+    "value",
+    [
+        "",
+        " ",
+        "..",
+        "../attachments",
+        r"..\attachments",
+        "/attachments",
+        r"\attachments",
+        r"C:\attachments",
+        r"C:attachments",
+    ],
+)
 def test_attachment_directory_still_rejects_empty_or_escaping_paths(value: str) -> None:
     with pytest.raises(ValueError):
         ProjectNamingConfiguration.model_validate({"post_structure": {"attachments": value}})
