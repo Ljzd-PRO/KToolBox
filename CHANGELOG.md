@@ -1,14 +1,33 @@
 # Unreleased
 
-## Fixes
+# KToolBox v1.1.0-beta.1
 
-- Normalize timezone-less `published` values by Pawchive Service, fixing Fanbox cross-midnight naming, filtering, and legacy-directory matching. The converter distinguishes Kemono UTC, Pawchive raw values, and custom Service timezones ([#390](https://github.com/Ljzd-PRO/KToolBox/issues/390)).
-- Persist the detected host target timezone only when a new project is created. Existing projects are not rewritten during configuration loading or WebUI startup, while WebUI, CLI, and MCP expose the effective publication time and target timezone.
+This beta validates the first post-v1 migration fixes before the next stable release. It focuses on publication-time correctness, legacy attachment layouts, release reliability, and clearer WebUI-first documentation.
+
+## Added
+
+- Add a Service-aware publication-time policy with configurable IANA target, fallback, and per-Service timezones. Fanbox defaults to `Asia/Tokyo`, Patreon defaults to `UTC`, and custom Pawchive Services can be configured independently ([#390](https://github.com/Ljzd-PRO/KToolBox/issues/390)).
+- Expose effective publication timestamps and configured target timezones through CLI, WebUI, MCP, project summaries, and a compact localized WebUI app-bar indicator.
+- Persist the detected host IANA timezone as `KTOOLBOX_PUBLISHED_TIME__TARGET_TIMEZONE` only when a new project is created, with a deterministic `UTC` fallback.
+
+## Changed
+
+- Interpret timezone-less Pawchive `published` values in their configured Service timezone before converting them to the target timezone for naming, year/month grouping, filters, automatic synchronization, and directory conversion.
+- Include publication-time policies in immutable naming-layout snapshots so conversion previews can distinguish Kemono UTC layouts, legacy Pawchive raw timestamps, and current Service-aware layouts.
+- Make the WebUI the primary path in README and documentation guidance, while keeping concise CLI and Python API references available.
+- Package wheel, sdist, six standalone architecture archives, and `SHA256SUMS` through the tag-driven release workflow, preserving executable permissions and publishing the Python package explicitly.
+
+## Fixed
+
 - Restore `.` / `./` attachment-directory support in project naming, pasted ENV/TOML sources, and confirmed v0 configuration migration ([#389](https://github.com/Ljzd-PRO/KToolBox/issues/389)).
-- Convert flat legacy attachments individually, including recognized revision files, while preserving covers, metadata, and unrelated files. Keep source and target sequential counters independent and reject target conflicts and unsafe paths.
+- Convert flat legacy attachments individually, including recognized revision files, while preserving covers, metadata, and unrelated files. Source and target sequential counters remain independent, and unsafe or conflicting destinations are rejected.
 - Validate paused conversion journal paths across parent-directory renames so nested attachment conversions can resume or roll back safely.
-- Show work-root attachments beside the cover in the WebUI directory preview, including the configured sequential filenames.
-- Correct the seven-language FAQ and document how to convert old root-level attachment layouts.
+- Show work-root attachments beside the cover in WebUI directory previews, including configured sequential filenames.
+- Reject POSIX- and Windows-rooted naming paths consistently on every operating system.
+- Correct the Python requirement to support the full Python 3.14 series rather than only Python 3.14.0.
+- Correct seven-language migration and FAQ guidance for old root-level attachment layouts and publication-time changes.
+
+**Full Changelog**: https://github.com/Ljzd-PRO/KToolBox/compare/v1.0.0...v1.1.0-beta.1
 
 # KToolBox v1.0.0
 

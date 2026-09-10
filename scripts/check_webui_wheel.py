@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import re
 from email.parser import Parser
 from pathlib import Path
 from zipfile import ZipFile
@@ -19,8 +20,16 @@ def _source_version() -> str:
     raise SystemExit("could not read the KToolBox source version")
 
 
+def _distribution_version(version: str) -> str:
+    match = re.fullmatch(r"(?P<base>\d+(?:\.\d+)+)-(?:alpha|beta|rc)\.(?P<number>\d+)", version)
+    if match is None:
+        return version
+    prerelease = "b" if "-beta." in version else "a" if "-alpha." in version else "rc"
+    return f"{match.group('base')}{prerelease}{match.group('number')}"
+
+
 def main() -> int:
-    source_version = _source_version()
+    source_version = _distribution_version(_source_version())
     wheels = sorted(Path("dist").glob(f"ktoolbox-{source_version}-*.whl"))
     if len(wheels) != 1:
         raise SystemExit(f"expected exactly one KToolBox wheel, found {len(wheels)}")

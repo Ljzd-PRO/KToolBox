@@ -60,12 +60,13 @@ def test_stop_process_tree_forces_windows_children_after_timeout(monkeypatch: py
 
 
 def test_wheel_check_does_not_import_the_source_package(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    wheel = tmp_path / "dist" / "ktoolbox-1.0.0-py3-none-any.whl"
+    version = check_webui_wheel._distribution_version(check_webui_wheel._source_version())
+    wheel = tmp_path / "dist" / f"ktoolbox-{version}-py3-none-any.whl"
     wheel.parent.mkdir()
     with ZipFile(wheel, "w") as archive:
         archive.writestr(
-            "ktoolbox-1.0.0.dist-info/METADATA",
-            "Metadata-Version: 2.4\nName: ktoolbox\nVersion: 1.0.0\n",
+            f"ktoolbox-{version}.dist-info/METADATA",
+            f"Metadata-Version: 2.4\nName: ktoolbox\nVersion: {version}\n",
         )
         archive.writestr("ktoolbox/webui/static/index.html", "")
         archive.writestr("ktoolbox/webui/static/assets/app.js", "")
@@ -76,3 +77,16 @@ def test_wheel_check_does_not_import_the_source_package(tmp_path: Path, monkeypa
     monkeypatch.chdir(tmp_path)
 
     assert check_webui_wheel.main() == 0
+
+
+@pytest.mark.parametrize(
+    ("source", "distribution"),
+    [
+        ("1.1.0", "1.1.0"),
+        ("1.1.0-alpha.2", "1.1.0a2"),
+        ("1.1.0-beta.1", "1.1.0b1"),
+        ("1.1.0-rc.3", "1.1.0rc3"),
+    ],
+)
+def test_distribution_version_matches_python_package_normalization(source: str, distribution: str) -> None:
+    assert check_webui_wheel._distribution_version(source) == distribution

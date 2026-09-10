@@ -1,7 +1,7 @@
 {
   "name": "ktoolbox-webui",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0-beta.1",
   "type": "module",
   "engines": {
     "node": ">=24"
