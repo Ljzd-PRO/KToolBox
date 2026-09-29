@@ -115,7 +115,8 @@ export function ConfigurationPage() {
     [dotenvQuery.data, productionQuery.data, projectQuery.data],
   );
 
-  if (schemaQuery.isLoading || dotenvQuery.isLoading || productionQuery.isLoading || projectQuery.isLoading) {
+  // 整页 loading 仅依赖 schema（字段区主体）；dotenv/production/project 文档有 ?? "" 兜底，慢/挂起不阻塞整页
+  if (schemaQuery.isLoading) {
     return <PageLoading />;
   }
 

@@ -31,6 +31,7 @@ import { useTranslation } from "react-i18next";
 
 import { api, errorText } from "../lib/api";
 import { useAuth } from "../lib/auth";
+import { ErrorBoundary } from "./ErrorBoundary";
 import { useRealtime } from "../lib/realtime";
 import { useTheme, type ThemeColor } from "../lib/theme";
 import { timeZonePresentation } from "../lib/timezones";
@@ -58,7 +59,7 @@ const navigation: NavigationItem[] = [
   { key: "blockers", path: "/blockers", icon: IconBan },
   { key: "naming", path: "/naming", icon: IconFolderCog },
   { key: "mcp", path: "/mcp", icon: IconPlugConnected },
-  { key: "configuration", path: "/configuration", icon: IconSettingsCog },
+  { key: "configuration", path: "/setting", icon: IconSettingsCog },
   { key: "system", path: "/system", icon: IconAdjustmentsHorizontal },
   { key: "about", path: "/about", icon: IconInfoCircle },
 ];
@@ -453,7 +454,10 @@ export function AppShell() {
         </header>
 
         <main className="app-main mx-auto grid min-w-0 w-full max-w-7xl gap-5 p-3 sm:p-6 md:p-8">
-          <Outlet />
+          {/* 空白页 bug 兜底：路由出口渲染异常 → 兜底 UI 而非白屏；resetKey=pathname 切页自动重置（非 key remount——避免整树重挂卡顿） */}
+          <ErrorBoundary label="route" resetKey={location.pathname}>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
 

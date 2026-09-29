@@ -13,6 +13,7 @@ class APIConfiguration(ktoolbox.configuration.APIConfiguration):
     :ivar timeout: API 请求超时时间
     :ivar retry_times: API 请求失败时重试次数
     :ivar retry_interval: API 请求重试间隔秒数
+    :ivar user_agent: 随 API 请求发送的自定义 User-Agent 头；空字符串表示使用 httpx 默认值（向后兼容）
     """
 
     ...
@@ -41,6 +42,7 @@ class DownloaderConfiguration(ktoolbox.configuration.DownloaderConfiguration):
     例如：``https://example.com/{}`` 会变成 ``https://example.com/https://file.pawchive.pw/data/66/83/xxxxx.jpg``；\
     ``https://example.com/?url={}`` 会变成 ``https://example.com/?url=https://file.pawchive.pw/data/66/83/xxxxx.jpg``
     :ivar keep_metadata: 下载文件时保留文件元数据（例如最后修改时间等）
+    :ivar user_agent: 随文件下载请求发送的自定义 User-Agent 头；空字符串表示使用 httpx 默认值（向后兼容）
     """
 
     ...

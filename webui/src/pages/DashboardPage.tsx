@@ -99,7 +99,8 @@ export function DashboardPage() {
     { value: "created", label: t("common.created") },
   ];
 
-  if (project.isLoading || tasks.isLoading || creators.isLoading) return <PageLoading />;
+  // 整页 loading 仅依赖主数据（creators 供统计/排序——有 ?? [] 兜底，慢/挂起不阻塞首页渲染）
+  if (project.isLoading || tasks.isLoading) return <PageLoading />;
 
   return (
     <div className="grid gap-5">

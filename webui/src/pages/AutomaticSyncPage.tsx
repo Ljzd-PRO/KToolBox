@@ -300,7 +300,8 @@ export function AutomaticSyncPage() {
     i18n.resolvedLanguage ?? i18n.language,
   );
 
-  if (plansQuery.isLoading || creatorsQuery.isLoading || runsQuery.isLoading) return <PageLoading />;
+  // 整页 loading 仅依赖主内容查询（creators 供表单选择——依赖处有 ?? [] 兜底，慢/挂起不阻塞整页）
+  if (plansQuery.isLoading || runsQuery.isLoading) return <PageLoading />;
 
   function openNew() {
     setEditingId(null);

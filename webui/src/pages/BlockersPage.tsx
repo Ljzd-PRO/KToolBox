@@ -111,7 +111,8 @@ export function BlockersPage() {
   const [saving, setSaving] = useState(false);
   const [removingIndex, setRemovingIndex] = useState<number | null>(null);
 
-  if (blockersQuery.isLoading || creatorsQuery.isLoading) return <PageLoading />;
+  // 整页 loading 仅依赖主列表查询（creators 供表单选择——creatorOptions 有 ?? [] 兜底，慢/挂起不阻塞整页）
+  if (blockersQuery.isLoading) return <PageLoading />;
   const blockers = blockersQuery.data?.blockers ?? [];
   const creatorOptions = (creatorsQuery.data ?? []).map((creator) => ({
     value: `${creator.service}:${creator.creator_id}`,

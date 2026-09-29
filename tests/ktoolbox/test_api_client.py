@@ -369,3 +369,18 @@ async def test_flag_status_and_client_lifecycle() -> None:
 def test_invalid_client_configuration(kwargs: dict[str, object], message: str) -> None:
     with pytest.raises(ValueError, match=message):
         PawchiveClient(**kwargs)
+
+
+async def test_custom_user_agent_header_sent() -> None:
+    """3.1: 配置 user_agent 时请求携带自定义 User-Agent 头"""
+    seen: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request.headers.get("user-agent", ""))
+        return response(request, json={"id": "creator", "name": "N", "service": "fanbox"})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http_client:
+        client = PawchiveClient(base_url=BASE_URL, http_client=http_client, user_agent="ktoolbox-test-ua")
+        await client.get_creator_profile("fanbox", "creator")
+
+    assert seen == ["ktoolbox-test-ua"]

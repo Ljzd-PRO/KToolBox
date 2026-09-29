@@ -225,7 +225,8 @@ async def test_invalid_content_length_does_not_abort_download(tmp_path: Path) ->
 
 @pytest.mark.asyncio
 async def test_unexpected_status_is_failure_and_restores_original_url(tmp_path: Path) -> None:
-    transport = httpx.MockTransport(lambda request: partial_response(request, status=200))
+    # 200 自 3.4 起为合法 fallback（服务端忽略 Range 返回全量）；用 403 等真正非预期状态验证失败路径
+    transport = httpx.MockTransport(lambda request: partial_response(request, status=403))
     async with httpx.AsyncClient(transport=transport) as client:
         downloader = Downloader("https://files.example.test/file.bin", tmp_path, client, server_path="/file.bin")
         downloader._url = "https://redirected.example.test/file.bin"
@@ -374,3 +375,74 @@ async def test_metadata_failure_is_nonfatal_and_cancel_stops_stream(tmp_path: Pa
         with pytest.raises(asyncio.CancelledError):
             await run_once(downloader)
     assert (tmp_path / "file.bin.tmp").exists()
+
+
+@pytest.mark.asyncio
+async def test_full_200_response_restarts_temp(tmp_path: Path) -> None:
+    """3.4: 服务端忽略 Range 返回 200 全量 → 清零 temp 从头重写，不失败"""
+    temp = tmp_path / "source.bin.tmp"
+    temp.write_bytes(b"stale-partial")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            content=b"complete-data",
+            headers={"Content-Disposition": "attachment;filename*=utf-8''source.bin"},
+            request=request,
+        )
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        downloader = Downloader(
+            "https://files.example.test/data/source.bin", tmp_path, client, server_path="/source.bin"
+        )
+        result = await run_once(downloader)
+
+    assert result.code == RetCodeEnum.Success
+    assert (tmp_path / "source.bin").read_bytes() == b"complete-data"
+    assert not temp.exists()  # 旧 temp 已清除，无残留
+
+
+@pytest.mark.asyncio
+async def test_incomplete_download_fails_on_size_mismatch(tmp_path: Path) -> None:
+    """3.6: Content-Range 声称 10 字节但实际仅 4 字节 → 完整性断言触发失败"""
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            206,
+            content=b"data",
+            headers={"Content-Range": "bytes 0-3/10"},
+            request=request,
+        )
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        downloader = Downloader(
+            "https://files.example.test/data/x.bin", tmp_path, client, server_path="/x.bin"
+        )
+        result = await run_once(downloader)
+
+    assert result.code == RetCodeEnum.GeneralFailure
+    assert not (tmp_path / "x.bin").exists()
+
+
+@pytest.mark.asyncio
+async def test_reverse_proxy_replaces_placeholder_safely(tmp_path: Path) -> None:
+    """10.6: reverse_proxy 用 replace 替换占位符——源 URL 含字面 {} 不抛 KeyError 且正确替换"""
+    seen: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(str(request.url))
+        return partial_response(request, b"ok", headers={"Content-Disposition": "attachment;filename*=utf-8''r.bin"})
+
+    config.downloader.reverse_proxy = "https://proxy.test/{}"
+    try:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            downloader = Downloader(
+                "https://files.example.test/data/{x}.bin", tmp_path, client, server_path="/{x}.bin"
+            )
+            result = await run_once(downloader)
+    finally:
+        config.downloader.reverse_proxy = "{}"
+
+    assert result.code == RetCodeEnum.Success
+    # httpx 会把 URL 中字面 {} 编码为 %7B%7D——断言编码后形式
+    assert seen and seen[0].startswith("https://proxy.test/https://files.example.test/data/")
+    assert "x" in seen[0]

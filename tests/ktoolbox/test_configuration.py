@@ -150,3 +150,9 @@ def test_bucket_validator_disables_unavailable_directory(tmp_path: Path) -> None
         configured = DownloaderConfiguration(use_bucket=True, bucket_path=tmp_path / "bucket")
     assert configured.use_bucket is False
     assert list(configured.bucket_path.iterdir()) == []
+
+
+def test_user_agent_defaults_empty_for_backward_compatibility() -> None:
+    """3.1: user_agent 新字段默认空串（= httpx 默认，向后兼容）"""
+    assert config.api.user_agent == ""
+    assert config.downloader.user_agent == ""

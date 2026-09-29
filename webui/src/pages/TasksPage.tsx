@@ -161,7 +161,9 @@ export function TasksPage() {
     enabled: Boolean(taskId),
   });
 
-  if (tasksQuery.isLoading || creatorsQuery.isLoading || projectQuery.isLoading) return <PageLoading />;
+  // 整页 loading 仅依赖主列表查询（creators/project 供编辑器区块——依赖处均有 ?? [] 兜底，
+  // 慢/挂起不再阻塞整页渲染——修复「切页后内容未完全渲染」）
+  if (tasksQuery.isLoading) return <PageLoading />;
   const tasks = tasksQuery.data ?? [];
   const selected = taskId ? tasks.find((task) => task.id === taskId) : undefined;
 

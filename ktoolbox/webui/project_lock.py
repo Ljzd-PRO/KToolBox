@@ -16,7 +16,7 @@ class ProjectProcessLock:
 
     def __init__(self, path: Path) -> None:
         self._path = path
-        self._lock = AsyncFileLock(path, fallback_to_soft=False)
+        self._lock = AsyncFileLock(path)
 
     async def acquire(self) -> None:
         await anyio.to_thread.run_sync(partial(self._path.parent.mkdir, parents=True, exist_ok=True))

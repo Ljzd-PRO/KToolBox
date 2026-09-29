@@ -169,7 +169,8 @@ export function MCPPage() {
   }, [visibleTools]);
   const expandToolGroups = Boolean(toolSearch.trim()) || scopeFilter !== "all" || toolGroups.length === 1;
 
-  if (status.isLoading || tokens.isLoading || tools.isLoading) return <PageLoading />;
+  // 整页 loading 仅依赖 status（服务状态区）；tokens/tools 区块数据均有兜底（?.length/?? []），慢/挂起不阻塞整页
+  if (status.isLoading) return <PageLoading />;
 
   async function copy(value: string, label: string) {
     try {

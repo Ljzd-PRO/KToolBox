@@ -51,6 +51,8 @@ class APIConfiguration(BaseModel):
     :ivar timeout: API request timeout
     :ivar retry_times: API request retry times (when request failed)
     :ivar retry_interval: Seconds of API request retry interval
+    :ivar user_agent: Custom User-Agent header sent with API requests. \
+    Empty string means httpx default (backward compatible)
     """
 
     scheme: Literal["http", "https"] = "https"
@@ -60,6 +62,7 @@ class APIConfiguration(BaseModel):
     timeout: float = 5.0
     retry_times: int = 3
     retry_interval: float = 2.0
+    user_agent: str = ""
 
 
 class DownloaderConfiguration(BaseModel):
@@ -89,6 +92,8 @@ class DownloaderConfiguration(BaseModel):
     ``https://example.com/?url={}`` will be \
     ``https://example.com/?url=https://file.pawchive.pw/data/66/83/xxxxx.jpg``
     :ivar keep_metadata: Keep the file metadata when downloading files (e.g. last modified time, etc.)
+    :ivar user_agent: Custom User-Agent header sent with file download requests. \
+    Empty string means httpx default (backward compatible)
     """
 
     scheme: Literal["http", "https"] = "https"
@@ -108,6 +113,7 @@ class DownloaderConfiguration(BaseModel):
     bucket_path: Path = Path("./.ktoolbox/bucket_storage")
     reverse_proxy: str = "{}"
     keep_metadata: bool = True
+    user_agent: str = ""
 
     @model_validator(mode="after")
     def check_bucket_path(self) -> "DownloaderConfiguration":

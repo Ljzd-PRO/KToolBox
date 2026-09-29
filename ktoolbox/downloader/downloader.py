@@ -264,14 +264,24 @@ class Downloader:
             except FileNotFoundError:
                 temp_size = 0
 
+            proxy_template = config.downloader.reverse_proxy
+            # 10.6: 用 replace 安全替换占位符（str.format 对含 {} 字符的 URL 会抛错/吞字符）
+            download_url = proxy_template.replace("{}", self._url) if "{}" in proxy_template else proxy_template
             async with self._client.stream(
                 method="GET",
-                url=config.downloader.reverse_proxy.format(self._url),
+                url=download_url,
                 follow_redirects=True,
                 timeout=config.downloader.timeout,
                 headers={"Range": f"bytes={temp_size}-"},
             ) as res:  # type: httpx.Response
-                if res.status_code != httpx.codes.PARTIAL_CONTENT:
+                if res.status_code == httpx.codes.OK:
+                    # 3.4: 服务端忽略 Range 头返回全量 200 → 清零 temp 从头重写（而非直接失败）
+                    temp_size = 0
+                    try:
+                        await aiofiles.os.remove(temp_filepath)
+                    except FileNotFoundError:
+                        pass
+                elif res.status_code != httpx.codes.PARTIAL_CONTENT:
                     self._url = self._initial_url
                     return DownloaderRet(
                         code=RetCodeEnum.GeneralFailure,
@@ -320,6 +330,20 @@ class Downloader:
                             progress.advance(len(chunk))
 
             # Download finished
+            # 3.6: 完整性校验——total_size 可得时断言 temp 实际写入字节一致，不符视为失败（触发重试）
+            if total_size is not None:
+                actual_size = (await aiofiles.os.stat(temp_filepath)).st_size
+                if actual_size != total_size:
+                    self._url = self._initial_url
+                    return DownloaderRet(
+                        code=RetCodeEnum.GeneralFailure,
+                        message=generate_msg(
+                            "Download incomplete",
+                            expected=total_size,
+                            actual=actual_size,
+                            filename=save_filepath,
+                        ),
+                    )
             if config.downloader.use_bucket and bucket_file_path is not None:
                 bucket_file_path.parent.mkdir(parents=True, exist_ok=True)
                 await aiofiles.os.link(temp_filepath, bucket_file_path)

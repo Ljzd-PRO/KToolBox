@@ -137,6 +137,7 @@ class DownloadWorkerPool:
         async with httpx.AsyncClient(
             verify=config.ssl_verify,
             cookies={"session": config.downloader.session_key} if config.downloader.session_key else None,
+            headers={"User-Agent": config.downloader.user_agent} if config.downloader.user_agent else None,
             limits=limits,
         ) as client:
             workers = [asyncio.create_task(self._worker(queue, client, summary)) for _ in range(self.concurrency)]

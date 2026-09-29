@@ -502,9 +502,7 @@ export function NamingPage() {
 
   if (
     namingQuery.isLoading ||
-    conversionsQuery.isLoading ||
     legacyContextQuery.isLoading ||
-    layoutVersionsQuery.isLoading ||
     !draft ||
     !current ||
     legacyRoots === null

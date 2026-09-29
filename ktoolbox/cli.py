@@ -50,6 +50,18 @@ async def _requested_post(
     return revision
 
 
+async def _creator_name(client: PawchiveClient, service: str, creator_id: str) -> str:
+    """Fetch the creator display name; fall back to the creator id when unavailable.
+
+    Shared by single-post download and creator sync so both produce an author directory.
+    """
+    try:
+        profile = await client.get_creator_profile(service, creator_id)
+        return profile.name
+    except PawchiveError:
+        return creator_id
+
+
 async def _dump_model(model: BaseModel, path: Path) -> None:
     async with aiofiles.open(path, "w", encoding="utf-8") as file:
         await file.write(model.model_dump_json(indent=config.json_dump_indent))
@@ -212,7 +224,12 @@ class KToolBoxCli:
         try:
             async with create_pawchive_client() as client:
                 post = await _requested_post(client, service, creator_id, post_id, revision_id)
-                post_path = output_path / generate_post_path_name(post, naming, published_time)
+                creator_name = await _creator_name(client, service, creator_id)
+                post_path = (
+                    output_path
+                    / generate_creator_path_name(service, creator_id, creator_name, naming)
+                    / generate_post_path_name(post, naming, published_time)
+                )
                 if revision_id:
                     post_path = (
                         post_path
@@ -305,11 +322,11 @@ class KToolBoxCli:
         published_time = config.published_time.policy()
         try:
             async with create_pawchive_client() as client:
-                profile = await client.get_creator_profile(service, creator_id)
+                creator_name = await _creator_name(client, service, creator_id)
                 creator_path = output_path / generate_creator_path_name(
                     service,
                     creator_id,
-                    profile.name,
+                    creator_name,
                     naming,
                 )
                 creator_path.mkdir(parents=True, exist_ok=True)

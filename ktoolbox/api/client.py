@@ -91,6 +91,7 @@ class PawchiveClient:
         http_client: httpx.AsyncClient | None = None,
         drift_reporter: DriftReporter | None = None,
         sleep: Sleep = asyncio.sleep,
+        user_agent: str = "",
     ) -> None:
         if max_retries < 0:
             raise ValueError("max_retries must not be negative")
@@ -108,7 +109,13 @@ class PawchiveClient:
         self._drift_reporter = drift_reporter or _log_drift
         self._sleep = sleep
         self._owns_http_client = http_client is None
-        self._http_client = http_client or httpx.AsyncClient(verify=verify)
+        if http_client is not None and user_agent:
+            # 外部传入 client 时也要应用自定义 UA（仅当调用方没自带 UA 时覆盖）
+            http_client.headers["User-Agent"] = user_agent
+        self._http_client = http_client or httpx.AsyncClient(
+            verify=verify,
+            headers={"User-Agent": user_agent} if user_agent else None,
+        )
         self._closed = False
 
     async def __aenter__(self) -> PawchiveClient:

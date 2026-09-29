@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 import secrets
+from datetime import datetime, timezone
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -8,7 +10,7 @@ from typing import Annotated, cast
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastmcp.utilities.lifespan import combine_lifespans
 from starlette.middleware.base import RequestResponseEndpoint
@@ -287,11 +289,31 @@ def create_app(
     app.router.lifespan_context = combine_lifespans(lifespan, mcp_app.lifespan)
     app.mount("/mcp", mcp_app, name="mcp")
 
+    # 前端错误自检①层（browser-error-observability 三件套注入 + 上报落盘——AI 无视觉感知浏览器错误）
+    ERROR_REPORTER = """<script>
+(function(){var N="/api/v1/client-error",n=0;function r(p){if(n++>20)return;try{navigator.sendBeacon(N,JSON.stringify(Object.assign({ts:Date.now(),href:location.href,ua:navigator.userAgent},p)));}catch(_){try{fetch(N,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p),keepalive:true}).catch(function(){})}catch(__){}}}
+window.addEventListener("error",function(e){if(e.target&&e.target!==window){r({type:"resource",tag:e.target.tagName,src:e.target.src||e.target.href});}else{r({type:"error",message:String(e.message),source:e.filename,lineno:e.lineno,colno:e.colno,stack:(e.error&&e.error.stack)||""});}},true);
+window.addEventListener("unhandledrejection",function(e){var er=e.reason;r({type:"unhandledrejection",message:(er&&er.message)||String(er),stack:(er&&er.stack)||""});});})();</script>"""
+
+    @app.post("/api/v1/client-error", include_in_schema=False)
+    async def client_error(request: Request) -> JSONResponse:
+        try:
+            body = await request.json()
+            entry = {**body, "receivedAt": datetime.now(timezone.utc).isoformat()}
+            with open(context.project_root / ".client-errors.jsonl", "a", encoding="utf-8") as f:
+                f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        except Exception:
+            pass
+        return JSONResponse({"ok": True})
+
     @app.get("/{path:path}", include_in_schema=False)
-    async def frontend(path: str) -> FileResponse:
+    async def frontend(path: str) -> HTMLResponse:
         index = static_root / "index.html"
         if path.startswith("api/") or not index.is_file():
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not found")
-        return FileResponse(index, headers={"Cache-Control": "no-cache"})
+        text = index.read_text(encoding="utf-8")
+        if "</head>" in text and "/api/v1/client-error" not in text:
+            text = text.replace("</head>", ERROR_REPORTER + "</head>")
+        return HTMLResponse(text)
 
     return app
