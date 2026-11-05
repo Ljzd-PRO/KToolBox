@@ -386,23 +386,20 @@ async def test_metadata_failure_is_nonfatal_and_cancel_stops_stream(tmp_path: Pa
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize(
-    ("status", "headers", "expected"),
-    [(429, {"Retry-After": "7"}, 7.0), (429, {}, None), (503, {"Retry-After": "7"}, None)],
-)
-async def test_failed_response_keeps_retry_after_only_for_rate_limits(
-    tmp_path: Path, status: int, headers: dict[str, str], expected: float | None
+@pytest.mark.parametrize(("headers", "expected"), [({"Retry-After": "7"}, 7.0), ({}, None)])
+async def test_failed_response_keeps_retry_after(
+    tmp_path: Path, headers: dict[str, str], expected: float | None
 ) -> None:
     config.downloader.tps_limit = 10_000
 
     def handler(request: httpx.Request) -> httpx.Response:
-        return partial_response(request, status=status, headers=headers)
+        return partial_response(request, status=429, headers=headers)
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
         downloader = Downloader("https://files.example.test/file.bin", tmp_path, client, server_path="/file.bin")
         result = await run_once(downloader)
 
-    assert result.status_code == status
+    assert result.status_code == 429
     assert result.retry_after == expected
 
 
@@ -456,10 +453,7 @@ async def test_only_rate_limited_retries_pause_other_downloads(
     assert result.code == RetCodeEnum.Success
     assert progress.retries == [(0, status)]
     assert "retry_in: 0.05s" in warning.call_args.args[0]
-    if pauses_others:
-        assert Downloader._rate_limited_until >= started + 0.05
-    else:
-        assert Downloader._rate_limited_until == 0.0
+    assert (Downloader._rate_limited_until >= started + 0.05) is pauses_others
 
 
 @pytest.mark.asyncio

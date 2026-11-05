@@ -34,18 +34,19 @@ def test_parse_retry_after_defaults_to_the_current_time() -> None:
     assert delay is not None and delay > 0
 
 
-def test_rate_limit_delay_honors_retry_after_within_bounds() -> None:
-    assert rate_limit_delay(10.0, 1, 2.0) == 10.0
-    assert rate_limit_delay(0.0, 1, 2.0) == 2.0
-    assert rate_limit_delay(10_000.0, 1, 2.0) == MAX_RATE_LIMIT_DELAY
-
-
-def test_rate_limit_delay_backs_off_exponentially_without_retry_after() -> None:
-    assert [rate_limit_delay(None, attempt, 2.0) for attempt in range(1, 6)] == [2.0, 4.0, 8.0, 16.0, 32.0]
-    assert rate_limit_delay(None, 0, 2.0) == 2.0
-    assert rate_limit_delay(None, 10_000, 2.0) == MAX_RATE_LIMIT_DELAY
-
-
-def test_rate_limit_delay_never_waits_less_than_the_configured_interval() -> None:
-    assert rate_limit_delay(None, 1, 600.0) == 600.0
-    assert rate_limit_delay(5.0, 1, 600.0) == 600.0
+@pytest.mark.parametrize(
+    ("retry_after", "attempt", "interval", "expected"),
+    [
+        (10.0, 1, 2.0, 10.0),  # the server's value wins
+        (0.0, 1, 2.0, 2.0),  # but never below the interval
+        (10_000.0, 1, 2.0, MAX_RATE_LIMIT_DELAY),  # and never above the cap
+        (None, 1, 2.0, 2.0),  # without Retry-After, double per attempt
+        (None, 2, 2.0, 4.0),
+        (None, 5, 2.0, 32.0),
+        (None, 10_000, 2.0, MAX_RATE_LIMIT_DELAY),  # endless retries don't overflow
+        (None, 1, 600.0, 600.0),  # an interval above the cap wins
+        (5.0, 1, 600.0, 600.0),
+    ],
+)
+def test_rate_limit_delay(retry_after: float | None, attempt: int, interval: float, expected: float) -> None:
+    assert rate_limit_delay(retry_after, attempt, interval) == expected

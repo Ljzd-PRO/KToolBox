@@ -12,4 +12,4 @@ class DownloaderRet(BaseRet[_T]):
 
     status_code: int | None = None
     retry_after: float | None = None
-    """Seconds the server asked us to wait (``Retry-After``), only set for HTTP 429"""
+    """Seconds from the ``Retry-After`` header, if the server sent one"""

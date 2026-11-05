@@ -243,9 +243,9 @@ class Downloader:
             else:
                 status_code = outcome.result().status_code
         exception = outcome.exception() if outcome is not None and outcome.failed else None
-        delay = state.next_action.sleep if state.next_action is not None else 0.0
+        assert state.next_action is not None  # tenacity sets it before calling before_sleep
+        delay = state.next_action.sleep
         if status_code == httpx.codes.TOO_MANY_REQUESTS:
-            # Slow every download down, not just this one, so the rate limit can clear.
             self._pause_all(delay)
         logger.warning(
             generate_msg(
@@ -311,11 +311,7 @@ class Downloader:
                         code=RetCodeEnum.GeneralFailure,
                         message=generate_msg("Download failed", status_code=res.status_code, filename=save_filepath),
                         status_code=res.status_code,
-                        retry_after=(
-                            parse_retry_after(res.headers.get("Retry-After"))
-                            if res.status_code == httpx.codes.TOO_MANY_REQUESTS
-                            else None
-                        ),
+                        retry_after=parse_retry_after(res.headers.get("Retry-After")),
                     )
                 # Get filename for saving and check if file exists (Second-time duplicate file check)
                 # Priority order can be referenced from the constructor's documentation

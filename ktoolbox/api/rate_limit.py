@@ -40,29 +40,13 @@ def parse_retry_after(value: str | None, *, now: datetime | None = None) -> floa
     return max((retry_at - current).total_seconds(), 0.0)
 
 
-def rate_limit_delay(
-    retry_after: float | None,
-    attempt: int,
-    interval: float,
-    *,
-    maximum: float = MAX_RATE_LIMIT_DELAY,
-) -> float:
+def rate_limit_delay(retry_after: float | None, attempt: int, interval: float) -> float:
     """
-    Choose how long to wait before retrying a rate-limited request.
+    Seconds to wait before retrying after HTTP 429.
 
-    The server's ``Retry-After`` wins when present. Without it the wait doubles with every
-    attempt, starting from ``interval``. The result is never shorter than ``interval`` and
-    never longer than ``maximum`` (unless ``interval`` itself is longer).
-
-    :param retry_after: Seconds from ``parse_retry_after``, or ``None``
-    :param attempt: Number of the attempt that was rate-limited, starting at 1
-    :param interval: Configured retry interval in seconds
-    :param maximum: Upper bound for a single wait in seconds
-    :return: Seconds to wait
+    The server's ``Retry-After`` wins; without it the wait doubles from ``interval`` on each
+    attempt (``attempt`` counts from 1). The result stays between ``interval`` and
+    ``MAX_RATE_LIMIT_DELAY``.
     """
-    if retry_after is None:
-        exponent = min(max(attempt - 1, 0), _MAX_BACKOFF_EXPONENT)
-        delay = interval * 2.0**exponent
-    else:
-        delay = retry_after
-    return max(interval, min(delay, maximum))
+    delay = interval * 2.0 ** min(attempt - 1, _MAX_BACKOFF_EXPONENT) if retry_after is None else retry_after
+    return max(interval, min(delay, MAX_RATE_LIMIT_DELAY))

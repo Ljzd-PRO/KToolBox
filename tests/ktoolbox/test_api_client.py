@@ -55,10 +55,11 @@ def response(
     *,
     json: object | None = None,
     text: str | None = None,
+    headers: dict[str, str] | None = None,
 ) -> httpx.Response:
     if text is not None:
-        return httpx.Response(status, text=text, request=request)
-    return httpx.Response(status, json=json, request=request)
+        return httpx.Response(status, text=text, headers=headers, request=request)
+    return httpx.Response(status, json=json, headers=headers, request=request)
 
 
 @pytest.mark.asyncio
@@ -252,7 +253,7 @@ async def test_rate_limited_requests_honor_retry_after_then_back_off() -> None:
 
     def handler(request: httpx.Request) -> httpx.Response:
         status, headers = next(statuses)
-        return httpx.Response(status, json=[], headers=headers, request=request)
+        return response(request, status, json=[], headers=headers)
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http_client:
         client = PawchiveClient(
