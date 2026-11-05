@@ -25,7 +25,7 @@ On narrow screens, swipe tables horizontally to inspect every column.
 | `path` | string | `/api/v1` | API root path. |
 | `timeout` | float | `5.0` | Per-request timeout in seconds. |
 | `retry_times` | integer | `3` | Additional attempts for transport, `429`, and `5xx` failures. |
-| `retry_interval` | float | `2.0` | Delay between API attempts in seconds. |
+| `retry_interval` | float | `2.0` | Delay between API attempts in seconds. After `429`, the server's `Retry-After` is used, or the delay doubles with each attempt (300 seconds at most). |
 
 The API group intentionally contains no session key.
 
@@ -44,7 +44,7 @@ The API group intentionally contains no session key.
 | `temp_suffix` | string | `tmp` | Suffix for incomplete downloads. |
 | `retry_times` | integer | `10` | Additional download attempts. |
 | `retry_stop_never` | boolean | `False` | Retry forever and ignore `retry_times`. |
-| `retry_interval` | float | `3.0` | Delay between download attempts in seconds. |
+| `retry_interval` | float | `3.0` | Delay between download attempts in seconds. After `429`, all downloads pause for the server's `Retry-After`, or for a delay that doubles each time (300 seconds at most). |
 | `tps_limit` | float | `5.0` | Maximum new connections per second. |
 | `use_bucket` | boolean | `False` | Enable content-addressed local hard-link storage. |
 | `bucket_path` | path | `.ktoolbox/bucket_storage` | Local bucket directory. |

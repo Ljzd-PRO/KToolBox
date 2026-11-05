@@ -213,6 +213,9 @@ for _naming, _creator_directory, _post in LEGACY_FIXTURES:
 
 
 class FixtureClient(AbstractAsyncContextManager["FixtureClient"]):
+    def __init__(self, **_options: object) -> None:
+        """Stands in for ``create_pawchive_client``, so it takes (and ignores) the same options."""
+
     async def __aenter__(self) -> FixtureClient:
         return self
 

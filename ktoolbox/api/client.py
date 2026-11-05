@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import math
 from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass
 from typing import TypeVar
@@ -29,6 +30,7 @@ from .generated import (
     Revision,
 )
 from .parameters import CreatorParameters, CreatorPostListParameters, FileHashParameters, PageParameters, PostParameters
+from .rate_limit import parse_retry_after, rate_limit_delay
 
 DEFAULT_API_BASE_URL = "https://pawchive.pw/api/v1"
 
@@ -87,15 +89,22 @@ class PawchiveClient:
         timeout: float = 5.0,
         max_retries: int = 3,
         retry_interval: float = 2.0,
+        max_retry_wait: float = math.inf,
         verify: bool = True,
         http_client: httpx.AsyncClient | None = None,
         drift_reporter: DriftReporter | None = None,
         sleep: Sleep = asyncio.sleep,
     ) -> None:
+        """
+        :param max_retry_wait: Raise instead of waiting longer than this many seconds before a retry, \
+        for example when a rate limit's ``Retry-After`` asks for minutes and someone is waiting on the answer
+        """
         if max_retries < 0:
             raise ValueError("max_retries must not be negative")
         if retry_interval < 0:
             raise ValueError("retry_interval must not be negative")
+        if max_retry_wait < 0:
+            raise ValueError("max_retry_wait must not be negative")
 
         parsed_base_url = httpx.URL(base_url.rstrip("/"))
         if not parsed_base_url.is_absolute_url:
@@ -105,6 +114,7 @@ class PawchiveClient:
         self._timeout = timeout
         self._max_retries = max_retries
         self._retry_interval = retry_interval
+        self._max_retry_wait = max_retry_wait
         self._drift_reporter = drift_reporter or _log_drift
         self._sleep = sleep
         self._owns_http_client = http_client is None
@@ -163,11 +173,16 @@ class PawchiveClient:
                 await self._sleep(self._retry_interval)
                 continue
 
-            retryable_status = response.status_code == 429 or response.status_code >= 500
-            if retryable_status and attempt < self._max_retries:
-                await response.aclose()
-                await self._sleep(self._retry_interval)
-                continue
+            rate_limited = response.status_code == httpx.codes.TOO_MANY_REQUESTS
+            if (rate_limited or response.status_code >= 500) and attempt < self._max_retries:
+                delay = self._retry_interval
+                if rate_limited:
+                    retry_after = parse_retry_after(response.headers.get("Retry-After"))
+                    delay = rate_limit_delay(retry_after, attempt + 1, self._retry_interval)
+                if delay <= self._max_retry_wait:
+                    await response.aclose()
+                    await self._sleep(delay)
+                    continue
             if response.status_code not in expected_statuses:
                 self._raise_http_error(response)
             return response

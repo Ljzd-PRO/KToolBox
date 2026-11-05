@@ -1,4 +1,5 @@
 import asyncio
+import time
 from asyncio import CancelledError, Lock
 from collections.abc import Awaitable, Callable
 from functools import cached_property, partial
@@ -16,6 +17,7 @@ from tenacity.stop import stop_after_attempt, stop_never
 
 from ktoolbox._enum import RetCodeEnum
 from ktoolbox.api.generated import Post
+from ktoolbox.api.rate_limit import parse_retry_after, rate_limit_delay
 from ktoolbox.configuration import config
 from ktoolbox.downloader.base import DownloaderRet
 from ktoolbox.downloader.utils import duplicate_file_check, filename_from_headers, utime_from_headers
@@ -51,6 +53,41 @@ class Downloader:
     """
 
     wait_lock = Lock()
+    _paused_until: float = 0.0
+    """``time.monotonic()`` time before which no download may send a request, set after HTTP 429"""
+    _rate_limit_strikes: int = 0
+    """Pauses in a row caused by HTTP 429; each one doubles the next"""
+
+    @classmethod
+    def _track_rate_limit(cls, response: httpx.Response) -> None:
+        """
+        Pause every download after HTTP 429, and back off further while it keeps happening.
+
+        Responses that arrive during a pause were sent before it started, so they neither
+        lengthen the backoff nor reset it; only a longer ``Retry-After`` extends the pause.
+        """
+        now = time.monotonic()
+        paused = now < cls._paused_until
+        if response.status_code != httpx.codes.TOO_MANY_REQUESTS:
+            if not paused:
+                cls._rate_limit_strikes = 0
+            return
+        retry_after = parse_retry_after(response.headers.get("Retry-After"))
+        if paused and retry_after is None:
+            return
+        if not paused:
+            cls._rate_limit_strikes += 1
+        delay = rate_limit_delay(retry_after, cls._rate_limit_strikes, config.downloader.retry_interval)
+        if now + delay > cls._paused_until:
+            cls._paused_until = now + delay
+            logger.warning(generate_msg("Rate limited by the file server, pausing all downloads", seconds=f"{delay:g}"))
+
+    @classmethod
+    async def _wait_for_rate_limit(cls) -> None:
+        # Not polling: each sleep lasts until the pause ends. It only loops again when
+        # another HTTP 429 extended the pause while we were asleep.
+        while (remaining := cls._paused_until - time.monotonic()) > 0:  # noqa: ASYNC110
+            await asyncio.sleep(remaining)
 
     def __init__(
         self,
@@ -256,6 +293,7 @@ class Downloader:
             )
 
         async with self.wait_lock:
+            await self._wait_for_rate_limit()
             await asyncio.sleep(1 / config.downloader.tps_limit)
         async with self._finished_lock:
             temp_filepath = Path(f"{save_filepath}.{config.downloader.temp_suffix}")
@@ -271,6 +309,7 @@ class Downloader:
                 timeout=config.downloader.timeout,
                 headers={"Range": f"bytes={temp_size}-"},
             ) as res:  # type: httpx.Response
+                self._track_rate_limit(res)
                 if res.status_code != httpx.codes.PARTIAL_CONTENT:
                     self._url = self._initial_url
                     return DownloaderRet(

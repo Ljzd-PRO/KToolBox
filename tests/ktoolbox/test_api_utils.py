@@ -44,7 +44,12 @@ async def test_client_factory_and_scopes() -> None:
     assert isinstance(client, PawchiveClient)
     assert str(client._base_url) == "https://example.test/custom"
     assert client._timeout == 9
+    assert client._max_retry_wait == float("inf")
     await client.aclose()
+
+    interactive = create_pawchive_client(max_retry_wait=10)
+    assert interactive._max_retry_wait == 10
+    await interactive.aclose()
 
     injected = PawchiveClient(base_url="https://example.test")
     async with pawchive_client_scope(injected) as scoped:

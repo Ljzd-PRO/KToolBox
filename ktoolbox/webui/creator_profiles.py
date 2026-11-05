@@ -4,6 +4,7 @@ from collections.abc import Callable
 from contextlib import AbstractAsyncContextManager
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from functools import partial
 from typing import Protocol
 
 import aiosqlite
@@ -12,7 +13,7 @@ from pydantic import ValidationError
 
 from ktoolbox.api.errors import PawchiveError
 from ktoolbox.api.generated import CreatorProfile
-from ktoolbox.api.utils import create_pawchive_client
+from ktoolbox.api.utils import INTERACTIVE_MAX_RETRY_WAIT, create_pawchive_client
 from ktoolbox.configuration import RuntimeContext
 from ktoolbox.project_config import CreatorReference, ProjectConfigStore
 from ktoolbox.webui.database import WebUIDatabase, utc_now
@@ -111,7 +112,9 @@ class CreatorRosterService:
     ) -> None:
         self.project_store = project_store
         self.cache = cache
-        self.client_factory = client_factory or create_pawchive_client
+        self.client_factory = client_factory or partial(
+            create_pawchive_client, max_retry_wait=INTERACTIVE_MAX_RETRY_WAIT
+        )
         self.cache_lifetime = cache_lifetime
         self.max_concurrency = max_concurrency
         self.clock = clock
