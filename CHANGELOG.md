@@ -1,5 +1,9 @@
 # Unreleased
 
+## Fixed
+
+- Keep comments at the top of `ktoolbox.toml` in place when the project configuration is saved with tomlkit 0.15.2, which wrote `blockers = []` and `automatic_sync = []` above them. Empty creator, blocker and automatic sync lists are left out of the file, as they were with earlier tomlkit releases.
+
 # KToolBox v1.1.0-beta.1
 
 This beta validates the first post-v1 migration fixes before the next stable release. It focuses on publication-time correctness, legacy attachment layouts, release reliability, and clearer WebUI-first documentation.
