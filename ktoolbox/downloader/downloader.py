@@ -1,4 +1,5 @@
 import asyncio
+import time
 from asyncio import CancelledError, Lock
 from collections.abc import Awaitable, Callable
 from functools import cached_property, partial
@@ -11,11 +12,12 @@ import aiofiles.os  # type: ignore[import-untyped]
 import httpx
 from loguru import logger
 from pathvalidate import sanitize_filename
-from tenacity import AsyncRetrying, RetryCallState, retry_if_exception, retry_if_result, wait_fixed
+from tenacity import AsyncRetrying, RetryCallState, retry_if_exception, retry_if_result
 from tenacity.stop import stop_after_attempt, stop_never
 
 from ktoolbox._enum import RetCodeEnum
 from ktoolbox.api.generated import Post
+from ktoolbox.api.rate_limit import parse_retry_after, rate_limit_delay
 from ktoolbox.configuration import config
 from ktoolbox.downloader.base import DownloaderRet
 from ktoolbox.downloader.utils import duplicate_file_check, filename_from_headers, utime_from_headers
@@ -45,12 +47,38 @@ def _last_result_or_raise(state: RetryCallState) -> DownloaderRet[str]:
     return cast(DownloaderRet[str], outcome.result())
 
 
+def _retry_wait(state: RetryCallState) -> float:
+    """Wait ``retry_interval`` between retries, or back off longer after HTTP 429."""
+    interval = config.downloader.retry_interval
+    outcome = state.outcome
+    if outcome is None or outcome.failed:
+        return interval
+    result = cast(DownloaderRet[str], outcome.result())
+    if result.status_code != httpx.codes.TOO_MANY_REQUESTS:
+        return interval
+    return rate_limit_delay(result.retry_after, state.attempt_number, interval)
+
+
 class Downloader:
     """
     :ivar _save_filename: The actual filename for saving.
     """
 
     wait_lock = Lock()
+    _rate_limited_until: float = 0.0
+    """``time.monotonic()`` deadline before which no download may start a request (set by HTTP 429)"""
+
+    @classmethod
+    def _pause_all(cls, delay: float) -> None:
+        """Hold back every download's next request for ``delay`` seconds."""
+        cls._rate_limited_until = max(cls._rate_limited_until, time.monotonic() + delay)
+
+    @classmethod
+    async def _wait_for_rate_limit(cls) -> None:
+        # Not polling: each sleep lasts until the deadline. It only loops again when
+        # another HTTP 429 pushed the deadline back while we were asleep.
+        while (remaining := cls._rate_limited_until - time.monotonic()) > 0:  # noqa: ASYNC110
+            await asyncio.sleep(remaining)
 
     def __init__(
         self,
@@ -186,7 +214,7 @@ class Downloader:
             stop=(
                 stop_never if config.downloader.retry_stop_never else stop_after_attempt(config.downloader.retry_times)
             ),
-            wait=wait_fixed(config.downloader.retry_interval),
+            wait=_retry_wait,
             retry=retry_if_result(_retryable_result)
             | retry_if_exception(lambda error: isinstance(error, httpx.HTTPError)),
             before_sleep=partial(self._before_retry, progress=progress),
@@ -215,6 +243,10 @@ class Downloader:
             else:
                 status_code = outcome.result().status_code
         exception = outcome.exception() if outcome is not None and outcome.failed else None
+        delay = state.next_action.sleep if state.next_action is not None else 0.0
+        if status_code == httpx.codes.TOO_MANY_REQUESTS:
+            # Slow every download down, not just this one, so the rate limit can clear.
+            self._pause_all(delay)
         logger.warning(
             generate_msg(
                 f"Retrying ({state.attempt_number})",
@@ -222,6 +254,7 @@ class Downloader:
                 post_id=self.post.id if self.post else None,
                 status_code=status_code,
                 error_type=type(exception).__name__ if exception is not None else None,
+                retry_in=f"{delay:g}s",
             )
         )
         if progress is not None:
@@ -255,6 +288,7 @@ class Downloader:
                 message=generate_msg(ret_msg or "Download file already exists", path=save_filepath),
             )
 
+        await self._wait_for_rate_limit()
         async with self.wait_lock:
             await asyncio.sleep(1 / config.downloader.tps_limit)
         async with self._finished_lock:
@@ -277,6 +311,11 @@ class Downloader:
                         code=RetCodeEnum.GeneralFailure,
                         message=generate_msg("Download failed", status_code=res.status_code, filename=save_filepath),
                         status_code=res.status_code,
+                        retry_after=(
+                            parse_retry_after(res.headers.get("Retry-After"))
+                            if res.status_code == httpx.codes.TOO_MANY_REQUESTS
+                            else None
+                        ),
                     )
                 # Get filename for saving and check if file exists (Second-time duplicate file check)
                 # Priority order can be referenced from the constructor's documentation

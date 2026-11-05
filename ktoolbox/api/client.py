@@ -29,6 +29,7 @@ from .generated import (
     Revision,
 )
 from .parameters import CreatorParameters, CreatorPostListParameters, FileHashParameters, PageParameters, PostParameters
+from .rate_limit import parse_retry_after, rate_limit_delay
 
 DEFAULT_API_BASE_URL = "https://pawchive.pw/api/v1"
 
@@ -163,10 +164,14 @@ class PawchiveClient:
                 await self._sleep(self._retry_interval)
                 continue
 
-            retryable_status = response.status_code == 429 or response.status_code >= 500
-            if retryable_status and attempt < self._max_retries:
+            rate_limited = response.status_code == httpx.codes.TOO_MANY_REQUESTS
+            if (rate_limited or response.status_code >= 500) and attempt < self._max_retries:
+                delay = self._retry_interval
+                if rate_limited:
+                    retry_after = parse_retry_after(response.headers.get("Retry-After"))
+                    delay = rate_limit_delay(retry_after, attempt + 1, self._retry_interval)
                 await response.aclose()
-                await self._sleep(self._retry_interval)
+                await self._sleep(delay)
                 continue
             if response.status_code not in expected_statuses:
                 self._raise_http_error(response)

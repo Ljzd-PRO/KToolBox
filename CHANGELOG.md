@@ -1,5 +1,9 @@
 # Unreleased
 
+## Fixed
+
+- Back off properly after HTTP 429 (Too Many Requests) from the file server or the Pawchive API. KToolBox now waits for the server's `Retry-After` header, or doubles the retry interval after each rate-limited attempt when the header is missing (each wait is capped at 5 minutes). A rate-limited download also pauses every other download for the same time, so the limit can clear instead of being hit again ([#398](https://github.com/Ljzd-PRO/KToolBox/issues/398)).
+
 # KToolBox v1.1.0-beta.1
 
 This beta validates the first post-v1 migration fixes before the next stable release. It focuses on publication-time correctness, legacy attachment layouts, release reliability, and clearer WebUI-first documentation.

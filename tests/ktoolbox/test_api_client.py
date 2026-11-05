@@ -246,6 +246,28 @@ async def test_retries_transport_429_and_server_errors() -> None:
 
 
 @pytest.mark.asyncio
+async def test_rate_limited_requests_honor_retry_after_then_back_off() -> None:
+    statuses = iter([(429, {"Retry-After": "7"}), (429, {}), (429, {}), (200, {})])
+    sleep = AsyncMock()
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        status, headers = next(statuses)
+        return httpx.Response(status, json=[], headers=headers, request=request)
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http_client:
+        client = PawchiveClient(
+            base_url=BASE_URL,
+            http_client=http_client,
+            max_retries=3,
+            retry_interval=0.5,
+            sleep=sleep,
+        )
+        assert await client.list_recent_posts() == []
+    # Server-requested delay first, then 0.5 * 2 ** (attempt - 1) for attempts 2 and 3.
+    assert [call.args[0] for call in sleep.await_args_list] == [7.0, 1.0, 2.0]
+
+
+@pytest.mark.asyncio
 async def test_exhausted_transport_and_server_status() -> None:
     def disconnected(request: httpx.Request) -> httpx.Response:
         raise httpx.ConnectError("offline", request=request)
