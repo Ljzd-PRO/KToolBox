@@ -21,6 +21,8 @@ from ktoolbox.project_config import (
 )
 
 UTC = timezone.utc
+# tomlkit 0.15.2 writes empty arrays of tables as `key = []` above leading comments.
+LIST_KEYS = {"creators", "blockers", "automatic_sync"}
 
 
 def test_project_config_path_priority(tmp_path: Path) -> None:
@@ -67,10 +69,6 @@ def test_store_round_trip_is_atomic_and_preserves_top_comment(tmp_path: Path) ->
     assert configuration.find_creator("https://pawchive.pw/fanbox/user/123") == configuration.creators[0]
 
 
-# tomlkit 0.15.2 writes empty arrays of tables as `key = []` above leading comments.
-LIST_KEYS = {"creators", "blockers", "automatic_sync"}
-
-
 def test_project_template_leaves_out_empty_lists(tmp_path: Path) -> None:
     template = ProjectConfigStore(tmp_path / "missing.toml").load_text()
     assert not LIST_KEYS & set(tomlkit.parse(template))
@@ -89,6 +87,8 @@ def test_store_keeps_top_comment_when_lists_become_empty(tmp_path: Path, origina
     path.write_text(original, encoding="utf-8")
     store = ProjectConfigStore(path)
     store.add_creator(CreatorReference(service="fanbox", creator_id="123"))
+    store.add_automatic_sync_plan(AutomaticSyncPlan(id="daily", name="Daily", creators=["fanbox:123"]))
+    store.remove_automatic_sync_plan("daily")
     store.remove_creator("fanbox:123")
 
     content = path.read_text(encoding="utf-8")
