@@ -50,7 +50,8 @@ class APIConfiguration(BaseModel):
     :ivar path: Pawchive API URL root path
     :ivar timeout: API request timeout
     :ivar retry_times: API request retry times (when request failed)
-    :ivar retry_interval: Seconds of API request retry interval
+    :ivar retry_interval: Seconds of API request retry interval. After HTTP 429, the server's ``Retry-After`` \
+    is used, or the interval doubles with each attempt (300 seconds at most)
     """
 
     scheme: Literal["http", "https"] = "https"
@@ -78,7 +79,8 @@ class DownloaderConfiguration(BaseModel):
     :ivar retry_times: Downloader retry times (when download failed)
     :ivar retry_stop_never: Never stop downloader from retrying (when download failed) \
     (``retry_times`` will be ignored when enabled)
-    :ivar retry_interval: Seconds of downloader retry interval
+    :ivar retry_interval: Seconds of downloader retry interval. After HTTP 429, all downloads pause for the \
+    server's ``Retry-After``, or for an interval that doubles each time (300 seconds at most)
     :ivar tps_limit: Maximum connections established per second
     :ivar use_bucket: Enable local storage bucket mode
     :ivar bucket_path: Path of local storage bucket

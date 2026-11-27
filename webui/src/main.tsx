@@ -8,7 +8,8 @@ import "./styles.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <BrowserRouter>
+    {/* Keep route changes in sync with sidebar clicks and task creation (#397). */}
+    <BrowserRouter useTransitions={false}>
       <App />
     </BrowserRouter>
   </React.StrictMode>,

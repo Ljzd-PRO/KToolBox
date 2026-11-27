@@ -25,7 +25,7 @@
 | `path` | 字串 | `/api/v1` | API 根路徑。 |
 | `timeout` | 浮點數 | `5.0` | 每個請求的逾時秒數。 |
 | `retry_times` | 整數 | `3` | 傳輸、`429` 與 `5xx` 失敗後的額外嘗試次數。 |
-| `retry_interval` | 浮點數 | `2.0` | API 嘗試之間的延遲秒數。 |
+| `retry_interval` | 浮點數 | `2.0` | API 嘗試之間的延遲秒數。遇到 `429` 時依伺服器的 `Retry-After` 等待，否則每次嘗試加倍（最長 300 秒）。 |
 
 API 群組刻意不包含工作階段金鑰。
 
@@ -44,7 +44,7 @@ API 群組刻意不包含工作階段金鑰。
 | `temp_suffix` | 字串 | `tmp` | 未完成下載的副檔名。 |
 | `retry_times` | 整數 | `10` | 額外下載嘗試次數。 |
 | `retry_stop_never` | 布林值 | `False` | 永遠重試並忽略 `retry_times`。 |
-| `retry_interval` | 浮點數 | `3.0` | 下載嘗試間的延遲秒數。 |
+| `retry_interval` | 浮點數 | `3.0` | 下載嘗試間的延遲秒數。遇到 `429` 時暫停所有下載，時長取伺服器的 `Retry-After`，否則每次加倍（最長 300 秒）。 |
 | `tps_limit` | 浮點數 | `5.0` | 每秒新連線數上限。 |
 | `use_bucket` | 布林值 | `False` | 啟用內容定址的本機硬連結儲存。 |
 | `bucket_path` | 路徑 | `.ktoolbox/bucket_storage` | 本機 Bucket 目錄。 |

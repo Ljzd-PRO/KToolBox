@@ -62,8 +62,6 @@ class TemporaryDownloader(Downloader):
         if validated_temporary_url(self.url) is None:
             raise ValueError("Invalid Pawchive temporary download destination")
         target = self.path / filename
-        async with self.wait_lock:
-            await asyncio.sleep(1 / config.downloader.tps_limit)
 
         async with self._finished_lock:
             request = self.client.build_request(
@@ -75,10 +73,15 @@ class TemporaryDownloader(Downloader):
             request.headers.pop("cookie", None)
             request.headers.pop("authorization", None)
             request.headers.pop("range", None)
+            async with Downloader.wait_lock:
+                await asyncio.sleep(1 / config.downloader.tps_limit)
+                await Downloader._wait_for_rate_limit()
+                request_generation = Downloader._rate_limit_generation
             token = _signed_request.set(True)
             try:
                 response = await self.client.send(request, stream=True, follow_redirects=False, auth=None)
                 try:
+                    Downloader._track_rate_limit(response, request_generation=request_generation)
                     result = await self._save_response(response, target, progress)
                 finally:
                     await response.aclose()

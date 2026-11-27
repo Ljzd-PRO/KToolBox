@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import time
 from pathlib import Path
 
 import httpx
@@ -13,6 +14,7 @@ from ktoolbox.action.job import create_job_from_post
 from ktoolbox.api.client import PawchiveClient
 from ktoolbox.api.generated import Post
 from ktoolbox.configuration import config
+from ktoolbox.downloader import Downloader
 from ktoolbox.downloader.temporary import TemporaryDownloader, TemporaryOutputConflict
 from ktoolbox.job.runner import JobRunner
 from ktoolbox.project_config import CreatorReference, ProjectNamingConfiguration
@@ -194,6 +196,21 @@ async def test_unknown_length_stream_is_bounded_and_partial_file_is_removed(tmp_
         config.job.min_file_size = 7
         assert (await download.run()).code == RetCodeEnum.FileExisted
         assert _entries(tmp_path) == set()
+
+
+async def test_temporary_429_updates_shared_download_pause(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(Downloader, "_paused_until", 0.0)
+    monkeypatch.setattr(Downloader, "_rate_limit_generation", 0)
+    monkeypatch.setattr(Downloader, "_rate_limit_strikes", 0)
+    config.downloader.retry_times = 1
+
+    def limited(_: httpx.Request) -> httpx.Response:
+        return httpx.Response(429, headers={"Retry-After": "1"})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(limited)) as client:
+        assert (await make_downloader(tmp_path, client).run()).status_code == 429
+    assert Downloader._paused_until > time.monotonic()
+    assert Downloader._rate_limit_generation == 1
 
 
 @respx.mock

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from urllib.parse import quote, urlsplit, urlunsplit
@@ -8,6 +9,7 @@ from ktoolbox.api.client import PawchiveClient
 from ktoolbox.configuration import config
 
 __all__ = [
+    "INTERACTIVE_MAX_RETRY_WAIT",
     "SEARCH_STEP",
     "create_pawchive_client",
     "get_creator_banner",
@@ -19,19 +21,27 @@ __all__ = [
 SEARCH_STEP = 50
 """Number of results returned by one paginated Pawchive request."""
 
+INTERACTIVE_MAX_RETRY_WAIT = 10.0
+"""Longest wait before a retry when someone is waiting on the answer (WebUI pages, MCP tools)."""
+
 
 def _host_url(scheme: str, netloc: str, path: str, query: str = "") -> str:
     return urlunsplit((scheme, netloc, path, query, ""))
 
 
-def create_pawchive_client() -> PawchiveClient:
-    """Create a Pawchive client from the active KToolBox configuration."""
+def create_pawchive_client(*, max_retry_wait: float = math.inf) -> PawchiveClient:
+    """
+    Create a Pawchive client from the active KToolBox configuration.
+
+    :param max_retry_wait: Raise instead of waiting longer than this many seconds before a retry
+    """
     base_url = _host_url(config.api.scheme, config.api.netloc, config.api.path.rstrip("/"))
     return PawchiveClient(
         base_url=base_url,
         timeout=config.api.timeout,
         max_retries=config.api.retry_times,
         retry_interval=config.api.retry_interval,
+        max_retry_wait=max_retry_wait,
         verify=config.ssl_verify,
     )
 
