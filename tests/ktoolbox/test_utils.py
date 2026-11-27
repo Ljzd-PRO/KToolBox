@@ -84,19 +84,23 @@ def test_uvloop_initialization_paths(monkeypatch) -> None:
     setter.assert_called_once_with(policy)
 
 
-def test_uvloop_initialization_ignores_python_314_policy_deprecation(monkeypatch) -> None:
-    def deprecated_policy() -> object:
+@pytest.mark.parametrize(("platform", "module"), [("darwin", "uvloop"), ("win32", "winloop")])
+@pytest.mark.parametrize("deprecated", ["AbstractEventLoopPolicy", "set_event_loop_policy"])
+def test_uvloop_initialization_ignores_python_314_policy_deprecation(
+    monkeypatch, platform: str, module: str, deprecated: str
+) -> None:
+    def warn() -> object:
         warnings.warn(
-            "'asyncio.AbstractEventLoopPolicy' is deprecated and slated for removal in Python 3.16",
+            f"'asyncio.{deprecated}' is deprecated and slated for removal in Python 3.16",
             DeprecationWarning,
             stacklevel=2,
         )
         return object()
 
     config.use_uvloop = True
-    monkeypatch.setattr(sys, "platform", "darwin")
-    monkeypatch.setitem(sys.modules, "uvloop", SimpleNamespace(EventLoopPolicy=deprecated_policy))
-    with patch("ktoolbox.utils.asyncio.set_event_loop_policy") as setter:
+    monkeypatch.setattr(sys, "platform", platform)
+    monkeypatch.setitem(sys.modules, module, SimpleNamespace(EventLoopPolicy=warn))
+    with patch("ktoolbox.utils.asyncio.set_event_loop_policy", side_effect=lambda _policy: warn()) as setter:
         assert uvloop_init() is True
     setter.assert_called_once()
 
