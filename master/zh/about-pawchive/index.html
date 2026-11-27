@@ -1582,7 +1582,8 @@
 </tr>
 </tbody>
 </table>
-<p>API 请求永远不会携带账号会话。配置 <code>downloader.session_key</code> 后，它只会作为 <code>session</code> Cookie 发送给文件下载请求。</p>
+<p>API 请求不会携带账号会话。配置 <code>downloader.session_key</code> 后，只在下载普通文件时将其作为 <code>session</code> Cookie 发送。</p>
+<p>KToolBox 会自动使用作品详情中的链接下载仍可用的临时文件，无需修改文件主机或路径前缀。临时下载直连 Pawchive，不使用已配置的下载反向代理、会话 Cookie 或断点续传。文件过期时，任务会报告该文件并继续处理其他文件。</p>
 <h2 id="api">已支持的 API 范围<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
 <p>KToolBox 实现了 OpenAPI 文档中全部 14 个不需要 <code>cookieAuth</code> 的操作：创作者与作品列表、Profile、公告、Fancard、关联创作者、作品详情、文件哈希搜索、作品标记状态与提交、修订、评论和应用版本。</p>
 <p>另外 5 个账号收藏操作需要登录 Pawchive，因此明确不实现。</p>

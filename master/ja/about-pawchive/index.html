@@ -1582,7 +1582,8 @@
 </tr>
 </tbody>
 </table>
-<p>API リクエストがアカウントセッションを送信することはありません。<code>downloader.session_key</code> を設定した場合は、ファイルダウンロードのリクエストだけに <code>session</code> Cookie として送信されます。</p>
+<p>API リクエストはアカウントのセッションを送信しません。<code>downloader.session_key</code> を設定した場合、通常のファイルをダウンロードするときだけ <code>session</code> Cookie として送信されます。</p>
+<p>KToolBox は、利用可能な一時ファイルを投稿詳細のリンクから自動でダウンロードします。ファイルホストやパスの接頭辞を変更する必要はありません。一時ファイルは Pawchive から直接取得し、設定済みのリバースプロキシ、セッション Cookie、途中からの再開は使用しません。期限切れのファイルはタスクに記録され、ほかのファイルの処理は続行されます。</p>
 <h2 id="api">対応する API の範囲<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
 <p>KToolBox は公開された OpenAPI 文書のうち、<code>cookieAuth</code> を必要としない 14 の操作をすべて実装しています。クリエイターと投稿の検出、プロフィール、告知、ファンカード、リンク、投稿詳細、ファイルハッシュ検索、投稿のフラグ状態と送信、改訂、コメント、アプリケーションバージョンが含まれます。</p>
 <p>Pawchive アカウントへのログインが必要な 5 つのお気に入り操作は意図的に除外しています。</p>

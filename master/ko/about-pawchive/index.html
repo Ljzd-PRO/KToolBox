@@ -1582,7 +1582,8 @@
 </tr>
 </tbody>
 </table>
-<p>API 요청은 계정 세션을 전송하지 않습니다. <code>downloader.session_key</code>를 설정한 경우 파일 다운로드 요청에만 <code>session</code> 쿠키로 전송됩니다.</p>
+<p>API 요청은 계정 세션을 전송하지 않습니다. <code>downloader.session_key</code>를 설정한 경우 일반 파일을 다운로드할 때만 <code>session</code> 쿠키를 전송합니다.</p>
+<p>KToolBox는 작품 세부 정보의 링크를 사용해 받을 수 있는 임시 파일을 자동으로 다운로드합니다. 파일 호스트나 경로 접두사를 바꿀 필요가 없습니다. 임시 파일은 설정된 리버스 프록시, 세션 쿠키 또는 이어받기 없이 Pawchive에서 직접 받습니다. 만료된 파일은 작업에 기록되며 다른 파일은 계속 처리됩니다.</p>
 <h2 id="api">지원하는 API 범위<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
 <p>KToolBox는 공개된 OpenAPI 문서에서 <code>cookieAuth</code>가 필요하지 않은 14개 작업을 모두 구현합니다. 여기에는 크리에이터와 게시물 검색, 프로필, 공지, 팬 카드, 링크, 게시물 상세 정보, 파일 해시 검색, 게시물 신고 상태와 제출, 개정판, 댓글 및 애플리케이션 버전이 포함됩니다.</p>
 <p>Pawchive 계정 로그인이 필요한 5개의 즐겨찾기 작업은 의도적으로 제외합니다.</p>

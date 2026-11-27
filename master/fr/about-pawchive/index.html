@@ -1582,7 +1582,8 @@
 </tr>
 </tbody>
 </table>
-<p>Les requêtes d'API ne transportent jamais de session de compte. Lorsqu'il est configuré, <code>downloader.session_key</code> est envoyé comme cookie <code>session</code> uniquement dans les requêtes de téléchargement de fichiers.</p>
+<p>Les requêtes d’API ne transmettent pas la session du compte. Si elle est configurée, la valeur de <code>downloader.session_key</code> est envoyée sous forme de cookie <code>session</code> uniquement pour les fichiers ordinaires.</p>
+<p>KToolBox télécharge automatiquement les fichiers temporaires encore disponibles à partir des liens de la publication. Il n’est pas nécessaire de modifier l’hôte de fichiers ou le préfixe du chemin. Ces téléchargements passent directement par Pawchive, sans le proxy inverse configuré, sans cookie de session et sans reprise partielle. Si un fichier a expiré, la tâche le signale et poursuit le traitement des autres fichiers.</p>
 <h2 id="perimetre-de-lapi">Périmètre de l'API<a class="headerlink" href="#perimetre-de-lapi" title="Permanent link">&para;</a></h2>
 <p>KToolBox met en œuvre les 14 opérations du document OpenAPI publié qui ne nécessitent pas <code>cookieAuth</code> : recherche de créateurs et de publications, profils, annonces, cartes de fans, liens, détails des publications, recherche par hachage de fichier, état et envoi du signalement d'une publication, révisions, commentaires et version de l'application.</p>
 <p>Les cinq opérations sur les favoris nécessitent un compte Pawchive connecté et sont volontairement exclues.</p>

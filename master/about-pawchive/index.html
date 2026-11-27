@@ -1582,7 +1582,8 @@
 </tr>
 </tbody>
 </table>
-<p>API requests never carry an account session. <code>downloader.session_key</code>, when configured, is sent only as the <code>session</code> cookie to file-download requests.</p>
+<p>API requests never carry an account session. When configured, <code>downloader.session_key</code> is sent as the <code>session</code> cookie for ordinary file downloads only.</p>
+<p>KToolBox downloads available temporary files automatically using the link from the post details. You do not need to change the file host or path prefix. Temporary downloads go directly to Pawchive without the configured download reverse proxy, session cookie, or byte-range resume. If a file has expired, the task reports it and continues with the other files.</p>
 <h2 id="supported-api-scope">Supported API scope<a class="headerlink" href="#supported-api-scope" title="Permanent link">&para;</a></h2>
 <p>KToolBox implements all 14 operations in the published OpenAPI document that do not require <code>cookieAuth</code>: creator and post discovery, profiles, announcements, fancards, links, post details, file-hash search, post flag status and submission, revisions, comments, and application version.</p>
 <p>The five account-favorites operations require a signed-in Pawchive account and are intentionally excluded.</p>
