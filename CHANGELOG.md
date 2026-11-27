@@ -2,6 +2,7 @@
 
 ## Fixed
 
+- Keep WebUI route updates synchronous so sidebar navigation and task creation render the destination without requiring a browser refresh ([#397](https://github.com/Ljzd-PRO/KToolBox/issues/397)).
 - Keep comments at the top of `ktoolbox.toml` in place when the project configuration is saved with tomlkit 0.15.2, which wrote `blockers = []` and `automatic_sync = []` above them. Empty creator, blocker and automatic sync lists are left out of the file, as they were with earlier tomlkit releases.
 
 # KToolBox v1.1.0-beta.1
