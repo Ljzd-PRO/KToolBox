@@ -1,22 +1,34 @@
 from __future__ import annotations
 
 import asyncio
+import json
+from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
+import httpx
 import pytest
+import respx
 
 from ktoolbox._enum import RetCodeEnum
 from ktoolbox.action.base import ActionRet
 from ktoolbox.action.job import CreatorJobGeneration
+from ktoolbox.api.client import PawchiveClient
 from ktoolbox.api.generated import CreatorProfile
 from ktoolbox.blocker import BlockerEngine
+from ktoolbox.configuration import config
 from ktoolbox.downloader.base import DownloaderRet
 from ktoolbox.failures import FailureCode, FailureItem, FailureStage
 from ktoolbox.job.model import Job
 from ktoolbox.job.stream import DownloadWorkerPool, QueuedJob
-from ktoolbox.project_config import CreatorReference, ProjectConfigError, ProjectConfiguration
+from ktoolbox.project_config import (
+    CreatorReference,
+    ProjectConfigError,
+    ProjectConfiguration,
+    ProjectNamingConfiguration,
+)
+from ktoolbox.publication_time import PublishedTimePolicy
 from ktoolbox.reporting import NullProgressReporter
 from ktoolbox.sync import SyncCoordinator, SyncOptions, resolve_sync_targets
 
@@ -32,6 +44,57 @@ def test_resolve_sync_targets_uses_roster_aliases_enabled_state_and_deduplicatio
     assert [item.key for item in selected] == ["fanbox:1", "fanbox:2"]
     with pytest.raises(ProjectConfigError, match="no creators selected"):
         resolve_sync_targets([], ProjectConfiguration())
+
+
+@respx.mock
+async def test_sync_reuses_legacy_kemono_utc_directory_at_fanbox_midnight(tmp_path: Path) -> None:
+    config.downloader.use_bucket = False
+    config.job.include_revisions = False
+    config.job.download_attachments = True
+    config.job.allow_list = set()
+    config.job.block_list = set()
+    naming = ProjectNamingConfiguration(
+        post_dirname_format="{published}-{post_id}",
+        filename_format="{published}_{}",
+        sequential_filename=False,
+    )
+    legacy_work = tmp_path / "Artist [fanbox-1]" / "2025-12-20-42"
+    existing = legacy_work / "attachments" / "2025-12-20_example.zip"
+    existing.parent.mkdir(parents=True)
+    existing.write_bytes(b"previously downloaded")
+    raw_published = "2025-12-21T00:35:43"
+    respx.get("https://pawchive.pw/api/v1/fanbox/user/1/profile").mock(
+        return_value=httpx.Response(200, json={"id": "1", "service": "fanbox", "name": "Artist"})
+    )
+    respx.get("https://pawchive.pw/api/v1/fanbox/user/1", params={"o": "0"}).mock(
+        return_value=httpx.Response(
+            200,
+            json=[
+                {
+                    "id": "42",
+                    "user": "1",
+                    "service": "fanbox",
+                    "published": raw_published,
+                    "attachments": [{"name": "example.zip", "path": "/aa/bb/example.zip"}],
+                }
+            ],
+        )
+    )
+
+    async with PawchiveClient(max_retries=0) as client:
+        summary = await SyncCoordinator(client, naming=naming, published_time=PublishedTimePolicy()).run(
+            [creator("1")],
+            SyncOptions(
+                output=tmp_path, start_time=datetime(2025, 12, 20), end_time=datetime(2025, 12, 20, 23, 59, 59)
+            ),
+        )
+
+    assert summary.successful
+    assert summary.downloads.existed == 1
+    assert len(respx.calls) == 2  # Only profile and list requests; no file fetch.
+    assert existing.read_bytes() == b"previously downloaded"
+    assert not (legacy_work.parent / "2025-12-21-42").exists()
+    assert json.loads((legacy_work / "post.json").read_text())["published"] == raw_published
 
 
 async def test_sync_coordinator_bounds_creators_and_downloads_all_jobs(tmp_path: Path) -> None:
