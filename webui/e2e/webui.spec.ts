@@ -175,6 +175,62 @@ test("publication time uses the configured service and target timezones", async 
 });
 
 
+test("sidebar navigation and browser history render content without a reload", async ({ page }) => {
+  await signIn(page);
+  const documentRequests: string[] = [];
+  page.on("request", (request) => {
+    if (request.resourceType() === "document") documentRequests.push(request.url());
+  });
+  const navigation = page.getByRole("navigation", { name: "Primary navigation" });
+  const main = page.getByRole("main");
+  const routes = [
+    { path: "/", content: main.getByRole("heading", { name: "Recent tasks", exact: true }) },
+    { path: "/tasks", content: main.getByRole("button", { name: "Create task", exact: true }) },
+    { path: "/auto-sync", content: main.getByRole("button", { name: "New plan", exact: true }) },
+    { path: "/creators", content: main.getByRole("button", { name: "Add creator", exact: true }) },
+    { path: "/posts", content: main.getByRole("button", { name: "Search posts", exact: true }) },
+    { path: "/blockers", content: main.getByRole("button", { name: "Add blocker", exact: true }) },
+    { path: "/naming", content: main.getByRole("tab", { name: "Directory structure", exact: true }) },
+    { path: "/mcp", content: main.getByText("Streamable HTTP", { exact: true }) },
+    { path: "/configuration", content: main.getByRole("button", { name: /Configuration section/ }) },
+    { path: "/system", content: main.getByRole("heading", { name: "Live updates", exact: true }) },
+    { path: "/about", content: main.getByRole("heading", { name: "KToolBox", exact: true }) },
+  ];
+  for (const { path, content } of routes) {
+    await navigation.locator(`a[href="${path}"]`).click();
+    await expect(page).toHaveURL((url) => url.pathname === path);
+    await expect(content).toBeVisible();
+  }
+
+  // Issue #397: exercise consecutive history updates before the route can paint.
+  for (let round = 0; round < 3; round += 1) {
+    await navigation.locator('a[href="/"]').click();
+    await expect(routes[0].content).toBeVisible();
+    await navigation.evaluate((element) => {
+      for (const path of ["/creators", "/configuration", "/about"]) {
+        element.querySelector<HTMLAnchorElement>(`a[href="${path}"]`)!.click();
+      }
+    });
+    await expect(page).toHaveURL((url) => url.pathname === "/about");
+    await expect(routes[10].content).toBeVisible();
+  }
+
+  await page.goBack();
+  await expect(page).toHaveURL((url) => url.pathname === "/configuration");
+  await expect(routes[8].content).toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL((url) => url.pathname === "/creators");
+  await expect(routes[3].content).toBeVisible();
+  await page.goForward();
+  await expect(page).toHaveURL((url) => url.pathname === "/configuration");
+  await expect(routes[8].content).toBeVisible();
+  await page.goForward();
+  await expect(page).toHaveURL((url) => url.pathname === "/about");
+  await expect(routes[10].content).toBeVisible();
+  expect(documentRequests).toEqual([]);
+});
+
+
 test("dashboard links, roster sorting, and platform suggestions work with real HeroUI controls", async ({ page }) => {
   await signIn(page);
 
@@ -970,11 +1026,22 @@ test("task form serializes one-sided dates and protects regular-expression comma
 
 test("task lifecycle remains operable through pause resume and stop", async ({ page }) => {
   await signIn(page);
+  const documentRequests: string[] = [];
+  page.on("request", (request) => {
+    if (request.resourceType() === "document") documentRequests.push(request.url());
+  });
   await page.getByRole("link", { name: "Tasks", exact: true }).click();
   await page.getByRole("button", { name: "Create task" }).click();
+  const createdTaskResponse = page.waitForResponse((response) =>
+    response.request().method() === "POST" && new URL(response.url()).pathname === "/api/v1/tasks",
+  );
   await page.getByRole("dialog", { name: "Create task" }).getByRole("button", { name: "Create task" }).click();
+  const response = await createdTaskResponse;
+  expect(response.ok()).toBe(true);
+  const createdTask = await response.json() as { id: string };
+  await expect(page).toHaveURL((url) => url.pathname === `/tasks/${createdTask.id}`);
   await expect(page.getByRole("heading", { name: "Task details" })).toBeVisible();
-  await expect(page.getByText("Running", { exact: true })).toBeVisible();
+  await expect(page.getByRole("main").getByText("Running", { exact: true })).toBeVisible();
   await expect(page.getByTitle(/KiB\/s|MiB\/s/)).toBeVisible();
   const liveCards = page.locator(".task-live-card");
   await expect(liveCards).toHaveCount(3);
@@ -999,6 +1066,7 @@ test("task lifecycle remains operable through pause resume and stop", async ({ p
   await expect(page.getByText("Running", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Stop" }).click();
   await expect(page.getByText("Stopped", { exact: true })).toBeVisible();
+  expect(documentRequests).toEqual([]);
 });
 
 
