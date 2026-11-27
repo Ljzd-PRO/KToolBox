@@ -1812,7 +1812,7 @@
 <td><code>retry_interval</code></td>
 <td>浮動小数点数</td>
 <td><code>2.0</code></td>
-<td>API 試行間の待機秒数。</td>
+<td>API 試行間の待機秒数。<code>429</code> の場合はサーバーの <code>Retry-After</code> に従い、なければ試行ごとに倍増します（最大 300 秒）。</td>
 </tr>
 </tbody>
 </table>
@@ -1898,7 +1898,7 @@
 <td><code>retry_interval</code></td>
 <td>浮動小数点数</td>
 <td><code>3.0</code></td>
-<td>ダウンロード試行間の待機秒数。</td>
+<td>ダウンロード試行間の待機秒数。<code>429</code> の場合はすべてのダウンロードを一時停止し、サーバーの <code>Retry-After</code> に従うか、毎回倍増する時間だけ待ちます（最大 300 秒）。</td>
 </tr>
 <tr>
 <td><code>tps_limit</code></td>

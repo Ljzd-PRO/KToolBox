@@ -1812,7 +1812,7 @@
 <td><code>retry_interval</code></td>
 <td>float</td>
 <td><code>2.0</code></td>
-<td>Delay between API attempts in seconds.</td>
+<td>Delay between API attempts in seconds. After <code>429</code>, the server's <code>Retry-After</code> is used, or the delay doubles with each attempt (300 seconds at most).</td>
 </tr>
 </tbody>
 </table>
@@ -1898,7 +1898,7 @@
 <td><code>retry_interval</code></td>
 <td>float</td>
 <td><code>3.0</code></td>
-<td>Delay between download attempts in seconds.</td>
+<td>Delay between download attempts in seconds. After <code>429</code>, all downloads pause for the server's <code>Retry-After</code>, or for a delay that doubles each time (300 seconds at most).</td>
 </tr>
 <tr>
 <td><code>tps_limit</code></td>

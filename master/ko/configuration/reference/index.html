@@ -1812,7 +1812,7 @@
 <td><code>retry_interval</code></td>
 <td>실수</td>
 <td><code>2.0</code></td>
-<td>API 시도 사이의 지연(초).</td>
+<td>API 시도 사이의 지연(초). <code>429</code>이면 서버의 <code>Retry-After</code>를 따르고, 없으면 시도마다 두 배로 늘립니다(최대 300초).</td>
 </tr>
 </tbody>
 </table>
@@ -1898,7 +1898,7 @@
 <td><code>retry_interval</code></td>
 <td>실수</td>
 <td><code>3.0</code></td>
-<td>다운로드 시도 사이의 지연(초).</td>
+<td>다운로드 시도 사이의 지연(초). <code>429</code>이면 모든 다운로드를 일시 중지하고, 서버의 <code>Retry-After</code>를 따르거나 매번 두 배로 늘어나는 시간만큼 기다립니다(최대 300초).</td>
 </tr>
 <tr>
 <td><code>tps_limit</code></td>

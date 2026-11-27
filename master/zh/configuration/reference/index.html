@@ -1812,7 +1812,7 @@
 <td><code>retry_interval</code></td>
 <td>浮点数</td>
 <td><code>2.0</code></td>
-<td>API 尝试间隔秒数。</td>
+<td>API 尝试间隔秒数。遇到 <code>429</code> 时按服务器的 <code>Retry-After</code> 等待，否则每次尝试加倍（最长 300 秒）。</td>
 </tr>
 </tbody>
 </table>
@@ -1898,7 +1898,7 @@
 <td><code>retry_interval</code></td>
 <td>浮点数</td>
 <td><code>3.0</code></td>
-<td>下载尝试间隔秒数。</td>
+<td>下载尝试间隔秒数。遇到 <code>429</code> 时暂停所有下载，时长取服务器的 <code>Retry-After</code>，否则每次加倍（最长 300 秒）。</td>
 </tr>
 <tr>
 <td><code>tps_limit</code></td>

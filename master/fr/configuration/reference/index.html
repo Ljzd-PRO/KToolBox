@@ -1812,7 +1812,7 @@
 <td><code>retry_interval</code></td>
 <td>nombre réel</td>
 <td><code>2.0</code></td>
-<td>Délai entre les tentatives d'API en secondes.</td>
+<td>Délai entre les tentatives d'API en secondes. Après un <code>429</code>, le <code>Retry-After</code> du serveur est utilisé, sinon le délai double à chaque tentative (300 secondes au maximum).</td>
 </tr>
 </tbody>
 </table>
@@ -1898,7 +1898,7 @@
 <td><code>retry_interval</code></td>
 <td>nombre réel</td>
 <td><code>3.0</code></td>
-<td>Délai entre les tentatives en secondes.</td>
+<td>Délai entre les tentatives en secondes. Après un <code>429</code>, tous les téléchargements sont suspendus pendant le <code>Retry-After</code> du serveur, sinon pendant un délai qui double à chaque fois (300 secondes au maximum).</td>
 </tr>
 <tr>
 <td><code>tps_limit</code></td>
