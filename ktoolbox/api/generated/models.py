@@ -6,7 +6,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
 
 class ErrorResponse(BaseModel):
@@ -25,6 +25,9 @@ class FileReference(BaseModel):
     path: str | None = None
     deferred: bool | None = None
     preview_only: bool | None = None
+    temp_download_url: Annotated[SecretStr | None, Field(exclude=True, repr=False)] = None
+    temp_url: Annotated[SecretStr | None, Field(exclude=True, repr=False)] = None
+    temp_expires: Annotated[datetime | None, Field(exclude=True, repr=False)] = None
 
 
 class CreatorSummary(BaseModel):

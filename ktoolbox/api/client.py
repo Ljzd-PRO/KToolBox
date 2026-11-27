@@ -24,11 +24,13 @@ from .generated import (
     CreatorProfile,
     CreatorSummary,
     Fancard,
+    FileReference,
     FileSearchResult,
     Post,
     Revision,
 )
 from .parameters import CreatorParameters, CreatorPostListParameters, FileHashParameters, PageParameters, PostParameters
+from .temporary_files import protect_temporary_path
 
 DEFAULT_API_BASE_URL = "https://pawchive.pw/api/v1"
 
@@ -60,16 +62,18 @@ class ResponseDrift:
 DriftReporter = Callable[[ResponseDrift], None]
 
 
-def _collect_model_extras(value: object, path: str = "$") -> set[str]:
+def _inspect_response_fields(value: object, path: str = "$") -> set[str]:
     extras: set[str] = set()
+    if isinstance(value, FileReference):
+        protect_temporary_path(value)
     if isinstance(value, BaseModel):
         if value.model_extra:
             extras.update(f"{path}.{name}" for name in value.model_extra)
         for field_name in type(value).model_fields:
-            extras.update(_collect_model_extras(getattr(value, field_name), f"{path}.{field_name}"))
+            extras.update(_inspect_response_fields(getattr(value, field_name), f"{path}.{field_name}"))
     elif isinstance(value, list):
         for item in value:
-            extras.update(_collect_model_extras(item, f"{path}[]"))
+            extras.update(_inspect_response_fields(item, f"{path}[]"))
     return extras
 
 
@@ -196,7 +200,7 @@ class PawchiveClient:
         except (ValueError, ValidationError) as error:
             raise PawchiveResponseValidationError(operation, response, error) from error
 
-        extras = tuple(sorted(_collect_model_extras(parsed)))
+        extras = tuple(sorted(_inspect_response_fields(parsed)))
         if extras:
             self._drift_reporter(ResponseDrift(operation=operation, fields=extras))
         return parsed
