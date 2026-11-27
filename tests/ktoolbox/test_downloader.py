@@ -4,6 +4,7 @@ import asyncio
 import os
 import time
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
 
 import httpx
@@ -20,6 +21,7 @@ def reset_rate_limit_pause(monkeypatch: pytest.MonkeyPatch) -> None:
     """Keep an HTTP 429 pause from one test out of the next."""
     monkeypatch.setattr(Downloader, "_paused_until", 0.0)
     monkeypatch.setattr(Downloader, "_rate_limit_strikes", 0)
+    monkeypatch.setattr(Downloader, "_rate_limit_generation", 0)
 
 
 class RecordingProgress:
@@ -389,7 +391,7 @@ def test_rate_limits_pause_every_download_and_back_off() -> None:
 
     def pause_after(response: httpx.Response) -> float:
         before = time.monotonic()
-        Downloader._track_rate_limit(response)
+        Downloader._track_rate_limit(response, request_generation=Downloader._rate_limit_generation)
         return Downloader._paused_until - before
 
     with patch("ktoolbox.downloader.downloader.logger.warning") as warning:
@@ -398,8 +400,8 @@ def test_rate_limits_pause_every_download_and_back_off() -> None:
 
         # Responses to requests sent before the pause leave it and the backoff alone...
         paused_until = Downloader._paused_until
-        Downloader._track_rate_limit(httpx.Response(429))
-        Downloader._track_rate_limit(httpx.Response(206))
+        Downloader._track_rate_limit(httpx.Response(429), request_generation=0)
+        Downloader._track_rate_limit(httpx.Response(206), request_generation=0)
         assert (Downloader._paused_until, Downloader._rate_limit_strikes) == (paused_until, 1)
         # ...unless the server asks for a longer wait.
         assert pause_after(httpx.Response(429, headers={"Retry-After": "30"})) == pytest.approx(30.0, abs=0.01)
@@ -409,7 +411,7 @@ def test_rate_limits_pause_every_download_and_back_off() -> None:
     assert pause_after(httpx.Response(429)) == pytest.approx(4.0, abs=0.01)
     # Any other response after the pause resets the backoff.
     Downloader._paused_until = 0.0
-    Downloader._track_rate_limit(httpx.Response(206))
+    Downloader._track_rate_limit(httpx.Response(206), request_generation=Downloader._rate_limit_generation)
     assert Downloader._rate_limit_strikes == 0
 
 
@@ -493,3 +495,105 @@ async def test_rate_limit_pause_extended_while_waiting_is_honored() -> None:
     await extension
 
     assert time.monotonic() >= Downloader._paused_until
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("pause_during", ["tps", "stat"])
+async def test_request_waits_for_pause_started_during_preparation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, pause_during: str
+) -> None:
+    config.downloader.tps_limit = 5
+    config.downloader.retry_interval = 3
+    now = 100.0
+    deadline = 0.0
+    request_times: list[float] = []
+
+    def rate_limit() -> None:
+        nonlocal deadline
+        Downloader._track_rate_limit(httpx.Response(429), request_generation=Downloader._rate_limit_generation)
+        deadline = Downloader._paused_until
+
+    async def sleep(delay: float) -> None:
+        nonlocal now
+        if pause_during == "tps" and not deadline:
+            # An in-flight response arrives while this download waits for its TPS slot.
+            rate_limit()
+        now += delay
+
+    async def stat(_path: Path) -> os.stat_result:
+        if pause_during == "stat":
+            rate_limit()
+        raise FileNotFoundError
+
+    monkeypatch.setattr(Downloader, "wait_lock", asyncio.Lock())
+    monkeypatch.setattr("ktoolbox.downloader.downloader.time", SimpleNamespace(monotonic=lambda: now))
+    monkeypatch.setattr("ktoolbox.downloader.downloader.asyncio", SimpleNamespace(Lock=asyncio.Lock, sleep=sleep))
+    monkeypatch.setattr("ktoolbox.downloader.downloader.aiofiles.os.stat", stat)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        request_times.append(now)
+        return partial_response(request, headers={"Content-Range": "bytes 0-3/4"})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        downloader = Downloader("https://files.example.test/file.bin", tmp_path, client, server_path="/file.bin")
+        result = await run_once(downloader)
+
+    assert result.code == RetCodeEnum.Success
+    assert deadline > 100
+    assert request_times == [deadline]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("status", [206, 429])
+async def test_response_sent_before_pause_cannot_change_backoff_after_it_ends(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, status: int
+) -> None:
+    config.downloader.retry_interval = 3
+    now = 100.0
+    deadline = 0.0
+
+    async def sleep(delay: float) -> None:
+        nonlocal now
+        now += delay
+
+    monkeypatch.setattr(Downloader, "wait_lock", asyncio.Lock())
+    monkeypatch.setattr("ktoolbox.downloader.downloader.time", SimpleNamespace(monotonic=lambda: now))
+    monkeypatch.setattr("ktoolbox.downloader.downloader.asyncio", SimpleNamespace(Lock=asyncio.Lock, sleep=sleep))
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal now, deadline
+        # Another download is rate limited while this request is in flight.
+        Downloader._track_rate_limit(httpx.Response(429), request_generation=Downloader._rate_limit_generation)
+        deadline = Downloader._paused_until
+        now = deadline + 1
+        return partial_response(request, status=status, headers={"Content-Range": "bytes 0-3/4"})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        downloader = Downloader("https://files.example.test/file.bin", tmp_path, client, server_path="/file.bin")
+        await run_once(downloader)
+
+    assert Downloader._paused_until == deadline
+    assert Downloader._rate_limit_strikes == 1
+    Downloader._track_rate_limit(httpx.Response(429), request_generation=Downloader._rate_limit_generation)
+    assert Downloader._paused_until == now + 6
+    assert Downloader._rate_limit_strikes == 2
+
+
+def test_old_retry_after_extends_pause_without_resetting_backoff(monkeypatch: pytest.MonkeyPatch) -> None:
+    config.downloader.retry_interval = 3
+    now = 100.0
+    monkeypatch.setattr("ktoolbox.downloader.downloader.time", SimpleNamespace(monotonic=lambda: now))
+    Downloader._track_rate_limit(httpx.Response(429), request_generation=0)
+    recovering_generation = Downloader._rate_limit_generation
+
+    now = Downloader._paused_until + 1
+    Downloader._track_rate_limit(httpx.Response(429, headers={"Retry-After": "30"}), request_generation=0)
+    assert Downloader._paused_until == now + 30
+    assert Downloader._rate_limit_strikes == 1
+    assert Downloader._rate_limit_generation > recovering_generation
+
+    now = Downloader._paused_until + 1
+    Downloader._track_rate_limit(httpx.Response(206), request_generation=recovering_generation)
+    assert Downloader._rate_limit_strikes == 1
+    Downloader._track_rate_limit(httpx.Response(206), request_generation=Downloader._rate_limit_generation)
+    assert Downloader._rate_limit_strikes == 0

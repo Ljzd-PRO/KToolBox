@@ -57,29 +57,33 @@ class Downloader:
     """``time.monotonic()`` time before which no download may send a request, set after HTTP 429"""
     _rate_limit_strikes: int = 0
     """Pauses in a row caused by HTTP 429; each one doubles the next"""
+    _rate_limit_generation: int = 0
+    """Changes whenever a pause is extended, so responses can be matched to their request's pause state"""
 
     @classmethod
-    def _track_rate_limit(cls, response: httpx.Response) -> None:
+    def _track_rate_limit(cls, response: httpx.Response, *, request_generation: int) -> None:
         """
         Pause every download after HTTP 429, and back off further while it keeps happening.
 
-        Responses that arrive during a pause were sent before it started, so they neither
-        lengthen the backoff nor reset it; only a longer ``Retry-After`` extends the pause.
+        Responses to requests sent before the latest pause neither advance the backoff nor
+        reset it, even after the pause ends; only a longer ``Retry-After`` extends the pause.
         """
         now = time.monotonic()
         paused = now < cls._paused_until
+        current_request = request_generation == cls._rate_limit_generation
         if response.status_code != httpx.codes.TOO_MANY_REQUESTS:
-            if not paused:
+            if current_request and not paused:
                 cls._rate_limit_strikes = 0
             return
         retry_after = parse_retry_after(response.headers.get("Retry-After"))
-        if paused and retry_after is None:
+        if (paused or not current_request) and retry_after is None:
             return
-        if not paused:
+        if current_request and not paused:
             cls._rate_limit_strikes += 1
         delay = rate_limit_delay(retry_after, cls._rate_limit_strikes, config.downloader.retry_interval)
         if now + delay > cls._paused_until:
             cls._paused_until = now + delay
+            cls._rate_limit_generation += 1
             logger.warning(generate_msg("Rate limited by the file server, pausing all downloads", seconds=f"{delay:g}"))
 
     @classmethod
@@ -292,15 +296,19 @@ class Downloader:
                 message=generate_msg(ret_msg or "Download file already exists", path=save_filepath),
             )
 
-        async with self.wait_lock:
-            await self._wait_for_rate_limit()
-            await asyncio.sleep(1 / config.downloader.tps_limit)
         async with self._finished_lock:
             temp_filepath = Path(f"{save_filepath}.{config.downloader.temp_suffix}")
             try:
                 temp_size = (await aiofiles.os.stat(temp_filepath)).st_size
             except FileNotFoundError:
                 temp_size = 0
+
+            async with self.wait_lock:
+                await asyncio.sleep(1 / config.downloader.tps_limit)
+                # A different request may have started or extended a pause during the
+                # TPS wait. Check it after all local preparation, just before sending.
+                await self._wait_for_rate_limit()
+                request_generation = self._rate_limit_generation
 
             async with self._client.stream(
                 method="GET",
@@ -309,7 +317,7 @@ class Downloader:
                 timeout=config.downloader.timeout,
                 headers={"Range": f"bytes={temp_size}-"},
             ) as res:  # type: httpx.Response
-                self._track_rate_limit(res)
+                self._track_rate_limit(res, request_generation=request_generation)
                 if res.status_code != httpx.codes.PARTIAL_CONTENT:
                     self._url = self._initial_url
                     return DownloaderRet(
