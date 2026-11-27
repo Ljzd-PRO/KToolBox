@@ -10,7 +10,9 @@
 | 创作者头像与横幅 | `https://pawchive.pw` |
 | 作品文件 | `https://file.pawchive.pw/data/...` |
 
-API 请求永远不会携带账号会话。配置 `downloader.session_key` 后，它只会作为 `session` Cookie 发送给文件下载请求。
+API 请求不会携带账号会话。配置 `downloader.session_key` 后，只在下载普通文件时将其作为 `session` Cookie 发送。
+
+KToolBox 会自动使用作品详情中的链接下载仍可用的临时文件，无需修改文件主机或路径前缀。临时下载直连 Pawchive，不使用已配置的下载反向代理、会话 Cookie 或断点续传。文件过期时，任务会报告该文件并继续处理其他文件。
 
 ## 已支持的 API 范围
 

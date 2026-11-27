@@ -1,5 +1,6 @@
+from collections import Counter
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime
 from fnmatch import fnmatch
 from pathlib import Path
@@ -23,13 +24,15 @@ from ktoolbox.action.utils import (
 )
 from ktoolbox.api.client import PawchiveClient
 from ktoolbox.api.errors import PawchiveError, PawchiveNotFoundError
-from ktoolbox.api.generated import Post, Revision
+from ktoolbox.api.generated import FileReference, Post, Revision
+from ktoolbox.api.temporary_files import protect_temporary_path
 from ktoolbox.api.utils import pawchive_client_scope
 from ktoolbox.blocker import BlockerContext, BlockerEngine
 from ktoolbox.blocker.engine import blocker_registry, legacy_keyword_blocker
 from ktoolbox.configuration import config
 from ktoolbox.failures import FailureStage, StagedFailure
 from ktoolbox.job import CreatorIndices, Job
+from ktoolbox.job.temporary import TemporaryFile, TemporaryFileSource
 from ktoolbox.project_config import ProjectNamingConfiguration
 from ktoolbox.publication_time import PublishedTimePolicy
 from ktoolbox.utils import extract_external_links, generate_msg
@@ -60,6 +63,11 @@ async def create_job_from_post(
     """
     naming = naming or ProjectNamingConfiguration()
     published_time = published_time or config.published_time.policy()
+    original_post = post
+    if post.file:
+        protect_temporary_path(post.file)
+    for reference in post.attachments or []:
+        protect_temporary_path(reference)
     await aiofiles.os.makedirs(post_path, exist_ok=True)
     job_post = Post.model_validate(post.model_dump(mode="python"))
 
@@ -82,9 +90,15 @@ async def create_job_from_post(
 
     # Filter and create jobs for ``Post.attachment``
     jobs: list[Job] = []
+    temporary_candidates: list[tuple[FileReference, str, bool]] = []
     sequential_counter = 1  # Counter for sequential filenames
     if config.job.download_attachments:
-        for attachment in post.attachments or []:
+        for index, attachment in enumerate(post.attachments or [], start=1):
+            if _is_temporary_file(attachment):
+                name = _temporary_filename(attachment, f"temporary-{index}")
+                if _included_file(name):
+                    temporary_candidates.append((attachment, name, False))
+                continue
             if not attachment.path:
                 continue
             file_path_obj = (
@@ -118,15 +132,18 @@ async def create_job_from_post(
 
     # Filter and create jobs for ``Post.file``
     selected_download_file = config.job.download_file if download_file is None else download_file
-    if selected_download_file and post.file and post.file.path:
+    if selected_download_file and post.file and _is_temporary_file(post.file):
+        name = _temporary_filename(post.file, "temporary-cover")
+        name = generate_filename(post, name, naming.post_structure.file, published_time)
+        if _included_file(name):
+            temporary_candidates.append((post.file, name, True))
+    elif selected_download_file and post.file and post.file.path:
         post_file_name = (
             Path(post.file.name)
             if post.file.name and is_valid_filename(post.file.name)
             else Path(urlparse(post.file.path).path)
         )
-        post_file_name = Path(
-            generate_filename(post, post_file_name.name, naming.post_structure.file, published_time)
-        )
+        post_file_name = Path(generate_filename(post, post_file_name.name, naming.post_structure.file, published_time))
         if (
             not config.job.allow_list or any(map(lambda x: fnmatch(post_file_name.name, x), config.job.allow_list))
         ) and not any(map(lambda x: fnmatch(post_file_name.name, x), config.job.block_list)):
@@ -231,7 +248,9 @@ async def create_job_from_post(
                         )
                         if should_use_sequential:
                             basic_filename = f"{sequential_counter}{image_file_path.suffix}"
-                            alt_filename = generate_filename(post, basic_filename, naming.filename_format, published_time)
+                            alt_filename = generate_filename(
+                                post, basic_filename, naming.filename_format, published_time
+                            )
                             sequential_counter += 1
 
                         jobs.append(
@@ -243,7 +262,51 @@ async def create_job_from_post(
                             )
                         )
 
+    if temporary_candidates:
+        source = TemporaryFileSource(original_post, detail=post if post is not original_post else None)
+        for reference, name, primary in temporary_candidates:
+            if not primary:
+                suffix = Path(name).suffix
+                if naming.sequential_filename and suffix.lower() not in naming.sequential_filename_excludes:
+                    name = f"{sequential_counter}{suffix}"
+                    sequential_counter += 1
+                name = generate_filename(original_post, name, naming.filename_format, published_time)
+            jobs.append(
+                Job(
+                    path=post_path if primary else attachments_path,
+                    alt_filename=name,
+                    server_path="",
+                    type=PostFileTypeEnum.File if primary else PostFileTypeEnum.Attachment,
+                    post=job_post,
+                    temporary=TemporaryFile(source, reference, primary),
+                )
+            )
+        # Keep the existing sequence of permanent attachments and inline images.
+        targets = Counter(str(job.path / (job.alt_filename or "")).casefold() for job in jobs)
+        reserved = {
+            str(path).casefold()
+            for path in (post_path / DataStorageNameEnum.PostData.value, content_path, external_links_path)
+            if path is not None
+        }
+        for job in jobs:
+            target = str(job.path / (job.alt_filename or "")).casefold()
+            if job.temporary and (targets[target] > 1 or target in reserved):
+                job.temporary = replace(job.temporary, output_conflict=True)
     return jobs
+
+
+def _is_temporary_file(reference: FileReference) -> bool:
+    return not reference.preview_only and bool(reference.deferred or reference.temp_download_url)
+
+
+def _included_file(name: str) -> bool:
+    return (not config.job.allow_list or any(fnmatch(name, item) for item in config.job.allow_list)) and not any(
+        fnmatch(name, item) for item in config.job.block_list
+    )
+
+
+def _temporary_filename(reference: FileReference, fallback: str) -> str:
+    return reference.name if reference.name and is_valid_filename(reference.name) else fallback
 
 
 @dataclass(slots=True)
@@ -507,9 +570,7 @@ def _post_matches_filters(
     keywords: set[str] | None,
     published_time: PublishedTimePolicy,
 ) -> bool:
-    if (start_time or end_time) and not list(
-        filter_posts_by_date([post], start_time, end_time, published_time)
-    ):
+    if (start_time or end_time) and not list(filter_posts_by_date([post], start_time, end_time, published_time)):
         return False
     return not keywords or bool(list(filter_posts_by_keywords([post], keywords)))
 
@@ -551,10 +612,14 @@ async def _emit_revision_jobs(
     try:
         revisions = await client.list_post_revisions(service, creator_id, post.id)
         for revision in revisions:
-            revision_path = post_path / naming.post_structure.revisions / generate_revision_path_name(
-                revision,
-                naming,
-                published_time,
+            revision_path = (
+                post_path
+                / naming.post_structure.revisions
+                / generate_revision_path_name(
+                    revision,
+                    naming,
+                    published_time,
+                )
             )
             revision_jobs = await create_job_from_post(
                 post=revision,

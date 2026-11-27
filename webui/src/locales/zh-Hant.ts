@@ -42,6 +42,10 @@ export const zhHant = {
       transferFinished: "{{file}} · {{creator}} · {{outcome}} · {{completed}} / {{total}} · {{duration}} · {{speed}}",
     },
     failures: {
+      temporaryUnavailable: "Pawchive 的暫存檔案已無法取得，或未提供可用的下載連結。",
+      temporaryAdvice: "重試前請先確認該檔案在 Pawchive 上仍可下載。",
+      temporaryConflict: "暫存檔案與其他檔案的輸出名稱衝突，未覆寫任何檔案。",
+      temporaryConflictAdvice: "請選擇其他輸出目錄，或處理檔名衝突後再重試。",
       title: "工作失敗原因", summary: "作者失敗 {{creatorCount}} 位，檔案失敗 {{fileCount}} 個。", creatorCount: "{{count}} 位作者失敗", fileCount: "{{count}} 個檔案失敗", creatorGroup: "作者", fileGroup: "檔案", otherGroup: "其他階段", showMoreFiles: "展開另外 {{count}} 筆檔案詳細資料", collapseFiles: "收合檔案詳細資料", moreFiles: "另有 {{count}} 個檔案失敗未展開。", retryable: "重試可能成功", notRetryable: "需要處理", fields: "受影響欄位：{{fields}}", event: "{{subject}}：{{reason}}",
       codes: { network: "無法連線 Pawchive 或檔案伺服器。", timeout: "要求在完成前逾時。", rate_limited: "Pawchive 暫時限制了要求頻率。", http_error: "遠端伺服器傳回 HTTP {{status}}。", response_incompatible: "Pawchive 傳回的資料格式暫不支援。", permission_denied: "KToolBox 沒有此位置的寫入權限。", disk_full: "磁碟剩餘空間不足。", download_failed: "檔案下載失敗。", resource_not_found: "找不到指定的作者、作品或檔案。", resource_not_found_file: "Pawchive 檔案伺服器缺少此檔案。", unknown: "未預期的錯誤中斷了此操作。" },
       stages: { creator_profile: "作者資料", work_list: "作品清單", work_detail: "作品詳細資料", revisions: "修訂版本", job_generation: "準備下載", file_request: "要求檔案", file_write: "寫入檔案", index_write: "儲存索引" },

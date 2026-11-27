@@ -10,7 +10,9 @@
 | 創作者圖示與橫幅 | `https://pawchive.pw` |
 | 作品檔案 | `https://file.pawchive.pw/data/...` |
 
-API 請求永遠不會攜帶帳號工作階段。設定 `downloader.session_key` 後，它只會作為 `session` Cookie 傳送給檔案下載請求。
+API 請求不會攜帶帳號工作階段。設定 `downloader.session_key` 後，只在下載一般檔案時將其作為 `session` Cookie 傳送。
+
+KToolBox 會自動使用作品詳細資料中的連結下載仍可取得的暫存檔案，不必修改檔案主機或路徑前綴。暫存檔案直接從 Pawchive 下載，不使用已設定的反向代理、工作階段 Cookie 或續傳。檔案過期時，工作會回報該檔案並繼續處理其他檔案。
 
 ## 支援的 API 範圍
 

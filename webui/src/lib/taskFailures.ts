@@ -34,6 +34,8 @@ const failureStages = new Set<FailureStage>([
 ]);
 
 export function failureMessage(t: TFunction, item: FailureItem): string {
+  if (item.operation === "download_temporary_file") return t("tasks.failures.temporaryUnavailable");
+  if (item.operation === "temporary_file_conflict") return t("tasks.failures.temporaryConflict");
   if (item.code === "resource_not_found" && item.stage === "file_request") {
     return t("tasks.failures.codes.resource_not_found_file");
   }
@@ -51,6 +53,8 @@ export function failureStageLabel(t: TFunction, stage: FailureStage): string {
 }
 
 export function failureAdvice(t: TFunction, item: FailureItem): string {
+  if (item.operation === "download_temporary_file") return t("tasks.failures.temporaryAdvice");
+  if (item.operation === "temporary_file_conflict") return t("tasks.failures.temporaryConflictAdvice");
   if (item.code === "resource_not_found" && item.stage === "file_request") {
     return t("tasks.failures.advice.resource_not_found_file");
   }

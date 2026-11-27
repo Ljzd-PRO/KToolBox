@@ -106,7 +106,9 @@ class SyncCoordinator:
         self.blocker_engine = blocker_engine or BlockerEngine()
         self.creator_concurrency = creator_concurrency
         self.reporter = reporter or NullProgressReporter()
-        self.download_pool = download_pool or DownloadWorkerPool(config.job.count, reporter=self.reporter)
+        self.download_pool = download_pool or DownloadWorkerPool(
+            config.job.count, reporter=self.reporter, api_client=client
+        )
         self.download_pool.reporter = self.reporter
         self.lane_size = lane_size or max(2, self.download_pool.concurrency)
 

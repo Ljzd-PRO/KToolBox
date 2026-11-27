@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import i18n from "./i18n";
+import i18n, { supportedLanguages } from "./i18n";
 import {
   compactActivityEvents,
   eventMessage,
@@ -63,6 +63,25 @@ describe("task failure presentation", () => {
       file_failures: 0,
       items: [{ ...incompatible, unsafe: "ignored" }],
     })?.items).toEqual([incompatible]);
+  });
+
+  it("localizes temporary file failures without falling back to generic file errors", () => {
+    for (const language of supportedLanguages) {
+      const t = i18n.getFixedT(language);
+      const file: FailureItem = {
+        ...incompatible,
+        code: "resource_not_found",
+        stage: "file_request",
+        file_name: "fixture.zip",
+        operation: "download_temporary_file",
+      };
+      expect(i18n.getResource(language, "translation", "tasks.failures.temporaryUnavailable")).toBeTruthy();
+      expect(failureMessage(t, file)).toBe(t("tasks.failures.temporaryUnavailable"));
+      expect(failureAdvice(t, file)).toBe(t("tasks.failures.temporaryAdvice"));
+      const conflict = { ...file, operation: "temporary_file_conflict" };
+      expect(failureMessage(t, conflict)).toBe(t("tasks.failures.temporaryConflict"));
+      expect(failureAdvice(t, conflict)).toBe(t("tasks.failures.temporaryConflictAdvice"));
+    }
   });
 
   it("renders creator and download failures in activity messages", async () => {

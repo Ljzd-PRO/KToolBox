@@ -42,6 +42,7 @@ jobs:
           ktoolbox/webui
           ktoolbox/action/base.py
           ktoolbox/action/fetch.py
+          ktoolbox/action/job.py
           ktoolbox/action/search.py
           ktoolbox/__main__.py
           ktoolbox/_enum.py
@@ -49,9 +50,12 @@ jobs:
           ktoolbox/cli_app.py
           ktoolbox/configuration.py
           ktoolbox/downloader/downloader.py
+          ktoolbox/downloader/temporary.py
           ktoolbox/exceptions.py
+          ktoolbox/job/model.py
           ktoolbox/job/runner.py
           ktoolbox/job/stream.py
+          ktoolbox/job/temporary.py
           ktoolbox/project_config.py
           ktoolbox/reporting.py
           ktoolbox/sync.py
@@ -68,6 +72,7 @@ jobs:
           ktoolbox/webui
           ktoolbox/action/base.py
           ktoolbox/action/fetch.py
+          ktoolbox/action/job.py
           ktoolbox/action/search.py
           ktoolbox/__main__.py
           ktoolbox/_enum.py
@@ -75,9 +80,12 @@ jobs:
           ktoolbox/cli_app.py
           ktoolbox/configuration.py
           ktoolbox/downloader/downloader.py
+          ktoolbox/downloader/temporary.py
           ktoolbox/exceptions.py
+          ktoolbox/job/model.py
           ktoolbox/job/runner.py
           ktoolbox/job/stream.py
+          ktoolbox/job/temporary.py
           ktoolbox/project_config.py
           ktoolbox/reporting.py
           ktoolbox/sync.py
@@ -90,6 +98,7 @@ jobs:
           ktoolbox/api/client.py
           ktoolbox/api/errors.py
           ktoolbox/api/parameters.py
+          ktoolbox/api/temporary_files.py
           ktoolbox/__main__.py
           ktoolbox/action/base.py
           ktoolbox/action/fetch.py
@@ -100,6 +109,7 @@ jobs:
           ktoolbox/exceptions.py
           ktoolbox/blocker
           ktoolbox/job/stream.py
+          ktoolbox/job/temporary.py
           ktoolbox/project_config.py
           ktoolbox/reporting.py
           ktoolbox/sync.py
@@ -122,6 +132,7 @@ jobs:
           tests/ktoolbox/test_api_client.py
           tests/ktoolbox/test_api_contract.py
           tests/ktoolbox/test_api_utils.py
+          tests/ktoolbox/test_temporary_files.py
           --cov=ktoolbox.api.client
           --cov=ktoolbox.api.errors
           --cov=ktoolbox.api.parameters
@@ -136,6 +147,7 @@ jobs:
           tests/ktoolbox/test_job_stream.py
           tests/ktoolbox/test_reporting.py
           tests/ktoolbox/test_sync.py
+          tests/ktoolbox/test_temporary_downloads.py
           --cov=ktoolbox.blocker.engine
           --cov=ktoolbox.blocker.field_match
           --cov=ktoolbox.blocker.model

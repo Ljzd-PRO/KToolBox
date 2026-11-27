@@ -8,8 +8,9 @@ from unittest.mock import AsyncMock, patch
 
 import httpx
 import pytest
+from pydantic import SecretStr
 
-from ktoolbox.api.generated import CreatorSummary, Post, Revision
+from ktoolbox.api.generated import CreatorSummary, FileReference, Post, Revision
 from ktoolbox.configuration import Configuration, RuntimeContext
 from ktoolbox.webui.app import create_app
 
@@ -41,6 +42,13 @@ async def test_pawchive_query_routes_use_typed_client(tmp_path: Path) -> None:
         service="fanbox",
         title="Fixture post",
         published=datetime(2025, 12, 21, 0, 35, 43),
+        attachments=[
+            FileReference(
+                name="fixture.zip",
+                deferred=True,
+                temp_download_url=SecretStr("https://t2.pawchive.pw/d/fixture/zip?signed=private-fixture"),
+            )
+        ],
     )
     revision = Revision(
         id="99",
@@ -83,6 +91,9 @@ async def test_pawchive_query_routes_use_typed_client(tmp_path: Path) -> None:
                 details = await client.get("/api/v1/pawchive/posts/fanbox/42/99")
                 assert details.json()["title"] == "Fixture post"
                 assert details.json()["published_service_timezone"] == "Asia/Tokyo"
+                assert details.json()["attachments"][0]["deferred"] is True
+                assert "private-fixture" not in details.text
+                assert "temp_download_url" not in details.text
                 selected = await client.get("/api/v1/pawchive/posts/fanbox/42/99?revision_id=7")
                 assert selected.json()["revision_id"] == 7
                 assert selected.json()["published_service_timezone"] == "UTC+09:00"

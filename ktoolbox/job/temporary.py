@@ -22,6 +22,7 @@ class TemporaryFile:
     source: TemporaryFileSource
     reference: FileReference
     primary: bool
+    output_conflict: bool = False
 
 
 class TemporaryFileSource:
@@ -55,9 +56,9 @@ class TemporaryFileSource:
             url = active_temporary_url(reference, now) if reference is not None else None
             if url and url != rejected_url:
                 return url
-            can_refresh = reference is not None and reference.temp_download_url is not None and not self._refreshed
-            if not self._loaded or can_refresh:
-                self._refreshed = self._loaded or rejected_url is not None
+            has_link = reference is not None and reference.temp_download_url is not None
+            if not self._loaded or (has_link and not self._refreshed):
+                self._refreshed = self._loaded or has_link or rejected_url is not None
                 self._loaded = True
                 self._detail = await self._fetch(client)
                 reference = _matching_file(self._detail, file) if self._detail is not None else None
@@ -68,6 +69,7 @@ class TemporaryFileSource:
 
     async def _fetch(self, client: PawchiveClient | None) -> Post | None:
         post = self._post
+        detail: Post | None
         try:
             async with pawchive_client_scope(client) as api:
                 if isinstance(post, Revision):

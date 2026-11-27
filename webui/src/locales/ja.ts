@@ -381,6 +381,10 @@ export const ja = {
     attempts_other: "{{count}}回の試行",
     noLogs: "タスクイベントはまだありません",
     failures: {
+      temporaryUnavailable: "Pawchive の一時ファイルは公開が終了したか、有効なダウンロードリンクがありません。",
+      temporaryAdvice: "再試行する前に、Pawchive でファイルをダウンロードできるか確認してください。",
+      temporaryConflict: "一時ファイルの出力名が別のファイルと重複しています。上書きは行われていません。",
+      temporaryConflictAdvice: "別の出力先を選ぶか、ファイル名の重複を解消してから再試行してください。",
       title: "タスクが失敗した理由",
       summary: "クリエイターの失敗：{{creatorCount}}件、ファイルの失敗：{{fileCount}}件。",
       creatorCount: "クリエイターの失敗 {{count}}件",

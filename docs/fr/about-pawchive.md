@@ -10,7 +10,9 @@
 | Icônes et bannières des créateurs | `https://pawchive.pw` |
 | Fichiers des publications | `https://file.pawchive.pw/data/...` |
 
-Les requêtes d'API ne transportent jamais de session de compte. Lorsqu'il est configuré, `downloader.session_key` est envoyé comme cookie `session` uniquement dans les requêtes de téléchargement de fichiers.
+Les requêtes d’API ne transmettent pas la session du compte. Si elle est configurée, la valeur de `downloader.session_key` est envoyée sous forme de cookie `session` uniquement pour les fichiers ordinaires.
+
+KToolBox télécharge automatiquement les fichiers temporaires encore disponibles à partir des liens de la publication. Il n’est pas nécessaire de modifier l’hôte de fichiers ou le préfixe du chemin. Ces téléchargements passent directement par Pawchive, sans le proxy inverse configuré, sans cookie de session et sans reprise partielle. Si un fichier a expiré, la tâche le signale et poursuit le traitement des autres fichiers.
 
 ## Périmètre de l'API
 

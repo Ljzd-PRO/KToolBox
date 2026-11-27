@@ -92,6 +92,10 @@ export const ko = {
       transferFinished: "{{file}} · {{creator}} · {{outcome}} · {{completed}} / {{total}} · {{duration}} · {{speed}}",
     },
     failures: {
+      temporaryUnavailable: "Pawchive 임시 파일을 더 이상 받을 수 없거나 사용할 수 있는 다운로드 링크가 없습니다.",
+      temporaryAdvice: "다시 시도하기 전에 Pawchive에서 해당 파일을 다운로드할 수 있는지 확인하세요.",
+      temporaryConflict: "임시 파일의 출력 이름이 다른 파일과 충돌합니다. 덮어쓴 파일은 없습니다.",
+      temporaryConflictAdvice: "다른 출력 폴더를 선택하거나 파일 이름 충돌을 해결한 뒤 다시 시도하세요.",
       title: "작업 실패 원인", summary: "크리에이터 실패 {{creatorCount}}건, 파일 실패 {{fileCount}}건.", creatorCount: "크리에이터 실패 {{count}}건", fileCount: "파일 실패 {{count}}건", creatorGroup: "크리에이터", fileGroup: "파일", otherGroup: "기타 단계", showMoreFiles: "파일 상세 {{count}}건 더 보기", collapseFiles: "파일 상세 접기", moreFiles: "파일 실패 {{count}}건을 더 숨겼습니다.", retryable: "재시도 가능", notRetryable: "조치 필요", fields: "영향받은 필드: {{fields}}", event: "{{subject}}: {{reason}}",
       codes: { network: "Pawchive 또는 파일 서버에 연결할 수 없습니다.", timeout: "요청이 완료되기 전에 시간이 초과되었습니다.", rate_limited: "Pawchive가 일시적으로 요청을 제한하고 있습니다.", http_error: "원격 서버가 HTTP {{status}}을 반환했습니다.", response_incompatible: "Pawchive가 지원되지 않는 형식의 데이터를 반환했습니다.", permission_denied: "KToolBox에 이 위치의 쓰기 권한이 없습니다.", disk_full: "디스크 여유 공간이 부족합니다.", download_failed: "파일을 다운로드하지 못했습니다.", resource_not_found: "지정한 크리에이터, 작품 또는 파일을 찾지 못했습니다.", resource_not_found_file: "Pawchive 파일 서버에 이 파일이 없습니다.", unknown: "예기치 않은 오류로 작업이 중단되었습니다." },
       stages: { creator_profile: "크리에이터 정보", work_list: "작품 목록", work_detail: "작품 세부 정보", revisions: "리비전", job_generation: "다운로드 준비", file_request: "파일 요청", file_write: "파일 쓰기", index_write: "색인 저장" },

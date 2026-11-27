@@ -10,7 +10,9 @@
 | Creator icons and banners | `https://pawchive.pw` |
 | Post files | `https://file.pawchive.pw/data/...` |
 
-API requests never carry an account session. `downloader.session_key`, when configured, is sent only as the `session` cookie to file-download requests.
+API requests never carry an account session. When configured, `downloader.session_key` is sent as the `session` cookie for ordinary file downloads only.
+
+KToolBox downloads available temporary files automatically using the link from the post details. You do not need to change the file host or path prefix. Temporary downloads go directly to Pawchive without the configured download reverse proxy, session cookie, or byte-range resume. If a file has expired, the task reports it and continues with the other files.
 
 ## Supported API scope
 

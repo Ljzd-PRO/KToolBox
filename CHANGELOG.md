@@ -2,6 +2,7 @@
 
 ## Fixed
 
+- Download available temporary Pawchive files automatically in CLI, WebUI, and scheduled tasks. Keep permanent attachment numbering and resume behavior unchanged; report expired files or output conflicts without overwriting existing files ([#393](https://github.com/Ljzd-PRO/KToolBox/issues/393)).
 - Keep comments at the top of `ktoolbox.toml` in place when the project configuration is saved with tomlkit 0.15.2, which wrote `blockers = []` and `automatic_sync = []` above them. Empty creator, blocker and automatic sync lists are left out of the file, as they were with earlier tomlkit releases.
 
 # KToolBox v1.1.0-beta.1

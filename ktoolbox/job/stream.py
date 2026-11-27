@@ -4,6 +4,7 @@ import asyncio
 from collections import deque
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
+from functools import partial
 from itertools import count
 from pathlib import PurePosixPath
 from urllib.parse import urlsplit
@@ -12,10 +13,12 @@ import httpx
 from loguru import logger
 
 from ktoolbox._enum import RetCodeEnum
+from ktoolbox.api.client import PawchiveClient
 from ktoolbox.api.utils import get_file_url
 from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
 from ktoolbox.downloader.base import DownloaderRet
+from ktoolbox.downloader.temporary import TemporaryDownloader, TemporaryOutputConflict
 from ktoolbox.failures import (
     FailureCode,
     FailureItem,
@@ -25,6 +28,7 @@ from ktoolbox.failures import (
     generic_failure,
 )
 from ktoolbox.job.model import Job
+from ktoolbox.job.temporary import TemporaryFileUnavailable
 from ktoolbox.reporting import NullProgressReporter, ProgressReporter, ReporterDownloadObserver
 
 
@@ -112,6 +116,7 @@ DownloadCallable = Callable[
     [QueuedJob, httpx.AsyncClient, ReporterDownloadObserver],
     Awaitable[DownloaderRet[str]],
 ]
+_REJECTED_TEMPORARY_URL_STATUSES = frozenset({401, 403, 404, 410})
 
 
 class DownloadWorkerPool:
@@ -123,23 +128,33 @@ class DownloadWorkerPool:
         *,
         download: DownloadCallable | None = None,
         reporter: ProgressReporter | None = None,
+        api_client: PawchiveClient | None = None,
     ) -> None:
         if concurrency < 1:
             raise ValueError("download concurrency must be positive")
         self.concurrency = concurrency
-        self._download = _download_job if download is None else download
+        self._download = download
+        self._api_client = api_client
         self.reporter = reporter or NullProgressReporter()
         self._task_ids = count(1)
 
     async def run(self, queue: FairJobQueue) -> DownloadSummary:
         summary = DownloadSummary()
         limits = httpx.Limits(max_connections=self.concurrency, max_keepalive_connections=self.concurrency)
-        async with httpx.AsyncClient(
-            verify=config.ssl_verify,
-            cookies={"session": config.downloader.session_key} if config.downloader.session_key else None,
-            limits=limits,
-        ) as client:
-            workers = [asyncio.create_task(self._worker(queue, client, summary)) for _ in range(self.concurrency)]
+        async with (
+            httpx.AsyncClient(
+                verify=config.ssl_verify,
+                cookies={"session": config.downloader.session_key} if config.downloader.session_key else None,
+                limits=limits,
+            ) as client,
+            httpx.AsyncClient(verify=config.ssl_verify, limits=limits) as temporary_client,
+        ):
+            download = self._download or partial(
+                _download_job, temporary_client=temporary_client, api_client=self._api_client
+            )
+            workers = [
+                asyncio.create_task(self._worker(queue, client, summary, download)) for _ in range(self.concurrency)
+            ]
             try:
                 await asyncio.gather(*workers)
             except BaseException:
@@ -154,6 +169,7 @@ class DownloadWorkerPool:
         queue: FairJobQueue,
         client: httpx.AsyncClient,
         summary: DownloadSummary,
+        download: DownloadCallable,
     ) -> None:
         while queued := await queue.get():
             summary.total += 1
@@ -169,7 +185,7 @@ class DownloadWorkerPool:
                 preserve_filename=queued.job.alt_filename is not None,
             )
             try:
-                result = await self._download(queued, client, observer)
+                result = await download(queued, client, observer)
                 if result.code == RetCodeEnum.FileExisted:
                     summary.existed += 1
                     status = "existed"
@@ -206,13 +222,33 @@ class DownloadWorkerPool:
             except Exception as error:
                 summary.failed += 1
                 summary.creator_failures[queued.creator_key] = summary.creator_failures.get(queued.creator_key, 0) + 1
-                failure = classify_failure(
-                    error,
-                    stage=FailureStage.file_write if isinstance(error, OSError) else FailureStage.file_request,
-                    file_name=filename,
-                )
+                if isinstance(error, TemporaryFileUnavailable):
+                    failure = FailureItem(
+                        code=FailureCode.resource_not_found,
+                        stage=FailureStage.file_request,
+                        operation="download_temporary_file",
+                        message=str(error),
+                        retryable=False,
+                        file_name=filename,
+                        http_status=error.status,
+                    )
+                elif isinstance(error, TemporaryOutputConflict):
+                    failure = FailureItem(
+                        code=FailureCode.download_failed,
+                        stage=FailureStage.file_write,
+                        operation="temporary_file_conflict",
+                        message=str(error),
+                        retryable=False,
+                        file_name=filename,
+                    )
+                else:
+                    failure = classify_failure(
+                        error,
+                        stage=FailureStage.file_write if isinstance(error, OSError) else FailureStage.file_request,
+                        file_name=filename,
+                    )
                 summary.failures.append(failure)
-                logger.error(failure.message)
+                logger.error("{}: {}", filename or "Download", failure.message)
             finally:
                 self.reporter.download_finished(task_key, status, failure)
                 queue.task_done(queued.creator_key)
@@ -222,8 +258,33 @@ async def _download_job(
     queued: QueuedJob,
     client: httpx.AsyncClient,
     observer: ReporterDownloadObserver,
+    *,
+    temporary_client: httpx.AsyncClient,
+    api_client: PawchiveClient | None,
 ) -> DownloaderRet[str]:
     job = queued.job
+    if temporary := job.temporary:
+        if temporary.output_conflict:
+            raise TemporaryOutputConflict
+        url = await temporary.source.resolve(temporary, api_client)
+        refreshed = False
+        while True:
+            result = await TemporaryDownloader(
+                url=url,
+                path=job.path,
+                client=temporary_client,
+                designated_filename=job.alt_filename,
+                server_path="",
+            ).run(progress=observer)
+            code = result.status_code
+            if code not in _REJECTED_TEMPORARY_URL_STATUSES:
+                if code is not None and (200 <= code < 400 or code == 416):
+                    raise TemporaryFileUnavailable(code)
+                return result
+            if refreshed:
+                raise TemporaryFileUnavailable(code)
+            url = await temporary.source.resolve(temporary, api_client, rejected_url=url, status=code)
+            refreshed = True
     downloader = Downloader(
         url=get_file_url(job.server_path),
         path=job.path,

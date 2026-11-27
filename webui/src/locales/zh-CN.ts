@@ -425,6 +425,10 @@ export const zhCN = {
     "attempts_other": "{{count}} 次尝试",
     "noLogs": "尚无任务事件",
     "failures": {
+      "temporaryUnavailable": "Pawchive 的临时文件已不可用，或未提供可用的下载链接。",
+      "temporaryAdvice": "重试前请先确认该文件在 Pawchive 上仍可下载。",
+      "temporaryConflict": "临时文件与其他文件的输出名称冲突，未覆盖任何文件。",
+      "temporaryConflictAdvice": "请选择其他输出目录，或处理文件名冲突后再重试。",
       "title": "任务失败原因",
       "summary": "作者失败 {{creatorCount}} 个，文件失败 {{fileCount}} 个。",
       "creatorCount": "{{count}} 个作者失败",

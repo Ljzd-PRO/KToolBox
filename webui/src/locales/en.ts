@@ -423,6 +423,10 @@ export const en = {
     "attempts_other": "{{count}} attempts",
     "noLogs": "No task events yet",
     "failures": {
+      "temporaryUnavailable": "Pawchive no longer offers this temporary file or did not provide a usable download link.",
+      "temporaryAdvice": "Check whether the file is still available on Pawchive before retrying.",
+      "temporaryConflict": "The temporary file has the same output name as a different file. Nothing was overwritten.",
+      "temporaryConflictAdvice": "Choose a different output directory or resolve the filename conflict, then retry.",
       "title": "Why this task failed",
       "summary": "Creator failures: {{creatorCount}}; file failures: {{fileCount}}.",
       "creatorCount": "{{count}} creator failures",
