@@ -470,10 +470,7 @@ class ProjectConfigStore:
         document = tomlkit.document()
         document.add("schema_version", 5)
         document.add("default_output", "downloads")
-        document.add("creators", tomlkit.aot())
-        document.add("blockers", tomlkit.aot())
         document.add("naming", tomlkit.item(ProjectNamingConfiguration().model_dump(mode="json")))
-        document.add("automatic_sync", tomlkit.aot())
         return tomlkit.dumps(document)
 
     def replace_text(self, content: str) -> ProjectConfiguration:
@@ -496,10 +493,10 @@ class ProjectConfigStore:
         document = self._document.copy()
         document["schema_version"] = configuration.schema_version
         document["default_output"] = str(configuration.default_output)
-        document["creators"] = _creator_tables(configuration.creators)
-        document["blockers"] = _blocker_tables(configuration.blockers)
+        _set_tables(document, "creators", _creator_tables(configuration.creators))
+        _set_tables(document, "blockers", _blocker_tables(configuration.blockers))
         document["naming"] = tomlkit.item(configuration.naming.model_dump(mode="json"))
-        document["automatic_sync"] = _automatic_sync_tables(configuration.automatic_sync)
+        _set_tables(document, "automatic_sync", _automatic_sync_tables(configuration.automatic_sync))
         self.path.parent.mkdir(parents=True, exist_ok=True)
 
         temporary_path: Path | None = None
@@ -601,6 +598,17 @@ class ProjectConfigStore:
             return ProjectConfiguration.model_validate(configuration.model_dump())
         except ValueError as error:
             raise ProjectConfigError(str(error)) from error
+
+
+def _set_tables(document: TOMLDocument, key: str, tables: AoT) -> None:
+    """Store an array of tables, leaving the key out while it is empty.
+
+    tomlkit 0.15.2+ writes an empty one as ``key = []`` above leading comments.
+    """
+    if tables:
+        document[key] = tables
+    else:
+        document.pop(key, None)
 
 
 def _creator_tables(creators: list[CreatorReference]) -> AoT:

@@ -131,6 +131,10 @@ def parse_webpage_url(url: str) -> tuple[str | None, str | None, str | None, str
     return service, user_id, post_id, revision_id
 
 
+# Python 3.14 deprecates event loop policies, which uvloop and winloop still use.
+_EVENT_LOOP_POLICY_DEPRECATION = r"'asyncio\.(AbstractEventLoopPolicy|set_event_loop_policy)' is deprecated.*"
+
+
 def uvloop_init() -> bool:
     """
     Set event loop policy to uvloop or winloop if available.
@@ -154,7 +158,7 @@ def uvloop_init() -> bool:
                 with warnings.catch_warnings():
                     warnings.filterwarnings(
                         "ignore",
-                        message=r"'asyncio\.AbstractEventLoopPolicy' is deprecated.*",
+                        message=_EVENT_LOOP_POLICY_DEPRECATION,
                         category=DeprecationWarning,
                     )
                     asyncio.set_event_loop_policy(winloop.EventLoopPolicy())
@@ -173,7 +177,7 @@ def uvloop_init() -> bool:
                 with warnings.catch_warnings():
                     warnings.filterwarnings(
                         "ignore",
-                        message=r"'asyncio\.AbstractEventLoopPolicy' is deprecated.*",
+                        message=_EVENT_LOOP_POLICY_DEPRECATION,
                         category=DeprecationWarning,
                     )
                     asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
