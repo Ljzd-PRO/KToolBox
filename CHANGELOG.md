@@ -4,6 +4,9 @@
 
 - Keep WebUI route updates synchronous so sidebar navigation and task creation render the destination without requiring a browser refresh ([#397](https://github.com/Ljzd-PRO/KToolBox/issues/397)).
 - Keep comments at the top of `ktoolbox.toml` in place when the project configuration is saved with tomlkit 0.15.2, which wrote `blockers = []` and `automatic_sync = []` above them. Empty creator, blocker and automatic sync lists are left out of the file, as they were with earlier tomlkit releases.
+- Back off properly after HTTP 429 (Too Many Requests) instead of retrying at a fixed interval ([#398](https://github.com/Ljzd-PRO/KToolBox/issues/398)).
+  - When the file server rate-limits a download, all downloads pause for the server's `Retry-After`, or for `retry_interval` doubled each time the limit is hit again (at most 5 minutes per pause), so the limit can clear instead of being hit again.
+  - Pawchive API requests back off the same way. WebUI pages and MCP tools report the rate limit instead of waiting more than 10 seconds.
 
 # KToolBox v1.1.0-beta.1
 

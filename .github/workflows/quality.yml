@@ -90,6 +90,7 @@ jobs:
           ktoolbox/api/client.py
           ktoolbox/api/errors.py
           ktoolbox/api/parameters.py
+          ktoolbox/api/rate_limit.py
           ktoolbox/__main__.py
           ktoolbox/action/base.py
           ktoolbox/action/fetch.py
@@ -122,9 +123,11 @@ jobs:
           tests/ktoolbox/test_api_client.py
           tests/ktoolbox/test_api_contract.py
           tests/ktoolbox/test_api_utils.py
+          tests/ktoolbox/test_api_rate_limit.py
           --cov=ktoolbox.api.client
           --cov=ktoolbox.api.errors
           --cov=ktoolbox.api.parameters
+          --cov=ktoolbox.api.rate_limit
           --cov=ktoolbox.api.utils
           --cov-branch
           --cov-fail-under=100

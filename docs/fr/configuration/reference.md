@@ -25,7 +25,7 @@ Sur un écran étroit, faites défiler les tableaux horizontalement pour consult
 | `path` | chaîne | `/api/v1` | Chemin racine de l'API. |
 | `timeout` | nombre réel | `5.0` | Délai de chaque requête en secondes. |
 | `retry_times` | entier | `3` | Tentatives supplémentaires pour les échecs de transport, `429` et `5xx`. |
-| `retry_interval` | nombre réel | `2.0` | Délai entre les tentatives d'API en secondes. |
+| `retry_interval` | nombre réel | `2.0` | Délai entre les tentatives d'API en secondes. Après un `429`, le `Retry-After` du serveur est utilisé, sinon le délai double à chaque tentative (300 secondes au maximum). |
 
 Le groupe API ne contient volontairement aucune clé de session.
 
@@ -44,7 +44,7 @@ Le groupe API ne contient volontairement aucune clé de session.
 | `temp_suffix` | chaîne | `tmp` | Suffixe des téléchargements incomplets. |
 | `retry_times` | entier | `10` | Tentatives supplémentaires de téléchargement. |
 | `retry_stop_never` | booléen | `False` | Réessayer indéfiniment et ignorer `retry_times`. |
-| `retry_interval` | nombre réel | `3.0` | Délai entre les tentatives en secondes. |
+| `retry_interval` | nombre réel | `3.0` | Délai entre les tentatives en secondes. Après un `429`, tous les téléchargements sont suspendus pendant le `Retry-After` du serveur, sinon pendant un délai qui double à chaque fois (300 secondes au maximum). |
 | `tps_limit` | nombre réel | `5.0` | Nombre maximal de nouvelles connexions par seconde. |
 | `use_bucket` | booléen | `False` | Activer le stockage local par liens physiques adressé par contenu. |
 | `bucket_path` | chemin | `.ktoolbox/bucket_storage` | Répertoire du stockage local. |

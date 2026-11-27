@@ -25,7 +25,7 @@
 | `path` | 字符串 | `/api/v1` | API 根路径。 |
 | `timeout` | 浮点数 | `5.0` | 单次请求超时秒数。 |
 | `retry_times` | 整数 | `3` | 传输错误、`429` 和 `5xx` 的额外尝试次数。 |
-| `retry_interval` | 浮点数 | `2.0` | API 尝试间隔秒数。 |
+| `retry_interval` | 浮点数 | `2.0` | API 尝试间隔秒数。遇到 `429` 时按服务器的 `Retry-After` 等待，否则每次尝试加倍（最长 300 秒）。 |
 
 API 配置组有意不包含会话密钥。
 
@@ -44,7 +44,7 @@ API 配置组有意不包含会话密钥。
 | `temp_suffix` | 字符串 | `tmp` | 未完成下载的后缀。 |
 | `retry_times` | 整数 | `10` | 下载的额外尝试次数。 |
 | `retry_stop_never` | 布尔值 | `False` | 永久重试并忽略 `retry_times`。 |
-| `retry_interval` | 浮点数 | `3.0` | 下载尝试间隔秒数。 |
+| `retry_interval` | 浮点数 | `3.0` | 下载尝试间隔秒数。遇到 `429` 时暂停所有下载，时长取服务器的 `Retry-After`，否则每次加倍（最长 300 秒）。 |
 | `tps_limit` | 浮点数 | `5.0` | 每秒新建连接上限。 |
 | `use_bucket` | 布尔值 | `False` | 启用按内容寻址的本地硬链接存储。 |
 | `bucket_path` | 路径 | `.ktoolbox/bucket_storage` | 本地存储桶目录。 |

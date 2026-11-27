@@ -12,7 +12,7 @@ class APIConfiguration(ktoolbox.configuration.APIConfiguration):
     :ivar path: Pawchive API 的根路径
     :ivar timeout: API 请求超时时间
     :ivar retry_times: API 请求失败时重试次数
-    :ivar retry_interval: API 请求重试间隔秒数
+    :ivar retry_interval: API 请求重试间隔秒数。遇到 HTTP 429 时按服务器的 ``Retry-After`` 等待，否则每次尝试加倍（最长 300 秒）
     """
 
     ...
@@ -33,7 +33,7 @@ class DownloaderConfiguration(ktoolbox.configuration.DownloaderConfiguration):
     :ivar temp_suffix: 下载文件的临时文件名后缀
     :ivar retry_times: 下载失败时重试次数
     :ivar retry_stop_never: 永不停止下载器重试（启用时忽略 retry_times）
-    :ivar retry_interval: 下载器重试间隔秒数
+    :ivar retry_interval: 下载器重试间隔秒数。遇到 HTTP 429 时暂停所有下载，时长取服务器的 ``Retry-After``，否则每次加倍（最长 300 秒）
     :ivar tps_limit: 每秒最大连接数
     :ivar use_bucket: 启用本地存储桶模式
     :ivar bucket_path: 本地存储桶路径

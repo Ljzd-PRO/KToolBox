@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from ktoolbox.action.search import search_creator, search_creator_post
 from ktoolbox.api.errors import PawchiveError, PawchiveNotFoundError
 from ktoolbox.api.generated import Post, Revision
-from ktoolbox.api.utils import create_pawchive_client
+from ktoolbox.api.utils import INTERACTIVE_MAX_RETRY_WAIT, create_pawchive_client
 from ktoolbox.configuration import RuntimeContext
 from ktoolbox.publication_time import PublishedTimeError
 from ktoolbox.webui.auth import require_session
@@ -61,7 +61,7 @@ def create_pawchive_router() -> APIRouter:
     ) -> list[CreatorSearchItemResponse]:
         context = runtime(request)
         with context.activate():
-            async with create_pawchive_client() as client:
+            async with create_pawchive_client(max_retry_wait=INTERACTIVE_MAX_RETRY_WAIT) as client:
                 result = await search_creator(id=creator_id, name=name, service=service, client=client)
         if not result:
             raise upstream_error(result.message or "creator search failed")
@@ -79,7 +79,7 @@ def create_pawchive_router() -> APIRouter:
     ) -> list[PawchivePostSummaryResponse]:
         context = runtime(request)
         with context.activate():
-            async with create_pawchive_client() as client:
+            async with create_pawchive_client(max_retry_wait=INTERACTIVE_MAX_RETRY_WAIT) as client:
                 result = await search_creator_post(
                     id=creator_id,
                     name=name,
@@ -143,7 +143,7 @@ def create_pawchive_router() -> APIRouter:
         context = runtime(request)
         try:
             with context.activate():
-                async with create_pawchive_client() as client:
+                async with create_pawchive_client(max_retry_wait=INTERACTIVE_MAX_RETRY_WAIT) as client:
                     revisions = await client.list_post_revisions(service, creator_id, post_id)
                     published_time = context.configuration.published_time.policy()
                     try:
@@ -163,7 +163,7 @@ def create_pawchive_router() -> APIRouter:
         context = runtime(request)
         try:
             with context.activate():
-                async with create_pawchive_client() as client:
+                async with create_pawchive_client(max_retry_wait=INTERACTIVE_MAX_RETRY_WAIT) as client:
                     version = await client.get_app_version()
         except PawchiveError as error:
             raise upstream_error(str(error)) from error
@@ -181,7 +181,7 @@ async def fetch_post(
 ) -> Post | Revision:
     try:
         with context.activate():
-            async with create_pawchive_client() as client:
+            async with create_pawchive_client(max_retry_wait=INTERACTIVE_MAX_RETRY_WAIT) as client:
                 if revision_id is None:
                     return await client.get_post(service, creator_id, post_id)
                 revisions = await client.list_post_revisions(service, creator_id, post_id)

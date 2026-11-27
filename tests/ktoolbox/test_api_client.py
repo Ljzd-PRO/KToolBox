@@ -55,10 +55,11 @@ def response(
     *,
     json: object | None = None,
     text: str | None = None,
+    headers: dict[str, str] | None = None,
 ) -> httpx.Response:
     if text is not None:
-        return httpx.Response(status, text=text, request=request)
-    return httpx.Response(status, json=json, request=request)
+        return httpx.Response(status, text=text, headers=headers, request=request)
+    return httpx.Response(status, json=json, headers=headers, request=request)
 
 
 @pytest.mark.asyncio
@@ -246,6 +247,53 @@ async def test_retries_transport_429_and_server_errors() -> None:
 
 
 @pytest.mark.asyncio
+async def test_rate_limited_requests_honor_retry_after_then_back_off() -> None:
+    statuses = iter([(429, {"Retry-After": "7"}), (429, {}), (429, {}), (200, {})])
+    sleep = AsyncMock()
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        status, headers = next(statuses)
+        return response(request, status, json=[], headers=headers)
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http_client:
+        client = PawchiveClient(
+            base_url=BASE_URL,
+            http_client=http_client,
+            max_retries=3,
+            retry_interval=0.5,
+            sleep=sleep,
+        )
+        assert await client.list_recent_posts() == []
+    # Server-requested delay first, then 0.5 * 2 ** (attempt - 1) for attempts 2 and 3.
+    assert [call.args[0] for call in sleep.await_args_list] == [7.0, 1.0, 2.0]
+
+
+@pytest.mark.asyncio
+async def test_rate_limit_longer_than_max_retry_wait_fails_fast() -> None:
+    calls = 0
+    sleep = AsyncMock()
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        return response(request, 429, headers={"Retry-After": "60"})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http_client:
+        client = PawchiveClient(
+            base_url=BASE_URL,
+            http_client=http_client,
+            max_retries=3,
+            max_retry_wait=10,
+            sleep=sleep,
+        )
+        with pytest.raises(PawchiveHTTPError) as caught:
+            await client.list_recent_posts()
+    assert caught.value.status_code == 429
+    assert calls == 1
+    sleep.assert_not_awaited()
+
+
+@pytest.mark.asyncio
 async def test_exhausted_transport_and_server_status() -> None:
     def disconnected(request: httpx.Request) -> httpx.Response:
         raise httpx.ConnectError("offline", request=request)
@@ -364,6 +412,7 @@ async def test_flag_status_and_client_lifecycle() -> None:
         ({"base_url": "/relative"}, "absolute"),
         ({"max_retries": -1}, "max_retries"),
         ({"retry_interval": -1}, "retry_interval"),
+        ({"max_retry_wait": -1}, "max_retry_wait"),
     ],
 )
 def test_invalid_client_configuration(kwargs: dict[str, object], message: str) -> None:
