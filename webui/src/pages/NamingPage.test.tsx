@@ -1,11 +1,15 @@
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { Profiler } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { App } from "../App";
+import { AuthProvider } from "../lib/auth";
 import i18n from "../lib/i18n";
 import { queryClient } from "../lib/query";
+import { NamingPage } from "./NamingPage";
 
 const session = {
   authenticated: true,
@@ -162,6 +166,115 @@ afterEach(async () => {
   window.history.replaceState({}, "", "/");
   localStorage.clear();
   await i18n.changeLanguage("en");
+});
+
+describe("Naming draft synchronization", () => {
+  function renderNaming() {
+    const onRender = vi.fn();
+    const response = {
+      default_output: "downloads",
+      resolved_default_output: "/project/downloads",
+      naming,
+      published_time: publishedTime,
+      revision: "revision-1",
+      conversion_pending: false,
+    };
+    window.history.replaceState({}, "", "/naming?tab=templates");
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      const path = String(input);
+      if (path.endsWith("/session")) return json(session);
+      if (path.endsWith("/naming")) return json(response);
+      if (path.endsWith("/naming/legacy-context")) {
+        return json({ roots: [], conversion_pending: false });
+      }
+      if (
+        path.endsWith("/naming/layout-versions") ||
+        path.endsWith("/naming/conversions") ||
+        path.endsWith("/startup-notices")
+      ) return json([]);
+      throw new Error(`Unexpected request: ${path}`);
+    }));
+    render(
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <Profiler id="naming" onRender={onRender}>
+              <NamingPage />
+            </Profiler>
+          </AuthProvider>
+        </QueryClientProvider>
+      </BrowserRouter>,
+    );
+    return { onRender, response };
+  }
+
+  async function settle() {
+    // Let asynchronous effects commit across several event-loop turns.
+    for (let turn = 0; turn < 5; turn += 1) {
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+    }
+  }
+
+  it("stops rendering while idle, including after edits return to the saved value", async () => {
+    const { onRender } = renderNaming();
+    const input = await screen.findByRole("textbox", { name: "Creator directory template" });
+    await settle();
+    onRender.mockClear();
+    await settle();
+    expect(onRender).not.toHaveBeenCalled();
+
+    fireEvent.change(input, { target: { value: "{creator_id}" } });
+    expect(screen.getByRole("button", { name: "Save naming templates" })).toBeEnabled();
+    fireEvent.change(input, { target: { value: naming.creator_dirname_format } });
+    await settle();
+    expect(screen.getByRole("button", { name: "Save naming templates" })).toBeDisabled();
+    onRender.mockClear();
+    await settle();
+    expect(onRender).not.toHaveBeenCalled();
+  });
+
+  it("loads new server data into a clean draft", async () => {
+    const { response } = renderNaming();
+    const input = await screen.findByRole("textbox", { name: "Creator directory template" });
+    act(() => {
+      queryClient.setQueryData(["naming"], {
+        ...response,
+        revision: "revision-2",
+        naming: { ...naming, creator_dirname_format: "{creator_id}" },
+      });
+    });
+    await waitFor(() => expect(input).toHaveValue("{creator_id}"));
+    expect(screen.getByRole("button", { name: "Save naming templates" })).toBeDisabled();
+    expect(screen.queryByText("Data changed elsewhere")).not.toBeInTheDocument();
+  });
+
+  it.each(["Reload data", "Keep editing"])("preserves dirty drafts until choosing %s", async (action) => {
+    const user = userEvent.setup();
+    const { response } = renderNaming();
+    const input = await screen.findByRole("textbox", { name: "Creator directory template" });
+    fireEvent.change(input, { target: { value: "{creator_name}" } });
+    act(() => {
+      queryClient.setQueryData(["naming"], {
+        ...response,
+        revision: "revision-2",
+        naming: { ...naming, creator_dirname_format: "{creator_id}" },
+      });
+    });
+    expect(await screen.findByText("Data changed elsewhere")).toBeInTheDocument();
+    expect(input).toHaveValue("{creator_name}");
+    await user.click(screen.getByRole("button", { name: action }));
+
+    if (action === "Keep editing") {
+      expect(input).toHaveValue("{creator_name}");
+      expect(screen.queryByText("Data changed elsewhere")).not.toBeInTheDocument();
+      fireEvent.change(input, { target: { value: naming.creator_dirname_format } });
+    }
+    await waitFor(() => expect(input).toHaveValue("{creator_id}"));
+    expect(screen.getByRole("button", { name: "Save naming templates" })).toBeDisabled();
+    expect(screen.queryByText("Data changed elsewhere")).not.toBeInTheDocument();
+  });
 });
 
 describe("Naming format page", { timeout: 10_000 }, () => {

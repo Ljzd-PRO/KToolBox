@@ -396,21 +396,20 @@ export function NamingPage() {
   ) ?? null;
 
   useEffect(() => {
-    if (!current) return;
-    if (!draft || !dirty) {
-      const timer = window.setTimeout(() => {
-        const normalized = normalizeNaming(current.naming);
-        setDraft(normalized);
-        setBaselineRevision(current.revision);
-        setStructureBaseline(structureKey(normalized));
-        setTemplateBaseline(templateKey(normalized));
-        setDefaultOutput(current.default_output);
-        setDefaultOutputBaseline(current.default_output);
-      }, 0);
-      return () => window.clearTimeout(timer);
-    }
-    return undefined;
-  }, [current, dirty, draft, remoteNamingRevision]);
+    if (!current || dirty) return;
+    // A missing draft is already clean. Depending on the draft object here would
+    // re-arm this effect whenever normalization creates a new clean draft.
+    const timer = window.setTimeout(() => {
+      const normalized = normalizeNaming(current.naming);
+      setDraft(normalized);
+      setBaselineRevision(current.revision);
+      setStructureBaseline(structureKey(normalized));
+      setTemplateBaseline(templateKey(normalized));
+      setDefaultOutput(current.default_output);
+      setDefaultOutputBaseline(current.default_output);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [current, dirty, remoteNamingRevision]);
 
   useEffect(() => {
     if (legacyRoots !== null || !legacyContextQuery.data) return;
