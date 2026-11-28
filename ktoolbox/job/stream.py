@@ -116,7 +116,12 @@ DownloadCallable = Callable[
     [QueuedJob, httpx.AsyncClient, ReporterDownloadObserver],
     Awaitable[DownloaderRet[str]],
 ]
+FailureLogger = Callable[[QueuedJob, FailureItem], None]
 _REJECTED_TEMPORARY_URL_STATUSES = frozenset({401, 403, 404, 410})
+
+
+def _log_download_failure(queued: QueuedJob, failure: FailureItem) -> None:
+    logger.error("{}: {}", failure.file_name or queued.creator_key, failure.message)
 
 
 class DownloadWorkerPool:
@@ -129,12 +134,14 @@ class DownloadWorkerPool:
         download: DownloadCallable | None = None,
         reporter: ProgressReporter | None = None,
         api_client: PawchiveClient | None = None,
+        failure_logger: FailureLogger | None = None,
     ) -> None:
         if concurrency < 1:
             raise ValueError("download concurrency must be positive")
         self.concurrency = concurrency
         self._download = download
         self._api_client = api_client
+        self._failure_logger = failure_logger or _log_download_failure
         self.reporter = reporter or NullProgressReporter()
         self._task_ids = count(1)
 
@@ -215,7 +222,6 @@ class DownloadWorkerPool:
                         )
                     )
                     summary.failures.append(failure)
-                    logger.error(failure.message)
             except asyncio.CancelledError:
                 status = "cancelled"
                 raise
@@ -248,8 +254,9 @@ class DownloadWorkerPool:
                         file_name=filename,
                     )
                 summary.failures.append(failure)
-                logger.error("{}: {}", filename or "Download", failure.message)
             finally:
+                if failure is not None:
+                    self._failure_logger(queued, failure)
                 self.reporter.download_finished(task_key, status, failure)
                 queue.task_done(queued.creator_key)
 

@@ -6,12 +6,15 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from loguru import logger
 
 from ktoolbox.action.job import CreatorJobGeneration
 from ktoolbox.api.errors import PawchiveError
-from ktoolbox.api.generated import CreatorSummary, Post
-from ktoolbox.cli_app import app, run_cli, stderr, stdout
-from ktoolbox.job.stream import DownloadSummary
+from ktoolbox.api.generated import CreatorSummary, Post, Revision
+from ktoolbox.cli_app import _log_sync_file_failure, _print_sync_summary, app, run_cli, stderr, stdout
+from ktoolbox.failures import FailureStage, failure_from_http_status
+from ktoolbox.job import Job
+from ktoolbox.job.stream import DownloadSummary, QueuedJob
 from ktoolbox.project_config import (
     CreatorReference,
     ProjectConfigStore,
@@ -30,6 +33,30 @@ def test_root_help_uses_hyphenated_commands(capsys) -> None:
     assert "download_post" not in output
     assert "--install-completion" in output
     assert "webui" in output
+
+
+def test_sync_summary_breaks_down_file_failures(capsys: pytest.CaptureFixture[str]) -> None:
+    failures = [failure_from_http_status(code, stage=FailureStage.file_request) for code in (404, 429, 503, 403)]
+    _print_sync_summary(SyncSummary(creators=[], downloads=DownloadSummary(failed=4, failures=failures)))
+    report = " ".join(capsys.readouterr().out.split())
+    assert "4 failed (1 missing on server (HTTP 404), 2 retryable, 1 other non-retryable)" in report
+
+
+def test_sync_failure_log_identifies_work_and_redacts_url(tmp_path: Path) -> None:
+    lines: list[str] = []
+    job = Job(
+        path=tmp_path,
+        server_path="https://hidden.example/data/hash/asset.png?signature=secret#private",
+        post=Revision(id="42", user="1", service="fanbox", revision_id=3),
+    )
+    item = failure_from_http_status(404, stage=FailureStage.file_request, file_name="1.png")
+    handler = logger.add(lines.append, format="{message}")
+    try:
+        _log_sync_file_failure(QueuedJob("fanbox:1", job), item)
+    finally:
+        logger.remove(handler)
+    assert "fanbox:1; post=42; revision=3; file=1.png; server_path=/data/hash/asset.png; HTTP 404" in lines[0]
+    assert not any(word in lines[0] for word in ("signature", "secret", "private", "hidden.example"))
 
 
 def test_webui_command_forwards_server_options(tmp_path: Path) -> None:

@@ -6,8 +6,10 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
+from urllib.parse import urlsplit
 
 from cyclopts import App, Group, Parameter
+from loguru import logger
 from pydantic import BaseModel
 from rich.console import Console
 from rich.table import Table
@@ -21,6 +23,8 @@ from ktoolbox.api.utils import create_pawchive_client
 from ktoolbox.blocker import BlockerEngine
 from ktoolbox.cli import KToolBoxCli
 from ktoolbox.configuration import config as runtime_config
+from ktoolbox.failures import FailureItem
+from ktoolbox.job.stream import DownloadWorkerPool, QueuedJob
 from ktoolbox.project_config import (
     CreatorReference,
     ProjectConfigError,
@@ -119,11 +123,48 @@ def _print_sync_summary(summary: SyncSummary) -> None:
                 style="green" if result.successful else "red",
             ),
         )
+    failures = summary.downloads.failures
+    missing = sum(item.http_status == 404 and item.operation != "download_temporary_file" for item in failures)
+    retryable = sum(item.retryable for item in failures)
+    other = summary.downloads.failed - missing - retryable
     table.caption = (
         f"Files: {summary.downloads.completed} downloaded, {summary.downloads.existed} existing, "
         f"{summary.downloads.failed} failed"
     )
+    breakdown = [
+        f"{total} {label}"
+        for total, label in (
+            (missing, "missing on server (HTTP 404)"),
+            (retryable, "retryable"),
+            (other, "other non-retryable"),
+        )
+        if total > 0
+    ]
+    if breakdown:
+        table.caption += f" ({', '.join(breakdown)})"
     stdout.print(table)
+
+
+def _log_sync_file_failure(queued: QueuedJob, failure: FailureItem) -> None:
+    job = queued.job
+    parts = [queued.creator_key]
+    if job.post is not None:
+        parts.append(f"post={job.post.id}")
+        if isinstance(revision := getattr(job.post, "revision_id", None), (int, str)):
+            parts.append(f"revision={revision}")
+    if failure.file_name:
+        parts.append(f"file={failure.file_name}")
+    if job.temporary is None:
+        try:
+            path = urlsplit(job.server_path).path
+        except ValueError:
+            path = ""
+        if path:
+            parts.append(f"server_path={path}")
+    if failure.http_status is not None:
+        parts.append(f"HTTP {failure.http_status}")
+    subject = "; ".join("".join(c if c.isprintable() else "?" for c in part[:500]) for part in parts)
+    logger.error("Download failed ({}): {}", subject, failure.message)
 
 
 @app.command
@@ -212,12 +253,16 @@ async def sync(
 
     try:
         async with create_pawchive_client() as client:
+            pool = DownloadWorkerPool(
+                runtime_config.job.count, api_client=client, failure_logger=_log_sync_file_failure
+            )
             summary = await SyncCoordinator(
                 client,
                 naming=project.naming,
                 published_time=runtime_config.published_time.policy(),
                 blocker_engine=engine,
                 creator_concurrency=runtime_config.job.creator_concurrency,
+                download_pool=pool,
                 reporter=_progress_reporter(),
             ).run(selected_creators, options)
     except PawchiveError as error:

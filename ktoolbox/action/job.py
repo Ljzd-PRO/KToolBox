@@ -259,6 +259,7 @@ async def create_job_from_post(
                                 alt_filename=alt_filename,
                                 server_path=image_path,
                                 type=PostFileTypeEnum.Attachment,
+                                post=job_post,
                             )
                         )
 
