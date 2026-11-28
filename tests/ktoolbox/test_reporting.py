@@ -64,6 +64,19 @@ def test_null_and_empty_plain_reporters_are_silent() -> None:
     assert output.getvalue() == ""
 
 
+def test_reporters_finish_skipped_missing_jobs_without_counting_downloads() -> None:
+    plain_output = StringIO()
+    plain = PlainProgressReporter(Console(file=plain_output))
+    rich = RichProgressReporter(Console(file=StringIO(), force_terminal=True))
+    for reporter in (plain, rich):
+        reporter.job_queued("fanbox:1")
+        reporter.download_finished("fixture", "skipped_missing")
+    plain.stop()
+    assert "0 downloaded, 0 existing, 0 failed, 1 known missing skipped" in plain_output.getvalue()
+    assert rich.overall.tasks[0].completed == rich.overall.tasks[0].total == 1
+    assert "1 known missing skipped" in rich.overall.tasks[0].fields["status"]
+
+
 def test_rich_reporter_tracks_dynamic_tasks_and_log_output() -> None:
     output = StringIO()
     console = Console(file=output, force_terminal=True, color_system=None, width=72)

@@ -2,6 +2,7 @@
 
 ## Fixed
 
+- Break down CLI sync failures into HTTP 404, retryable, and other failures, and identify the affected work and file in the log. Use `sync --skip-missing` to skip direct file-server 404s already recorded by the project in the past seven days; ordinary sync still checks every candidate file ([#401](https://github.com/Ljzd-PRO/KToolBox/issues/401)).
 - Download available temporary Pawchive files automatically in CLI, WebUI, and scheduled tasks. Keep permanent attachment numbering and resume behavior unchanged; report expired files or output conflicts without overwriting existing files ([#393](https://github.com/Ljzd-PRO/KToolBox/issues/393)).
 - Keep WebUI route updates synchronous so sidebar navigation and task creation render the destination without requiring a browser refresh ([#397](https://github.com/Ljzd-PRO/KToolBox/issues/397)).
 - Keep comments at the top of `ktoolbox.toml` in place when the project configuration is saved with tomlkit 0.15.2, which wrote `blockers = []` and `automatic_sync = []` above them. Empty creator, blocker and automatic sync lists are left out of the file, as they were with earlier tomlkit releases.

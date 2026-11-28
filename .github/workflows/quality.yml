@@ -50,6 +50,7 @@ jobs:
           ktoolbox/cli_app.py
           ktoolbox/configuration.py
           ktoolbox/downloader/downloader.py
+          ktoolbox/downloader/missing_files.py
           ktoolbox/downloader/temporary.py
           ktoolbox/exceptions.py
           ktoolbox/job/model.py
@@ -80,6 +81,7 @@ jobs:
           ktoolbox/cli_app.py
           ktoolbox/configuration.py
           ktoolbox/downloader/downloader.py
+          ktoolbox/downloader/missing_files.py
           ktoolbox/downloader/temporary.py
           ktoolbox/exceptions.py
           ktoolbox/job/model.py
@@ -148,6 +150,7 @@ jobs:
           poetry run pytest
           tests/ktoolbox/test_blocker.py
           tests/ktoolbox/test_job_stream.py
+          tests/ktoolbox/test_missing_files.py
           tests/ktoolbox/test_reporting.py
           tests/ktoolbox/test_sync.py
           tests/ktoolbox/test_temporary_downloads.py

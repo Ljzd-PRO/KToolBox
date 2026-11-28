@@ -18,6 +18,7 @@ from ktoolbox.api.utils import get_file_url
 from ktoolbox.configuration import config
 from ktoolbox.downloader import Downloader
 from ktoolbox.downloader.base import DownloaderRet
+from ktoolbox.downloader.missing_files import MissingFileHistory
 from ktoolbox.downloader.temporary import TemporaryDownloader, TemporaryOutputConflict
 from ktoolbox.failures import (
     FailureCode,
@@ -106,6 +107,7 @@ class DownloadSummary:
     failed: int = 0
     failures: list[FailureItem] = field(default_factory=list)
     creator_failures: dict[str, int] = field(default_factory=dict)
+    skipped_missing: int = 0
 
     @property
     def successful(self) -> bool:
@@ -135,6 +137,7 @@ class DownloadWorkerPool:
         reporter: ProgressReporter | None = None,
         api_client: PawchiveClient | None = None,
         failure_logger: FailureLogger | None = None,
+        missing_files: MissingFileHistory | None = None,
     ) -> None:
         if concurrency < 1:
             raise ValueError("download concurrency must be positive")
@@ -142,6 +145,7 @@ class DownloadWorkerPool:
         self._download = download
         self._api_client = api_client
         self._failure_logger = failure_logger or _log_download_failure
+        self._missing_files = missing_files
         self.reporter = reporter or NullProgressReporter()
         self._task_ids = count(1)
 
@@ -157,7 +161,10 @@ class DownloadWorkerPool:
             httpx.AsyncClient(verify=config.ssl_verify, limits=limits) as temporary_client,
         ):
             download = self._download or partial(
-                _download_job, temporary_client=temporary_client, api_client=self._api_client
+                _download_job,
+                temporary_client=temporary_client,
+                api_client=self._api_client,
+                missing_files=self._missing_files,
             )
             workers = [
                 asyncio.create_task(self._worker(queue, client, summary, download)) for _ in range(self.concurrency)
@@ -196,6 +203,9 @@ class DownloadWorkerPool:
                 if result.code == RetCodeEnum.FileExisted:
                     summary.existed += 1
                     status = "existed"
+                elif result.code == RetCodeEnum.FileMissingSkipped:
+                    summary.skipped_missing += 1
+                    status = "skipped_missing"
                 elif result.code == RetCodeEnum.Success:
                     summary.completed += 1
                     status = "completed"
@@ -268,6 +278,7 @@ async def _download_job(
     *,
     temporary_client: httpx.AsyncClient,
     api_client: PawchiveClient | None,
+    missing_files: MissingFileHistory | None,
 ) -> DownloaderRet[str]:
     job = queued.job
     if temporary := job.temporary:
@@ -299,6 +310,7 @@ async def _download_job(
         designated_filename=job.alt_filename,
         server_path=job.server_path,
         post=job.post,
+        missing_files=missing_files,
     )
     return await downloader.run(progress=observer)
 

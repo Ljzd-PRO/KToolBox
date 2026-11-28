@@ -23,6 +23,7 @@ from ktoolbox.api.utils import create_pawchive_client
 from ktoolbox.blocker import BlockerEngine
 from ktoolbox.cli import KToolBoxCli
 from ktoolbox.configuration import config as runtime_config
+from ktoolbox.downloader.missing_files import MissingFileHistory
 from ktoolbox.failures import FailureItem
 from ktoolbox.job.stream import DownloadWorkerPool, QueuedJob
 from ktoolbox.project_config import (
@@ -142,6 +143,8 @@ def _print_sync_summary(summary: SyncSummary) -> None:
     ]
     if breakdown:
         table.caption += f" ({', '.join(breakdown)})"
+    if summary.downloads.skipped_missing:
+        table.caption += f", {summary.downloads.skipped_missing} known missing skipped"
     stdout.print(table)
 
 
@@ -222,6 +225,9 @@ async def sync(
     length: int | None = None,
     keywords: tuple[str, ...] | None = None,
     keywords_exclude: tuple[str, ...] | None = None,
+    skip_missing: Annotated[
+        bool, Parameter(help="Skip files confirmed missing on the file server in the past seven days.")
+    ] = False,
 ) -> int:
     """Synchronize one or more creators, or every enabled roster creator."""
     targets = list(creators)
@@ -254,7 +260,12 @@ async def sync(
     try:
         async with create_pawchive_client() as client:
             pool = DownloadWorkerPool(
-                runtime_config.job.count, api_client=client, failure_logger=_log_sync_file_failure
+                runtime_config.job.count,
+                api_client=client,
+                failure_logger=_log_sync_file_failure,
+                missing_files=MissingFileHistory(
+                    project_root / ".ktoolbox" / "missing-files.sqlite3", skip=skip_missing
+                ),
             )
             summary = await SyncCoordinator(
                 client,

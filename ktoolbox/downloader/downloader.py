@@ -20,6 +20,7 @@ from ktoolbox.api.generated import Post
 from ktoolbox.api.rate_limit import parse_retry_after, rate_limit_delay
 from ktoolbox.configuration import config
 from ktoolbox.downloader.base import DownloaderRet
+from ktoolbox.downloader.missing_files import MissingFileHistory
 from ktoolbox.downloader.utils import duplicate_file_check, filename_from_headers, utime_from_headers
 from ktoolbox.reporting import DownloadProgressObserver
 from ktoolbox.utils import generate_msg
@@ -28,7 +29,7 @@ __all__ = ["Downloader"]
 
 
 def _retryable_result(result: DownloaderRet[str]) -> bool:
-    if result or result.code == RetCodeEnum.FileExisted:
+    if result or result.code in {RetCodeEnum.FileExisted, RetCodeEnum.FileMissingSkipped}:
         return False
     if result.status_code is None:
         return True
@@ -104,6 +105,7 @@ class Downloader:
         designated_filename: str | None = None,
         server_path: str,
         post: Post | None = None,
+        missing_files: MissingFileHistory | None = None,
     ) -> None:
         # noinspection GrazieInspection
         """
@@ -134,6 +136,7 @@ class Downloader:
         self._server_path = server_path  # /hash[:1]/hash2[1:3]/hash
         self._save_filename = designated_filename  # Prioritize the manually specified filename
         self._post = post
+        self._missing_files = missing_files
 
         self._finished_lock = asyncio.Lock()
         self._stop: bool = False
@@ -297,6 +300,11 @@ class Downloader:
             )
 
         async with self._finished_lock:
+            history = self._missing_files if config.downloader.reverse_proxy == "{}" else None
+            missing_key = history.key(self._url, config.downloader.session_key) if history is not None else None
+            if history is not None and missing_key is not None and await history.should_skip(missing_key):
+                return DownloaderRet(code=RetCodeEnum.FileMissingSkipped)
+
             temp_filepath = Path(f"{save_filepath}.{config.downloader.temp_suffix}")
             try:
                 temp_size = (await aiofiles.os.stat(temp_filepath)).st_size
@@ -318,6 +326,11 @@ class Downloader:
                 headers={"Range": f"bytes={temp_size}-"},
             ) as res:  # type: httpx.Response
                 self._track_rate_limit(res, request_generation=request_generation)
+                if history is not None and missing_key is not None:
+                    if res.status_code == httpx.codes.NOT_FOUND and not res.history:
+                        await history.record(missing_key)
+                    elif res.status_code == httpx.codes.PARTIAL_CONTENT:
+                        await history.clear(missing_key)
                 if res.status_code != httpx.codes.PARTIAL_CONTENT:
                     self._url = self._initial_url
                     return DownloaderRet(

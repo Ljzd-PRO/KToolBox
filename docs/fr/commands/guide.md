@@ -63,6 +63,8 @@ Chaque créateur est stocké sous la forme `Creator name [service-creator_id]`. 
 
 L'échec d'un créateur n'efface pas le travail terminé pour les autres. Les créateurs en échec conservent leur index précédent et la commande finale se termine avec l'état `1` après avoir affiché un résumé.
 
+En cas d’échec de la synchronisation, le bilan distingue les réponses 404 du serveur de fichiers ordinaire, les échecs pouvant être retentés et les autres échecs. Le journal indique l’identifiant de la publication et le chemin du fichier. Utilisez `ktoolbox sync fanbox:123 --skip-missing` pour ignorer les fichiers signalés manquants au cours des sept derniers jours. Un fichier ignoré ne compte pas comme un échec, mais une nouvelle réponse 404 donne le code de sortie `1`. Omettez `--skip-missing` pour vérifier à nouveau les fichiers immédiatement. Les liens temporaires et les réponses 404 issues d’un proxy ou d’une redirection ne sont pas mémorisés.
+
 ## Gérer une liste de créateurs
 
 ```bash

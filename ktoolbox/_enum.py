@@ -24,6 +24,7 @@ class RetCodeEnum(IntEnum):
 
     # DownloaderRet
     FileExisted = 3001
+    FileMissingSkipped = 3002
 
 
 class PostFileTypeEnum(Enum):

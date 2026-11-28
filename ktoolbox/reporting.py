@@ -150,6 +150,7 @@ class PlainProgressReporter(NullProgressReporter):
         self.completed = 0
         self.failed = 0
         self.existed = 0
+        self.skipped_missing = 0
 
     def creator_finished(
         self,
@@ -190,13 +191,16 @@ class PlainProgressReporter(NullProgressReporter):
                 self.console.print(f"Download failed{subject}: {failure.message}")
         elif status == "existed":
             self.existed += 1
+        elif status == "skipped_missing":
+            self.skipped_missing += 1
         else:
             self.completed += 1
 
     def stop(self) -> None:
         if self.queued:
+            skipped = f", {self.skipped_missing} known missing skipped" if self.skipped_missing else ""
             self.console.print(
-                f"Files processed: {self.completed} downloaded, {self.existed} existing, {self.failed} failed."
+                f"Files processed: {self.completed} downloaded, {self.existed} existing, {self.failed} failed{skipped}."
             )
 
 
@@ -244,6 +248,7 @@ class RichProgressReporter(NullProgressReporter):
         self._download_tasks: dict[str, TaskID] = {}
         self._failed = 0
         self._existed = 0
+        self._skipped_missing = 0
         self._live = Live(
             Group(self.overall, self.creators, self.downloads),
             console=console,
@@ -343,13 +348,16 @@ class RichProgressReporter(NullProgressReporter):
                 self.console.print(f"[red]Download failed{subject}:[/red] {failure.message}")
         elif status == "existed":
             self._existed += 1
+        elif status == "skipped_missing":
+            self._skipped_missing += 1
         self.overall.advance(self._overall_task)
         self._refresh_status()
 
     def _refresh_status(self) -> None:
+        skipped = f", {self._skipped_missing} known missing skipped" if self._skipped_missing else ""
         self.overall.update(
             self._overall_task,
-            status=f"{self._existed} existing, {self._failed} failed",
+            status=f"{self._existed} existing, {self._failed} failed{skipped}",
         )
 
     def _refresh_transfer_speed(self) -> None:

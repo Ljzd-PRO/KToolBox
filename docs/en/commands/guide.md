@@ -63,6 +63,8 @@ Each creator is stored as `Creator name [service-creator_id]`. Creator producers
 
 One creator failure does not discard completed work from other creators. Failed creators keep their previous index, and the final command exits with status `1` after printing a summary.
 
+If a sync fails, the summary separates ordinary file-server 404s, retryable failures, and other failures. Read the log for the post ID and file path. To avoid requesting files that the server already reported missing in the past seven days, run `ktoolbox sync fanbox:123 --skip-missing`. A skipped file is not a failure, but a new 404 still gives exit status `1`. Leave out `--skip-missing` to recheck the files immediately. Temporary download links and 404s from proxies or redirects are not remembered.
+
 ## Maintain a roster
 
 ```bash
